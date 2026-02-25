@@ -1,11 +1,5 @@
 import * as React from 'react';
-import styled from 'styled-components';
-
-const Title = styled.div`
-  font-size: 40px;
-  font-weight: bold;
-  text-align: center;
-`;
+import './index.css';
 
 interface Props {
   title: string;
@@ -14,7 +8,7 @@ interface Props {
 export const TripSubmitSuccess: React.FC<Props> = ({ title, content }) => {
   return (
     <>
-      <Title>{title}</Title>
+      <div>{title}</div>
       {content?.map((item, index) => (
         <div key={index}>
           <span>{item?.name}</span>

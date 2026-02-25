@@ -6,7 +6,7 @@ import {
   SharedModuleFeatures,
 } from '@pawhaven/backend-core';
 import { EmailModule } from '@modules/Email/email.module';
-import { PDFModule } from '@modules/PDF/PDF.module';
+import { PDFModule } from '@modules/Pdf/pdf.module';
 
 @Module({
   imports: [

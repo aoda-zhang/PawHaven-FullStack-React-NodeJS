@@ -35,7 +35,8 @@
 ## Community & Impact
 
 - Shared rescue story
-- Internal notes（private）
+- Internal notes（private
+- Stray Animal Adoption
 
 ## User profile
 

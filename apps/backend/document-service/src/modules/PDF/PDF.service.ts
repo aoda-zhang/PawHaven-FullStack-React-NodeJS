@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
-import puppeteer, { PDFOptions } from 'puppeteer';
-import { ServerStyleSheet } from 'styled-components';
+import puppeteer, { Browser, PDFOptions } from 'puppeteer';
 
 import i18n from '../../i18n/i18n.config';
 
@@ -26,28 +28,77 @@ interface HeaderFooterResult {
 }
 
 @Injectable()
-export class PDFService {
+export class PdfService implements OnModuleInit, OnModuleDestroy {
+  private browser: Browser | null = null;
+
   constructor() {}
+
+  async onModuleInit() {
+    try {
+      // Force Puppeteer to install or locate Chromium
+      // await puppeteer.createBrowserFetcher().download(puppeteer.executableRevision());
+      this.browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      });
+      // this.browser = await puppeteer.launch();
+    } catch (error) {
+      console.error('Puppeteer bootstrap failed:', error);
+      throw new Error('Puppeteer failed to bootstrap Chromium');
+    }
+  }
+
+  async onModuleDestroy() {
+    if (this.browser) {
+      await this.browser.close();
+      this.browser = null;
+    }
+  }
 
   async getHTMLContent({
     template,
     PDFData = {},
   }: GetHTMLContentParams): Promise<string> {
     try {
-      const styleSheet = new ServerStyleSheet();
       const { default: TemplateComponent } = await import(
-        `./templates/${template}`
+        `./templates/${template}/index.tsx`
       );
+
       const htmlContent = ReactDOMServer.renderToStaticMarkup(
-        styleSheet.collectStyles(
-          React.createElement(TemplateComponent, PDFData),
-        ),
+        React.createElement(TemplateComponent, PDFData),
       );
-      const styleTags = styleSheet.getStyleTags();
-      return `<html lang="en"><head><meta charset="UTF-8" />${styleTags}</head><body>${htmlContent}</body></html>`;
+
+      const cssFilePath = path.resolve(
+        __dirname,
+        `./templates/${template}/index.css`,
+      );
+
+      let cssContent = '';
+
+      if (fs.existsSync(cssFilePath)) {
+        cssContent = fs.readFileSync(cssFilePath, 'utf8');
+      }
+
+      return `
+        <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <style>
+              ${cssContent}
+            </style>
+          </head>
+          <body>
+            ${htmlContent}
+          </body>
+        </html>
+      `;
     } catch (error) {
       console.error(error);
-      throw new Error(`get the ${template} with error: ${error}`);
+      throw new Error(
+        `get the ${template} with error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 
@@ -73,31 +124,33 @@ export class PDFService {
   async getPDFSettings(payload: GeneratePDFPayload): Promise<PDFOptions> {
     try {
       const headerFooter = await this.getHeaderFooter(payload);
-      const {
-        format = 'A4',
-        margin = {
+      const defaultOptions: PDFOptions = {
+        format: 'A4',
+        margin: {
           top: '120px',
           bottom: '120px',
           left: '40px',
           right: '40px',
         },
-        displayHeaderFooter = true,
-        headerTemplate = headerFooter?.headerTemplate,
-        footerTemplate = headerFooter?.footerTemplate,
-        preferCSSPageSize = true, // Optionally use CSS page size
-      } = payload?.PDFOptions ?? {};
+        displayHeaderFooter: true,
+        preferCSSPageSize: true,
+        headerTemplate: headerFooter?.headerTemplate,
+        footerTemplate: headerFooter?.footerTemplate,
+      };
+
       return {
-        format,
-        margin,
-        displayHeaderFooter,
-        headerTemplate,
-        footerTemplate,
-        preferCSSPageSize,
+        ...defaultOptions,
         ...(payload?.PDFOptions ?? {}),
+        headerTemplate: headerFooter?.headerTemplate,
+        footerTemplate: headerFooter?.footerTemplate,
       };
     } catch (error) {
       console.error(error);
-      throw new Error(`get PDF settings with error: ${error}`);
+      throw new Error(
+        `get PDF settings with error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 
@@ -109,8 +162,10 @@ export class PDFService {
       const locale = payload?.locale ?? 'en';
       i18n.setLocale(locale);
 
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
+      if (!this.browser) {
+        throw new Error('Puppeteer browser is not initialized');
+      }
+      const page = await this.browser.newPage();
 
       const PDFMainContent = await this.getHTMLContent({
         template: payload?.template,
@@ -121,14 +176,19 @@ export class PDFService {
       });
       const PDFSettings = await this.getPDFSettings(payload);
       const PDFBuffer = await page.pdf(PDFSettings);
-      await browser.close();
+      await page.close();
+
       return {
-        data: Buffer.from(PDFBuffer?.buffer),
+        data: Buffer.from(PDFBuffer),
         fileName: this.generatePDFFileName(payload),
       };
     } catch (error) {
       console.error(error);
-      throw new Error(`${payload?.template} generate PDF with error: ${error}`);
+      throw new Error(
+        `${payload?.template} generate PDF with error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 

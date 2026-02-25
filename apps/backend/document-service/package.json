@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@pawhaven/backend-core": "workspace:*",
+    "@pawhaven/shared": "workspace:*",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.1.6",
@@ -35,7 +36,7 @@
     "i18n": "^0.15.2",
     "js-yaml": "^4.1.0",
     "nodemailer": "^7.0.11",
-    "puppeteer": "^24.24.0",
+    "puppeteer": "^24.34.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "reflect-metadata": "^0.2.2",
