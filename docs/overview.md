@@ -9,7 +9,9 @@ The goal is to help people contribute to rescuing and caring for stray animals t
 
 ### Architectural Overview
 
-![System Architecture](./images/sys_architecture.webp)
+<p align="center">
+  <img src="./images/sys_architecture.webp" width="650" alt="System Architecture"/>
+</p>
 
 PawHaven follows a layered, service-oriented architecture:
 
