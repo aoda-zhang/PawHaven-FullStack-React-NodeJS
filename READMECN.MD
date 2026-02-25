@@ -1,68 +1,53 @@
 [English](README.MD) | [中文](READMECN.MD)
 
-# 🐾 PawHaven
+# 🐾 PawHaven - 流浪动物救助平台
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
-![React](https://img.shields.io/badge/React-20232a?logo=react&logoColor=61dafb)
-![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
-![pnpm](https://img.shields.io/badge/Package-pnpm-F69220?logo=pnpm&logoColor=white)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-
-一个开源的动物救助平台，旨在通过数字化工具**连接志愿者、救助机构和领养者**，帮助他们高效地**上报、追踪并分享**动物救助案例。
-
-[![image.png](https://i.postimg.cc/qqWcLRHN/image.png)](https://postimg.cc/y3XS67dK)
-
-🌍 **在线地址：** [PawHaven](https://pawhaven.work)
+PawHaven 致力于为流浪动物提供一个安全的救助和领养平台，连接救助志愿者、领养者与社区。用户可以发布救助案例、分享故事，参与社区互动，实现救助信息的高效流转和资源共享。
 
 ---
 
-## ✨ 项目亮点
+## 🧠 核心模块与技术实践
 
-- 基于**专业调研与业内从业者访谈**，围绕**真实的动物救助需求与业务流程**设计与构建
+- **身份认证与权限管理**  
+  实现基于角色的访问控制，保障用户数据安全与操作合规。采用 JWT 与权限策略，结合前后端统一验证机制，提升系统安全性。
 
-- 采用 **Monorepo 架构** 实现统一项目管理，集中管理前端、后端与共享代码，为**长期规划、多方协作与持续演进**提供基础
+- **救助案例管理模块**  
+  支持救助案例的创建、审核、状态流转和操作指引，自动化业务流程。
 
-- 从项目设计之初即面向**多用户角色协作**，支持志愿者、救助机构与社区领养者共同参与，构建协同救助生态
+- **知识库与内容管理**  
+  提供动态内容更新和多端同步，支持救助指南、领养流程等知识共享。通过 CMS 集成与 API 设计，实现内容的统一管理与实时更新。
 
-- 前端在架构设计初期即采用**核心功能模块化**方案，使上报、追踪、故事分享等功能可独立维护与扩展
-
-- 后端采用**微服务导向的模块化设计**，保障系统的可维护性与可扩展性
+- **社区互动与故事分享**  
+  构建用户之间的信息交流和情感连接，支持评论、点赞和分享功能。结合前端组件化和后端事件推送，打造流畅的交互体验。
 
 ---
 
-## 🧠 核心业务领域与功能
+## ✨ 技术亮点
 
-- **身份与信任体系** —— 用户认证、基于角色的权限控制，以及志愿者可信度机制
-- **救助案例管理** —— 上报救助信息、跟踪进度、状态流转与操作指引
-- **知识库与救助指南** —— 为志愿者与救助机构提供实用的救助指导
-- **社区与故事分享** —— 分享救助成果，提升公众意识，连接潜在领养者
+- 采用 Monorepo 架构与模块化设计，实现前端、后端及共享组件的统一管理与高效协作。
+- 实现前后端共享类型定义和复用组件，减少重复开发，提升代码一致性。
+- 前端采用模块化结构，结合 React Hook Form 和 React Query，优化表单管理与数据缓存。
+- 后端基于微服务架构，支持独立部署与数据隔离，提升系统扩展性与稳定性。
+- 完善的 CI/CD 流程，实现自动化构建、测试与部署，保障持续交付质量。
+- 注重工程化实践，支持可扩展架构设计和代码规范，提升团队协作效率。
 
 ---
 
 ## 🧰 技术栈与工具链
 
-- **前端：** React + Redux Toolkit + React Query + React Hook Form
-- **后端：** NestJS + Prisma + MongoDB
-- **共享包：** 可复用的 UI 组件、类型定义与通用工具方法等
-- **基础设施：** 基于 pnpm + Turbo的 Monorepo 架构，GitHub Actions 实现 CI/CD
+- **前端：** React + Redux Toolkit（状态管理）+ React Query（数据缓存）+ React Hook Form（表单管理）
+- **后端：** NestJS（微服务架构）+ Prisma（数据库 ORM）+ MongoDB（文档数据库）
+- **共享包：** UI 组件库、类型定义与通用工具，支持跨端复用与统一规范
+- **基础设施：** pnpm + TurboRepo Monorepo 架构，GitHub Actions 实现自动化 CI/CD
 
 ---
 
 ## 📚 目录导航
 
-- [💻 应用概览](./docs/app_overview.md)
-- ⚙️ Monorepo 架构与项目规范
-- 🗄️ 仓库结构说明
-- 🧱 共享包与 UI 组件库
-- 📡 API 与后端架构
-- 🗃️ 前端架构与状态管理
-- ⚠️ 错误处理与监控
-
----
-
-## 🚀 快速开始
-
-如需在本地运行 PawHaven，请参考 **开发指南** 获取详细说明：
-
-👉 [Development Guide](./docs/development.md)
+- [💻 应用概览](./docs/overview.md)
+- ⚙️ Monorepo 项目结构与规范
+- 🗄️ 代码仓库与模块划分
+- 🧱 共享组件库与复用策略
+- 📡 后端服务设计与 API 管理
+- 🗃️ 前端架构与状态管理实践
+- ⚠️ 错误处理、监控与日志
