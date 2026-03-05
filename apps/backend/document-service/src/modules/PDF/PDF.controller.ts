@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 
-import { PdfService } from './pdf.service';
+import { PdfService } from './PDF.service';
 
 @Controller('pdfs')
 export class PdfController {

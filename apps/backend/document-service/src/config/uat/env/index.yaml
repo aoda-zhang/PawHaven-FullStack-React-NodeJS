@@ -38,3 +38,7 @@ cors:
     - DELETE
     - PATCH
     - OPTIONS
+
+auth:
+  jwtSecret: ${JWT_SECRET}
+  jwtExpiresIn: 3600
