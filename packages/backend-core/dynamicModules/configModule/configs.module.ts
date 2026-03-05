@@ -15,13 +15,13 @@ export class ConfigsModule {
    * dynamic configuration
    * @param serviceRoot absolute path to service root directory
    */
-  static forRoot(serviceRoot: string): DynamicModule {
+  static forRoot(serviceRoot: string, serviceName: string): DynamicModule {
     const runtimeEnv = process.env.NODE_ENV as RuntimeEnvType;
     const currentEnv = getRuntimeEnv(runtimeEnv);
 
     const yamlContent = this.loadYamlContent<Record<string, unknown>>(
       currentEnv,
-      serviceRoot,
+      serviceName,
     );
     const appConfig = resolveAppConfig(yamlContent, process.env) ?? {};
     const configFactory: ConfigFactory = () => ({
@@ -50,13 +50,12 @@ export class ConfigsModule {
 
   private static loadYamlContent<T = unknown>(
     runtimeEnv: string,
-    serviceRoot: string,
+    serviceName: string,
   ): T {
+    const PROJECT_ROOT = join(__dirname, '../../../../../');
     const conventionalConfigPath = join(
-      serviceRoot,
-      'src/config',
-      runtimeEnv,
-      'env/index.yaml',
+      PROJECT_ROOT,
+      `apps/backend/${serviceName}/src/config/${runtimeEnv}/env/index.yaml`,
     );
     try {
       return yaml.load(readFileSync(conventionalConfigPath, 'utf8')) as T;

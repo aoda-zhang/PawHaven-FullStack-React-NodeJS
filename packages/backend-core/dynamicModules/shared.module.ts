@@ -15,6 +15,7 @@ import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type';
 
 interface SharedModuleForRootOptions {
   serviceRoot: string;
+  serviceName: string;
   modules?: SharedModuleItem[];
   providers?: Provider[];
 }
@@ -23,9 +24,9 @@ interface SharedModuleForRootOptions {
 @Module({})
 export class SharedModule {
   static forRoot(options: SharedModuleForRootOptions): DynamicModule {
-    const { serviceRoot, modules = [], providers = [] } = options;
+    const { serviceRoot, serviceName, modules = [], providers = [] } = options;
 
-    const defaultModules = this.getDefaultModules(serviceRoot);
+    const defaultModules = this.getDefaultModules(serviceRoot, serviceName);
 
     const loadedExtraModules = this.loadExtraModules(modules);
 
@@ -43,8 +44,9 @@ export class SharedModule {
 
   private static getDefaultModules(
     serviceRoot: string,
+    serviceName: string,
   ): Array<Type<any> | DynamicModule> {
-    return [ConfigsModule.forRoot(serviceRoot), HttpClientModule];
+    return [ConfigsModule.forRoot(serviceRoot, serviceName), HttpClientModule];
   }
 
   private static loadExtraModules(
