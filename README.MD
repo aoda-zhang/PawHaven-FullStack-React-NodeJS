@@ -8,6 +8,7 @@
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
 ![pnpm](https://img.shields.io/badge/Package-pnpm-F69220?logo=pnpm&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?logo=discord&logoColor=white)](https://discord.gg/你的Discord邀请链接)
 
 PawHaven is a full-stack platform designed to provide a safe rescue and adoption environment for stray animals, connecting volunteers, adopters, and the community. Users can report rescue cases, share stories, participate in community interactions, and enable efficient flow and sharing of rescue information.
 
@@ -37,6 +38,13 @@ PawHaven is a full-stack platform designed to provide a safe rescue and adoption
 - Backend microservices architecture supporting independent deployment and data isolation, improving scalability and system stability.
 - Complete CI/CD pipeline with automated build, testing, and deployment for reliable continuous delivery.
 - Emphasis on engineering practices, supporting scalable architecture design and code standards, enhancing team collaboration efficiency.
+
+---
+
+## 🤝 Community & Support
+
+Join our Discord community to connect with developers, volunteers, and animal rescue enthusiasts:
+- **Discord Server**: [https://discord.gg/znnG258E](https://discord.gg/znnG258E)
 
 ---
 
