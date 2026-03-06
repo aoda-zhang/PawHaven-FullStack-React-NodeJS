@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { MenuItem, Menu, Router, RouterItem } from '@pawhaven/shared/types';
-import { PrismaClient as MongoPrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
 
 import { CreatedRouteDTO } from './DTO/router.DTO';
@@ -10,7 +10,7 @@ import { CreatedRouteDTO } from './DTO/router.DTO';
 export class BootstrapService {
   constructor(
     @InjectPrisma(databaseEngines.mongodb)
-    private readonly prisma: MongoPrismaClient,
+    private readonly prisma: PrismaClient,
   ) {}
 
   async addMenuItem(menu: MenuItem): Promise<MenuItem> {

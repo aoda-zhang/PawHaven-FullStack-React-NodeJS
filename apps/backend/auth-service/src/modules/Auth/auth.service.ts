@@ -12,16 +12,20 @@ import {
   httpBusinessMappingCodes,
 } from '@pawhaven/backend-core/constants';
 import { InjectPrisma } from '@pawhaven/backend-core';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
+  private tokenExpire: number;
+
   constructor(
     private jwtService: JwtService,
+    private config: ConfigService,
     @InjectPrisma(databaseEngines.mongodb)
-    private prisma: PrismaClient & {
-      user: any;
-    },
-  ) {}
+    private prisma: PrismaClient,
+  ) {
+    this.tokenExpire = this.config.get<number>('auth.jwtExpiresIn') || 1800;
+  }
 
   /**
    * Sign and return JWT token
@@ -60,7 +64,6 @@ export class AuthService {
    * Login user with email and password
    */
   async login(email: string, password: string): Promise<AuthResponseDto> {
-    // Find user by email
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
@@ -69,19 +72,15 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
 
-    // Verify password
     const isPasswordValid = await this.comparePassword(password, user.password);
-
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid email or password');
     }
-
-    // Sign JWT token
     const token = this.signToken({ userId: user.id, email: user.email });
 
     return {
       access_token: token,
-      expires_in: 86400, // 24 hours in seconds
+      expires_in: this.tokenExpire,
       user: {
         id: user.id,
         email: user.email,
@@ -123,11 +122,11 @@ export class AuthService {
 
     return {
       access_token: token,
-      expires_in: 86400,
+      expires_in: this.tokenExpire,
       user: {
         id: newUser.id,
         email: newUser.email,
-        username: newUser?.username,
+        username: newUser?.username ?? undefined,
       },
     };
   }
