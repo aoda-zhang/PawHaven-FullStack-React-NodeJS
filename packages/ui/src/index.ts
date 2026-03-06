@@ -9,14 +9,3 @@ export { SuspenseWrapper } from './SuspenseWrapper';
 export { Phase } from './Phase';
 export { NotificationBanner } from './NotificationBanner';
 export { Toast, showToast, notificationType, type ToastType } from './Toast';
-export {
-  ErrorDisplayProvider,
-  showError,
-  useErrorDisplay,
-  errorType,
-  displayStyle,
-  type ErrorType,
-  type DisplayStyle,
-  type ErrorDisplayProps,
-  type ShowErrorProps,
-} from './ErrorDisplay';
