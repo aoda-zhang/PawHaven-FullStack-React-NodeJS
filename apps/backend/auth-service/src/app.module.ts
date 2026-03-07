@@ -2,12 +2,12 @@ import { join } from 'path';
 
 import { AuthModule } from '@modules/Auth/auth.module';
 import { Module } from '@nestjs/common';
-import { PrismaClient as MongoPrismaClient } from '@prisma/client';
 import { SharedModule, SharedModuleFeatures } from '@pawhaven/backend-core';
 import {
   databaseEngines,
   microServiceNames,
 } from '@pawhaven/backend-core/constants';
+import { PrismaClient } from '@prismaClient';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import {
           module: SharedModuleFeatures.PrismaModule,
           options: {
             databaseEngine: databaseEngines.mongodb,
-            Client: MongoPrismaClient,
+            Client: PrismaClient,
           },
         },
         {

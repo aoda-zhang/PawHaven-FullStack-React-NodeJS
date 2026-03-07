@@ -1,4 +1,4 @@
 import { createZodDto } from 'nestjs-zod';
-import { RegisterSchema } from '@pawhaven/shared/types';
+import { CredentialsSchema } from '@pawhaven/shared/types';
 
-export class RegisterDTO extends createZodDto(RegisterSchema) {}
+export class RegisterDTO extends createZodDto(CredentialsSchema) {}

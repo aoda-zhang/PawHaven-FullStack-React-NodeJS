@@ -2,11 +2,11 @@
 export type { MenuItem, Menu } from './menu.schema';
 export type { Router, RouterItem, RouterHandle } from './router.schema';
 export type {
-  LoginDto,
-  RegisterDto,
+  CredentialsDto,
+  RefreshDto,
   AuthResponseDto,
-  JwtPayload,
-  VerifyResponseDto,
+  SessionDto,
+  JwtVerifyInfo,
 } from './auth.schema';
 
 // schemas
@@ -14,9 +14,9 @@ export type {
 export { MenuItemSchema, MenuSchema } from './menu.schema';
 export { RouterSchema, RouterItemSchema } from './router.schema';
 export {
-  LoginSchema,
-  RegisterSchema,
+  CredentialsSchema,
+  RefreshSchema,
   AuthResponseSchema,
-  JwtPayloadSchema,
-  VerifyResponseSchema,
+  SessionSchema,
+  JwtVerifyInfoSchema,
 } from './auth.schema';

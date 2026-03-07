@@ -1,3 +1,4 @@
+import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
 import { Button } from '@mui/material';
 import { FormInput } from '@pawhaven/ui';
 import { type FC } from 'react';
@@ -11,7 +12,9 @@ import { AuthLayout } from '../authLayout';
 import { routePaths } from '@/router/routePaths';
 
 export const Login: FC = () => {
-  const formProps = useForm({});
+  const formProps = useForm({
+    resolver: zodResolver(CredentialsSchema),
+  });
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { mutate, isPending } = useLogin();

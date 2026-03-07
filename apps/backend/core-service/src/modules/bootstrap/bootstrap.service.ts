@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { MenuItem, Menu, Router, RouterItem } from '@pawhaven/shared/types';
-import type { PrismaClient } from '@prisma/client';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
+
+// eslint-disable-next-line import/no-relative-packages
+import { PrismaClient } from '../../prisma/mongodb/client';
 
 import { CreatedRouteDTO } from './DTO/router.DTO';
 
@@ -105,11 +107,13 @@ export class BootstrapService {
       orderBy: { order: 'asc' },
     });
 
-    const activeRoutes = routes.filter((route) => route.status === 'active');
+    const activeRoutes = routes.filter(
+      (route: (typeof routes)[number]) => route.status === 'active',
+    );
 
     const routeMap = new Map<string, any>();
 
-    activeRoutes.forEach((r) => {
+    activeRoutes.forEach((r: (typeof activeRoutes)[number]) => {
       routeMap.set(r.id, {
         path: r.path ?? undefined,
         element: r.element,
@@ -119,7 +123,7 @@ export class BootstrapService {
 
     const result: RouterItem[] = [];
 
-    activeRoutes.forEach((r) => {
+    activeRoutes.forEach((r: (typeof activeRoutes)[number]) => {
       const current = routeMap.get(r.id);
 
       if (r.parentId) {

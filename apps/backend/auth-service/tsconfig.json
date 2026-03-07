@@ -2,8 +2,13 @@
   "extends": "@pawhaven/tsconfig/node",
   "compilerOptions": {
     "outDir": "dist",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "declaration": false,
+    "declarationMap": false,
     "paths": {
-      "@modules/*": ["./src/modules/*"]
+      "@modules/*": ["./src/modules/*"],
+      "@prismaClient": ["src/prisma/mongodb/client"]
     }
   },
   "include": ["src"]

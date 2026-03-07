@@ -1,5 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
+  output          = "../mongodb/client"
   binaryTargets   = ["native", "rhel-openssl-3.0.x"]
   previewFeatures = ["relationJoins"]
   moduleFormat    = "cjs"
@@ -16,8 +17,8 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  status   String  @default("pending")
-  email    String  @unique
-  password String
-  username String?
+  status       String  @default("pending")
+  email        String  @unique
+  password     String
+  refreshToken String?
 }

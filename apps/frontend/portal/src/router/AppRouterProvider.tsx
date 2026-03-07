@@ -5,8 +5,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { routerElementMapping } from './routerElementMapping';
 
-import { AuthGuard } from '@/features/Auth/AuthGuard';
 import { useLandingContext } from '@/features/Landing/landingContext';
+import { AuthGuard } from '@/router/AuthGuard';
 import type { RouterEle } from '@/types/LayoutType';
 
 // Applies route-level guards such as AuthGuard to a route element
@@ -37,7 +37,7 @@ const createRouteElement = (route: RouterEle): ReactNode => {
 const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {
   return routesConfig.map((route) => {
     const mappedRoute: RouteObject = {
-      path: route.path,
+      path: route.path ?? undefined,
       element: createRouteElement(route),
       handle: route.handle,
     };

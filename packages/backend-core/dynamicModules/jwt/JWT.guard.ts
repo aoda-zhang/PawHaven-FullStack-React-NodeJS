@@ -28,6 +28,8 @@ export class JWTGuard extends AuthGuard('jwt') {
     if (isPublicApi) {
       return true;
     }
+
+    // AuthGuard('jwt') extracts and verifies the token via JwtStrategy
     return super.canActivate(context);
   }
 

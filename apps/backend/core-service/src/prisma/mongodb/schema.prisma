@@ -1,5 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
+  output          = "../mongodb/client"
   binaryTargets   = ["native", "rhel-openssl-3.0.x"]
   previewFeatures = ["relationJoins"]
   moduleFormat    = "cjs"

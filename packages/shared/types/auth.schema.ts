@@ -7,23 +7,21 @@ import { z } from 'zod';
 /**
  * Login Request Schema
  */
-export const LoginSchema = z.object({
+export const CredentialsSchema = z.object({
   email: z.email({ message: 'Invalid email address' }),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
-export type LoginDto = z.infer<typeof LoginSchema>;
+export type CredentialsDto = z.infer<typeof CredentialsSchema>;
 
 /**
- * Register Request Schema
+ * Refresh Token Request Schema
  */
-export const RegisterSchema = z.object({
-  email: z.email({ message: 'Invalid email address' }),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  username: z.string().optional(),
+export const RefreshSchema = z.object({
+  refresh_token: z.string(),
 });
 
-export type RegisterDto = z.infer<typeof RegisterSchema>;
+export type RefreshDto = z.infer<typeof RefreshSchema>;
 
 /**
  * Auth Response Schema
@@ -31,33 +29,36 @@ export type RegisterDto = z.infer<typeof RegisterSchema>;
 export const AuthResponseSchema = z.object({
   access_token: z.string(),
   expires_in: z.number(),
+  refresh_token: z.string().optional(),
   user: z.object({
     id: z.string(),
     email: z.string(),
-    username: z.string().optional(),
   }),
 });
 
 export type AuthResponseDto = z.infer<typeof AuthResponseSchema>;
 
 /**
- * JWT Payload Schema
+ * Session Schema (common response for login/register/verify)
  */
-export const JwtPayloadSchema = z.object({
+export const SessionSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+  }),
+  expires_in: z.number(),
+});
+
+export type SessionDto = z.infer<typeof SessionSchema>;
+
+/**
+ * JWT Verify Info Schema
+ */
+export const JwtVerifyInfoSchema = z.object({
   userId: z.string(),
   email: z.string(),
   iat: z.number().optional(),
   exp: z.number().optional(),
 });
 
-export type JwtPayload = z.infer<typeof JwtPayloadSchema>;
-
-/**
- * Verify Response Schema
- */
-export const VerifyResponseSchema = z.object({
-  isValid: z.boolean(),
-  payload: JwtPayloadSchema,
-});
-
-export type VerifyResponseDto = z.infer<typeof VerifyResponseSchema>;
+export type JwtVerifyInfo = z.infer<typeof JwtVerifyInfoSchema>;

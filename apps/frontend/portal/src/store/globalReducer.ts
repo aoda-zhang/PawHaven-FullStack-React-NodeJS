@@ -18,7 +18,7 @@ export interface GlobalStateType {
 const initialState: GlobalStateType = {
   profile: {
     baseUserInfo: {
-      userName: '',
+      email: '',
       userID: '',
       globalMenuUpdateAt: '',
       globalRouterUpdateAt: '',

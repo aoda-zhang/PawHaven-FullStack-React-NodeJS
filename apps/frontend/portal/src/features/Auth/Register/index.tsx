@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
-import { RegisterSchema } from '@pawhaven/shared/types';
+import { CredentialsSchema } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
 import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -14,7 +14,7 @@ import { routePaths } from '@/router/routePaths';
 
 export const Register: FC = () => {
   const formProps = useForm({
-    resolver: zodResolver(RegisterSchema),
+    resolver: zodResolver(CredentialsSchema),
   });
   const navigate = useNavigate();
   const { t } = useTranslation();

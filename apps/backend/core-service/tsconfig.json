@@ -2,11 +2,15 @@
   "extends": "@pawhaven/tsconfig/node",
   "compilerOptions": {
     "outDir": "dist",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "declaration": false,
+    "declarationMap": false,
     "paths": {
       "@modules/*": ["./src/modules/*"],
-      "@prisma-mongo-client": ["./src/prisma/mongodb/generated/prisma/client"]
+      "@prismaClient": ["src/prisma/mongodb/client"]
     }
   },
   "include": ["src"],
-  "exclude": ["./src/prisma/mongodb/base-model.snippet.prisma"]
+  "exclude": ["src/prisma/mongodb/base-model.snippet.prisma"]
 }

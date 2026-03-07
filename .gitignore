@@ -128,5 +128,4 @@ tsconfig.tsbuildinfo
 .turbo
 
 # prisma dev runtime
-**/prisma/generated/**
-**/prisma/**/generated/**
+**/prisma/**/client**

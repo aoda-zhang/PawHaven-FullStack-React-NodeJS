@@ -1,5 +1,5 @@
 type UserInfoType = {
-  userName: string;
+  email: string;
   userID: string;
   globalMenuUpdateAt: string;
   globalRouterUpdateAt: string;

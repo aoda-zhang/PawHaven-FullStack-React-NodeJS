@@ -3,11 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Headers,
   BadRequestException,
+  Res,
+  Req,
 } from '@nestjs/common';
-import { AuthResponseDto, VerifyResponseDto } from '@pawhaven/shared/types';
-import { HttpReqHeader } from '@pawhaven/backend-core/types';
+import type { Request, Response } from 'express';
+import { JwtVerifyInfo } from '@pawhaven/shared/types';
 import { httpBusinessMappingCodes } from '@pawhaven/backend-core/constants';
 import { PublicAPI } from '@pawhaven/backend-core/decorators';
 
@@ -20,32 +21,96 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Get('/verify')
-  async verify(
-    @Headers(HttpReqHeader.accessToken) token?: string,
-  ): Promise<VerifyResponseDto> {
+  async verify(@Req() req: Request): Promise<JwtVerifyInfo> {
+    const token = this.authService.getTokenFromRequest(req, 'access');
+
     if (!token) {
       throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
     }
-    const payload = await this.authService.verify(token);
-    return {
-      isValid: true,
-      payload,
-    };
+
+    const verifyInfo = await this.authService.verifyToken(token);
+    return verifyInfo;
   }
 
   @PublicAPI()
   @Post('/login')
-  async login(@Body() loginDto: LoginDTO): Promise<AuthResponseDto> {
-    return this.authService.login(loginDto.email, loginDto.password);
+  async login(
+    @Body() loginDto: LoginDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(
+      loginDto.email,
+      loginDto.password,
+    );
+
+    this.authService.setAuthCookies(res, result);
+
+    // Return user info only (not tokens)
+    return {
+      user: result.user,
+      expires_in: result.expires_in,
+    };
   }
 
   @PublicAPI()
   @Post('/register')
-  async register(@Body() registerDto: RegisterDTO): Promise<AuthResponseDto> {
-    return this.authService.register(
+  async register(
+    @Body() registerDto: RegisterDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.register(
       registerDto.email,
       registerDto.password,
-      registerDto?.username,
     );
+
+    this.authService.setAuthCookies(res, result);
+
+    // Return user info only (not tokens)
+    return {
+      user: result.user,
+      expires_in: result.expires_in,
+    };
+  }
+
+  @PublicAPI()
+  @Post('/refresh')
+  async refresh(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = this.authService.getTokenFromRequest(req, 'refresh');
+
+    if (!refreshToken) {
+      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+    }
+
+    const result = await this.authService.refresh(refreshToken);
+
+    this.authService.setAuthCookies(res, result);
+
+    // Return user info only
+    return {
+      user: result.user,
+      expires_in: result.expires_in,
+    };
+  }
+
+  @Post('/logout')
+  async logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ message: string }> {
+    const token = this.authService.getTokenFromRequest(req, 'access');
+
+    if (!token) {
+      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+    }
+
+    const claims = await this.authService.verifyToken(token);
+    await this.authService.logout(claims.userId);
+
+    this.authService.clearAuthCookies(res);
+
+    return { message: 'Logout successful' };
   }
 }

@@ -7,5 +7,8 @@ export const httpBusinessMappingCodes = {
   unauthorized: 'E4005', // User not authenticated
   forbidden: 'E4006', // User has no permission
   validationError: 'E4007', // Request validation failed
+  invalidCredentials: 'E4008', // Invalid email or password
+  userAlreadyExists: 'E4009', // User with email already exists
+  invalidRefreshToken: 'E4010', // Refresh token is invalid or expired
   serverError: 'E5000', // Internal server error
 } as const;
