@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
 import { Button } from '@mui/material';
+import { CredentialsSchema } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
 import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
