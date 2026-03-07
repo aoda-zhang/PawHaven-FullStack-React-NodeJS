@@ -8,6 +8,9 @@
         "include": "config/**",
         "exclude": "config/index.ts",
         "watchAssets": true
+      },
+      {
+        "include": "prisma/mongodb/client/**"
       }
     ]
   },

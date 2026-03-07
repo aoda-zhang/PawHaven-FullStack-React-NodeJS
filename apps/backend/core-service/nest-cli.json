@@ -3,7 +3,10 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "assets": [{ "include": "config/**", "watchAssets": true }]
+    "assets": [
+      { "include": "config/**", "watchAssets": true },
+      { "include": "prisma/mongodb/client/**" }
+    ]
   },
   "generateOptions": {
     "spec": false
