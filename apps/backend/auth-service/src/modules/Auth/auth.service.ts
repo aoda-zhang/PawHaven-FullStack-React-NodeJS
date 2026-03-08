@@ -17,21 +17,30 @@ import { PrismaClient } from '@prismaClient';
 
 @Injectable()
 export class AuthService {
-  private tokenExpire: number;
+  private readonly cookieConfig: {
+    names: {
+      access: string;
+      refresh: string;
+    };
+    sameSite: {
+      access: 'lax' | 'strict' | 'none';
+      refresh: 'lax' | 'strict' | 'none';
+    };
+    baseOptions: {
+      httpOnly: true;
+      secure: boolean;
+      path: '/';
+    };
+  };
 
-  private refreshTokenExpire: number;
-
-  private refreshTokenMaxAge: number;
-
-  private readonly accessCookieName: string;
-
-  private readonly refreshCookieName: string;
-
-  private readonly baseCookieOptions: {
-    httpOnly: true;
-    secure: boolean;
-    sameSite: 'strict';
-    path: '/';
+  private readonly tokenConfig: {
+    expiresIn: {
+      access: number;
+      refresh: number;
+    };
+    maxAge: {
+      refresh: number;
+    };
   };
 
   constructor(
@@ -40,28 +49,40 @@ export class AuthService {
     @InjectPrisma(databaseEngines.mongodb)
     private prisma: PrismaClient,
   ) {
-    const configuredAccessExpire = this.config.get<number>('auth.jwtExpiresIn');
-    const configuredRefreshExpire = this.config.get<number>(
-      'auth.refreshTokenExpiresIn',
-    );
-
-    this.tokenExpire = configuredAccessExpire || 60;
-    this.refreshTokenExpire = configuredRefreshExpire || 604800;
-    this.refreshTokenMaxAge = this.refreshTokenExpire * 1000;
+    this.tokenConfig = {
+      expiresIn: {
+        access: this.config.get<number>('auth.jwtExpiresIn') || 60,
+        refresh:
+          this.config.get<number>('auth.refreshTokenExpiresIn') || 604800,
+      },
+      maxAge: {
+        refresh:
+          (this.config.get<number>('auth.refreshTokenExpiresIn') || 604800) *
+          1000,
+      },
+    };
 
     const env = this.config.get<string>('http.env');
     const isProduction = env === 'prod' || env === 'production';
-    this.accessCookieName = isProduction
-      ? '__Host-access-token'
-      : 'access_token';
-    this.refreshCookieName = isProduction
-      ? '__Host-refresh-token'
-      : 'refresh_token';
-    this.baseCookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      sameSite: 'strict',
-      path: '/',
+    this.cookieConfig = {
+      names: isProduction
+        ? {
+            access: '__Host-access-token',
+            refresh: '__Host-refresh-token',
+          }
+        : {
+            access: 'access_token',
+            refresh: 'refresh_token',
+          },
+      sameSite: {
+        access: 'lax',
+        refresh: 'strict',
+      },
+      baseOptions: {
+        httpOnly: true,
+        secure: isProduction,
+        path: '/',
+      },
     };
   }
 
@@ -70,14 +91,14 @@ export class AuthService {
    */
   private signToken(payload: Omit<JwtVerifyInfo, 'iat' | 'exp'>): string {
     return this.jwtService.sign(payload, {
-      expiresIn: this.tokenExpire,
+      expiresIn: this.tokenConfig.expiresIn.access,
     });
   }
 
   private generateRefreshToken(userId: string): string {
     return this.jwtService.sign(
       { userId },
-      { expiresIn: this.refreshTokenExpire },
+      { expiresIn: this.tokenConfig.expiresIn.refresh },
     );
   }
 
@@ -110,47 +131,51 @@ export class AuthService {
     type: 'access' | 'refresh',
   ): string | undefined {
     const cookieName =
-      type === 'access' ? this.accessCookieName : this.refreshCookieName;
+      type === 'access'
+        ? this.cookieConfig.names.access
+        : this.cookieConfig.names.refresh;
     return req.cookies?.[cookieName];
   }
 
   setAuthCookies(res: Response, result: AuthResponseDto): void {
     const accessMaxAge = result.expires_in * 1000;
 
-    res.cookie(this.accessCookieName, result.access_token, {
-      ...this.baseCookieOptions,
+    res.cookie(this.cookieConfig.names.access, result.access_token, {
+      ...this.cookieConfig.baseOptions,
+      sameSite: this.cookieConfig.sameSite.access,
       maxAge: accessMaxAge,
     });
 
     if (result.refresh_token) {
-      res.cookie(this.refreshCookieName, result.refresh_token, {
-        ...this.baseCookieOptions,
-        maxAge: this.refreshTokenMaxAge,
+      res.cookie(this.cookieConfig.names.refresh, result.refresh_token, {
+        ...this.cookieConfig.baseOptions,
+        sameSite: this.cookieConfig.sameSite.refresh,
+        maxAge: this.tokenConfig.maxAge.refresh,
       });
     }
   }
 
   setAuthCookiesOnRequest(req: Request, result: AuthResponseDto): void {
     const cookies = req.cookies ?? {};
-    cookies[this.accessCookieName] = result.access_token;
+    cookies[this.cookieConfig.names.access] = result.access_token;
 
     if (result.refresh_token) {
-      cookies[this.refreshCookieName] = result.refresh_token;
+      cookies[this.cookieConfig.names.refresh] = result.refresh_token;
     }
     // eslint-disable-next-line no-param-reassign
     req.cookies = cookies;
   }
 
   clearAuthCookies(res: Response): void {
-    res.clearCookie(this.accessCookieName, { path: '/' });
-    res.clearCookie(this.refreshCookieName, { path: '/' });
+    res.clearCookie(this.cookieConfig.names.access, { path: '/' });
+    res.clearCookie(this.cookieConfig.names.refresh, { path: '/' });
   }
 
   clearAuthCookiesOnRequest(req: Request): void {
     if (req.cookies) {
       const cookies = { ...req.cookies };
-      delete cookies[this.accessCookieName];
-      delete cookies[this.refreshCookieName];
+      delete cookies[this.cookieConfig.names.access];
+      delete cookies[this.cookieConfig.names.refresh];
       // eslint-disable-next-line no-param-reassign
       req.cookies = cookies;
     }
@@ -188,7 +213,7 @@ export class AuthService {
 
     return {
       access_token: token,
-      expires_in: this.tokenExpire,
+      expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: refreshToken,
       user: {
         id: user.id,
@@ -233,7 +258,7 @@ export class AuthService {
 
     return {
       access_token: token,
-      expires_in: this.tokenExpire,
+      expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: refreshToken,
       user: {
         id: newUser.id,
@@ -284,7 +309,7 @@ export class AuthService {
 
     return {
       access_token: newAccessToken,
-      expires_in: this.tokenExpire,
+      expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: newRefreshToken,
       user: {
         id: user.id,

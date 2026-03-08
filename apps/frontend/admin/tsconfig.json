@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@pawhaven/tsconfig/web",
   "compilerOptions": {
     "jsx": "react-jsx",
     "paths": {

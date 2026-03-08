@@ -15,6 +15,8 @@ export interface BaseSelectType {
 export interface BaseTextFieldType {
   prefix?: string;
   defaultPrefix?: boolean;
+  owPasswordToggle?: boolean;
   suffix?: string;
+  showPasswordToggle?: boolean;
   defaultSuffix?: boolean;
 }

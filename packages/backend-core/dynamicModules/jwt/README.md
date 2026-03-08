@@ -51,14 +51,14 @@ Configure JWT secret in your environment config:
 # config/development.yaml
 auth:
   jwtSecret: 'your-secret-key-here'
-  jwtExpiresIn: 1800 # seconds
+  jwtExpiresIn: 900 # seconds
 ```
 
 Or via environment variables:
 
 ```bash
 AUTH_JWT_SECRET=your-secret-key-here
-AUTH_JWT_EXPIRES_IN=1800
+AUTH_JWT_EXPIRES_IN=900
 ```
 
 ### Protecting Routes

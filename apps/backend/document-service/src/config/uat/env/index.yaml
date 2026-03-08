@@ -41,4 +41,4 @@ cors:
 
 auth:
   jwtSecret: ${JWT_SECRET}
-  jwtExpiresIn: 1800
+  jwtExpiresIn: 900

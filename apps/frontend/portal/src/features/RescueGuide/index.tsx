@@ -1,4 +1,4 @@
-import { Alert, Box, Container, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { FileDownloadButton } from '@pawhaven/frontend-core';
 import { showToast } from '@pawhaven/ui';
 import { ArrowDownToLine } from 'lucide-react';

@@ -57,7 +57,7 @@ Example `development.yaml`:
 ```yaml
 auth:
   jwtSecret: 'dev-secret-key'
-  jwtExpiresIn: 1800
+  jwtExpiresIn: 900
 
 database:
   url: 'mongodb://localhost:27017/pawhaven-dev'
@@ -225,7 +225,7 @@ logging:
 # config/production.yaml
 auth:
   # Secret should come from env var in production
-  jwtExpiresIn: 1800 # 1 hour for security
+  jwtExpiresIn: 900 # 1 hour for security
 
 logging:
   level: 'info'
