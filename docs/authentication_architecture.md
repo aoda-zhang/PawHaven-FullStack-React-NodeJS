@@ -26,7 +26,7 @@ graph TB
         Portal[Portal Frontend]
     end
 
-    subgraph "Gateway"
+    subgraph "Gateway Layer"
         Gateway[API Gateway]
     end
 
@@ -66,7 +66,7 @@ graph TB
 
 ## Authentication Flows
 
-### 1. Login and Registration
+### 1. Login
 
 ```mermaid
 sequenceDiagram
@@ -77,7 +77,7 @@ sequenceDiagram
     participant AuthDB as Auth Service DB
 
     User->>Portal: Enter credentials
-    Portal->>Gateway: Login or registration request
+    Portal->>Gateway: Login request
     Gateway->>AuthService: Proxy request
 
     Note over AuthService: @PublicAPI bypasses JWT Guard
@@ -99,31 +99,12 @@ sequenceDiagram
             Gateway-->>Portal: Success
             Portal-->>User: Logged in
         end
-    else Register
-        AuthService->>AuthDB: Check if user exists
-        AuthDB-->>AuthService: Result
-        alt User exists
-            AuthService-->>Gateway: 409 Conflict
-            Gateway-->>Portal: Error
-            Portal-->>User: Show error
-        else New user
-            AuthService->>AuthService: Hash password
-            AuthService->>AuthDB: Create user
-            AuthDB-->>AuthService: User created
-            AuthService->>AuthService: Generate access and refresh tokens
-            AuthService->>AuthService: Hash refresh token
-            AuthService->>AuthDB: Store refresh token hash
-            AuthDB-->>AuthService: Success
-            AuthService-->>Gateway: 200 OK + Set-Cookie
-            Gateway-->>Portal: Success
-            Portal-->>User: Registered and logged in
-        end
     end
 ```
 
 **Details**
 
-- Login and registration share the same token issuance and cookie response.
+- Login issues access and refresh tokens and returns them as HTTP-only cookies.
 - Refresh tokens are stored as hashes in the Auth Service database.
 - Tokens are delivered via HTTP-only cookies; frontend does not store raw tokens.
 
