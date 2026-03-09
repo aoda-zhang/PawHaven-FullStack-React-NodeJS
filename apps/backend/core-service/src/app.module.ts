@@ -16,9 +16,6 @@ import { PrismaClient } from '@prismaClient';
       serviceName: microServiceNames.CORE,
       modules: [
         {
-          module: SharedModuleFeatures.JWTModule,
-        },
-        {
           module: SharedModuleFeatures.PrismaModule,
           options: {
             databaseEngine: databaseEngines.mongodb,

@@ -4,6 +4,7 @@ import {
   Post,
   Body,
   BadRequestException,
+  UnauthorizedException,
   Res,
   Req,
 } from '@nestjs/common';
@@ -22,14 +23,18 @@ export class AuthController {
 
   @Get('/verify')
   async verify(@Req() req: Request): Promise<JwtVerifyInfo> {
-    const token = this.authService.getTokenFromRequest(req, 'access');
+    const userId = req.headers['x-auth-user-id'];
+    const email = req.headers['x-auth-user-email'];
+    const verified = req.headers['x-auth-verified'];
 
-    if (!token) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+    if (verified !== '1' || typeof userId !== 'string') {
+      throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
     }
 
-    const verifyInfo = await this.authService.verifyToken(token);
-    return verifyInfo;
+    return {
+      userId,
+      ...(typeof email === 'string' ? { email } : {}),
+    } as JwtVerifyInfo;
   }
 
   @PublicAPI()
@@ -100,14 +105,14 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
-    const token = this.authService.getTokenFromRequest(req, 'access');
+    const userId = req.headers['x-auth-user-id'];
+    const verified = req.headers['x-auth-verified'];
 
-    if (!token) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+    if (verified !== '1' || typeof userId !== 'string') {
+      throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
     }
 
-    const claims = await this.authService.verifyToken(token);
-    await this.authService.logout(claims.userId);
+    await this.authService.logout(userId);
 
     this.authService.clearAuthCookies(res);
 

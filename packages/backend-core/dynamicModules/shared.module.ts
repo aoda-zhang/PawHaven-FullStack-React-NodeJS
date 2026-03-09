@@ -10,38 +10,49 @@ import { SwaggerModule } from './swagger/swagger.module';
 import { ConfigsModule } from './configModule/configs.module';
 import { HttpClientModule } from './httpClient/httpClient.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { JWTModule } from './jwt/JWT.module';
 import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type';
 
+/**
+ * SharedModule configuration options
+ * Only accepts predefined shared modules, not custom providers or modules
+ */
 interface SharedModuleForRootOptions {
   serviceRoot: string;
   serviceName: string;
+  /**
+   * Optional predefined shared modules to load
+   * Only accepts modules from SharedModuleFeatures enum
+   */
   modules?: SharedModuleItem[];
-  providers?: Provider[];
 }
 
 @Global()
 @Module({})
 export class SharedModule {
+  /**
+   * Configure SharedModule with predefined modules only
+   * For service-specific modules or providers, import them directly in your AppModule
+   */
   static forRoot(options: SharedModuleForRootOptions): DynamicModule {
-    const { serviceRoot, serviceName, modules = [], providers = [] } = options;
+    const { serviceRoot, serviceName, modules = [] } = options;
 
     const defaultModules = this.getDefaultModules(serviceRoot, serviceName);
-
-    const loadedExtraModules = this.loadExtraModules(modules);
-
-    const defaultProviders = this.getDefaultProviders();
-
-    const loadedExtraProviders = this.loadExtraProviders(providers);
+    const optionalModules = this.loadOptionalModules(modules);
+    const sharedProviders = this.getSharedProviders();
 
     return {
       module: SharedModule,
-      imports: [...defaultModules, ...loadedExtraModules],
-      exports: [...defaultModules, ...loadedExtraModules],
-      providers: [...defaultProviders, ...loadedExtraProviders],
+      imports: [...defaultModules, ...optionalModules],
+      exports: [...defaultModules, ...optionalModules],
+      providers: sharedProviders,
     };
   }
 
+  /**
+   * Core modules required by all services
+   * - ConfigsModule: Environment configuration
+   * - HttpClientModule: HTTP client utilities
+   */
   private static getDefaultModules(
     serviceRoot: string,
     serviceName: string,
@@ -49,7 +60,11 @@ export class SharedModule {
     return [ConfigsModule.forRoot(serviceRoot, serviceName), HttpClientModule];
   }
 
-  private static loadExtraModules(
+  /**
+   * Load optional predefined shared modules
+   * Only modules defined in SharedModuleFeatures are allowed
+   */
+  private static loadOptionalModules(
     items: SharedModuleItem[],
   ): Array<Type<any> | DynamicModule> {
     return items.map((item) => {
@@ -63,30 +78,27 @@ export class SharedModule {
         case SharedModuleFeatures.MonitoringModule:
           return MiddlewareModule;
 
-        case SharedModuleFeatures.JWTModule:
-          return JWTModule;
-
-        default:
-          throw new Error(`Unknown module: ${item}`);
+        default: {
+          const _exhaustiveCheck: never = item;
+          throw new Error(
+            `Unknown shared module: ${JSON.stringify(_exhaustiveCheck)}`,
+          );
+        }
       }
     });
   }
 
-  private static getDefaultProviders(): Provider[] {
+  /**
+   * Global providers applied to all services
+   * - HttpExceptionFilter: Standardizes error responses
+   * - HttpSuccessInterceptor: Standardizes success responses
+   * - ZodValidationPipe: Validates request DTOs
+   */
+  private static getSharedProviders(): Provider[] {
     return [
-      // Global exception filter - catches and formats all thrown HTTP exceptions
       { provide: APP_FILTER, useClass: HttpExceptionFilter },
-      // Global interceptor - wraps all successful responses with consistent response format
       { provide: APP_INTERCEPTOR, useClass: HttpSuccessInterceptor },
-      // Global pipe - validates request body/query/params using Zod schemas from nestjs-zod
-      {
-        provide: APP_PIPE,
-        useClass: ZodValidationPipe,
-      },
+      { provide: APP_PIPE, useClass: ZodValidationPipe },
     ];
-  }
-
-  private static loadExtraProviders(providers: Provider[]): Provider[] {
-    return [...providers];
   }
 }

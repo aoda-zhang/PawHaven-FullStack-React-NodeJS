@@ -9,7 +9,7 @@ export class EmailController {
 
   @Post('/send')
   sendEmail(@Req() req: any, @Body() emailInfo: any) {
-    const userID = req?.user?.userID;
+    const userID = req?.headers?.['x-auth-user-id'] || req?.user?.userId;
     return this.emailService.sendMail(userID, emailInfo);
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import crypto from 'node:crypto';
 
 import { BadGatewayException, Injectable } from '@nestjs/common';
@@ -54,10 +55,22 @@ export class ProxyService {
   }
 
   private handleProxyReq(proxyReq: any, req: Request): void {
-    // TODO
-    // setup customize header to next
-    const userId = (req as any).user?.id || 'anonymous';
-    proxyReq.setHeader('X-User-Id', userId);
+    delete req.headers['x-auth-user-id'];
+    delete req.headers['x-auth-user-email'];
+    delete req.headers['x-auth-verified'];
+
+    const { user } = req as Request & {
+      user?: { userId: string; email?: string };
+    };
+
+    if (user?.userId) {
+      proxyReq.setHeader('X-Auth-User-Id', user.userId);
+      proxyReq.setHeader('X-Auth-Verified', '1');
+      if (user.email) {
+        proxyReq.setHeader('X-Auth-User-Email', user.email);
+      }
+    }
+
     fixRequestBody(proxyReq, req);
   }
 

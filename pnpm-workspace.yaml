@@ -2,6 +2,9 @@ packages:
   - apps/**
   - packages/**
   - libs/**
+  # Exclude Prisma generated client directories
+  - '!**/prisma/**/client'
+  - '!**/src/prisma/**/client'
 
 onlyBuiltDependencies:
   - '@mui/x-telemetry'

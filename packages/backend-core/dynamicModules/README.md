@@ -1,22 +1,55 @@
 # DynamicModules
 
-This directory contains dynamic, reusable NestJS modules and global providers for the PawHaven backend. These modules are designed to be imported and configured flexibly in different services, providing shared infrastructure such as JWT authentication, configuration, HTTP client, Prisma, Swagger, and more.
+This directory contains dynamic, reusable NestJS modules and global providers for the PawHaven backend. These modules are designed to be imported and configured flexibly in different services, providing shared infrastructure such as configuration, HTTP client, Prisma, Swagger, and more.
 
 ## Purpose
 
-- **Centralize common infrastructure**: Avoid code duplication by providing shared modules (e.g., JWT guard/strategy, config, HTTP client, Prisma, Swagger, etc.).
+- **Centralize common infrastructure**: Avoid code duplication by providing shared modules (e.g., config, HTTP client, Prisma, Swagger, etc.).
 - **Dynamic configuration**: Many modules expose a `forRoot` or similar method to allow per-service configuration.
-- **Global providers**: Some modules (like guards, interceptors, filters) are registered globally for all routes.
-- **Consistent security and error handling**: By centralizing guards, interceptors, and filters, all services benefit from unified authentication, response formatting, and exception handling.
+- **Global providers**: Some modules (like interceptors, filters, pipes) are registered globally for all routes.
+- **Consistent error handling and validation**: By centralizing interceptors, filters, and pipes, all services benefit from unified response formatting, exception handling, and validation.
+
+## Design Philosophy
+
+**SharedModule is for predefined shared infrastructure only.**
+
+- Service-specific modules should be imported directly in the service's `AppModule`, not through `SharedModule.forRoot()`.
+- `SharedModule` only accepts predefined modules from `SharedModuleFeatures` enum (PrismaModule, SwaggerModule, MonitoringModule).
+- For custom providers or service-specific modules, add them directly to your service's module imports/providers.
+
+### Example
+
+```typescript
+// ✅ Correct: Use SharedModule for predefined modules
+@Module({
+  imports: [
+    SharedModule.forRoot({
+      serviceRoot: __dirname,
+      serviceName: 'auth-service',
+      modules: [
+        { module: SharedModuleFeatures.PrismaModule, options: {...} },
+        { module: SharedModuleFeatures.SwaggerModule },
+      ],
+    }),
+    AuthModule,        // ← Service-specific module
+    EmailModule,       // ← Service-specific module
+  ],
+})
+export class AppModule {}
+
+// ❌ Incorrect: Don't pass custom providers to SharedModule
+SharedModule.forRoot({
+  providers: [CustomService, CustomGuard],  // ← Not supported
+})
+```
 
 ## Structure Overview
 
-- `jwt/` — JWT authentication guard (`JWT.guard.ts`) and strategy (`jwt.strategy.ts`). Handles token validation, user extraction, and attaches user info to requests.
 - `configModule/` — Dynamic configuration module for loading and providing config values from environment or files.
 - `httpClient/` — HTTP client module, interceptors, and exception filters. Provides outbound HTTP utilities and global error formatting.
 - `prisma/` — Dynamic Prisma module for database access, supporting per-service configuration.
 - `swagger/` — Swagger module for API documentation, auto-generates OpenAPI docs for your service.
-- `shared.module.ts` — The main entry point for importing all shared modules/providers in a service. Handles dynamic assembly of modules and providers.
+- `shared.module.ts` — The main entry point for importing predefined shared modules. Handles dynamic assembly of infrastructure modules.
 - `sharedModule.type.ts` — Types for dynamic module options, ensuring type safety and extensibility.
 
 ## How to Use

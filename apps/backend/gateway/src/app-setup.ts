@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 export async function setupApp(app: NestExpressApplication): Promise<void> {
   const configService = app.get(ConfigService);
@@ -24,6 +25,7 @@ export async function setupApp(app: NestExpressApplication): Promise<void> {
 
   app.enableShutdownHooks();
   app.enableCors(corsOptions);
+  app.use(cookieParser());
 
   // Global prefix & versioning
   app.setGlobalPrefix(httpPrefix);
