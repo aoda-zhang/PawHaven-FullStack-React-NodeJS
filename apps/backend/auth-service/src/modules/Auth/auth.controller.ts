@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   BadRequestException,
@@ -9,9 +8,7 @@ import {
   Req,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { JwtVerifyInfo } from '@pawhaven/shared/types';
 import { httpBusinessMappingCodes } from '@pawhaven/backend-core/constants';
-import { PublicAPI } from '@pawhaven/backend-core/decorators';
 
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
@@ -21,23 +18,6 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/verify')
-  async verify(@Req() req: Request): Promise<JwtVerifyInfo> {
-    const userId = req.headers['x-auth-user-id'];
-    const email = req.headers['x-auth-user-email'];
-    const verified = req.headers['x-auth-verified'];
-
-    if (verified !== '1' || typeof userId !== 'string') {
-      throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
-    }
-
-    return {
-      userId,
-      ...(typeof email === 'string' ? { email } : {}),
-    } as JwtVerifyInfo;
-  }
-
-  @PublicAPI()
   @Post('/login')
   async login(
     @Body() loginDto: LoginDTO,
@@ -57,7 +37,6 @@ export class AuthController {
     };
   }
 
-  @PublicAPI()
   @Post('/register')
   async register(
     @Body() registerDto: RegisterDTO,
@@ -77,7 +56,6 @@ export class AuthController {
     };
   }
 
-  @PublicAPI()
   @Post('/refresh')
   async refresh(
     @Req() req: Request,

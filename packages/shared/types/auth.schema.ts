@@ -4,6 +4,13 @@ import { z } from 'zod';
  * Auth schemas used by frontend & backend
  */
 
+export const UserSchema = z.object({
+  userId: z.string(),
+  email: z.email(),
+});
+
+export type User = z.infer<typeof UserSchema>;
+
 /**
  * Login Request Schema
  */
@@ -30,10 +37,7 @@ export const AuthResponseSchema = z.object({
   access_token: z.string(),
   expires_in: z.number(),
   refresh_token: z.string().optional(),
-  user: z.object({
-    id: z.string(),
-    email: z.string(),
-  }),
+  user: UserSchema,
 });
 
 export type AuthResponseDto = z.infer<typeof AuthResponseSchema>;
@@ -42,21 +46,25 @@ export type AuthResponseDto = z.infer<typeof AuthResponseSchema>;
  * Session Schema (common response for login/register/verify)
  */
 export const SessionSchema = z.object({
-  user: z.object({
-    id: z.string(),
-    email: z.string(),
-  }),
+  user: UserSchema,
   expires_in: z.number(),
 });
 
 export type SessionDto = z.infer<typeof SessionSchema>;
 
 /**
+ * Auth User Schema
+ */
+export const AuthUserSchema = UserSchema.extend({
+  email: z.string().optional(),
+});
+
+export type AuthUser = z.infer<typeof AuthUserSchema>;
+
+/**
  * JWT Verify Info Schema
  */
-export const JwtVerifyInfoSchema = z.object({
-  userId: z.string(),
-  email: z.string(),
+export const JwtVerifyInfoSchema = UserSchema.extend({
   iat: z.number().optional(),
   exp: z.number().optional(),
 });

@@ -6,32 +6,17 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routerElementMapping } from './routerElementMapping';
 
 import { useLandingContext } from '@/features/Landing/landingContext';
-import { AuthGuard } from '@/router/AuthGuard';
 import type { RouterEle } from '@/types/LayoutType';
 
-// Applies route-level guards such as AuthGuard to a route element
-const wrapWithGuards = (node: ReactNode, handle?: RouterEle['handle']) => {
-  const routeWrappers = [
-    (childNode: ReactNode) =>
-      handle?.isRequireUserLogin ? (
-        <AuthGuard>{childNode}</AuthGuard>
-      ) : (
-        childNode
-      ),
-  ];
-
-  return routeWrappers.reduceRight((childNode, wrap) => wrap(childNode), node);
-};
-
+// Route rendering is now purely declarative.
+// Login gating is handled by backend 401 responses + global auth error redirect.
 const createRouteElement = (route: RouterEle): ReactNode => {
   const handle = route.handle ?? {};
-  const componentElement = handle.isLazyLoad ? (
+  return handle.isLazyLoad ? (
     <SuspenseWrapper>{routerElementMapping[route.element]}</SuspenseWrapper>
   ) : (
     routerElementMapping[route.element]
   );
-
-  return wrapWithGuards(componentElement, handle);
 };
 
 const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {

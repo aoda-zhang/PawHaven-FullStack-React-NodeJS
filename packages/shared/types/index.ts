@@ -6,7 +6,9 @@ export type {
   RefreshDto,
   AuthResponseDto,
   SessionDto,
+  AuthUser,
   JwtVerifyInfo,
+  User,
 } from './auth.schema';
 
 // schemas
@@ -18,5 +20,7 @@ export {
   RefreshSchema,
   AuthResponseSchema,
   SessionSchema,
+  AuthUserSchema,
   JwtVerifyInfoSchema,
+  UserSchema,
 } from './auth.schema';

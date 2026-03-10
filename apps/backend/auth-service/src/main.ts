@@ -18,7 +18,7 @@ async function bootstrap(): Promise<void> {
 
   try {
     await app.listen(port, '0.0.0.0');
-    logger.log(`core-service running at http://localhost:${port}`);
+    logger.log(`auth-service running at http://localhost:${port}`);
   } catch (error) {
     logger.error('Failed to start auth-service', error);
     throw new Error(

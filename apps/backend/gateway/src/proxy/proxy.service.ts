@@ -9,6 +9,7 @@ import {
   RequestHandler,
 } from 'http-proxy-middleware';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@pawhaven/shared/types';
 
 @Injectable()
 export class ProxyService {
@@ -54,14 +55,12 @@ export class ProxyService {
     return `/${segments.join('/')}`;
   }
 
-  private handleProxyReq(proxyReq: any, req: Request): void {
+  private handleProxyReq(proxyReq: any, req: Request & { user?: User }): void {
     delete req.headers['x-auth-user-id'];
     delete req.headers['x-auth-user-email'];
     delete req.headers['x-auth-verified'];
 
-    const { user } = req as Request & {
-      user?: { userId: string; email?: string };
-    };
+    const { user } = req;
 
     if (user?.userId) {
       proxyReq.setHeader('X-Auth-User-Id', user.userId);

@@ -11,7 +11,7 @@ export class ProxyController {
     this.proxyClient = this.proxyService.getProxyClient();
   }
 
-  @All('*all')
+  @All('/:service/*path')
   proxyRequests(
     @Req() req: Request,
     @Res() res: Response,

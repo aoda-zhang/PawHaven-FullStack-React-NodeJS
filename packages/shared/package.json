@@ -19,6 +19,11 @@
       "import": "./dist/esm/types/index.js",
       "require": "./dist/cjs/types/index.js"
     },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "import": "./dist/esm/constants/index.js",
+      "require": "./dist/cjs/constants/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/esm/utils/index.js",

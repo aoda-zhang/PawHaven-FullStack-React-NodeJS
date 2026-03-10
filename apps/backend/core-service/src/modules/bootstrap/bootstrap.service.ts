@@ -1,15 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { MenuItem, Menu, Router, RouterItem } from '@pawhaven/shared/types';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-
-// eslint-disable-next-line import/no-relative-packages
-import { PrismaClient } from '../../prisma/mongodb/client';
+import { PrismaClient, Prisma } from '@prismaClient';
 
 import { CreatedRouteDTO } from './DTO/router.DTO';
 
 @Injectable()
 export class BootstrapService {
+  private readonly logger = new Logger(BootstrapService.name);
+
   constructor(
     @InjectPrisma(databaseEngines.mongodb)
     private readonly prisma: PrismaClient,
@@ -31,7 +31,7 @@ export class BootstrapService {
       });
       return menuCreated;
     } catch (error) {
-      console.error('error-------', error);
+      this.logger.error(`Failed to add menu: ${menu?.label}`, error);
       throw new BadRequestException(`add menu :${menu?.label} failed`);
     }
   }
@@ -55,7 +55,7 @@ export class BootstrapService {
       });
       return menus;
     } catch (error) {
-      console.error('error-------', error);
+      this.logger.error('Failed to get app menus', error);
       throw new BadRequestException('get menus failed');
     }
   }
@@ -67,7 +67,7 @@ export class BootstrapService {
       data: {
         path: router.path,
         element: router.element,
-        handle: router.handle,
+        handle: router.handle as Prisma.InputJsonValue,
         ...(router?.parentId
           ? {
               parent: { connect: { id: router.parentId } },

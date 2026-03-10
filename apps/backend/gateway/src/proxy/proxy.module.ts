@@ -1,14 +1,22 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
-import { GatewayAuthMiddleware } from '../middleware/gateway-auth.middleware';
+import { JwtRefreshMiddleware } from '../middleware/jwt-refresh.middleware';
+import { JwtVerificationMiddleware } from '../middleware/jwt-verification.middleware';
 
 import { ProxyController } from './proxy.controller';
 import { ProxyService } from './proxy.service';
 
 @Module({
   imports: [
+    HttpModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -21,10 +29,13 @@ import { ProxyService } from './proxy.service';
     }),
   ],
   controllers: [ProxyController],
-  providers: [ProxyService, GatewayAuthMiddleware],
+  providers: [ProxyService, JwtRefreshMiddleware, JwtVerificationMiddleware],
 })
 export class ProxyModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(GatewayAuthMiddleware).forRoutes('*');
+    // Apply middlewares in order: Refresh first, then Verification
+    consumer
+      .apply(JwtRefreshMiddleware, JwtVerificationMiddleware)
+      .forRoutes({ path: '/:service/*path', method: RequestMethod.ALL });
   }
 }

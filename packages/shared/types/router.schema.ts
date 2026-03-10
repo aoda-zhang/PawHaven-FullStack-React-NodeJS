@@ -5,10 +5,8 @@ import { z } from 'zod';
  * This is intentionally simple and data-driven.
  */
 export interface RouterHandle {
-  isRequireUserLogin?: boolean;
   isMenuAvailable?: boolean;
   isLazyLoad?: boolean;
-  [key: string]: boolean | string | number | null | undefined;
 }
 
 export interface RouterItem {
@@ -23,7 +21,6 @@ export interface RouterItem {
  */
 const HandleSchema = z
   .object({
-    isRequireUserLogin: z.boolean().optional(),
     isMenuAvailable: z.boolean().optional(),
     isLazyLoad: z.boolean().optional(),
   })

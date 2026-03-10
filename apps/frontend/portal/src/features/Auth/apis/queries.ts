@@ -1,5 +1,5 @@
-import type { CredentialsDto, RouterHandle } from '@pawhaven/shared/types';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import type { CredentialsDto } from '@pawhaven/shared/types';
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import type { ProfileType } from '../types';
@@ -18,15 +18,6 @@ export const useLogin = () => {
       dispatch(setProfile(loginInfo));
       navigate('/');
     },
-  });
-};
-
-export const useVerify = (routerMeta: RouterHandle) => {
-  return useQuery({
-    queryKey: ['auth', 'verify'],
-    queryFn: AuthAPI.verify,
-    refetchOnMount: 'always',
-    enabled: routerMeta?.isRequireUserLogin,
   });
 };
 
