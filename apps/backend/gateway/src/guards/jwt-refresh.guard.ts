@@ -1,78 +1,77 @@
-import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
-import type { NextFunction, Request, Response } from 'express';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import type { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { JwtVerifyInfo } from '@pawhaven/shared/types';
-import {
-  AUTH_PUBLIC_PATHS,
-  cookieKeys,
-} from '@pawhaven/backend-core/constants';
-import { isProd } from '@pawhaven/shared/utils';
 import { firstValueFrom } from 'rxjs';
+import { JwtVerifyInfo } from '@pawhaven/shared/types';
+import { cookieKeys } from '@pawhaven/backend-core/constants';
+import { isProd } from '@pawhaven/shared/utils';
 
-/**
- * JWT Refresh Middleware
- * - Proactively refreshes access tokens before they expire
- * - Checks if token is in refresh window (20% of lifetime remaining)
- * - Calls auth-service /refresh endpoint to get new tokens
- */
+import { IS_PUBLIC_API } from '../decorators/public.decorator';
+
 @Injectable()
-export class JwtRefreshMiddleware implements NestMiddleware {
-  private readonly logger = new Logger(JwtRefreshMiddleware.name);
-
-  private readonly publicPaths = new Set(AUTH_PUBLIC_PATHS);
+export class JwtRefreshGuard implements CanActivate {
+  private readonly logger = new Logger(JwtRefreshGuard.name);
 
   constructor(
+    private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {}
 
-  async use(req: Request, res: Response, next: NextFunction): Promise<void> {
-    const path = this.normalizePath(req.path);
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_API, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    // Skip refresh for public paths
-    if (this.publicPaths.has(path)) {
-      return next();
+    if (isPublic) {
+      return true;
     }
+
+    const req = context.switchToHttp().getRequest<Request>();
+    const res = context.switchToHttp().getResponse<Response>();
 
     const accessToken = req.cookies?.[cookieKeys.access_token];
-
     if (!accessToken) {
-      // No access token, try to refresh
-      await this.attemptTokenRefresh(req, res, { clearCookiesOnFailure: true });
-      return next();
+      await this.attemptTokenRefresh(req, res, {
+        clearCookiesOnFailure: true,
+      });
+      return true;
     }
 
-    const accessPayload = await this.verifyAccessToken(accessToken);
-
-    if (accessPayload) {
-      // Token is valid, check if it needs refresh soon
-      const shouldRefresh = this.shouldRefreshSoon(accessPayload);
-
-      if (!shouldRefresh) {
-        // Token is valid and not expiring soon, no refresh needed
-        return next();
-      }
+    const accessPayload = this.verifyAccessToken(accessToken);
+    if (!accessPayload) {
+      await this.attemptTokenRefresh(req, res, {
+        clearCookiesOnFailure: true,
+      });
+      return true;
     }
 
-    // Token is invalid or expiring soon, attempt refresh
-    await this.attemptTokenRefresh(req, res, {
-      clearCookiesOnFailure: !accessPayload,
-    });
+    if (this.shouldRefreshSoon(accessPayload)) {
+      await this.attemptTokenRefresh(req, res, {
+        clearCookiesOnFailure: false,
+      });
+    }
 
-    return next();
+    return true;
   }
 
-  private async verifyAccessToken(
-    token: string,
-  ): Promise<JwtVerifyInfo | null> {
+  private verifyAccessToken(token: string): JwtVerifyInfo | null {
     try {
       const payload = this.jwtService.verify<JwtVerifyInfo>(token);
       if (!payload?.userId) {
         return null;
       }
+
       return payload;
     } catch {
       return null;
@@ -98,6 +97,7 @@ export class JwtRefreshMiddleware implements NestMiddleware {
     );
     const windowPercentage =
       this.configService.get<number>('auth.jwtRefreshWindowPercentage') ?? 0.2;
+
     if (!payload.iat || !payload.exp) {
       return fallbackSeconds;
     }
@@ -126,10 +126,13 @@ export class JwtRefreshMiddleware implements NestMiddleware {
     }
 
     try {
-      // Get auth-service configuration
       const microServices =
-        this.configService.get<any[]>('microServices') || [];
-      const authService = microServices.find((s) => s.name === 'auth-service');
+        this.configService.get<
+          Array<{ name: string; options?: { host: string; port: number } }>
+        >('microServices') ?? [];
+      const authService = microServices.find(
+        (service) => service.name === 'auth-service',
+      );
 
       if (!authService?.options) {
         this.logger.error('Auth service configuration not found');
@@ -138,7 +141,6 @@ export class JwtRefreshMiddleware implements NestMiddleware {
 
       const authServiceUrl = `http://${authService.options.host}:${authService.options.port}`;
 
-      // Call auth-service /refresh endpoint
       const response = await firstValueFrom(
         this.httpService.post(
           `${authServiceUrl}/api/auth/refresh`,
@@ -151,13 +153,12 @@ export class JwtRefreshMiddleware implements NestMiddleware {
         ),
       );
 
-      if (response.data && response.headers['set-cookie']) {
-        // Parse and set new cookies
-        const setCookieHeaders = response.headers['set-cookie'];
+      const setCookieHeaders = response.headers['set-cookie'];
+      if (Array.isArray(setCookieHeaders) && setCookieHeaders.length > 0) {
         this.updateAuthCookies(req, res, setCookieHeaders);
       }
     } catch (error) {
-      this.logger.error('Token refresh failed', error);
+      this.logger.error('Token refresh failed', error as Error);
       if (options.clearCookiesOnFailure) {
         this.clearAuthCookies(res);
       }
@@ -169,16 +170,14 @@ export class JwtRefreshMiddleware implements NestMiddleware {
     res: Response,
     setCookieHeaders: string[],
   ): void {
-    // Forward set-cookie headers to response
-    setCookieHeaders.forEach((cookie) => {
-      res.setHeader('Set-Cookie', cookie);
+    res.setHeader('Set-Cookie', setCookieHeaders);
 
-      // Also update request cookies for current request
+    setCookieHeaders.forEach((cookie) => {
       const match = cookie.match(/^([^=]+)=([^;]+)/);
       if (match) {
         const [, name, value] = match;
         // eslint-disable-next-line no-param-reassign
-        req.cookies = req.cookies || {};
+        req.cookies = req.cookies ?? {};
         // eslint-disable-next-line no-param-reassign
         req.cookies[name] = value;
       }
@@ -194,14 +193,5 @@ export class JwtRefreshMiddleware implements NestMiddleware {
       `${cookieKeys.access_token}=; ${cookieOptions}${secureSuffix}`,
       `${cookieKeys.refresh_token}=; ${cookieOptions}${secureSuffix}`,
     ]);
-  }
-
-  private normalizePath(path: string): string {
-    // Remove API version prefix (e.g., /api/v1/auth/login -> /api/auth/login)
-    const withoutVersion = path.replace(/^\/api\/v\d+\//, '/api/');
-    // Remove trailing slash
-    return withoutVersion.endsWith('/') && withoutVersion.length > 1
-      ? withoutVersion.slice(0, -1)
-      : withoutVersion;
   }
 }

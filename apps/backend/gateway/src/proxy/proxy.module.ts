@@ -1,17 +1,14 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
-import { JwtRefreshMiddleware } from '../middleware/jwt-refresh.middleware';
-import { JwtVerificationMiddleware } from '../middleware/jwt-verification.middleware';
+import { JwtRefreshGuard } from '../guards/jwt-refresh.guard';
+import { JwtVerificationGuard } from '../guards/jwt-verification.guard';
 
-import { ProxyController } from './proxy.controller';
+import { ProtectedProxyController } from './proxy.controller';
+import { PublicProxyController } from './public-proxy.controller';
 import { ProxyService } from './proxy.service';
 
 @Module({
@@ -28,14 +25,17 @@ import { ProxyService } from './proxy.service';
       },
     }),
   ],
-  controllers: [ProxyController],
-  providers: [ProxyService, JwtRefreshMiddleware, JwtVerificationMiddleware],
+  controllers: [PublicProxyController, ProtectedProxyController],
+  providers: [
+    ProxyService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtRefreshGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtVerificationGuard,
+    },
+  ],
 })
-export class ProxyModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    // Apply middlewares in order: Refresh first, then Verification
-    consumer
-      .apply(JwtRefreshMiddleware, JwtVerificationMiddleware)
-      .forRoutes({ path: '/:service/*path', method: RequestMethod.ALL });
-  }
-}
+export class ProxyModule {}

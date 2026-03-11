@@ -13,9 +13,17 @@ import { User } from '@pawhaven/shared/types';
 
 @Injectable()
 export class ProxyService {
-  constructor(private readonly configService: ConfigService) {}
+  private readonly proxyClient: RequestHandler<Request, Response, NextFunction>;
 
-  getProxyClient(): RequestHandler<Request, Response, NextFunction> {
+  constructor(private readonly configService: ConfigService) {
+    this.proxyClient = this.createProxyClient();
+  }
+
+  proxyRequest(req: Request, res: Response, next: NextFunction): void {
+    this.proxyClient(req, res, next);
+  }
+
+  private createProxyClient(): RequestHandler<Request, Response, NextFunction> {
     try {
       return createProxyMiddleware({
         router: this.resolveTarget.bind(this),

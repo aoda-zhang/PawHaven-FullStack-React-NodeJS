@@ -4,19 +4,19 @@
 
 PawHaven uses a cookie-based JWT authentication system across multiple microservices. The flow is centered around:
 
-- API Gateway routing requests to backend services
+- API Gateway with JWT Guards handling authentication and token refresh
+- Public routes explicitly declared in gateway controllers
 - Auth Service handling login, registration, refresh, and logout
-- Shared JWT Guard and JWT Strategy enforced by default in each service
-- Public endpoints explicitly marked with `@PublicAPI()`
+- Microservices trust gateway-forwarded user headers (no JWT validation)
 - Each microservice owning its own database (auth data lives in the Auth Service DB)
 
 ## System Components
 
 - Portal Frontend: collects credentials, sends requests, and keeps only user profile state
-- API Gateway: central entry point that forwards cookies and headers to services
+- API Gateway: central entry point with JWT Guards for authentication and auto-refresh
 - Auth Service: validates credentials, issues tokens, rotates refresh tokens
-- Domain Services: core/document/etc; verify tokens and use their own databases
-- Shared Auth Infrastructure: JWT Guard, JWT Strategy, and PublicAPI decorator
+- Domain Services: core/document/etc; receive authenticated requests with user headers from gateway
+- No shared auth infrastructure needed in services (gateway handles all authentication)
 
 ## System Architecture
 
@@ -28,6 +28,10 @@ graph TB
 
     subgraph "Gateway Layer"
         Gateway[API Gateway]
+        RefreshGuard[JWT Refresh Guard]
+        VerifyGuard[JWT Verification Guard]
+        PublicController[Public Proxy Controller]
+        ProtectedController[Protected Proxy Controller]
     end
 
     subgraph "Microservices"
@@ -42,26 +46,21 @@ graph TB
         DocumentDB[(Document Service DB)]
     end
 
-    subgraph "Shared Auth Infrastructure"
-        JWTGuard[JWT Guard]
-        JWTStrategy[JWT Strategy]
-        PublicAPI[PublicAPI Decorator]
-    end
-
     Portal --> Gateway
-    Gateway --> AuthService
-    Gateway --> CoreService
-    Gateway --> DocumentService
+    Gateway --> RefreshGuard
+    Gateway --> VerifyGuard
+    Gateway --> PublicController
+    Gateway --> ProtectedController
+    RefreshGuard --> VerifyGuard
+    PublicController --> AuthService
+    PublicController --> CoreService
+    ProtectedController --> AuthService
+    ProtectedController --> CoreService
+    ProtectedController --> DocumentService
 
     AuthService --> AuthDB
     CoreService --> CoreDB
     DocumentService --> DocumentDB
-
-    AuthService --> JWTGuard
-    CoreService --> JWTGuard
-    DocumentService --> JWTGuard
-    JWTGuard --> JWTStrategy
-    JWTGuard -.-> PublicAPI
 ```
 
 ## Authentication Flows
@@ -77,10 +76,11 @@ sequenceDiagram
     participant AuthDB as Auth Service DB
 
     User->>Portal: Enter credentials
-    Portal->>Gateway: Login request
-    Gateway->>AuthService: Proxy request
+    Portal->>Gateway: POST /auth/login
 
-    Note over AuthService: @PublicAPI bypasses JWT Guard
+    Note over Gateway: @Public() bypasses JWT Guards
+
+    Gateway->>AuthService: Proxy request
 
     alt Login
         AuthService->>AuthDB: Find user by email
@@ -115,33 +115,40 @@ sequenceDiagram
     actor User
     participant Portal as Portal Frontend
     participant Gateway as API Gateway
+    participant RefreshGuard as JWT Refresh Guard
+    participant VerifyGuard as JWT Verification Guard
     participant Service as Domain Service
-    participant JWTGuard as JWT Guard
-    participant JWTStrategy as JWT Strategy
     participant ServiceDB as Service DB
 
     User->>Portal: Access protected resource
     Portal->>Gateway: Request with cookies
-    Gateway->>Service: Proxy request
+    Gateway->>RefreshGuard: Intercept request
 
-    Service->>JWTGuard: Intercept request
-    alt Endpoint is public
-        JWTGuard-->>Service: Allow request
+    alt Public route (@Public decorator)
+        RefreshGuard-->>VerifyGuard: Skip refresh
+        VerifyGuard-->>Gateway: Skip verification
+        Gateway->>Service: Proxy request
         Service-->>Gateway: Response
         Gateway-->>Portal: Response
-    else Protected endpoint
-        JWTGuard->>JWTStrategy: Validate token
-        JWTStrategy->>JWTStrategy: Extract token (cookies or header)
+    else Protected route
+        RefreshGuard->>RefreshGuard: Check access token expiry
+        alt Token expiring soon
+            RefreshGuard->>Service: Call /auth/refresh
+            Service-->>RefreshGuard: New tokens + Set-Cookie
+            RefreshGuard->>RefreshGuard: Update request cookies
+        end
+        RefreshGuard->>VerifyGuard: Continue
+        VerifyGuard->>VerifyGuard: Verify access token
         alt Token valid
-            JWTStrategy-->>JWTGuard: Return payload
-            JWTGuard->>Service: Attach req.user
-            Service->>ServiceDB: Optional user or permission lookup
+            VerifyGuard->>VerifyGuard: Extract user payload
+            VerifyGuard->>Gateway: Attach req.user
+            Gateway->>Service: Proxy with X-Auth-User-Id header
+            Service->>ServiceDB: Optional authorization checks
             ServiceDB-->>Service: Result
             Service-->>Gateway: Response
             Gateway-->>Portal: Response
         else Invalid or missing token
-            JWTGuard-->>Service: 401 Unauthorized
-            Service-->>Gateway: Error
+            VerifyGuard-->>Gateway: 401 Unauthorized
             Gateway-->>Portal: Error
         end
     end
@@ -149,9 +156,15 @@ sequenceDiagram
 
 **Details**
 
-- JWT Guard is registered globally in each service via the shared backend-core module.
-- `@PublicAPI()` marks endpoints that bypass authentication.
-- Each service validates tokens independently and can use its own database for authorization checks.
+- Gateway enforces authentication with two sequential guards:
+  - `JwtRefreshGuard`: Proactively refreshes tokens before expiry
+  - `JwtVerificationGuard`: Validates access token and attaches user to request
+- `@Public()` decorator marks controllers/routes that bypass both guards
+- Public routes are explicitly declared in `PublicProxyController` (e.g., POST /auth/login)
+- Protected routes use catch-all pattern `/:service/*path` in `ProtectedProxyController`
+- Gateway forwards authenticated user info via `X-Auth-User-Id` and `X-Auth-User-Email` headers
+- **Microservices trust gateway headers and do not perform JWT validation**
+- Services use forwarded headers for business logic and authorization decisions
 
 ### 3. Token Refresh
 
@@ -159,13 +172,14 @@ sequenceDiagram
 sequenceDiagram
     participant Portal as Portal Frontend
     participant Gateway as API Gateway
+    participant RefreshGuard as JWT Refresh Guard
     participant AuthService as Auth Service
     participant AuthDB as Auth Service DB
 
-    Portal->>Gateway: Refresh request
+    Portal->>Gateway: POST /auth/refresh
+    Gateway->>RefreshGuard: Intercept (public route)
+    RefreshGuard-->>Gateway: Skip (marked @Public)
     Gateway->>AuthService: Proxy request
-
-    Note over AuthService: @PublicAPI bypasses JWT Guard
 
     AuthService->>AuthService: Extract refresh token
     alt Refresh token present
@@ -194,41 +208,70 @@ sequenceDiagram
 
 - Refresh rotates both access and refresh tokens.
 - A refresh token is valid only if it matches the stored hash for that user.
-- Refresh can be triggered explicitly (client call) or implicitly (AuthRefreshMiddleware).
+- Refresh can be triggered explicitly (client call) or implicitly (JwtRefreshGuard).
 
-**AuthRefreshMiddleware behavior**
+**JwtRefreshGuard behavior**
 
-- Attempts refresh when no access token, expired token, or token nearing expiry.
-- On success: updates both response cookies and the request object for downstream handlers.
-- On failure: clears cookies only when there is no valid access token; otherwise keeps the current token.
+- Runs before JwtVerificationGuard on all protected requests
+- Checks if access token is missing, invalid, or expiring soon (configurable window)
+- Automatically calls auth-service `/refresh` endpoint with refresh token
+- On success: updates both response Set-Cookie headers and request cookies for current request
+- On failure: clears cookies only when no valid access token exists; otherwise preserves current token
+- Skips refresh logic entirely for routes marked with `@Public()` decorator
 
 ## Component Details
 
 ### API Gateway
 
-- Acts as a single entry point for all client requests.
-- Routes requests to the appropriate microservice and forwards cookies and headers.
+- Acts as a single entry point for all client requests
+- Enforces authentication via global JWT guards (refresh + verification)
+- Public routes explicitly declared in `PublicProxyController`:
+  - `POST /auth/login`
+  - `POST /auth/register`
+  - `POST /auth/refresh`
+  - `GET /core/app/bootstrap`
+- Protected routes handled by `ProtectedProxyController` with catch-all pattern
+- Forwards requests to microservices with user info in custom headers (`X-Auth-User-Id`, `X-Auth-User-Email`)
+- Automatically refreshes tokens before expiry via `JwtRefreshGuard`
 
 ### Auth Service
 
-- Handles login, registration, refresh, and logout.
-- Stores password hashes and refresh token hashes in its own database.
-- Issues tokens and writes HTTP-only cookies in the response.
+- Handles login, registration, refresh, and logout
+- Stores password hashes and refresh token hashes in its own database
+- Issues tokens and writes HTTP-only cookies in the response
+- Does not validate JWT for its own endpoints (trusts gateway authentication)
+- Receives `X-Auth-User-Id` header from gateway for protected endpoints like logout
 
-### JWT Guard and JWT Strategy (Shared)
+### Domain Services (Core, Document, etc.)
 
-- Provided by the shared backend-core package and imported by each microservice.
-- JWT Guard enforces authentication by default.
-- JWT Strategy validates the token and returns a normalized user payload.
+- Receive pre-authenticated requests from gateway
+- Extract user information from `X-Auth-User-Id` and `X-Auth-User-Email` headers
+- **Do not perform JWT validation** - trust gateway's authentication
+- Focus on business logic and domain-specific authorization
+- Use forwarded user context for database queries and access control
 
-### PublicAPI Decorator
+### Public Decorator (Gateway)
 
-- Marks endpoints as public to bypass the global JWT Guard.
+- Gateway-level `@Public()` decorator marks controllers/routes that bypass authentication
+- Applied at class or method level using NestJS Reflector metadata
+- Checked by both `JwtRefreshGuard` and `JwtVerificationGuard`
+- Example: `PublicProxyController` has class-level `@Public()` for all auth endpoints
 
-### Auth Refresh Middleware
+### JWT Guards (Gateway)
 
-- Centralizes auto-refresh behavior for services that opt in.
-- Keeps active sessions seamless by refreshing tokens before they expire.
+**JwtRefreshGuard** (runs first):
+
+- Proactively refreshes access tokens before expiry
+- Configurable refresh window (default: 20% of token lifetime)
+- Calls auth-service refresh endpoint internally
+- Updates cookies on both response and request objects
+
+**JwtVerificationGuard** (runs second):
+
+- Validates access token JWT signature
+- Extracts user payload (userId, email)
+- Attaches `req.user` object for downstream proxy service
+- Throws 401 Unauthorized if token is missing or invalid
 
 ## Logout
 
