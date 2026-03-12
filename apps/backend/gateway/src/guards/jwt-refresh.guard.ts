@@ -7,10 +7,9 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
 import { JwtVerifyInfo } from '@pawhaven/shared/types';
+import { HttpClientService } from '@pawhaven/backend-core';
 import { cookieKeys } from '@pawhaven/backend-core/constants';
 import { isProd } from '@pawhaven/shared/utils';
 
@@ -23,7 +22,7 @@ export class JwtRefreshGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
-    private readonly httpService: HttpService,
+    private readonly httpClientService: HttpClientService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -126,36 +125,23 @@ export class JwtRefreshGuard implements CanActivate {
     }
 
     try {
-      const microServices =
-        this.configService.get<
-          Array<{ name: string; options?: { host: string; port: number } }>
-        >('microServices') ?? [];
-      const authService = microServices.find(
-        (service) => service.name === 'auth-service',
-      );
-
-      if (!authService?.options) {
-        this.logger.error('Auth service configuration not found');
-        return;
-      }
-
-      const authServiceUrl = `http://${authService.options.host}:${authService.options.port}`;
-
-      const response = await firstValueFrom(
-        this.httpService.post(
-          `${authServiceUrl}/api/auth/refresh`,
-          {},
-          {
-            headers: {
-              Cookie: `${cookieKeys.refresh_token}=${refreshToken}`,
-            },
+      const authClient = this.httpClientService.create('auth-service');
+      const response = await authClient.post<unknown>(
+        '/auth-service/refresh',
+        {},
+        {
+          returnResponse: true,
+          headers: {
+            Cookie: `${cookieKeys.refresh_token}=${refreshToken}`,
           },
-        ),
+        },
       );
 
       const setCookieHeaders = response.headers['set-cookie'];
       if (Array.isArray(setCookieHeaders) && setCookieHeaders.length > 0) {
         this.updateAuthCookies(req, res, setCookieHeaders);
+      } else {
+        this.logger.warn('Token refresh succeeded but no Set-Cookie returned');
       }
     } catch (error) {
       this.logger.error('Token refresh failed', error as Error);
