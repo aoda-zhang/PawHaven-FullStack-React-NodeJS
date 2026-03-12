@@ -37,6 +37,10 @@ const matchesStatusAndCode = (
 const isAuthError = (errorRes: ErrorResponse): boolean => {
   if (!errorRes) return false;
 
+  if (errorRes.status === HTTP_STATUS.UNAUTHORIZED) {
+    return true;
+  }
+
   // 1. Status + code
   if (
     matchesStatusAndCode(errorRes, HTTP_STATUS.UNAUTHORIZED, [
@@ -143,8 +147,8 @@ const isMaintenance = (errorRes: ErrorResponse): boolean => {
  */
 const mapErrorToType = (errorRes: ErrorResponse) => {
   if (isAuthError(errorRes)) return httpRequestErrors.AUTH;
-  if (isPermissionError(errorRes)) return httpRequestErrors.FORBIDDEN;
-  if (isBadRequest(errorRes)) return httpRequestErrors.CLIENT;
+  if (isPermissionError(errorRes)) return httpRequestErrors.PERMISSION;
+  if (isBadRequest(errorRes)) return httpRequestErrors.BADREQUEST;
   if (isRateLimit(errorRes)) return httpRequestErrors.RATELIMIT;
   if (isMaintenance(errorRes)) return httpRequestErrors.MAINTENANCE;
   if (isServerError(errorRes)) return httpRequestErrors.SERVER;
