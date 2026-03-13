@@ -12,6 +12,9 @@ swagger:
   prefix: api-docs
   description: 管理后台接口文档
 
+auth:
+  jwtSecret: ${JWT_SECRET}
+
 DBConnections:
   - enable: true
     options:

@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtVerifyInfo, AuthResponseDto } from '@pawhaven/shared/types';
+import { isProd } from '@pawhaven/shared/utils';
 import * as bcrypt from 'bcrypt';
 import {
   databaseEngines,
+  cookieKeys,
   httpBusinessMappingCodes,
 } from '@pawhaven/backend-core/constants';
 import { InjectPrisma } from '@pawhaven/backend-core';
@@ -63,24 +65,20 @@ export class AuthService {
     };
 
     const env = this.config.get<string>('http.env');
-    const isProduction = env === 'prod' || env === 'production';
+    const isProdEnv = isProd(env);
+
     this.cookieConfig = {
-      names: isProduction
-        ? {
-            access: '__Host-access-token',
-            refresh: '__Host-refresh-token',
-          }
-        : {
-            access: 'access_token',
-            refresh: 'refresh_token',
-          },
+      names: {
+        access: cookieKeys.access_token,
+        refresh: cookieKeys.refresh_token,
+      },
       sameSite: {
         access: 'lax',
         refresh: 'strict',
       },
       baseOptions: {
         httpOnly: true,
-        secure: isProduction,
+        secure: isProdEnv,
         path: '/',
       },
     };
@@ -216,7 +214,7 @@ export class AuthService {
       expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: refreshToken,
       user: {
-        id: user.id,
+        userId: user.id,
         email: user.email,
       },
     };
@@ -261,7 +259,7 @@ export class AuthService {
       expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: refreshToken,
       user: {
-        id: newUser.id,
+        userId: newUser.id,
         email: newUser.email,
       },
     };
@@ -312,7 +310,7 @@ export class AuthService {
       expires_in: this.tokenConfig.expiresIn.access,
       refresh_token: newRefreshToken,
       user: {
-        id: user.id,
+        userId: user.id,
         email: user.email,
       },
     };

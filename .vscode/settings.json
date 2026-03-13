@@ -59,5 +59,10 @@
   },
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "rg": true,
+    "head": true,
+    "grep": true
   }
 }

@@ -14,9 +14,6 @@ import { microServiceNames } from '@pawhaven/backend-core/constants';
       serviceName: microServiceNames.DOCUMENT,
       modules: [
         {
-          module: SharedModuleFeatures.JWTModule,
-        },
-        {
           module: SharedModuleFeatures.SwaggerModule,
         },
       ],

@@ -4,19 +4,15 @@ import type { Request, Response, NextFunction } from 'express';
 import { ProxyService } from './proxy.service';
 
 @Controller()
-export class ProxyController {
-  private readonly proxyClient;
+export class ProtectedProxyController {
+  constructor(private readonly proxyService: ProxyService) {}
 
-  constructor(private readonly proxyService: ProxyService) {
-    this.proxyClient = this.proxyService.getProxyClient();
-  }
-
-  @All('*all')
+  @All('/:service/*path')
   proxyRequests(
     @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
-  ): Promise<void> {
-    return this.proxyClient(req, res, next);
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
   }
 }

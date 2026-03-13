@@ -21,7 +21,7 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
           staleTime: Number(loadConfig().query?.staleTime) ?? 5 * 60 * 1000,
           cacheTime: Number(loadConfig().query?.cacheTime) ?? 30 * 60 * 1000,
           onAuthError: () => {
-            // Use hard redirect to fully reset app state and avoid SPA guard loops
+            // Backend/gateway 401 -> hard redirect to reset app state and enter login flow
             window.location.href = '/auth/login';
           },
           onPermissionError: () => {},

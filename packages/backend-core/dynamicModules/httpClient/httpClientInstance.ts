@@ -1,6 +1,5 @@
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { firstValueFrom } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
@@ -11,9 +10,33 @@ export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 interface RequestOptions {
   headers?: Record<string, string>;
   config?: AxiosRequestConfig;
+  returnResponse?: boolean;
 }
 
+interface MicroserviceOption {
+  host: string;
+  port?: number;
+}
+
+interface MicroserviceConfigItem {
+  name: string;
+  enable?: boolean;
+  options?: MicroserviceOption;
+}
+
+interface RequestContext {
+  traceId: string;
+  startTime: number;
+  method: HttpMethod;
+  url: string;
+  requestData: unknown;
+}
+
+const DEFAULT_REQUEST_TIMEOUT_MS = 8000;
+
 export class HttpClientInstance {
+  private readonly fallbackTimeout = DEFAULT_REQUEST_TIMEOUT_MS;
+
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
@@ -22,35 +45,44 @@ export class HttpClientInstance {
     private readonly logger: Logger,
   ) {}
 
-  private getCurrentMicroserviceOption(): Record<string, any> {
+  private getCurrentMicroserviceOption(): MicroserviceOption {
     const allMicroservices =
-      this.configService.get<Array<Record<string, any>>>('microServices') ?? [];
+      this.configService.get<MicroserviceConfigItem[]>('microServices') ?? [];
     const currentMicroserviceOption = allMicroservices?.find(
       (mic) => mic?.name === this.serviceName && mic?.enable,
     );
-    if (allMicroservices?.length > 0 && currentMicroserviceOption) {
-      return currentMicroserviceOption?.options;
+
+    if (currentMicroserviceOption?.options?.host) {
+      return currentMicroserviceOption.options;
     }
+
     throw new Error(
       `ConfigService: missing microServices ${this.serviceName} config`,
     );
   }
 
+  private resolveServiceOrigin(option: MicroserviceOption): string {
+    const host = (
+      /^https?:\/\//i.test(option.host) ? option.host : `http://${option.host}`
+    ).replace(/\/+$/, '');
+
+    if (
+      (host.includes('localhost') || host.includes('127.0.0.1')) &&
+      option.port &&
+      !/:\d+(?=\/|$)/.test(host)
+    ) {
+      return `${host}:${option.port}`;
+    }
+
+    return host;
+  }
+
   private getFullURL(path: string): string {
     const currentMicroserviceOption = this.getCurrentMicroserviceOption();
-    if (!currentMicroserviceOption) {
-      throw new Error(`Microservice host for "${this.serviceName}" is empty`);
-    }
-    let finalHost = currentMicroserviceOption?.host?.trim();
-    if (
-      (finalHost.includes('localhost') || finalHost.includes('127.0.0.1')) &&
-      currentMicroserviceOption?.port
-    ) {
-      finalHost += `:${currentMicroserviceOption.port}`;
-    }
-    const cleanedBase = finalHost.replace(/\/+$/, '');
+    const cleanedBase = this.resolveServiceOrigin(currentMicroserviceOption);
     const cleanedPath = path?.trim()?.replace(/^\/+/, '');
-    const fullUrl = `${cleanedBase}/${cleanedPath}`;
+
+    const fullUrl = cleanedPath ? `${cleanedBase}/${cleanedPath}` : cleanedBase;
     if (!fullUrl) {
       throw new Error(`Invalid composed URL: "${fullUrl}"`);
     }
@@ -58,102 +90,209 @@ export class HttpClientInstance {
     return fullUrl;
   }
 
-  private async request<T>(
-    method: HttpMethod,
-    path: string,
-    data?: any,
+  private buildRequestConfig(
+    context: RequestContext,
     options?: RequestOptions,
-  ): Promise<T> {
-    const url = this.getFullURL(path);
-    const traceId = uuidv4();
-    const startTime = Date.now();
+  ): AxiosRequestConfig {
     const headers = {
       ...this.defaultHeaders,
       ...options?.headers,
-      'x-trace-id': traceId,
+      'x-trace-id': context.traceId,
     };
 
-    const requestConfig: AxiosRequestConfig = {
-      timeout: 8000,
+    return {
+      timeout:
+        this.configService.get<number>('http.timeout') ?? this.fallbackTimeout,
       ...options?.config,
-      method,
-      url,
+      method: context.method,
+      url: context.url,
       headers,
-      data,
+      data: context.requestData,
+    };
+  }
+
+  private extractErrorMessage(error: AxiosError): string {
+    const responseData = error.response?.data;
+    if (typeof responseData === 'object' && responseData !== null) {
+      const { message } = responseData as { message?: unknown };
+      if (typeof message === 'string' && message.length > 0) {
+        return message;
+      }
+    }
+
+    return error.message || 'Remote service error';
+  }
+
+  private resolveAxiosError(error: AxiosError): {
+    status: number;
+    message: string;
+  } {
+    if (error.code === 'ECONNABORTED') {
+      return {
+        status: HttpStatus.GATEWAY_TIMEOUT,
+        message: 'Request timeout',
+      };
+    }
+
+    if (!error.response) {
+      return {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        message: 'Service unavailable',
+      };
+    }
+
+    return {
+      status: error.response.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      message: this.extractErrorMessage(error),
+    };
+  }
+
+  private handleAxiosError(error: AxiosError, context: RequestContext): never {
+    const duration = Date.now() - context.startTime;
+
+    this.logger.error(
+      `HTTP ${context.method.toUpperCase()} ${context.url} failed in ${duration}ms (traceId=${context.traceId})`,
+      error.stack || error.message,
+    );
+    const { status, message } = this.resolveAxiosError(error);
+
+    throw new HttpException(
+      {
+        traceId: context.traceId,
+        duration,
+        message,
+        status,
+        data: context.requestData,
+      },
+      status,
+    );
+  }
+
+  private async executeRequest<T, TResult>(
+    method: HttpMethod,
+    path: string,
+    data: unknown,
+    options: RequestOptions | undefined,
+    transform: (response: AxiosResponse<T>) => TResult,
+  ): Promise<TResult> {
+    const context: RequestContext = {
+      traceId: uuidv4(),
+      startTime: Date.now(),
+      method,
+      url: this.getFullURL(path),
+      requestData: data,
     };
 
     try {
       const response = await firstValueFrom(
-        this.httpService.request<T>(requestConfig).pipe(
-          map((res: AxiosResponse<T>) => {
-            const duration = Date.now() - startTime;
-            this.logger.log(
-              `HTTP ${method.toUpperCase()} ${url} completed in ${duration}ms (traceId=${traceId})`,
-            );
-            return res?.data;
-          }),
-          catchError((error: AxiosError) => {
-            const duration = Date.now() - startTime;
-
-            this.logger.error(
-              `HTTP ${method.toUpperCase()} ${url} failed in ${duration}ms (traceId=${traceId})`,
-              error.stack || error.message,
-            );
-
-            let status = HttpStatus.INTERNAL_SERVER_ERROR;
-            let message = 'Remote service error';
-            // const errorData = null;
-
-            if (error?.code === 'ECONNABORTED') {
-              status = HttpStatus.GATEWAY_TIMEOUT;
-              message = 'Request timeout';
-            } else if (!error?.response) {
-              status = HttpStatus.SERVICE_UNAVAILABLE;
-              message = 'Service unavailable';
-            } else {
-              status =
-                error?.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
-              message = error?.message || 'Remote service error';
-              // errorData = error?.response?.data ?? null
-            }
-
-            throw new HttpException(
-              {
-                traceId,
-                duration,
-                message,
-                status,
-                data,
-              },
-              status,
-            );
-          }),
-        ),
+        this.httpService.request<T>(this.buildRequestConfig(context, options)),
       );
 
-      return response;
+      const duration = Date.now() - context.startTime;
+      this.logger.log(
+        `HTTP ${method.toUpperCase()} ${context.url} completed in ${duration}ms (traceId=${context.traceId})`,
+      );
+
+      return transform(response);
     } catch (error) {
+      const duration = Date.now() - context.startTime;
+      const axiosError = error as AxiosError;
+      if (axiosError?.isAxiosError) {
+        this.handleAxiosError(axiosError, context);
+      }
+
       this.logger.error(
-        `Final request failed: ${method.toUpperCase()} ${url}`,
-        error,
+        `Final request failed: ${method.toUpperCase()} ${context.url}`,
+        error as Error,
       );
-      throw error;
+      throw new HttpException(
+        {
+          traceId: context.traceId,
+          duration,
+          message:
+            error instanceof Error
+              ? error.message
+              : 'Unexpected HTTP client error',
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          data: context.requestData,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  get<T>(path: string, options?: RequestOptions) {
+  private async request<T>(
+    method: HttpMethod,
+    path: string,
+    data?: unknown,
+    options?: RequestOptions,
+  ): Promise<T | AxiosResponse<T>> {
+    return this.executeRequest<T, T | AxiosResponse<T>>(
+      method,
+      path,
+      data,
+      options,
+      (response) => (options?.returnResponse ? response : response.data),
+    );
+  }
+
+  get<T>(
+    path: string,
+    options: RequestOptions & { returnResponse: true },
+  ): Promise<AxiosResponse<T>>;
+
+  get<T>(path: string, options?: RequestOptions): Promise<T>;
+
+  get<T>(
+    path: string,
+    options?: RequestOptions,
+  ): Promise<T | AxiosResponse<T>> {
     return this.request<T>('get', path, null, options);
   }
 
-  post<T>(path: string, body: any, options?: RequestOptions) {
+  post<T>(
+    path: string,
+    body: unknown,
+    options: RequestOptions & { returnResponse: true },
+  ): Promise<AxiosResponse<T>>;
+
+  post<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
+
+  post<T>(
+    path: string,
+    body: unknown,
+    options?: RequestOptions,
+  ): Promise<T | AxiosResponse<T>> {
     return this.request<T>('post', path, body, options);
   }
 
-  put<T>(path: string, body: any, options?: RequestOptions) {
+  put<T>(
+    path: string,
+    body: unknown,
+    options: RequestOptions & { returnResponse: true },
+  ): Promise<AxiosResponse<T>>;
+
+  put<T>(path: string, body: unknown, options?: RequestOptions): Promise<T>;
+
+  put<T>(
+    path: string,
+    body: unknown,
+    options?: RequestOptions,
+  ): Promise<T | AxiosResponse<T>> {
     return this.request<T>('put', path, body, options);
   }
 
-  delete<T>(path: string, options?: RequestOptions) {
+  delete<T>(
+    path: string,
+    options: RequestOptions & { returnResponse: true },
+  ): Promise<AxiosResponse<T>>;
+
+  delete<T>(path: string, options?: RequestOptions): Promise<T>;
+
+  delete<T>(
+    path: string,
+    options?: RequestOptions,
+  ): Promise<T | AxiosResponse<T>> {
     return this.request<T>('delete', path, null, options);
   }
 }

@@ -1,16 +1,14 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   BadRequestException,
+  UnauthorizedException,
   Res,
   Req,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import { JwtVerifyInfo } from '@pawhaven/shared/types';
 import { httpBusinessMappingCodes } from '@pawhaven/backend-core/constants';
-import { PublicAPI } from '@pawhaven/backend-core/decorators';
 
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
@@ -20,19 +18,6 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('/verify')
-  async verify(@Req() req: Request): Promise<JwtVerifyInfo> {
-    const token = this.authService.getTokenFromRequest(req, 'access');
-
-    if (!token) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
-    }
-
-    const verifyInfo = await this.authService.verifyToken(token);
-    return verifyInfo;
-  }
-
-  @PublicAPI()
   @Post('/login')
   async login(
     @Body() loginDto: LoginDTO,
@@ -52,7 +37,6 @@ export class AuthController {
     };
   }
 
-  @PublicAPI()
   @Post('/register')
   async register(
     @Body() registerDto: RegisterDTO,
@@ -72,7 +56,6 @@ export class AuthController {
     };
   }
 
-  @PublicAPI()
   @Post('/refresh')
   async refresh(
     @Req() req: Request,
@@ -100,14 +83,14 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
-    const token = this.authService.getTokenFromRequest(req, 'access');
+    const userId = req.headers['x-auth-user-id'];
+    const verified = req.headers['x-auth-verified'];
 
-    if (!token) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+    if (verified !== '1' || typeof userId !== 'string') {
+      throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
     }
 
-    const claims = await this.authService.verifyToken(token);
-    await this.authService.logout(claims.userId);
+    await this.authService.logout(userId);
 
     this.authService.clearAuthCookies(res);
 

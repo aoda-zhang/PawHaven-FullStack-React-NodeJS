@@ -1,4 +1,4 @@
-import type { CredentialsDto, JwtVerifyInfo } from '@pawhaven/shared/types';
+import type { CredentialsDto } from '@pawhaven/shared/types';
 
 import type { ProfileType } from '../types';
 
@@ -10,8 +10,4 @@ export const register = (userInfo: CredentialsDto): Promise<ProfileType> => {
 
 export const login = (userInfo: CredentialsDto): Promise<ProfileType> => {
   return apiClient.post('/auth/login', userInfo);
-};
-
-export const verify = (): Promise<JwtVerifyInfo> => {
-  return apiClient.get('/auth/verify');
 };

@@ -1,10 +1,9 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AuthRefreshMiddleware } from './auth-refresh.middleware';
 
 @Module({
   imports: [
@@ -29,20 +28,4 @@ import { AuthRefreshMiddleware } from './auth-refresh.middleware';
   providers: [AuthService],
   exports: [AuthService],
 })
-export class AuthModule implements NestModule {
-  private readonly PUBLIC_ROUTES = ['login', 'register', 'refresh', 'logout'];
-
-  constructor(private configService: ConfigService) {}
-
-  configure(consumer: MiddlewareConsumer) {
-    const prefix = this.configService.get<string>('http.prefix');
-    const excludedRoutes = this.PUBLIC_ROUTES.map(
-      (route) => `${prefix}/${route}`,
-    );
-
-    consumer
-      .apply(AuthRefreshMiddleware)
-      .exclude(...excludedRoutes)
-      .forRoutes('*');
-  }
-}
+export class AuthModule {}
