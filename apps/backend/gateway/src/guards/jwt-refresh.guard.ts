@@ -8,12 +8,15 @@ import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { JwtVerifyInfo } from '@pawhaven/shared/types';
+import { JwtVerifyInfo, User } from '@pawhaven/shared/types';
 import { HttpClientService } from '@pawhaven/backend-core';
 import { cookieKeys } from '@pawhaven/backend-core/constants';
 import { isProd } from '@pawhaven/shared/utils';
 
 import { IS_PUBLIC_API } from '../decorators/public.decorator';
+import { IS_OPTIONAL_AUTH } from '../decorators/optional-auth.decorator';
+
+type RequestWithUser = Request & { user?: User };
 
 @Injectable()
 export class JwtRefreshGuard implements CanActivate {
@@ -31,15 +34,19 @@ export class JwtRefreshGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+    const isOptionalAuth = this.reflector.getAllAndOverride<boolean>(
+      IS_OPTIONAL_AUTH,
+      [context.getHandler(), context.getClass()],
+    );
 
-    if (isPublic) {
+    const req = context.switchToHttp().getRequest<RequestWithUser>();
+    const res = context.switchToHttp().getResponse<Response>();
+    const accessToken = req.cookies?.[cookieKeys.access_token];
+
+    if (isPublic || (isOptionalAuth && !accessToken)) {
       return true;
     }
 
-    const req = context.switchToHttp().getRequest<Request>();
-    const res = context.switchToHttp().getResponse<Response>();
-
-    const accessToken = req.cookies?.[cookieKeys.access_token];
     if (!accessToken) {
       await this.attemptTokenRefresh(req, res, {
         clearCookiesOnFailure: true,
