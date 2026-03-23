@@ -160,9 +160,7 @@ export class BootstrapService {
         select: {
           id: true,
           label: true,
-          type: true,
           to: true,
-          component: true,
           classNames: true,
           order: true,
         },
@@ -181,13 +179,14 @@ export class BootstrapService {
       const menus = await this.prisma.menu.findMany({
         where: {
           status: 'active',
+          to: {
+            startsWith: '/',
+          },
         },
         select: {
           id: true,
           label: true,
-          type: true,
           to: true,
-          component: true,
           classNames: true,
           order: true,
           menuPermissions: {
@@ -208,9 +207,7 @@ export class BootstrapService {
         )
         .map((menu) => ({
           label: menu.label,
-          type: menu.type,
           to: menu.to,
-          component: menu.component,
           classNames: menu.classNames,
           order: menu.order,
         }));

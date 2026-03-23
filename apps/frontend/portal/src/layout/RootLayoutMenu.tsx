@@ -1,4 +1,5 @@
 import { useMatchBreakpoint } from '@pawhaven/design-system/useMatchBreakpoint';
+import { LanguageSelector } from '@pawhaven/frontend-core';
 import { AlignJustify } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,7 +23,7 @@ export const RootLayoutMenu = ({
   return (
     <header className="flex justify-between items-center box-border p-[.625rem] z-header border-border border-b-1 px-6 py-4 bg-white">
       <Brand navigate={navigate} />
-      <div className="flex gap-4">
+      <div className="flex items-center gap-4">
         {!enableSidebarMode && (
           <RootLayoutMenuRender
             menuItems={menuItems}
@@ -30,6 +31,8 @@ export const RootLayoutMenu = ({
             navigate={navigate}
           />
         )}
+
+        {!enableSidebarMode && <LanguageSelector />}
 
         {/* Open Side bar Icon */}
         {enableSidebarMode && (

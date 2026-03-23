@@ -49,18 +49,20 @@ export const I18nSwitch = () => {
 
   return (
     <>
-      <div
-        className="flex items-center justify-center gap-[.625rem] cursor-pointer min-w-[12.5rem] mb-2 sm:mb-0"
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-haspopup="true"
-        aria-expanded={open}
-      >
-        <Globe />
-        {t(`common.${i18n.language}`)}
-        <ChevronDown size={26} />
+      <div className="shrink-0 rounded-full border border-border bg-white px-[2px] py-1 shadow-sm">
+        <div
+          className="flex items-center justify-center gap-[.625rem] cursor-pointer min-w-[12.5rem] mb-0 px-2 py-1 text-sm"
+          onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          role="button"
+          tabIndex={0}
+          aria-haspopup="true"
+          aria-expanded={open}
+        >
+          <Globe />
+          {t(`common.${i18n.language}`)}
+          <ChevronDown size={26} />
+        </div>
       </div>
       <Popover
         open={open}
@@ -80,3 +82,5 @@ export const I18nSwitch = () => {
     </>
   );
 };
+
+export const LanguageSelector = I18nSwitch;
