@@ -22,7 +22,7 @@ export const ConfigSchema = z.object({
     refetchOnFocus: z.boolean(),
     refetchOnWindowFocus: z.boolean(),
     staleTime: z.number(),
-    cacheTime: z.number(),
+    gcTime: z.number(),
   }),
 
   // sentry: z.object({

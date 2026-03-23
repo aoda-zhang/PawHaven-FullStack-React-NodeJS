@@ -32,8 +32,9 @@ model Menu {
   to         String?
   component  String?
   classNames String[]
-  roles      String[] @default([])
   order      Int
+
+  menuPermissions MenuPermission[]
 }
 
 model Route {
@@ -56,5 +57,83 @@ model Route {
 
   order Int?
 
+  routePermissions RoutePermission[]
+
   @@index([parentId])
+}
+
+model Role {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  status String @default("active")
+  key    String @unique
+  name   String
+
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  status String @default("active")
+  code   String @unique
+  name   String
+
+  rolePermissions  RolePermission[]
+  menuPermissions  MenuPermission[]
+  routePermissions RoutePermission[]
+}
+
+model RolePermission {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  roleId       String     @db.ObjectId
+  permissionId String     @db.ObjectId
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+}
+
+model MenuPermission {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  menuId       String     @db.ObjectId
+  permissionId String     @db.ObjectId
+  menu         Menu       @relation(fields: [menuId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([menuId, permissionId])
+  @@index([menuId])
+  @@index([permissionId])
+}
+
+model RoutePermission {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  routeId      String     @db.ObjectId
+  permissionId String     @db.ObjectId
+  route        Route      @relation(fields: [routeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([routeId, permissionId])
+  @@index([routeId])
+  @@index([permissionId])
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Next, Post, Req, Res } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
 import { Public } from '../decorators/public.decorator';
+import { OptionalAuth } from '../decorators/optional-auth.decorator';
 
 import { ProxyService } from './proxy.service';
 
@@ -42,7 +43,7 @@ export class PublicProxyController {
     this.proxyService.proxyRequest(req, res, next);
   }
 
-  // TODO: Will be removed after core app bootstrap is complete and can be accessed directly
+  @OptionalAuth()
   @Get('/core/app/bootstrap')
   proxyCoreBootstrap(
     @Req() req: Request,

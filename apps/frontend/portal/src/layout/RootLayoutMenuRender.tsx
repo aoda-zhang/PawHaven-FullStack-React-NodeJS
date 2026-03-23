@@ -4,10 +4,13 @@ import clsx from 'clsx';
 import { cloneElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useLogout } from '@/features/Auth/apis/queries';
 import {
   menuTypes,
   type MenuRenderType,
 } from '@/features/Landing/landing.type';
+import { routePaths } from '@/router/routePaths';
+import { useGlobalState } from '@/store/globalReducer';
 
 const rootLayoutClassNames = {
   menuItem:
@@ -18,10 +21,17 @@ const rootLayoutClassNames = {
 };
 export const RootLayoutMenuRender = (props: MenuRenderType) => {
   const HeaderComponentMappings = {
-    I18nSwitch: <I18nSwitch />,
+    I18nSwitch: (
+      <div className="shrink-0 rounded-full border border-border bg-white px-1 py-1 shadow-sm [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
+        <I18nSwitch />
+      </div>
+    ),
   };
   const { menuItems, activePath, navigate } = props;
   const { t } = useTranslation();
+  const { profile } = useGlobalState();
+  const { mutate: logout, isPending: isLogoutPending } = useLogout();
+  const isLoggedIn = !!profile?.baseUserInfo?.userID;
 
   const handleLinkMenu = (item: MenuItem) => {
     if (item?.to) {
@@ -46,11 +56,27 @@ export const RootLayoutMenuRender = (props: MenuRenderType) => {
           role="button"
           tabIndex={0}
           onClick={() => {
+            if (
+              item.to === routePaths.login &&
+              isLoggedIn &&
+              !isLogoutPending
+            ) {
+              logout();
+              return;
+            }
             navigate(item.to || '/');
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
+              if (
+                item.to === routePaths.login &&
+                isLoggedIn &&
+                !isLogoutPending
+              ) {
+                logout();
+                return;
+              }
               navigate(item.to || '/');
             }
           }}
@@ -70,12 +96,7 @@ export const RootLayoutMenuRender = (props: MenuRenderType) => {
           item.component as unknown as keyof typeof HeaderComponentMappings
         ];
       return (
-        <div
-          className={clsx(itemClassNames)}
-          key={item?.label}
-          role="button"
-          tabIndex={0}
-        >
+        <div className={clsx(itemClassNames)} key={item?.label}>
           {Component && cloneElement(Component)}
         </div>
       );

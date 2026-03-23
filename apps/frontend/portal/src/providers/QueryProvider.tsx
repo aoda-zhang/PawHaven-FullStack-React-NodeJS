@@ -11,23 +11,23 @@ import { useIsStableEnv } from '@/hooks/useIsStableEnv';
 
 export const QueryProvider = ({ children }: { children: ReactNode }) => {
   const IsStableEnv = useIsStableEnv();
-  const [queryClient] = useState(
-    () =>
-      new QueryClient(
-        getRequestQueryOptions({
-          refetchOnReconnect: loadConfig().query?.refetchOnReconnect ?? true,
-          refetchOnWindowFocus:
-            loadConfig().query?.refetchOnWindowFocus ?? false,
-          staleTime: Number(loadConfig().query?.staleTime) ?? 5 * 60 * 1000,
-          cacheTime: Number(loadConfig().query?.cacheTime) ?? 30 * 60 * 1000,
-          onAuthError: () => {
-            // Backend/gateway 401 -> hard redirect to reset app state and enter login flow
-            window.location.href = '/auth/login';
-          },
-          onPermissionError: () => {},
-        }),
-      ),
-  );
+  const [queryClient] = useState(() => {
+    const queryConfig = loadConfig().query;
+
+    return new QueryClient(
+      getRequestQueryOptions({
+        refetchOnReconnect: queryConfig?.refetchOnReconnect ?? true,
+        refetchOnWindowFocus: queryConfig?.refetchOnWindowFocus ?? false,
+        staleTime: queryConfig?.staleTime ?? 5 * 60 * 1000,
+        gcTime: queryConfig?.gcTime ?? 30 * 60 * 1000,
+        onAuthError: () => {
+          // Backend/gateway 401 -> hard redirect to reset app state and enter login flow
+          window.location.href = '/auth/login';
+        },
+        onPermissionError: () => {},
+      }),
+    );
+  });
 
   const [asyncStoragePersister] = useState(() =>
     createAsyncStoragePersister({

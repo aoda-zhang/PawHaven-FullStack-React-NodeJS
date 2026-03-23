@@ -5,6 +5,14 @@
   "type": "module",
   "private": true,
   "sideEffects": false,
+  "scripts": {
+    "dev": "vite --mode dev",
+    "build": "vite build",
+    "turbo:build": "turbo run build --filter=@pawhaven/portal --env-mode=loose",
+    "install:portal": "pnpm --filter=@pawhaven/portal... install",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -50,14 +58,6 @@
     "vite": "^7.1.11",
     "vite-tsconfig-paths": "6.0.0-beta.4",
     "zod": "^4.3.6"
-  },
-  "scripts": {
-    "dev": "vite --mode dev",
-    "build": "vite build",
-    "turbo:build": "turbo run build --filter=@pawhaven/portal --env-mode=loose",
-    "install:portal": "pnpm --filter=@pawhaven/portal... install",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@pawhaven/eslint-config": "workspace:*",

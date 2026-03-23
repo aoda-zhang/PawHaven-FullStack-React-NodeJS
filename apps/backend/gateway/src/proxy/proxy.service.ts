@@ -67,6 +67,7 @@ export class ProxyService {
     delete req.headers['x-auth-user-id'];
     delete req.headers['x-auth-user-email'];
     delete req.headers['x-auth-verified'];
+    delete req.headers['x-auth-user-roles'];
 
     const { user } = req;
 
@@ -75,6 +76,9 @@ export class ProxyService {
       proxyReq.setHeader('X-Auth-Verified', '1');
       if (user.email) {
         proxyReq.setHeader('X-Auth-User-Email', user.email);
+      }
+      if (Array.isArray(user.roles) && user.roles.length > 0) {
+        proxyReq.setHeader('X-Auth-User-Roles', user.roles.join(','));
       }
     }
 

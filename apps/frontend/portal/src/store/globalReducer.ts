@@ -15,16 +15,19 @@ export interface GlobalStateType {
   locale: string;
   isSysMaintain: boolean;
 }
-const initialState: GlobalStateType = {
-  profile: {
-    baseUserInfo: {
-      email: '',
-      userID: '',
-      globalMenuUpdateAt: '',
-      globalRouterUpdateAt: '',
-    },
-    accessToken: '',
+
+export const emptyProfile: ProfileType = {
+  baseUserInfo: {
+    email: '',
+    userID: '',
+    globalMenuUpdateAt: '',
+    globalRouterUpdateAt: '',
   },
+  accessToken: '',
+};
+
+const initialState: GlobalStateType = {
+  profile: emptyProfile,
   locale: storageTool.get(StorageKeys.i18nextLng) || localeCodes['en-US'],
   isSysMaintain: true,
 };

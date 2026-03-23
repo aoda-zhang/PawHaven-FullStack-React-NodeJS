@@ -17,7 +17,7 @@ query:
   refetchOnFocus: false
   refetchOnWindowFocus: false
   staleTime: 30000
-  cacheTime: 60000
+  gcTime: 60000
 
 sentry:
   dsn: ${PAWHAVEN_USER_SENTRY_DSN}

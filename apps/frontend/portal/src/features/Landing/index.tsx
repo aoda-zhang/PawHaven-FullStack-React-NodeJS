@@ -6,12 +6,19 @@ import type { LandingDataType } from './landingContext';
 import { LandingContext } from './landingContext';
 
 import { SystemError } from '@/components/SystemError';
+import { useGlobalState } from '@/store/globalReducer';
 
 interface LandingProps {
   children: ReactNode;
 }
 export const Landing = ({ children }: LandingProps) => {
-  const { data, isError, isLoading } = useGetAppBootstrap();
+  const { profile } = useGlobalState();
+  const bootstrapScope = {
+    userID: profile?.baseUserInfo?.userID ?? '',
+    menuUpdateAt: profile?.baseUserInfo?.globalMenuUpdateAt ?? '',
+    routerUpdateAt: profile?.baseUserInfo?.globalRouterUpdateAt ?? '',
+  };
+  const { data, isError, isLoading } = useGetAppBootstrap(bootstrapScope);
 
   const contextValue: LandingDataType = data ?? {
     menus: [],

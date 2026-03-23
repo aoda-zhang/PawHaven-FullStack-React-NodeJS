@@ -6,6 +6,7 @@ import { z } from 'zod';
  */
 export interface RouterHandle {
   isMenuAvailable?: boolean;
+  isFooterAvailable?: boolean;
   isLazyLoad?: boolean;
 }
 
@@ -22,6 +23,7 @@ export interface RouterItem {
 const HandleSchema = z
   .object({
     isMenuAvailable: z.boolean().optional(),
+    isFooterAvailable: z.boolean().optional(),
     isLazyLoad: z.boolean().optional(),
   })
   .default({});

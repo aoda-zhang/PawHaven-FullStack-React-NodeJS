@@ -1,3 +1,4 @@
+import { I18nSwitch } from '@pawhaven/frontend-core';
 import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -5,13 +6,22 @@ import { Brand } from '@/components/Brand';
 
 export const AuthLayout: FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
+
   return (
-    <div className="flex flex-col w-full min-h-screen p-4 lg:p-10 bg-[url('/images/auth_bg.png')] bg-cover bg-center bg-no-repeat overflow-hidden">
-      <div className="flex justify-center md:justify-start">
-        <Brand navigate={navigate} />
-      </div>
-      <div className="flex flex-col w-full lg:max-w-[40%] m-auto transition-all duration-300 bg-white rounded-2xl shadow-md box-border p-6 lg:p-16">
-        {children}
+    <div className="h-screen overflow-hidden px-3 py-3 sm:px-6 sm:py-5">
+      <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
+        <div className="flex w-full items-center gap-4">
+          <Brand navigate={navigate} />
+          <div className="ml-auto shrink-0 rounded-full border border-border bg-white px-1 py-1 shadow-sm [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
+            <I18nSwitch />
+          </div>
+        </div>
+
+        <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
+          <div className="max-h-full w-full max-w-[30rem] overflow-y-auto rounded-2xl border border-border bg-white px-5 py-6 shadow-lg sm:px-8 sm:py-7 sm:shadow-xl">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   );

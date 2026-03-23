@@ -17,7 +17,7 @@ interface QueryOptionsType {
   refetchOnReconnect?: boolean;
   refetchOnWindowFocus?: boolean;
   staleTime?: number;
-  cacheTime?: number;
+  gcTime?: number;
   maxRetry?: number;
   onAuthError?: () => void;
   onPermissionError?: () => void;
@@ -97,7 +97,7 @@ export const getRequestQueryOptions = (queryOptions: QueryOptionsType) => {
     refetchOnReconnect = true,
     refetchOnWindowFocus = false,
     staleTime = 5 * 60 * 1000, // Data is considered fresh within 5 minutes
-    cacheTime = 30 * 60 * 1000, // Cache for 30 minutes
+    gcTime = 30 * 60 * 1000, // Query cache garbage collection after 30 minutes
     maxRetry = 2, // Default max retry 2 times
   } = queryOptions ?? {};
 
@@ -107,7 +107,7 @@ export const getRequestQueryOptions = (queryOptions: QueryOptionsType) => {
         refetchOnReconnect,
         refetchOnWindowFocus,
         staleTime,
-        cacheTime,
+        gcTime,
         retry: (failureCount: number, error: unknown) => {
           const apiError = error as ApiErrorInfo;
           if (!apiError) return false;
