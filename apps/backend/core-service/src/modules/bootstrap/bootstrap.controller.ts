@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
 
 import { BootstrapService } from './bootstrap.service';
 import { MenuItemDto } from './DTO/menu.DTO';
@@ -9,16 +9,24 @@ export class BootstrapController {
   constructor(private readonly bootService: BootstrapService) {}
 
   @Get('/bootstrap')
-  getAppBootstrap(): Promise<{
+  getAppBootstrap(
+    @Headers('x-auth-user-roles') userRolesHeader?: string,
+  ): Promise<{
     menus: MenuItemDto[];
     routers: RouterItemDTO[];
   }> {
-    return this.bootService.getAppBootstrap();
+    const userRoles = this.bootService.resolveRequestRoles(userRolesHeader);
+
+    return this.bootService.getAppBootstrap(userRoles);
   }
 
   @Get('/menu')
-  getMenus(): Promise<MenuItemDto[]> {
-    return this.bootService.getAppMenus();
+  getMenus(
+    @Headers('x-auth-user-roles') userRolesHeader?: string,
+  ): Promise<MenuItemDto[]> {
+    const userRoles = this.bootService.resolveRequestRoles(userRolesHeader);
+
+    return this.bootService.getAppMenus(userRoles);
   }
 
   @Post('/menu')

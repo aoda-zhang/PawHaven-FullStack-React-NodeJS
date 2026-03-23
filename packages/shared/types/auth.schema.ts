@@ -7,6 +7,7 @@ import { z } from 'zod';
 export const UserSchema = z.object({
   userId: z.string(),
   email: z.email(),
+  roles: z.array(z.string()).optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

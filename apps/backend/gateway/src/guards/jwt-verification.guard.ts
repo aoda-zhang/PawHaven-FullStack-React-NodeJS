@@ -51,6 +51,7 @@ export class JwtVerificationGuard implements CanActivate {
     req.user = {
       userId: payload.userId,
       email: payload.email,
+      roles: payload.roles,
     };
 
     return true;
