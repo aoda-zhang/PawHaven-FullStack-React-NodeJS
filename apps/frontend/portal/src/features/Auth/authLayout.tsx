@@ -1,4 +1,4 @@
-import { I18nSwitch } from '@pawhaven/frontend-core';
+import { LanguageSelector } from '@pawhaven/frontend-core';
 import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ export const AuthLayout: FC<{ children: React.ReactNode }> = ({ children }) => {
         <div className="flex w-full items-center gap-4">
           <Brand navigate={navigate} />
           <div className="ml-auto shrink-0 rounded-full border border-border bg-white px-1 py-1 shadow-sm [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
-            <I18nSwitch />
+            <LanguageSelector />
           </div>
         </div>
 

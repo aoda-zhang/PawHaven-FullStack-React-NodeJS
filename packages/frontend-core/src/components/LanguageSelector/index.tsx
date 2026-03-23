@@ -26,7 +26,7 @@ const LanguageSelect = () => {
   );
 };
 
-export const I18nSwitch = () => {
+export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -51,7 +51,7 @@ export const I18nSwitch = () => {
     <>
       <div className="shrink-0 rounded-full border border-border bg-white px-[2px] py-1 shadow-sm">
         <div
-          className="flex items-center justify-center gap-[.625rem] cursor-pointer min-w-[12.5rem] mb-0 px-2 py-1 text-sm"
+          className="flex items-center justify-center gap-[.625rem] cursor-pointer mb-0 px-2 text-sm"
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           role="button"
@@ -82,5 +82,3 @@ export const I18nSwitch = () => {
     </>
   );
 };
-
-export const LanguageSelector = I18nSwitch;
