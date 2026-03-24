@@ -1,12 +1,6 @@
 import type { MenuItem, RouterItem } from '@pawhaven/shared/types';
 import type { NavigateFunction } from 'react-router-dom';
 
-export const menuTypes = {
-  link: 'link',
-  component: 'component',
-} as const;
-
-export type MenuType = (typeof menuTypes)[keyof typeof menuTypes];
 export interface MenuRenderType {
   menuItems: MenuItem[];
   activePath?: string;

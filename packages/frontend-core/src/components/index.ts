@@ -1,4 +1,4 @@
-export { I18nSwitch } from './I18nSwitch';
+export { LanguageSelector } from './LanguageSelector';
 export { FileDownloadButton } from './FileDownloadButton';
 export {
   ErrorDisplayProvider,

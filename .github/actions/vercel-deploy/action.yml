@@ -1,0 +1,100 @@
+name: Vercel Deploy
+description: Deploy an app service to Vercel
+
+inputs:
+  service_path:
+    description: Relative path to service root for vercel --cwd
+    required: true
+  vercel_project_id:
+    description: Vercel project id
+    required: true
+  target:
+    description: Deploy target (preview|production)
+    required: true
+  vercel_token:
+    description: Vercel token
+    required: true
+  vercel_org_id:
+    description: Vercel org id
+    required: true
+  node_version:
+    description: Node.js version
+    required: false
+    default: '24'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+
+    - name: Validate inputs
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ "${{ inputs.target }}" != "preview" && "${{ inputs.target }}" != "production" ]]; then
+          echo "target must be preview or production" >&2
+          exit 1
+        fi
+        if [[ -z "${{ inputs.service_path }}" ]]; then
+          echo "service_path is required" >&2
+          exit 1
+        fi
+        if [[ -z "${{ inputs.vercel_project_id }}" ]]; then
+          echo "vercel_project_id is required" >&2
+          exit 1
+        fi
+        if [[ -z "${{ inputs.vercel_token }}" ]]; then
+          echo "vercel_token is required" >&2
+          exit 1
+        fi
+        if [[ -z "${{ inputs.vercel_org_id }}" ]]; then
+          echo "vercel_org_id is required" >&2
+          exit 1
+        fi
+
+    - name: Install Vercel CLI
+      shell: bash
+      run: npm i -g vercel@latest
+
+    - name: Pull Vercel project settings
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      run: |
+        vercel pull \
+          --yes \
+          --environment="${{ inputs.target }}" \
+          --token="${VERCEL_TOKEN}" \
+          --cwd="${{ inputs.service_path }}"
+
+    - name: Deploy preview
+      if: ${{ inputs.target == 'preview' }}
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      run: |
+        vercel deploy \
+          --yes \
+          --token="${VERCEL_TOKEN}" \
+          --cwd="${{ inputs.service_path }}"
+
+    - name: Deploy production
+      if: ${{ inputs.target == 'production' }}
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ inputs.vercel_token }}
+        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+      run: |
+        vercel deploy \
+          --prod \
+          --yes \
+          --token="${VERCEL_TOKEN}" \
+          --cwd="${{ inputs.service_path }}"

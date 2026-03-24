@@ -11,11 +11,6 @@ datasource db {
   url      = env("CORE_SERVICE_MONGODB")
 }
 
-enum MenuType {
-  link
-  component
-}
-
 model Menu {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime  @default(now())
@@ -26,11 +21,9 @@ model Menu {
   version  Int    @default(1)
   tenantId String @default("system")
 
-  label String   @unique
-  type  MenuType
+  label String @unique
+  to    String
 
-  to         String?
-  component  String?
   classNames String[]
   order      Int
 
