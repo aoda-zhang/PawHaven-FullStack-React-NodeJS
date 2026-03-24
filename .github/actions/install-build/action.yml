@@ -25,7 +25,6 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ steps.node_version.outputs.node_version }}
-        cache: pnpm
 
     - name: Enable package manager from package.json
       shell: bash

@@ -64,5 +64,6 @@
     "rg": true,
     "head": true,
     "grep": true
-  }
+  },
+  "timezoneTheme.nightTheme": "Quiet Light"
 }
