@@ -1,0 +1,82 @@
+name: Service Resolver
+description: Resolve app service name to path/filter/project-id
+
+inputs:
+  service:
+    description: Service key
+    required: true
+  gateway_project_id:
+    description: Vercel project id for gateway
+    required: true
+  core_service_project_id:
+    description: Vercel project id for core-service
+    required: true
+  auth_service_project_id:
+    description: Vercel project id for auth-service
+    required: true
+  document_service_project_id:
+    description: Vercel project id for document-service
+    required: true
+  portal_project_id:
+    description: Vercel project id for portal
+    required: true
+  admin_project_id:
+    description: Vercel project id for admin
+    required: true
+
+outputs:
+  service_path:
+    description: Relative service path
+    value: ${{ steps.resolve.outputs.service_path }}
+  build_filter:
+    description: pnpm build filter
+    value: ${{ steps.resolve.outputs.build_filter }}
+  vercel_project_id:
+    description: Vercel project id
+    value: ${{ steps.resolve.outputs.vercel_project_id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve service config
+      id: resolve
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        case "${{ inputs.service }}" in
+          gateway)
+            echo "service_path=apps/backend/gateway" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/gateway" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.gateway_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          core-service)
+            echo "service_path=apps/backend/core-service" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/core-service" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.core_service_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          auth-service)
+            echo "service_path=apps/backend/auth-service" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/auth-service" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.auth_service_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          document-service)
+            echo "service_path=apps/backend/document-service" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/document-service" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.document_service_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          portal)
+            echo "service_path=apps/frontend/portal" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/portal" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.portal_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          admin)
+            echo "service_path=apps/frontend/admin" >> "$GITHUB_OUTPUT"
+            echo "build_filter=@pawhaven/admin" >> "$GITHUB_OUTPUT"
+            echo "vercel_project_id=${{ inputs.admin_project_id }}" >> "$GITHUB_OUTPUT"
+            ;;
+          *)
+            echo "Unsupported service: ${{ inputs.service }}" >&2
+            exit 1
+            ;;
+        esac

@@ -1,0 +1,52 @@
+name: Install And Build
+description: Setup toolchain, install dependencies and build selected backend package
+
+inputs:
+  build_filter:
+    description: pnpm filter target (for example @pawhaven/core-service)
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Resolve Node.js version from package.json
+      id: node_version
+      shell: bash
+      run: |
+        set -euo pipefail
+        NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+        if [[ -z "${NODE_VERSION}" ]]; then
+          echo "Missing engines.node in package.json" >&2
+          exit 1
+        fi
+        echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ steps.node_version.outputs.node_version }}
+        cache: pnpm
+
+    - name: Enable package manager from package.json
+      shell: bash
+      run: |
+        set -euo pipefail
+        corepack enable
+        corepack install
+
+    - name: Validate inputs
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [[ -z "${{ inputs.build_filter }}" ]]; then
+          echo "build_filter is required" >&2
+          exit 1
+        fi
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Build selected backend package
+      shell: bash
+      run: pnpm --filter "${{ inputs.build_filter }}" build
