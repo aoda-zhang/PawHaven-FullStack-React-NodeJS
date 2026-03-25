@@ -65,12 +65,12 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        DEPLOY_CWD="${GITHUB_WORKSPACE}/${{ inputs.service_path }}"
-        if [[ ! -d "${DEPLOY_CWD}" ]]; then
-          echo "Resolved deploy path not found: ${DEPLOY_CWD}" >&2
+        SERVICE_CWD="${GITHUB_WORKSPACE}/${{ inputs.service_path }}"
+        if [[ ! -d "${SERVICE_CWD}" ]]; then
+          echo "Resolved service path not found: ${SERVICE_CWD}" >&2
           exit 1
         fi
-        echo "deploy_cwd=${DEPLOY_CWD}" >> "$GITHUB_OUTPUT"
+        echo "deploy_cwd=${GITHUB_WORKSPACE}" >> "$GITHUB_OUTPUT"
 
     - name: Pull Vercel project settings
       shell: bash
