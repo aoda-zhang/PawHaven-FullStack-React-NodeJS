@@ -19,12 +19,68 @@ permissions:
   contents: read
 
 jobs:
+  preflight:
+    name: Preflight Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate required secrets for selected service
+        env:
+          SERVICE: ${{ inputs.service }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          VERCEL_PROJECT_ID_CORE_SERVICE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          VERCEL_PROJECT_ID_AUTH_SERVICE: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          VERCEL_PROJECT_ID_DOCUMENT_SERVICE: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
+          VERCEL_PROJECT_ID_PORTAL: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
+          VERCEL_PROJECT_ID_ADMIN: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          require_secret() {
+            local value="$1"
+            local name="$2"
+            if [[ -z "${value}" ]]; then
+              echo "Missing required secret: ${name}" >&2
+              exit 1
+            fi
+          }
+
+          require_secret "${VERCEL_TOKEN}" "VERCEL_TOKEN"
+          require_secret "${VERCEL_ORG_ID}" "VERCEL_ORG_ID"
+
+          case "${SERVICE}" in
+            gateway)
+              require_secret "${VERCEL_PROJECT_ID_GATEWAY}" "VERCEL_PROJECT_ID_GATEWAY"
+              ;;
+            core-service)
+              require_secret "${VERCEL_PROJECT_ID_CORE_SERVICE}" "VERCEL_PROJECT_ID_CORE_SERVICE"
+              ;;
+            auth-service)
+              require_secret "${VERCEL_PROJECT_ID_AUTH_SERVICE}" "VERCEL_PROJECT_ID_AUTH_SERVICE"
+              ;;
+            document-service)
+              require_secret "${VERCEL_PROJECT_ID_DOCUMENT_SERVICE}" "VERCEL_PROJECT_ID_DOCUMENT_SERVICE"
+              ;;
+            portal)
+              require_secret "${VERCEL_PROJECT_ID_PORTAL}" "VERCEL_PROJECT_ID_PORTAL"
+              ;;
+            admin)
+              require_secret "${VERCEL_PROJECT_ID_ADMIN}" "VERCEL_PROJECT_ID_ADMIN"
+              ;;
+            *)
+              echo "Unsupported service: ${SERVICE}" >&2
+              exit 1
+              ;;
+          esac
+
   resolve:
     runs-on: ubuntu-latest
+    needs: preflight
     outputs:
       service_path: ${{ steps.config.outputs.service_path }}
       build_filter: ${{ steps.config.outputs.build_filter }}
-      vercel_project_id: ${{ steps.config.outputs.vercel_project_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,12 +90,6 @@ jobs:
         uses: ./.github/actions/service-resolver
         with:
           service: ${{ inputs.service }}
-          gateway_project_id: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
-          core_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
-          auth_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
-          document_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
-          portal_project_id: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
-          admin_project_id: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
 
   install_build:
     name: Install And Build
@@ -67,8 +117,14 @@ jobs:
       - name: Deploy preview to Vercel
         uses: ./.github/actions/vercel-deploy
         with:
+          service: ${{ inputs.service }}
           service_path: ${{ needs.resolve.outputs.service_path }}
-          vercel_project_id: ${{ needs.resolve.outputs.vercel_project_id }}
+          gateway_project_id: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          core_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          auth_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          document_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
+          portal_project_id: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
+          admin_project_id: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
           target: preview
           vercel_token: ${{ secrets.VERCEL_TOKEN }}
           vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
@@ -86,8 +142,14 @@ jobs:
       - name: Deploy production to Vercel
         uses: ./.github/actions/vercel-deploy
         with:
+          service: ${{ inputs.service }}
           service_path: ${{ needs.resolve.outputs.service_path }}
-          vercel_project_id: ${{ needs.resolve.outputs.vercel_project_id }}
+          gateway_project_id: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          core_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          auth_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          document_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
+          portal_project_id: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
+          admin_project_id: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
           target: production
           vercel_token: ${{ secrets.VERCEL_TOKEN }}
           vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
