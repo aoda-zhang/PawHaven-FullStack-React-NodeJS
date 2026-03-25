@@ -1,0 +1,93 @@
+name: Deploy Pipeline
+run-name: Deploy ${{ inputs.service }} to Vercel (preview -> production)
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: App service to deploy
+        required: true
+        type: choice
+        options:
+          - portal
+          - admin
+          - gateway
+          - core-service
+          - auth-service
+          - document-service
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      service_path: ${{ steps.config.outputs.service_path }}
+      build_filter: ${{ steps.config.outputs.build_filter }}
+      vercel_project_id: ${{ steps.config.outputs.vercel_project_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve app service config
+        id: config
+        uses: ./.github/actions/service-resolver
+        with:
+          service: ${{ inputs.service }}
+          gateway_project_id: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          core_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          auth_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          document_service_project_id: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
+          portal_project_id: ${{ secrets.VERCEL_PROJECT_ID_PORTAL }}
+          admin_project_id: ${{ secrets.VERCEL_PROJECT_ID_ADMIN }}
+
+  install_build:
+    name: Install And Build
+    runs-on: ubuntu-latest
+    needs: resolve
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and build package
+        uses: ./.github/actions/install-build
+        with:
+          build_filter: ${{ needs.resolve.outputs.build_filter }}
+
+  deploy_preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: [resolve, install_build]
+    environment:
+      name: preview
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy preview to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          service_path: ${{ needs.resolve.outputs.service_path }}
+          vercel_project_id: ${{ needs.resolve.outputs.vercel_project_id }}
+          target: preview
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
+
+  deploy_production:
+    name: Deploy Production
+    runs-on: ubuntu-latest
+    needs: [resolve, install_build, deploy_preview]
+    environment:
+      name: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy production to Vercel
+        uses: ./.github/actions/vercel-deploy
+        with:
+          service_path: ${{ needs.resolve.outputs.service_path }}
+          vercel_project_id: ${{ needs.resolve.outputs.vercel_project_id }}
+          target: production
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}

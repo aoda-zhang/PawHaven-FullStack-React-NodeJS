@@ -59,6 +59,18 @@ runs:
       shell: bash
       run: npm i -g vercel@latest
 
+    - name: Resolve deploy path
+      id: resolve_path
+      shell: bash
+      run: |
+        set -euo pipefail
+        DEPLOY_CWD="${GITHUB_WORKSPACE}/${{ inputs.service_path }}"
+        if [[ ! -d "${DEPLOY_CWD}" ]]; then
+          echo "Resolved deploy path not found: ${DEPLOY_CWD}" >&2
+          exit 1
+        fi
+        echo "deploy_cwd=${DEPLOY_CWD}" >> "$GITHUB_OUTPUT"
+
     - name: Pull Vercel project settings
       shell: bash
       env:
@@ -70,7 +82,7 @@ runs:
           --yes \
           --environment="${{ inputs.target }}" \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"
 
     - name: Deploy preview
       if: ${{ inputs.target == 'preview' }}
@@ -83,7 +95,7 @@ runs:
         vercel deploy \
           --yes \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"
 
     - name: Deploy production
       if: ${{ inputs.target == 'production' }}
@@ -97,4 +109,4 @@ runs:
           --prod \
           --yes \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"
