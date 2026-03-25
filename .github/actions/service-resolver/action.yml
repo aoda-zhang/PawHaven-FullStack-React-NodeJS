@@ -13,6 +13,9 @@ outputs:
   build_filter:
     description: pnpm build filter
     value: ${{ steps.resolve.outputs.build_filter }}
+  project_secret_name:
+    description: Secret name for Vercel project id
+    value: ${{ steps.resolve.outputs.project_secret_name }}
 
 runs:
   using: composite
@@ -27,26 +30,32 @@ runs:
           gateway)
             echo "service_path=apps/backend/gateway" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/gateway" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_GATEWAY" >> "$GITHUB_OUTPUT"
             ;;
           core-service)
             echo "service_path=apps/backend/core-service" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/core-service" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_CORE_SERVICE" >> "$GITHUB_OUTPUT"
             ;;
           auth-service)
             echo "service_path=apps/backend/auth-service" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/auth-service" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_AUTH_SERVICE" >> "$GITHUB_OUTPUT"
             ;;
           document-service)
             echo "service_path=apps/backend/document-service" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/document-service" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_DOCUMENT_SERVICE" >> "$GITHUB_OUTPUT"
             ;;
           portal)
             echo "service_path=apps/frontend/portal" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/portal" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_PORTAL" >> "$GITHUB_OUTPUT"
             ;;
           admin)
             echo "service_path=apps/frontend/admin" >> "$GITHUB_OUTPUT"
             echo "build_filter=@pawhaven/admin" >> "$GITHUB_OUTPUT"
+            echo "project_secret_name=VERCEL_PROJECT_ID_ADMIN" >> "$GITHUB_OUTPUT"
             ;;
           *)
             echo "Unsupported service: ${{ inputs.service }}" >&2

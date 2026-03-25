@@ -2,38 +2,11 @@ name: Vercel Deploy
 description: Deploy an app service to Vercel
 
 inputs:
-  service:
-    description: Service key
-    required: true
   service_path:
     description: Relative path to service root for vercel --cwd
     required: true
-  gateway_project_id:
-    description: Vercel project id for gateway
-    required: true
-  core_service_project_id:
-    description: Vercel project id for core-service
-    required: true
-  auth_service_project_id:
-    description: Vercel project id for auth-service
-    required: true
-  document_service_project_id:
-    description: Vercel project id for document-service
-    required: true
-  portal_project_id:
-    description: Vercel project id for portal
-    required: true
-  admin_project_id:
-    description: Vercel project id for admin
-    required: true
   target:
     description: Deploy target (preview|production)
-    required: true
-  vercel_token:
-    description: Vercel token
-    required: true
-  vercel_org_id:
-    description: Vercel org id
     required: true
   node_version:
     description: Node.js version
@@ -60,59 +33,28 @@ runs:
           echo "service_path is required" >&2
           exit 1
         fi
-        if [[ -z "${{ inputs.vercel_token }}" ]]; then
-          echo "vercel_token is required" >&2
-          exit 1
-        fi
-        if [[ -z "${{ inputs.vercel_org_id }}" ]]; then
-          echo "vercel_org_id is required" >&2
-          exit 1
-        fi
 
-    - name: Resolve Vercel project id
+    - name: Validate Vercel secrets
       shell: bash
+      env:
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
       run: |
         set -euo pipefail
 
-        ensure_project_id() {
+        ensure_required() {
           local value="$1"
-          local secret_name="$2"
+          local name="$2"
           if [[ -z "${value}" ]]; then
-            echo "Missing required secret: ${secret_name}" >&2
+            echo "Missing required secret: ${name}" >&2
             exit 1
           fi
         }
 
-        case "${{ inputs.service }}" in
-          gateway)
-            ensure_project_id "${{ inputs.gateway_project_id }}" "VERCEL_PROJECT_ID_GATEWAY"
-            echo "VERCEL_PROJECT_ID=${{ inputs.gateway_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          core-service)
-            ensure_project_id "${{ inputs.core_service_project_id }}" "VERCEL_PROJECT_ID_CORE_SERVICE"
-            echo "VERCEL_PROJECT_ID=${{ inputs.core_service_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          auth-service)
-            ensure_project_id "${{ inputs.auth_service_project_id }}" "VERCEL_PROJECT_ID_AUTH_SERVICE"
-            echo "VERCEL_PROJECT_ID=${{ inputs.auth_service_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          document-service)
-            ensure_project_id "${{ inputs.document_service_project_id }}" "VERCEL_PROJECT_ID_DOCUMENT_SERVICE"
-            echo "VERCEL_PROJECT_ID=${{ inputs.document_service_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          portal)
-            ensure_project_id "${{ inputs.portal_project_id }}" "VERCEL_PROJECT_ID_PORTAL"
-            echo "VERCEL_PROJECT_ID=${{ inputs.portal_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          admin)
-            ensure_project_id "${{ inputs.admin_project_id }}" "VERCEL_PROJECT_ID_ADMIN"
-            echo "VERCEL_PROJECT_ID=${{ inputs.admin_project_id }}" >> "$GITHUB_ENV"
-            ;;
-          *)
-            echo "Unsupported service: ${{ inputs.service }}" >&2
-            exit 1
-            ;;
-        esac
+        ensure_required "${VERCEL_TOKEN}" "VERCEL_TOKEN"
+        ensure_required "${VERCEL_ORG_ID}" "VERCEL_ORG_ID"
+        ensure_required "${VERCEL_PROJECT_ID}" "VERCEL_PROJECT_ID_* for selected service"
 
     - name: Install Vercel CLI
       shell: bash
@@ -133,8 +75,8 @@ runs:
     - name: Pull Vercel project settings
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel pull \
           --yes \
@@ -146,8 +88,8 @@ runs:
       if: ${{ inputs.target == 'preview' }}
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel deploy \
           --yes \
@@ -158,8 +100,8 @@ runs:
       if: ${{ inputs.target == 'production' }}
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel deploy \
           --prod \
