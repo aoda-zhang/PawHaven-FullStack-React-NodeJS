@@ -12,13 +12,13 @@ export const AuthLayout: FC<{ children: React.ReactNode }> = ({ children }) => {
       <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
         <div className="flex w-full items-center gap-4">
           <Brand navigate={navigate} />
-          <div className="ml-auto shrink-0 rounded-full border border-border bg-white px-1 py-1 shadow-sm [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
+          <div className="ml-auto shrink-0 [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
             <LanguageSelector />
           </div>
         </div>
 
         <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
-          <div className="max-h-full w-full max-w-[30rem] overflow-y-auto rounded-2xl border border-border bg-white px-5 py-6 shadow-lg sm:px-8 sm:py-7 sm:shadow-xl">
+          <div className="w-full max-w-[30rem] rounded-2xl border border-border bg-white px-5 py-6 shadow-lg sm:px-8 sm:py-7 sm:shadow-xl">
             {children}
           </div>
         </div>
