@@ -2,7 +2,7 @@ import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { RescueService } from './rescue.service';
-import type { CreateRescueDto } from './DTO/rescue.DTO';
+import { CreateRescueDto } from './DTO/rescue.DTO';
 
 @ApiTags('rescues')
 @Controller('rescues')

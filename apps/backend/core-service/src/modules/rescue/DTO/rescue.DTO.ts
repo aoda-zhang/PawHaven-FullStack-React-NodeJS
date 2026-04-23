@@ -1,3 +1,4 @@
-import type { CreateRescueDto } from '@pawhaven/shared/types';
+import { createZodDto } from 'nestjs-zod';
+import { CreateRescueDtoSchema } from '@pawhaven/shared/types';
 
-export type { CreateRescueDto };
+export class CreateRescueDto extends createZodDto(CreateRescueDtoSchema) {}
