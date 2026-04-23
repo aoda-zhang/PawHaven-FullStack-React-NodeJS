@@ -1,4 +1,4 @@
-// types
+// rescue.schema
 export type { MenuItem, Menu } from './menu.schema';
 export type { Router, RouterItem, RouterHandle } from './router.schema';
 export type {
@@ -10,6 +10,12 @@ export type {
   JwtVerifyInfo,
   User,
 } from './auth.schema';
+export type {
+  RescueStatus,
+  RescueItem,
+  CreateRescueDto,
+  RescueDetail,
+} from './rescue.schema';
 
 // schemas
 
@@ -24,3 +30,9 @@ export {
   JwtVerifyInfoSchema,
   UserSchema,
 } from './auth.schema';
+export {
+  RescueStatusSchema,
+  RescueItemSchema,
+  CreateRescueDtoSchema,
+  RescueDetailSchema,
+} from './rescue.schema';

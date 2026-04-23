@@ -1,17 +1,3 @@
-export type RescueStatus =
-  | 'pending'
-  | 'inProgress'
-  | 'treated'
-  | 'recovering'
-  | 'awaitingAdoption'
-  | 'adopted'
-  | 'failed';
+import type { CreateRescueDto } from '@pawhaven/shared/types';
 
-export interface CreateRescueDto {
-  animalID: string;
-  name: string;
-  img: string;
-  description: string;
-  location: string;
-  rescueStatus?: RescueStatus;
-}
+export type { CreateRescueDto };
