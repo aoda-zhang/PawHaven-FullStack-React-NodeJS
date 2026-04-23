@@ -27,7 +27,7 @@
     "subSlogan": "Spot,Record,Rescue every stray animal!",
     "view_all": "View All",
     "love_story": "Love Story",
-    "owner_text": "© 2023 PawHaven by <a href='https://aoda.vercel.app' target='_blank' rel='noopener noreferrer' class='link'  >Aoda Zhang</a>. All rights reserved.",
+    "owner_text": "© {{year}} PawHaven by <a href='https://aoda.vercel.app' target='_blank' rel='noopener noreferrer' class='link'  >Aoda Zhang</a>. All rights reserved.",
     "system_error": "503",
     "system_error_info": "An unexpected error occurred. Please try again later.",
     "retry": "RETRY",

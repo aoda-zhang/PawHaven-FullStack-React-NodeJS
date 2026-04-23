@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 
 export const RootLayoutFooter = () => {
   const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
+
   return (
     <div className="flex justify-between gap-2 text-center items-center flex-col lg:flex-row px-4 lg:px-16 py-6 bg-slate-900 text-white">
       <p className="flex flex-col justify-between items-center lg:items-start text-left">
@@ -18,7 +20,11 @@ export const RootLayoutFooter = () => {
           {t('common.record')}
         </Link>
       </p>
-      <p dangerouslySetInnerHTML={{ __html: t('common.owner_text') }} />
+      <p
+        dangerouslySetInnerHTML={{
+          __html: t('common.owner_text', { year: currentYear }),
+        }}
+      />
       <p className="flex flex-col justify-between items-center lg:items-start text-left">
         <span className="text-xl font-bold">{t('common.contact_me')}</span>
         <a

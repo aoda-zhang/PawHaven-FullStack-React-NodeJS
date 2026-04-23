@@ -27,7 +27,7 @@
     "subSlogan": "Finde, erfasse und rette jedes streunende Tier!",
     "view_all": "Alle anzeigen",
     "love_story": "Liebesgeschichte",
-    "owner_text": "© 2023 PawHaven von <a href='https://aoda.vercel.app' target='_blank' rel='noopener noreferrer' class='link'>Aoda Zhang</a>. Alle Rechte vorbehalten.",
+    "owner_text": "© {{year}} PawHaven von <a href='https://aoda.vercel.app' target='_blank' rel='noopener noreferrer' class='link'>Aoda Zhang</a>. Alle Rechte vorbehalten.",
     "system_error": "503",
     "system_error_info": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
     "retry": "WIEDERHOLEN",
