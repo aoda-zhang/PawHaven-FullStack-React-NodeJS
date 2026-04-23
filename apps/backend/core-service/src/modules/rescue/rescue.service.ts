@@ -29,7 +29,6 @@ export class RescueService {
     try {
       return await this.prisma.rescue.findMany({
         where: {
-          deletedAt: null,
           ...(status ? { rescueStatus: status } : {}),
         },
         orderBy: { createdAt: 'desc' },

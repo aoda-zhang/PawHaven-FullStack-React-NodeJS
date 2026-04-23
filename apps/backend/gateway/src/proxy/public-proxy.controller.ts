@@ -52,4 +52,24 @@ export class PublicProxyController {
   ): void {
     this.proxyService.proxyRequest(req, res, next);
   }
+
+  @Public()
+  @Get('/core-service/rescues')
+  proxyGetRescues(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
+  }
+
+  @Public()
+  @Get('/core-service/rescues/:id')
+  proxyGetRescueById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
+  }
 }

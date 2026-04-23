@@ -29,6 +29,13 @@ microServices:
       port: 8081
       gatewayPrefix: /api/core
       pathRewrite: /core-service
+  - name: core-service-api
+    enable: true
+    options:
+      host: ${CORE_SERVICE_HOST}
+      port: 8081
+      gatewayPrefix: /api/core-service
+      pathRewrite: /core-service
   - name: auth-service
     enable: true
     options:
