@@ -1,6 +1,7 @@
 import { join } from 'path';
 
 import { BootstrapModule } from '@modules/bootstrap/bootstrap.module';
+import { RescueModule } from '@modules/rescue/rescue.module';
 import { Module } from '@nestjs/common';
 import { SharedModule, SharedModuleFeatures } from '@pawhaven/backend-core';
 import {
@@ -28,6 +29,7 @@ import { PrismaClient } from '@prismaClient';
       ],
     }),
     BootstrapModule,
+    RescueModule,
   ],
 })
 export class AppModule {}
