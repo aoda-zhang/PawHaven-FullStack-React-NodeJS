@@ -3,6 +3,6 @@
 export const myPersonal = {
   profile: 'https://aoda.vercel.app/',
   github: 'https://github.com/aoda-zhang',
-  email: 'mailto:aodazhang666@email.com',
+  email: 'mailto:aoda.zhang.work@gmail.com',
   linkedin: 'https://www.linkedin.com/in/aodazhang"',
 };
