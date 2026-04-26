@@ -27,12 +27,16 @@ export class RescueService {
 
   async findAll(status?: string) {
     try {
-      return await this.prisma.rescue.findMany({
+      const rescues = await this.prisma.rescue.findMany({
         where: {
           ...(status ? { rescueStatus: status } : {}),
         },
         orderBy: { createdAt: 'desc' },
       });
+      return rescues.map((r) => ({
+        ...r,
+        status: r?.rescueStatus,
+      }));
     } catch (error) {
       this.logger.error('Failed to fetch rescues', error);
       throw new BadRequestException('Failed to fetch rescues');
