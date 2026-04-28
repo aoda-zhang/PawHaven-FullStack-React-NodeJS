@@ -1,3 +1,4 @@
+import { Skeleton } from '@mui/material';
 import clsx from 'clsx';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
@@ -44,7 +45,7 @@ const RescueItem = ({
       <p className="text-xl text-primary">{name}</p>
       <p className="flex justify-between text-sm text-text-secondary">
         <span>{location}</span>
-        <span>{time}</span>
+        <span>{new Date(time).toLocaleDateString('en-GB')}</span>
       </p>
       <p className="text-text-secondary">{description}</p>
       <div
@@ -59,9 +60,34 @@ const RescueItem = ({
   );
 };
 
+const SKELETON_COUNT = 3;
+
+const RescueItemSkeleton = () => (
+  <div className="p-4 mb-4 border-1 border-border rounded-md bg-white">
+    <Skeleton
+      variant="rounded"
+      width="100%"
+      height="15rem"
+      sx={{ marginBottom: '0.75rem', borderRadius: '0.375rem' }}
+    />
+    <Skeleton variant="text" sx={{ fontSize: '1.25rem' }} width="60%" />
+    <div className="flex justify-between">
+      <Skeleton variant="text" width="40%" />
+      <Skeleton variant="text" width="25%" />
+    </div>
+    <Skeleton variant="text" width="100%" />
+    <Skeleton
+      variant="rounded"
+      width="100%"
+      height="2rem"
+      sx={{ borderRadius: '9999px', marginTop: '0.5rem' }}
+    />
+  </div>
+);
+
 export const LatestRescue = () => {
   const { t } = useTranslation();
-  const { data: rescues } = useFetchLatestRescuesByNumber();
+  const { data: rescues, isLoading } = useFetchLatestRescuesByNumber();
 
   const handleViewAllClick = () => {
     // TODO: Navigate to the appropriate page for viewing all rescues
@@ -96,9 +122,11 @@ export const LatestRescue = () => {
         </div>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-4">
-        {rescues?.map((item) => (
-          <RescueItem {...item} key={item.name} />
-        ))}
+        {isLoading
+          ? Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+              <RescueItemSkeleton key={`skeleton-${i}`} />
+            ))
+          : rescues?.map((item) => <RescueItem {...item} key={item.name} />)}
       </div>
     </div>
   );

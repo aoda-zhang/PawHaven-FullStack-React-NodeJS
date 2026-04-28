@@ -53,7 +53,7 @@ export class PublicProxyController {
     this.proxyService.proxyRequest(req, res, next);
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/core-service/rescues')
   proxyGetRescues(
     @Req() req: Request,
@@ -63,7 +63,7 @@ export class PublicProxyController {
     this.proxyService.proxyRequest(req, res, next);
   }
 
-  @Public()
+  @OptionalAuth()
   @Get('/core-service/rescues/:id')
   proxyGetRescueById(
     @Req() req: Request,
