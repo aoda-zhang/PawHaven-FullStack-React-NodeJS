@@ -1,5 +1,6 @@
 import { Skeleton } from '@mui/material';
 import clsx from 'clsx';
+import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,7 +46,7 @@ const RescueItem = ({
       <p className="text-xl text-primary">{name}</p>
       <p className="flex justify-between text-sm text-text-secondary">
         <span>{location}</span>
-        <span>{new Date(time).toLocaleDateString('en-GB')}</span>
+        <span>{dayjs(time).format('DD/MM/YYYY')}</span>
       </p>
       <p className="text-text-secondary">{description}</p>
       <div
