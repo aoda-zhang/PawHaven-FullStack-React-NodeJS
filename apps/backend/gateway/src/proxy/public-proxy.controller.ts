@@ -54,7 +54,7 @@ export class PublicProxyController {
   }
 
   @OptionalAuth()
-  @Get('/core-service/rescues')
+  @Get('/core/rescues')
   proxyGetRescues(
     @Req() req: Request,
     @Res() res: Response,
@@ -64,7 +64,7 @@ export class PublicProxyController {
   }
 
   @OptionalAuth()
-  @Get('/core-service/rescues/:id')
+  @Get('/core/rescues/:id')
   proxyGetRescueById(
     @Req() req: Request,
     @Res() res: Response,
