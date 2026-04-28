@@ -6,7 +6,13 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-center text-center p-[.625rem] mb-5 pl-5 lg:pl-10 box-border overflow-hidden h-screen bg-center bg-cover bg-[url('/images/hero.webp')]">
+    <div className="relative flex flex-col lg:flex-row justify-center lg:justify-between items-center lg:items-center text-center p-[.625rem] mb-5 pl-5 lg:pl-10 box-border overflow-hidden h-screen">
+      <img
+        src="/images/hero.webp"
+        alt="hero"
+        className="absolute inset-0 w-full h-full object-cover"
+        fetchPriority="high"
+      />
       <div className="absolute inset-0 bg-black/30" />
       <div className="relative z-base text-center text-white px-4">
         <p className="text-4xl lg:text-7xl text-start font-bold text-white mb-2 lg:mb-6">
