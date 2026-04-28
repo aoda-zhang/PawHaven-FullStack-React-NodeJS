@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Body,
-  Headers,
-} from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { RescueService } from './rescue.service';
@@ -30,9 +22,9 @@ export class RescueController {
   })
   findAll(
     @Query('status') status?: string,
-    @Headers('x-auth-user-id') userId?: string,
+    // @Headers('x-auth-user-id') userId?: string,
   ) {
-    return this.rescueService.findAll(status, userId);
+    return this.rescueService.findAll(status);
   }
 
   @Get(':id')
