@@ -1,9 +1,9 @@
 import { useRouterInfo } from '@pawhaven/frontend-core';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction, UIMatch } from 'react-router-dom';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { RootLayoutFooter } from './RootLayoutFooter';
 import { RootLayoutMenu } from './RootLayoutMenu';
@@ -26,6 +26,11 @@ export const RootLayout = () => {
   const currentRouterInfo = useRouterInfo<RouterInfoType>();
   const { isMenuAvailable = true, isFooterAvailable = true } =
     currentRouterInfo?.handle ?? {};
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col box-border min-h-dvh">
