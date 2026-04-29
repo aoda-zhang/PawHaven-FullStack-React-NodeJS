@@ -71,11 +71,7 @@ export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
     <div className="w-full bg-white rounded-lg shadow-md p-6 mt-6">
       {/* 操作按钮区 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <Button
-          variant="outlined"
-          className="min-w-[180px]"
-          onClick={handleRescue}
-        >
+        <Button variant="outlined" className="min-w-72" onClick={handleRescue}>
           <HandHelping size={18} className="mr-2" />
           {t('pawHaven.i_will_rescue')}
         </Button>

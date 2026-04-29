@@ -21,7 +21,7 @@ export const RootLayoutMenu = ({
   const onCloseSidebar = () => setSidebarOpen(false);
 
   return (
-    <header className="flex justify-between items-center box-border p-[.625rem] z-header border-border border-b-1 px-6 py-4 bg-white">
+    <header className="flex justify-between items-center box-border z-header border-border border-b-1 px-6 py-4 bg-white">
       <Brand navigate={navigate} />
       <div className="flex items-center gap-4">
         {!enableSidebarMode && (

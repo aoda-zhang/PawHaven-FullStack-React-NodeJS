@@ -18,8 +18,8 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
   };
 
   return (
-    <div className="flex flex-col items-center gap-2 justify-center pt-[6%] text-lg;">
-      <p className="text-error text-[8rem] lg:text-[20rem]">404</p>
+    <div className="flex flex-col items-center gap-2 justify-center pt-8 text-lg;">
+      <p className="text-error text-8xl lg:text-9xl">404</p>
       <p className="text-3xl">{t('common.not_found')}</p>
       <p>{t('common.not_found_info')}</p>
       {!IsStableEnv && <p>{error?.data}</p>}

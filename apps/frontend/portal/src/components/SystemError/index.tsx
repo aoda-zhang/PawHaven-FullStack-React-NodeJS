@@ -18,7 +18,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
 
   return (
     <div className="flex flex-col justify-center items-center  p-10 min-w-lvw min-h-lvh">
-      <p className="text-error text-9xl lg:text-[14rem] ">
+      <p className="text-error text-9xl ">
         {t('common.system_error', { defaultValue: 'Something went wrong' })}
       </p>
 
