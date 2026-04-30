@@ -678,9 +678,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.69.0(react@19.2.3))
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../../../packages/design-system
+        version: link:../../../packages/design-tokens
       '@pawhaven/frontend-core':
         specifier: workspace:*
         version: link:../../../packages/frontend-core
@@ -817,9 +817,9 @@ importers:
       '@mui/system':
         specifier: ^7.3.7
         version: 7.3.7(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3)
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../../../packages/design-system
+        version: link:../../../packages/design-tokens
       '@pawhaven/frontend-core':
         specifier: workspace:*
         version: link:../../../packages/frontend-core
@@ -1177,11 +1177,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/design-system:
+  packages/design-tokens:
     dependencies:
       '@mui/material':
         specifier: ^7.3.4
-        version: 7.3.6(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 7.3.7(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@pawhaven/eslint-config':
         specifier: workspace:*
         version: link:../../libs/eslint-config
@@ -1331,9 +1331,9 @@ importers:
       '@mui/x-date-pickers-pro':
         specifier: ^8.14.0
         version: 8.23.0(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@mui/material@7.3.6(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mui/system@7.3.7(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(react@19.2.3))(@types/react@19.2.7)(dayjs@1.11.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../design-system
+        version: link:../design-tokens
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

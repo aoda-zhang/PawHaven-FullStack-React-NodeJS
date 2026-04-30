@@ -59,9 +59,9 @@ It provides:
 | --------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `shared`        | All frontend apps, all backend apps, all other packages       | Single source of truth for types, constants, pure utilities; enables cross-boundary type safety |
 | `frontend-core` | `portal`, `admin`                                             | Framework-agnostic frontend logic layer; isolates business logic from UI                        |
-| `design-system` | `portal`, `admin`                                             | Ensures visual consistency; contains design tokens, not implementation                          |
+| `design-tokens` | `portal`, `admin`                                             | Ensures visual consistency; contains design tokens, not implementation                          |
 | `i18n`          | `portal`, `admin`                                             | Centralized translation management; supports runtime language switching                         |
-| `ui`            | `portal`, `admin`                                             | Production-ready component library; built on `design-system` tokens                             |
+| `ui`            | `portal`, `admin`                                             | Production-ready component library; built on `design-tokens` tokens                             |
 | `backend-core`  | `gateway`, `core-service`, `auth-service`, `document-service` | Infrastructure abstraction; standardizes logging, DB access, error handling across services     |
 
 ### Why This Layer Exists Separately

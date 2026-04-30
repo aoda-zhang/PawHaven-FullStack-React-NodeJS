@@ -8,7 +8,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
-    "@pawhaven/design-system": "workspace:*",
+    "@pawhaven/design-tokens": "workspace:*",
     "@pawhaven/frontend-core": "workspace:*",
     "@pawhaven/i18n": "workspace:*",
     "@pawhaven/shared": "workspace:*",

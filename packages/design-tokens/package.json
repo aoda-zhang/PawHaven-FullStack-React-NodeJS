@@ -1,5 +1,5 @@
 {
-  "name": "@pawhaven/design-system",
+  "name": "@pawhaven/design-tokens",
   "version": "1.0.0",
   "private": true,
   "dependencies": {

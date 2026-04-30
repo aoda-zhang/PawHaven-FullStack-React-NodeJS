@@ -11,7 +11,7 @@ Sub-packages within the monorepo can import theme values directly from this pack
 You can import specific theme parts like colors or spacing as follows:
 
 ```js
-import { colors, spacing } from '@pawhaven/design-system';
+import { colors, spacing } from '@pawhaven/design-tokens';
 
 console.log(colors.primary);
 console.log(spacing.md);

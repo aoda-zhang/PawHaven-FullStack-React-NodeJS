@@ -1,4 +1,4 @@
-import '@pawhaven/design-system/globalTailwind.css';
+import '@pawhaven/design-tokens/globalTailwind.css';
 import { I18nProvider } from '@pawhaven/i18n/i18nProvider';
 import { type ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';

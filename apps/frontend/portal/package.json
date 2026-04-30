@@ -21,7 +21,7 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
     "@mui/system": "^7.3.7",
-    "@pawhaven/design-system": "workspace:*",
+    "@pawhaven/design-tokens": "workspace:*",
     "@pawhaven/frontend-core": "workspace:*",
     "@pawhaven/i18n": "workspace:*",
     "@pawhaven/shared": "workspace:*",
