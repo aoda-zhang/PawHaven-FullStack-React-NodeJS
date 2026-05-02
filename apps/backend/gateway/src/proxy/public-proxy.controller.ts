@@ -8,10 +8,9 @@ import { ProxyService } from './proxy.service';
 
 /**
  * Public Proxy Controller
- * Handles public API requests that do not require JWT authentication.
- * All routes are forwarded to corresponding microservices via ProxyService.
+ * Handles public API requests.
+ * Routes without @Public require JWT authentication.
  */
-@Public()
 @Controller()
 export class PublicProxyController {
   constructor(private readonly proxyService: ProxyService) {}
