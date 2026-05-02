@@ -1,4 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
+import { AnimalReportSchema } from '@pawhaven/shared/types';
+import type { AnimalReportDto } from '@pawhaven/shared/types';
 import {
   FormInput,
   FormRadio,
@@ -36,7 +39,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const defaultValues: AnimalReport = {
+  const defaultValues: AnimalReportDto = {
     animalType: 'cat',
     age: 'adult',
     appearance: {
@@ -50,7 +53,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       latitude: 0,
       longitude: 0,
     },
-    foundTime: new Date().toISOString(),
+    foundTime: '',
     status: 'other',
     statusDescription: '',
     images: [],
@@ -61,20 +64,18 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     },
   };
 
-  const methods = useForm<AnimalReport>({
+  const methods = useForm<AnimalReportDto>({
+    resolver: zodResolver(AnimalReportSchema),
     defaultValues,
   });
 
   const handleSubmit = methods.handleSubmit(onSubmit);
 
-  // const handleImageChange = (files: File[]) => {
-  //   methods.setValue('images', files);
-  // };
-
   return (
     <FormProvider {...methods}>
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="bg-white rounded-lg shadow-md p-6 space-y-6"
       >
         <FormSection title={t('reportStray.animal_basic_info')}>
@@ -90,6 +91,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             <FormInput
               name="animalTypeOther"
               placeholder={t('reportStray.enter_other_type_placeholder')}
+              required
               className="mb-4"
             />
           )}
@@ -110,6 +112,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             name="appearance.color"
             label={t('reportStray.color')}
             placeholder={t('reportStray.enter_color')}
+            required
             className="mb-4"
           />
 
@@ -124,6 +127,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               name="appearance.injuryDescription"
               label={t('reportStray.injury_description')}
               placeholder={t('reportStray.describe_injury')}
+              required
               className="mb-4"
             />
           )}
@@ -141,6 +145,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             name="foundTime"
             label={t('reportStray.found_time')}
             type="datetime-local"
+            required
             className="mb-4"
           />
 
@@ -162,20 +167,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           />
         </FormSection>
 
-        {/* <FormSection title={t('reportStray.images')}>
-          <FileUpload
-            accept="image/*"
-            maxSizeMB={5}
-            multiple
-            onFilesChange={handleImageChange}
-          />
-        </FormSection> */}
-
         <FormSection title={t('reportStray.contact_info')}>
           <FormInput
             name="contactInfo.name"
             label={t('reportStray.name')}
             placeholder={t('reportStray.enter_name')}
+            required
             className="mb-4"
           />
 
@@ -184,6 +181,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             label={t('reportStray.phone')}
             type="tel"
             placeholder={t('reportStray.enter_phone')}
+            required
             className="mb-4"
           />
 
@@ -204,7 +202,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           >
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" disabled={isSubmitting} size="medium">
+          <Button variant="contained" type="submit" disabled={isSubmitting} size="medium">
             {t('reportStray.submit')}
           </Button>
         </div>

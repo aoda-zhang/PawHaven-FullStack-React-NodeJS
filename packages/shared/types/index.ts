@@ -36,3 +36,6 @@ export {
   CreateRescueDtoSchema,
   RescueDetailSchema,
 } from './rescue.schema';
+
+export { AnimalReportSchema } from './report-stray.schema';
+export type { AnimalReportDto } from './report-stray.schema';
