@@ -205,6 +205,7 @@
     min-height: 100%;
     color: var(--color-text);
     font-family: var(--font-family-sans);
+    box-sizing: border-box;
     /*
       Whether to set a fixed font-size here depends on your business needs:
       - If you want a consistent font size and layout across all devices and browsers, set a fixed root font-size (e.g., font-size: var(--font-size-base);).
