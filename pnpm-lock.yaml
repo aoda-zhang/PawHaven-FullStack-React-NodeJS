@@ -678,9 +678,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.75.0(react@19.2.6))
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../../../packages/design-system
+        version: link:../../../packages/design-tokens
       '@pawhaven/frontend-core':
         specifier: workspace:*
         version: link:../../../packages/frontend-core
@@ -817,9 +817,9 @@ importers:
       '@mui/system':
         specifier: ^7.3.7
         version: 7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6)
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../../../packages/design-system
+        version: link:../../../packages/design-tokens
       '@pawhaven/frontend-core':
         specifier: workspace:*
         version: link:../../../packages/frontend-core
@@ -1177,7 +1177,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/design-system:
+  packages/design-tokens:
     dependencies:
       '@mui/material':
         specifier: ^7.3.4
@@ -1331,9 +1331,9 @@ importers:
       '@mui/x-date-pickers-pro':
         specifier: ^8.14.0
         version: 8.28.4(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6))(@mui/material@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(@mui/system@7.3.11(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(react@19.2.6))(@types/react@19.2.14)(dayjs@1.11.20)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@pawhaven/design-system':
+      '@pawhaven/design-tokens':
         specifier: workspace:*
-        version: link:../design-system
+        version: link:../design-tokens
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

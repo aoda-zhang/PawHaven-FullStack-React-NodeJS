@@ -27,7 +27,7 @@ PawHaven is a pnpm monorepo with these core layers:
 
 - `apps/backend/*`: `gateway`, `auth-service`, `core-service`, `document-service`
 - `apps/frontend/*`: `portal`, `admin`
-- `packages/*`: `backend-core`, `frontend-core`, `shared`, `design-system`, `ui`, `i18n`
+- `packages/*`: `backend-core`, `frontend-core`, `shared`, `design-tokens`, `ui`, `i18n`
 - `libs/*`: `eslint-config`, `tsconfig`
 
 Dependency direction must remain: `libs -> packages -> apps`.

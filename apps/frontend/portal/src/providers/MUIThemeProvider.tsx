@@ -4,7 +4,7 @@ import {
   ThemeProvider,
   createTheme,
 } from '@mui/material/styles';
-import { MUITheme } from '@pawhaven/design-system/MUI-theme';
+import { MUITheme } from '@pawhaven/design-tokens/MUI-theme';
 
 const theme = createTheme(MUITheme, {
   components: {

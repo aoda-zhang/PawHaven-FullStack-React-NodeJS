@@ -21,8 +21,8 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
-        // target: 'https://pawhaven.work',
+        // target: 'http://localhost:8080',
+        target: 'https://pawhaven.work',
         changeOrigin: true,
         // rewrite: (url) => url.replace(/^\/api/, ''),
       },

@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom';
 
 import { useFetchAnimalDetail } from './apis/queries';
 import { AnimalBasicInfo } from './components/AnimalBasicInfo';
-import { RescueInteraction } from './components/RescueInteraction';
 import { RescueTimeline } from './components/RescueTimeline';
 import type { RescueUpdate } from './types';
 
@@ -68,7 +67,6 @@ export const RescueDetail = () => {
       {animal && <AnimalBasicInfo animal={animal} />}
 
       <RescueTimeline updates={updates} />
-      {animalID && <RescueInteraction animalId={animalID} />}
     </div>
   );
 };

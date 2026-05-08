@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
-import { Chrome, Github } from 'lucide-react';
 import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,8 +19,6 @@ export const Login: FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { mutate, isPending } = useLogin();
-
-  const handleSSOLogin = () => {};
 
   return (
     <AuthLayout>
@@ -78,34 +75,6 @@ export const Login: FC = () => {
             </Button>
           </form>
         </FormProvider>
-
-        <div className="my-4 flex items-center gap-3 text-xs font-medium uppercase tracking-wide text-text-secondary">
-          <div className="h-px flex-1 bg-border" />
-          <span>{t('auth.or')}</span>
-          <div className="h-px flex-1 bg-border" />
-        </div>
-
-        <Button
-          fullWidth
-          type="button"
-          variant="outlined"
-          startIcon={<Chrome size={18} />}
-          className="!h-11 !rounded-full !border-border !text-sm !font-semibold !text-text"
-          onClick={handleSSOLogin}
-        >
-          {t('auth.continueWithGoogle')}
-        </Button>
-
-        <Button
-          fullWidth
-          type="button"
-          variant="outlined"
-          startIcon={<Github size={18} />}
-          className="!mt-2 !h-11 !rounded-full !border-border !text-sm !font-semibold !text-text"
-          onClick={handleSSOLogin}
-        >
-          {t('auth.continueWithGithub')}
-        </Button>
 
         <div className="mt-4 text-center text-sm text-text-secondary">
           <span>{t('auth.no_account')} </span>

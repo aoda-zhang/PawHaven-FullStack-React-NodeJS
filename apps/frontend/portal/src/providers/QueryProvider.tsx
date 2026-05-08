@@ -49,7 +49,12 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-      {!IsStableEnv && <ReactQueryDevtools initialIsOpen />}
+      {!IsStableEnv && (
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-right"
+        />
+      )}
     </PersistQueryClientProvider>
   );
 };

@@ -5,17 +5,8 @@ inputs:
   service_path:
     description: Relative path to service root for vercel --cwd
     required: true
-  vercel_project_id:
-    description: Vercel project id
-    required: true
   target:
     description: Deploy target (preview|production)
-    required: true
-  vercel_token:
-    description: Vercel token
-    required: true
-  vercel_org_id:
-    description: Vercel org id
     required: true
   node_version:
     description: Node.js version
@@ -42,59 +33,78 @@ runs:
           echo "service_path is required" >&2
           exit 1
         fi
-        if [[ -z "${{ inputs.vercel_project_id }}" ]]; then
-          echo "vercel_project_id is required" >&2
-          exit 1
-        fi
-        if [[ -z "${{ inputs.vercel_token }}" ]]; then
-          echo "vercel_token is required" >&2
-          exit 1
-        fi
-        if [[ -z "${{ inputs.vercel_org_id }}" ]]; then
-          echo "vercel_org_id is required" >&2
-          exit 1
-        fi
+
+    - name: Validate Vercel secrets
+      shell: bash
+      env:
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ env.VERCEL_PROJECT_ID }}
+      run: |
+        set -euo pipefail
+
+        ensure_required() {
+          local value="$1"
+          local name="$2"
+          if [[ -z "${value}" ]]; then
+            echo "Missing required secret: ${name}" >&2
+            exit 1
+          fi
+        }
+
+        ensure_required "${VERCEL_TOKEN}" "VERCEL_TOKEN"
+        ensure_required "${VERCEL_ORG_ID}" "VERCEL_ORG_ID"
+        ensure_required "${VERCEL_PROJECT_ID}" "VERCEL_PROJECT_ID_* for selected service"
 
     - name: Install Vercel CLI
       shell: bash
       run: npm i -g vercel@latest
 
+    - name: Resolve deploy path
+      id: resolve_path
+      shell: bash
+      run: |
+        set -euo pipefail
+        SERVICE_CWD="${GITHUB_WORKSPACE}/${{ inputs.service_path }}"
+        if [[ ! -d "${SERVICE_CWD}" ]]; then
+          echo "Resolved service path not found: ${SERVICE_CWD}" >&2
+          exit 1
+        fi
+        echo "deploy_cwd=${GITHUB_WORKSPACE}" >> "$GITHUB_OUTPUT"
+
     - name: Pull Vercel project settings
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
-        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel pull \
           --yes \
           --environment="${{ inputs.target }}" \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"
 
     - name: Deploy preview
       if: ${{ inputs.target == 'preview' }}
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
-        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel deploy \
           --yes \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"
 
     - name: Deploy production
       if: ${{ inputs.target == 'production' }}
       shell: bash
       env:
-        VERCEL_TOKEN: ${{ inputs.vercel_token }}
-        VERCEL_ORG_ID: ${{ inputs.vercel_org_id }}
-        VERCEL_PROJECT_ID: ${{ inputs.vercel_project_id }}
+        VERCEL_TOKEN: ${{ env.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ env.VERCEL_ORG_ID }}
       run: |
         vercel deploy \
           --prod \
           --yes \
           --token="${VERCEL_TOKEN}" \
-          --cwd="${{ inputs.service_path }}"
+          --cwd="${{ steps.resolve_path.outputs.deploy_cwd }}"

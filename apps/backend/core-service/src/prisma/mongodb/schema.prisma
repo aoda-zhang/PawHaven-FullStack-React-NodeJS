@@ -130,3 +130,22 @@ model RoutePermission {
   @@index([routeId])
   @@index([permissionId])
 }
+
+model Rescue {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  status      String   @default("active")
+
+  animalID    String   @unique
+  name        String
+  img         String
+  description String
+  location    String
+  time        DateTime @default(now())
+  rescueStatus String   @default("pending")
+
+  @@index([rescueStatus])
+}

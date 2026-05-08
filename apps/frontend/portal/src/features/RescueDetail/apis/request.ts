@@ -3,7 +3,6 @@ import { apiClient } from '@/utils/apiClient';
 
 export const getAnimalDetail = (id: string) => {
   // return http.get(`/animal/${id}`);
-  console.log('Fetching animal detail for ID:', id);
 
   const animal: AnimalDetail = {
     id: 'animal_007',

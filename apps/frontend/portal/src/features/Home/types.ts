@@ -1,16 +1,8 @@
-import type { RescueStatus } from '@/constants/RescueStatus';
+import type { RescueStatus, RescueItem } from '@pawhaven/shared/types';
 
-export type RescueStatusType = (typeof RescueStatus)[keyof typeof RescueStatus];
+// Re-export shared types for backward compatibility
+export type { RescueStatus as RescueStatusType, RescueItem as RescueItemType };
 
-export interface RescueItemType {
-  animalID: string;
-  name: string;
-  img: string;
-  description: string;
-  location: string;
-  time: string;
-  status: RescueStatusType;
-}
-
+// UI-only helper types (not shared)
 export type ColorPrefix = 'text' | 'bg' | 'border';
-export type StatusColorType = `${ColorPrefix}-rescue-${RescueStatusType}`;
+export type StatusColorType = `${ColorPrefix}-rescue-${RescueStatus}`;

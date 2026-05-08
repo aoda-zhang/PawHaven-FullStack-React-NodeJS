@@ -42,7 +42,7 @@ export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
         <div className="relative pl-6">
           {sortedUpdates.map((update, index) => (
             <div key={update.id} className="mb-8 relative">
-              <div className="absolute left-[-1.5rem] top-3.5 flex flex-col items-center">
+              <div className="absolute -left-6 top-3.5 flex flex-col items-center">
                 <div
                   className={clsx(
                     'w-7 h-7 rounded-full flex items-center justify-center z-base',

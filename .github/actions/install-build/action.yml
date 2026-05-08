@@ -42,10 +42,10 @@ runs:
           exit 1
         fi
 
-    - name: Install dependencies
+    - name: Install selected app dependencies
       shell: bash
-      run: pnpm install --frozen-lockfile
+      run: pnpm --filter "${{ inputs.build_filter }}..." install --frozen-lockfile
 
-    - name: Build selected backend package
+    - name: Build package and dependencies
       shell: bash
-      run: pnpm --filter "${{ inputs.build_filter }}" build
+      run: pnpm --filter "${{ inputs.build_filter }}..." build

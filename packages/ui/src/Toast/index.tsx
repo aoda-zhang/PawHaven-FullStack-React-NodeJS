@@ -1,4 +1,4 @@
-import designTokens from '@pawhaven/design-system/designTokens';
+import { theme } from '@pawhaven/design-tokens/designTokens';
 import type { ReactElement } from 'react';
 import React from 'react';
 import type { ToastOptions } from 'react-hot-toast';
@@ -42,8 +42,8 @@ export const showToast = ({
       id: globalNotificationID,
       duration: notificationOption?.duration ?? 3000,
       style: notificationOption?.style ?? {
-        backgroundColor: designTokens.colors.surface,
-        color: designTokens.colors.textPrimary,
+        backgroundColor: theme.colors.surface,
+        color: theme.colors.textPrimary,
       },
       ...(notificationOption ?? {}),
     });
@@ -62,24 +62,24 @@ export const Toast: React.FC<NotificationProps> = ({ success, error }) => {
           position: success?.position ?? 'top-center',
           duration: success?.duration ?? 2500,
           style: success?.style ?? {
-            backgroundColor: designTokens.colors.surface,
-            color: designTokens.colors.success,
+            backgroundColor: theme.colors.surface,
+            color: theme.colors.success,
           },
           iconTheme: success?.iconTheme ?? {
-            primary: designTokens.colors.success,
-            secondary: designTokens.colors.surface,
+            primary: theme.colors.success,
+            secondary: theme.colors.surface,
           },
         },
         error: {
           position: error?.position ?? 'top-center',
           duration: error?.duration ?? Infinity,
           style: error?.style ?? {
-            backgroundColor: designTokens.colors.error,
-            color: designTokens.colors.surface,
+            backgroundColor: theme.colors.error,
+            color: theme.colors.surface,
           },
           iconTheme: error?.iconTheme ?? {
-            primary: designTokens.colors.surface,
-            secondary: designTokens.colors.error,
+            primary: theme.colors.surface,
+            secondary: theme.colors.error,
           },
         },
       }}

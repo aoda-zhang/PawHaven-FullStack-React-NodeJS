@@ -34,17 +34,24 @@ export class JwtVerificationGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<RequestWithUser>();
     const accessToken = req.cookies?.[cookieKeys.access_token];
 
-    if (isPublic || (isOptionalAuth && !accessToken)) {
+    if (isPublic) {
       return true;
     }
 
     if (!accessToken) {
+      if (isOptionalAuth) {
+        return true;
+      }
       throw new UnauthorizedException('Access token missing');
     }
 
     const payload = this.verifyAccessToken(accessToken);
 
     if (!payload?.userId) {
+      if (isOptionalAuth) {
+        // Token expired/invalid but route allows optional auth — proceed without user
+        return true;
+      }
       throw new UnauthorizedException('Invalid or expired token');
     }
 
