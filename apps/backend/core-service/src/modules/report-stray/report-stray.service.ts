@@ -17,7 +17,9 @@ export class ReportStrayService {
   async create(dto: CreateReportStrayDto) {
     try {
       const name =
-        dto.animalType === 'other' ? dto.animalTypeOther ?? 'Unknown' : dto.animalType;
+        dto.animalType === 'other'
+          ? (dto.animalTypeOther ?? 'Unknown')
+          : dto.animalType;
       const animalID = `stray-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const img = dto.images?.[0] ?? '';
 

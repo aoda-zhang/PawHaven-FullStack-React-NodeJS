@@ -1,7 +1,6 @@
 import { Controller, Get, Next, Post, Req, Res } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
-import { Public } from '../decorators/public.decorator';
 import { OptionalAuth } from '../decorators/optional-auth.decorator';
 
 import { ProxyService } from './proxy.service';
@@ -65,15 +64,6 @@ export class PublicProxyController {
   @OptionalAuth()
   @Get('/core/rescues/:id')
   proxyGetRescueById(
-    @Req() req: Request,
-    @Res() res: Response,
-    @Next() next: NextFunction,
-  ): void {
-    this.proxyService.proxyRequest(req, res, next);
-  }
-
-  @Post('/core/report-stray')
-  proxyReportStray(
     @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,

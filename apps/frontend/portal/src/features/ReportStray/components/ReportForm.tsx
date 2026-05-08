@@ -10,7 +10,7 @@ import {
   FormCheckbox,
 } from '@pawhaven/ui';
 import React from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { ageOptions, animalTypeOptions, statusOptions } from '../constants';
@@ -29,7 +29,7 @@ const FormSection: React.FC<FormSectionProps> = ({ title, children }) => (
 );
 
 interface ReportFormProps {
-  onSubmit: (data: AnimalReport) => void;
+  onSubmit: (data: AnimalReportDto) => void;
   isSubmitting: boolean;
 }
 
@@ -69,6 +69,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     defaultValues,
   });
 
+  const animalType = useWatch({ control: methods.control, name: 'animalType' });
+  const hasInjury = useWatch({
+    control: methods.control,
+    name: 'appearance.hasInjury',
+  });
+
   const handleSubmit = methods.handleSubmit(onSubmit);
 
   return (
@@ -87,7 +93,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
               label: t(option.label),
             }))}
           />
-          {methods.watch('animalType') === 'other' && (
+          {animalType === 'other' && (
             <FormInput
               name="animalTypeOther"
               placeholder={t('reportStray.enter_other_type_placeholder')}
@@ -122,7 +128,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
             className="mb-4"
           />
 
-          {methods.watch('appearance.hasInjury') && (
+          {hasInjury && (
             <FormTextArea
               name="appearance.injuryDescription"
               label={t('reportStray.injury_description')}
@@ -202,7 +208,12 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           >
             {t('common.cancel')}
           </Button>
-          <Button variant="contained" type="submit" disabled={isSubmitting} size="medium">
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={isSubmitting}
+            size="medium"
+          >
             {t('reportStray.submit')}
           </Button>
         </div>

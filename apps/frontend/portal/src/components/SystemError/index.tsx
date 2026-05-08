@@ -21,7 +21,9 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+    >
       {/* Main content */}
       <div
         style={{
@@ -64,7 +66,14 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
         </div>
 
         {/* Error heading */}
-        <div style={{ marginBottom: '48px', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div
+          style={{
+            marginBottom: '48px',
+            maxWidth: '560px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           <h1
             style={{
               color: '#111827',
@@ -91,7 +100,14 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
         </div>
 
         {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '16px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           <Button
             variant="contained"
             onClick={retry}

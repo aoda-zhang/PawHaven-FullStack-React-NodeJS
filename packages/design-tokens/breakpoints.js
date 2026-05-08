@@ -1,4 +1,4 @@
-const BREAKPOINTS = {
+export const BREAKPOINTS = {
   xs: 0, // small mobile
   sm: 480, // mobile
   md: 768, // tablet
@@ -6,5 +6,3 @@ const BREAKPOINTS = {
   xl: 1280, // desktop
   '2xl': 1920, // large desktop / 4K
 };
-
-export default BREAKPOINTS;

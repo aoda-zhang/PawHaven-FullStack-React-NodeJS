@@ -2,7 +2,7 @@
 // Accepts either a breakpoint name (e.g. "md") or a numeric pixel value.
 import { useState, useEffect, useCallback } from 'react';
 
-import BREAKPOINTS from './breakpoints';
+import { BREAKPOINTS } from './breakpoints';
 
 export const useMatchBreakpoint = (input) => {
   const getTarget = useCallback(() => {

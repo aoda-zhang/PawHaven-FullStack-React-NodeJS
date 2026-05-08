@@ -1,4 +1,4 @@
-const designTokens = {
+export const theme = {
   colors: {
     primary: '#f7823a',
     primaryLight: '#f89c61',
@@ -28,5 +28,3 @@ const designTokens = {
     base: '0.25rem',
   },
 };
-
-export default designTokens;

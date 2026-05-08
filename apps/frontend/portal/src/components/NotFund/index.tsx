@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import type { ErrorInfo } from '../RouterErrorFallback';
 
-import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 import { useIsStableEnv } from '@/hooks/useIsStableEnv';
+import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
 interface NotFundProps {
   error?: Partial<ErrorInfo>;
@@ -20,7 +20,9 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
+    >
       {/* Main content */}
       <div
         style={{
@@ -79,7 +81,14 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
         </div>
 
         {/* Message */}
-        <div style={{ marginBottom: '48px', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <div
+          style={{
+            marginBottom: '48px',
+            maxWidth: '560px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
           <h2
             style={{
               color: '#111827',

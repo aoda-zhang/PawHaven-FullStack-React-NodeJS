@@ -1,43 +1,43 @@
 import { createTheme } from '@mui/material/styles';
 
-import designTokens from './designTokens';
+import { theme } from './theme';
 
 export const MUITheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: designTokens.colors.primary,
-      light: designTokens.colors.primaryLight,
-      dark: designTokens.colors.primaryDark,
+      main: theme.colors.primary,
+      light: theme.colors.primaryLight,
+      dark: theme.colors.primaryDark,
       contrastText: '#ffffff',
     },
     secondary: {
-      main: designTokens.colors.secondary,
-      light: designTokens.colors.secondaryLight,
-      dark: designTokens.colors.secondaryDark,
+      main: theme.colors.secondary,
+      light: theme.colors.secondaryLight,
+      dark: theme.colors.secondaryDark,
       contrastText: '#ffffff',
     },
     background: {
-      default: designTokens.colors.background,
-      paper: designTokens.colors.surface,
+      default: theme.colors.background,
+      paper: theme.colors.surface,
     },
     text: {
-      primary: designTokens.colors.textPrimary,
-      secondary: designTokens.colors.textSecondary,
+      primary: theme.colors.textPrimary,
+      secondary: theme.colors.textSecondary,
     },
-    divider: designTokens.colors.divider,
+    divider: theme.colors.divider,
     error: {
-      main: designTokens.colors.error,
+      main: theme.colors.error,
     },
     success: {
-      main: designTokens.colors.success,
+      main: theme.colors.success,
     },
     warning: {
-      main: designTokens.colors.warning,
+      main: theme.colors.warning,
     },
     info: {
-      main: designTokens.colors.accent,
+      main: theme.colors.accent,
     },
   },
-  spacing: designTokens.spacing.base,
+  spacing: theme.spacing.base,
 });
