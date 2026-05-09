@@ -83,6 +83,7 @@ Detailed documentation can be found in the `/docs` directory.
 - [Project Structure](./docs/project_structure.md)
 - [Monorepo & Project Standards](./docs/project_standards.md)
 - [Authentication & Authorization Architecture](./docs/authentication_architecture.md)
+- [Route-Level Authentication](./docs/route_authentication.md)
 
 ---
 
