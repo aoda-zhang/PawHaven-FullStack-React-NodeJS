@@ -345,12 +345,12 @@ export class BootstrapService {
             ? (route.handle as RouterItem['handle'])
             : {};
 
-        const requiresAuth = Boolean((route as any).authRequired);
+        const isRequireUserLogin = Boolean((route as any).authRequired);
 
         routeMap.set(route.id, {
           path: route.path,
           element: route.element,
-          handle: { ...rawHandle, requiresAuth },
+          handle: { ...rawHandle, isRequireUserLogin },
           children: [],
         });
       },

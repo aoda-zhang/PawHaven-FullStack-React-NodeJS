@@ -43,7 +43,7 @@ flowchart LR
 
 - Admin sets `authRequired: true` on a route record in the database.
 - On app startup, `BootstrapService` reads all routes from the database and injects `authRequired` into each route's `handle` object.
-- Frontend receives the route config via `GET /core/app/bootstrap`, which includes `handle.requiresAuth: true`.
+- Frontend receives the route config via `GET /core/app/bootstrap`, which includes `handle.isRequireUserLogin: true`.
 
 ### Step 2: Route Rendering (AppRouterProvider)
 
@@ -55,7 +55,7 @@ import { useCurrentUser } from '@/features/Auth/apis/queries';
 const createRouteElement = (route: RouterEle): ReactNode => {
   const page = routerElementMapping[route.element];
 
-  if (route.handle?.requiresAuth) {
+  if (route.handle?.isRequireUserLogin) {
     // Pass useCurrentUser hook as authQuery parameter
     return <RequireAuth authQuery={useCurrentUser}>{page}</RequireAuth>;
   }

@@ -18,7 +18,7 @@ const createRouteElement = (route: RouterEle): ReactNode => {
     routerElementMapping[route.element]
   );
 
-  if (handle?.requiresAuth) {
+  if (handle?.isRequireUserLogin) {
     return <RequireAuth authQuery={useCurrentUser}>{page}</RequireAuth>;
   }
 
