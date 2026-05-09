@@ -5,18 +5,24 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { routerElementMapping } from './routerElementMapping';
 
+import { RequireAuth } from '@/components/RequireAuth';
+import { useCurrentUser } from '@/features/Auth/apis/queries';
 import { useLandingContext } from '@/features/Landing/landingContext';
 import type { RouterEle } from '@/types/LayoutType';
 
-// Route rendering is now purely declarative.
-// Login gating is handled by backend 401 responses + global auth error redirect.
 const createRouteElement = (route: RouterEle): ReactNode => {
   const handle = route.handle ?? {};
-  return handle.isLazyLoad ? (
+  const page = handle.isLazyLoad ? (
     <SuspenseWrapper>{routerElementMapping[route.element]}</SuspenseWrapper>
   ) : (
     routerElementMapping[route.element]
   );
+
+  if (handle?.requiresAuth) {
+    return <RequireAuth authQuery={useCurrentUser}>{page}</RequireAuth>;
+  }
+
+  return page;
 };
 
 const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {

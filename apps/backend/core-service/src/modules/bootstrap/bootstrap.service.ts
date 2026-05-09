@@ -218,7 +218,7 @@ export class BootstrapService {
   }
 
   async addAppRouter(
-    router: RouterItem & { parentId?: string },
+    router: RouterItem & { parentId?: string; authRequired?: boolean },
   ): Promise<CreatedRouteDTO> {
     const parentDepth = await this.validateAndGetParentDepth(router.parentId);
     const newRouteDepth = parentDepth + 1;
@@ -234,6 +234,7 @@ export class BootstrapService {
         path: router.path,
         element: router.element,
         handle: this.normalizeRouteHandle(router.handle),
+        authRequired: router.authRequired ?? false,
         ...(router?.parentId
           ? {
               parent: { connect: { id: router.parentId } },
@@ -275,6 +276,7 @@ export class BootstrapService {
         parentId: true,
         order: true,
         status: true,
+        authRequired: true,
         routePermissions: {
           select: {
             permissionId: true,
@@ -336,15 +338,19 @@ export class BootstrapService {
 
     sortedVisibleRoutes.forEach(
       (route: (typeof sortedVisibleRoutes)[number]) => {
+        const rawHandle: RouterItem['handle'] =
+          route.handle &&
+          typeof route.handle === 'object' &&
+          !Array.isArray(route.handle)
+            ? (route.handle as RouterItem['handle'])
+            : {};
+
+        const requiresAuth = Boolean((route as any).authRequired);
+
         routeMap.set(route.id, {
           path: route.path,
           element: route.element,
-          handle:
-            route.handle &&
-            typeof route.handle === 'object' &&
-            !Array.isArray(route.handle)
-              ? (route.handle as RouterItem['handle'])
-              : {},
+          handle: { ...rawHandle, requiresAuth },
           children: [],
         });
       },

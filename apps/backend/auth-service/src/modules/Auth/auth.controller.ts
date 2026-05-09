@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   BadRequestException,
   UnauthorizedException,
@@ -95,5 +96,15 @@ export class AuthController {
     this.authService.clearAuthCookies(res);
 
     return { message: 'Logout successful' };
+  }
+
+  @Get('/me')
+  async me(@Req() req: Request) {
+    const accessToken = this.authService.getTokenFromRequest(req, 'access');
+    if (!accessToken) {
+      throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
+    }
+    const payload = await this.authService.verifyToken(accessToken);
+    return { userId: payload.userId, email: payload.email };
   }
 }

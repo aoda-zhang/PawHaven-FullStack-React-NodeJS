@@ -1,7 +1,7 @@
 import type { AnimalDetail, AnimalRescueStatus } from '@/types/AnimalType';
 import { apiClient } from '@/utils/apiClient';
 
-export const getAnimalDetail = (id: string) => {
+export const getAnimalDetail = (_id: string) => {
   // return http.get(`/animal/${id}`);
 
   const animal: AnimalDetail = {

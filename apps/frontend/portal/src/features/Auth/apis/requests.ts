@@ -15,3 +15,7 @@ export const login = (userInfo: CredentialsDto): Promise<ProfileType> => {
 export const logout = (): Promise<{ message: string }> => {
   return apiClient.post('/auth/logout');
 };
+
+export const getMe = (): Promise<{ userId: string; email: string }> => {
+  return apiClient.get('/auth/me');
+};

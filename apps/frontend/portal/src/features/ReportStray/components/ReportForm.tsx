@@ -14,7 +14,6 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { ageOptions, animalTypeOptions, statusOptions } from '../constants';
-import type { AnimalReport } from '../types';
 
 interface FormSectionProps {
   title: string;

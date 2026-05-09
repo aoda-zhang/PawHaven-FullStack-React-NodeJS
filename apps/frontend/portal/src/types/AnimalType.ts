@@ -1,4 +1,3 @@
-import type { Comment } from '@/features/RescueDetail/components/RescueInteraction';
 import type {
   RescueParticipantType,
   RescueUpdate,
@@ -12,6 +11,16 @@ export type AnimalRescueStatus =
   | 'awaitingAdoption'
   | 'adopted'
   | 'failed';
+
+export interface Comment {
+  id: string;
+  userId: string;
+  userName: string;
+  avatar: string;
+  content: string;
+  timestamp: string;
+  likes: number;
+}
 
 export interface AnimalDetail {
   id: string;

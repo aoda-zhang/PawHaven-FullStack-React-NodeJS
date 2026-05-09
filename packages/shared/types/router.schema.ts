@@ -8,6 +8,7 @@ export interface RouterHandle {
   isMenuAvailable?: boolean;
   isFooterAvailable?: boolean;
   isLazyLoad?: boolean;
+  requiresAuth?: boolean;
 }
 
 export interface RouterItem {
@@ -25,6 +26,7 @@ const HandleSchema = z
     isMenuAvailable: z.boolean().optional(),
     isFooterAvailable: z.boolean().optional(),
     isLazyLoad: z.boolean().optional(),
+    requiresAuth: z.boolean().optional(),
   })
   .default({});
 
