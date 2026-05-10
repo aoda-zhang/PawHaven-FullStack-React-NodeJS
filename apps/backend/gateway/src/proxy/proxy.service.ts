@@ -80,6 +80,8 @@ export class ProxyService {
       if (Array.isArray(user.roles) && user.roles.length > 0) {
         proxyReq.setHeader('X-Auth-User-Roles', user.roles.join(','));
       }
+    } else {
+      proxyReq.setHeader('X-Auth-Verified', '0');
     }
 
     fixRequestBody(proxyReq, req);

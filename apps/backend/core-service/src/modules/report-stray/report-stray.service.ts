@@ -28,12 +28,9 @@ export class ReportStrayService {
           animalID,
           name,
           img,
-          description: dto.statusDescription ?? '',
           location: dto.location?.address ?? '',
           time: new Date(dto.foundTime),
           rescueStatus: 'pending',
-          // Store additional fields as JSON in description field temporarily
-          // TODO: extend Prisma schema for full report-stray fields
           description: JSON.stringify({
             description: dto.statusDescription,
             age: dto.age,

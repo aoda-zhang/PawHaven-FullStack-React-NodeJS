@@ -3,6 +3,7 @@ import {
   CanActivate,
   ExecutionContext,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request, Response } from 'express';
@@ -50,6 +51,7 @@ export class JwtRefreshGuard implements CanActivate {
     if (!accessToken) {
       await this.attemptTokenRefresh(req, res, {
         clearCookiesOnFailure: true,
+        isOptionalAuth,
       });
       return true;
     }
@@ -58,6 +60,7 @@ export class JwtRefreshGuard implements CanActivate {
     if (!accessPayload) {
       await this.attemptTokenRefresh(req, res, {
         clearCookiesOnFailure: true,
+        isOptionalAuth,
       });
       return true;
     }
@@ -65,6 +68,7 @@ export class JwtRefreshGuard implements CanActivate {
     if (this.shouldRefreshSoon(accessPayload)) {
       await this.attemptTokenRefresh(req, res, {
         clearCookiesOnFailure: false,
+        isOptionalAuth,
       });
     }
 
@@ -119,7 +123,7 @@ export class JwtRefreshGuard implements CanActivate {
   private async attemptTokenRefresh(
     req: Request,
     res: Response,
-    options: { clearCookiesOnFailure: boolean },
+    options: { clearCookiesOnFailure: boolean; isOptionalAuth: boolean },
   ): Promise<void> {
     const refreshToken = req.cookies?.[cookieKeys.refresh_token];
 
@@ -154,6 +158,9 @@ export class JwtRefreshGuard implements CanActivate {
       this.logger.error('Token refresh failed', error as Error);
       if (options.clearCookiesOnFailure) {
         this.clearAuthCookies(res);
+      }
+      if (!options.isOptionalAuth) {
+        throw new UnauthorizedException('Session expired, please login again');
       }
     }
   }

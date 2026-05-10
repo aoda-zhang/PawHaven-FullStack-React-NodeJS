@@ -103,24 +103,16 @@ export class BootstrapService {
       return 0;
     }
 
-    const routeIndex = await this.prisma.route.findMany({
-      select: {
-        id: true,
-        parentId: true,
-        status: true,
-      },
+    const activeRoutes = await this.prisma.route.findMany({
+      where: { status: 'active' },
+      select: { id: true, parentId: true },
     });
 
-    const routeMap = new Map(
-      routeIndex.map((route) => [
-        route.id,
-        { parentId: route.parentId, status: route.status },
-      ]),
-    );
+    const routeMap = new Map(activeRoutes.map((r) => [r.id, r.parentId]));
 
-    let depth = 1;
-    let currentParentId: string | null = parentId;
     const visited = new Set<string>();
+    let currentParentId: string | null = parentId;
+    let depth = 0;
 
     while (currentParentId) {
       if (visited.has(currentParentId)) {
@@ -130,24 +122,15 @@ export class BootstrapService {
       }
       visited.add(currentParentId);
 
-      const parent = routeMap.get(currentParentId);
-
-      if (!parent) {
+      const parentParentId = routeMap.get(currentParentId);
+      if (parentParentId === undefined) {
         throw new BadRequestException(
           `parent route not found: ${currentParentId}`,
         );
       }
 
-      if (parent.status !== 'active') {
-        throw new BadRequestException('parent route is not active');
-      }
-
-      if (!parent.parentId) {
-        break;
-      }
-
       depth += 1;
-      currentParentId = parent.parentId;
+      currentParentId = parentParentId;
     }
 
     return depth;
@@ -268,6 +251,9 @@ export class BootstrapService {
   ): Promise<Router> {
     const userPermissionSet = await this.getPermissionSetByRoles(userRoles);
     const routes = await this.prisma.route.findMany({
+      where: {
+        status: 'active',
+      },
       select: {
         id: true,
         path: true,
