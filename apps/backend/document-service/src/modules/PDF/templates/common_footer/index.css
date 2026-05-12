@@ -1,0 +1,27 @@
+.pdf-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 40px;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  font-size: 10px;
+  color: #6b7280;
+}
+
+.pdf-footer-left,
+.pdf-footer-center,
+.pdf-footer-right {
+  flex: 1;
+}
+
+.pdf-footer-center {
+  text-align: center;
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.pdf-footer-right {
+  text-align: right;
+}

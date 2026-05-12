@@ -70,4 +70,13 @@ export class PublicProxyController {
   ): void {
     this.proxyService.proxyRequest(req, res, next);
   }
+
+  @Get('/document/rescue/guide')
+  proxyRescueGuidePdf(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
+  }
 }

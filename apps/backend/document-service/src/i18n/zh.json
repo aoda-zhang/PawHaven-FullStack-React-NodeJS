@@ -1,5 +1,26 @@
 {
-  "common.brand": "Trip",
+  "common.brand": "PawHaven",
   "common.slogan": "探索无限可能",
-  "trip_submit_failed.title": "行程提交失败"
+  "trip_submit_failed.title": "行程提交失败",
+  "rescue_guide.title": "动物救助指南",
+  "rescue_guide.subtitle": "如何帮助流浪动物——分步指南",
+  "rescue_guide.safety.title": "安全第一",
+  "rescue_guide.safety.description": "在尝试任何救助之前，请确保自身和动物的安全。不要逼迫或追逐受惊的动物。",
+  "rescue_guide.assess.title": "评估情况",
+  "rescue_guide.assess.description": "在安全距离外观察动物。检查它是否受伤、被困或处于危险中。记录其位置和状态。",
+  "rescue_guide.approach.title": "谨慎接近",
+  "rescue_guide.approach.description": "缓慢移动并轻声说话。提供食物（水和少量清淡食物）以建立信任。给动物留出空间。",
+  "rescue_guide.contain.title": "安全控制",
+  "rescue_guide.contain.description": "使用人道捕捉笼、运输笼或带有柔软布料的牢固箱子。切勿直接抓取未知动物——请使用手套和毛巾。",
+  "rescue_guide.transport.title": "安全运送",
+  "rescue_guide.transport.description": "运送途中将动物置于温暖、黑暗、安静的空间。除非兽医指示，否则不要喂食。",
+  "rescue_guide.support.title": "寻求专业帮助",
+  "rescue_guide.support.description": "立即联系当地收容所、救助组织或兽医。通过PawHaven的'报告流浪动物'功能上报救助信息。",
+  "rescue_guide.emergency.title": "紧急联系方式",
+  "rescue_guide.emergency.localVet": "当地兽医",
+  "rescue_guide.emergency.shelter": "动物收容所",
+  "rescue_guide.emergency.pawhaven": "PawHaven热线",
+  "rescue_guide.emergency.emergency": "紧急服务",
+  "rescue_guide.footer.copyright": "© 2024 PawHaven. 保留所有权利。",
+  "rescue_guide.footer.disclaimer": "本指南仅供参考。如有医疗或行为问题，请务必咨询专业人士。"
 }

@@ -21,13 +21,11 @@ export class ReportStrayService {
           ? (dto.animalTypeOther ?? 'Unknown')
           : dto.animalType;
       const animalID = `stray-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      const img = dto.images?.[0] ?? '';
 
       return await this.prisma.rescue.create({
         data: {
           animalID,
           name,
-          img,
           location: dto.location?.address ?? '',
           time: new Date(dto.foundTime),
           rescueStatus: 'pending',

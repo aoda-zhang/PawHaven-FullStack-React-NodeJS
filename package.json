@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "24.x",
+    "node": "25.x",
     "pnpm": "11"
   },
   "scripts": {
@@ -27,12 +27,12 @@
     ]
   },
   "description": "PawHaven: An enterprise-level fullstack project built with React and NestJS.",
-  "author": "aodazhang666@gmail.com",
+  "author": "aoda.zhang.work@gmail.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/aoda-zhang/PawHaven-Enterprise-FullStack-React-NestJS"
   },
-  "homepage": "https://github.com/aoda-zhang/PawHaven-Enterprise-FullStack-React-NestJS#readme",
+  "homepage": "https://pawhaven.work",
   "keywords": [
     "FullStack",
     "react",
@@ -67,5 +67,5 @@
     "turbo": "^2.8.14",
     "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@11.0.8"
+  "packageManager": "pnpm@11.0.9"
 }

@@ -142,7 +142,7 @@ model Rescue {
 
   animalID     String   @unique
   name         String
-  img          String
+  img          String?
   description  String
   location     String
   time         DateTime @default(now())

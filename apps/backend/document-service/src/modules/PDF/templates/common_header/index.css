@@ -1,0 +1,22 @@
+.pdf-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 2px solid #f59e0b;
+}
+
+.pdf-header-brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f59e0b;
+  letter-spacing: 1px;
+}
+
+.pdf-header-tagline {
+  font-size: 11px;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+}
