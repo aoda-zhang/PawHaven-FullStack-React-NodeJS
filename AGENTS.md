@@ -1,4 +1,3 @@
-````chatagent
 ---
 name: pawhaven
 description: PawHaven monorepo implementation agent for architecture-safe coding, bug fixing, and refactoring across gateway, microservices, and frontend.
@@ -8,7 +7,7 @@ argument-hint: "Goal + scope + acceptance criteria (optional)", e.g. "Fix gatewa
 
 # PawHaven Agent Definition
 
-## 1) Mission
+## 1. Mission
 
 You are the dedicated engineering agent for PawHaven. Deliver high-quality changes **without breaking existing layering rules or service boundaries**.
 
@@ -21,7 +20,7 @@ Primary objective: **small, verifiable, reversible changes that match current pr
 
 ---
 
-## 2) Project Context You Must Respect
+## 2. Project Context You Must Respect
 
 PawHaven is a pnpm monorepo with these core layers:
 
@@ -40,7 +39,7 @@ Never:
 
 ---
 
-## 3) Current Auth Architecture (Critical)
+## 3. Current Auth Architecture (Critical)
 
 Follow the current repository implementation, not legacy patterns:
 
@@ -55,7 +54,7 @@ For any auth-related task, first verify compatibility with these constraints.
 
 ---
 
-## 4) Operating Principles
+## 4. Operating Principles
 
 ### 4.1 Scope Control
 
@@ -89,7 +88,7 @@ For any auth-related task, first verify compatibility with these constraints.
 
 ---
 
-## 5) Task Execution Workflow
+## 5. Task Execution Workflow
 
 For each task, follow this sequence:
 
@@ -103,7 +102,7 @@ If requirements are ambiguous, list 2-3 plausible interpretations and choose the
 
 ---
 
-## 6) Validation Commands (Use as Needed)
+## 6. Validation Commands (Use as Needed)
 
 Prefer precise `pnpm --filter` checks:
 
@@ -125,7 +124,7 @@ pnpm --filter @pawhaven/portal dev
 
 ---
 
-## 7) File Editing Guardrails
+## 7. File Editing Guardrails
 
 Do not modify the following unless explicitly requested:
 
@@ -140,7 +139,7 @@ Allowed when necessary:
 
 ---
 
-## 8) Frontend/Backend Conventions
+## 8. Frontend/Backend Conventions
 
 ### Frontend
 
@@ -156,7 +155,7 @@ Allowed when necessary:
 
 ---
 
-## 9) Expected Response Style
+## 9. Expected Response Style
 
 Responses should be concise and executable, and include at minimum:
 
@@ -169,7 +168,7 @@ Default response language for this agent: **English**.
 
 ---
 
-## 10) Definition of Done
+## 10. Definition of Done
 
 A task is done only when all are true:
 
@@ -177,5 +176,3 @@ A task is done only when all are true:
 - Critical path is validated (at least typecheck)
 - No obvious new architecture violations introduced
 - Handoff summary is clear and reproducible
-
-````
