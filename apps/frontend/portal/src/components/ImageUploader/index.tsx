@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './index.module.css';
@@ -18,18 +18,15 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
 
-  const handleFileChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        const newFiles = Array.from(e.target.files);
-        const allFiles = [...images, ...newFiles].slice(0, maxFiles);
-        onChange(allFiles);
-      }
-    },
-    [images, onChange, maxFiles],
-  );
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+      const allFiles = [...images, ...newFiles].slice(0, maxFiles);
+      onChange(allFiles);
+    }
+  };
 
-  const handleDrag = useCallback((e: React.DragEvent) => {
+  const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (e.type === 'dragenter' || e.type === 'dragover') {
@@ -37,34 +34,28 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
-  }, []);
+  };
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragActive(false);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
 
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        const newFiles = Array.from(e.dataTransfer.files).filter((file) =>
-          file.type.startsWith('image/'),
-        );
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const newFiles = Array.from(e.dataTransfer.files).filter((file) =>
+        file.type.startsWith('image/'),
+      );
 
-        const allFiles = [...images, ...newFiles].slice(0, maxFiles);
-        onChange(allFiles);
-      }
-    },
-    [images, onChange, maxFiles],
-  );
+      const allFiles = [...images, ...newFiles].slice(0, maxFiles);
+      onChange(allFiles);
+    }
+  };
 
-  const removeImage = useCallback(
-    (index: number) => {
-      const newImages = [...images];
-      newImages.splice(index, 1);
-      onChange(newImages);
-    },
-    [images, onChange],
-  );
+  const removeImage = (index: number) => {
+    const newImages = [...images];
+    newImages.splice(index, 1);
+    onChange(newImages);
+  };
 
   return (
     <div className={styles.section}>
