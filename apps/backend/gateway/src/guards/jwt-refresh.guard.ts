@@ -132,6 +132,9 @@ export class JwtRefreshGuard implements CanActivate {
       if (options.clearCookiesOnFailure) {
         this.clearAuthCookies(res);
       }
+      if (!options.isOptionalAuth) {
+        throw new UnauthorizedException('Authentication required');
+      }
       return;
     }
 

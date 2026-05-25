@@ -20,7 +20,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const newFiles = Array.from(e.target.files);
+      const newFiles = Array.from(e.target.files).filter((file) =>
+        file.type.startsWith('image/'),
+      );
       const allFiles = [...images, ...newFiles].slice(0, maxFiles);
       onChange(allFiles);
     }

@@ -53,6 +53,7 @@ export class PdfController {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="${filename}"`,
       'Cache-Control': 'public, max-age=86400',
+      Vary: 'Accept-Language',
     });
     res.end(PDFData?.data);
   }

@@ -272,26 +272,19 @@ export class BootstrapService {
       orderBy: { order: 'asc' },
     });
 
-    const activeRoutes = routes.filter(
-      (route: (typeof routes)[number]) => route.status === 'active',
-    );
-
     const activeRouteMap = new Map(
-      activeRoutes.map((route: (typeof activeRoutes)[number]) => [
-        route.id,
-        route,
-      ]),
+      routes.map((route: (typeof routes)[number]) => [route.id, route]),
     );
 
     const visibleRouteIds = new Set(
-      activeRoutes
-        .filter((route: (typeof activeRoutes)[number]) =>
+      routes
+        .filter((route: (typeof routes)[number]) =>
           this.hasAccessByPermissions(
             route.routePermissions.map((permission) => permission.permissionId),
             userPermissionSet,
           ),
         )
-        .map((route: (typeof activeRoutes)[number]) => route.id),
+        .map((route: (typeof routes)[number]) => route.id),
     );
 
     visibleRouteIds.forEach((routeId) => {
@@ -306,10 +299,8 @@ export class BootstrapService {
       }
     });
 
-    const sortedVisibleRoutes = activeRoutes
-      .filter((route: (typeof activeRoutes)[number]) =>
-        visibleRouteIds.has(route.id),
-      )
+    const sortedVisibleRoutes = routes
+      .filter((route) => visibleRouteIds.has(route.id))
       .sort((a, b) => {
         const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
         const orderB = b.order ?? Number.MAX_SAFE_INTEGER;
