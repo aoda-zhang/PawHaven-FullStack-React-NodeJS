@@ -1,5 +1,26 @@
 {
-  "common.brand": "Trip",
+  "common.brand": "PawHaven",
   "common.slogan": "Explore the world of possibilities",
-  "trip_submit_failed.title": "Trip Submit Failed"
+  "trip_submit_failed.title": "Trip Submit Failed",
+  "rescue_guide.title": "Animal Rescue Guide",
+  "rescue_guide.subtitle": "How to Help Stray Animals — A Step-by-Step Guide",
+  "rescue_guide.safety.title": "Safety First",
+  "rescue_guide.safety.description": "Before attempting any rescue, ensure your own safety and that of the animal. Do not corner or chase frightened animals.",
+  "rescue_guide.assess.title": "Assess the Situation",
+  "rescue_guide.assess.description": "Observe the animal from a safe distance. Check if it is injured, trapped, or in immediate danger. Note its location and condition.",
+  "rescue_guide.approach.title": "Approach Carefully",
+  "rescue_guide.approach.description": "Move slowly and speak softly. Offer food (water and a small amount of plain food) to build trust. Give the animal space.",
+  "rescue_guide.contain.title": "Contain Safely",
+  "rescue_guide.contain.description": "Use a humane trap, carrier, or sturdy box with a soft cloth. Never grab an unknown animal directly — use gloves and a towel.",
+  "rescue_guide.transport.title": "Transport to Safety",
+  "rescue_guide.transport.description": "Keep the animal in a warm, dark, quiet space during transport. Do not feed unless directed by a veterinarian.",
+  "rescue_guide.support.title": "Seek Professional Support",
+  "rescue_guide.support.description": "Contact a local shelter, rescue organization, or veterinarian immediately. Report the rescue through PawHaven's Report Stray feature.",
+  "rescue_guide.emergency.title": "Emergency Contacts",
+  "rescue_guide.emergency.localVet": "Local Veterinarian",
+  "rescue_guide.emergency.shelter": "Animal Shelter",
+  "rescue_guide.emergency.pawhaven": "PawHaven Hotline",
+  "rescue_guide.emergency.emergency": "Emergency Services",
+  "rescue_guide.footer.copyright": "© 2026 PawHaven. All rights reserved.",
+  "rescue_guide.footer.disclaimer": "This guide is for informational purposes only. Always consult a professional for medical or behavioral concerns."
 }

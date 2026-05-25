@@ -1,16 +1,15 @@
-import type { useQuery } from '@tanstack/react-query';
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { useCurrentUser } from '@/features/Auth/apis/queries';
 import { routePaths } from '@/router/routePaths';
 
 interface RequireAuthProps {
   children: React.ReactNode;
-  authQuery: () => ReturnType<typeof useQuery>;
 }
 
-export const RequireAuth = ({ children, authQuery }: RequireAuthProps) => {
+export const RequireAuth = ({ children }: RequireAuthProps) => {
   const location = useLocation();
-  const { isLoading, isError } = authQuery();
+  const { isLoading, isError } = useCurrentUser();
 
   if (isLoading) {
     return null;

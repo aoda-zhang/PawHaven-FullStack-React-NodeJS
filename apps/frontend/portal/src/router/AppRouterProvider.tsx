@@ -6,7 +6,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routerElementMapping } from './routerElementMapping';
 
 import { RequireAuth } from '@/components/RequireAuth';
-import { useCurrentUser } from '@/features/Auth/apis/queries';
 import { useLandingContext } from '@/features/Landing/landingContext';
 import type { RouterEle } from '@/types/LayoutType';
 
@@ -19,7 +18,7 @@ const createRouteElement = (route: RouterEle): ReactNode => {
   );
 
   if (handle?.isRequireUserLogin) {
-    return <RequireAuth authQuery={useCurrentUser}>{page}</RequireAuth>;
+    return <RequireAuth>{page}</RequireAuth>;
   }
 
   return page;

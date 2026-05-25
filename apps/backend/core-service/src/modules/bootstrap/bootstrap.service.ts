@@ -103,24 +103,16 @@ export class BootstrapService {
       return 0;
     }
 
-    const routeIndex = await this.prisma.route.findMany({
-      select: {
-        id: true,
-        parentId: true,
-        status: true,
-      },
+    const activeRoutes = await this.prisma.route.findMany({
+      where: { status: 'active' },
+      select: { id: true, parentId: true },
     });
 
-    const routeMap = new Map(
-      routeIndex.map((route) => [
-        route.id,
-        { parentId: route.parentId, status: route.status },
-      ]),
-    );
+    const routeMap = new Map(activeRoutes.map((r) => [r.id, r.parentId]));
 
-    let depth = 1;
-    let currentParentId: string | null = parentId;
     const visited = new Set<string>();
+    let currentParentId: string | null = parentId;
+    let depth = 0;
 
     while (currentParentId) {
       if (visited.has(currentParentId)) {
@@ -130,24 +122,15 @@ export class BootstrapService {
       }
       visited.add(currentParentId);
 
-      const parent = routeMap.get(currentParentId);
-
-      if (!parent) {
+      const parentParentId = routeMap.get(currentParentId);
+      if (parentParentId === undefined) {
         throw new BadRequestException(
           `parent route not found: ${currentParentId}`,
         );
       }
 
-      if (parent.status !== 'active') {
-        throw new BadRequestException('parent route is not active');
-      }
-
-      if (!parent.parentId) {
-        break;
-      }
-
       depth += 1;
-      currentParentId = parent.parentId;
+      currentParentId = parentParentId;
     }
 
     return depth;
@@ -268,6 +251,9 @@ export class BootstrapService {
   ): Promise<Router> {
     const userPermissionSet = await this.getPermissionSetByRoles(userRoles);
     const routes = await this.prisma.route.findMany({
+      where: {
+        status: 'active',
+      },
       select: {
         id: true,
         path: true,
@@ -286,26 +272,19 @@ export class BootstrapService {
       orderBy: { order: 'asc' },
     });
 
-    const activeRoutes = routes.filter(
-      (route: (typeof routes)[number]) => route.status === 'active',
-    );
-
     const activeRouteMap = new Map(
-      activeRoutes.map((route: (typeof activeRoutes)[number]) => [
-        route.id,
-        route,
-      ]),
+      routes.map((route: (typeof routes)[number]) => [route.id, route]),
     );
 
     const visibleRouteIds = new Set(
-      activeRoutes
-        .filter((route: (typeof activeRoutes)[number]) =>
+      routes
+        .filter((route: (typeof routes)[number]) =>
           this.hasAccessByPermissions(
             route.routePermissions.map((permission) => permission.permissionId),
             userPermissionSet,
           ),
         )
-        .map((route: (typeof activeRoutes)[number]) => route.id),
+        .map((route: (typeof routes)[number]) => route.id),
     );
 
     visibleRouteIds.forEach((routeId) => {
@@ -320,10 +299,8 @@ export class BootstrapService {
       }
     });
 
-    const sortedVisibleRoutes = activeRoutes
-      .filter((route: (typeof activeRoutes)[number]) =>
-        visibleRouteIds.has(route.id),
-      )
+    const sortedVisibleRoutes = routes
+      .filter((route) => visibleRouteIds.has(route.id))
       .sort((a, b) => {
         const orderA = a.order ?? Number.MAX_SAFE_INTEGER;
         const orderB = b.order ?? Number.MAX_SAFE_INTEGER;

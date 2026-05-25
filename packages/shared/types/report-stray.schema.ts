@@ -57,7 +57,6 @@ export const AnimalReportSchema = z
     foundTime: z.string().min(1, 'Found time is required'),
     status: z.enum(['dangerous', 'friendly', 'scared', 'other']),
     statusDescription: z.string().optional(),
-    images: z.array(z.any()).optional(),
     contactInfo: contactInfoSchema,
   })
   .superRefine((data, ctx) => {

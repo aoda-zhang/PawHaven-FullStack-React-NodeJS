@@ -15,7 +15,6 @@ export interface AnimalReport {
   foundTime: string; // ISO string
   status: 'dangerous' | 'friendly' | 'scared' | 'other';
   statusDescription: string;
-  images: File[];
   contactInfo: {
     name: string;
     phone: string;

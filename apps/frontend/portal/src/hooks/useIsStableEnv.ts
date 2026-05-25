@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import { loadConfig } from '@/config';
 
 /**
@@ -7,10 +5,7 @@ import { loadConfig } from '@/config';
  * Returns true for both production (prod) and testing (test) environments.
  */
 export const useIsStableEnv = (): boolean => {
-  const isProdOrTest = useMemo(() => {
-    const env = loadConfig()?.env;
-    return env === 'prod' || env === 'test';
-  }, []);
-
-  return isProdOrTest;
+  const env = loadConfig()?.env;
+  const stableDev = ['prod', 'test'];
+  return stableDev.includes(env);
 };

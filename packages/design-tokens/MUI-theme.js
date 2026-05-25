@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-import { theme } from './theme';
+import { theme } from './designTokens';
 
 export const MUITheme = createTheme({
   palette: {

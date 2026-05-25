@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import type { ReactNode } from 'react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 export interface FileDownloadButtonProps {
   fileFetchRequest: () => Promise<Blob>;
@@ -36,7 +36,7 @@ export const FileDownloadButton = ({
 }: FileDownloadButtonProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleDownload = useCallback(async () => {
+  const handleDownload = async () => {
     if (!fileFetchRequest) return;
 
     try {
@@ -61,7 +61,7 @@ export const FileDownloadButton = ({
     } finally {
       setIsDownloading(false);
     }
-  }, [fileFetchRequest, fileName, fileType, onSuccess, onError]);
+  };
 
   return (
     <Button

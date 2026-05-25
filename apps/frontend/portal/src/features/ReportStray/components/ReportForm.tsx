@@ -55,7 +55,6 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     foundTime: '',
     status: 'other',
     statusDescription: '',
-    images: [],
     contactInfo: {
       name: '',
       phone: '',
@@ -74,7 +73,9 @@ export const ReportForm: React.FC<ReportFormProps> = ({
     name: 'appearance.hasInjury',
   });
 
-  const handleSubmit = methods.handleSubmit(onSubmit);
+  const handleSubmit = methods.handleSubmit((data) => {
+    onSubmit(data);
+  });
 
   return (
     <FormProvider {...methods}>
