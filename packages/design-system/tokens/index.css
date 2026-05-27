@@ -1,0 +1,11 @@
+/* ============================================================
+   Design Tokens — Barrel import
+   ============================================================ */
+
+@import './color.css';
+@import './typography.css';
+@import './spacing.css';
+@import './border.css';
+@import './radius.css';
+@import './shadow.css';
+@import './motion.css';

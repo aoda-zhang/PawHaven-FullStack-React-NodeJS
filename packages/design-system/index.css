@@ -1,0 +1,41 @@
+/* ============================================================
+   Design System — Main entry point
+   ============================================================
+   1. tailwindcss (base)
+   2. tokens   (via tokens/index.css barrel)
+   3. theme    (semantic mappings)
+   4. utilities (custom utilities + component styles)
+   ============================================================ */
+
+@import 'tailwindcss';
+
+/* 1. Tokens — barrel import */
+@import './tokens/index.css';
+
+/* 2. Theme — Semantic mappings */
+@import './theme.css';
+
+/* 3. Utilities — Custom utilities + component styles */
+@import './utilities.css';
+
+/* ── Source paths for Tailwind scanning ──────────────────── */
+@source '../ui/**/*.{js,ts,jsx,tsx}';
+@source '../../apps/frontend/**/*.{jsx,tsx}';
+@source '../frontend-core/**/*.{jsx,tsx}';
+
+/* ── Base styles ─────────────────────────────────────────── */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

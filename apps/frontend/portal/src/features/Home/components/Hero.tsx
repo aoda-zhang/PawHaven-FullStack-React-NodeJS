@@ -18,13 +18,13 @@ export const Hero = () => {
         <p className="text-4xl lg:text-7xl font-bold text-white mb-2 lg:mb-6">
           {t('common.slogan')}
         </p>
-        <p className="text-xl lg:text-3xl text-gray-200 mb-6 lg:mb-10">
+        <p className="text-xl lg:text-3xl text-text-inverse mb-6 lg:mb-10">
           {t('common.subSlogan')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-start">
           <button
             type="button"
-            className="roundedButton text-xl bg-primary text-white hover:bg-primary-dark transition-colors"
+            className="roundedButton text-xl bg-primary text-text-inverse hover:bg-primary-hover transition-colors"
             onClick={() => {
               navigate('/report-stray');
             }}
@@ -33,7 +33,7 @@ export const Hero = () => {
           </button>
           <button
             type="button"
-            className="roundedButton text-xl bg-white text-primary hover:bg-gray-100 transition-colors"
+            className="roundedButton text-xl bg-surface text-primary hover:bg-surface-hover transition-colors"
           >
             {t('home.rescue')}
           </button>

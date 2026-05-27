@@ -1,0 +1,159 @@
+/* ============================================================
+   Utilities — Custom utility classes using @utility
+   ============================================================
+   Tailwind v4 @utility directive for custom utilities.
+   https://tailwindcss.com/docs/upgrade-guide#adding-custom-utilities
+   ============================================================ */
+
+/* ═══ Flex Utilities ════════════════════════════════════════ */
+
+@utility flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@utility flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@utility flex-col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══ Text Utilities ════════════════════════════════════════ */
+
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility text-pretty {
+  text-wrap: pretty;
+}
+
+/* ═══ Link Utilities ════════════════════════════════════════ */
+
+@utility link {
+  color: var(--color-text-link);
+  text-underline-offset: 4px;
+  transition-property: color;
+  transition-timing-function: var(--ease-standard);
+  transition-duration: var(--duration-150);
+
+  &:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
+  }
+}
+
+/* ═══ Button Utilities ════════════════════════════════════════ */
+
+@utility btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-medium);
+  transition-property: background-color, border-color, color;
+  transition-timing-function: var(--ease-standard);
+  transition-duration: var(--duration-150);
+}
+
+@utility btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+
+  &:hover {
+    background-color: var(--color-primary-hover);
+  }
+
+  &:active {
+    background-color: var(--color-primary-active);
+  }
+}
+
+@utility btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+
+  &:hover {
+    background-color: var(--color-secondary-hover);
+  }
+}
+
+@utility btn-outline {
+  border: var(--border-width-1) solid var(--color-border);
+  background-color: transparent;
+  color: var(--color-text);
+
+  &:hover {
+    border-color: var(--color-border-strong);
+  }
+}
+
+/* ═══ Card Utility ════════════════════════════════════════ */
+
+@utility card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: var(--border-width-1) solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ═══ Form Utilities ════════════════════════════════════════ */
+
+@utility input-field {
+  width: 100%;
+  padding: var(--spacing-input);
+  border: var(--border-width-1) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  outline: none;
+  transition-property: border-color, box-shadow;
+  transition-timing-function: var(--ease-standard);
+  transition-duration: var(--duration-150);
+
+  &:focus {
+    border-color: var(--color-border-focus);
+    box-shadow: 0 0 0 var(--border-width-2) var(--color-primary);
+  }
+}
+
+@utility form-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+  margin-top: var(--spacing-1);
+}
+
+/* ═══ Reset Utilities ════════════════════════════════════════ */
+
+@utility link-reset {
+  text-decoration: none;
+  color: inherit;
+}
+
+@utility button-reset {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+@utility visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

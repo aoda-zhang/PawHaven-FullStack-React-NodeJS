@@ -12,10 +12,12 @@ const rootLayoutClassNames = {
     'cursor-pointer flex justify-center items-center p-sm border-b border-border md:border-none hover:text-primary',
   activeMenuItem: 'block text-primary',
   login:
-    'px-3 py-2 rounded-sm bg-primary text-white m-4 lg:m-0 flex justify-center items-center cursor-pointer',
+    'px-3 py-2 rounded-sm bg-primary text-text-inverse m-4 lg:m-0 flex justify-center items-center cursor-pointer',
 };
-export const RootLayoutMenuRender = (props: MenuRenderType) => {
-  const { menuItems, activePath, navigate } = props;
+export const RootLayoutMenuRender = (
+  props: MenuRenderType & { className?: string },
+) => {
+  const { menuItems, activePath, navigate, className } = props;
   const { t } = useTranslation();
   const { profile } = useGlobalState();
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
@@ -65,5 +67,9 @@ export const RootLayoutMenuRender = (props: MenuRenderType) => {
     );
   };
 
-  return menuItems?.map(handleLinkMenu);
+  return (
+    <div className={clsx('flex', className)}>
+      {menuItems?.map(handleLinkMenu)}
+    </div>
+  );
 };

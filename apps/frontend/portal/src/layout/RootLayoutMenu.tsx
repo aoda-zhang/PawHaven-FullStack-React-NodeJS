@@ -1,4 +1,3 @@
-import { useMatchBreakpoint } from '@pawhaven/design-tokens/useMatchBreakpoint';
 import { LanguageSelector } from '@pawhaven/frontend-core';
 import { AlignJustify } from 'lucide-react';
 import { useState } from 'react';
@@ -14,30 +13,33 @@ export const RootLayoutMenu = ({
   navigate,
   currentRouterInfo,
 }: RootLayoutHeaderProps) => {
-  const enableSidebarMode = useMatchBreakpoint('lg');
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const onOpenSidebar = () => setSidebarOpen(true);
   const onCloseSidebar = () => setSidebarOpen(false);
 
   return (
-    <header className="flex justify-between items-center box-border z-header border-border border-b-1 px-6 py-4 bg-white">
+    <header className="flex justify-between items-center box-border z-sticky border-border border-b px-6 py-4 bg-surface">
       <Brand navigate={navigate} />
       <div className="flex items-center gap-4">
-        {!enableSidebarMode && (
-          <RootLayoutMenuRender
-            menuItems={menuItems}
-            activePath={currentRouterInfo?.pathname || ''}
-            navigate={navigate}
-          />
-        )}
+        {/* Desktop: horizontal menu */}
+        <RootLayoutMenuRender
+          className="hidden lg:flex"
+          menuItems={menuItems}
+          activePath={currentRouterInfo?.pathname || ''}
+          navigate={navigate}
+        />
+        <div className="hidden lg:flex">
+          <LanguageSelector />
+        </div>
 
-        {!enableSidebarMode && <LanguageSelector />}
+        {/* Mobile: hamburger */}
+        <AlignJustify
+          size={34}
+          className="lg:hidden cursor-pointer"
+          onClick={onOpenSidebar}
+        />
 
-        {/* Open Side bar Icon */}
-        {enableSidebarMode && (
-          <AlignJustify size={34} onClick={onOpenSidebar} />
-        )}
         {/* Side bar */}
         <RootLayoutSidebar
           menuItems={menuItems}

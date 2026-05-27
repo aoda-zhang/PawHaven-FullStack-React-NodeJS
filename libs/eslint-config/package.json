@@ -25,6 +25,7 @@
     "eslint-plugin-react-hooks": "^7.0.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "prettier": "^3.6.2",
-    "eslint-plugin-node": "^11.1.0"
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-tailwindcss": "^3.18.3"
   }
 }

@@ -29,13 +29,13 @@ export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
   );
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-6 mt-6">
-      <h2 className="text-xl font-bold mb-6 text-gray-800">
+    <div className="w-full bg-surface rounded-card shadow-card p-6 mt-6">
+      <h2 className="text-xl font-bold mb-6 text-text">
         {t('reportStray.rescue_timeline')}
       </h2>
 
       {sortedUpdates.length === 0 ? (
-        <p className="text-center text-gray-500 py-8">
+        <p className="text-center text-text-muted py-8">
           {t('reportStray.no_updates_yet')}
         </p>
       ) : (
@@ -55,11 +55,11 @@ export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
                   <CheckCircle size={16} />
                 </div>
                 {index < sortedUpdates.length - 1 && (
-                  <div className="w-0.5 h-full bg-gray-200 mt-1" />
+                  <div className="w-0.5 h-full bg-muted mt-1" />
                 )}
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-muted p-4 rounded-card">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3">
                   <div className="flex items-center gap-2">
                     <span
@@ -76,18 +76,18 @@ export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
                   </div>
 
                   <div className="flex gap-4 mt-2 sm:mt-0 text-sm">
-                    <div className="flex items-center gap-1 text-gray-500">
+                    <div className="flex items-center gap-1 text-text-muted">
                       <Clock size={14} />
                       <span>{new Date(update.timestamp).toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-500">
+                    <div className="flex items-center gap-1 text-text-muted">
                       <User size={14} />
                       <span>{update.operator.name}</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-gray-700 mb-4">{update.content}</p>
+                <p className="text-text mb-4">{update.content}</p>
 
                 {update.images && update.images.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
@@ -96,7 +96,7 @@ export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
                         key={img}
                         src={img}
                         alt={`Update ${i + 1}`}
-                        className="w-24 h-24 object-cover rounded-md"
+                        className="w-24 h-24 object-cover rounded-card"
                       />
                     ))}
                   </div>
