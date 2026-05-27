@@ -83,7 +83,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
               lineHeight: 1.2,
             }}
           >
-            {t('common.system_error', 'Oops! Something went wrong')}
+            {t('common.system_error', 'Oops Something went wrong')}
           </h1>
           <p
             style={{
@@ -112,7 +112,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="contained"
             onClick={retry}
             startIcon={<RotateCw size={18} />}
-            className="!bg-[#f59e0b] !text-white !font-semibold !px-8 !py-3 !rounded-xl hover:!bg-[#d97706] !transition-all !duration-300 !text-base"
+            className="bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-[#d97706] transition-all duration-300 text-base"
           >
             {t('common.retry', 'Try Again')}
           </Button>
@@ -120,7 +120,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="outlined"
             onClick={handleGoHome}
             startIcon={<Home size={18} />}
-            className="!border-[#f59e0b] !text-[#f59e0b] !font-semibold !px-8 !py-3 !rounded-xl hover:!bg-[#f59e0b]/10 !transition-all !duration-300 !text-base"
+            className="border-[#f59e0b] text-[#f59e0b] font-semibold px-8 py-3 rounded-xl hover:bg-[#f59e0b]/10 transition-all duration-300 text-base"
           >
             {t('common.go_to_home', 'Go Home')}
           </Button>

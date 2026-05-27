@@ -9,9 +9,9 @@
   --border-width-4: 4px;
   --border-width-8: 8px;
 
-  --color-border: oklch(var(--color-neutral-300));
-  --color-border-hover: oklch(var(--color-neutral-400));
-  --color-border-strong: oklch(var(--color-neutral-400));
-  --color-border-focus: oklch(var(--color-brand-500));
-  --color-border-error: oklch(var(--color-error-500));
+  --color-border: var(--color-neutral-300);
+  --color-border-hover: var(--color-neutral-400);
+  --color-border-strong: var(--color-neutral-400);
+  --color-border-focus: var(--color-brand-500);
+  --color-border-error: var(--color-error-500);
 }

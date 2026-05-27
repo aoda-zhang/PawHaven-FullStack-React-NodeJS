@@ -3,11 +3,11 @@
    ============================================================ */
 
 @theme {
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.16);
-  --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.18);
-  --shadow-xl: 0 12px 28px rgba(0, 0, 0, 0.22);
-  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-xs: 0 1px 2px var(--color-shadow-light);
+  --shadow-sm: 0 1px 3px var(--color-shadow-medium);
+  --shadow-md: 0 3px 6px var(--color-shadow-strong);
+  --shadow-lg: 0 8px 20px var(--color-shadow-heavy);
+  --shadow-xl: 0 12px 28px var(--color-shadow-dark);
+  --shadow-inner: inset 0 2px 4px var(--color-shadow-inner);
   --shadow-none: none;
 }
