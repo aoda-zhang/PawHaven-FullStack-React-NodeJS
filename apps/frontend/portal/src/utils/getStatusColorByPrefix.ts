@@ -10,33 +10,33 @@ interface GetStatusColorParams {
 }
 
 const bgStatusColors: Record<RescueStatusType, StatusColorType> = {
-  pending: 'bg-rescue-pending',
-  inProgress: 'bg-rescue-inProgress',
-  treated: 'bg-rescue-treated',
-  recovering: 'bg-rescue-recovering',
-  awaitingAdoption: 'bg-rescue-awaitingAdoption',
-  adopted: 'bg-rescue-adopted',
-  failed: 'bg-rescue-failed',
+  pending: 'bg-rescue-status-pending',
+  inProgress: 'bg-rescue-status-inProgress',
+  treated: 'bg-rescue-status-treated',
+  recovering: 'bg-rescue-status-recovering',
+  awaitingAdoption: 'bg-rescue-status-awaitingAdoption',
+  adopted: 'bg-rescue-status-adopted',
+  failed: 'bg-rescue-status-failed',
 };
 
 const textStatusColors: Record<RescueStatusType, StatusColorType> = {
-  pending: 'text-rescue-pending',
-  inProgress: 'text-rescue-inProgress',
-  treated: 'text-rescue-treated',
-  recovering: 'text-rescue-recovering',
-  awaitingAdoption: 'text-rescue-awaitingAdoption',
-  adopted: 'text-rescue-adopted',
-  failed: 'text-rescue-failed',
+  pending: 'text-rescue-status-pending',
+  inProgress: 'text-rescue-status-inProgress',
+  treated: 'text-rescue-status-treated',
+  recovering: 'text-rescue-status-recovering',
+  awaitingAdoption: 'text-rescue-status-awaitingAdoption',
+  adopted: 'text-rescue-status-adopted',
+  failed: 'text-rescue-status-failed',
 };
 
 const borderStatusColors: Record<RescueStatusType, StatusColorType> = {
-  pending: 'border-rescue-pending',
-  inProgress: 'border-rescue-inProgress',
-  treated: 'border-rescue-treated',
-  recovering: 'border-rescue-recovering',
-  awaitingAdoption: 'border-rescue-awaitingAdoption',
-  adopted: 'border-rescue-adopted',
-  failed: 'border-rescue-failed',
+  pending: 'border-rescue-status-pending',
+  inProgress: 'border-rescue-status-inProgress',
+  treated: 'border-rescue-status-treated',
+  recovering: 'border-rescue-status-recovering',
+  awaitingAdoption: 'border-rescue-status-awaitingAdoption',
+  adopted: 'border-rescue-status-adopted',
+  failed: 'border-rescue-status-failed',
 };
 
 export const getStatusColorByPrefix = ({

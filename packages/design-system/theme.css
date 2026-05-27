@@ -61,13 +61,13 @@
   --color-info-light: var(--color-blue-2);
 
   /* ═══ Rescue Status Colors ═════════════════════════ */
-  --color-status-pending: var(--color-yellow-6);
-  --color-status-in-progress: var(--color-blue-6);
-  --color-status-treated: var(--color-blue-10);
-  --color-status-recovering: var(--color-green-6);
-  --color-status-awaiting-adoption: var(--color-yellow-5);
-  --color-status-adopted: var(--color-green-8);
-  --color-status-failed: var(--color-gray-6);
+  --color-rescue-status-pending: var(--color-yellow-6);
+  --color-rescue-status-inProgress: var(--color-blue-6);
+  --color-rescue-status-treated: var(--color-blue-10);
+  --color-rescue-status-recovering: var(--color-green-6);
+  --color-rescue-status-awaitingAdoption: var(--color-yellow-5);
+  --color-rescue-status-adopted: var(--color-green-8);
+  --color-rescue-status-failed: var(--color-gray-6);
 
   /* ═══ Spacing Aliases ═════════════════════════════════ */
   --spacing-gutter: 1.5rem;
