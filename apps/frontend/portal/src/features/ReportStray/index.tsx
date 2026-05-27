@@ -14,7 +14,7 @@ export const ReportStray: React.FC = () => {
   };
 
   return (
-    <div className="p-4 lg:p-10 max-w-4xl mx-auto">
+    <div className="p-4 lg:p-10 max-w-4xl mx-auto w-full overflow-x-hidden">
       <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-primary">
         {t('reportStray.report_animal')}
       </h2>

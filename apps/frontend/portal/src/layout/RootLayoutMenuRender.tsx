@@ -9,7 +9,7 @@ import { useGlobalState } from '@/store/globalReducer';
 
 const rootLayoutClassNames = {
   menuItem:
-    'cursor-pointer flex justify-center items-center p-sm border-b border-border md:border-none hover:text-primary',
+    'cursor-pointer flex justify-center items-center px-3 border-b border-border md:border-none hover:text-primary',
   activeMenuItem: 'block text-primary',
   login:
     'px-3 py-2 rounded-sm bg-primary text-text-inverse m-4 lg:m-0 flex justify-center items-center cursor-pointer',

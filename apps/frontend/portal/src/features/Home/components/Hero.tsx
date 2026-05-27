@@ -24,7 +24,7 @@ export const Hero = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-start">
           <button
             type="button"
-            className="roundedButton text-xl bg-primary text-text-inverse hover:bg-primary-hover transition-colors"
+            className="button-rounded text-xl bg-primary text-text-inverse hover:bg-primary-hover transition-colors"
             onClick={() => {
               navigate('/report-stray');
             }}
@@ -33,7 +33,7 @@ export const Hero = () => {
           </button>
           <button
             type="button"
-            className="roundedButton text-xl bg-surface text-primary hover:bg-surface-hover transition-colors"
+            className="button-rounded text-xl bg-surface text-primary hover:bg-surface-hover transition-colors"
           >
             {t('home.rescue')}
           </button>

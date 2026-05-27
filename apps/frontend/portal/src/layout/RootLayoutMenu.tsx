@@ -19,7 +19,7 @@ export const RootLayoutMenu = ({
   const onCloseSidebar = () => setSidebarOpen(false);
 
   return (
-    <header className="flex justify-between items-center box-border z-sticky border-border border-b px-6 py-4 bg-surface">
+    <header className="flex justify-between items-center box-border border-border border-b px-6 py-4 bg-surface">
       <Brand navigate={navigate} />
       <div className="flex items-center gap-4">
         {/* Desktop: horizontal menu */}

@@ -34,7 +34,7 @@ export const RootLayout = () => {
 
   return (
     <div className="flex flex-col box-border min-h-dvh">
-      <header className="sticky top-0 bg-background z-notification">
+      <header className="sticky top-0 bg-surface shadow-sm z-sticky">
         <Toast />
         {isSysMaintain && (
           <NotificationBanner

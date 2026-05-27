@@ -1,98 +1,115 @@
 /* ============================================================
    Color Tokens — Raw design primitives from Figma
+   ============================================================
+   
+   Naming Convention: color-{name}-{scale}
+   Scale: 1 (lightest) to 10 (darkest)
+   Example: color-gray-1, color-gray-2, ..., color-gray-10
    ============================================================ */
 
 @theme {
-  /* Brand / Primary (Orange) */
-  --color-brand-50: #fff7ed;
-  --color-brand-100: #ffedd5;
-  --color-brand-200: #fed7aa;
-  --color-brand-300: #fdb87a;
-  --color-brand-400: #fb923c;
-  --color-brand-500: #f7823a;
-  --color-brand-600: #f66b26;
-  --color-brand-700: #e65a1a;
-  --color-brand-800: #c2410b;
-  --color-brand-900: #7a2b08;
+  /* ═══ Shadow Colors ══════════════════════════════════ */
+  --color-shadow: #000000;
+  --color-shadow-light: rgba(0, 0, 0, 0.04);
+  --color-shadow-medium: rgba(0, 0, 0, 0.12);
+  --color-shadow-strong: rgba(0, 0, 0, 0.16);
+  --color-shadow-heavy: rgba(0, 0, 0, 0.18);
+  --color-shadow-dark: rgba(0, 0, 0, 0.22);
+  --color-shadow-inner: rgba(0, 0, 0, 0.06);
 
-  /* Secondary (Green) */
-  --color-secondary-50: #f0fdf4;
-  --color-secondary-100: #dcfce7;
-  --color-secondary-200: #bbf7d0;
-  --color-secondary-300: #86efac;
-  --color-secondary-400: #4ad07a;
-  --color-secondary-500: #4caf50;
-  --color-secondary-600: #3da64a;
-  --color-secondary-700: #2f8c3f;
-  --color-secondary-800: #1f6f33;
-  --color-secondary-900: #124e23;
+  /* ═══ Grayscale ═════════════════════════════════════ */
+  --color-gray-1: #ffffff;
+  --color-gray-2: #f8f8f8;
+  --color-gray-3: #f0f0f0;
+  --color-gray-4: #e5e5e5;
+  --color-gray-5: #d4d4d4;
+  --color-gray-6: #a3a3a3;
+  --color-gray-7: #737373;
+  --color-gray-8: #525252;
+  --color-gray-9: #2f2f2f;
+  --color-gray-10: #171717;
 
-  /* Neutral (Warm Gray) */
-  --color-neutral-50: #fffaf6;
-  --color-neutral-100: #fff5ec;
-  --color-neutral-200: #f6e9df;
-  --color-neutral-300: #ecdccf;
-  --color-neutral-400: #e1cfbf;
-  --color-neutral-500: #d3c3b3;
-  --color-neutral-600: #b9a596;
-  --color-neutral-700: #8f7b69;
-  --color-neutral-800: #6b5642;
-  --color-neutral-900: #4a392c;
+  /* ═══ Orange (Brand Primary) ═══════════════════════════ */
+  --color-orange-1: #fff7ed;
+  --color-orange-2: #ffedd5;
+  --color-orange-3: #fed7aa;
+  --color-orange-4: #fdb87a;
+  --color-orange-5: #fb923c;
+  --color-orange-6: #f7823a;
+  --color-orange-7: #f66b26;
+  --color-orange-8: #e65a1a;
+  --color-orange-9: #c2410b;
+  --color-orange-10: #7a2b08;
 
-  /* Error */
-  --color-error-50: #fff1f2;
-  --color-error-100: #fee2e2;
-  --color-error-200: #fecaca;
-  --color-error-300: #fca5a5;
-  --color-error-400: #f87171;
-  --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-  --color-error-700: #b91c1c;
-  --color-error-800: #991b1b;
-  --color-error-900: #7f1d1d;
+  /* ═══ Green (Secondary) ══════════════════════════════ */
+  --color-green-1: #f0fdf4;
+  --color-green-2: #dcfce7;
+  --color-green-3: #bbf7d0;
+  --color-green-4: #86efac;
+  --color-green-5: #4ad07a;
+  --color-green-6: #4caf50;
+  --color-green-7: #3da64a;
+  --color-green-8: #2f8c3f;
+  --color-green-9: #1f6f33;
+  --color-green-10: #124e23;
 
-  /* Success */
-  --color-success-50: #f0fdf4;
-  --color-success-100: #dcfce7;
-  --color-success-200: #bbf7d0;
-  --color-success-300: #86efac;
-  --color-success-400: #4ade80;
-  --color-success-500: #4caf50;
-  --color-success-600: #16a34a;
-  --color-success-700: #15803d;
-  --color-success-800: #166534;
-  --color-success-900: #14532d;
+  /* ═══ Red (Error) ═══════════════════════════════════ */
+  --color-red-1: #fff1f2;
+  --color-red-2: #fee2e2;
+  --color-red-3: #fecaca;
+  --color-red-4: #fca5a5;
+  --color-red-5: #f87171;
+  --color-red-6: #ef4444;
+  --color-red-7: #dc2626;
+  --color-red-8: #b91c1c;
+  --color-red-9: #991b1b;
+  --color-red-10: #7f1d1d;
 
-  /* Warning */
-  --color-warning-50: #fffbeb;
-  --color-warning-100: #fef3c7;
-  --color-warning-200: #fde68a;
-  --color-warning-300: #fcd34d;
-  --color-warning-400: #fbbf24;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-  --color-warning-700: #b45309;
-  --color-warning-800: #92400e;
-  --color-warning-900: #78350f;
+  /* ═══ Green (Success) ═══════════════════════════════ */
+  --color-green-success-1: #f0fdf4;
+  --color-green-success-2: #dcfce7;
+  --color-green-success-3: #bbf7d0;
+  --color-green-success-4: #86efac;
+  --color-green-success-5: #4ade80;
+  --color-green-success-6: #4caf50;
+  --color-green-success-7: #16a34a;
+  --color-green-success-8: #15803d;
+  --color-green-success-9: #166534;
+  --color-green-success-10: #14532d;
 
-  /* Info */
-  --color-info-50: #eff6ff;
-  --color-info-100: #dbeafe;
-  --color-info-200: #bfdbfe;
-  --color-info-300: #93c5fd;
-  --color-info-400: #60a5fa;
-  --color-info-500: #3b82f6;
-  --color-info-600: #2563eb;
-  --color-info-700: #1d4ed8;
-  --color-info-800: #1e40af;
-  --color-info-900: #1e3a8a;
+  /* ═══ Yellow (Warning) ══════════════════════════════ */
+  --color-yellow-1: #fffbeb;
+  --color-yellow-2: #fef3c7;
+  --color-yellow-3: #fde68a;
+  --color-yellow-4: #fcd34d;
+  --color-yellow-5: #fbbf24;
+  --color-yellow-6: #f59e0b;
+  --color-yellow-7: #d97706;
+  --color-yellow-8: #b45309;
+  --color-yellow-9: #92400e;
+  --color-yellow-10: #78350f;
 
-  /* Rescue Status */
-  --color-status-pending: #f59e0b;
-  --color-status-in-progress: #3b82f6;
-  --color-status-treated: #8b5cf6;
-  --color-status-recovering: #22c55e;
-  --color-status-awaiting-adoption: #fbbf24;
-  --color-status-adopted: #16a34a;
-  --color-status-failed: #6b7280;
+  /* ═══ Blue (Info) ══════════════════════════════════ */
+  --color-blue-1: #eff6ff;
+  --color-blue-2: #dbeafe;
+  --color-blue-3: #bfdbfe;
+  --color-blue-4: #93c5fd;
+  --color-blue-5: #60a5fa;
+  --color-blue-6: #3b82f6;
+  --color-blue-7: #2563eb;
+  --color-blue-8: #1d4ed8;
+  --color-blue-9: #1e40af;
+  --color-blue-10: #1e3a8a;
+
+  /* ═══ Warm Brown (Neutral) ═══════════════════════ */
+  --color-brown-1: #fffaf6;
+  --color-brown-2: #fff5ec;
+  --color-brown-3: #f6e9df;
+  --color-brown-4: #ecdccf;
+  --color-brown-5: #e1cfbf;
+  --color-brown-6: #d3c3b3;
+  --color-brown-7: #b9a596;
+  --color-brown-8: #8f7b69;
+  --color-brown-9: #6b5642;
+  --color-brown-10: #4a392c;
 }
