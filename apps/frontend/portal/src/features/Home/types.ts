@@ -5,4 +5,4 @@ export type { RescueStatus as RescueStatusType, RescueItem as RescueItemType };
 
 // UI-only helper types (not shared)
 export type ColorPrefix = 'text' | 'bg' | 'border';
-export type StatusColorType = `${ColorPrefix}-rescue-${RescueStatus}`;
+export type StatusColorType = `${ColorPrefix}-rescue-status-${RescueStatus}`;
