@@ -7,14 +7,14 @@ export const RootLayoutFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="flex justify-between gap-2 text-center items-center flex-col lg:flex-row px-4 lg:px-16 py-6 bg-slate-700 text-white">
+    <div className="flex justify-between gap-2 text-center items-center flex-col lg:flex-row px-4 lg:px-16 py-6 bg-surface-dark text-text-inverse">
       <p className="flex flex-col justify-between items-center lg:items-start text-left">
         <span className="text-xl font-bold">{t('common.quick_links')}</span>
-        <Link className="hover:text-primary transition-colors" to="/">
+        <Link className="hover:text-primary-hover transition-colors" to="/">
           {t('home.home_page')}
         </Link>
         <Link
-          className="hover:text-primary transition-colors"
+          className="hover:text-primary-hover transition-colors"
           to="/report-stray"
         >
           {t('common.record')}
@@ -29,7 +29,7 @@ export const RootLayoutFooter = () => {
         <span className="text-xl font-bold">{t('common.contact_me')}</span>
         <a
           href={myPersonal.github}
-          className="hover:text-primary transition-colors"
+          className="hover:text-primary-hover transition-colors"
           target="_blank"
           rel="noreferrer"
         >
@@ -37,7 +37,7 @@ export const RootLayoutFooter = () => {
         </a>
         <a
           href={myPersonal.email}
-          className="hover:text-primary transition-colors"
+          className="hover:text-primary-hover transition-colors"
           target="_blank"
           rel="noreferrer"
         >
@@ -45,7 +45,7 @@ export const RootLayoutFooter = () => {
         </a>
         <a
           href={myPersonal.linkedin}
-          className="hover:text-primary transition-colors"
+          className="hover:text-primary-hover transition-colors"
           target="_blank"
           rel="noreferrer"
         >

@@ -1,0 +1,17 @@
+/* ============================================================
+   Border Tokens — Border widths and colors from Figma
+   ============================================================ */
+
+@theme {
+  --border-width-0: 0;
+  --border-width-1: 1px;
+  --border-width-2: 2px;
+  --border-width-4: 4px;
+  --border-width-8: 8px;
+
+  --color-border: oklch(var(--color-neutral-300));
+  --color-border-hover: oklch(var(--color-neutral-400));
+  --color-border-strong: oklch(var(--color-neutral-400));
+  --color-border-focus: oklch(var(--color-brand-500));
+  --color-border-error: oklch(var(--color-error-500));
+}

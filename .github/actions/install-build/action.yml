@@ -46,6 +46,13 @@ runs:
       shell: bash
       run: pnpm --filter "${{ inputs.build_filter }}..." install --frozen-lockfile
 
+    - name: Generate Prisma client
+      if: ${{ inputs.build_filter == '@pawhaven/core-service' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        pnpm --filter "${{ inputs.build_filter }}" prisma:generate-mongodb
+
     - name: Build package and dependencies
       shell: bash
       run: pnpm --filter "${{ inputs.build_filter }}..." build

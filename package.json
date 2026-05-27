@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "25.x",
+    "node": "24.x",
     "pnpm": "11"
   },
   "scripts": {
@@ -61,6 +61,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.25",
+    "eslint-plugin-tailwindcss": "^3.18.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",

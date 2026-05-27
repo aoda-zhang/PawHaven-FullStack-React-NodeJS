@@ -1,0 +1,98 @@
+/* ============================================================
+   Theme — Single semantic mapping layer
+   ============================================================
+   Maps semantic names to primitive tokens.
+   Use these in components: bg-primary, text-primary, etc.
+   
+   Categories:
+   - Colors: primary, secondary, surfaces, text, borders, status
+   - Layout: spacing aliases, z-index
+   ============================================================ */
+
+@theme {
+  /* ═══ Brand / Primary ════════════════════════════════════ */
+  --color-primary: var(--color-brand-500);
+  --color-primary-hover: var(--color-brand-600);
+  --color-primary-active: var(--color-brand-700);
+  --color-primary-light: var(--color-brand-50);
+  --color-primary-subtle: var(--color-brand-100);
+
+  /* ═══ Secondary ══════════════════════════════════════════════ */
+  --color-secondary: var(--color-secondary-500);
+  --color-secondary-hover: var(--color-secondary-600);
+  --color-secondary-active: var(--color-secondary-700);
+  --color-secondary-light: var(--color-secondary-50);
+
+  /* ═══ Surfaces ═══════════════════════════════════════ */
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-surface-hover: var(--color-neutral-50);
+  --color-surface-active: var(--color-neutral-100);
+  --color-surface-dark: #334155;
+  --color-background: #eee3d8;
+  --color-background-subtle: #f5ebe0;
+  --color-muted: #f0eeeb;
+  --color-muted-strong: #e6dfd4;
+
+  /* ═══ Text ═════════════════════════════════════════════ */
+  --color-text: #2f2f2f;
+  --color-text-secondary: #5c5c5c;
+  --color-text-tertiary: #6b6b6b;
+  --color-text-muted: #9a9a9a;
+  --color-text-placeholder: #a3a3a3;
+  --color-text-inverse: #ffffff;
+  --color-text-link: var(--color-primary);
+
+  /* ═══ Borders ════════════════════════════════════════ */
+  --color-border: var(--color-neutral-200);
+  --color-border-hover: var(--color-neutral-300);
+  --color-border-strong: var(--color-neutral-400);
+  --color-border-focus: var(--color-primary);
+  --color-border-error: var(--color-error-500);
+
+  /* ═══ Status ════════════════════════════════════════════ */
+  --color-error: var(--color-error-500);
+  --color-error-light: var(--color-error-50);
+  --color-success: var(--color-success-500);
+  --color-success-light: var(--color-success-50);
+  --color-warning: var(--color-warning-500);
+  --color-warning-light: var(--color-warning-50);
+  --color-info: var(--color-info-500);
+  --color-info-light: var(--color-info-50);
+
+  /* ═══ Rescue Status (Domain) ══════════════════════════ */
+  --color-rescue-pending: var(--color-status-pending);
+  --color-rescue-in-progress: var(--color-status-in-progress);
+  --color-rescue-treated: var(--color-status-treated);
+  --color-rescue-recovering: var(--color-status-recovering);
+  --color-rescue-awaiting-adoption: var(--color-status-awaiting-adoption);
+  --color-rescue-adopted: var(--color-status-adopted);
+  --color-rescue-failed: var(--color-status-failed);
+
+  /* ═══ Spacing Aliases ═════════════════════════════════ */
+  --spacing-gutter: 1.5rem;
+  --spacing-section: 4rem;
+  --spacing-card: 1.5rem;
+  --spacing-input: 0.75rem;
+
+  /* ═══ Z-Index Scale ══════════════════════════════════ */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-notification: 500;
+  --z-toast: 600;
+
+  /* ═══ Border Radius ═══════════════════════════════════ */
+  --radius-input: var(--radius-sm);
+  --radius-button: var(--radius-md);
+  --radius-card: var(--radius-lg);
+  --radius-dialog: var(--radius-xl);
+
+  /* ═══ Shadows (Semantic aliases) ════════════════════════ */
+  --shadow-card: var(--shadow-sm);
+  --shadow-dropdown: var(--shadow-md);
+  --shadow-modal: var(--shadow-lg);
+  --shadow-toast: var(--shadow-xl);
+}

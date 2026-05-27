@@ -1,0 +1,19 @@
+/* ============================================================
+   Spacing Tokens — Layout primitives
+   ============================================================ */
+
+@theme {
+  --spacing-gutter: 1.5rem;
+  --spacing-section: 4rem;
+  --spacing-card: 1.5rem;
+  --spacing-input: 0.75rem;
+  --spacing-container: 1.5rem;
+  --spacing-container-lg: 2rem;
+  --spacing-container-xl: 3rem;
+
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1536px;
+}
