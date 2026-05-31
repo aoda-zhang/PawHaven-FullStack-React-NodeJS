@@ -35,7 +35,7 @@ export const FormTextArea: React.FC<BaseFormType & TextareaAutosizeProps> = ({
         >
           <div className="mb-3">{label}</div>
           <TextareaAutosize
-            className="border border-neutral focus:border-2 focus:border-primary focus:outline-none"
+            className="border-neutral focus:border-primary border focus:border-2 focus:outline-none"
             {...fieldProps}
             value={value ?? ''}
             ref={fieldRef}

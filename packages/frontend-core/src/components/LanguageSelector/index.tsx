@@ -11,7 +11,7 @@ const LanguageSelect = () => {
   };
 
   return (
-    <div className="flex flex-col gap-[.625rem] text-[.875rem] p-[.625rem] text-gray-600 border-gray-400 rounded-[10%] border">
+    <div className="flex flex-col gap-[.625rem] rounded-[10%] border border-gray-400 p-[.625rem] text-[.875rem] text-gray-600">
       {supportedLngs.map((item) => (
         <button
           key={item}
@@ -49,9 +49,9 @@ export const LanguageSelector = () => {
 
   return (
     <>
-      <div className="shrink-0 rounded-full border border-border bg-white px-[2px] py-1 shadow-sm">
+      <div className="border-border shrink-0 rounded-full border bg-white px-[2px] py-1 shadow-sm">
         <div
-          className="flex items-center justify-center gap-[.625rem] cursor-pointer mb-0 px-2 text-sm"
+          className="mb-0 flex cursor-pointer items-center justify-center gap-[.625rem] px-2 text-sm"
           onClick={handleClick}
           onKeyDown={handleKeyDown}
           role="button"

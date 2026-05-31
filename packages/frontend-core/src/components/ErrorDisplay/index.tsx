@@ -11,13 +11,15 @@ import type { HttpRequestErrorType } from '../../api/types';
  * These can be overridden with i18n translations at runtime.
  */
 const DEFAULT_ERROR_MESSAGES: Record<HttpRequestErrorType, string> = {
-  NETWORK: 'Network connection error. Please check your internet connection and try again.',
+  NETWORK:
+    'Network connection error. Please check your internet connection and try again.',
   SERVER: 'Server error occurred. Please try again later.',
   AUTH: 'Your session has expired. Please log in again.',
   PERMISSION: 'You do not have permission to perform this action.',
   RATELIMIT: 'Too many requests. Please wait a moment and try again.',
   BADREQUEST: 'Invalid request. Please check your input and try again.',
-  MAINTENANCE: 'The service is temporarily under maintenance. Please try again later.',
+  MAINTENANCE:
+    'The service is temporarily under maintenance. Please try again later.',
   UNKNOWN: 'An unexpected error occurred. Please try again.',
 };
 
@@ -62,7 +64,7 @@ const ErrorMessage: React.FC<{
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="text-xs font-semibold uppercase tracking-wide opacity-80">
+      <div className="text-xs font-semibold tracking-wide uppercase opacity-80">
         {getErrorTypeLabel(errorType)}
       </div>
       <div className="text-sm font-medium">{message}</div>
@@ -71,7 +73,7 @@ const ErrorMessage: React.FC<{
           {onRetry && (
             <button
               onClick={onRetry}
-              className="text-sm font-medium underline hover:no-underline transition-all"
+              className="text-sm font-medium underline transition-all hover:no-underline"
             >
               Retry
             </button>
@@ -82,7 +84,7 @@ const ErrorMessage: React.FC<{
                 e.stopPropagation();
                 onDismiss();
               }}
-              className="text-sm font-medium underline hover:no-underline transition-all"
+              className="text-sm font-medium underline transition-all hover:no-underline"
             >
               Dismiss
             </button>
@@ -110,7 +112,9 @@ const showErrorToast = (
     id: globalErrorID,
     duration: notificationOption?.duration ?? Infinity,
     position: notificationOption?.position ?? 'top-center',
-    className: notificationOption?.className ?? 'bg-red-600 text-white rounded-lg shadow-lg max-w-2xl',
+    className:
+      notificationOption?.className ??
+      'bg-red-600 text-white rounded-lg shadow-lg max-w-2xl',
     ...(() => {
       if (!notificationOption) return {};
       const { duration, position, className, ...rest } = notificationOption;
@@ -153,7 +157,13 @@ export const showError = ({
   notificationOption,
 }: ErrorDisplayProps) => {
   const displayMessage = message ?? DEFAULT_ERROR_MESSAGES[errorType];
-  showErrorToast(displayMessage, errorType, onRetry, onDismiss, notificationOption);
+  showErrorToast(
+    displayMessage,
+    errorType,
+    onRetry,
+    onDismiss,
+    notificationOption,
+  );
 };
 
 /**

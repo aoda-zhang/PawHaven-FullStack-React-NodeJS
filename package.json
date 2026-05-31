@@ -9,6 +9,7 @@
   },
   "scripts": {
     "prepare": "husky",
+    "format": "prettier --write .",
     "lint-staged": "lint-staged",
     "build:backend-core": "turbo run build --filter=@pawhaven/backend-core...",
     "build:frontend-core": "turbo run build --filter=@pawhaven/frontend-core...",
@@ -64,9 +65,10 @@
     "eslint-plugin-tailwindcss": "^3.18.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.8.14",
     "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@11.3.0"
+  "packageManager": "pnpm@11.5.0"
 }

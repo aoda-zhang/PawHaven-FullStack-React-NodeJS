@@ -119,7 +119,7 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
           variant="contained"
           onClick={goToHome}
           startIcon={<Home size={18} />}
-          className="!bg-[#f59e0b] !text-white !font-semibold !px-8 !py-3 !rounded-xl hover:!bg-[#d97706] !transition-all !duration-300 !text-base"
+          className="!rounded-xl !bg-[#f59e0b] !px-8 !py-3 !text-base !font-semibold !text-white !transition-all !duration-300 hover:!bg-[#d97706]"
         >
           {t('common.go_to_home', 'Go to Home')}
         </Button>

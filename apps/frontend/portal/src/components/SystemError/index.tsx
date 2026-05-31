@@ -112,7 +112,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="contained"
             onClick={retry}
             startIcon={<RotateCw size={18} />}
-            className="bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-[#d97706] transition-all duration-300 text-base"
+            className="bg-primary rounded-xl px-8 py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-[#d97706]"
           >
             {t('common.retry', 'Try Again')}
           </Button>
@@ -120,7 +120,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="outlined"
             onClick={handleGoHome}
             startIcon={<Home size={18} />}
-            className="border-[#f59e0b] text-[#f59e0b] font-semibold px-8 py-3 rounded-xl hover:bg-[#f59e0b]/10 transition-all duration-300 text-base"
+            className="rounded-xl border-[#f59e0b] px-8 py-3 text-base font-semibold text-[#f59e0b] transition-all duration-300 hover:bg-[#f59e0b]/10"
           >
             {t('common.go_to_home', 'Go Home')}
           </Button>

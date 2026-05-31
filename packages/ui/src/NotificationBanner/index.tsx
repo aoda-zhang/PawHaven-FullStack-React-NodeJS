@@ -27,7 +27,7 @@ export const NotificationBanner: React.FC<{ banner: BannerMessage }> = ({
         severity={banner.type ?? 'info'}
         variant={banner?.variant ?? 'standard'}
         className={clsx([
-          'rounded-none justify-start text-left text-[0.95rem] py-4 px-4 lg:px-20 bg-info',
+          'bg-info justify-start rounded-none px-4 py-4 text-left text-[0.95rem] lg:px-20',
           banner?.bannerWrapClassNames,
         ])}
         sx={{ borderRadius: 0 }}
@@ -40,7 +40,7 @@ export const NotificationBanner: React.FC<{ banner: BannerMessage }> = ({
         }
       >
         {banner.title && (
-          <AlertTitle className="text-2xl text-left">{banner.title}</AlertTitle>
+          <AlertTitle className="text-left text-2xl">{banner.title}</AlertTitle>
         )}
         <p className="text-left">{banner.message}</p>
         {banner.linkText && banner.linkUrl && (

@@ -22,7 +22,7 @@ export const Register: FC = () => {
   const { mutate, isPending } = useRegister();
   return (
     <AuthLayout>
-      <div className="text-2xl mb-5 text-center">{t('auth.sighup')}</div>
+      <div className="mb-5 text-center text-2xl">{t('auth.sighup')}</div>
       <FormProvider {...formProps}>
         <form>
           <FormInput
@@ -42,7 +42,7 @@ export const Register: FC = () => {
             loading={isPending}
             disabled={isPending}
             type="submit"
-            className="w-full lg:min-w-[30vw] lg:mb-2"
+            className="w-full lg:mb-2 lg:min-w-[30vw]"
             variant="contained"
             onClick={formProps.handleSubmit((data) => {
               mutate({
@@ -55,11 +55,11 @@ export const Register: FC = () => {
           </Button>
         </form>
       </FormProvider>
-      <p className="text-right mt-5">
-        <span className="text-gray-400 mr-3">{t('auth.with_account')}</span>
+      <p className="mt-5 text-right">
+        <span className="mr-3 text-gray-400">{t('auth.with_account')}</span>
         <Button
           type="button"
-          className="cursor-pointer text-primary"
+          className="text-primary cursor-pointer"
           onClick={() => {
             navigate(routePaths.login);
           }}

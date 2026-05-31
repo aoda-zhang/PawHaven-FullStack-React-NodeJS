@@ -6,7 +6,7 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
 
   return (
     <div
-      className="flex flex-row items-center gap-3 cursor-pointer"
+      className="flex cursor-pointer flex-row items-center gap-3"
       onClick={() => {
         navigate('/');
       }}
@@ -23,7 +23,7 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
       <img
         src="/images/logo.png"
         alt={t('common.slogan')}
-        className="w-38 lg:w-46 h-auto"
+        className="h-auto w-38 lg:w-46"
       />
     </div>
   );

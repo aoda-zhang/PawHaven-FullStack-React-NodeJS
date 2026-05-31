@@ -36,22 +36,22 @@ const RescueItem = ({
 
   return (
     <div
-      className="flex flex-col gap-1 p-4 mb-4 border-1 border-border rounded-md bg-white cursor-pointer"
+      className="border-border mb-4 flex cursor-pointer flex-col gap-1 rounded-md border-1 bg-white p-4"
       role="button"
       tabIndex={0}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
     >
-      <img src={img} alt={name} className="rounded-md w-full h-3/4 mb-3" />
-      <p className="text-xl text-primary">{name}</p>
-      <p className="flex justify-between text-sm text-text-secondary">
+      <img src={img} alt={name} className="mb-3 h-3/4 w-full rounded-md" />
+      <p className="text-primary text-xl">{name}</p>
+      <p className="text-text-secondary flex justify-between text-sm">
         <span>{location}</span>
         <span>{dayjs(time).format('DD/MM/YYYY')}</span>
       </p>
       <p className="text-text-secondary">{description}</p>
       <div
         className={clsx([
-          'rounded-full text-center text-white py-2',
+          'rounded-full py-2 text-center text-white',
           getStatusColorByPrefix({ status, prefix: 'bg' }),
         ])}
       >
@@ -64,7 +64,7 @@ const RescueItem = ({
 const SKELETON_COUNT = 3;
 
 const RescueItemSkeleton = () => (
-  <div className="p-4 mb-4 border-1 border-border rounded-md bg-white">
+  <div className="border-border mb-4 rounded-md border-1 bg-white p-4">
     <Skeleton
       variant="rounded"
       width="100%"
@@ -104,8 +104,8 @@ export const LatestRescue = () => {
 
   return (
     <div className="px-4 lg:px-20">
-      <div className="flex items-center justify-between my-4">
-        <span className="text-base lg:text-2xl font-bold">
+      <div className="my-4 flex items-center justify-between">
+        <span className="text-base font-bold lg:text-2xl">
           {t('common.recent_rescue')}
         </span>
         <div
@@ -118,7 +118,7 @@ export const LatestRescue = () => {
           <span>{t('common.view_all')}</span>
           <ArrowRight
             size="1.875rem"
-            className="text-white bg-primary rounded-full"
+            className="bg-primary rounded-full text-white"
           />
         </div>
       </div>

@@ -33,8 +33,8 @@ export const RootLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col box-border min-h-dvh">
-      <header className="sticky top-0 bg-surface shadow-sm z-sticky">
+    <div className="box-border flex min-h-dvh flex-col">
+      <header className="bg-surface z-sticky sticky top-0 shadow-sm">
         <Toast />
         {isSysMaintain && (
           <NotificationBanner
@@ -56,7 +56,7 @@ export const RootLayout = () => {
         )}
       </header>
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex flex-1 flex-col">
         <div className="flex-1">
           <Suspense fallback={<Loading></Loading>}>
             <Outlet />

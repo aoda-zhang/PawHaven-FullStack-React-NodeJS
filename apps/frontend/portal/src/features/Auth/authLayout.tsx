@@ -18,7 +18,7 @@ export const AuthLayout: FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
 
         <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
-          <div className="w-full max-w-[30rem] rounded-dialog border border-border bg-surface px-5 py-6 shadow-modal sm:px-8 sm:py-7 sm:shadow-toast">
+          <div className="rounded-dialog border-border bg-surface shadow-modal sm:shadow-toast w-full max-w-[30rem] border px-5 py-6 sm:px-8 sm:py-7">
             {children}
           </div>
         </div>

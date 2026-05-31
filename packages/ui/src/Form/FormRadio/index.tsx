@@ -30,7 +30,7 @@ export const FormRadio: FC<BaseFormType & FormRadioProps> = ({
       {options.map((option) => (
         <label
           key={option.value}
-          className="cursor-pointer flex items-center text-[1rem] mb-[.625rem]"
+          className="mb-[.625rem] flex cursor-pointer items-center text-[1rem]"
           htmlFor={`${name}-${option.value}`}
         >
           <input
