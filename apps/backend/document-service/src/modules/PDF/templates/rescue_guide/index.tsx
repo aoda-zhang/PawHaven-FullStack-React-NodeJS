@@ -1,4 +1,3 @@
-import * as React from 'react';
 import './index.css';
 
 interface Props {
@@ -111,7 +110,7 @@ const CONTENT = {
   },
 };
 
-export const RescueGuide: React.FC<Props> = ({ locale = 'en' }) => {
+export const RescueGuide = ({ locale = 'en' }: Props) => {
   const c = CONTENT[locale === 'zh' ? 'zh' : 'en'];
 
   return (

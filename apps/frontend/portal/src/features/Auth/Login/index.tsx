@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
-import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,7 @@ import { AuthLayout } from '../authLayout';
 
 import { routePaths } from '@/router/routePaths';
 
-export const Login: FC = () => {
+export const Login = () => {
   const formProps = useForm<CredentialsDto>({
     resolver: zodResolver(CredentialsSchema),
   });

@@ -5,19 +5,18 @@ import {
   type TextareaAutosizeProps,
 } from '@mui/material';
 import clsx from 'clsx';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType } from '../formBase.type';
 
-export const FormTextArea: React.FC<BaseFormType & TextareaAutosizeProps> = ({
+export const FormTextArea = ({
   name,
   label,
 
   defaultValue = '',
   fullWidth = true,
   ...props
-}) => {
+}: BaseFormType & TextareaAutosizeProps) => {
   const { control } = useFormContext();
   return (
     <Controller

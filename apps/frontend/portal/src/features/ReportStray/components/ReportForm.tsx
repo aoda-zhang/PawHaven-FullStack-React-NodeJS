@@ -9,7 +9,6 @@ import {
   FormTextArea,
   FormCheckbox,
 } from '@pawhaven/ui';
-import React from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -20,9 +19,9 @@ interface FormSectionProps {
   children: React.ReactNode;
 }
 
-const FormSection: React.FC<FormSectionProps> = ({ title, children }) => (
+const FormSection = ({ title, children }: FormSectionProps) => (
   <div className="mb-6">
-    <h3 className="mb-4 text-lg font-semibold text-gray-800">{title}</h3>
+    <h3 className="text-text mb-4 text-lg font-semibold">{title}</h3>
     {children}
   </div>
 );
@@ -32,10 +31,7 @@ interface ReportFormProps {
   isSubmitting: boolean;
 }
 
-export const ReportForm: React.FC<ReportFormProps> = ({
-  onSubmit,
-  isSubmitting,
-}) => {
+export const ReportForm = ({ onSubmit, isSubmitting }: ReportFormProps) => {
   const { t } = useTranslation();
 
   const defaultValues: AnimalReportDto = {

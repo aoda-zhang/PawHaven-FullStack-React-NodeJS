@@ -1,7 +1,7 @@
 import { Alert, AlertTitle, Link, Collapse, IconButton } from '@mui/material';
 import clsx from 'clsx';
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export interface BannerMessage {
   id: string;
@@ -15,9 +15,7 @@ export interface BannerMessage {
   bannerWrapClassNames?: string;
 }
 
-export const NotificationBanner: React.FC<{ banner: BannerMessage }> = ({
-  banner,
-}) => {
+export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
   const [open, setOpen] = useState(true);
   if (!open) return null;
 

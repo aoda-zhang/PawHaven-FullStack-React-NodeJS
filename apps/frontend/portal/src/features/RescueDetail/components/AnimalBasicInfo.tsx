@@ -1,13 +1,10 @@
 import dayjs from 'dayjs';
 import { MapPin, Calendar, Info } from 'lucide-react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { AnimalDetail } from '@/types/AnimalType';
 
-export const AnimalBasicInfo: React.FC<{ animal: AnimalDetail }> = ({
-  animal,
-}) => {
+export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
   const { t } = useTranslation();
 
   const formatDate = (dateString: string) => {

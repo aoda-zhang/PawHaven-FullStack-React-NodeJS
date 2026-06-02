@@ -11,7 +11,7 @@ interface NotFundProps {
   error?: Partial<ErrorInfo>;
 }
 
-export const NotFund: React.FC<NotFundProps> = ({ error }) => {
+export const NotFund = ({ error }: NotFundProps) => {
   const { t } = useTranslation();
   const isStableEnv = useIsStableEnv();
 

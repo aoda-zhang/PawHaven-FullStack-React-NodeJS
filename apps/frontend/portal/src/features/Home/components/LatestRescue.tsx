@@ -69,9 +69,16 @@ const RescueItemSkeleton = () => (
       variant="rounded"
       width="100%"
       height="15rem"
-      sx={{ marginBottom: '0.75rem', borderRadius: '0.375rem' }}
+      sx={{
+        marginBottom: 'var(--spacing-card)',
+        borderRadius: 'var(--radius-card)',
+      }}
     />
-    <Skeleton variant="text" sx={{ fontSize: '1.25rem' }} width="60%" />
+    <Skeleton
+      variant="text"
+      sx={{ fontSize: 'var(--font-size-xl)' }}
+      width="60%"
+    />
     <div className="flex justify-between">
       <Skeleton variant="text" width="40%" />
       <Skeleton variant="text" width="25%" />
@@ -81,7 +88,10 @@ const RescueItemSkeleton = () => (
       variant="rounded"
       width="100%"
       height="2rem"
-      sx={{ borderRadius: '9999px', marginTop: '0.5rem' }}
+      sx={{
+        borderRadius: 'var(--radius-full)',
+        marginTop: 'var(--spacing-input)',
+      }}
     />
   </div>
 );

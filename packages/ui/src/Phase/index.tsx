@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface SectionType {
   label: string | ReactNode;
@@ -10,7 +10,7 @@ interface Props {
   sections: SectionType[];
 }
 
-export const Phase: FC<Props> = (props) => {
+export const Phase = (props: Props) => {
   const { title, sections } = props;
   return (
     <div className="mb-3 border-b border-neutral-200 pb-5">

@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import type { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { BaseFormType } from '../formBase.type';
@@ -13,12 +12,12 @@ interface FormRadioProps {
   options: Option[];
 }
 
-export const FormRadio: FC<BaseFormType & FormRadioProps> = ({
+export const FormRadio = ({
   name,
   label,
   options,
   required,
-}) => {
+}: BaseFormType & FormRadioProps) => {
   const {
     register,
     formState: { errors },

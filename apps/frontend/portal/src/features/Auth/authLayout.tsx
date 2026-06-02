@@ -1,10 +1,9 @@
 import { LanguageSelector } from '@pawhaven/frontend-core';
-import { type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Brand } from '@/components/Brand';
 
-export const AuthLayout: FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   return (

@@ -6,14 +6,11 @@ import {
 } from '@mui/material';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType, BaseTextFieldType } from '../formBase.type';
 
-export const FormInput: React.FC<
-  BaseFormType & TextFieldProps & BaseTextFieldType
-> = ({
+export const FormInput = ({
   name,
   label,
   defaultValue = '',
@@ -21,7 +18,7 @@ export const FormInput: React.FC<
   fullWidth = true,
   showPasswordToggle = true,
   ...props
-}) => {
+}: BaseFormType & TextFieldProps & BaseTextFieldType) => {
   const { control } = useFormContext();
   const [showPassword, setShowPassword] = React.useState(false);
 

@@ -1,12 +1,10 @@
-import React from 'react';
-
 interface StepCardProps {
   icon: string;
   title: string;
   desc: string;
 }
 
-export const StepCard: React.FC<StepCardProps> = ({ icon, title, desc }) => {
+export const StepCard = ({ icon, title, desc }: StepCardProps) => {
   return (
     <div className="bg-surface shadow-card hover:shadow-modal border-border mb-4 rounded-2xl border p-6 transition-transform duration-200 hover:-translate-y-1">
       <div className="text-4xl">{icon}</div>

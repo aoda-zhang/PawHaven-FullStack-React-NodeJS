@@ -1,6 +1,5 @@
 import { Button } from '@mui/material';
 import { Home, RotateCw } from 'lucide-react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
@@ -9,7 +8,7 @@ interface SystemErrorProps {
   error?: unknown;
 }
 
-export const SystemError: React.FC<SystemErrorProps> = () => {
+export const SystemError = ({ error }: SystemErrorProps) => {
   const { t } = useTranslation();
 
   const handleGoHome = () => {

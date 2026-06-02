@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { Clock, CheckCircle, User } from 'lucide-react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { RescueStatusType } from '@/features/Home/types';
@@ -22,7 +21,7 @@ interface RescueTimelineProps {
   updates: RescueUpdate[];
 }
 
-export const RescueTimeline: React.FC<RescueTimelineProps> = ({ updates }) => {
+export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
   const sortedUpdates = [...updates].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),

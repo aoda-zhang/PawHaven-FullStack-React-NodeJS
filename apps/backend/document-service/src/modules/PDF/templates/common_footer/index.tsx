@@ -1,4 +1,3 @@
-import * as React from 'react';
 import './index.css';
 
 interface Props {
@@ -6,7 +5,7 @@ interface Props {
   totalPages?: number;
 }
 
-export const CommonFooter: React.FC<Props> = ({ pageNumber, totalPages }) => {
+export const CommonFooter = ({ pageNumber, totalPages }: Props) => {
   return (
     <div className="pdf-footer">
       <div className="pdf-footer-left">© 2024 PawHaven</div>

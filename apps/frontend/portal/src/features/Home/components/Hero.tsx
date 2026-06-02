@@ -6,7 +6,7 @@ export const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative mb-5 box-border flex h-screen flex-col items-center justify-center overflow-hidden p-1 pl-5 lg:flex-row lg:items-center lg:justify-between lg:pl-10">
+    <div className="pl-gutter relative mb-5 box-border flex h-screen flex-col items-center justify-center overflow-hidden p-4 lg:flex-row lg:items-center lg:justify-between lg:pl-10">
       <img
         src="/images/hero.webp"
         alt="hero"

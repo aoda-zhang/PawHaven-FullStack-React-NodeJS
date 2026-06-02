@@ -1,13 +1,13 @@
 import { Button } from '@mui/material';
 import { Heart, HandHelping } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RescueInteractionProps {
   animalId: string;
 }
 
-export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
+export const RescueInteraction = ({ animalId }: RescueInteractionProps) => {
   const { t } = useTranslation();
   const [likes, setLikes] = useState(12);
   const [isLiked, setIsLiked] = useState(false);
@@ -21,7 +21,6 @@ export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
 
   return (
     <div className="mt-6 w-full rounded-lg bg-white p-6 shadow-md">
-      {/* 操作按钮区 */}
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <Button variant="outlined" className="min-w-72" onClick={handleRescue}>
           <HandHelping size={18} className="mr-2" />

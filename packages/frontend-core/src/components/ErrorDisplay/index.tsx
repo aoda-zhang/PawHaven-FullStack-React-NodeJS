@@ -1,5 +1,4 @@
 import type { ReactElement } from 'react';
-import React from 'react';
 import type { ToastOptions } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 
@@ -35,12 +34,17 @@ export interface ErrorDisplayProps {
  * Renders error message with appropriate styling and actions
  * Uses Tailwind CSS classes for styling
  */
-const ErrorMessage: React.FC<{
+const ErrorMessage = ({
+  message,
+  errorType,
+  onRetry,
+  onDismiss,
+}: {
   message: string | ReactElement;
   errorType: HttpRequestErrorType;
   onRetry?: () => void;
   onDismiss?: () => void;
-}> = ({ message, errorType, onRetry, onDismiss }) => {
+}) => {
   const getErrorTypeLabel = (type: HttpRequestErrorType): string => {
     switch (type) {
       case httpRequestErrors.NETWORK:
@@ -180,8 +184,10 @@ export const useErrorDisplay = () => {
 /**
  * Context provider component for future enhancements
  */
-export const ErrorDisplayProvider: React.FC<{ children: React.ReactNode }> = ({
+export const ErrorDisplayProvider = ({
   children,
+}: {
+  children: React.ReactNode;
 }) => {
   return <>{children}</>;
 };
