@@ -33,7 +33,7 @@ export const RootLayout = () => {
   }, [location.pathname]);
 
   return (
-    <div className="box-border flex min-h-dvh flex-col">
+    <div>
       <header className="bg-surface z-sticky sticky top-0 shadow-sm">
         <Toast />
         {isSysMaintain && (

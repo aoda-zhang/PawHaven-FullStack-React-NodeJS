@@ -6,7 +6,7 @@ import { supportedLngs } from './supportedLngs';
 
 i18n
   .use(LanguageDetector)
-  .use(resourcesToBackend((language) => import(`./locales/${language}.json`)))
+  .use(resourcesToBackend((locale) => import(`./locales/${locale}.json`)))
   .use(initReactI18next)
   .init({
     supportedLngs: supportedLngs,
