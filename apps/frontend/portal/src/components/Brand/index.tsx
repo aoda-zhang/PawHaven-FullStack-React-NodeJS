@@ -5,19 +5,12 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
   const { t } = useTranslation();
 
   return (
-    <div
+    <button
+      type="button"
       className="flex cursor-pointer flex-row items-center gap-3"
       onClick={() => {
         navigate('/');
       }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          navigate('/');
-        }
-      }}
-      role="button"
-      tabIndex={0}
       aria-label={t('common.name')}
     >
       <img
@@ -25,6 +18,6 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
         alt={t('common.slogan')}
         className="h-auto w-38 lg:w-46"
       />
-    </div>
+    </button>
   );
 };

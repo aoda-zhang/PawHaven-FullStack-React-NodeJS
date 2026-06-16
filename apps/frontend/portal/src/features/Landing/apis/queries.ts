@@ -8,17 +8,19 @@ type AppBootstrapScope = {
   routerUpdateAt: string;
 };
 
-export const landingQueryKeys = {
+const queryKeys = {
   all: ['landing'] as const,
   appBootstrap: (scope: AppBootstrapScope) =>
-    [...landingQueryKeys.all, 'appBootstrap', scope] as const,
+    [...queryKeys.all, 'appBootstrap', scope] as const,
 };
 
+export const landingQueryKeys = queryKeys;
+
 export const useGetAppBootstrap = (scope: AppBootstrapScope) => {
-  const query = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: landingQueryKeys.appBootstrap(scope),
     queryFn: getAppBootstrap,
   });
 
-  return query;
+  return { data, isLoading, isError };
 };

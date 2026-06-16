@@ -20,11 +20,21 @@ export const RootLayoutFooter = () => {
           {t('common.record')}
         </Link>
       </p>
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t('common.owner_text', { year: currentYear }),
-        }}
-      />
+      <p>
+        {t('common.owner_text', {
+          year: currentYear,
+          author: (
+            <a
+              href={t('common.owner_text_author_url')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary-hover underline transition-colors"
+            >
+              {t('common.owner_text_author')}
+            </a>
+          ),
+        })}
+      </p>
       <p className="flex flex-col items-center justify-between text-left lg:items-start">
         <span className="text-xl font-bold">{t('common.contact_me')}</span>
         <a

@@ -7,6 +7,8 @@ interface RescueInteractionProps {
   animalId: string;
 }
 
+const handleRescue = () => {};
+
 export const RescueInteraction = ({ animalId }: RescueInteractionProps) => {
   const { t } = useTranslation();
   const [likes, setLikes] = useState(12);
@@ -16,8 +18,6 @@ export const RescueInteraction = ({ animalId }: RescueInteractionProps) => {
     setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
     setIsLiked(!isLiked);
   };
-
-  const handleRescue = () => {};
 
   return (
     <div className="mt-6 w-full rounded-lg bg-white p-6 shadow-md">

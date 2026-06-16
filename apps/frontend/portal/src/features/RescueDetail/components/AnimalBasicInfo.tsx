@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import type { AnimalDetail } from '@/types/AnimalType';
 
+const formatDate = (dateString: string) => {
+  return dayjs(dateString).format('YYYY-MM-DD');
+};
+
 export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
   const { t } = useTranslation();
-
-  const formatDate = (dateString: string) => {
-    return dayjs(dateString).format('YYYY-MM-DD');
-  };
 
   return (
     <div className="bg-surface rounded-card shadow-card w-full">

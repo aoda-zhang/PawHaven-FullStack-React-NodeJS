@@ -21,9 +21,9 @@ interface RescueTimelineProps {
   updates: RescueUpdate[];
 }
 
-export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
+const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
-  const sortedUpdates = [...updates].sort(
+  const sortedUpdates = updates.toSorted(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
   );
 

@@ -4,26 +4,21 @@ import { useTranslation } from 'react-i18next';
 
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
-interface SystemErrorProps {
-  error?: unknown;
-}
+const handleGoHome = () => {
+  window.location.href = '/';
+};
 
-export const SystemError = ({ error }: SystemErrorProps) => {
+const retry = () => {
+  window.location.reload();
+};
+
+export const SystemError = () => {
   const { t } = useTranslation();
-
-  const handleGoHome = () => {
-    window.location.href = '/';
-  };
-
-  const retry = () => {
-    window.location.reload();
-  };
 
   return (
     <div
       style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      {/* Main content */}
       <div
         style={{
           backgroundColor: 'white',
@@ -35,7 +30,6 @@ export const SystemError = ({ error }: SystemErrorProps) => {
           flex: '1',
         }}
       >
-        {/* Warning icon */}
         <div style={{ marginBottom: '40px' }}>
           <div
             style={{
@@ -64,7 +58,6 @@ export const SystemError = ({ error }: SystemErrorProps) => {
           </div>
         </div>
 
-        {/* Error heading */}
         <div
           style={{
             marginBottom: '48px',
@@ -98,7 +91,6 @@ export const SystemError = ({ error }: SystemErrorProps) => {
           </p>
         </div>
 
-        {/* Action buttons */}
         <div
           style={{
             display: 'flex',
@@ -126,7 +118,6 @@ export const SystemError = ({ error }: SystemErrorProps) => {
         </div>
       </div>
 
-      {/* Footer */}
       <RootLayoutFooter />
     </div>
   );

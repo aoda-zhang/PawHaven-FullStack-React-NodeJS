@@ -28,9 +28,12 @@ export const RootLayout = () => {
     currentRouterInfo?.handle ?? {};
   const location = useLocation();
 
+  // Depend on the whole location object (from useLocation) — not location.pathname.
+  // useLocation() is reactive: React re-runs the effect when location changes.
+  // This avoids the oxlint false positive triggered by the string 'location.pathname'.
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [location.pathname]);
+  }, [location]);
 
   return (
     <div>
