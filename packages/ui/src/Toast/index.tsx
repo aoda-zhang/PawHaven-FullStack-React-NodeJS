@@ -1,5 +1,4 @@
 import type { ReactElement } from 'react';
-import React from 'react';
 import type { ToastOptions } from 'react-hot-toast';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -49,7 +48,7 @@ export const showToast = ({
   }
 };
 
-export const Toast: React.FC<NotificationProps> = ({ success, error }) => {
+export const Toast = ({ success, error }: NotificationProps) => {
   return (
     <Toaster
       toastOptions={{

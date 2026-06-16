@@ -7,23 +7,22 @@ import type { ErrorInfo } from '../RouterErrorFallback';
 import { useIsStableEnv } from '@/hooks/useIsStableEnv';
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
+const goToHome = () => {
+  window.location.href = '/';
+};
+
 interface NotFundProps {
   error?: Partial<ErrorInfo>;
 }
 
-export const NotFund: React.FC<NotFundProps> = ({ error }) => {
+export const NotFund = ({ error }: NotFundProps) => {
   const { t } = useTranslation();
   const isStableEnv = useIsStableEnv();
-
-  const goToHome = () => {
-    window.location.href = '/';
-  };
 
   return (
     <div
       style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      {/* Main content */}
       <div
         style={{
           backgroundColor: 'white',
@@ -35,7 +34,6 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
           flex: '1',
         }}
       >
-        {/* Paw icon */}
         <div style={{ marginBottom: '40px' }}>
           <div
             style={{
@@ -65,7 +63,6 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
           </div>
         </div>
 
-        {/* 404 number */}
         <div style={{ marginBottom: '32px' }}>
           <span
             style={{
@@ -80,7 +77,6 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
           </span>
         </div>
 
-        {/* Message */}
         <div
           style={{
             marginBottom: '48px',
@@ -114,17 +110,15 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
           </p>
         </div>
 
-        {/* Action */}
         <Button
           variant="contained"
           onClick={goToHome}
           startIcon={<Home size={18} />}
-          className="!bg-[#f59e0b] !text-white !font-semibold !px-8 !py-3 !rounded-xl hover:!bg-[#d97706] !transition-all !duration-300 !text-base"
+          className="!rounded-xl !bg-[#f59e0b] !px-8 !py-3 !text-base !font-semibold !text-white !transition-all !duration-300 hover:!bg-[#d97706]"
         >
           {t('common.go_to_home', 'Go to Home')}
         </Button>
 
-        {/* Debug info in dev */}
         {!isStableEnv && error?.data && (
           <p
             style={{
@@ -142,7 +136,6 @@ export const NotFund: React.FC<NotFundProps> = ({ error }) => {
         )}
       </div>
 
-      {/* Footer */}
       <RootLayoutFooter />
     </div>
   );

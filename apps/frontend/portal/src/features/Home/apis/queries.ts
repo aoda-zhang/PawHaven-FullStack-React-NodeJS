@@ -1,23 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getLatestRescuesByNumber, getLatestStories } from './requests';
+import { getLatestRescuesByNumber } from './requests';
 
-export const homeQueryKeys = {
+const queryKeys = {
   all: ['home'] as const,
-  latestRescues: () => [...homeQueryKeys.all, 'latestRescues'] as const,
-  latestStories: () => [...homeQueryKeys.all, 'latestStories'] as const,
+  latestRescues: () => [...queryKeys.all, 'latestRescues'] as const,
 };
+
+export const homeQueryKeys = queryKeys;
 
 export const useFetchLatestRescuesByNumber = () => {
   return useQuery({
-    queryKey: homeQueryKeys.latestRescues(),
+    queryKey: queryKeys.latestRescues(),
     queryFn: getLatestRescuesByNumber,
-  });
-};
-
-export const useFetchLatestStories = () => {
-  return useQuery({
-    queryKey: homeQueryKeys.latestStories(),
-    queryFn: getLatestStories,
   });
 };

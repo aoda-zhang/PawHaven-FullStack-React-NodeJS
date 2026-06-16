@@ -7,8 +7,8 @@ export const RootLayoutFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="flex justify-between gap-2 text-center items-center flex-col lg:flex-row px-4 lg:px-16 py-6 bg-surface-dark text-text-inverse">
-      <p className="flex flex-col justify-between items-center lg:items-start text-left">
+    <div className="bg-surface-dark text-text-inverse flex flex-col items-center justify-between gap-2 px-4 py-6 text-center lg:flex-row lg:px-16">
+      <p className="flex flex-col items-center justify-between text-left lg:items-start">
         <span className="text-xl font-bold">{t('common.quick_links')}</span>
         <Link className="hover:text-primary-hover transition-colors" to="/">
           {t('home.home_page')}
@@ -20,12 +20,22 @@ export const RootLayoutFooter = () => {
           {t('common.record')}
         </Link>
       </p>
-      <p
-        dangerouslySetInnerHTML={{
-          __html: t('common.owner_text', { year: currentYear }),
-        }}
-      />
-      <p className="flex flex-col justify-between items-center lg:items-start text-left">
+      <p>
+        {t('common.owner_text', {
+          year: currentYear,
+          author: (
+            <a
+              href={t('common.owner_text_author_url')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary-hover underline transition-colors"
+            >
+              {t('common.owner_text_author')}
+            </a>
+          ),
+        })}
+      </p>
+      <p className="flex flex-col items-center justify-between text-left lg:items-start">
         <span className="text-xl font-bold">{t('common.contact_me')}</span>
         <a
           href={myPersonal.github}

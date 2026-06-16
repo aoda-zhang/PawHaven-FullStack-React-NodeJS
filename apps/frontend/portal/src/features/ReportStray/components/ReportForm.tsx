@@ -9,7 +9,6 @@ import {
   FormTextArea,
   FormCheckbox,
 } from '@pawhaven/ui';
-import React from 'react';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
@@ -20,9 +19,9 @@ interface FormSectionProps {
   children: React.ReactNode;
 }
 
-const FormSection: React.FC<FormSectionProps> = ({ title, children }) => (
+const FormSection = ({ title, children }: FormSectionProps) => (
   <div className="mb-6">
-    <h3 className="text-lg font-semibold mb-4 text-gray-800">{title}</h3>
+    <h3 className="text-text mb-4 text-lg font-semibold">{title}</h3>
     {children}
   </div>
 );
@@ -32,10 +31,7 @@ interface ReportFormProps {
   isSubmitting: boolean;
 }
 
-export const ReportForm: React.FC<ReportFormProps> = ({
-  onSubmit,
-  isSubmitting,
-}) => {
+export const ReportForm = ({ onSubmit, isSubmitting }: ReportFormProps) => {
   const { t } = useTranslation();
 
   const defaultValues: AnimalReportDto = {
@@ -82,7 +78,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="bg-white rounded-lg shadow-md p-6 space-y-6"
+        className="space-y-6 rounded-lg bg-white p-6 shadow-md"
       >
         <FormSection title={t('reportStray.animal_basic_info')}>
           <FormRadio
@@ -200,7 +196,7 @@ export const ReportForm: React.FC<ReportFormProps> = ({
           />
         </FormSection>
 
-        <div className="flex justify-end gap-4 mt-8">
+        <div className="mt-8 flex justify-end gap-4">
           <Button
             variant="outlined"
             onClick={() => window.history.back()}

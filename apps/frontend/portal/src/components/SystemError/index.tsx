@@ -1,30 +1,24 @@
 import { Button } from '@mui/material';
 import { Home, RotateCw } from 'lucide-react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
-interface SystemErrorProps {
-  error?: unknown;
-}
+const handleGoHome = () => {
+  window.location.href = '/';
+};
 
-export const SystemError: React.FC<SystemErrorProps> = () => {
+const retry = () => {
+  window.location.reload();
+};
+
+export const SystemError = () => {
   const { t } = useTranslation();
-
-  const handleGoHome = () => {
-    window.location.href = '/';
-  };
-
-  const retry = () => {
-    window.location.reload();
-  };
 
   return (
     <div
       style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
     >
-      {/* Main content */}
       <div
         style={{
           backgroundColor: 'white',
@@ -36,7 +30,6 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
           flex: '1',
         }}
       >
-        {/* Warning icon */}
         <div style={{ marginBottom: '40px' }}>
           <div
             style={{
@@ -65,7 +58,6 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
           </div>
         </div>
 
-        {/* Error heading */}
         <div
           style={{
             marginBottom: '48px',
@@ -99,7 +91,6 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
           </p>
         </div>
 
-        {/* Action buttons */}
         <div
           style={{
             display: 'flex',
@@ -112,7 +103,7 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="contained"
             onClick={retry}
             startIcon={<RotateCw size={18} />}
-            className="bg-primary text-white font-semibold px-8 py-3 rounded-xl hover:bg-[#d97706] transition-all duration-300 text-base"
+            className="bg-primary rounded-xl px-8 py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-[#d97706]"
           >
             {t('common.retry', 'Try Again')}
           </Button>
@@ -120,14 +111,13 @@ export const SystemError: React.FC<SystemErrorProps> = () => {
             variant="outlined"
             onClick={handleGoHome}
             startIcon={<Home size={18} />}
-            className="border-[#f59e0b] text-[#f59e0b] font-semibold px-8 py-3 rounded-xl hover:bg-[#f59e0b]/10 transition-all duration-300 text-base"
+            className="rounded-xl border-[#f59e0b] px-8 py-3 text-base font-semibold text-[#f59e0b] transition-all duration-300 hover:bg-[#f59e0b]/10"
           >
             {t('common.go_to_home', 'Go Home')}
           </Button>
         </div>
       </div>
 
-      {/* Footer */}
       <RootLayoutFooter />
     </div>
   );

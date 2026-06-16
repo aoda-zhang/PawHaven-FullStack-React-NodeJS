@@ -14,8 +14,8 @@ export const ReportStray: React.FC = () => {
   };
 
   return (
-    <div className="p-4 lg:p-10 max-w-4xl mx-auto w-full overflow-x-hidden">
-      <h2 className="text-2xl lg:text-3xl font-bold mb-6 text-primary">
+    <div className="mx-auto w-full max-w-4xl overflow-x-hidden p-4 lg:p-10">
+      <h2 className="text-primary mb-6 text-2xl font-bold lg:text-3xl">
         {t('reportStray.report_animal')}
       </h2>
       <ReportForm onSubmit={handleSubmit} isSubmitting={isPending} />

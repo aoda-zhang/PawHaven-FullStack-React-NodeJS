@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import type { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import type { BaseFormType } from '../formBase.type';
@@ -13,12 +12,12 @@ interface FormRadioProps {
   options: Option[];
 }
 
-export const FormRadio: FC<BaseFormType & FormRadioProps> = ({
+export const FormRadio = ({
   name,
   label,
   options,
   required,
-}) => {
+}: BaseFormType & FormRadioProps) => {
   const {
     register,
     formState: { errors },
@@ -30,7 +29,7 @@ export const FormRadio: FC<BaseFormType & FormRadioProps> = ({
       {options.map((option) => (
         <label
           key={option.value}
-          className="cursor-pointer flex items-center text-[1rem] mb-[.625rem]"
+          className="mb-[.625rem] flex cursor-pointer items-center text-[1rem]"
           htmlFor={`${name}-${option.value}`}
         >
           <input

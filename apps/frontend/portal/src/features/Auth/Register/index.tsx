@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@mui/material';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
-import { type FC } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,7 @@ import { AuthLayout } from '../authLayout';
 
 import { routePaths } from '@/router/routePaths';
 
-export const Register: FC = () => {
+export const Register = () => {
   const formProps = useForm<CredentialsDto>({
     resolver: zodResolver(CredentialsSchema),
   });
@@ -23,10 +22,10 @@ export const Register: FC = () => {
   return (
     <AuthLayout>
       <div className="w-full">
-        <h1 className="text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+        <h1 className="text-text text-2xl font-semibold tracking-tight sm:text-3xl">
           {t('auth.sighup')}
         </h1>
-        <p className="mt-1 text-sm leading-6 text-text-secondary">
+        <p className="text-text-secondary mt-1 text-sm leading-6">
           {t('auth.registerSubtitle')}
         </p>
 
@@ -76,11 +75,11 @@ export const Register: FC = () => {
           </form>
         </FormProvider>
 
-        <div className="mt-4 text-center text-sm text-text-secondary">
+        <div className="text-text-secondary mt-4 text-center text-sm">
           <span>{t('auth.with_account')} </span>
           <button
             type="button"
-            className="font-semibold text-primary"
+            className="text-primary font-semibold"
             onClick={() => {
               navigate(routePaths.login);
             }}

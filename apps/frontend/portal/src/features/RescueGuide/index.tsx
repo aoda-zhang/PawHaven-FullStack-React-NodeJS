@@ -40,7 +40,7 @@ export const RescueGuide = () => {
           ))}
         </Box>
 
-        <p className="flex justify-center m-6">
+        <p className="m-6 flex justify-center">
           <FileDownloadButton
             fileFetchRequest={getRescueGuideDocs}
             onError={() => {

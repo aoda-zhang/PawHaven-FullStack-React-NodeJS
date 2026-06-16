@@ -5,17 +5,16 @@ import {
   type CheckboxProps,
 } from '@mui/material';
 import clsx from 'clsx';
-import type { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType } from '../formBase.type';
 
-export const FormCheckbox: FC<BaseFormType & CheckboxProps> = ({
+export const FormCheckbox = ({
   name,
   label,
   defaultValue = false,
   ...props
-}) => {
+}: BaseFormType & CheckboxProps) => {
   const { control } = useFormContext();
 
   return (

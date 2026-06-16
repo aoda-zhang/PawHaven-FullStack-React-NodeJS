@@ -1,13 +1,15 @@
 import { Button } from '@mui/material';
 import { Heart, HandHelping } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface RescueInteractionProps {
   animalId: string;
 }
 
-export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
+const handleRescue = () => {};
+
+export const RescueInteraction = ({ animalId }: RescueInteractionProps) => {
   const { t } = useTranslation();
   const [likes, setLikes] = useState(12);
   const [isLiked, setIsLiked] = useState(false);
@@ -17,12 +19,9 @@ export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
     setIsLiked(!isLiked);
   };
 
-  const handleRescue = () => {};
-
   return (
-    <div className="w-full bg-white rounded-lg shadow-md p-6 mt-6">
-      {/* 操作按钮区 */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="mt-6 w-full rounded-lg bg-white p-6 shadow-md">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <Button variant="outlined" className="min-w-72" onClick={handleRescue}>
           <HandHelping size={18} className="mr-2" />
           {t('pawHaven.i_will_rescue')}
@@ -31,7 +30,7 @@ export const RescueInteraction: React.FC<RescueInteractionProps> = () => {
         <div className="flex gap-2">
           <button
             type="button"
-            className="flex items-center gap-1 p-2 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1 rounded-full border border-gray-200 p-2 transition-colors hover:bg-gray-50"
             onClick={handleLike}
             aria-label={t('common.like')}
           >

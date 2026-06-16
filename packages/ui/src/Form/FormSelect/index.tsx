@@ -6,21 +6,18 @@ import {
   type SelectProps,
 } from '@mui/material';
 import clsx from 'clsx';
-import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType, BaseSelectType } from '../formBase.type';
 
-export const FormSelect: React.FC<
-  BaseFormType & BaseSelectType & SelectProps
-> = ({
+export const FormSelect = ({
   name,
   label,
   options,
   defaultValue = '',
   fullWidth = true,
   ...props
-}) => {
+}: BaseFormType & BaseSelectType & SelectProps) => {
   const { control } = useFormContext();
   return (
     <Controller

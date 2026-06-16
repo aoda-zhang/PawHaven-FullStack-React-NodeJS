@@ -4,7 +4,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import type { SingleInputDateRangeFieldProps } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import { SingleInputDateRangeField } from '@mui/x-date-pickers-pro/SingleInputDateRangeField';
 import clsx from 'clsx';
-import type { FC } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType } from '../formBase.type';
@@ -14,13 +13,13 @@ type FormSingleDateRangerProps = BaseFormType &
     fullWidth?: boolean;
   };
 
-export const FormDateRanger: FC<FormSingleDateRangerProps> = ({
+export const FormDateRanger = ({
   name,
   label,
   defaultValue = [null, null],
   fullWidth = true,
   ...props
-}) => {
+}: FormSingleDateRangerProps) => {
   const { control } = useFormContext();
 
   return (

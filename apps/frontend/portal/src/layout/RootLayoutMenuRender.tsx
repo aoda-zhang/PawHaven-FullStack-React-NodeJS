@@ -14,6 +14,7 @@ const rootLayoutClassNames = {
   login:
     'px-3 py-2 rounded-sm bg-primary text-text-inverse m-4 lg:m-0 flex justify-center items-center cursor-pointer',
 };
+
 export const RootLayoutMenuRender = (
   props: MenuRenderType & { className?: string },
 ) => {
@@ -31,39 +32,26 @@ export const RootLayoutMenuRender = (
       ] ?? '',
     ];
     if (isActiveMenuItem) {
-      // Active the current menu
       itemClassNames = [...itemClassNames, rootLayoutClassNames.activeMenuItem];
     }
+
+    const handleClick = () => {
+      if (item.to === routePaths.login && isLoggedIn && !isLogoutPending) {
+        logout();
+        return;
+      }
+      navigate(item.to || '/');
+    };
+
     return (
-      <div
+      <button
+        type="button"
         className={clsx(itemClassNames)}
         key={item.label}
-        role="button"
-        tabIndex={0}
-        onClick={() => {
-          if (item.to === routePaths.login && isLoggedIn && !isLogoutPending) {
-            logout();
-            return;
-          }
-          navigate(item.to || '/');
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            if (
-              item.to === routePaths.login &&
-              isLoggedIn &&
-              !isLogoutPending
-            ) {
-              logout();
-              return;
-            }
-            navigate(item.to || '/');
-          }
-        }}
+        onClick={handleClick}
       >
         {t(item.label)}
-      </div>
+      </button>
     );
   };
 

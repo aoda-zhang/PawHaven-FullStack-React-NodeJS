@@ -4,12 +4,14 @@ import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { useFetchLatestRescuesByNumber } from '../apis/queries';
 import type { RescueItemType } from '../types';
 
 import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
+
+const SKELETON_COUNT = 3;
 
 const RescueItem = ({
   animalID,
@@ -21,57 +23,47 @@ const RescueItem = ({
   status,
 }: RescueItemType) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(`/rescue/detail/${animalID}`);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleClick();
-    }
-  };
 
   return (
-    <div
-      className="flex flex-col gap-1 p-4 mb-4 border-1 border-border rounded-md bg-white cursor-pointer"
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
+    <Link
+      to={`/rescue/detail/${animalID}`}
+      className="border-border mb-4 flex cursor-pointer flex-col gap-1 rounded-md border-1 bg-white p-4"
     >
-      <img src={img} alt={name} className="rounded-md w-full h-3/4 mb-3" />
-      <p className="text-xl text-primary">{name}</p>
-      <p className="flex justify-between text-sm text-text-secondary">
+      <img src={img} alt={name} className="mb-3 h-3/4 w-full rounded-md" />
+      <p className="text-primary text-xl">{name}</p>
+      <p className="text-text-secondary flex justify-between text-sm">
         <span>{location}</span>
         <span>{dayjs(time).format('DD/MM/YYYY')}</span>
       </p>
       <p className="text-text-secondary">{description}</p>
       <div
         className={clsx([
-          'rounded-full text-center text-white py-2',
+          'rounded-full py-2 text-center text-white',
           getStatusColorByPrefix({ status, prefix: 'bg' }),
         ])}
       >
         {t(`common.rescue_status_${status}`)}
       </div>
-    </div>
+    </Link>
   );
 };
 
-const SKELETON_COUNT = 3;
-
 const RescueItemSkeleton = () => (
-  <div className="p-4 mb-4 border-1 border-border rounded-md bg-white">
+  <div className="border-border mb-4 rounded-md border-1 bg-white p-4">
     <Skeleton
       variant="rounded"
       width="100%"
       height="15rem"
-      sx={{ marginBottom: '0.75rem', borderRadius: '0.375rem' }}
+      sx={{
+        marginBottom: 'var(--spacing-card)',
+        borderRadius: 'var(--radius-card)',
+      }}
     />
-    <Skeleton variant="text" sx={{ fontSize: '1.25rem' }} width="60%" />
+    <Skeleton
+      variant="text"
+      sx={{ fontSize: 'var(--font-size-xl)' }}
+      width="60%"
+    />
     <div className="flex justify-between">
       <Skeleton variant="text" width="40%" />
       <Skeleton variant="text" width="25%" />
@@ -81,7 +73,10 @@ const RescueItemSkeleton = () => (
       variant="rounded"
       width="100%"
       height="2rem"
-      sx={{ borderRadius: '9999px', marginTop: '0.5rem' }}
+      sx={{
+        borderRadius: 'var(--radius-full)',
+        marginTop: 'var(--spacing-input)',
+      }}
     />
   </div>
 );
@@ -90,44 +85,28 @@ export const LatestRescue = () => {
   const { t } = useTranslation();
   const { data: rescues, isLoading } = useFetchLatestRescuesByNumber();
 
-  const handleViewAllClick = () => {
-    // TODO: Navigate to the appropriate page for viewing all rescues
-    // navigate('/rescues');
-  };
-
-  const handleViewAllKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleViewAllClick();
-    }
-  };
-
   return (
     <div className="px-4 lg:px-20">
-      <div className="flex items-center justify-between my-4">
-        <span className="text-base lg:text-2xl font-bold">
+      <div className="my-4 flex items-center justify-between">
+        <span className="text-base font-bold lg:text-2xl">
           {t('common.recent_rescue')}
         </span>
-        <div
-          className="flex items-center gap-4"
-          role="button"
-          tabIndex={0}
-          onClick={handleViewAllClick}
-          onKeyDown={handleViewAllKeyDown}
-        >
+        <Link to="/rescues" className="flex items-center gap-4">
           <span>{t('common.view_all')}</span>
           <ArrowRight
             size="1.875rem"
-            className="text-white bg-primary rounded-full"
+            className="bg-primary rounded-full text-white"
           />
-        </div>
+        </Link>
       </div>
       <div className="grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-4">
         {isLoading
           ? Array.from({ length: SKELETON_COUNT }).map((_, i) => (
               <RescueItemSkeleton key={`skeleton-${i}`} />
             ))
-          : rescues?.map((item) => <RescueItem {...item} key={item.name} />)}
+          : rescues?.map((item) => (
+              <RescueItem {...item} key={item.animalID} />
+            ))}
       </div>
     </div>
   );
