@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven 设计系统 (中文版)</title>
+<style>
+/* ══════════════════════════════════════════════════════════════
+   PawHaven Design System — Living Style Guide
+   Based on @pawhaven/design-system tokens
+   ══════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Design Tokens ─────────────────────────────────────── */
+:root {
+  --color-gray-1: #ffffff;  --color-gray-2: #f8f8f8;  --color-gray-3: #f0f0f0;
+  --color-gray-4: #e5e5e5;  --color-gray-5: #d4d4d4;  --color-gray-6: #a3a3a3;
+  --color-gray-7: #737373;  --color-gray-8: #525252;  --color-gray-9: #2f2f2f;
+  --color-gray-10: #171717;
+  --color-orange-1: #fff7ed; --color-orange-2: #ffedd5; --color-orange-3: #fed7aa;
+  --color-orange-4: #fdb87a; --color-orange-5: #fb923c; --color-orange-6: #f7823a;
+  --color-orange-7: #f66b26; --color-orange-8: #e65a1a; --color-orange-9: #c2410b;
+  --color-orange-10: #7a2b08;
+  --color-green-1: #f0fdf4;  --color-green-2: #dcfce7;  --color-green-3: #bbf7d0;
+  --color-green-4: #86efac;  --color-green-5: #4ade80;  --color-green-6: #4caf50;
+  --color-green-7: #16a34a;  --color-green-8: #15803d;  --color-green-9: #166534;
+  --color-green-10: #14532d;
+  --color-red-1: #fff1f2;  --color-red-2: #fee2e2;  --color-red-3: #fecaca;
+  --color-red-4: #fca5a5;  --color-red-5: #f87171;  --color-red-6: #ef4444;
+  --color-red-7: #dc2626;  --color-red-8: #b91c1c;
+  --color-yellow-1: #fffbeb; --color-yellow-2: #fef3c7; --color-yellow-3: #fde68a;
+  --color-yellow-4: #fcd34d; --color-yellow-5: #fbbf24; --color-yellow-6: #f59e0b;
+  --color-blue-1: #eff6ff;  --color-blue-2: #dbeafe;  --color-blue-3: #bfdbfe;
+  --color-blue-6: #3b82f6;  --color-blue-10: #1e3a8a;
+  --color-brown-1: #fffaf6; --color-brown-2: #fff5ec; --color-brown-3: #f6e9df;
+  --color-brown-4: #ecdccf; --color-brown-5: #e1cfbf; --color-brown-6: #d3c3b3;
+  --color-brown-7: #b9a596; --color-brown-8: #8f7b69; --color-brown-9: #6b5642;
+  --color-brown-10: #4a392c;
+
+  --color-primary: var(--color-orange-6);
+  --color-primary-hover: var(--color-orange-7);
+  --color-primary-active: var(--color-orange-8);
+  --color-primary-light: var(--color-orange-1);
+  --color-primary-subtle: var(--color-orange-2);
+  --color-secondary: var(--color-green-6);
+  --color-secondary-hover: var(--color-green-7);
+  --color-secondary-light: var(--color-green-1);
+  --color-surface: var(--color-gray-1);
+  --color-surface-elevated: var(--color-gray-1);
+  --color-surface-hover: var(--color-brown-2);
+  --color-surface-dark: var(--color-gray-9);
+  --color-background: var(--color-brown-4);
+  --color-background-subtle: var(--color-brown-3);
+  --color-muted: var(--color-brown-2);
+  --color-muted-strong: var(--color-brown-4);
+  --color-text: var(--color-gray-9);
+  --color-text-secondary: var(--color-gray-7);
+  --color-text-tertiary: var(--color-gray-6);
+  --color-text-muted: var(--color-gray-5);
+  --color-text-inverse: var(--color-gray-1);
+  --color-text-link: var(--color-primary);
+  --color-border: var(--color-gray-5);
+  --color-border-hover: var(--color-gray-6);
+  --color-border-focus: var(--color-primary);
+  --color-error: var(--color-red-6);
+  --color-error-light: var(--color-red-2);
+  --color-success: var(--color-green-6);
+  --color-success-light: var(--color-green-2);
+  --color-warning: var(--color-yellow-6);
+  --color-warning-light: var(--color-yellow-2);
+  --color-info: var(--color-blue-6);
+  --color-info-light: var(--color-blue-2);
+
+  --font-sans: 'Plus Jakarta Sans', 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Fraunces', 'Poppins', Georgia, serif;
+  --font-serif: 'Lora', 'Merriweather', serif;
+  --font-handwriting: 'Patrick Hand', cursive;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-size-xs: 0.75rem;   --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;    --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;   --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem; --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;     --font-size-6xl: 3.75rem;
+  --leading-none: 1;         --leading-tight: 1.25;
+  --leading-snug: 1.375;     --leading-normal: 1.5;
+  --leading-relaxed: 1.625;  --leading-loose: 2;
+  --tracking-tighter: -0.05em; --tracking-tight: -0.025em;
+  --tracking-normal: 0;      --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;  --tracking-widest: 0.1em;
+  --font-weight-normal: 400; --font-weight-medium: 500;
+  --font-weight-semibold: 600; --font-weight-bold: 700;
+
+  --spacing-1: 0.25rem; --spacing-2: 0.5rem;  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;    --spacing-5: 1.5rem;  --spacing-6: 2rem;
+  --spacing-8: 3rem;    --spacing-10: 4rem;   --spacing-12: 5rem;
+  --spacing-16: 6rem;   --spacing-20: 8rem;
+  --spacing-gutter: var(--spacing-5);
+  --spacing-section: var(--spacing-10);
+  --spacing-card: var(--spacing-5);
+  --spacing-input: var(--spacing-3);
+  --container-sm: 640px; --container-md: 768px;
+  --container-lg: 1024px; --container-xl: 1280px;
+
+  --radius-xs: 2px;  --radius-sm: 4px;   --radius-md: 8px;
+  --radius-lg: 12px; --radius-xl: 16px;  --radius-2xl: 24px;
+  --radius-3xl: 32px; --radius-full: 9999px;
+  --radius-input: var(--radius-sm);
+  --radius-button: var(--radius-md);
+  --radius-card: var(--radius-lg);
+  --radius-dialog: var(--radius-xl);
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 3px 6px rgba(0,0,0,0.16);
+  --shadow-lg: 0 8px 20px rgba(0,0,0,0.18);
+  --shadow-xl: 0 12px 28px rgba(0,0,0,0.22);
+  --shadow-card: var(--shadow-sm);
+  --shadow-dropdown: var(--shadow-md);
+  --shadow-modal: var(--shadow-lg);
+
+  --duration-75: 75ms;  --duration-100: 100ms;
+  --duration-150: 150ms; --duration-200: 200ms;
+  --duration-300: 300ms; --duration-500: 500ms;
+  --duration-700: 700ms; --duration-1000: 1000ms;
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --z-base: 1; --z-dropdown: 100; --z-sticky: 200;
+  --z-overlay: 300; --z-modal: 400; --z-toast: 600;
+
+  --breakpoint-sm: 640px; --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px; --breakpoint-xl: 1280px;
+}
+
+/* ── Page ──────────────────────────────────────────────── */
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text);
+  background: var(--color-background-subtle);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ────────────────────────────────────────────── */
+.container {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: 0 var(--spacing-5);
+}
+
+.hero {
+  background: linear-gradient(165deg, var(--color-orange-2) 0%, var(--color-brown-3) 40%, var(--color-brown-4) 100%);
+  padding: var(--spacing-16) 0 var(--spacing-12);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; right: -10%;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, var(--color-orange-2) 0%, transparent 70%);
+  border-radius: 50%; opacity: 0.6;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%; left: -5%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--color-green-2) 0%, transparent 70%);
+  border-radius: 50%; opacity: 0.4;
+}
+.hero-content {
+  position: relative; z-index: 1;
+  max-width: 720px;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.5rem, 5vw, var(--font-size-6xl));
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-brown-10);
+}
+.hero h1 .accent { color: var(--color-primary); }
+.hero .subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-4);
+  max-width: 560px;
+}
+
+/* ── Section ───────────────────────────────────────────── */
+.section {
+  padding: var(--spacing-section) 0;
+}
+.section-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  color: var(--color-brown-10);
+  margin-bottom: var(--spacing-2);
+}
+.section-desc {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin-bottom: var(--spacing-8);
+}
+
+/* ── Nav ───────────────────────────────────────────────── */
+.nav-bar {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky; top: 0;
+  z-index: var(--z-sticky);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-brown-10);
+  text-decoration: none;
+}
+.nav-links {
+  display: flex; gap: var(--spacing-1);
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-150) var(--ease-out);
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+/* ── Token Display ─────────────────────────────────────── */
+.token-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.color-group {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: box-shadow var(--duration-200) var(--ease-out);
+}
+.color-group:hover { box-shadow: var(--shadow-md); }
+.color-group-header {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.color-group-header h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+.swatch-list { display: flex; flex-direction: column; }
+.swatch-item {
+  display: flex; align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  transition: background var(--duration-100) var(--ease-out);
+}
+.swatch-item:hover { background: var(--color-surface-hover); }
+.swatch-preview {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+.swatch-info { flex: 1; min-width: 0; }
+.swatch-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+.swatch-value {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-family: var(--font-mono);
+}
+.swatch-role {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: 1px;
+}
+
+/* ── Typography ────────────────────────────────────────── */
+.type-row {
+  padding: var(--spacing-5) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.type-row:last-child { border-bottom: none; }
+.type-label {
+  display: flex; align-items: baseline;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-2);
+}
+.type-token {
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-tertiary);
+  background: var(--color-muted);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+.type-specs {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+.type-sample { margin-top: var(--spacing-1); }
+
+/* ── Spacing ───────────────────────────────────────────── */
+.spacing-row {
+  display: flex; align-items: center; gap: var(--spacing-4);
+  padding: var(--spacing-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.spacing-bar {
+  height: 32px;
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  opacity: 0.7;
+}
+.spacing-label {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 100px;
+}
+.spacing-value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+/* ── Component Showcase ────────────────────────────────── */
+.component-showcase {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-8);
+  margin-bottom: var(--spacing-8);
+}
+.component-showcase h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-2);
+}
+.component-showcase .specs {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--spacing-6);
+}
+.component-showcase .specs code {
+  font-family: var(--font-mono);
+  background: var(--color-muted);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+}
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn-row {
+  display: flex; flex-wrap: wrap;
+  gap: var(--spacing-3); align-items: center;
+}
+.btn {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  gap: var(--spacing-2);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  border: 2px solid transparent;
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: all var(--duration-150) var(--ease-out);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative; overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: transparent;
+  transition: background var(--duration-150) var(--ease-out);
+}
+.btn:hover::after { background: rgba(0,0,0,0.06); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  padding: 10px 24px;
+}
+.btn-primary:hover { background: var(--color-primary-hover); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  padding: 10px 24px;
+}
+.btn-secondary:hover { background: var(--color-primary-light); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text);
+  padding: 10px 24px;
+}
+.btn-ghost:hover { background: var(--color-muted); }
+
+.btn-success {
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+  padding: 10px 24px;
+}
+
+.btn-danger {
+  background: var(--color-error);
+  color: var(--color-text-inverse);
+  padding: 10px 24px;
+}
+
+.btn-sm { padding: 6px 14px; font-size: var(--font-size-xs); }
+.btn-lg { padding: 14px 32px; font-size: var(--font-size-base); }
+.btn-xl { padding: 16px 40px; font-size: var(--font-size-lg); }
+
+.btn-icon {
+  width: 40px; height: 40px;
+  padding: 0; border-radius: var(--radius-full);
+}
+
+.btn:disabled {
+  opacity: 0.5; cursor: not-allowed; pointer-events: none;
+}
+
+/* ── Cards ─────────────────────────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-5);
+}
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: all var(--duration-200) var(--ease-out);
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-border-hover);
+}
+.card-image {
+  width: 100%; aspect-ratio: 4/3;
+  object-fit: cover;
+  background: var(--color-muted-strong);
+}
+.card-body { padding: var(--spacing-card); }
+.card-body h4 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-snug);
+  margin-bottom: var(--spacing-1);
+}
+.card-body p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.card-footer {
+  padding: var(--spacing-3) var(--spacing-card);
+  border-top: 1px solid var(--color-border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Form ──────────────────────────────────────────────── */
+.form-group { margin-bottom: var(--spacing-5); }
+.form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-2);
+}
+.form-label .required { color: var(--color-error); margin-left: 2px; }
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-input);
+  transition: all var(--duration-150) var(--ease-out);
+  outline: none;
+}
+.form-input:hover { border-color: var(--color-border-hover); }
+.form-input:focus { border-color: var(--color-border-focus); box-shadow: 0 0 0 3px var(--color-primary-subtle); }
+.form-input::placeholder { color: var(--color-text-muted); }
+.form-input.error { border-color: var(--color-error); }
+.form-input.error:focus { box-shadow: 0 0 0 3px var(--color-error-light); }
+.form-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  margin-top: var(--spacing-1);
+}
+.form-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-1);
+  display: flex; align-items: center; gap: 4px;
+}
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  padding-right: 36px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-input);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23737373'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  cursor: pointer;
+  transition: all var(--duration-150) var(--ease-out);
+  outline: none;
+}
+.form-select:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+}
+.checkbox-row, .radio-row {
+  display: flex; align-items: center; gap: var(--spacing-2);
+  cursor: pointer; font-size: var(--font-size-sm);
+}
+.checkbox-row input[type="checkbox"],
+.radio-row input[type="radio"] {
+  width: 18px; height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ── Badges ────────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  line-height: 1.5;
+}
+.badge-primary { background: var(--color-primary-light); color: var(--color-primary-active); }
+.badge-success { background: var(--color-success-light); color: #166534; }
+.badge-warning { background: var(--color-warning-light); color: #92400e; }
+.badge-error   { background: var(--color-error-light); color: #991b1b; }
+.badge-info    { background: var(--color-info-light); color: #1e40af; }
+.badge-neutral { background: var(--color-muted); color: var(--color-text-secondary); }
+
+/* ── Alerts ────────────────────────────────────────────── */
+.alert {
+  display: flex; align-items: flex-start; gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: var(--font-size-sm);
+}
+.alert-info {
+  background: var(--color-info-light);
+  border-color: #bfdbfe; color: #1e40af;
+}
+.alert-success {
+  background: var(--color-success-light);
+  border-color: #bbf7d0; color: #166534;
+}
+.alert-warning {
+  background: var(--color-warning-light);
+  border-color: #fde68a; color: #92400e;
+}
+.alert-error {
+  background: var(--color-error-light);
+  border-color: #fecaca; color: #991b1b;
+}
+.alert-icon { flex-shrink: 0; font-size: 1.2em; margin-top: 1px; }
+.alert-content { flex: 1; }
+.alert-title { font-weight: var(--font-weight-semibold); margin-bottom: 2px; }
+
+/* ── Table ─────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: separate; border-spacing: 0;
+  font-size: var(--font-size-sm);
+}
+.data-table th {
+  text-align: left;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 2px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+.data-table td {
+  padding: var(--spacing-3) var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+.data-table tr:hover td { background: var(--color-surface-hover); }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* ── Tabs ──────────────────────────────────────────────── */
+.tab-bar {
+  display: flex; gap: 0;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: var(--spacing-6);
+}
+.tab-item {
+  padding: var(--spacing-3) var(--spacing-5);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  border: none; background: none; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--duration-150) var(--ease-out);
+}
+.tab-item:hover { color: var(--color-text); }
+.tab-item.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* ── Modal ─────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: var(--z-modal);
+}
+.modal-dialog {
+  background: var(--color-surface);
+  border-radius: var(--radius-dialog);
+  box-shadow: var(--shadow-modal);
+  max-width: 520px; width: 90%;
+  max-height: 85vh; overflow-y: auto;
+}
+.modal-header {
+  padding: var(--spacing-5) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+.modal-body { padding: var(--spacing-6); }
+.modal-footer {
+  padding: var(--spacing-4) var(--spacing-6);
+  border-top: 1px solid var(--color-border);
+  display: flex; justify-content: flex-end;
+  gap: var(--spacing-3);
+}
+.modal-close {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border: none;
+  background: var(--color-muted);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  transition: all var(--duration-100) var(--ease-out);
+}
+.modal-close:hover { background: var(--color-border); color: var(--color-text); }
+
+/* ── Stepper ───────────────────────────────────────────── */
+.stepper {
+  display: flex; align-items: center; gap: 0;
+}
+.step {
+  display: flex; align-items: center; gap: var(--spacing-2);
+  flex: 1;
+}
+.step-circle {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: all var(--duration-200) var(--ease-out);
+}
+.step.active .step-circle {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.step.completed .step-circle {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: var(--color-text-inverse);
+}
+.step-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+}
+.step.active .step-label { color: var(--color-primary); }
+.step.completed .step-label { color: var(--color-success); }
+.step-connector {
+  flex: 1; height: 2px;
+  background: var(--color-border);
+  margin: 0 var(--spacing-2);
+}
+.step.completed + .step-connector { background: var(--color-success); }
+
+/* ── Stat Card ─────────────────────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-5);
+}
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  transition: all var(--duration-200) var(--ease-out);
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+.stat-value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-1);
+}
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.stat-change {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-top: var(--spacing-2);
+}
+.stat-change.positive { color: var(--color-success); }
+.stat-change.negative { color: var(--color-error); }
+
+/* ── Timeline ──────────────────────────────────────────── */
+.timeline {
+  position: relative;
+  padding-left: var(--spacing-6);
+}
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 11px; top: 8px; bottom: 8px;
+  width: 2px;
+  background: var(--color-border);
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: var(--spacing-5);
+}
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot {
+  position: absolute;
+  left: calc(-1 * var(--spacing-6) + 4px);
+  top: 4px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 3px solid var(--color-primary);
+  background: var(--color-surface);
+  z-index: 1;
+}
+.timeline-item.completed .timeline-dot {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+.timeline-content h4 {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  margin-bottom: 2px;
+}
+.timeline-content time {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+.timeline-content p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+/* ── Empty State ───────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-5);
+  max-width: 420px; margin: 0 auto;
+}
+.empty-state .illustration {
+  font-size: 64px; margin-bottom: var(--spacing-5); opacity: 0.8;
+}
+.empty-state h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-2);
+}
+.empty-state p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-5);
+}
+
+/* ── Search ────────────────────────────────────────────── */
+.search-bar {
+  position: relative; max-width: 480px;
+}
+.search-bar .search-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+.search-bar input {
+  width: 100%;
+  padding: 10px 14px 10px 42px;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-150) var(--ease-out);
+  outline: none;
+}
+.search-bar input:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px var(--color-primary-subtle);
+}
+.search-bar input::placeholder { color: var(--color-text-muted); }
+
+/* ── Pagination ────────────────────────────────────────── */
+.pagination {
+  display: flex; align-items: center;
+  justify-content: center; gap: var(--spacing-1);
+}
+.pagination button {
+  min-width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-100) var(--ease-out);
+}
+.pagination button:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.pagination button.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+.pagination button:disabled {
+  opacity: 0.4; cursor: not-allowed;
+}
+
+/* ── Tooltip ───────────────────────────────────────────── */
+.tooltip-wrapper {
+  position: relative; display: inline-block;
+}
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-surface-dark);
+  color: var(--color-text-inverse);
+  font-size: var(--font-size-xs);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-150) var(--ease-out);
+}
+.tooltip-wrapper:hover .tooltip { opacity: 1; }
+
+/* ── Principles ────────────────────────────────────────── */
+.principle-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-6);
+  transition: box-shadow var(--duration-200) var(--ease-out);
+}
+.principle-card:hover { box-shadow: var(--shadow-md); }
+.principle-number {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-4xl);
+  color: var(--color-primary);
+  opacity: 0.3; line-height: 1;
+  margin-bottom: var(--spacing-2);
+}
+.principle-card h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-2);
+}
+.principle-card p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ── Page Layout Mockup ────────────────────────────────── */
+.layout-mockup {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+.layout-header {
+  background: var(--color-muted);
+  padding: var(--spacing-4) var(--spacing-6);
+  border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+}
+.layout-header-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+.layout-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 400px;
+}
+.layout-sidebar {
+  background: var(--color-muted);
+  border-right: 1px solid var(--color-border);
+  padding: var(--spacing-5);
+}
+.layout-main { padding: var(--spacing-6); }
+.layout-sidebar-item {
+  height: 36px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-2);
+  display: flex; align-items: center;
+  padding: 0 var(--spacing-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+.layout-sidebar-item.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+.layout-content-block {
+  height: 60px;
+  background: var(--color-muted);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-3);
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+.doc-footer {
+  background: var(--color-brown-9);
+  color: var(--color-brown-3);
+  padding: var(--spacing-8) 0;
+  margin-top: var(--spacing-12);
+  font-size: var(--font-size-sm);
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero { padding: var(--spacing-10) 0 var(--spacing-8); }
+  .card-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .btn-row { flex-direction: column; align-items: stretch; }
+  .btn-row .btn { justify-content: center; }
+  .nav-links { display: none; }
+}
+
+/* ── Utility ───────────────────────────────────────────── */
+.text-center { text-align: center; }
+.mt-4 { margin-top: var(--spacing-4); }
+.mt-8 { margin-top: var(--spacing-8); }
+.mb-4 { margin-bottom: var(--spacing-4); }
+.mb-8 { margin-bottom: var(--spacing-8); }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-4 { gap: var(--spacing-4); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ NAVIGATION ═══════════ -->
+<nav class="nav-bar">
+  <div class="container nav-inner">
+    <a href="#" class="nav-logo">PawHaven Design System</a>
+    <ul class="nav-links">
+      <li><a href="#principles" class="active">设计原则</a></li>
+      <li><a href="#colors">色彩系统</a></li>
+      <li><a href="#typography">字体排版</a></li>
+      <li><a href="#spacing">间距布局</a></li>
+      <li><a href="#components">组件库</a></li>
+      <li><a href="#pages">页面布局</a></li>
+      <li><a href="#motion">交互动效</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="container hero-content">
+    <h1>PawHaven <span class="accent">Design System</span></h1>
+    <p class="subtitle">
+      面向多平台应用的设计系统规范 — 完整的设计 Token、组件库与交互指南。
+      基于 @pawhaven/design-system tokens 构建。
+    </p>
+  </div>
+</header>
+
+<!-- ═══════════ DESIGN PRINCIPLES ═══════════ -->
+<section id="principles" class="section">
+  <div class="container">
+    <h2 class="section-title">设计原则</h2>
+    <p class="section-desc">指导每一个设计决策的核心价值观。</p>
+    <div class="card-grid">
+      <div class="principle-card">
+        <div class="principle-number">01</div>
+        <h3>一致性</h3>
+        <p>统一的视觉语言贯穿所有界面。使用 Design Token 确保颜色、间距、字体在所有组件中保持一致。</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-number">02</div>
+        <h3>清晰可操作</h3>
+        <p>每个界面必须让用户立即理解：当前状态是什么、下一步该做什么。减少认知负担，让操作路径最短。</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-number">03</div>
+        <h3>状态可视化</h3>
+        <p>用颜色、图标和文案明确传达系统状态。加载中、成功、失败、空状态等都应有清晰的视觉反馈。</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-number">04</div>
+        <h3>包容无障碍</h3>
+        <p>WCAG AA 级对比度标准，支持键盘导航，所有交互元素至少 44px 触控区域，尊重用户系统偏好。</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-number">05</div>
+        <h3>优雅克制</h3>
+        <p>动效服务于功能，不喧宾夺主。适度的微交互提升体验，而不是分散注意力。</p>
+      </div>
+      <div class="principle-card">
+        <div class="principle-number">06</div>
+        <h3>效率优先</h3>
+        <p>信息层级清晰，常用操作一键可达。组件设计遵循最小惊讶原则。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COLOR SYSTEM ═══════════ -->
+<section id="colors" class="section" style="background: var(--color-surface);">
+  <div class="container">
+    <h2 class="section-title">色彩系统</h2>
+    <p class="section-desc">
+      基于 Design Token 的语义色彩体系。主色为暖橙（活力、引导），辅色为绿色（积极、成功）。
+      背景使用暖调中性色，避免纯灰的冰冷感。
+    </p>
+
+    <div class="token-grid">
+      <!-- Primary -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>🔶 Primary · Orange</h3>
+          <span class="badge badge-primary">品牌主色</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-orange-1)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Light</div>
+              <div class="swatch-value">#fff7ed</div>
+              <div class="swatch-role">浅色背景、选中态背景</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-orange-2)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Subtle</div>
+              <div class="swatch-value">#ffedd5</div>
+              <div class="swatch-role">悬浮态背景、高亮区域</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-orange-6)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary</div>
+              <div class="swatch-value">#f7823a</div>
+              <div class="swatch-role">主按钮、链接、强调元素</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-orange-7)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Hover</div>
+              <div class="swatch-value">#f66b26</div>
+              <div class="swatch-role">主按钮悬浮态</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-orange-8)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Primary Active</div>
+              <div class="swatch-value">#e65a1a</div>
+              <div class="swatch-role">主按钮按下态</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>🟢 Secondary · Green</h3>
+          <span class="badge badge-success">辅助色</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-green-1)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Secondary Light</div>
+              <div class="swatch-value">#f0fdf4</div>
+              <div class="swatch-role">成功状态浅色背景</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-green-6)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Secondary / Success</div>
+              <div class="swatch-value">#4caf50</div>
+              <div class="swatch-role">成功状态、完成标记</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-green-7)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Secondary Hover</div>
+              <div class="swatch-value">#16a34a</div>
+              <div class="swatch-role">成功按钮悬浮态</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Surfaces -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>📄 Surfaces</h3>
+          <span class="badge badge-neutral">表面/背景</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-surface)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Surface</div>
+              <div class="swatch-value">#ffffff</div>
+              <div class="swatch-role">卡片、表单、弹窗背景</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-surface-hover)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Surface Hover</div>
+              <div class="swatch-value">#fff5ec</div>
+              <div class="swatch-role">表格行悬浮、列表项悬浮</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-background)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Background</div>
+              <div class="swatch-value">#ecdccf</div>
+              <div class="swatch-role">页面背景（暖棕调）</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-muted)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Muted</div>
+              <div class="swatch-value">#fff5ec</div>
+              <div class="swatch-role">次要区域背景、分隔</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>📝 Text</h3>
+          <span class="badge badge-neutral">文本层级</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-text)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Primary</div>
+              <div class="swatch-value">#2f2f2f</div>
+              <div class="swatch-role">正文、标题</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-text-secondary)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Secondary</div>
+              <div class="swatch-value">#737373</div>
+              <div class="swatch-role">描述文字、辅助信息</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-text-tertiary)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Tertiary</div>
+              <div class="swatch-value">#a3a3a3</div>
+              <div class="swatch-role">占位符、禁用文字</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-text-inverse)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Text Inverse</div>
+              <div class="swatch-value">#ffffff</div>
+              <div class="swatch-role">深色背景上的文字</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>🚦 Status</h3>
+          <span class="badge badge-info">状态指示</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-error)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Error</div>
+              <div class="swatch-value">#ef4444</div>
+              <div class="swatch-role">错误、危险操作</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-success)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Success</div>
+              <div class="swatch-value">#4caf50</div>
+              <div class="swatch-role">成功、完成</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-warning)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Warning</div>
+              <div class="swatch-value">#f59e0b</div>
+              <div class="swatch-role">警告、待处理</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-info)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Info</div>
+              <div class="swatch-value">#3b82f6</div>
+              <div class="swatch-role">信息提示、进行中</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Border -->
+      <div class="color-group">
+        <div class="color-group-header">
+          <h3>📏 Borders</h3>
+          <span class="badge badge-neutral">边框/分割</span>
+        </div>
+        <div class="swatch-list">
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-border)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Border</div>
+              <div class="swatch-value">#d4d4d4</div>
+              <div class="swatch-role">默认边框</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-border-hover)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Border Hover</div>
+              <div class="swatch-value">#a3a3a3</div>
+              <div class="swatch-role">悬浮态边框</div>
+            </div>
+          </div>
+          <div class="swatch-item">
+            <div class="swatch-preview" style="background: var(--color-border-focus)"></div>
+            <div class="swatch-info">
+              <div class="swatch-name">Border Focus</div>
+              <div class="swatch-value">#f7823a</div>
+              <div class="swatch-role">聚焦态边框（品牌色）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ TYPOGRAPHY ═══════════ -->
+<section id="typography" class="section">
+  <div class="container">
+    <h2 class="section-title">字体排版</h2>
+    <p class="section-desc">
+      标题使用 <strong>Fraunces</strong>（优雅衬线体），正文使用 <strong>Plus Jakarta Sans</strong>（现代几何无衬线）。
+      手写体 <strong>Patrick Hand</strong> 用于特殊情感场景点缀。
+    </p>
+
+    <div class="component-showcase">
+      <h3>字体层级</h3>
+      <p class="specs">Font Family Stack: <code>--font-heading</code> / <code>--font-sans</code> / <code>--font-serif</code> / <code>--font-handwriting</code></p>
+
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-6xl</span>
+          <span class="type-specs">3.75rem · Bold · Heading</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-heading); font-size: var(--font-size-6xl); font-weight: var(--font-weight-bold); line-height: var(--leading-tight);">Hero 大标题</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-5xl</span>
+          <span class="type-specs">3rem · Bold · Heading</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-heading); font-size: var(--font-size-5xl); font-weight: var(--font-weight-bold); line-height: var(--leading-tight);">页面主标题</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-4xl</span>
+          <span class="type-specs">2.25rem · Bold · Heading</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-heading); font-size: var(--font-size-4xl); font-weight: var(--font-weight-bold); line-height: var(--leading-tight);">区块标题</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-3xl</span>
+          <span class="type-specs">1.875rem · Bold · Heading</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-heading); font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); line-height: var(--leading-snug);">分区标题 Heading 1</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-2xl</span>
+          <span class="type-specs">1.5rem · Semibold · Heading</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-heading); font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); line-height: var(--leading-snug);">卡片标题 / 弹窗标题</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-xl</span>
+          <span class="type-specs">1.25rem · Semibold · Sans</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-sans); font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); line-height: var(--leading-snug);">小标题 / 引导语</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-lg</span>
+          <span class="type-specs">1.125rem · Normal · Sans</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-sans); font-size: var(--font-size-lg); font-weight: var(--font-weight-normal); line-height: var(--leading-relaxed);">段落引导文字 / 引言</div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-base</span>
+          <span class="type-specs">1rem · Normal · Sans</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-sans); font-size: var(--font-size-base); font-weight: var(--font-weight-normal); line-height: var(--leading-relaxed); color: var(--color-text-secondary);">
+          正文段落 — 设计系统是产品设计的基石，它确保视觉一致性、提升开发效率，并让团队协作更加顺畅。
+        </div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-sm</span>
+          <span class="type-specs">0.875rem · Normal · Sans</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-sans); font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); line-height: var(--leading-relaxed); color: var(--color-text-secondary);">
+          辅助文字 — 用于描述信息、元数据、表单提示等场景。
+        </div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-size-xs</span>
+          <span class="type-specs">0.75rem · Medium · Sans</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-sans); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); line-height: var(--leading-normal); color: var(--color-text-tertiary);">
+          标签文字 — 时间戳、状态标签、辅助标注。
+        </div>
+      </div>
+      <div class="type-row">
+        <div class="type-label">
+          <span class="type-token">--font-handwriting</span>
+          <span class="type-specs">Handwriting · 情感点缀</span>
+        </div>
+        <div class="type-sample" style="font-family: var(--font-handwriting); font-size: var(--font-size-xl); line-height: var(--leading-relaxed); color: var(--color-primary);">
+          Beautiful design, thoughtful details.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SPACING ═══════════ -->
+<section id="spacing" class="section" style="background: var(--color-surface);">
+  <div class="container">
+    <h2 class="section-title">间距与布局</h2>
+    <p class="section-desc">
+      基于 <strong>4px 基础单位</strong> 的间距系统，配合语义化别名。
+    </p>
+
+    <div class="component-showcase">
+      <h3>间距尺度</h3>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-1</span>
+        <span class="spacing-value">0.25rem (4px)</span>
+        <div class="spacing-bar" style="width: 4px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-2</span>
+        <span class="spacing-value">0.5rem (8px)</span>
+        <div class="spacing-bar" style="width: 8px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-3</span>
+        <span class="spacing-value">0.75rem (12px)</span>
+        <div class="spacing-bar" style="width: 12px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-4</span>
+        <span class="spacing-value">1rem (16px)</span>
+        <div class="spacing-bar" style="width: 16px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-5</span>
+        <span class="spacing-value">1.5rem (24px)</span>
+        <div class="spacing-bar" style="width: 24px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-6</span>
+        <span class="spacing-value">2rem (32px)</span>
+        <div class="spacing-bar" style="width: 32px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-8</span>
+        <span class="spacing-value">3rem (48px)</span>
+        <div class="spacing-bar" style="width: 48px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-10</span>
+        <span class="spacing-value">4rem (64px)</span>
+        <div class="spacing-bar" style="width: 64px"></div>
+      </div>
+      <div class="spacing-row">
+        <span class="spacing-label">--spacing-12</span>
+        <span class="spacing-value">5rem (80px)</span>
+        <div class="spacing-bar" style="width: 80px"></div>
+      </div>
+    </div>
+
+    <div class="component-showcase">
+      <h3>语义化间距别名</h3>
+      <p class="specs">组件开发中应优先使用语义别名，而非直接引用数值。</p>
+      <table class="data-table">
+        <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>--spacing-gutter</code></td><td>1.5rem (24px)</td><td>页面两侧留白、列表间距</td></tr>
+          <tr><td><code>--spacing-section</code></td><td>4rem (64px)</td><td>页面区块间距</td></tr>
+          <tr><td><code>--spacing-card</code></td><td>1.5rem (24px)</td><td>卡片内边距</td></tr>
+          <tr><td><code>--spacing-input</code></td><td>0.75rem (12px)</td><td>输入框内边距</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="component-showcase">
+      <h3>圆角系统</h3>
+      <p class="specs">组件级圆角使用语义别名：<code>--radius-input</code> <code>--radius-button</code> <code>--radius-card</code> <code>--radius-dialog</code></p>
+      <div style="display: flex; gap: var(--spacing-4); flex-wrap: wrap; align-items: center;">
+        <div style="width: 64px; height: 64px; background: var(--color-primary-light); border-radius: var(--radius-xs); display: flex; align-items: center; justify-content: center; font-size: 10px;">xs 2px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary-light); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px;">sm 4px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">md 8px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">lg 12px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">xl 16px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary); border-radius: var(--radius-2xl); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">2xl 24px</div>
+        <div style="width: 64px; height: 64px; background: var(--color-primary); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px;">full</div>
+      </div>
+    </div>
+
+    <div class="component-showcase">
+      <h3>阴影层级</h3>
+      <p class="specs">从浅到深表达 4 个层级的高度关系。</p>
+      <div style="display: flex; gap: var(--spacing-5); flex-wrap: wrap;">
+        <div style="width: 120px; height: 80px; background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-xs); display: flex; align-items: center; justify-content: center; font-size: 12px;">xs</div>
+        <div style="width: 120px; height: 80px; background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 12px;">sm · card</div>
+        <div style="width: 120px; height: 80px; background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-md); display: flex; align-items: center; justify-content: center; font-size: 12px;">md · dropdown</div>
+        <div style="width: 120px; height: 80px; background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); display: flex; align-items: center; justify-content: center; font-size: 12px;">lg · modal</div>
+        <div style="width: 120px; height: 80px; background: var(--color-surface); border-radius: var(--radius-md); box-shadow: var(--shadow-xl); display: flex; align-items: center; justify-content: center; font-size: 12px;">xl · toast</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COMPONENTS ═══════════ -->
+<section id="components" class="section">
+  <div class="container">
+    <h2 class="section-title">组件库</h2>
+    <p class="section-desc">基于 Design Tokens 构建的标准 UI 组件规范。</p>
+
+    <!-- Buttons -->
+    <div class="component-showcase">
+      <h3>按钮 Button</h3>
+      <p class="specs">
+        Token: <code>--radius-button (--radius-md: 8px)</code> ·
+        Font: <code>--font-size-sm · Semibold</code> ·
+        Height: <code>sm 32px / md 40px / lg 48px / xl 56px</code>
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-primary">主要按钮</button>
+        <button class="btn btn-secondary">次要按钮</button>
+        <button class="btn btn-ghost">幽灵按钮</button>
+        <button class="btn btn-success">成功按钮</button>
+        <button class="btn btn-danger">危险按钮</button>
+      </div>
+      <div class="btn-row" style="margin-top: var(--spacing-4);">
+        <button class="btn btn-primary btn-sm">小按钮</button>
+        <button class="btn btn-primary">默认</button>
+        <button class="btn btn-primary btn-lg">大按钮</button>
+        <button class="btn btn-primary btn-xl">超大按钮</button>
+        <button class="btn btn-primary" disabled>禁用状态</button>
+      </div>
+      <div class="btn-row" style="margin-top: var(--spacing-4);">
+        <button class="btn btn-icon btn-secondary" title="搜索">🔍</button>
+        <button class="btn btn-icon btn-secondary" title="编辑">✏️</button>
+        <button class="btn btn-icon btn-secondary" title="删除">🗑️</button>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <div class="component-showcase">
+      <h3>卡片 Card</h3>
+      <p class="specs">
+        Token: <code>--radius-card (--radius-lg: 12px)</code> ·
+        Shadow: <code>--shadow-card (hover → --shadow-md)</code> ·
+        Padding: <code>--spacing-card</code>
+      </p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, var(--color-orange-3), var(--color-orange-4)); display: flex; align-items: center; justify-content: center; font-size: 48px;">📋</div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-1);">
+              <h4>项目 Alpha</h4>
+              <span class="badge badge-info">进行中</span>
+            </div>
+            <p>项目描述 — 当前处于开发阶段，预计下季度交付。</p>
+          </div>
+          <div class="card-footer">
+            <span style="font-size: 12px; color: var(--color-text-tertiary);">📅 更新于 2024-06-15</span>
+            <button class="btn btn-primary btn-sm">查看详情</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, var(--color-brown-3), var(--color-brown-4)); display: flex; align-items: center; justify-content: center; font-size: 48px;">📊</div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-1);">
+              <h4>季度报告</h4>
+              <span class="badge badge-success">已完成</span>
+            </div>
+            <p>第二季度数据分析报告，包含关键指标和趋势预测。</p>
+          </div>
+          <div class="card-footer">
+            <span style="font-size: 12px; color: var(--color-text-tertiary);">📅 2024-06-30</span>
+            <button class="btn btn-ghost btn-sm">下载</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-image" style="background: linear-gradient(135deg, var(--color-green-2), var(--color-green-3)); display: flex; align-items: center; justify-content: center; font-size: 48px;">🔔</div>
+          <div class="card-body">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--spacing-1);">
+              <h4>系统通知</h4>
+              <span class="badge badge-warning">待处理</span>
+            </div>
+            <p>系统将于本周六凌晨 2:00-4:00 进行维护升级。</p>
+          </div>
+          <div class="card-footer">
+            <span style="font-size: 12px; color: var(--color-text-tertiary);">📅 2024-06-28</span>
+            <button class="btn btn-ghost btn-sm">了解更多</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Forms -->
+    <div class="component-showcase">
+      <h3>表单 Form</h3>
+      <p class="specs">
+        Input radius: <code>--radius-input (--radius-sm: 4px)</code> ·
+        Focus ring: <code>3px var(--color-primary-subtle)</code> ·
+        Border: <code>2px solid</code>
+      </p>
+      <div style="max-width: 480px;">
+        <div class="form-group">
+          <label class="form-label">用户名 <span class="required">*</span></label>
+          <input type="text" class="form-input" placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+          <label class="form-label">角色 <span class="required">*</span></label>
+          <select class="form-select">
+            <option value="">请选择角色</option>
+            <option>管理员</option>
+            <option>编辑</option>
+            <option>访客</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea class="form-input" rows="3" placeholder="请输入备注信息..." style="resize: vertical;"></textarea>
+          <span class="form-hint">可选字段，最多 200 字</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">邮箱 <span class="required">*</span></label>
+          <input type="email" class="form-input error" placeholder="请输入邮箱" value="invalid-email">
+          <span class="form-error">⚠️ 请输入有效的邮箱地址</span>
+        </div>
+        <div class="form-group">
+          <label class="checkbox-row">
+            <input type="checkbox"> 我同意服务条款
+          </label>
+        </div>
+        <div style="display: flex; gap: var(--spacing-3); margin-top: var(--spacing-5);">
+          <button class="btn btn-primary btn-lg">提交</button>
+          <button class="btn btn-ghost btn-lg">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="component-showcase">
+      <h3>徽章 Badge</h3>
+      <p class="specs">通用状态徽章，用于标识分类和状态信息。</p>
+      <div style="display: flex; flex-wrap: wrap; gap: var(--spacing-2); align-items: center;">
+        <span class="badge badge-primary">品牌</span>
+        <span class="badge badge-success">成功</span>
+        <span class="badge badge-warning">警告</span>
+        <span class="badge badge-error">错误</span>
+        <span class="badge badge-info">信息</span>
+        <span class="badge badge-neutral">默认</span>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="component-showcase">
+      <h3>提示 Banner</h3>
+      <div style="display: flex; flex-direction: column; gap: var(--spacing-3);">
+        <div class="alert alert-info">
+          <span class="alert-icon">ℹ️</span>
+          <div class="alert-content">
+            <div class="alert-title">信息提示</div>
+            这是一条普通的信息提示。
+          </div>
+        </div>
+        <div class="alert alert-success">
+          <span class="alert-icon">✅</span>
+          <div class="alert-content">
+            <div class="alert-title">操作成功</div>
+            您的操作已成功完成。
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          <span class="alert-icon">⚠️</span>
+          <div class="alert-content">
+            <div class="alert-title">注意</div>
+            此操作可能带来影响，请谨慎处理。
+          </div>
+        </div>
+        <div class="alert alert-error">
+          <span class="alert-icon">❌</span>
+          <div class="alert-content">
+            <div class="alert-title">操作失败</div>
+            发生错误，请稍后重试。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tables -->
+    <div class="component-showcase">
+      <h3>数据表格 Table</h3>
+      <p class="specs">表头大写 + 宽字距，行悬浮高亮。</p>
+      <div style="overflow-x: auto;">
+        <table class="data-table">
+          <thead><tr><th>编号</th><th>名称</th><th>类别</th><th>状态</th><th>日期</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code>#T-2024-001</code></td>
+              <td>项目 Alpha</td>
+              <td>开发</td>
+              <td><span class="badge badge-info">进行中</span></td>
+              <td>2024-06-15</td>
+              <td><button class="btn btn-ghost btn-sm">查看</button></td>
+            </tr>
+            <tr>
+              <td><code>#T-2024-002</code></td>
+              <td>项目 Beta</td>
+              <td>设计</td>
+              <td><span class="badge badge-warning">待审核</span></td>
+              <td>2024-06-20</td>
+              <td><button class="btn btn-ghost btn-sm">查看</button></td>
+            </tr>
+            <tr>
+              <td><code>#T-2024-003</code></td>
+              <td>项目 Gamma</td>
+              <td>运营</td>
+              <td><span class="badge badge-success">已完成</span></td>
+              <td>2024-06-10</td>
+              <td><button class="btn btn-ghost btn-sm">查看</button></td>
+            </tr>
+            <tr>
+              <td><code>#T-2024-004</code></td>
+              <td>项目 Delta</td>
+              <td>测试</td>
+              <td><span class="badge badge-error">已取消</span></td>
+              <td>2024-05-30</td>
+              <td><button class="btn btn-ghost btn-sm">查看</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="component-showcase">
+      <h3>标签页 Tabs</h3>
+      <div class="tab-bar">
+        <button class="tab-item active">全部</button>
+        <button class="tab-item">待处理 (3)</button>
+        <button class="tab-item">进行中 (5)</button>
+        <button class="tab-item">已完成 (12)</button>
+        <button class="tab-item">已归档</button>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="component-showcase">
+      <h3>步骤条 Stepper</h3>
+      <p class="specs">用于多步骤流程的可视化展示。</p>
+      <div class="stepper">
+        <div class="step completed"><div class="step-circle">✓</div><span class="step-label">创建</span></div>
+        <div class="step-connector"></div>
+        <div class="step completed"><div class="step-circle">✓</div><span class="step-label">审核</span></div>
+        <div class="step-connector"></div>
+        <div class="step active"><div class="step-circle">3</div><span class="step-label">执行</span></div>
+        <div class="step-connector"></div>
+        <div class="step"><div class="step-circle">4</div><span class="step-label">验收</span></div>
+        <div class="step-connector"></div>
+        <div class="step"><div class="step-circle">5</div><span class="step-label">完成</span></div>
+      </div>
+    </div>
+
+    <!-- Search & Pagination -->
+    <div class="component-showcase">
+      <h3>搜索 & 分页</h3>
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--spacing-4);">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="搜索...">
+        </div>
+        <div class="pagination">
+          <button disabled>‹</button>
+          <button class="active">1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>...</button>
+          <button>8</button>
+          <button>›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="component-showcase">
+      <h3>统计卡片 Stat Card</h3>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value">12,847</div>
+          <div class="stat-label">总用户数</div>
+          <div class="stat-change positive">↑ 12% 较上月</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">8,392</div>
+          <div class="stat-label">活跃用户</div>
+          <div class="stat-change positive">↑ 8% 较上月</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">3,156</div>
+          <div class="stat-label">新增订单</div>
+          <div class="stat-change positive">↑ 5% 较上月</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">94.2%</div>
+          <div class="stat-label">系统可用率</div>
+          <div class="stat-change negative">↓ 0.3% 较上月</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="component-showcase">
+      <h3>空状态 Empty State</h3>
+      <div class="empty-state">
+        <div class="illustration">📭</div>
+        <h3>暂无数据</h3>
+        <p>当前列表为空，创建第一个条目以开始使用。</p>
+        <button class="btn btn-primary btn-lg">创建新条目</button>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="component-showcase">
+      <h3>时间线 Timeline</h3>
+      <div class="timeline">
+        <div class="timeline-item completed">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h4>项目创建</h4>
+            <time>2024-06-01 10:00</time>
+            <p>项目立项并通过初步审核。</p>
+          </div>
+        </div>
+        <div class="timeline-item completed">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h4>需求评审</h4>
+            <time>2024-06-05 14:30</time>
+            <p>完成需求文档评审，确定开发排期。</p>
+          </div>
+        </div>
+        <div class="timeline-item completed">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h4>开发阶段</h4>
+            <time>2024-06-10 09:00</time>
+            <p>进入开发迭代，第一阶段开发完成。</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <h4>测试验收</h4>
+            <time>2024-06-25 14:00</time>
+            <p>进入测试阶段，预计 7 个工作日内完成验收。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="component-showcase">
+      <h3>弹窗 Modal</h3>
+      <div style="background: var(--color-muted); padding: var(--spacing-6); border-radius: var(--radius-md); display: flex; justify-content: center;">
+        <div class="modal-dialog" style="position: relative; z-index: 1;">
+          <div class="modal-header">
+            <h3>确认操作</h3>
+            <button class="modal-close">✕</button>
+          </div>
+          <div class="modal-body">
+            <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm); line-height: var(--leading-relaxed);">
+              您确定要执行此操作吗？此操作可能不可撤销，请确认后再继续。
+            </p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost">取消</button>
+            <button class="btn btn-primary">确认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="component-showcase">
+      <h3>提示 Tooltip</h3>
+      <div style="display: flex; gap: var(--spacing-6); align-items: center; padding: var(--spacing-5) 0;">
+        <div class="tooltip-wrapper">
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-link); cursor: help; border-bottom: 1px dashed var(--color-text-link);">悬停查看提示</span>
+          <div class="tooltip">这是一个 Tooltip 提示内容</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PAGE LAYOUTS ═══════════ -->
+<section id="pages" class="section" style="background: var(--color-surface);">
+  <div class="container">
+    <h2 class="section-title">页面布局设计</h2>
+    <p class="section-desc">通用页面布局模式和信息层级参考。</p>
+
+    <!-- Dashboard Layout -->
+    <div class="component-showcase">
+      <h3>📊 管理后台布局 (Admin Dashboard)</h3>
+      <p class="specs">侧边栏 + 主内容区 · 240px 侧边栏 · 统计卡片 + 数据表格</p>
+      <div class="layout-mockup">
+        <div class="layout-header">
+          <div style="display: flex; gap: 6px;">
+            <div class="layout-header-dot" style="background: var(--color-red-5);"></div>
+            <div class="layout-header-dot" style="background: var(--color-yellow-5);"></div>
+            <div class="layout-header-dot" style="background: var(--color-green-5);"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--color-text-tertiary);">Admin Dashboard</div>
+          <div style="width: 60px;"></div>
+        </div>
+        <div class="layout-body">
+          <div class="layout-sidebar">
+            <div class="layout-sidebar-item active">📋 仪表盘</div>
+            <div class="layout-sidebar-item">📦 内容管理</div>
+            <div class="layout-sidebar-item">👤 用户管理</div>
+            <div class="layout-sidebar-item">📊 数据分析</div>
+            <div class="layout-sidebar-item">⚙️ 系统设置</div>
+          </div>
+          <div class="layout-main">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--spacing-3); margin-bottom: var(--spacing-4);">
+              <div style="background: var(--color-orange-1); border: 1px solid var(--color-orange-3); border-radius: var(--radius-md); padding: var(--spacing-4);">
+                <div style="font-size: 24px; font-weight: bold; color: var(--color-primary);">12,847</div>
+                <div style="font-size: 11px; color: var(--color-text-tertiary);">总用户</div>
+              </div>
+              <div style="background: var(--color-blue-1); border: 1px solid var(--color-blue-3); border-radius: var(--radius-md); padding: var(--spacing-4);">
+                <div style="font-size: 24px; font-weight: bold; color: var(--color-info);">583</div>
+                <div style="font-size: 11px; color: var(--color-text-tertiary);">进行中</div>
+              </div>
+              <div style="background: var(--color-green-1); border: 1px solid var(--color-green-3); border-radius: var(--radius-md); padding: var(--spacing-4);">
+                <div style="font-size: 24px; font-weight: bold; color: var(--color-success);">8,392</div>
+                <div style="font-size: 11px; color: var(--color-text-tertiary);">已完成</div>
+              </div>
+              <div style="background: var(--color-yellow-1); border: 1px solid var(--color-yellow-3); border-radius: var(--radius-md); padding: var(--spacing-4);">
+                <div style="font-size: 24px; font-weight: bold; color: var(--color-warning);">128</div>
+                <div style="font-size: 11px; color: var(--color-text-tertiary);">待处理</div>
+              </div>
+            </div>
+            <div class="layout-content-block" style="height: 200px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Page Layout -->
+    <div class="component-showcase">
+      <h3>📋 详情页布局 (Detail Page)</h3>
+      <p class="specs">顶部状态条 + 主内容区 + 侧边操作栏 · 两栏布局</p>
+      <div class="layout-mockup">
+        <div class="layout-header">
+          <div style="display: flex; gap: 6px;">
+            <div class="layout-header-dot" style="background: var(--color-red-5);"></div>
+            <div class="layout-header-dot" style="background: var(--color-yellow-5);"></div>
+            <div class="layout-header-dot" style="background: var(--color-green-5);"></div>
+          </div>
+          <div style="font-size: 12px; color: var(--color-text-tertiary);">#T-2024-001 · 项目 Alpha · 进行中</div>
+          <div style="width: 60px;"></div>
+        </div>
+        <div style="padding: var(--spacing-6);">
+          <div style="display: flex; align-items: center; gap: var(--spacing-2); margin-bottom: var(--spacing-5); padding: var(--spacing-3) var(--spacing-4); background: var(--color-blue-1); border: 1px solid var(--color-blue-3); border-radius: var(--radius-md);">
+            <span>🔵</span>
+            <span style="font-size: 14px; font-weight: 500;">当前状态：进行中</span>
+            <span style="font-size: 12px; color: var(--color-text-tertiary); margin-left: auto;">更新于 2024-06-20</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 320px; gap: var(--spacing-5);">
+            <div>
+              <div style="height: 200px; background: var(--color-muted); border-radius: var(--radius-lg); margin-bottom: var(--spacing-4);"></div>
+              <div style="height: 300px; background: var(--color-muted); border-radius: var(--radius-lg);"></div>
+            </div>
+            <div>
+              <div style="background: var(--color-muted); border-radius: var(--radius-lg); padding: var(--spacing-4); margin-bottom: var(--spacing-4);">
+                <div style="font-weight: 600; margin-bottom: var(--spacing-3);">基本信息</div>
+                <div style="font-size: 12px; color: var(--color-text-secondary); line-height: 2;">类型：开发项目<br>负责人：张三<br>优先级：高<br>创建时间：2024-06-01<br>截止时间：2024-07-15</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: var(--spacing-2);">
+                <button class="btn btn-primary" style="width: 100%;">更新状态</button>
+                <button class="btn btn-secondary" style="width: 100%;">编辑信息</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile View -->
+    <div class="component-showcase">
+      <h3>📱 移动端适配 (Mobile)</h3>
+      <p class="specs">单栏布局 · 底部导航 · 全宽卡片 · 触摸友好的 44px+ 点击区域</p>
+      <div style="max-width: 375px; margin: 0 auto;">
+        <div style="border: 1px solid var(--color-border); border-radius: var(--radius-xl); overflow: hidden;">
+          <div style="background: var(--color-surface); padding: var(--spacing-2) var(--spacing-4); display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-tertiary); border-bottom: 1px solid var(--color-border);">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+          </div>
+          <div style="background: var(--color-surface); padding: var(--spacing-3) var(--spacing-4); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--color-border);">
+            <span style="font-weight: bold; font-family: var(--font-heading);">App Name</span>
+            <span>🔔</span>
+          </div>
+          <div style="padding: var(--spacing-4); background: var(--color-background-subtle); min-height: 400px;">
+            <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--spacing-4); margin-bottom: var(--spacing-3);">
+              <div style="display: flex; gap: var(--spacing-3);">
+                <div style="width: 80px; height: 80px; background: var(--color-muted-strong); border-radius: var(--radius-md); flex-shrink: 0;"></div>
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">项目 Alpha</div>
+                  <div style="font-size: 12px; color: var(--color-text-secondary);">开发 · 进行中</div>
+                  <div><span class="badge badge-info" style="margin-top: 4px;">进行中</span></div>
+                </div>
+              </div>
+            </div>
+            <div style="background: var(--color-surface); border-radius: var(--radius-lg); padding: var(--spacing-4); margin-bottom: var(--spacing-3);">
+              <div style="display: flex; gap: var(--spacing-3);">
+                <div style="width: 80px; height: 80px; background: var(--color-muted-strong); border-radius: var(--radius-md); flex-shrink: 0;"></div>
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">项目 Beta</div>
+                  <div style="font-size: 12px; color: var(--color-text-secondary);">设计 · 待审核</div>
+                  <div><span class="badge badge-warning" style="margin-top: 4px;">待审核</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="background: var(--color-surface); border-top: 1px solid var(--color-border); padding: var(--spacing-2) var(--spacing-4); display: flex; justify-content: space-around;">
+            <div style="text-align: center; font-size: 11px; color: var(--color-primary);">🏠<br>首页</div>
+            <div style="text-align: center; font-size: 11px; color: var(--color-text-tertiary);">🔍<br>搜索</div>
+            <div style="text-align: center; font-size: 11px; color: var(--color-text-tertiary);">➕<br>新建</div>
+            <div style="text-align: center; font-size: 11px; color: var(--color-text-tertiary);">💬<br>消息</div>
+            <div style="text-align: center; font-size: 11px; color: var(--color-text-tertiary);">👤<br>我的</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MOTION ═══════════ -->
+<section id="motion" class="section">
+  <div class="container">
+    <h2 class="section-title">动效与交互规范</h2>
+    <p class="section-desc">基于 motion tokens 的动效系统，确保一致且愉悦的交互体验。</p>
+
+    <div class="component-showcase">
+      <h3>缓动函数</h3>
+      <table class="data-table">
+        <thead><tr><th>Token</th><th>值</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><code>--ease-out</code></td><td><code>cubic-bezier(0, 0, 0.2, 1)</code></td><td>元素出现、展开（默认缓出）</td></tr>
+          <tr><td><code>--ease-in</code></td><td><code>cubic-bezier(0.4, 0, 1, 1)</code></td><td>元素消失、收起</td></tr>
+          <tr><td><code>--ease-in-out</code></td><td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td><td>持续动画、循环动画</td></tr>
+          <tr><td><code>--ease-standard</code></td><td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td><td>通用过渡</td></tr>
+          <tr><td><code>--ease-bounce</code></td><td><code>cubic-bezier(0.68, -0.55, 0.265, 1.55)</code></td><td>弹入效果（少量使用）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="component-showcase">
+      <h3>动画时长</h3>
+      <table class="data-table">
+        <thead><tr><th>Token</th><th>时长</th><th>适用场景</th></tr></thead>
+        <tbody>
+          <tr><td><code>--duration-75</code></td><td>75ms</td><td>微交互：按钮按下态、复选框切换</td></tr>
+          <tr><td><code>--duration-100</code></td><td>100ms</td><td>悬浮态变化、tooltip 显示</td></tr>
+          <tr><td><code>--duration-150</code></td><td>150ms</td><td>按钮颜色过渡、输入框聚焦</td></tr>
+          <tr><td><code>--duration-200</code></td><td>200ms</td><td>卡片悬浮、列表项高亮</td></tr>
+          <tr><td><code>--duration-300</code></td><td>300ms</td><td>弹窗打开/关闭、抽屉滑入</td></tr>
+          <tr><td><code>--duration-500</code></td><td>500ms</td><td>页面过渡、复杂动画</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="component-showcase">
+      <h3>交互动效清单</h3>
+      <div style="display: flex; flex-direction: column; gap: var(--spacing-6);">
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">🖱️ 悬浮态 (Hover)</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            按钮：背景色过渡 150ms ease-out · 卡片：上移 2px + 阴影加深 200ms ease-out ·
+            表格行：背景色变化 100ms · 链接：颜色过渡 150ms
+          </p>
+        </div>
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">👆 点击态 (Active/Press)</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            按钮：缩小至 0.97x 75ms ease-out · 卡片：无缩放（避免布局抖动）·
+            输入框：边框颜色 + 外发光 150ms
+          </p>
+        </div>
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">📋 聚焦态 (Focus)</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            所有可聚焦元素：<code>box-shadow: 0 0 0 3px var(--color-primary-subtle)</code> ·
+            边框变为 <code>--color-border-focus</code>（品牌橙色）· 键盘 Tab 导航可见清晰焦点环
+          </p>
+        </div>
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">🔔 通知与反馈</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            Toast：从右上角滑入 300ms ease-out · 5s 后自动消失 300ms ease-in ·
+            加载状态：骨架屏脉冲动画（opacity 0.5 ↔ 1.0 循环 1.5s）·
+            表单验证：错误提示从透明淡入 200ms
+          </p>
+        </div>
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">📄 页面过渡</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            路由切换：内容区淡入 + 轻微上移（opacity 0→1, translateY 8px→0, 300ms ease-out）·
+            弹窗：背景遮罩淡入 + 弹窗缩放从 0.95→1（300ms ease-out）
+          </p>
+        </div>
+        <div>
+          <h4 style="font-family: var(--font-heading); margin-bottom: var(--spacing-2);">✨ 情感化细节</h4>
+          <p style="font-size: 14px; color: var(--color-text-secondary);">
+            成功操作：绿色对勾弹跳动画（--ease-bounce, 500ms）·
+            空状态插画：轻微浮动动画（translateY 循环 ±4px, 3s ease-in-out）·
+            统计数字：计数增加动画（数字滚动 800ms ease-out）
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="doc-footer">
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-4);">
+    <div>
+      <strong>PawHaven Design System</strong> v1.0.0<br>
+      <span style="font-size: 12px;">基于 @pawhaven/design-system tokens 构建</span>
+    </div>
+    <div style="font-size: 12px;">Built with ❤️</div>
+  </div>
+</footer>
+
+</body>
+</html>
