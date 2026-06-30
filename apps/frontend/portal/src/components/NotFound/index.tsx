@@ -11,11 +11,11 @@ const goToHome = () => {
   window.location.href = '/';
 };
 
-interface NotFundProps {
+interface NotFoundProps {
   error?: Partial<ErrorInfo>;
 }
 
-export const NotFund = ({ error }: NotFundProps) => {
+export const NotFound = ({ error }: NotFoundProps) => {
   const { t } = useTranslation();
   const isStableEnv = useIsStableEnv();
 

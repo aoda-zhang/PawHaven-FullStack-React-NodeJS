@@ -45,8 +45,8 @@ Never:
 Follow the current repository implementation, not legacy patterns:
 
 1. JWT verification and proactive refresh are handled in `gateway`:
-   - `JwtRefreshMiddleware` runs first
-   - `JwtVerificationMiddleware` runs second
+   - `JwtRefreshGuard` runs first
+   - `JwtVerificationGuard` runs second
 2. `auth-service` handles token issuing and rotation (`/login`, `/register`, `/refresh`, `/logout`)
 3. Frontend should not rely on active `/auth/verify` calls
 4. Auth state flows via cookies plus gateway-injected headers (e.g. `X-Auth-User-Id`)
