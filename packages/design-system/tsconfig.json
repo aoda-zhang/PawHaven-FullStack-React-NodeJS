@@ -1,5 +1,5 @@
 {
-  "extends": "@pawhaven/tsconfig/web.json",
+  "extends": "@pawhaven/tsconfig/web",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"
