@@ -82,10 +82,8 @@ Detailed documentation can be found in the `/docs` directory.
 
 | Document | Description |
 |----------|-------------|
-| [Product Strategy (EN)](./docs/PawHaven-Product-Strategy-EN.md) | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
-| [Product Strategy (中文)](./docs/PawHaven-Product-Strategy.md) | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
-| [System Architecture (EN)](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs |
-| [System Architecture (中文)](./docs/PawHaven-System-Architecture-CN.md) | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录 |
+| [Product Strategy](./docs/PawHaven-Product-Strategy-EN.md) | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
+| [System Architecture](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs |
 | [Design System](./packages/design-system/README.MD) | Design tokens, Tailwind v4 + MUI v7 theme, CSS utilities |
 
 ### Engineering
