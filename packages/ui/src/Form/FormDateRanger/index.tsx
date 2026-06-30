@@ -16,7 +16,7 @@ type FormSingleDateRangerProps = BaseFormType &
 export const FormDateRanger = ({
   name,
   label,
-  defaultValue = [null, null],
+  defaultValue,
   fullWidth = true,
   ...props
 }: FormSingleDateRangerProps) => {

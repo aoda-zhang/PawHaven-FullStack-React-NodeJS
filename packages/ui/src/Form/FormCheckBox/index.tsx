@@ -12,9 +12,10 @@ import type { BaseFormType } from '../formBase.type';
 export const FormCheckbox = ({
   name,
   label,
-  defaultValue = false,
+  defaultValue,
   ...props
-}: BaseFormType & CheckboxProps) => {
+}: BaseFormType &
+  Omit<CheckboxProps, 'defaultValue'> & { defaultValue?: boolean }) => {
   const { control } = useFormContext();
 
   return (
@@ -23,14 +24,14 @@ export const FormCheckbox = ({
       control={control}
       defaultValue={defaultValue}
       render={({ field, fieldState: { error } }) => (
-        <div className={clsx([props?.className, 'baseFormContainer'])}>
+        <div className={clsx([props.className, 'baseFormContainer'])}>
           <FormControlLabel
             control={
               <Checkbox
-                {...field}
                 {...props}
+                {...field}
                 checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
+                onChange={(_e, checked) => field.onChange(checked)}
               />
             }
             label={label}
