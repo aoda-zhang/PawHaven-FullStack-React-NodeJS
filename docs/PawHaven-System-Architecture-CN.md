@@ -1,6 +1,6 @@
 # PawHaven — 系统架构设计（修订版）
 
-> **版本**: v2.0 | **日期**: 2025-07-01 | **架构师**: 软件架构师  
+> **版本**: v2.0 | **日期**: 2024-12-01
 > **基于**: [PawHaven-Product-Strategy.md](./PawHaven-Product-Strategy.md)  
 > **设计哲学**: 务实的服务拆分。core-service 内部采用模块化单体。仅在必要时提取。
 
@@ -33,18 +33,19 @@
 
 ### 核心原则
 
-| # | 原则 | 含义 |
-|---|------|------|
-| P1 | **按运维需求拆分，而非按领域数量拆分** | 仅当需要独立扩缩、不同技术栈、独立团队或不同部署节奏时才提取服务 |
-| P2 | **单体优先，模块始终** | core-service 是单个可部署单元。内部每个限界上下文都是严格的 NestJS 模块 |
-| P3 | **内部模块 = 未来的服务** | 模块边界由 lint 规则强制执行。提取只是部署变更，不是代码重写 |
-| P4 | **网关作为唯一对外入口** | 所有外部流量经过网关。内部服务绝不暴露到公网 |
-| P5 | **内部事件驱动，之间 REST** | core-service 内部模块间用进程内 EventEmitter。服务间通过网关代理的 HTTP 通信 |
-| P6 | **一个数据库，逻辑分区** | MongoDB 采用按模块命名的集合。仅当法律或运维要求时才分离数据库 |
+| #   | 原则                                   | 含义                                                                         |
+| --- | -------------------------------------- | ---------------------------------------------------------------------------- |
+| P1  | **按运维需求拆分，而非按领域数量拆分** | 仅当需要独立扩缩、不同技术栈、独立团队或不同部署节奏时才提取服务             |
+| P2  | **单体优先，模块始终**                 | core-service 是单个可部署单元。内部每个限界上下文都是严格的 NestJS 模块      |
+| P3  | **内部模块 = 未来的服务**              | 模块边界由 lint 规则强制执行。提取只是部署变更，不是代码重写                 |
+| P4  | **网关作为唯一对外入口**               | 所有外部流量经过网关。内部服务绝不暴露到公网                                 |
+| P5  | **内部事件驱动，之间 REST**            | core-service 内部模块间用进程内 EventEmitter。服务间通过网关代理的 HTTP 通信 |
+| P6  | **一个数据库，逻辑分区**               | MongoDB 采用按模块命名的集合。仅当法律或运维要求时才分离数据库               |
 
 ### 提取触发规则
 
 > **不满足以下至少两个条件，不从 core-service 提取模块：**
+>
 > 1. 需要**独立扩缩**（不同的流量/负载模式）
 > 2. 需要**不同技术栈**（如用 Python 做 ML 匹配）
 > 3. **不同团队**负责
@@ -106,13 +107,13 @@
 
 ### 2.2 为什么每个服务独立存在
 
-| # | 服务 | 为什么独立？ | 如果合并会怎样？ |
-|---|------|-------------|----------------|
-| 1 | **gateway** | 无状态。处理所有流量。需要独立水平扩缩。TLS 终止、限流、CORS——基础设施关注点，非业务逻辑。 | 合并进 core-service 会将基础设施扩缩与业务逻辑扩缩耦合。网关可能需要 5 个 pod，而 core 只需 2 个。 |
-| 2 | **auth-service** | 不同安全姿态。持有 bcrypt 哈希 + JWT 密钥。独立安全审计。认证挂了全站不可用——需要熔断。 | 合并进 core-service 意味着任何 core 部署都可能影响认证可用性。安全审计范围扩大到所有业务代码。 |
-| 3 | **core-service** | 模块化单体。7 个业务模块作为严格 NestJS 模块存在于此。单部署、单数据库。内部模块边界由 lint 规则强制。 | 这就是合并目标。所有不需要运维隔离的东西都在这。 |
-| 4 | **document-service** | 重量级依赖（Puppeteer ~300MB）。不同资源画像——PDF 生成时 CPU/内存激增。不同扩缩模型。 | 合并进 core-service 意味着每个 core pod 都携带 Puppeteer。PDF 生成激增影响救助 API 延迟。 |
-| 5 | **config-service** | 目前提供静态菜单/路由配置。未来：集中化功能开关、动态配置。独立部署使得配置变更无需 core-service 重新部署。 | 今天可以合并进 core-service。保留独立是为了未来的集中化配置策略。三个月后重新评估。 |
+| #   | 服务                 | 为什么独立？                                                                                                | 如果合并会怎样？                                                                                   |
+| --- | -------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| 1   | **gateway**          | 无状态。处理所有流量。需要独立水平扩缩。TLS 终止、限流、CORS——基础设施关注点，非业务逻辑。                  | 合并进 core-service 会将基础设施扩缩与业务逻辑扩缩耦合。网关可能需要 5 个 pod，而 core 只需 2 个。 |
+| 2   | **auth-service**     | 不同安全姿态。持有 bcrypt 哈希 + JWT 密钥。独立安全审计。认证挂了全站不可用——需要熔断。                     | 合并进 core-service 意味着任何 core 部署都可能影响认证可用性。安全审计范围扩大到所有业务代码。     |
+| 3   | **core-service**     | 模块化单体。7 个业务模块作为严格 NestJS 模块存在于此。单部署、单数据库。内部模块边界由 lint 规则强制。      | 这就是合并目标。所有不需要运维隔离的东西都在这。                                                   |
+| 4   | **document-service** | 重量级依赖（Puppeteer ~300MB）。不同资源画像——PDF 生成时 CPU/内存激增。不同扩缩模型。                       | 合并进 core-service 意味着每个 core pod 都携带 Puppeteer。PDF 生成激增影响救助 API 延迟。          |
+| 5   | **config-service**   | 目前提供静态菜单/路由配置。未来：集中化功能开关、动态配置。独立部署使得配置变更无需 core-service 重新部署。 | 今天可以合并进 core-service。保留独立是为了未来的集中化配置策略。三个月后重新评估。                |
 
 ### 2.3 服务间通信
 
@@ -253,8 +254,8 @@ apps/backend/core-service/src/modules/
 @Injectable()
 export class SubmitReportUseCase {
   constructor(
-    private readonly eventBus: EventEmitter2,  // NestJS 事件总线
-    private readonly prisma: PrismaClient,       // 本模块的数据库访问
+    private readonly eventBus: EventEmitter2, // NestJS 事件总线
+    private readonly prisma: PrismaClient, // 本模块的数据库访问
   ) {}
 
   async execute(dto: SubmitReportDto): Promise<StrayReport> {
@@ -290,9 +291,7 @@ export class SubmitReportUseCase {
 
 @Injectable()
 export class RescueEventHandlers {
-  constructor(
-    private readonly createRescueCase: CreateRescueCaseUseCase,
-  ) {}
+  constructor(private readonly createRescueCase: CreateRescueCaseUseCase) {}
 
   @OnEvent('stray.animal.reported')
   async handleStrayReported(event: StrayAnimalReportedEvent) {
@@ -312,6 +311,7 @@ export class RescueEventHandlers {
 ```
 
 **关键点：**
+
 - Reporting 模块**不导入** Rescue 模块的任何东西
 - Reporting 模块**不知道** RescueCase 是如何创建的
 - 通过类型化事件（定义在 `@pawhaven/shared` 中）通信
@@ -361,67 +361,67 @@ export class RescueEventHandlers {
 
 #### 救助模块（系统心脏）
 
-| 维度 | 详情 |
-|------|------|
-| **职责** | 救助案例全生命周期：创建 → 7 阶段状态机 → 时间线 → 结局 |
-| **核心聚合** | `RescueCase`（救助案例）、`StatusTransition`（状态转换/时间线条目） |
-| **不变性约束** | 状态只能沿定义路径转换；每次转换记录时间戳 + 操作人 |
-| **拥有的集合** | `rescue_cases`、`rescue_transitions` |
-| **发布事件** | `RescueCaseReported`、`RescueStatusChanged`、`RescueCaseCompleted` |
-| **订阅事件** | `StrayAnimalReported`、`VolunteerClaimed`、`AdoptionFinalized` |
+| 维度           | 详情                                                                |
+| -------------- | ------------------------------------------------------------------- |
+| **职责**       | 救助案例全生命周期：创建 → 7 阶段状态机 → 时间线 → 结局             |
+| **核心聚合**   | `RescueCase`（救助案例）、`StatusTransition`（状态转换/时间线条目） |
+| **不变性约束** | 状态只能沿定义路径转换；每次转换记录时间戳 + 操作人                 |
+| **拥有的集合** | `rescue_cases`、`rescue_transitions`                                |
+| **发布事件**   | `RescueCaseReported`、`RescueStatusChanged`、`RescueCaseCompleted`  |
+| **订阅事件**   | `StrayAnimalReported`、`VolunteerClaimed`、`AdoptionFinalized`      |
 
 #### 上报模块
 
-| 维度 | 详情 |
-|------|------|
-| **职责** | 流浪动物上报录入：照片、GPS、状态评估、紧急程度自动判定 |
-| **核心聚合** | `StrayReport`（流浪上报）、`UrgencyAssessment`（紧急评估） |
-| **不变性约束** | 上报必须有照片 + 位置 + 动物类型；紧急程度自动计算 |
-| **拥有的集合** | `stray_reports`、`urgency_assessments` |
-| **发布事件** | `StrayAnimalReported` |
-| **订阅事件** | 无（仅上游） |
+| 维度           | 详情                                                       |
+| -------------- | ---------------------------------------------------------- |
+| **职责**       | 流浪动物上报录入：照片、GPS、状态评估、紧急程度自动判定    |
+| **核心聚合**   | `StrayReport`（流浪上报）、`UrgencyAssessment`（紧急评估） |
+| **不变性约束** | 上报必须有照片 + 位置 + 动物类型；紧急程度自动计算         |
+| **拥有的集合** | `stray_reports`、`urgency_assessments`                     |
+| **发布事件**   | `StrayAnimalReported`                                      |
+| **订阅事件**   | 无（仅上游）                                               |
 
 #### 领养模块
 
-| 维度 | 详情 |
-|------|------|
-| **职责** | 领养列表、申请、匹配、审批、领养后回访 |
-| **核心聚合** | `AdoptionListing`（领养列表）、`AdoptionApplication`（领养申请）、`AdoptionAgreement`（领养协议） |
-| **不变性约束** | 只有"待领养"状态的动物可被发布；一个动物 = 一个活跃列表 |
-| **拥有的集合** | `adoption_listings`、`adoption_applications`、`adoption_agreements` |
-| **发布事件** | `AdoptionFinalized`、`AdoptionApplicationSubmitted` |
-| **订阅事件** | `RescueStatusChanged`（转为"awaitingAdoption"时） |
+| 维度           | 详情                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| **职责**       | 领养列表、申请、匹配、审批、领养后回访                                                            |
+| **核心聚合**   | `AdoptionListing`（领养列表）、`AdoptionApplication`（领养申请）、`AdoptionAgreement`（领养协议） |
+| **不变性约束** | 只有"待领养"状态的动物可被发布；一个动物 = 一个活跃列表                                           |
+| **拥有的集合** | `adoption_listings`、`adoption_applications`、`adoption_agreements`                               |
+| **发布事件**   | `AdoptionFinalized`、`AdoptionApplicationSubmitted`                                               |
+| **订阅事件**   | `RescueStatusChanged`（转为"awaitingAdoption"时）                                                 |
 
 #### 内容模块（故事 + 知识库）
 
-| 维度 | 详情 |
-|------|------|
-| **职责** | 爱心故事、知识库文章、内容审核 |
-| **核心聚合** | `Story`（故事）、`KnowledgeArticle`（知识文章）、`ContentReview`（内容审核） |
-| **不变性约束** | 故事必须引用已完成的救助案例；医疗文章需专家审核 |
-| **拥有的集合** | `stories`、`knowledge_articles`、`content_reviews`、`tags` |
-| **发布事件** | `StoryPublished`、`ArticlePublished` |
-| **订阅事件** | `RescueCaseCompleted`（触发故事撰写邀请） |
+| 维度           | 详情                                                                         |
+| -------------- | ---------------------------------------------------------------------------- |
+| **职责**       | 爱心故事、知识库文章、内容审核                                               |
+| **核心聚合**   | `Story`（故事）、`KnowledgeArticle`（知识文章）、`ContentReview`（内容审核） |
+| **不变性约束** | 故事必须引用已完成的救助案例；医疗文章需专家审核                             |
+| **拥有的集合** | `stories`、`knowledge_articles`、`content_reviews`、`tags`                   |
+| **发布事件**   | `StoryPublished`、`ArticlePublished`                                         |
+| **订阅事件**   | `RescueCaseCompleted`（触发故事撰写邀请）                                    |
 
 #### 志愿者模块
 
-| 维度 | 详情 |
-|------|------|
-| **职责** | 志愿者资料、能力匹配、案例认领、可用性管理 |
-| **核心聚合** | `VolunteerProfile`（志愿者资料）、`CaseClaim`（案例认领）、`VolunteerStats`（志愿者统计） |
-| **不变性约束** | 每志愿者每案例一个活跃认领；能力必须匹配案例需求 |
-| **拥有的集合** | `volunteer_profiles`、`case_claims`、`volunteer_stats` |
-| **发布事件** | `VolunteerClaimed`、`VolunteerUnavailable` |
-| **订阅事件** | `RescueCaseReported`（触发匹配 + 通知） |
+| 维度           | 详情                                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| **职责**       | 志愿者资料、能力匹配、案例认领、可用性管理                                                |
+| **核心聚合**   | `VolunteerProfile`（志愿者资料）、`CaseClaim`（案例认领）、`VolunteerStats`（志愿者统计） |
+| **不变性约束** | 每志愿者每案例一个活跃认领；能力必须匹配案例需求                                          |
+| **拥有的集合** | `volunteer_profiles`、`case_claims`、`volunteer_stats`                                    |
+| **发布事件**   | `VolunteerClaimed`、`VolunteerUnavailable`                                                |
+| **订阅事件**   | `RescueCaseReported`（触发匹配 + 通知）                                                   |
 
 ### 4.3 模块详情（支撑/通用域）
 
-| 模块 | 类型 | 职责 | 拥有的集合 |
-|------|------|------|-----------|
-| **Notification** | 仅订阅 | 消费领域事件 → 推送/邮件/站内通知 | `notifications`、`notification_preferences` |
-| **Achievement** | 仅订阅 | 消费领域事件 → 徽章/里程碑计算 | `achievements`、`milestones` |
-| **Profile** | 只读聚合 | 跨模块聚合用户数据（上报、救助、领养、故事） | 无（读取其他模块的 service） |
-| **Bootstrap** | 系统 | 菜单/路由配置、应用初始化（已有） | `menus`、`routes`、`roles`、`permissions` |
+| 模块             | 类型     | 职责                                         | 拥有的集合                                  |
+| ---------------- | -------- | -------------------------------------------- | ------------------------------------------- |
+| **Notification** | 仅订阅   | 消费领域事件 → 推送/邮件/站内通知            | `notifications`、`notification_preferences` |
+| **Achievement**  | 仅订阅   | 消费领域事件 → 徽章/里程碑计算               | `achievements`、`milestones`                |
+| **Profile**      | 只读聚合 | 跨模块聚合用户数据（上报、救助、领养、故事） | 无（读取其他模块的 service）                |
+| **Bootstrap**    | 系统     | 菜单/路由配置、应用初始化（已有）            | `menus`、`routes`、`roles`、`permissions`   |
 
 ---
 
@@ -556,14 +556,14 @@ export class RescueEventHandlers {
 
 ### 6.2 数据访问规则
 
-| 规则 | 执行方式 |
-|------|---------|
-| 每个模块拥有自己的集合 | 仅拥有模块的 Prisma service 访问其集合 |
-| 跨模块数据访问 | 通过拥有模块的公开 service 类，绝不直接访问数据库 |
-| 集合命名 | `{module}_{entity}` — 明确所有权，便于未来数据库拆分 |
-| 共享 Prisma 扩展 | 软删除 + 版本控制通过 `@pawhaven/backend-core` — 应用于所有模块 |
-| 地理查询 | MongoDB `$near` 通过 Prisma 原始查询（志愿者模块） |
-| 全文搜索 | MongoDB Atlas Search 在 `knowledge_articles` 集合上（内容模块） |
+| 规则                   | 执行方式                                                        |
+| ---------------------- | --------------------------------------------------------------- |
+| 每个模块拥有自己的集合 | 仅拥有模块的 Prisma service 访问其集合                          |
+| 跨模块数据访问         | 通过拥有模块的公开 service 类，绝不直接访问数据库               |
+| 集合命名               | `{module}_{entity}` — 明确所有权，便于未来数据库拆分            |
+| 共享 Prisma 扩展       | 软删除 + 版本控制通过 `@pawhaven/backend-core` — 应用于所有模块 |
+| 地理查询               | MongoDB `$near` 通过 Prisma 原始查询（志愿者模块）              |
+| 全文搜索               | MongoDB Atlas Search 在 `knowledge_articles` 集合上（内容模块） |
 
 ---
 
@@ -666,14 +666,14 @@ core-service 内部（NestJS EventEmitter2）：
 
 ### 9.1 各包职责边界
 
-| 包 | 包含内容 | 不得包含 |
-|----|---------|---------|
-| `@pawhaven/shared` | Zod Schema、TypeScript 类型、常量、事件定义、纯工具函数 | React 代码、NestJS 代码、数据库逻辑 |
-| `@pawhaven/backend-core` | SharedModule、PrismaModule、HttpClientModule、装饰器、守卫、拦截器、Prisma 扩展 | 业务逻辑、领域实体 |
-| `@pawhaven/frontend-core` | React hooks、API 客户端、存储工具、懒加载辅助 | 业务相关组件 |
-| `@pawhaven/design-system` | CSS Token、Tailwind 主题、MUI 主题、CSS 工具类 | React 组件 |
-| `@pawhaven/ui` | 可复用 React 组件（Form*、Loading、Toast 等） | 业务逻辑、API 调用 |
-| `@pawhaven/i18n` | 翻译 Provider、语言文件、语言检测 | 业务内容 |
+| 包                        | 包含内容                                                                        | 不得包含                            |
+| ------------------------- | ------------------------------------------------------------------------------- | ----------------------------------- |
+| `@pawhaven/shared`        | Zod Schema、TypeScript 类型、常量、事件定义、纯工具函数                         | React 代码、NestJS 代码、数据库逻辑 |
+| `@pawhaven/backend-core`  | SharedModule、PrismaModule、HttpClientModule、装饰器、守卫、拦截器、Prisma 扩展 | 业务逻辑、领域实体                  |
+| `@pawhaven/frontend-core` | React hooks、API 客户端、存储工具、懒加载辅助                                   | 业务相关组件                        |
+| `@pawhaven/design-system` | CSS Token、Tailwind 主题、MUI 主题、CSS 工具类                                  | React 组件                          |
+| `@pawhaven/ui`            | 可复用 React 组件（Form\*、Loading、Toast 等）                                  | 业务逻辑、API 调用                  |
+| `@pawhaven/i18n`          | 翻译 Provider、语言文件、语言检测                                               | 业务内容                            |
 
 ---
 
@@ -701,13 +701,13 @@ apps/frontend/portal/src/
 
 ### 10.2 状态管理策略
 
-| 状态类型 | 工具 | 理由 |
-|---------|------|------|
-| **服务端状态** | **TanStack Query** | 内置缓存、后台刷新、乐观更新、分页 |
-| **客户端状态** | **Redux Toolkit**（已有） | 认证状态、UI 开关 |
-| **表单状态** | **React Hook Form + Zod** | 已有模式，类型安全校验 |
-| **URL 状态** | **React Router search params** | 可分享、可收藏、支持浏览器后退 |
-| **持久化状态** | **Redux Persist + localStorage** | 认证 Token、偏好设置 |
+| 状态类型       | 工具                             | 理由                               |
+| -------------- | -------------------------------- | ---------------------------------- |
+| **服务端状态** | **TanStack Query**               | 内置缓存、后台刷新、乐观更新、分页 |
+| **客户端状态** | **Redux Toolkit**（已有）        | 认证状态、UI 开关                  |
+| **表单状态**   | **React Hook Form + Zod**        | 已有模式，类型安全校验             |
+| **URL 状态**   | **React Router search params**   | 可分享、可收藏、支持浏览器后退     |
+| **持久化状态** | **Redux Persist + localStorage** | 认证 Token、偏好设置               |
 
 ---
 
@@ -732,16 +732,16 @@ apps/frontend/portal/src/
 
 ### 11.2 安全分层
 
-| 层次 | 机制 |
-|------|------|
-| 传输层 | HTTPS (TLS 1.3) |
-| 认证 | JWT (RS256)，网关层校验 |
-| 授权 | RBAC — 角色 + 权限，网关 + 服务双重检查 |
-| 输入校验 | Zod Schema，通过 nestjs-zod 全局管道 |
-| 限流 | 每 IP + 每用户令牌桶，网关层 |
+| 层次     | 机制                                                |
+| -------- | --------------------------------------------------- |
+| 传输层   | HTTPS (TLS 1.3)                                     |
+| 认证     | JWT (RS256)，网关层校验                             |
+| 授权     | RBAC — 角色 + 权限，网关 + 服务双重检查             |
+| 输入校验 | Zod Schema，通过 nestjs-zod 全局管道                |
+| 限流     | 每 IP + 每用户令牌桶，网关层                        |
 | 数据隐私 | GPS 模糊化（displayArea，救助完成后不显示精确坐标） |
-| CSRF | SameSite Cookie + Token Header |
-| CORS | 按环境白名单域名 |
+| CSRF     | SameSite Cookie + Token Header                      |
+| CORS     | 按环境白名单域名                                    |
 
 ---
 
@@ -812,57 +812,57 @@ GET /health/ready → 就绪探针 (k8s)
 
 ### ADR-001: core-service 内部采用模块化单体
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 产品策略定义了 7 个业务模块。过早的微服务拆分增加了分布式复杂度，却未被证明有价值。所有模块共享 NestJS + MongoDB 技术栈、同一团队、同一部署节奏。 |
-| **决策** | 所有 7 个业务模块作为严格 NestJS 模块存在于 core-service 内部。模块边界由 ESLint 规则强制执行。通过进程内 EventEmitter2 通信。 |
+| 字段     | 内容                                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **状态** | 已接受                                                                                                                                                   |
+| **背景** | 产品策略定义了 7 个业务模块。过早的微服务拆分增加了分布式复杂度，却未被证明有价值。所有模块共享 NestJS + MongoDB 技术栈、同一团队、同一部署节奏。        |
+| **决策** | 所有 7 个业务模块作为严格 NestJS 模块存在于 core-service 内部。模块边界由 ESLint 规则强制执行。通过进程内 EventEmitter2 通信。                           |
 | **后果** | **更容易**: 快速迭代、简单部署、模块间零网络开销、容易调试。**更困难**: 必须保持模块边界纪律；存在意外耦合风险。通过 lint 规则 + CI 架构适应度函数缓解。 |
 
 ### ADR-002: 5 服务拆分理由
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 需要确定哪些能力值得拥有自己的可部署单元，哪些留在 core-service 中。 |
-| **决策** | 5 个服务：gateway（无状态、扩缩）、auth（安全隔离）、core（模块化单体）、document（重量依赖、不同资源画像）、config（独立部署以支持配置变更）。 |
+| 字段     | 内容                                                                                                                                                     |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **状态** | 已接受                                                                                                                                                   |
+| **背景** | 需要确定哪些能力值得拥有自己的可部署单元，哪些留在 core-service 中。                                                                                     |
+| **决策** | 5 个服务：gateway（无状态、扩缩）、auth（安全隔离）、core（模块化单体）、document（重量依赖、不同资源画像）、config（独立部署以支持配置变更）。          |
 | **后果** | **更容易**: 每个服务独立扩缩，auth 可隔离安全审计，PDF 生成不影响 API 延迟。**更困难**: 5 个可部署单元需要管理。可接受——每个都有明确独立存在的运维理由。 |
 
 ### ADR-003: MongoDB 按模块命名集合
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 所有 core-service 模块共享一个 MongoDB 数据库。需要防止意外的跨模块数据访问，同时保持运维简单。 |
-| **决策** | 单数据库 `pawhaven-core`，集合命名约定 `{module}_{entity}`。每个模块的 Prisma service 仅访问自己的集合。跨模块数据访问仅通过公开 service 类。 |
+| 字段     | 内容                                                                                                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **状态** | 已接受                                                                                                                                                                   |
+| **背景** | 所有 core-service 模块共享一个 MongoDB 数据库。需要防止意外的跨模块数据访问，同时保持运维简单。                                                                          |
+| **决策** | 单数据库 `pawhaven-core`，集合命名约定 `{module}_{entity}`。每个模块的 Prisma service 仅访问自己的集合。跨模块数据访问仅通过公开 service 类。                            |
 | **后果** | **更容易**: 单个数据库运维、备份、监控。**更困难**: 模块间无数据库级访问控制（通过代码级强制执行缓解）。未来：若模块需要数据隔离，将其集合拆分为独立数据库——代码零改动。 |
 
 ### ADR-004: Zod 用于共享 Schema 校验
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 需要类型安全的校验，在前端（表单校验）和后端（请求校验）中工作方式一致。 |
+| 字段     | 内容                                                                                                                                                  |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **状态** | 已接受                                                                                                                                                |
+| **背景** | 需要类型安全的校验，在前端（表单校验）和后端（请求校验）中工作方式一致。                                                                              |
 | **决策** | 所有 DTO、事件 Schema 和领域类型在 `@pawhaven/shared` 中以 Zod Schema 定义。前端通过 `@hookform/resolvers/zod` 使用。后端使用 `nestjs-zod` 校验管道。 |
-| **后果** | 校验的单一真相来源。自动 TypeScript 类型推断。前端 Zod ~12KB gzipped——可接受。 |
+| **后果** | 校验的单一真相来源。自动 TypeScript 类型推断。前端 Zod ~12KB gzipped——可接受。                                                                        |
 
 ### ADR-005: 进程内事件 → 未来消息代理
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 模块需要响应其他模块的变更，但不希望紧耦合。 |
-| **决策** | Phase 1: NestJS EventEmitter2（进程内）。Phase 3+: 仅当模块从 core-service 提取时才迁移到消息代理。 |
+| 字段     | 内容                                                                                                                       |
+| -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **状态** | 已接受                                                                                                                     |
+| **背景** | 模块需要响应其他模块的变更，但不希望紧耦合。                                                                               |
+| **决策** | Phase 1: NestJS EventEmitter2（进程内）。Phase 3+: 仅当模块从 core-service 提取时才迁移到消息代理。                        |
 | **后果** | **更容易**: 零基础设施、零延迟、简单调试。**更困难**: 进程重启时事件丢失（Phase 1 可接受——事件不是记录系统，数据库才是）。 |
 
 ### ADR-006: 基于功能的前端模块
 
-| 字段 | 内容 |
-|------|------|
-| **状态** | 已接受 |
-| **背景** | 7 个产品模块需要清晰的前端组织。 |
+| 字段     | 内容                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------- |
+| **状态** | 已接受                                                                                             |
+| **背景** | 7 个产品模块需要清晰的前端组织。                                                                   |
 | **决策** | `features/{module}/`，每个功能含 apis/、components/、hooks/、types.ts、index.tsx。禁止跨功能导入。 |
-| **后果** | 清晰所有权、独立开发、更容易代码分割。Lint 规则强制执行功能隔离。 |
+| **后果** | 清晰所有权、独立开发、更容易代码分割。Lint 规则强制执行功能隔离。                                  |
 
 ---
 
@@ -917,18 +917,19 @@ echo "✅ 模块边界干净"
 
 ### 16.1 务实的平衡
 
-| 关注点 | 如何解决 |
-|--------|---------|
-| **可扩展性** | Gateway + core 独立扩缩。Document 独立扩缩（重量级 PDF）。 |
-| **可维护性** | 7 个模块，强制边界。每个模块独立可理解。 |
-| **可扩展性** | 新产品模块 = `modules/` 中的新文件夹。无需新服务。 |
+| 关注点       | 如何解决                                                     |
+| ------------ | ------------------------------------------------------------ |
+| **可扩展性** | Gateway + core 独立扩缩。Document 独立扩缩（重量级 PDF）。   |
+| **可维护性** | 7 个模块，强制边界。每个模块独立可理解。                     |
+| **可扩展性** | 新产品模块 = `modules/` 中的新文件夹。无需新服务。           |
 | **可部署性** | 5 个服务。每个都有明确的存在理由。没有"为了微服务而微服务"。 |
-| **可观测性** | 结构化日志带 module 标签。Trace ID 跨所有服务。 |
-| **面向未来** | 模块可提取为独立服务而无需代码改动——仅部署配置变更。 |
+| **可观测性** | 结构化日志带 module 标签。Trace ID 跨所有服务。              |
+| **面向未来** | 模块可提取为独立服务而无需代码改动——仅部署配置变更。         |
 
 ### 16.2 何时添加第 6 个服务
 
 > **仅当某个模块满足以下至少两个条件时：**
+>
 > 1. 需要独立扩缩（如通知模块流量增长 10 倍）
 > 2. 需要不同技术栈（如用 Python ML 做领养匹配）
 > 3. 不同团队接管
