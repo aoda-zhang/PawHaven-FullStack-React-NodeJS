@@ -78,13 +78,25 @@ You can use the Discord server to:
 
 Detailed documentation can be found in the `/docs` directory.
 
-- [Application Overview](./docs/application_overview.md)
-- [Architecture Design](./docs/architecture_design.md)
-- [Project Structure](./docs/project_structure.md)
-- [Monorepo & Project Standards](./docs/project_standards.md)
-- [Authentication & Authorization Architecture](./docs/authentication_architecture.md)
-- [Route-Level Authentication](./docs/route_authentication.md)
-- [Design System](./packages/design-system/README.MD)
+### Product & Architecture
+
+| Document | Description |
+|----------|-------------|
+| [Product Strategy (EN)](./docs/PawHaven-Product-Strategy-EN.md) | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
+| [Product Strategy (中文)](./docs/PawHaven-Product-Strategy.md) | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
+| [System Architecture (EN)](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs |
+| [System Architecture (中文)](./docs/PawHaven-System-Architecture-CN.md) | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录 |
+| [Design System](./packages/design-system/README.MD) | Design tokens, Tailwind v4 + MUI v7 theme, CSS utilities |
+
+### Engineering
+
+| Document | Description |
+|----------|-------------|
+| [Application Overview](./docs/application_overview.md) | High-level application overview |
+| [Project Structure](./docs/project_structure.md) | Monorepo layout and module organization |
+| [Monorepo & Project Standards](./docs/project_standards.md) | Coding conventions, tooling, workflows |
+| [Authentication & Authorization Architecture](./docs/authentication_architecture.md) | JWT-based auth flow and RBAC design |
+| [Route-Level Authentication](./docs/route_authentication.md) | Frontend route guard implementation |
 
 ---
 

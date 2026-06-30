@@ -75,11 +75,25 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 详细文档请查看 `/docs` 目录：
 
-- [应用概览](./docs/application_overview.md)
-- [架构设计](./docs/architecture_design.md)
-- [项目结构](./docs/project_structure.md)
-- [Monorepo 与项目规范](./docs/project_standards.md)
-- [身份认证与授权架构](./docs/authentication_architecture.md)
+### 产品与架构
+
+| 文档 | 说明 |
+|------|------|
+| [产品策略 (中文)](./docs/PawHaven-Product-Strategy.md) | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
+| [产品策略 (EN)](./docs/PawHaven-Product-Strategy-EN.md) | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
+| [系统架构 (中文)](./docs/PawHaven-System-Architecture-CN.md) | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录 |
+| [系统架构 (EN)](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs |
+| [设计系统](./packages/design-system/README.MD) | Design tokens、Tailwind v4 + MUI v7 主题、CSS 工具类 |
+
+### 工程
+
+| 文档 | 说明 |
+|------|------|
+| [应用概览](./docs/application_overview.md) | 应用高层概览 |
+| [项目结构](./docs/project_structure.md) | Monorepo 布局与模块组织 |
+| [Monorepo 与项目规范](./docs/project_standards.md) | 编码规范、工具链、工作流 |
+| [身份认证与授权架构](./docs/authentication_architecture.md) | JWT 认证流程与 RBAC 设计 |
+| [路由级认证](./docs/route_authentication.md) | 前端路由守卫实现 |
 
 ---
 
