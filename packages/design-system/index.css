@@ -3,7 +3,7 @@
    ============================================================
    1. tailwindcss (base)
    2. tokens   (via tokens/index.css barrel)
-   3. theme    (semantic mappings + dark mode)
+   3. theme    (semantic mappings)
    4. utilities (custom utilities + component styles)
    ============================================================ */
 
@@ -12,14 +12,11 @@
 /* 1. Tokens — barrel import */
 @import './tokens/index.css';
 
-/* 2. Theme — Semantic mappings + dark mode overrides */
+/* 2. Theme — Semantic mappings */
 @import './theme.css';
 
 /* 3. Utilities — Custom utilities + component styles */
 @import './utilities.css';
-
-/* ── Dark mode variant registration ─────────────────────── */
-@custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Base styles ─────────────────────────────────────────── */
 

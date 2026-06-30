@@ -5,7 +5,7 @@ Shared design tokens, theme, utilities, and MUI theme for the PawHaven monorepo.
 ## Quick Start
 
 ```ts
-// CSS entry — imports tokens, theme, dark mode, utilities, and base styles
+// CSS entry — imports tokens, theme, utilities, and base styles
 import '@pawhaven/design-system/styles.css';
 
 // TypeScript token access
@@ -13,9 +13,6 @@ import { color, spacing, radius, tokenVar } from '@pawhaven/design-system';
 
 // MUI theme (MUI v7, cssVariables mode)
 import { MUITheme } from '@pawhaven/design-system/theme';
-
-// Dark mode hook
-import { useColorScheme } from '@pawhaven/design-system';
 ```
 
 ## Package Structure
@@ -23,7 +20,7 @@ import { useColorScheme } from '@pawhaven/design-system';
 ```
 packages/design-system/
 ├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
-├── theme.css           # Semantic token mappings + dark mode overrides
+├── theme.css           # Semantic token mappings
 ├── utilities.css       # Custom Tailwind @utility classes
 ├── MUI-theme.ts        # MUI v7 theme (derives from CSS variables)
 ├── tokens/             # Primitive design tokens (CSS @theme blocks)
@@ -41,13 +38,7 @@ packages/design-system/
 │   └── z-index.css     # Z-index primitives
 ├── src/                # TypeScript source
 │   ├── index.ts        # JS/TS entry point
-│   ├── tokens.ts       # Typed token access (CSS var references + raw values)
-│   └── useColorScheme.ts # React hook for light/dark/system theme toggle
-├── scripts/            # Build & CI tooling
-│   ├── build-tokens.mjs    # Figma → CSS/TS token generation
-│   └── check-contrast.mjs  # WCAG AA contrast audit
-├── figma/              # Figma export directory (W3C Design Tokens Format)
-├── CHANGELOG.md
+│   └── tokens.ts       # Typed token access (CSS var references + raw values)
 └── package.json
 ```
 
@@ -127,26 +118,6 @@ function App() {
 
 The MUI theme reads CSS variables at runtime, so changing a token in `tokens/color.css` updates both Tailwind and MUI automatically.
 
-### Dark Mode
-
-```tsx
-import { useColorScheme } from '@pawhaven/design-system';
-
-function ThemeToggle() {
-  const { scheme, setScheme } = useColorScheme();
-
-  return (
-    <select value={scheme} onChange={e => setScheme(e.target.value as any)}>
-      <option value="system">System</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
-  );
-}
-```
-
-Dark mode re-maps the semantic color layer — no component changes needed. Both Tailwind (`dark:`) and MUI components respond automatically.
-
 ### Token Reference
 
 #### Color Scales
@@ -180,14 +151,4 @@ Each color has a 1–10 scale (1 = lightest, 10 = darkest):
 ```bash
 # Type-check the TypeScript source
 pnpm --filter @pawhaven/design-system typecheck
-
-# Build tokens from Figma export (requires figma/tokens.json)
-pnpm --filter @pawhaven/design-system tokens:build
-
-# Check WCAG AA contrast for key token pairings
-pnpm --filter @pawhaven/design-system a11y:check
 ```
-
-## Enhancement Roadmap
-
-See [docs/design-system-enhancement-plan.md](../../docs/design-system-enhancement-plan.md) for the full audit and prioritized enhancement plan.

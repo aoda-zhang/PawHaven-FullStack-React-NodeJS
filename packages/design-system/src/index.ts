@@ -26,5 +26,3 @@ export type {
   EasingToken,
   TypographyToken,
 } from './tokens';
-
-export { useColorScheme } from './useColorScheme';

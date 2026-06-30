@@ -85,7 +85,6 @@ Detailed documentation can be found in the `/docs` directory.
 - [Authentication & Authorization Architecture](./docs/authentication_architecture.md)
 - [Route-Level Authentication](./docs/route_authentication.md)
 - [Design System](./packages/design-system/README.MD)
-- [Design System Enhancement Plan](./docs/design-system-enhancement-plan.md)
 
 ---
 
