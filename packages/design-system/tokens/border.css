@@ -1,5 +1,7 @@
 /* ============================================================
-   Border Tokens — Border widths and colors from Figma
+   Border Tokens — Border width primitives from Figma
+   ============================================================
+   Semantic border colors live in theme.css (single source of truth).
    ============================================================ */
 
 @theme {
@@ -8,10 +10,4 @@
   --border-width-2: 2px;
   --border-width-4: 4px;
   --border-width-8: 8px;
-
-  --color-border: var(--color-neutral-300);
-  --color-border-hover: var(--color-neutral-400);
-  --color-border-strong: var(--color-neutral-400);
-  --color-border-focus: var(--color-brand-500);
-  --color-border-error: var(--color-error-500);
 }

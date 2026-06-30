@@ -3,10 +3,10 @@
    ============================================================
    Maps semantic names to primitive tokens.
    Use these in components: bg-primary, text-primary, etc.
-   
+
    Categories:
    - Colors: primary, secondary, surfaces, text, borders, status
-   - Layout: spacing aliases, z-index
+   - Layout: spacing aliases, z-index, radius, shadows
    ============================================================ */
 
 @theme {
@@ -53,8 +53,8 @@
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6);
   --color-error-light: var(--color-red-2);
-  --color-success: var(--color-green-success-6);
-  --color-success-light: var(--color-green-success-2);
+  --color-success: var(--color-green-6);
+  --color-success-light: var(--color-green-2);
   --color-warning: var(--color-yellow-6);
   --color-warning-light: var(--color-yellow-2);
   --color-info: var(--color-blue-6);
@@ -70,10 +70,10 @@
   --color-rescue-status-failed: var(--color-gray-6);
 
   /* ═══ Spacing Aliases ═════════════════════════════════ */
-  --spacing-gutter: 1.5rem;
-  --spacing-section: 4rem;
-  --spacing-card: 1.5rem;
-  --spacing-input: 0.75rem;
+  --spacing-gutter: var(--spacing-5);
+  --spacing-section: var(--spacing-10);
+  --spacing-card: var(--spacing-5);
+  --spacing-input: var(--spacing-3);
 
   /* ═══ Z-Index Scale ══════════════════════════════════ */
   --z-index-base: 1;
@@ -96,3 +96,4 @@
   --shadow-modal: var(--shadow-lg);
   --shadow-toast: var(--shadow-xl);
 }
+

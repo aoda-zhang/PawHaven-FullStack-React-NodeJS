@@ -6,7 +6,7 @@ import { QueryProvider } from './QueryProvider';
 import { StoreProvider } from './StoreProvider';
 
 import { SystemError } from '@/components/SystemError';
-import '@pawhaven/design-system/index.css';
+import '@pawhaven/design-system/styles.css';
 
 type AppProviderProps = {
   children: ReactNode;

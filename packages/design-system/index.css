@@ -18,11 +18,6 @@
 /* 3. Utilities — Custom utilities + component styles */
 @import './utilities.css';
 
-/* ── Source paths for Tailwind scanning ──────────────────── */
-@source '../ui/**/*.{js,ts,jsx,tsx}';
-@source '../../apps/frontend/**/*.{jsx,tsx}';
-@source '../frontend-core/**/*.{jsx,tsx}';
-
 /* ── Base styles ─────────────────────────────────────────── */
 
 html,
@@ -36,4 +31,18 @@ body {
   display: flex;
   flex-direction: column;
   isolation: isolate;
+}
+
+/* ── Reduced motion (WCAG 2.2 SC 2.3.3) ─────────────────── */
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

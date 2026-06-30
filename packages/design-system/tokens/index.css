@@ -9,3 +9,7 @@
 @import './radius.css';
 @import './shadow.css';
 @import './motion.css';
+@import './breakpoint.css';
+@import './opacity.css';
+@import './sizing.css';
+@import './z-index.css';

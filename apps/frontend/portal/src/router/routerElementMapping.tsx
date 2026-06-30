@@ -1,7 +1,7 @@
 import { lazyImport } from '@pawhaven/frontend-core';
 import type { ReactElement } from 'react';
 
-import { NotFund } from '@/components/NotFund';
+import { NotFound } from '@/components/NotFound';
 import { RouterErrorFallback } from '@/components/RouterErrorFallback';
 import { Login } from '@/features/Auth/Login';
 import { Register } from '@/features/Auth/Register';
@@ -29,6 +29,6 @@ export const routerElementMapping: Record<string, ReactElement> = {
   report_stray: <ReportStray />,
   rescue_guides: <RescueGuide />,
   rescue_detail: <ReportDetail />,
-  notFund: <NotFund />,
+  notFund: <NotFound />,
   errorFallback: <RouterErrorFallback />,
 };

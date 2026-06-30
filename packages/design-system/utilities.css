@@ -3,6 +3,9 @@
    ============================================================
    Tailwind v4 @utility directive for custom utilities.
    https://tailwindcss.com/docs/upgrade-guide#adding-custom-utilities
+
+   Note: text-balance, text-pretty, and sr-only are Tailwind v4
+   built-ins — use those directly instead of custom utilities.
    ============================================================ */
 
 /* ═══ Flex Utilities ════════════════════════════════════════ */
@@ -26,21 +29,11 @@
   justify-content: center;
 }
 
-/* ═══ Text Utilities ════════════════════════════════════════ */
-
-@utility text-balance {
-  text-wrap: balance;
-}
-
-@utility text-pretty {
-  text-wrap: pretty;
-}
-
 /* ═══ Link Utilities ════════════════════════════════════════ */
 
 @utility link {
   color: var(--color-text-link);
-  text-underline-offset: 4px;
+  text-underline-offset: var(--radius-xs);
   transition-property: color;
   transition-timing-function: var(--ease-standard);
   transition-duration: var(--duration-150);
@@ -48,6 +41,16 @@
   &:hover {
     color: var(--color-primary-hover);
     text-decoration: underline;
+  }
+}
+
+/* ═══ Focus Ring Utility ════════════════════════════════════ */
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 var(--border-width-2) var(--color-primary-light);
   }
 }
 
@@ -61,6 +64,11 @@
   transition-property: background-color, border-color, color;
   transition-timing-function: var(--ease-standard);
   transition-duration: var(--duration-150);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 @utility btn-primary {
@@ -118,9 +126,9 @@
   transition-timing-function: var(--ease-standard);
   transition-duration: var(--duration-150);
 
-  &:focus {
+  &:focus-visible {
     border-color: var(--color-border-focus);
-    box-shadow: 0 0 0 var(--border-width-2) var(--color-primary);
+    box-shadow: 0 0 0 var(--border-width-2) var(--color-primary-light);
   }
 }
 
@@ -146,20 +154,8 @@
   cursor: pointer;
 }
 
-@utility visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
 @utility button-rounded {
   cursor: pointer;
-  border-radius: var(--radius-md);
-  padding: 6px 12px;
+  border-radius: var(--radius-button);
+  padding: var(--spacing-2) var(--spacing-3);
 }

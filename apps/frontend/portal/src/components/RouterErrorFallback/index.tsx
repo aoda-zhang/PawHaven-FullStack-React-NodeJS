@@ -1,7 +1,7 @@
 import { useEffect, type ReactElement } from 'react';
 import { useRouteError } from 'react-router-dom';
 
-import { NotFund } from '../NotFund';
+import { NotFound } from '../NotFound';
 import { SystemError } from '../SystemError';
 
 import { useIsStableEnv } from '@/hooks/useIsStableEnv';
@@ -26,7 +26,7 @@ export const RouterErrorFallback = () => {
 
   switch (errorInfo?.status) {
     case 404:
-      return <NotFund error={errorInfo} />;
+      return <NotFound error={errorInfo} />;
     case 500:
       return <SystemError error={errorInfo} />;
     default:

@@ -2,11 +2,33 @@
   "name": "@pawhaven/design-system",
   "version": "1.0.0",
   "private": true,
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./index.css",
+    "./theme": "./src/MUI-theme.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "files": [
+    "index.css",
+    "theme.css",
+    "utilities.css",
+    "tokens",
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
     "react": "^19.2.0",
     "@mui/material": "^7.3.4",
     "tailwindcss": "^4.1.14",
     "typescript": "^5.9.3",
     "@pawhaven/eslint-config": "workspace:*"
+  },
+  "devDependencies": {
+    "@pawhaven/tsconfig": "workspace:*"
   }
 }
