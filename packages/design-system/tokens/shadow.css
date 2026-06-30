@@ -1,8 +1,18 @@
 /* ============================================================
-   Shadow Tokens — Box shadows from Figma
+   Shadow Tokens — Box shadow primitives and colors from Figma
    ============================================================ */
 
 @theme {
+  /* ═══ Shadow Colors ══════════════════════════════════ */
+  --color-shadow: #000000;
+  --color-shadow-light: rgba(0, 0, 0, 0.04);
+  --color-shadow-medium: rgba(0, 0, 0, 0.12);
+  --color-shadow-strong: rgba(0, 0, 0, 0.16);
+  --color-shadow-heavy: rgba(0, 0, 0, 0.18);
+  --color-shadow-dark: rgba(0, 0, 0, 0.22);
+  --color-shadow-inner: rgba(0, 0, 0, 0.06);
+
+  /* ═══ Shadow Tokens ══════════════════════════════════ */
   --shadow-xs: 0 1px 2px var(--color-shadow-light);
   --shadow-sm: 0 1px 3px var(--color-shadow-medium);
   --shadow-md: 0 3px 6px var(--color-shadow-strong);

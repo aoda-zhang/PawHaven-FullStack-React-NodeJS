@@ -1,20 +1,193 @@
-# PawHaven design token Package
+# @pawhaven/design-system
 
-This package provides shared theme resources—including colors, fonts, spacing, and global styles—for the entire PawHaven monorepo. It centralizes design tokens and style definitions to ensure consistency across all projects.
+Shared design tokens, theme, utilities, and MUI theme for the PawHaven monorepo. Provides the single source of truth for all visual primitives used across `apps/frontend/*`, `packages/ui`, and `packages/frontend-core`.
+
+## Quick Start
+
+```ts
+// CSS entry — imports tokens, theme, dark mode, utilities, and base styles
+import '@pawhaven/design-system/styles.css';
+
+// TypeScript token access
+import { color, spacing, radius, tokenVar } from '@pawhaven/design-system';
+
+// MUI theme (MUI v7, cssVariables mode)
+import { MUITheme } from '@pawhaven/design-system/theme';
+
+// Dark mode hook
+import { useColorScheme } from '@pawhaven/design-system';
+```
+
+## Package Structure
+
+```
+packages/design-system/
+├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
+├── theme.css           # Semantic token mappings + dark mode overrides
+├── utilities.css       # Custom Tailwind @utility classes
+├── MUI-theme.ts        # MUI v7 theme (derives from CSS variables)
+├── tokens/             # Primitive design tokens (CSS @theme blocks)
+│   ├── index.css       # Barrel import
+│   ├── color.css       # Color scales (gray, orange, green, red, yellow, blue, brown)
+│   ├── typography.css  # Font families, sizes, weights, line heights, letter spacing
+│   ├── spacing.css     # Spacing scale + container widths
+│   ├── border.css      # Border widths
+│   ├── radius.css      # Border radius scale
+│   ├── shadow.css      # Shadow primitives + shadow colors
+│   ├── motion.css      # Durations + easing curves
+│   ├── breakpoint.css  # Responsive breakpoints
+│   ├── opacity.css     # Opacity scale
+│   ├── sizing.css      # Width/height primitives
+│   └── z-index.css     # Z-index primitives
+├── src/                # TypeScript source
+│   ├── index.ts        # JS/TS entry point
+│   ├── tokens.ts       # Typed token access (CSS var references + raw values)
+│   └── useColorScheme.ts # React hook for light/dark/system theme toggle
+├── scripts/            # Build & CI tooling
+│   ├── build-tokens.mjs    # Figma → CSS/TS token generation
+│   └── check-contrast.mjs  # WCAG AA contrast audit
+├── figma/              # Figma export directory (W3C Design Tokens Format)
+├── CHANGELOG.md
+└── package.json
+```
 
 ## Usage
 
-Sub-packages within the monorepo can import theme values directly from this package without duplicating files. This workspace-aware setup simplifies maintenance and promotes reuse.
+### CSS Import
 
-### Importing token values
+Import once in your app root to get all tokens, theme mappings, utilities, and base styles:
 
-You can import specific theme parts like colors or spacing as follows:
-
-```js
-import { colors, spacing } from '@pawhaven/design-system';
-
-console.log(colors.primary);
-console.log(spacing.md);
+```ts
+// apps/frontend/portal/src/providers/AppProvider.tsx
+import '@pawhaven/design-system/styles.css';
 ```
 
-Use these imports in your frontend apps or other packages to apply consistent styling throughout PawHaven projects.
+### Tailwind Utility Classes
+
+Use semantic tokens directly in Tailwind classes:
+
+```html
+<div class="bg-primary text-text-inverse rounded-xl shadow-card">
+  <h1 class="font-heading text-3xl text-text">Hello PawHaven</h1>
+  <button class="btn-primary btn-base rounded-xl px-4 py-2">Get Started</button>
+  <input class="input-field" placeholder="Search..." />
+</div>
+```
+
+### Custom Utilities
+
+| Utility | Description |
+|---------|-------------|
+| `flex-center` | `display: flex; align-items: center; justify-content: center` |
+| `flex-between` | `display: flex; align-items: center; justify-content: space-between` |
+| `flex-col-center` | Vertical flex with centered content |
+| `btn-base` | Base button reset (inline-flex, centered, medium weight, transitions) |
+| `btn-primary` | Primary brand button (orange bg + white text) |
+| `btn-secondary` | Secondary button (green bg + white text) |
+| `btn-outline` | Outlined button (transparent bg + border) |
+| `card` | Card surface (white bg, border, shadow, rounded) |
+| `input-field` | Full-width form input with focus ring |
+| `form-error` | Error text below form inputs |
+| `link` | Semantic link styling |
+| `link-reset` | Remove link decoration |
+| `button-reset` | Full button reset |
+| `button-rounded` | Rounded button with token-based padding |
+| `focus-ring` | Accessible focus-visible outline |
+
+### TypeScript Token Access
+
+```ts
+import { color, spacing, radius, shadow, duration, easing, typography, tokenVar } from '@pawhaven/design-system';
+
+// CSS variable references — use in inline styles, MUI overrides, etc.
+const style = { color: color.primary, padding: spacing.card };
+
+// Type-safe tokenVar helper
+const primaryVar = tokenVar('color.primary'); // → 'var(--color-primary)'
+
+// Raw color primitives (for canvas, charts, etc.)
+import { colorPrimitives } from '@pawhaven/design-system';
+const orange500 = colorPrimitives.orange[5]; // → '#fb923c'
+```
+
+### MUI Theme
+
+```tsx
+import { ThemeProvider } from '@mui/material/styles';
+import { MUITheme } from '@pawhaven/design-system/theme';
+
+function App() {
+  return (
+    <ThemeProvider theme={MUITheme}>
+      {/* MUI components now share the same tokens as Tailwind */}
+    </ThemeProvider>
+  );
+}
+```
+
+The MUI theme reads CSS variables at runtime, so changing a token in `tokens/color.css` updates both Tailwind and MUI automatically.
+
+### Dark Mode
+
+```tsx
+import { useColorScheme } from '@pawhaven/design-system';
+
+function ThemeToggle() {
+  const { scheme, setScheme } = useColorScheme();
+
+  return (
+    <select value={scheme} onChange={e => setScheme(e.target.value as any)}>
+      <option value="system">System</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  );
+}
+```
+
+Dark mode re-maps the semantic color layer — no component changes needed. Both Tailwind (`dark:`) and MUI components respond automatically.
+
+### Token Reference
+
+#### Color Scales
+
+Each color has a 1–10 scale (1 = lightest, 10 = darkest):
+
+| Scale | Gray | Orange (Brand) | Green (Secondary/Success) | Red (Error) | Yellow (Warning) | Blue (Info) | Brown (Neutral) |
+|-------|------|----------------|---------------------------|-------------|------------------|-------------|-----------------|
+| 1 | `#ffffff` | `#fff7ed` | `#f0fdf4` | `#fff1f2` | `#fffbeb` | `#eff6ff` | `#fffaf6` |
+| 5 | `#d4d4d4` | `#fb923c` | `#4ade80` | `#f87171` | `#fbbf24` | `#60a5fa` | `#e1cfbf` |
+| 6 | `#a3a3a3` | `#f7823a` | `#4caf50` | `#ef4444` | `#f59e0b` | `#3b82f6` | `#d3c3b3` |
+| 10 | `#171717` | `#7a2b08` | `#14532d` | `#7f1d1d` | `#78350f` | `#1e3a8a` | `#4a392c` |
+
+#### Semantic Mappings
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--color-primary` | `--color-orange-6` | Primary actions, brand |
+| `--color-secondary` | `--color-green-6` | Secondary actions |
+| `--color-surface` | `--color-gray-1` | Card/paper backgrounds |
+| `--color-background` | `--color-brown-4` | Page background |
+| `--color-text` | `--color-gray-9` | Body text |
+| `--color-text-secondary` | `--color-gray-7` | Subtle text |
+| `--color-error` | `--color-red-6` | Error states |
+| `--color-success` | `--color-green-6` | Success states |
+| `--color-warning` | `--color-yellow-6` | Warning states |
+| `--color-info` | `--color-blue-6` | Info states |
+
+## Scripts
+
+```bash
+# Type-check the TypeScript source
+pnpm --filter @pawhaven/design-system typecheck
+
+# Build tokens from Figma export (requires figma/tokens.json)
+pnpm --filter @pawhaven/design-system tokens:build
+
+# Check WCAG AA contrast for key token pairings
+pnpm --filter @pawhaven/design-system a11y:check
+```
+
+## Enhancement Roadmap
+
+See [docs/design-system-enhancement-plan.md](../../docs/design-system-enhancement-plan.md) for the full audit and prioritized enhancement plan.

@@ -1,16 +1,24 @@
 /* ============================================================
-   Spacing Tokens — Layout primitives
+   Spacing Tokens — Layout primitives from Figma
+   ============================================================
+   Semantic spacing aliases live in theme.css (single source of truth).
    ============================================================ */
 
 @theme {
-  --spacing-gutter: 1.5rem;
-  --spacing-section: 4rem;
-  --spacing-card: 1.5rem;
-  --spacing-input: 0.75rem;
-  --spacing-container: 1.5rem;
-  --spacing-container-lg: 2rem;
-  --spacing-container-xl: 3rem;
+  /* Primitive spacing scale */
+  --spacing-px: 1px;
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.5rem;
+  --spacing-6: 2rem;
+  --spacing-8: 3rem;
+  --spacing-10: 4rem;
+  --spacing-12: 5rem;
 
+  /* Container widths */
   --container-sm: 640px;
   --container-md: 768px;
   --container-lg: 1024px;

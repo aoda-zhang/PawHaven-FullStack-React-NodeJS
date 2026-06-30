@@ -2,6 +2,26 @@
   "name": "@pawhaven/design-system",
   "version": "1.0.0",
   "private": true,
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./index.css",
+    "./theme": "./MUI-theme.ts",
+    "./tokens": "./src/tokens.ts"
+  },
+  "files": [
+    "index.css",
+    "theme.css",
+    "utilities.css",
+    "MUI-theme.ts",
+    "tokens",
+    "src"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "tokens:build": "node scripts/build-tokens.mjs",
+    "a11y:check": "node scripts/check-contrast.mjs"
+  },
   "dependencies": {
     "react": "^19.2.0",
     "@mui/material": "^7.3.4",

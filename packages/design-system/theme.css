@@ -3,10 +3,11 @@
    ============================================================
    Maps semantic names to primitive tokens.
    Use these in components: bg-primary, text-primary, etc.
-   
+
    Categories:
    - Colors: primary, secondary, surfaces, text, borders, status
-   - Layout: spacing aliases, z-index
+   - Layout: spacing aliases, z-index, radius, shadows
+   - Dark mode: .dark class + prefers-color-scheme overrides
    ============================================================ */
 
 @theme {
@@ -53,8 +54,8 @@
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6);
   --color-error-light: var(--color-red-2);
-  --color-success: var(--color-green-success-6);
-  --color-success-light: var(--color-green-success-2);
+  --color-success: var(--color-green-6);
+  --color-success-light: var(--color-green-2);
   --color-warning: var(--color-yellow-6);
   --color-warning-light: var(--color-yellow-2);
   --color-info: var(--color-blue-6);
@@ -70,10 +71,10 @@
   --color-rescue-status-failed: var(--color-gray-6);
 
   /* ═══ Spacing Aliases ═════════════════════════════════ */
-  --spacing-gutter: 1.5rem;
-  --spacing-section: 4rem;
-  --spacing-card: 1.5rem;
-  --spacing-input: 0.75rem;
+  --spacing-gutter: var(--spacing-5);
+  --spacing-section: var(--spacing-10);
+  --spacing-card: var(--spacing-5);
+  --spacing-input: var(--spacing-3);
 
   /* ═══ Z-Index Scale ══════════════════════════════════ */
   --z-index-base: 1;
@@ -95,4 +96,78 @@
   --shadow-dropdown: var(--shadow-md);
   --shadow-modal: var(--shadow-lg);
   --shadow-toast: var(--shadow-xl);
+}
+
+/* ============================================================
+   Dark Mode — Overrides for .dark and prefers-color-scheme
+   ============================================================ */
+
+@layer base {
+  .dark {
+    /* Surfaces */
+    --color-surface: var(--color-gray-9);
+    --color-surface-elevated: var(--color-gray-8);
+    --color-surface-hover: var(--color-gray-8);
+    --color-surface-active: var(--color-gray-7);
+    --color-surface-dark: var(--color-gray-1);
+    --color-background: var(--color-gray-10);
+    --color-background-subtle: var(--color-gray-9);
+    --color-muted: var(--color-gray-8);
+    --color-muted-strong: var(--color-gray-7);
+
+    /* Text */
+    --color-text: var(--color-gray-1);
+    --color-text-secondary: var(--color-gray-3);
+    --color-text-tertiary: var(--color-gray-4);
+    --color-text-muted: var(--color-gray-6);
+    --color-text-placeholder: var(--color-gray-6);
+    --color-text-inverse: var(--color-gray-9);
+    --color-text-link: var(--color-orange-4);
+
+    /* Borders */
+    --color-border: var(--color-gray-7);
+    --color-border-hover: var(--color-gray-6);
+    --color-border-strong: var(--color-gray-5);
+
+    /* Shadows (darker for dark mode) */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-dropdown: 0 3px 6px rgba(0, 0, 0, 0.45);
+    --shadow-modal: 0 8px 20px rgba(0, 0, 0, 0.5);
+    --shadow-toast: 0 12px 28px rgba(0, 0, 0, 0.55);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      /* Surfaces */
+      --color-surface: var(--color-gray-9);
+      --color-surface-elevated: var(--color-gray-8);
+      --color-surface-hover: var(--color-gray-8);
+      --color-surface-active: var(--color-gray-7);
+      --color-surface-dark: var(--color-gray-1);
+      --color-background: var(--color-gray-10);
+      --color-background-subtle: var(--color-gray-9);
+      --color-muted: var(--color-gray-8);
+      --color-muted-strong: var(--color-gray-7);
+
+      /* Text */
+      --color-text: var(--color-gray-1);
+      --color-text-secondary: var(--color-gray-3);
+      --color-text-tertiary: var(--color-gray-4);
+      --color-text-muted: var(--color-gray-6);
+      --color-text-placeholder: var(--color-gray-6);
+      --color-text-inverse: var(--color-gray-9);
+      --color-text-link: var(--color-orange-4);
+
+      /* Borders */
+      --color-border: var(--color-gray-7);
+      --color-border-hover: var(--color-gray-6);
+      --color-border-strong: var(--color-gray-5);
+
+      /* Shadows */
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-dropdown: 0 3px 6px rgba(0, 0, 0, 0.45);
+      --shadow-modal: 0 8px 20px rgba(0, 0, 0, 0.5);
+      --shadow-toast: 0 12px 28px rgba(0, 0, 0, 0.55);
+    }
+  }
 }

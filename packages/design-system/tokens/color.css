@@ -1,22 +1,13 @@
 /* ============================================================
    Color Tokens — Raw design primitives from Figma
    ============================================================
-   
+
    Naming Convention: color-{name}-{scale}
    Scale: 1 (lightest) to 10 (darkest)
    Example: color-gray-1, color-gray-2, ..., color-gray-10
    ============================================================ */
 
 @theme {
-  /* ═══ Shadow Colors ══════════════════════════════════ */
-  --color-shadow: #000000;
-  --color-shadow-light: rgba(0, 0, 0, 0.04);
-  --color-shadow-medium: rgba(0, 0, 0, 0.12);
-  --color-shadow-strong: rgba(0, 0, 0, 0.16);
-  --color-shadow-heavy: rgba(0, 0, 0, 0.18);
-  --color-shadow-dark: rgba(0, 0, 0, 0.22);
-  --color-shadow-inner: rgba(0, 0, 0, 0.06);
-
   /* ═══ Grayscale ═════════════════════════════════════ */
   --color-gray-1: #ffffff;
   --color-gray-2: #f8f8f8;
@@ -41,17 +32,17 @@
   --color-orange-9: #c2410b;
   --color-orange-10: #7a2b08;
 
-  /* ═══ Green (Secondary) ══════════════════════════════ */
+  /* ═══ Green (Secondary + Success) ═══════════════════════════ */
   --color-green-1: #f0fdf4;
   --color-green-2: #dcfce7;
   --color-green-3: #bbf7d0;
   --color-green-4: #86efac;
-  --color-green-5: #4ad07a;
+  --color-green-5: #4ade80;
   --color-green-6: #4caf50;
-  --color-green-7: #3da64a;
-  --color-green-8: #2f8c3f;
-  --color-green-9: #1f6f33;
-  --color-green-10: #124e23;
+  --color-green-7: #16a34a;
+  --color-green-8: #15803d;
+  --color-green-9: #166534;
+  --color-green-10: #14532d;
 
   /* ═══ Red (Error) ═══════════════════════════════════ */
   --color-red-1: #fff1f2;
@@ -64,18 +55,6 @@
   --color-red-8: #b91c1c;
   --color-red-9: #991b1b;
   --color-red-10: #7f1d1d;
-
-  /* ═══ Green (Success) ═══════════════════════════════ */
-  --color-green-success-1: #f0fdf4;
-  --color-green-success-2: #dcfce7;
-  --color-green-success-3: #bbf7d0;
-  --color-green-success-4: #86efac;
-  --color-green-success-5: #4ade80;
-  --color-green-success-6: #4caf50;
-  --color-green-success-7: #16a34a;
-  --color-green-success-8: #15803d;
-  --color-green-success-9: #166534;
-  --color-green-success-10: #14532d;
 
   /* ═══ Yellow (Warning) ══════════════════════════════ */
   --color-yellow-1: #fffbeb;
