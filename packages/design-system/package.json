@@ -18,9 +18,7 @@
     "src"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "tokens:build": "node scripts/build-tokens.mjs",
-    "a11y:check": "node scripts/check-contrast.mjs"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "react": "^19.2.0",
