@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven — 领养匹配 + 个人中心</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root {
+  --color-gray-1: #fff; --color-gray-2: #f8f8f8; --color-gray-3: #f0f0f0; --color-gray-4: #e5e5e5;
+  --color-gray-5: #d4d4d4; --color-gray-6: #a3a3a3; --color-gray-7: #737373; --color-gray-9: #2f2f2f;
+  --color-orange-1: #fff7ed; --color-orange-2: #ffedd5; --color-orange-6: #f7823a; --color-orange-7: #f66b26;
+  --color-green-1: #f0fdf4; --color-green-6: #4caf50; --color-green-8: #15803d;
+  --color-red-6: #ef4444; --color-yellow-6: #f59e0b; --color-blue-6: #3b82f6;
+  --color-brown-1: #fffaf6; --color-brown-2: #fff5ec; --color-brown-3: #f6e9df; --color-brown-4: #ecdccf; --color-brown-7: #b9a596;
+  --color-primary: var(--color-orange-6); --color-primary-hover: var(--color-orange-7); --color-primary-light: var(--color-orange-1);
+  --color-surface: var(--color-gray-1); --color-background: var(--color-brown-4); --color-text: var(--color-gray-9);
+  --color-text-secondary: var(--color-gray-7); --color-text-tertiary: var(--color-gray-6); --color-border: var(--color-gray-4);
+  --font-sans: 'Inter','Nunito',sans-serif; --font-heading: 'Poppins','Nunito',sans-serif;
+  --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.12); --shadow-dropdown: 0 3px 6px rgba(0,0,0,0.16);
+  --duration-200: 200ms; --duration-300: 300ms; --ease-out: cubic-bezier(0,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);color:var(--color-text);background:var(--color-background);line-height:1.5}
+img{max-width:100%;display:block}a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none}
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+h1{font-family:var(--font-heading);font-size:clamp(1.5rem,3vw,2.25rem);font-weight:700;letter-spacing:-0.025em;line-height:1.25}
+h2{font-family:var(--font-heading);font-size:1.5rem;font-weight:600;line-height:1.3}
+h3{font-family:var(--font-heading);font-size:1.25rem;font-weight:600;line-height:1.35}
+.body-small{font-size:.8125rem;color:var(--color-text-secondary)}.body-caption{font-size:.75rem;color:var(--color-text-tertiary)}
+
+/* Header */
+.header{position:fixed;top:0;left:0;right:0;z-index:200;height:72px;background:var(--color-surface);box-shadow:0 1px 3px rgba(0,0,0,0.08);display:flex;align-items:center}
+.header .container{display:flex;align-items:center;justify-content:space-between;width:100%}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:40px;height:40px;background:var(--color-primary);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff}
+.logo-text{font-family:var(--font-heading);font-weight:700;font-size:1.25rem}
+.nav-links{display:flex;gap:32px}
+.nav-links a{font-size:.875rem;font-weight:500;color:var(--color-text-secondary);padding:8px 0;border-bottom:2px solid transparent;transition:all var(--duration-200)}
+.nav-links a:hover,.nav-links a.active{color:var(--color-text);border-bottom-color:var(--color-primary)}
+.header-actions{display:flex;align-items:center;gap:12px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--color-orange-2);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--color-primary);font-size:.875rem}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:.875rem;border-radius:var(--radius-md);transition:all var(--duration-200);cursor:pointer;white-space:nowrap;font-family:inherit}
+.btn-md{padding:10px 20px;height:40px;font-size:.8125rem}
+.btn-lg{padding:14px 28px;height:48px;font-size:1rem}
+.btn-primary{background:var(--color-primary);color:#fff}.btn-primary:hover{background:var(--color-primary-hover)}
+.btn-outline{background:transparent;border:1px solid var(--color-border);color:var(--color-text-secondary)}.btn-outline:hover{border-color:var(--color-text)}
+.btn-secondary{background:var(--color-primary-light);color:var(--color-primary)}
+
+.card{background:var(--color-surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-card);transition:all var(--duration-200)}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-dropdown)}
+
+/* SECTION: Page Header */
+.page-header{padding:calc(72px + 3rem) 0 2rem;text-align:center}
+.page-header h1{margin-bottom:8px}.page-header p{font-size:1.0625rem;color:var(--color-text-secondary);max-width:560px;margin:0 auto}
+
+/* SECTION: Filter Bar */
+.filter-bar{display:flex;align-items:center;gap:12px;margin-bottom:2rem;flex-wrap:wrap}
+.search-box{flex:1;min-width:260px;display:flex;align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:0 16px;height:44px}
+.search-box input{flex:1;border:none;outline:none;font-size:.875rem;font-family:inherit;background:transparent}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 16px;border-radius:var(--radius-full);font-size:.8125rem;font-weight:500;border:1px solid var(--color-border);color:var(--color-text-secondary);background:var(--color-surface);transition:all var(--duration-200);cursor:pointer}
+.chip:hover{border-color:var(--color-primary);color:var(--color-primary)}.chip.active{background:var(--color-primary);border-color:var(--color-primary);color:#fff}
+
+/* SECTION: Adoption Grid */
+.adoption-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem}
+.adoption-card{border-radius:var(--radius-lg);overflow:hidden;background:var(--color-surface);box-shadow:var(--shadow-card);cursor:pointer;transition:all var(--duration-300)}
+.adoption-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-dropdown)}
+.adoption-card-img{height:220px;position:relative;display:flex;align-items:center;justify-content:center;font-size:64px}
+.adoption-card-badge{position:absolute;top:12px;right:12px;padding:4px 10px;border-radius:var(--radius-full);font-size:.75rem;font-weight:600;background:rgba(255,255,255,0.9);color:var(--color-text)}
+.adoption-card-body{padding:20px}
+.adoption-card-name{font-weight:600;font-size:1.125rem;display:flex;align-items:center;gap:8px}
+.adoption-card-wait{font-size:.75rem;color:var(--color-yellow-6);font-weight:500}
+.adoption-card-meta{display:flex;gap:12px;font-size:.8125rem;color:var(--color-text-secondary);margin:8px 0}
+.adoption-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.adoption-card-tag{padding:3px 10px;background:var(--color-brown-3);border-radius:var(--radius-full);font-size:.75rem;color:var(--color-brown-7)}
+.adoption-card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--color-gray-3);font-size:.8125rem}
+.adoption-card-location{color:var(--color-text-tertiary)}
+
+/* SECTION: Profile Page */
+.profile-header{position:relative;margin-top:72px}
+.profile-cover{height:200px;background:linear-gradient(135deg,var(--color-orange-6),var(--color-orange-7) 60%,var(--color-orange-8));display:flex;align-items:center;justify-content:center;font-size:64px;color:rgba(255,255,255,0.15)}
+.profile-avatar-wrap{position:relative;margin-top:-60px;text-align:center;padding:0 24px 32px;border-bottom:1px solid var(--color-gray-3);background:var(--color-surface)}
+.profile-avatar{width:120px;height:120px;border-radius:50%;border:4px solid #fff;background:var(--color-orange-2);display:inline-flex;align-items:center;justify-content:center;font-size:48px;color:var(--color-primary);box-shadow:var(--shadow-card)}
+.profile-name{font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-top:16px}
+.profile-bio{font-size:.875rem;color:var(--color-text-secondary);margin-top:4px}
+.profile-roles{display:flex;gap:8px;justify-content:center;margin-top:12px}
+.profile-role{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:var(--radius-full);font-size:.75rem;font-weight:500}
+.role-reporter{background:#eff6ff;color:var(--color-blue-6)}.role-volunteer{background:var(--color-primary-light);color:var(--color-primary)}.role-adopter{background:var(--color-green-1);color:var(--color-green-6)}
+
+.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;padding:2rem 0}
+.stat-card{text-align:center}
+.stat-number{font-family:var(--font-heading);font-size:2rem;font-weight:700}.stat-label{font-size:.8125rem;color:var(--color-text-tertiary);margin-top:4px}
+
+.achievement-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.achievement-card{padding:24px 16px;text-align:center;background:var(--color-surface);border-radius:var(--radius-lg);border:1px solid var(--color-gray-3);transition:all var(--duration-200);cursor:pointer}
+.achievement-card:hover{border-color:var(--color-primary);transform:translateY(-2px)}
+.achievement-icon{font-size:40px;margin-bottom:12px}.achievement-name{font-weight:600;font-size:.875rem;margin-bottom:4px}
+.achievement-desc{font-size:.75rem;color:var(--color-text-tertiary)}.achievement-locked{opacity:.45}
+
+.content-section{padding:2rem 0}.content-section h2{margin-bottom:1.5rem}
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem}
+
+/* Login Modal Card */
+.login-wrapper{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--color-background)}
+.login-card{width:440px;background:var(--color-surface);border-radius:var(--radius-2xl);padding:48px 40px;box-shadow:var(--shadow-dropdown);text-align:center}
+.login-logo{font-size:48px;margin-bottom:20px}
+.login-title{font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:8px}
+.login-subtitle{font-size:.875rem;color:var(--color-text-secondary);margin-bottom:32px}
+.login-form{text-align:left}
+.form-group{margin-bottom:20px}.form-group label{display:block;font-size:.875rem;font-weight:500;margin-bottom:6px}
+.form-input{width:100%;height:48px;padding:0 16px;border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:.9375rem;font-family:inherit;transition:all var(--duration-200);outline:none}
+.form-input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-light)}
+.login-divider{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--color-text-tertiary);font-size:.75rem}.login-divider::before,.login-divider::after{content:"";flex:1;height:1px;background:var(--color-gray-4)}
+.login-links{font-size:.8125rem;color:var(--color-text-secondary);margin-top:20px;text-align:center}.login-links a{color:var(--color-primary);font-weight:500}
+
+/* Responsive */
+@media(max-width:1024px){.adoption-grid{grid-template-columns:repeat(2,1fr)}.profile-stats{grid-template-columns:repeat(2,1fr)}.achievement-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){.adoption-grid{grid-template-columns:1fr}.profile-stats{grid-template-columns:repeat(2,1fr);gap:1rem}.achievement-grid{grid-template-columns:repeat(2,1fr)}.login-card{width:90vw;padding:32px 24px}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PAGE 1: ADOPTION LISTING
+     ============================================================ -->
+<div id="page-adoption">
+
+<header class="header">
+  <div class="container">
+    <a href="#" class="logo"><div class="logo-icon">🐾</div><span class="logo-text">PawHaven</span></a>
+    <nav class="nav-links"><a href="#">首页</a><a href="#">救助案例</a><a href="#" class="active">领养</a><a href="#">爱心故事</a><a href="#">知识库</a></nav>
+    <div class="header-actions"><div class="avatar">李</div></div>
+  </div>
+</header>
+
+<div class="page-header" style="padding-bottom:1rem">
+  <h1>待领养动物</h1>
+  <p>给它们一个温暖的家 — 每一次领养，都是生命的重启</p>
+  <p style="margin-top:8px"><span style="display:inline-flex;align-items:center;gap:6px;padding:4px 14px;background:var(--color-green-1);border-radius:var(--radius-full);font-size:.8125rem;font-weight:500;color:var(--color-green-6)">🏠 当前 24 只动物等待领养</span></p>
+</div>
+
+<div class="container">
+  <div class="filter-bar">
+    <div class="search-box">🔍 <input type="text" placeholder="搜索待领养动物..."></div>
+    <div class="filter-chips">
+      <button class="chip active">全部</button><button class="chip">🐱 猫</button><button class="chip">🐕 狗</button><button class="chip">幼年</button><button class="chip">成年</button><button class="chip">附近</button>
+    </div>
+  </div>
+
+  <div class="adoption-grid">
+    <div class="adoption-card">
+      <div class="adoption-card-img" style="background:linear-gradient(135deg,#f6e9df,#ecdccf)">🐱</div>
+      <div class="adoption-card-body">
+        <div class="adoption-card-name">花花 <span class="adoption-card-wait">⏳ 等待 45 天</span></div>
+        <div class="adoption-card-meta"><span>母 · 2岁</span><span>已绝育</span><span>已疫苗</span></div>
+        <div class="adoption-card-tags"><span class="adoption-card-tag">温顺</span><span class="adoption-card-tag">亲人</span><span class="adoption-card-tag">适合新手</span></div>
+        <div class="adoption-card-footer"><span class="adoption-card-location">📍 丰台区</span><span style="color:var(--color-primary);font-weight:600">了解我 →</span></div>
+      </div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-card-img" style="background:linear-gradient(135deg,#dbeafe,#bfdbfe)">🐕</div>
+      <div class="adoption-card-body">
+        <div class="adoption-card-name">大黄 <span class="adoption-card-wait">⏳ 等待 23 天</span></div>
+        <div class="adoption-card-meta"><span>公 · 3岁</span><span>已绝育</span><span>已疫苗</span></div>
+        <div class="adoption-card-tags"><span class="adoption-card-tag">活泼</span><span class="adoption-card-tag">聪明</span></div>
+        <div class="adoption-card-footer"><span class="adoption-card-location">📍 朝阳区</span><span style="color:var(--color-primary);font-weight:600">了解我 →</span></div>
+      </div>
+    </div>
+    <div class="adoption-card">
+      <div class="adoption-card-img" style="background:linear-gradient(135deg,#dcfce7,#bbf7d0)">🐱</div>
+      <div class="adoption-card-body">
+        <div class="adoption-card-name">小灰 <span class="adoption-card-wait">⏳ 等待 12 天</span></div>
+        <div class="adoption-card-meta"><span>公 · 1岁</span><span>已绝育</span></div>
+        <div class="adoption-card-tags"><span class="adoption-card-tag">害羞</span><span class="adoption-card-tag">安静</span></div>
+        <div class="adoption-card-footer"><span class="adoption-card-location">📍 海淀区</span><span style="color:var(--color-primary);font-weight:600">了解我 →</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============================================================
+     PAGE 2: PROFILE & ACHIEVEMENTS
+     ============================================================ -->
+<div id="page-profile" style="display:none">
+
+<header class="header">
+  <div class="container">
+    <a href="#" class="logo"><div class="logo-icon">🐾</div><span class="logo-text">PawHaven</span></a>
+    <nav class="nav-links"><a href="#">首页</a><a href="#">救助案例</a><a href="#">领养</a><a href="#">爱心故事</a><a href="#">知识库</a></nav>
+    <div class="header-actions"><div class="avatar">李</div></div>
+  </div>
+</header>
+
+<div class="profile-header">
+  <div class="profile-cover">🐾🐾🐾</div>
+  <div class="profile-avatar-wrap">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-name">李明</div>
+    <div class="profile-bio">资深流浪动物救助志愿者 · 已在PawHaven活跃 2 年</div>
+    <div class="profile-roles">
+      <span class="profile-role role-reporter">📋 发现者</span>
+      <span class="profile-role role-volunteer">🤝 志愿者</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="profile-stats">
+    <div class="stat-card"><div class="stat-number">15</div><div class="stat-label">上报案例 · 12个已救助</div></div>
+    <div class="stat-card"><div class="stat-number">23</div><div class="stat-label">志愿者行动</div></div>
+    <div class="stat-card"><div class="stat-number">0</div><div class="stat-label">领养的动物</div></div>
+    <div class="stat-card"><div class="stat-number">3</div><div class="stat-label">爱心故事 · 256 赞</div></div>
+  </div>
+
+  <div class="content-section">
+    <div class="section-header"><h2>我的成就</h2><span class="body-small">8 个已解锁</span></div>
+    <div class="achievement-grid">
+      <div class="achievement-card"><div class="achievement-icon">🎯</div><div class="achievement-name">第一次上报</div><div class="achievement-desc">完成首次流浪动物上报</div></div>
+      <div class="achievement-card"><div class="achievement-icon">🦸</div><div class="achievement-name">第一次救助</div><div class="achievement-desc">完成首次志愿者救助</div></div>
+      <div class="achievement-card"><div class="achievement-icon">⭐</div><div class="achievement-name">救助达人</div><div class="achievement-desc">参与 10+ 次救助</div></div>
+      <div class="achievement-card"><div class="achievement-icon">💝</div><div class="achievement-name">社区英雄</div><div class="achievement-desc">被感谢 5 次</div></div>
+      <div class="achievement-card achievement-locked"><div class="achievement-icon">🔒</div><div class="achievement-name">第一次领养</div><div class="achievement-desc">完成首次领养</div></div>
+      <div class="achievement-card achievement-locked"><div class="achievement-icon">🔒</div><div class="achievement-name">故事大王</div><div class="achievement-desc">撰写 5+ 篇爱心故事</div></div>
+      <div class="achievement-card achievement-locked"><div class="achievement-icon">🔒</div><div class="achievement-name">知识贡献者</div><div class="achievement-desc">贡献 X 篇知识库文章</div></div>
+      <div class="achievement-card"><div class="achievement-icon">🔥</div><div class="achievement-name">连续救助</div><div class="achievement-desc">连续 3 个月参与救助</div></div>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>最近动态</h2>
+    <div class="card" style="padding:20px;margin-bottom:12px"><strong>认领了救助案例 PH-2025-0089</strong> · <span class="body-caption">2025-07-01 08:30</span></div>
+    <div class="card" style="padding:20px;margin-bottom:12px"><strong>案例 PH-2025-0085 更新了状态：康复中</strong> · <span class="body-caption">2025-06-28 14:00</span></div>
+    <div class="card" style="padding:20px"><strong>获得了"社区英雄"成就</strong> · <span class="body-caption">2025-06-25</span></div>
+  </div>
+</div>
+
+</div>
+
+<!-- ============================================================
+     PAGE 3: LOGIN
+     ============================================================ -->
+<div id="page-login" style="display:none" class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">🐾</div>
+    <div class="login-title">欢迎回到 PawHaven</div>
+    <div class="login-subtitle">登录以继续你的救助之旅</div>
+
+    <button class="btn btn-outline btn-lg" style="width:100%;margin-bottom:16px;justify-content:center">G 使用 Google 登录</button>
+
+    <div class="login-divider">或使用邮箱</div>
+
+    <div class="login-form">
+      <div class="form-group"><label>邮箱</label><input type="email" class="form-input" placeholder="hello@example.com"></div>
+      <div class="form-group"><label>密码</label><input type="password" class="form-input" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-lg" style="width:100%">登录</button>
+    </div>
+
+    <div class="login-links"><a href="#">忘记密码？</a><span style="margin:0 8px">·</span>还没有账号？<a href="#">立即注册</a></div>
+    <p style="font-size:.75rem;color:var(--color-text-tertiary);margin-top:20px">登录即表示你同意我们的<a href="#" style="color:var(--color-primary)">服务条款</a>和<a href="#" style="color:var(--color-primary)">隐私政策</a></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB SWITCHER
+     ============================================================ -->
+<div style="position:fixed;bottom:20px;right:20px;z-index:999;display:flex;gap:8px">
+  <button class="btn btn-md btn-primary" onclick="showPage('adoption')">领养列表</button>
+  <button class="btn btn-md btn-primary" onclick="showPage('profile')">个人中心</button>
+  <button class="btn btn-md btn-secondary" onclick="showPage('login')">登录</button>
+</div>
+
+<script>
+function showPage(page) {
+  document.getElementById('page-adoption').style.display = page==='adoption'?'block':'none';
+  document.getElementById('page-profile').style.display = page==='profile'?'block':'none';
+  document.getElementById('page-login').style.display = page==='login'?'flex':'none';
+}
+</script>
+
+</body>
+</html>
