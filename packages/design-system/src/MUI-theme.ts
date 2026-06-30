@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-import { color, easing, radius, shadow, typography } from './src/tokens';
+import { color, easing, radius, shadow, typography } from './tokens';
 
 export const MUITheme = createTheme({
   cssVariables: true,
@@ -50,7 +50,7 @@ export const MUITheme = createTheme({
       shorter: 200,
       short: 250,
       standard: 300,
-      long: 500,
+      complex: 500,
     },
     easing: {
       easeInOut: easing.standard,

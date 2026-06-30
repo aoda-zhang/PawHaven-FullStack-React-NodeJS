@@ -2,18 +2,19 @@
   "name": "@pawhaven/design-system",
   "version": "1.0.0",
   "private": true,
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./index.css",
-    "./theme": "./MUI-theme.ts",
+    "./theme": "./src/MUI-theme.ts",
     "./tokens": "./src/tokens.ts"
   },
   "files": [
     "index.css",
     "theme.css",
     "utilities.css",
-    "MUI-theme.ts",
     "tokens",
     "src"
   ],
@@ -26,5 +27,8 @@
     "tailwindcss": "^4.1.14",
     "typescript": "^5.9.3",
     "@pawhaven/eslint-config": "workspace:*"
+  },
+  "devDependencies": {
+    "@pawhaven/tsconfig": "workspace:*"
   }
 }

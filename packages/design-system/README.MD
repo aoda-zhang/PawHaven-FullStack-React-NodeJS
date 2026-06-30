@@ -22,7 +22,6 @@ packages/design-system/
 ├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
 ├── theme.css           # Semantic token mappings
 ├── utilities.css       # Custom Tailwind @utility classes
-├── MUI-theme.ts        # MUI v7 theme (derives from CSS variables)
 ├── tokens/             # Primitive design tokens (CSS @theme blocks)
 │   ├── index.css       # Barrel import
 │   ├── color.css       # Color scales (gray, orange, green, red, yellow, blue, brown)
@@ -38,6 +37,7 @@ packages/design-system/
 │   └── z-index.css     # Z-index primitives
 ├── src/                # TypeScript source
 │   ├── index.ts        # JS/TS entry point
+│   ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
 │   └── tokens.ts       # Typed token access (CSS var references + raw values)
 └── package.json
 ```

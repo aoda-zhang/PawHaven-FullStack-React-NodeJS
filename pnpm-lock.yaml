@@ -142,7 +142,7 @@ importers:
         version: 2.0.6
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -293,7 +293,7 @@ importers:
         version: 5.0.6
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -423,7 +423,7 @@ importers:
         version: 2.0.6
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -568,7 +568,7 @@ importers:
         version: link:../../../packages/shared
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -725,7 +725,7 @@ importers:
         version: 5.2.0(vite@7.3.5(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -852,7 +852,7 @@ importers:
         version: 5.2.0(vite@7.3.5(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(yaml@2.9.0))
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -1027,7 +1027,7 @@ importers:
         version: link:../shared
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
@@ -1167,6 +1167,10 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+    devDependencies:
+      '@pawhaven/tsconfig':
+        specifier: workspace:*
+        version: link:../../libs/tsconfig
 
   packages/frontend-core:
     dependencies:
@@ -1193,7 +1197,7 @@ importers:
         version: 5.101.0(react@19.2.7)
       axios:
         specifier: ^1.12.2
-        version: 1.18.0
+        version: 1.18.0(debug@4.4.3)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -7165,8 +7169,8 @@ packages:
     resolution: {integrity: sha512-iv7LhNVO047HzYR3InF6pUcUsPQiHTM1Qal51DcGSuZFBil1aBBWG5eHPNek7bvILMaYJ/8RU1e8w1AMdHmLQQ==}
     engines: {node: '>= 0.8'}
 
-  range-parser@1.2.1:
-    resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
+  range-parser@1.3.0:
+    resolution: {integrity: sha512-hek2mFQpPuI4E1BBKrSto+BU3e3x4xuarsbiwr3+lf7p44juvFMV0XFWQAP3xUyqXA4RrXLIoaSUGbSt056ZMw==}
     engines: {node: '>= 0.6'}
 
   raw-body@3.0.2:
@@ -8318,6 +8322,10 @@ packages:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
 
+  yargs@17.7.3:
+    resolution: {integrity: sha512-GZtjxm/J/4TSxuL3FNYjCmLktBTnIw/rVmKSIyKeYAZpmJB2ig9VauCC5xsa82GNKVKDAqpOn3KVzNt0zmrU0g==}
+    engines: {node: '>=12'}
+
   yauzl@2.10.0:
     resolution: {integrity: sha512-p4a9I6X6nu6IhoGmBqAcbJy1mlC4j27vEPZX9F4L4/vZT3Lyq1VkFHw/V/PUcB9Buo+DG3iHkT0x3Qya58zc3g==}
 
@@ -8899,7 +8907,7 @@ snapshots:
       lodash.camelcase: 4.3.0
       long: 5.3.2
       protobufjs: 7.6.4
-      yargs: 17.7.2
+      yargs: 17.7.3
 
   '@hookform/resolvers@5.4.0(react-hook-form@7.79.0(react@19.2.7))':
     dependencies:
@@ -9477,7 +9485,7 @@ snapshots:
   '@nestjs/axios@4.0.1(@nestjs/common@11.1.26(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.18.0)(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 11.1.26(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      axios: 1.18.0
+      axios: 1.18.0(debug@4.4.3)
       rxjs: 7.8.2
 
   '@nestjs/cli@11.0.23(@types/node@24.13.2)(cssnano@7.1.9(postcss@8.5.15))(postcss@8.5.15)(prettier@3.8.4)':
@@ -10905,7 +10913,7 @@ snapshots:
 
   axe-core@4.12.1: {}
 
-  axios@1.18.0:
+  axios@1.18.0(debug@4.4.3):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
@@ -11136,7 +11144,7 @@ snapshots:
       css-what: 6.1.0
       domelementtype: 2.3.0
       domhandler: 5.0.3
-      domutils: 3.1.0
+      domutils: 3.0.1
     optional: true
 
   cheerio@1.0.0:
@@ -11218,7 +11226,7 @@ snapshots:
 
   cliui@8.0.1:
     dependencies:
-      string-width: 4.2.3
+      string-width: 4.2.0
       strip-ansi: 6.0.1
       wrap-ansi: 7.0.0
 
@@ -11414,8 +11422,8 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
       css-what: 6.1.0
-      domhandler: 5.0.3
-      domutils: 3.1.0
+      domhandler: 5.0.2
+      domutils: 3.0.1
       nth-check: 2.0.1
     optional: true
 
@@ -11675,7 +11683,7 @@ snapshots:
     dependencies:
       dom-serializer: 2.0.0
       domelementtype: 2.3.0
-      domhandler: 5.0.3
+      domhandler: 5.0.2
 
   domutils@3.1.0:
     dependencies:
@@ -12285,7 +12293,7 @@ snapshots:
       parseurl: 1.3.3
       proxy-addr: 2.0.7
       qs: 6.15.2
-      range-parser: 1.2.1
+      range-parser: 1.3.0
       router: 2.2.0
       send: 1.2.1
       serve-static: 2.2.1
@@ -13659,7 +13667,7 @@ snapshots:
       mjml-parser-xml: 5.3.0
       mjml-preset-core: 5.3.0(svgo@4.0.1)(terser@5.48.0)(typescript@5.9.3)
       mjml-validator: 5.3.0
-      yargs: 17.7.2
+      yargs: 17.7.3
     transitivePeerDependencies:
       - purgecss
       - relateurl
@@ -14391,7 +14399,7 @@ snapshots:
 
   parse5-htmlparser2-tree-adapter@7.0.0:
     dependencies:
-      domhandler: 5.0.3
+      domhandler: 5.0.2
       parse5: 7.1.2
     optional: true
 
@@ -14935,7 +14943,7 @@ snapshots:
 
   random-bytes@1.0.0: {}
 
-  range-parser@1.2.1: {}
+  range-parser@1.3.0: {}
 
   raw-body@3.0.2:
     dependencies:
@@ -15263,7 +15271,7 @@ snapshots:
       mime-types: 3.0.2
       ms: 2.1.3
       on-finished: 2.4.1
-      range-parser: 1.2.1
+      range-parser: 1.3.0
       statuses: 2.0.2
     transitivePeerDependencies:
       - supports-color
@@ -16254,6 +16262,16 @@ snapshots:
       yargs-parser: 20.2.9
 
   yargs@17.7.2:
+    dependencies:
+      cliui: 8.0.1
+      escalade: 3.2.0
+      get-caller-file: 2.0.5
+      require-directory: 2.1.1
+      string-width: 4.2.3
+      y18n: 5.0.8
+      yargs-parser: 21.1.1
+
+  yargs@17.7.3:
     dependencies:
       cliui: 8.0.1
       escalade: 3.2.0
