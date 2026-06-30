@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import clsx from 'clsx';
 import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import type { BaseFormType, BaseTextFieldType } from '../formBase.type';
@@ -20,7 +21,7 @@ export const FormInput = ({
   ...props
 }: BaseFormType & TextFieldProps & BaseTextFieldType) => {
   const { control } = useFormContext();
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const isPasswordType = type === 'password';
   const shouldShowToggle = isPasswordType && showPasswordToggle;

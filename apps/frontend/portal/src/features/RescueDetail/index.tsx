@@ -64,7 +64,7 @@ export const RescueDetail = () => {
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6 lg:p-8">
-      {animal && <AnimalBasicInfo animal={animal} />}
+      {/* {animal && <AnimalBasicInfo animal={animal} />} */}
 
       <RescueTimeline updates={updates} />
     </div>
