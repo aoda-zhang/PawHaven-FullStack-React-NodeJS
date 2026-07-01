@@ -450,18 +450,18 @@ ul { list-style: none; }
       <span class="logo-text">PawHaven</span>
     </a>
     <nav class="nav-links">
-      <a href="#" class="active">首页</a>
-      <a href="#">救助案例</a>
-      <a href="#">领养</a>
-      <a href="#">爱心故事</a>
-      <a href="#">知识库</a>
+      <a href="pawhaven-homepage.html" class="active">首页</a>
+      <a href="pawhaven-homepage.html#rescues">救助案例</a>
+      <a href="pawhaven-adoption-profile-login.html">领养</a>
+      <a href="pawhaven-homepage.html#stories">爱心故事</a>
+      <a href="pawhaven-homepage.html#knowledge">知识库</a>
     </nav>
     <div class="header-actions">
       <button class="notification-btn" aria-label="Notifications">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="badge-dot"></span>
       </button>
-      <button class="btn btn-primary btn-md" onclick="location.href='pawhaven-login.html'">登录</button>
+      <button class="btn btn-primary btn-md" onclick="location.href='pawhaven-adoption-profile-login.html'">登录</button>
     </div>
   </div>
 </header>
@@ -485,7 +485,7 @@ ul { list-style: none; }
     </div>
     <div class="hero-visual">
       <div class="hero-card-stack">
-        <div class="hero-card">
+        <div class="hero-card" onclick="location.href='pawhaven-rescue-detail.html'" style="cursor:pointer">
           <div class="hero-card-img" style="background: linear-gradient(135deg, #fed7aa, #fdb87a); display: flex; align-items: center; justify-content: center; font-size: 64px;">🐱</div>
           <span class="hero-card-badge">已领养</span>
           <div class="hero-card-info">
@@ -534,7 +534,7 @@ ul { list-style: none; }
 </section>
 
 <!-- Latest Rescues -->
-<section class="section">
+<section class="section" id="rescues">
   <div class="container">
     <div class="section-header">
       <div>
@@ -558,7 +558,7 @@ ul { list-style: none; }
     </div>
     <div class="card-grid">
       <!-- Card 1 -->
-      <article class="rescue-card">
+      <article class="rescue-card" onclick="location.href='pawhaven-rescue-detail.html'" style="cursor:pointer">
         <div class="rescue-card-img-wrap">
           <div class="rescue-card-img" style="background: linear-gradient(135deg, #f6e9df, #ecdccf); display: flex; align-items: center; justify-content: center; font-size: 72px;">🐱</div>
           <span class="rescue-status-badge">救助中</span>
@@ -570,14 +570,14 @@ ul { list-style: none; }
           <div class="rescue-card-footer">
             <span class="rescue-card-time">30 分钟前</span>
             <div class="rescue-card-actions">
-              <button class="icon-btn" title="关注">🔔</button>
-              <button class="icon-btn" title="分享">↗</button>
+              <button class="icon-btn" title="关注" onclick="event.stopPropagation()">🔔</button>
+              <button class="icon-btn" title="分享" onclick="event.stopPropagation()">↗</button>
             </div>
           </div>
         </div>
       </article>
       <!-- Card 2 -->
-      <article class="rescue-card">
+      <article class="rescue-card" onclick="location.href='pawhaven-rescue-detail.html'" style="cursor:pointer">
         <div class="rescue-card-img-wrap">
           <div class="rescue-card-img" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); display: flex; align-items: center; justify-content: center; font-size: 72px;">🐕</div>
           <span class="urgency-badge urgency-badge--urgent">紧急</span>
@@ -590,14 +590,14 @@ ul { list-style: none; }
           <div class="rescue-card-footer">
             <span class="rescue-card-time">12 分钟前</span>
             <div class="rescue-card-actions">
-              <button class="icon-btn" title="关注">🔔</button>
-              <button class="icon-btn" title="分享">↗</button>
+              <button class="icon-btn" title="关注" onclick="event.stopPropagation()">🔔</button>
+              <button class="icon-btn" title="分享" onclick="event.stopPropagation()">↗</button>
             </div>
           </div>
         </div>
       </article>
       <!-- Card 3 -->
-      <article class="rescue-card">
+      <article class="rescue-card" onclick="location.href='pawhaven-rescue-detail.html'" style="cursor:pointer">
         <div class="rescue-card-img-wrap">
           <div class="rescue-card-img" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); display: flex; align-items: center; justify-content: center; font-size: 72px;">🐱</div>
           <span class="rescue-status-badge">康复中</span>
@@ -616,7 +616,7 @@ ul { list-style: none; }
         </div>
       </article>
       <!-- Card 4 -->
-      <article class="rescue-card">
+      <article class="rescue-card" onclick="location.href='pawhaven-rescue-detail.html'" style="cursor:pointer">
         <div class="rescue-card-img-wrap">
           <div class="rescue-card-img" style="background: linear-gradient(135deg, #fef3c7, #fde68a); display: flex; align-items: center; justify-content: center; font-size: 72px;">🐕</div>
           <span class="rescue-status-badge">待领养</span>

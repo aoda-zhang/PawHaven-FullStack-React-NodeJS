@@ -222,10 +222,10 @@ h1,h2,h3,h4{font-family:var(--font-heading)}
 
 // BASE menu items shared by all logged-in users
 const BASE_MENU = [
-  { label:'Home', href:'#' },
-  { label:'Rescues', href:'#' },
-  { label:'Stories', href:'#' },
-  { label:'Guide', href:'#' },
+  { label:'Home', href:'pawhaven-homepage.html' },
+  { label:'Rescues', href:'pawhaven-homepage.html#rescues' },
+  { label:'Stories', href:'pawhaven-homepage.html#stories' },
+  { label:'Guide', href:'pawhaven-homepage.html#knowledge' },
 ];
 
 const roles = {
@@ -235,13 +235,13 @@ const roles = {
     avatar: null,
     roleTag: null,
     menu: [
-      { label:'Home', href:'#', active:true },
-      { label:'Rescues', href:'#' },
-      { label:'Stories', href:'#' },
-      { label:'Guide', href:'#' },
-      { label:'Adopt', href:'#' },
+      { label:'Home', href:'pawhaven-homepage.html', active:true },
+      { label:'Rescues', href:'pawhaven-homepage.html#rescues' },
+      { label:'Stories', href:'pawhaven-homepage.html#stories' },
+      { label:'Guide', href:'pawhaven-homepage.html#knowledge' },
+      { label:'Adopt', href:'pawhaven-adoption-profile-login.html' },
     ],
-    rightActions: `<a href="#" class="btn btn-primary btn-sm btn-full">Sign In</a>`,
+    rightActions: `<a href="pawhaven-adoption-profile-login.html" class="btn btn-primary btn-sm btn-full">Sign In</a>`,
     changes: {
       added: [],
       removed: ['My Reports', 'Dashboard', 'My Claims', 'My Articles', 'My Applications', 'Profile/Avatar', 'Notifications'],
@@ -255,9 +255,9 @@ const roles = {
     avatar: 'CL',
     roleTag: null,
     menu: [
-      { label:'Home', href:'#', active:true },
-      { label:'Report Stray', href:'#', primary:true },
-      { label:'My Reports', href:'#', badge:'1' },
+      { label:'Home', href:'pawhaven-homepage.html', active:true },
+      { label:'Report Stray', href:'pawhaven-report-flow.html', primary:true },
+      { label:'My Reports', href:'pawhaven-homepage.html#rescues', badge:'1' },
       ...BASE_MENU.map(m=>({...m, active:false})),
     ],
     rightActions: `<div class="nav-badge" data-count="1"><div class="avatar">CL</div></div>`,
@@ -274,11 +274,11 @@ const roles = {
     avatar: 'WQ',
     roleTag: 'rescuer',
     menu: [
-      { label:'Home', href:'#' },
-      { label:'Nearby Cases', href:'#', badge:'5', primary:true },
-      { label:'My Claims', href:'#', badge:'2' },
+      { label:'Home', href:'pawhaven-homepage.html' },
+      { label:'Nearby Cases', href:'pawhaven-homepage.html#rescues', badge:'5', primary:true },
+      { label:'My Claims', href:'pawhaven-homepage.html#rescues', badge:'2' },
       ...BASE_MENU.map(m=>({...m, active:false})),
-      { label:'Report Stray', href:'#' },
+      { label:'Report Stray', href:'pawhaven-report-flow.html' },
     ],
     rightActions: `<span class="role-tag role-rescuer">Volunteer</span><div class="nav-badge" data-count="3"><div class="avatar">WQ</div></div>`,
     changes: {
@@ -294,9 +294,9 @@ const roles = {
     avatar: 'ZW',
     roleTag: 'adopter',
     menu: [
-      { label:'Home', href:'#', active:true },
-      { label:'Adopt', href:'#', primary:true },
-      { label:'My Applications', href:'#', badge:'1' },
+      { label:'Home', href:'pawhaven-homepage.html', active:true },
+      { label:'Adopt', href:'pawhaven-adoption-profile-login.html', primary:true },
+      { label:'My Applications', href:'pawhaven-adoption-profile-login.html', badge:'1' },
       ...BASE_MENU.map(m=>({...m, active:false})),
     ],
     rightActions: `<span class="role-tag role-adopter">Adopter</span><div class="nav-badge" data-count="1"><div class="avatar">ZW</div></div>`,
@@ -313,9 +313,9 @@ const roles = {
     avatar: 'DL',
     roleTag: 'contributor',
     menu: [
-      { label:'Home', href:'#', active:true },
-      { label:'My Articles', href:'#', badge:'3' },
-      { label:'Reviews', href:'#', badge:'2', primary:true },
+      { label:'Home', href:'pawhaven-homepage.html', active:true },
+      { label:'My Articles', href:'pawhaven-homepage.html#knowledge', badge:'3' },
+      { label:'Reviews', href:'pawhaven-homepage.html#knowledge', badge:'2', primary:true },
       ...BASE_MENU.map(m=>({...m, active:false})),
     ],
     rightActions: `<span class="role-tag role-contributor">Veterinarian</span><div class="nav-badge" data-count="2"><div class="avatar">DL</div></div>`,
@@ -332,14 +332,14 @@ const roles = {
     avatar: 'LM',
     roleTag: null,
     menu: [
-      { label:'Home', href:'#', active:true },
-      { label:'Report', href:'#' },
-      { label:'Nearby', href:'#', badge:'2' },
-      { label:'My Claims', href:'#', badge:'2' },
-      { label:'Rescues', href:'#' },
-      { label:'Stories', href:'#' },
-      { label:'Guide', href:'#' },
-      { label:'Adopt', href:'#' },
+      { label:'Home', href:'pawhaven-homepage.html', active:true },
+      { label:'Report', href:'pawhaven-report-flow.html' },
+      { label:'Nearby', href:'pawhaven-homepage.html#rescues', badge:'2' },
+      { label:'My Claims', href:'pawhaven-homepage.html#rescues', badge:'2' },
+      { label:'Rescues', href:'pawhaven-homepage.html#rescues' },
+      { label:'Stories', href:'pawhaven-homepage.html#stories' },
+      { label:'Guide', href:'pawhaven-homepage.html#knowledge' },
+      { label:'Adopt', href:'pawhaven-adoption-profile-login.html' },
     ],
     rightActions: `<div class="nav-badge" data-count="3"><div class="avatar" style="position:relative">LM<span style="font-size:8px;margin-left:2px">▼</span></div></div>`,
     changes: {
@@ -365,7 +365,7 @@ function renderHeader(roleKey) {
   return `
     <header class="header">
       <div class="container">
-        <a href="#" class="logo">
+        <a href="pawhaven-homepage.html" class="logo">
           <span class="logo-icon">🐾</span>
           <span class="logo-text">PawHaven</span>
         </a>
