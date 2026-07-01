@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven — Multi-Role Navigation & Layout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;500;600;700;800&family=Patrick+Hand&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PawHaven Design Tokens — Replicating @pawhaven/design-system
+   ============================================================ */
+:root {
+  --color-gray-1:#fff;--color-gray-2:#f8f8f8;--color-gray-3:#f0f0f0;--color-gray-4:#e5e5e5;--color-gray-5:#d4d4d4;--color-gray-6:#a3a3a3;--color-gray-7:#737373;--color-gray-8:#525252;--color-gray-9:#2f2f2f;--color-gray-10:#171717;
+  --color-orange-1:#fff7ed;--color-orange-2:#ffedd5;--color-orange-3:#fed7aa;--color-orange-4:#fdb87a;--color-orange-5:#fb923c;--color-orange-6:#f7823a;--color-orange-7:#f66b26;--color-orange-8:#e65a1a;
+  --color-green-1:#f0fdf4;--color-green-2:#dcfce7;--color-green-6:#4caf50;--color-green-8:#15803d;
+  --color-red-1:#fff1f2;--color-red-2:#fee2e2;--color-red-6:#ef4444;
+  --color-yellow-1:#fffbeb;--color-yellow-5:#fbbf24;--color-yellow-6:#f59e0b;
+  --color-blue-1:#eff6ff;--color-blue-2:#dbeafe;--color-blue-6:#3b82f6;--color-blue-10:#1e3a8a;
+  --color-brown-1:#fffaf6;--color-brown-2:#fff5ec;--color-brown-3:#f6e9df;--color-brown-4:#ecdccf;--color-brown-5:#e1cfbf;--color-brown-7:#b9a596;
+
+  --color-primary:var(--color-orange-6);--color-primary-hover:var(--color-orange-7);--color-primary-light:var(--color-orange-1);
+  --color-secondary:var(--color-green-6);--color-surface:var(--color-gray-1);--color-surface-dark:var(--color-gray-9);
+  --color-background:var(--color-brown-4);--color-text:var(--color-gray-9);--color-text-secondary:var(--color-gray-7);--color-text-inverse:var(--color-gray-1);--color-border:var(--color-gray-4);
+
+  --font-sans:'Inter','Nunito',system-ui,sans-serif;--font-heading:'Poppins','Nunito',system-ui,sans-serif;--font-serif:'Merriweather',serif;--font-handwriting:'Patrick Hand',cursive;
+  --text-xs:0.75rem;--text-sm:0.875rem;--text-base:1rem;--text-lg:1.125rem;--text-xl:1.25rem;--text-2xl:1.5rem;--text-3xl:1.875rem;--text-4xl:2.25rem;
+  --s-1:0.25rem;--s-2:0.5rem;--s-3:0.75rem;--s-4:1rem;--s-5:1.5rem;--s-6:2rem;--s-8:3rem;--s-10:4rem;--s-12:5rem;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:9999px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.12);--shadow-md:0 3px 6px rgba(0,0,0,0.16);--shadow-lg:0 8px 20px rgba(0,0,0,0.18);
+  --duration-150:150ms;--duration-200:200ms;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-sans);color:var(--color-text);background:var(--color-background);line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-heading)}
+.container{max-width:1280px;margin:0 auto;padding:0 var(--s-5)}
+
+/* ============================================================
+   Header — Base (all roles share this structure)
+   ============================================================ */
+.header{background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:100}
+.header .container{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:var(--s-2);text-decoration:none;color:var(--color-text)}
+.logo-icon{font-size:1.5rem}
+.logo-text{font-family:var(--font-heading);font-weight:700;font-size:var(--text-xl);color:var(--color-primary)}
+.nav-links{display:flex;align-items:center;gap:var(--s-1)}
+.nav-links a{color:var(--color-text-secondary);text-decoration:none;font-size:var(--text-sm);font-weight:500;padding:var(--s-2) var(--s-3);border-radius:var(--radius-md);transition:all var(--duration-150);white-space:nowrap}
+.nav-links a:hover{color:var(--color-primary);background:var(--color-primary-light)}
+.nav-links a.active{color:var(--color-primary);font-weight:600;background:var(--color-primary-light)}
+.nav-links a.primary-item{color:var(--color-primary);font-weight:700}
+.header-actions{display:flex;align-items:center;gap:var(--s-3)}
+.header-actions .btn{font-size:var(--text-sm);height:36px;padding:0 var(--s-4)}
+
+/* Nav badge */
+.nav-badge{position:relative}
+.nav-badge::after{content:attr(data-count);position:absolute;top:-6px;right:-10px;background:var(--color-red-6);color:white;font-size:10px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;padding:0 4px}
+
+/* Role indicator */
+.role-tag{display:inline-flex;align-items:center;gap:var(--s-1);padding:var(--s-1) var(--s-2);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:500}
+.role-rescuer{background:var(--color-blue-1);color:var(--color-blue-6)}
+.role-adopter{background:var(--color-green-1);color:var(--color-green-8)}
+.role-contributor{background:var(--color-yellow-1);color:var(--color-yellow-6)}
+
+/* Avatar */
+.avatar{width:36px;height:36px;border-radius:var(--radius-full);background:var(--color-brown-5);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:var(--text-sm);color:var(--color-text);cursor:pointer;border:2px solid transparent;transition:border-color var(--duration-150)}
+.avatar:hover{border-color:var(--color-primary)}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);font-family:var(--font-sans);font-weight:500;border:none;cursor:pointer;transition:all var(--duration-150);font-size:var(--text-base);border-radius:var(--radius-md);text-decoration:none}
+.btn:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.btn-primary{background:var(--color-primary);color:var(--color-text-inverse);padding:var(--s-3) var(--s-5)}
+.btn-primary:hover{background:var(--color-primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-outline{background:transparent;border:1px solid var(--color-border);color:var(--color-text);padding:var(--s-3) var(--s-5)}
+.btn-outline:hover{border-color:var(--color-text-secondary);background:var(--color-gray-2)}
+.btn-sm{font-size:var(--text-sm);padding:var(--s-2) var(--s-3)}
+.btn-lg{font-size:var(--text-lg);padding:var(--s-4) var(--s-6)}
+.btn-full{border-radius:var(--radius-full)}
+
+/* ============================================================
+   Page Layout
+   ============================================================ */
+.page{padding:var(--s-8) 0}
+.page-header{margin-bottom:var(--s-6)}
+.page-header h1{font-size:var(--text-3xl);font-weight:700;letter-spacing:-0.02em;margin-bottom:var(--s-2)}
+.page-header p{font-size:var(--text-base);color:var(--color-text-secondary);max-width:65ch}
+
+/* ============================================================
+   Comparison Table
+   ============================================================ */
+.compare-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin:var(--s-5) 0;background:var(--color-surface);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.compare-table thead th{padding:var(--s-3) var(--s-4);text-align:left;font-weight:600;font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.05em;background:var(--color-brown-2);color:var(--color-text-secondary);border-bottom:2px solid var(--color-border)}
+.compare-table thead th:first-child{min-width:180px}
+.compare-table thead th.role-col{text-align:center;min-width:140px}
+.compare-table tbody td{padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--color-gray-3)}
+.compare-table tbody td:first-child{font-weight:500}
+.compare-table tbody td.role-col{text-align:center}
+.compare-table tbody tr:hover{background:var(--color-brown-1)}
+.compare-table .added{color:var(--color-green-8);font-weight:600}
+.compare-table .removed{color:var(--color-red-6);text-decoration:line-through}
+.compare-table .same{color:var(--color-text-secondary)}
+.compare-table .highlight{background:var(--color-primary-light)}
+
+/* ============================================================
+   Header Demo Section
+   ============================================================ */
+.header-demo{margin-bottom:var(--s-6)}
+.header-demo-label{display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-4)}
+.header-demo-label .role-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.header-demo-label h3{font-size:var(--text-xl);font-weight:600}
+.header-demo-label .tag{margin-left:var(--s-2)}
+
+/* ============================================================
+   Feature Cards
+   ============================================================ */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--s-4);margin-bottom:var(--s-6)}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.card-body{padding:var(--s-5)}
+.card-body h3{font-size:var(--text-lg);font-weight:600;margin-bottom:var(--s-2)}
+.card-body p{font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6}
+
+/* ============================================================
+   Role Switcher
+   ============================================================ */
+.role-switcher{display:flex;gap:var(--s-2);margin-bottom:var(--s-6);flex-wrap:wrap;background:var(--color-surface);padding:var(--s-2);border-radius:var(--radius-lg);border:1px solid var(--color-border)}
+.role-btn{padding:var(--s-2) var(--s-4);border:none;background:none;cursor:pointer;font-family:var(--font-sans);font-size:var(--text-sm);font-weight:500;color:var(--color-text-secondary);border-radius:var(--radius-md);transition:all var(--duration-150)}
+.role-btn:hover{background:var(--color-brown-2)}
+.role-btn.active{background:var(--color-primary);color:var(--color-text-inverse)}
+.role-btn .count{font-size:var(--text-xs);opacity:0.7;margin-left:var(--s-1)}
+
+/* ============================================================
+   Section header
+   ============================================================ */
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:var(--s-5)}
+.section-header h2{font-size:var(--text-2xl);font-weight:700}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media(max-width:768px){
+  .compare-table{font-size:var(--text-xs)}
+  .compare-table thead th,.compare-table tbody td{padding:var(--s-2)}
+  .nav-links{display:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="container">
+
+    <!-- ============================================================
+         Page Header
+         ============================================================ -->
+    <div class="page-header">
+      <h1>Multi-Role Navigation & Menu Design</h1>
+      <p>All roles share the same base layout structure. Each role <strong>adds or removes</strong> menu items, right-side actions, and content sections — the core design remains consistent.</p>
+    </div>
+
+    <!-- ============================================================
+         Role Switcher
+         ============================================================ -->
+    <div class="role-switcher">
+      <button class="role-btn active" onclick="switchRole('visitor')">Visitor (Guest)</button>
+      <button class="role-btn" onclick="switchRole('reporter')">Reporter</button>
+      <button class="role-btn" onclick="switchRole('rescuer')">Rescuer</button>
+      <button class="role-btn" onclick="switchRole('adopter')">Adopter</button>
+      <button class="role-btn" onclick="switchRole('contributor')">Contributor</button>
+      <button class="role-btn" onclick="switchRole('multi')">Multi-Role User</button>
+    </div>
+
+    <!-- ============================================================
+         Live Header Preview
+         ============================================================ -->
+    <div class="section-header">
+      <h2>Header Preview</h2>
+      <span style="font-size:var(--text-sm);color:var(--color-text-secondary)">Switch roles to see changes</span>
+    </div>
+
+    <div id="header-preview" class="header-demo"></div>
+
+    <!-- ============================================================
+         Role-Specific Features
+         ============================================================ -->
+    <div class="section-header" style="margin-top:var(--s-8)">
+      <h2>What Changes Per Role</h2>
+      <span style="font-size:var(--text-sm);color:var(--color-text-secondary)">Base layout is identical — only these elements differ</span>
+    </div>
+
+    <div id="role-features"></div>
+
+    <!-- ============================================================
+         Menu Item Comparison Table
+         ============================================================ -->
+    <div class="section-header" style="margin-top:var(--s-8)">
+      <h2>Full Menu Comparison</h2>
+      <span style="font-size:var(--text-sm);color:var(--color-text-secondary)">Base items are shared. Added items shown in green.</span>
+    </div>
+
+    <div id="menu-comparison"></div>
+
+    <!-- ============================================================
+         Multi-Role Profile Dropdown
+         ============================================================ -->
+    <div class="section-header" style="margin-top:var(--s-8)">
+      <h2>Multi-Role User: Profile Dropdown</h2>
+      <span style="font-size:var(--text-sm);color:var(--color-text-secondary)">Users with multiple roles can switch active context</span>
+    </div>
+
+    <div id="profile-dropdown-demo"></div>
+
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Role Definitions
+// ============================================================
+
+// BASE menu items shared by all logged-in users
+const BASE_MENU = [
+  { label:'Home', href:'#' },
+  { label:'Rescues', href:'#' },
+  { label:'Stories', href:'#' },
+  { label:'Guide', href:'#' },
+];
+
+const roles = {
+  visitor: {
+    name: 'Visitor',
+    description: 'Not logged in. Browsing the platform.',
+    avatar: null,
+    roleTag: null,
+    menu: [
+      { label:'Home', href:'#', active:true },
+      { label:'Rescues', href:'#' },
+      { label:'Stories', href:'#' },
+      { label:'Guide', href:'#' },
+      { label:'Adopt', href:'#' },
+    ],
+    rightActions: `<a href="#" class="btn btn-primary btn-sm btn-full">Sign In</a>`,
+    changes: {
+      added: [],
+      removed: ['My Reports', 'Dashboard', 'My Claims', 'My Articles', 'My Applications', 'Profile/Avatar', 'Notifications'],
+      notes: 'Minimal menu. Strong CTA to sign in and report. "Adopt" shown to attract potential adopters.'
+    }
+  },
+
+  reporter: {
+    name: 'Reporter',
+    description: 'Logged in. Primary identity: reporting stray animals.',
+    avatar: 'CL',
+    roleTag: null,
+    menu: [
+      { label:'Home', href:'#', active:true },
+      { label:'Report Stray', href:'#', primary:true },
+      { label:'My Reports', href:'#', badge:'1' },
+      ...BASE_MENU.map(m=>({...m, active:false})),
+    ],
+    rightActions: `<div class="nav-badge" data-count="1"><div class="avatar">CL</div></div>`,
+    changes: {
+      added: ['+ Report Stray (primary CTA)', '+ My Reports (with badge count)'],
+      removed: ['- Adopt (not core for reporter)'],
+      notes: 'Report Stray is the primary action — highlighted in orange. My Reports shows case tracking. Avatar with notification badge.'
+    }
+  },
+
+  rescuer: {
+    name: 'Rescuer',
+    description: 'Logged in. Primary identity: volunteer rescuer.',
+    avatar: 'WQ',
+    roleTag: 'rescuer',
+    menu: [
+      { label:'Home', href:'#' },
+      { label:'Nearby Cases', href:'#', badge:'5', primary:true },
+      { label:'My Claims', href:'#', badge:'2' },
+      ...BASE_MENU.map(m=>({...m, active:false})),
+      { label:'Report Stray', href:'#' },
+    ],
+    rightActions: `<span class="role-tag role-rescuer">Volunteer</span><div class="nav-badge" data-count="3"><div class="avatar">WQ</div></div>`,
+    changes: {
+      added: ['+ Nearby Cases (primary, with badge)', '+ My Claims (with badge)', '+ Role tag "Volunteer" (blue)'],
+      removed: ['- Adopt (secondary for rescuer)'],
+      notes: 'Nearby Cases is the primary view — rescuer\'s main workflow. My Claims shows active rescue missions. Blue role tag identifies them as volunteer.'
+    }
+  },
+
+  adopter: {
+    name: 'Adopter',
+    description: 'Logged in. Primary identity: looking to adopt.',
+    avatar: 'ZW',
+    roleTag: 'adopter',
+    menu: [
+      { label:'Home', href:'#', active:true },
+      { label:'Adopt', href:'#', primary:true },
+      { label:'My Applications', href:'#', badge:'1' },
+      ...BASE_MENU.map(m=>({...m, active:false})),
+    ],
+    rightActions: `<span class="role-tag role-adopter">Adopter</span><div class="nav-badge" data-count="1"><div class="avatar">ZW</div></div>`,
+    changes: {
+      added: ['+ Adopt (primary CTA)', '+ My Applications (with badge)', '+ Role tag "Adopter" (green)'],
+      removed: ['- Report Stray (not core)', '- Nearby Cases (not relevant)'],
+      notes: 'Adopt is the primary CTA. My Applications tracks adoption requests. Green role tag.'
+    }
+  },
+
+  contributor: {
+    name: 'Contributor',
+    description: 'Logged in. Primary identity: knowledge contributor / veterinarian.',
+    avatar: 'DL',
+    roleTag: 'contributor',
+    menu: [
+      { label:'Home', href:'#', active:true },
+      { label:'My Articles', href:'#', badge:'3' },
+      { label:'Reviews', href:'#', badge:'2', primary:true },
+      ...BASE_MENU.map(m=>({...m, active:false})),
+    ],
+    rightActions: `<span class="role-tag role-contributor">Veterinarian</span><div class="nav-badge" data-count="2"><div class="avatar">DL</div></div>`,
+    changes: {
+      added: ['+ My Articles (with badge)', '+ Reviews (pending review queue, primary)', '+ Role tag "Veterinarian" (yellow)'],
+      removed: ['- Adopt', '- Report Stray', '- Nearby Cases (not relevant to contributor workflow)'],
+      notes: 'Reviews is the primary item — shows pending review queue. My Articles tracks published content. Yellow role tag.'
+    }
+  },
+
+  multi: {
+    name: 'Multi-Role',
+    description: 'Logged in. Has multiple roles (Reporter + Rescuer + Storyteller).',
+    avatar: 'LM',
+    roleTag: null,
+    menu: [
+      { label:'Home', href:'#', active:true },
+      { label:'Report', href:'#' },
+      { label:'Nearby', href:'#', badge:'2' },
+      { label:'My Claims', href:'#', badge:'2' },
+      { label:'Rescues', href:'#' },
+      { label:'Stories', href:'#' },
+      { label:'Guide', href:'#' },
+      { label:'Adopt', href:'#' },
+    ],
+    rightActions: `<div class="nav-badge" data-count="3"><div class="avatar" style="position:relative">LM<span style="font-size:8px;margin-left:2px">▼</span></div></div>`,
+    changes: {
+      added: ['+ Report, Nearby, My Claims (from Reporter + Rescuer roles)', '+ Avatar with dropdown for role switching'],
+      removed: [],
+      notes: 'All menu items visible. Avatar opens dropdown with role switcher + unified profile. Badge shows total notifications across roles.'
+    }
+  }
+};
+
+// ============================================================
+// Render Functions
+// ============================================================
+
+function renderHeader(roleKey) {
+  const r = roles[roleKey];
+  const menuItems = r.menu.map(item => {
+    const cls = [item.active ? 'active' : '', item.primary ? 'primary-item' : ''].filter(Boolean).join(' ');
+    const badge = item.badge ? `<span style="background:var(--color-red-6);color:white;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:2px">${item.badge}</span>` : '';
+    return `<a href="${item.href}" class="${cls}">${item.label}${badge}</a>`;
+  }).join('');
+
+  return `
+    <header class="header">
+      <div class="container">
+        <a href="#" class="logo">
+          <span class="logo-icon">🐾</span>
+          <span class="logo-text">PawHaven</span>
+        </a>
+        <nav class="nav-links">${menuItems}</nav>
+        <div class="header-actions">${r.rightActions}</div>
+      </div>
+    </header>`;
+}
+
+function renderFeatures(roleKey) {
+  const r = roles[roleKey];
+  const added = r.changes.added.map(a => `<li style="color:var(--color-green-8);margin-bottom:var(--s-1)">${a}</li>`).join('');
+  const removed = r.changes.removed.map(a => `<li style="color:var(--color-red-6);text-decoration:line-through;margin-bottom:var(--s-1)">${a}</li>`).join('');
+
+  return `
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-body">
+          <h3>Added vs Base</h3>
+          <ul style="list-style:none;margin-top:var(--s-3);font-size:var(--text-sm)">
+            ${added || '<li style="color:var(--color-text-secondary)">None — same as base</li>'}
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3>Removed vs Base</h3>
+          <ul style="list-style:none;margin-top:var(--s-3);font-size:var(--text-sm)">
+            ${removed || '<li style="color:var(--color-text-secondary)">None — all base items kept</li>'}
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3>Design Notes</h3>
+          <p>${r.changes.notes}</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderComparisonTable() {
+  const allRoles = ['visitor','reporter','rescuer','adopter','contributor','multi'];
+  const roleNames = {visitor:'Visitor',reporter:'Reporter',rescuer:'Rescuer',adopter:'Adopter',contributor:'Contributor',multi:'Multi-Role'};
+
+  // Collect all unique menu items across roles
+  const allItems = [];
+  const seen = new Set();
+  allRoles.forEach(rk => {
+    roles[rk].menu.forEach(item => {
+      if (!seen.has(item.label)) { seen.add(item.label); allItems.push(item.label); }
+    });
+  });
+
+  // For each role, check which items are present
+  const rows = allItems.map(label => {
+    const cells = allRoles.map(rk => {
+      const item = roles[rk].menu.find(m => m.label === label);
+      if (!item) return '<td class="role-col removed">—</td>';
+      const badge = item.badge ? ` <span style="font-size:10px;color:var(--color-red-6)">${item.badge}</span>` : '';
+      const primary = item.primary ? ' <span style="font-size:10px;color:var(--color-primary)">★</span>' : '';
+      return `<td class="role-col added">✓${badge}${primary}</td>`;
+    });
+    return `<tr><td>${label}</td>${cells.join('')}</tr>`;
+  });
+
+  return `
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Menu Item</th>
+          ${allRoles.map(rk => `<th class="role-col">${roleNames[rk]}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+    <p style="font-size:var(--text-xs);color:var(--color-text-secondary);margin-top:var(--s-2)">
+      ✓ = present &nbsp; — = not shown &nbsp; ★ = primary CTA &nbsp; numbers = notification badge
+    </p>`;
+}
+
+function renderProfileDropdown() {
+  return `
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-body">
+          <h3>Multi-Role Profile Dropdown</h3>
+          <p style="margin-bottom:var(--s-4)">When a user has multiple roles, the avatar opens a dropdown that shows:</p>
+
+          <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);max-width:280px;overflow:hidden">
+            <div style="padding:var(--s-4);border-bottom:1px solid var(--color-border)">
+              <div style="font-weight:600;font-size:var(--text-base);margin-bottom:var(--s-1)">Li Ming</div>
+              <div style="font-size:var(--text-xs);color:var(--color-text-secondary)">liming@email.com</div>
+            </div>
+            <div style="padding:var(--s-3)">
+              <div style="font-size:var(--text-xs);color:var(--color-text-secondary);padding:var(--s-2) var(--s-3);text-transform:uppercase;letter-spacing:0.05em">Active Roles</div>
+              <div style="display:flex;align-items:center;gap:var(--s-2);padding:var(--s-2) var(--s-3);border-radius:var(--radius-md);background:var(--color-primary-light);color:var(--color-primary);font-size:var(--text-xs);font-weight:600;margin-bottom:var(--s-2)">
+                🐾 Reporter · Rescuer · Storyteller
+              </div>
+              <div style="border-top:1px solid var(--color-gray-3);margin:var(--s-2) 0"></div>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-text);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-brown-2)'" onmouseout="this.style.background='none'">👤 My Profile</a>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-text);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-brown-2)'" onmouseout="this.style.background='none'">📋 My Reports <span style="margin-left:auto;font-size:var(--text-xs);color:var(--color-text-secondary)">3</span></a>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-text);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-brown-2)'" onmouseout="this.style.background='none'">🤝 My Rescues <span style="margin-left:auto;font-size:var(--text-xs);color:var(--color-text-secondary)">15</span></a>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-text);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-brown-2)'" onmouseout="this.style.background='none'">💝 My Stories <span style="margin-left:auto;font-size:var(--text-xs);color:var(--color-text-secondary)">2</span></a>
+              <div style="border-top:1px solid var(--color-gray-3);margin:var(--s-2) 0"></div>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-text);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-brown-2)'" onmouseout="this.style.background='none'">⚙️ Settings</a>
+              <a href="#" style="display:flex;align-items:center;gap:var(--s-3);padding:var(--s-3);text-decoration:none;color:var(--color-red-6);font-size:var(--text-sm);border-radius:var(--radius-md);transition:background 150ms" onmouseover="this.style.background='var(--color-red-1)'" onmouseout="this.style.background='none'">🚪 Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <h3>Key Design Rules</h3>
+          <ul style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:2;padding-left:var(--s-4);margin-top:var(--s-3)">
+            <li><strong>Base menu</strong> (Home, Rescues, Stories, Guide) is always present for logged-in users</li>
+            <li><strong>Primary CTA</strong> (★) is orange-highlighted — the most important action for that role</li>
+            <li><strong>Badge numbers</strong> show actionable counts (pending reviews, active claims, new reports)</li>
+            <li><strong>Role tags</strong> (blue/green/yellow) appear when a user has a specialized identity</li>
+            <li><strong>Multi-role users</strong> see all menus + a dropdown to switch active context</li>
+            <li><strong>Guest (visitor)</strong> sees minimal menu with strong "Sign In" CTA</li>
+          </ul>
+        </div>
+      </div>
+    </div>`;
+}
+
+function render(roleKey) {
+  document.getElementById('header-preview').innerHTML = renderHeader(roleKey);
+  document.getElementById('role-features').innerHTML = renderFeatures(roleKey);
+  document.getElementById('menu-comparison').innerHTML = renderComparisonTable();
+  document.getElementById('profile-dropdown-demo').innerHTML = renderProfileDropdown();
+}
+
+function switchRole(roleKey) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.role-btn[onclick="switchRole('${roleKey}')"]`).classList.add('active');
+  render(roleKey);
+}
+
+// Initial render
+render('visitor');
+</script>
+
+</body>
+</html>
