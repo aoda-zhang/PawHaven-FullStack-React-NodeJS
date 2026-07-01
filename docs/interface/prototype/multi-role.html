@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven — Multi-Role UI Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Patrick+Hand&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Design Tokens — from @pawhaven/design-system
+   ============================================================ */
+:root {
+  --gray-1:#fff;--gray-2:#f8f8f8;--gray-3:#f0f0f0;--gray-4:#e5e5e5;--gray-5:#d4d4d4;--gray-6:#a3a3a3;--gray-7:#737373;--gray-8:#525252;--gray-9:#2f2f2f;--gray-10:#171717;
+  --orange-1:#fff7ed;--orange-2:#ffedd5;--orange-3:#fed7aa;--orange-4:#fdb87a;--orange-5:#fb923c;--orange-6:#f7823a;--orange-7:#f66b26;--orange-8:#e65a1a;--orange-9:#c2410b;--orange-10:#7a2b08;
+  --green-1:#f0fdf4;--green-2:#dcfce7;--green-3:#bbf7d0;--green-4:#86efac;--green-5:#4ade80;--green-6:#4caf50;--green-7:#16a34a;--green-8:#15803d;--green-9:#166534;--green-10:#14532d;
+  --red-1:#fff1f2;--red-2:#fee2e2;--red-3:#fecaca;--red-4:#fca5a5;--red-5:#f87171;--red-6:#ef4444;--red-7:#dc2626;--red-8:#b91c1c;--red-9:#991b1b;--red-10:#7f1d1d;
+  --yellow-1:#fffbeb;--yellow-2:#fef3c7;--yellow-3:#fde68a;--yellow-4:#fcd34d;--yellow-5:#fbbf24;--yellow-6:#f59e0b;--yellow-7:#d97706;--yellow-8:#b45309;--yellow-9:#92400e;--yellow-10:#78350f;
+  --blue-1:#eff6ff;--blue-2:#dbeafe;--blue-3:#bfdbfe;--blue-4:#93c5fd;--blue-5:#60a5fa;--blue-6:#3b82f6;--blue-7:#2563eb;--blue-8:#1d4ed8;--blue-9:#1e40af;--blue-10:#1e3a8a;
+  --brown-1:#fffaf6;--brown-2:#fff5ec;--brown-3:#f6e9df;--brown-4:#ecdccf;--brown-5:#e1cfbf;--brown-6:#d3c3b3;--brown-7:#b9a596;--brown-8:#8f7b69;--brown-9:#6b5642;--brown-10:#4a392c;
+
+  --color-primary:var(--orange-6);--color-primary-hover:var(--orange-7);--color-primary-active:var(--orange-8);--color-primary-light:var(--orange-1);--color-primary-subtle:var(--orange-2);
+  --color-secondary:var(--green-6);--color-secondary-hover:var(--green-7);--color-secondary-light:var(--green-1);
+  --color-surface:var(--gray-1);--color-surface-hover:var(--brown-2);--color-surface-dark:var(--gray-9);
+  --color-background:var(--brown-4);--color-muted:var(--brown-2);--color-muted-strong:var(--brown-4);
+  --color-text:var(--gray-9);--color-text-secondary:var(--gray-7);--color-text-muted:var(--gray-5);--color-text-inverse:var(--gray-1);
+  --color-border:var(--gray-5);--color-border-strong:var(--gray-7);--color-border-focus:var(--color-primary);
+  --color-error:var(--red-6);--color-error-light:var(--red-2);--color-success:var(--green-6);--color-success-light:var(--green-2);--color-warning:var(--yellow-6);--color-warning-light:var(--yellow-2);--color-info:var(--blue-6);--color-info-light:var(--blue-2);
+
+  --font-sans:'Inter','Nunito',system-ui,sans-serif;--font-heading:'Poppins','Nunito',system-ui,sans-serif;--font-serif:'Merriweather',serif;--font-handwriting:'Patrick Hand',cursive;
+  --text-xs:0.75rem;--text-sm:0.875rem;--text-base:1rem;--text-lg:1.125rem;--text-xl:1.25rem;--text-2xl:1.5rem;--text-3xl:1.875rem;--text-4xl:2.25rem;
+  --sp-1:0.25rem;--sp-2:0.5rem;--sp-3:0.75rem;--sp-4:1rem;--sp-5:1.5rem;--sp-6:2rem;--sp-8:3rem;--sp-10:4rem;
+  --radius-sm:4px;--radius-md:8px;--radius-lg:12px;--radius-xl:16px;--radius-2xl:24px;--radius-full:9999px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.12);--shadow-md:0 3px 6px rgba(0,0,0,0.16);--shadow-lg:0 8px 20px rgba(0,0,0,0.18);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-sans);color:var(--color-text);background:var(--color-background);line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--font-heading)}
+
+/* Layout */
+.page{padding:var(--sp-6) var(--sp-5);max-width:1280px;margin:0 auto}
+.page-header{margin-bottom:var(--sp-6)}
+.page-header h1{font-size:var(--text-3xl);font-weight:700;letter-spacing:-0.02em;margin-bottom:var(--sp-1)}
+.page-header p{color:var(--color-text-secondary);font-size:var(--text-base)}
+
+/* Role Switcher */
+.role-switcher{position:fixed;bottom:var(--sp-4);right:var(--sp-4);z-index:999;display:flex;flex-direction:column;gap:var(--sp-1)}
+.role-switcher-label{font-size:var(--text-xs);color:var(--color-text-muted);text-align:center;margin-bottom:var(--sp-1)}
+.role-btn{padding:var(--sp-2) var(--sp-3);border:2px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface);cursor:pointer;font-family:var(--font-sans);font-size:var(--text-xs);font-weight:500;color:var(--color-text-secondary);transition:all 150ms;white-space:nowrap}
+.role-btn:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.role-btn.active{border-color:var(--color-primary);background:var(--color-primary);color:var(--color-text-inverse);box-shadow:var(--shadow-md)}
+
+/* Nav Bar */
+.nav-bar{display:flex;align-items:center;justify-content:space-between;padding:var(--sp-4) var(--sp-5);background:var(--color-surface);border-bottom:1px solid var(--color-border);position:sticky;top:0;z-index:100}
+.nav-left{display:flex;align-items:center;gap:var(--sp-8)}
+.nav-logo{font-family:var(--font-heading);font-weight:700;font-size:var(--text-xl);color:var(--color-primary);display:flex;align-items:center;gap:var(--sp-2);text-decoration:none}
+.nav-links{display:flex;gap:var(--sp-1);list-style:none;align-items:center}
+.nav-links a,.nav-links button{color:var(--color-text-secondary);text-decoration:none;font-size:var(--text-sm);font-weight:500;padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-md);transition:all 150ms;border:none;background:none;cursor:pointer;font-family:var(--font-sans);white-space:nowrap}
+.nav-links a:hover,.nav-links button:hover{color:var(--color-primary);background:var(--color-muted)}
+.nav-links a.active,.nav-links button.active{color:var(--color-primary);font-weight:600;background:var(--color-primary-light)}
+.nav-right{display:flex;align-items:center;gap:var(--sp-3)}
+.nav-avatar{width:36px;height:36px;border-radius:var(--radius-full);background:var(--color-muted-strong);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:var(--text-sm);color:var(--color-text-secondary);cursor:pointer;border:2px solid transparent;transition:border-color 150ms}
+.nav-avatar:hover{border-color:var(--color-primary)}
+.nav-badge{position:relative}
+.nav-badge::after{content:attr(data-count);position:absolute;top:-6px;right:-8px;background:var(--color-error);color:white;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
+
+/* Role badge on avatar */
+.role-indicator{display:inline-flex;align-items:center;gap:var(--sp-2);padding:var(--sp-1) var(--sp-3);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:500}
+.role-indicator.rescuer{background:var(--color-info-light);color:var(--color-info)}
+.role-indicator.adopter{background:var(--color-success-light);color:var(--color-success)}
+.role-indicator.contributor{background:var(--color-warning-light);color:var(--color-warning)}
+.role-indicator.guest{background:var(--gray-3);color:var(--color-text-secondary)}
+
+/* Hero */
+.hero{position:relative;display:flex;align-items:center;min-height:420px;overflow:hidden;border-radius:var(--radius-2xl);margin-bottom:var(--sp-6)}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,var(--orange-2),var(--brown-3))}
+.hero-content{position:relative;z-index:1;padding:var(--sp-8) var(--sp-8);max-width:600px}
+.hero-content h1{font-size:var(--text-4xl);font-weight:800;line-height:1.1;letter-spacing:-0.03em;margin-bottom:var(--sp-3)}
+.hero-content p{font-size:var(--text-lg);color:var(--color-text-secondary);line-height:1.6;margin-bottom:var(--sp-5)}
+.hero-actions{display:flex;gap:var(--sp-3);flex-wrap:wrap}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);font-family:var(--font-sans);font-weight:500;border:none;cursor:pointer;transition:all 150ms;font-size:var(--text-base);border-radius:var(--radius-md);text-decoration:none}
+.btn:focus-visible{outline:2px solid var(--color-primary);outline-offset:2px}
+.btn-primary{background:var(--color-primary);color:var(--color-text-inverse);padding:var(--sp-3) var(--sp-5)}
+.btn-primary:hover{background:var(--color-primary-hover);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-outline{background:transparent;border:1px solid var(--color-border);color:var(--color-text);padding:var(--sp-3) var(--sp-5)}
+.btn-outline:hover{border-color:var(--color-border-strong);background:var(--gray-2)}
+.btn-sm{padding:var(--sp-2) var(--sp-3);font-size:var(--text-sm)}
+.btn-lg{padding:var(--sp-4) var(--sp-6);font-size:var(--text-lg)}
+.btn-full{border-radius:var(--radius-full)}
+
+/* Cards */
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm)}
+.card-body{padding:var(--sp-5)}
+
+/* Section */
+.section{margin-bottom:var(--sp-8)}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-4)}
+.section-header h2{font-size:var(--text-2xl);font-weight:700}
+.section-header .view-all{font-size:var(--text-sm);color:var(--color-primary);text-decoration:none;font-weight:500}
+.section-header .view-all:hover{text-decoration:underline}
+
+/* Dashboard stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--sp-4);margin-bottom:var(--sp-6)}
+.stat-card{text-align:center}
+.stat-card .stat-value{font-family:var(--font-heading);font-size:var(--text-3xl);font-weight:700;color:var(--color-primary);line-height:1}
+.stat-card .stat-label{font-size:var(--text-sm);color:var(--color-text-secondary);margin-top:var(--sp-1)}
+
+/* Rescue Cards Grid */
+.rescue-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--sp-4)}
+.rescue-card{overflow:hidden;transition:box-shadow 200ms,transform 200ms;cursor:pointer}
+.rescue-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.rescue-card-img{aspect-ratio:4/3;overflow:hidden}
+.rescue-card-img img{width:100%;height:100%;object-fit:cover;transition:transform 400ms}
+.rescue-card:hover .rescue-card-img img{transform:scale(1.03)}
+.rescue-card-body{padding:var(--sp-4)}
+.rescue-card-body h3{font-family:var(--font-heading);font-size:var(--text-lg);font-weight:600;margin-bottom:var(--sp-1)}
+.rescue-card-body .meta{font-size:var(--text-xs);color:var(--color-text-muted);display:flex;justify-content:space-between;margin-bottom:var(--sp-2)}
+.rescue-card-body .desc{font-size:var(--text-sm);color:var(--color-text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:var(--sp-3)}
+
+/* Status Badge */
+.status-badge{display:inline-flex;align-items:center;padding:var(--sp-1) var(--sp-3);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:500;color:white}
+.status-pending{background:#f59e0b}.status-inProgress{background:#3b82f6}.status-treated{background:#1e3a8a}.status-recovering{background:#4caf50}.status-awaitingAdoption{background:#fbbf24;color:var(--gray-9)}.status-adopted{background:#15803d}.status-failed{background:#a3a3a3}
+
+/* Urgency badge */
+.urgency-badge{display:inline-flex;align-items:center;gap:var(--sp-1);padding:var(--sp-1) var(--sp-2);border-radius:var(--radius-sm);font-size:var(--text-xs);font-weight:600}
+.urgency-urgent{background:var(--color-error-light);color:var(--color-error)}
+.urgency-critical{background:var(--color-error);color:white}
+
+/* Two column layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5)}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-4)}
+
+/* Quick actions */
+.quick-actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-3);margin-bottom:var(--sp-6)}
+.quick-action{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4);border-radius:var(--radius-lg);background:var(--color-surface);border:1px solid var(--color-border);cursor:pointer;transition:all 150ms;text-decoration:none;color:var(--color-text)}
+.quick-action:hover{border-color:var(--color-primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.quick-action-icon{width:48px;height:48px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.quick-action-text h4{font-size:var(--text-base);font-weight:600;margin-bottom:var(--sp-1)}
+.quick-action-text p{font-size:var(--text-xs);color:var(--color-text-secondary)}
+
+/* Notification item */
+.notif-item{display:flex;gap:var(--sp-3);padding:var(--sp-3);border-radius:var(--radius-md);transition:background 150ms}
+.notif-item:hover{background:var(--color-muted)}
+.notif-item.unread{background:var(--color-primary-light)}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--color-primary);margin-top:6px;flex-shrink:0}
+.notif-content{flex:1}
+.notif-content .notif-title{font-size:var(--text-sm);font-weight:600;margin-bottom:var(--sp-1)}
+.notif-content .notif-desc{font-size:var(--text-xs);color:var(--color-text-secondary)}
+.notif-content .notif-time{font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--sp-1)}
+
+/* Role feature comparison table */
+.comparison-table{width:100%;border-collapse:collapse;font-size:var(--text-sm);margin:var(--sp-5) 0}
+.comparison-table th,.comparison-table td{padding:var(--sp-3) var(--sp-4);text-align:left;border-bottom:1px solid var(--color-border)}
+.comparison-table th{font-weight:600;background:var(--color-muted);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.05em;color:var(--color-text-secondary)}
+.comparison-table td:first-child{font-weight:500}
+.comparison-table .check{color:var(--color-success);font-weight:700}
+.comparison-table .dash{color:var(--color-text-muted)}
+.comparison-table .primary-action{color:var(--color-primary);font-weight:700}
+
+/* Profile dropdown */
+.profile-dropdown{position:absolute;top:100%;right:0;margin-top:var(--sp-2);background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);min-width:240px;overflow:hidden;z-index:300}
+.profile-dropdown-header{padding:var(--sp-4);border-bottom:1px solid var(--color-border)}
+.profile-dropdown-header .name{font-weight:600;font-size:var(--text-base)}
+.profile-dropdown-header .email{font-size:var(--text-xs);color:var(--color-text-secondary)}
+.profile-dropdown-body{padding:var(--sp-2)}
+.profile-dropdown-body a,.profile-dropdown-body button{display:flex;align-items:center;gap:var(--sp-3);width:100%;padding:var(--sp-3) var(--sp-4);border:none;background:none;cursor:pointer;font-family:var(--font-sans);font-size:var(--text-sm);color:var(--color-text);text-decoration:none;border-radius:var(--radius-md);transition:background 150ms}
+.profile-dropdown-body a:hover,.profile-dropdown-body button:hover{background:var(--color-muted)}
+.profile-dropdown-body .divider{border-top:1px solid var(--color-border);margin:var(--sp-2) 0}
+.profile-dropdown-body .role-switch-section{padding:var(--sp-3) var(--sp-4)}
+.profile-dropdown-body .role-switch-section .section-label{font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--sp-2);text-transform:uppercase;letter-spacing:0.05em}
+.profile-dropdown-body .role-option{display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-2) var(--sp-3);border-radius:var(--radius-md);cursor:pointer;font-size:var(--text-xs);transition:background 150ms}
+.profile-dropdown-body .role-option:hover{background:var(--color-muted)}
+.profile-dropdown-body .role-option.active{background:var(--color-primary-light);color:var(--color-primary);font-weight:600}
+
+/* Menu comparison sidebar */
+.menu-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--sp-5);margin-bottom:var(--sp-8)}
+.menu-card .card-body{padding:0}
+.menu-card-header{padding:var(--sp-4);border-bottom:1px solid var(--color-border);display:flex;align-items:center;gap:var(--sp-3)}
+.menu-card-header .role-icon{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+.menu-list{list-style:none;padding:var(--sp-2)}
+.menu-list li{padding:var(--sp-3) var(--sp-4);display:flex;align-items:center;gap:var(--sp-3);font-size:var(--text-sm);border-bottom:1px solid var(--gray-2)}
+.menu-list li:last-child{border-bottom:none}
+.menu-list li .menu-icon{width:20px;text-align:center;opacity:0.5}
+.menu-list li .menu-label{flex:1}
+.menu-list li .menu-badge{font-size:var(--text-xs);padding:var(--sp-1) var(--sp-2);border-radius:var(--radius-full);background:var(--color-primary-light);color:var(--color-primary)}
+.menu-list li.primary-item{font-weight:600;background:var(--color-primary-light)}
+
+/* Responsive */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .two-col,.three-col{grid-template-columns:1fr}
+  .menu-compare{grid-template-columns:1fr}
+  .hero-content h1{font-size:var(--text-2xl)}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ROLE SWITCHER
+     ============================================================ -->
+<div class="role-switcher">
+  <div class="role-switcher-label">Switch Role</div>
+  <button class="role-btn" onclick="switchRole('guest')">Visitor (Guest)</button>
+  <button class="role-btn active" onclick="switchRole('reporter')">Reporter</button>
+  <button class="role-btn" onclick="switchRole('rescuer')">Rescuer</button>
+  <button class="role-btn" onclick="switchRole('adopter')">Adopter</button>
+  <button class="role-btn" onclick="switchRole('contributor')">Contributor</button>
+  <button class="role-btn" onclick="switchRole('multi')">Multi-Role</button>
+</div>
+
+<!-- ============================================================
+     DYNAMIC CONTENT AREA
+     ============================================================ -->
+<div id="app"></div>
+
+<script>
+// ============================================================
+// Role Data
+// ============================================================
+const roles = {
+  guest: {
+    name: 'Guest',
+    avatar: 'G',
+    isLoggedIn: false,
+    roleTag: null,
+    navItems: [
+      { label: 'Home', href: '#', active: true },
+      { label: 'Rescues', href: '#' },
+      { label: 'Stories', href: '#' },
+      { label: 'Guide', href: '#' },
+      { label: 'Adopt', href: '#' },
+    ],
+    rightNav: `<a href="#" class="btn btn-primary btn-sm btn-full">Sign In</a>`,
+    hero: {
+      title: 'No More Stray',
+      subtitle: 'Spot, Record, Rescue every stray animal. Join thousands of volunteers making a difference.',
+      actions: `<a href="#" class="btn btn-primary btn-lg">Report a Stray</a>
+                <a href="#" class="btn btn-outline btn-lg">Learn How to Help</a>`,
+    },
+    quickActions: [
+      { icon: '🐾', bg: 'var(--orange-2)', title: 'Report a Stray', desc: 'Found a stray animal? Report it now.' },
+      { icon: '📖', bg: 'var(--green-2)', title: 'Read Rescue Guide', desc: 'Learn how to safely help.' },
+      { icon: '💝', bg: 'var(--brown-3)', title: 'Browse Stories', desc: 'Read rescue success stories.' },
+      { icon: '🏠', bg: 'var(--blue-2)', title: 'View Adoptions', desc: 'Looking to adopt? Start here.' },
+    ],
+    showStats: false,
+    showRescuerDashboard: false,
+    showAdopterMatch: false,
+    showContributorPanel: false,
+    sectionTitle: 'Latest Rescue Updates',
+  },
+
+  reporter: {
+    name: 'Chen Li',
+    avatar: 'CL',
+    isLoggedIn: true,
+    roleTag: null,
+    navItems: [
+      { label: 'Home', href: '#', active: true },
+      { label: 'Report Stray', href: '#', active: false, primary: true },
+      { label: 'My Reports', href: '#', badge: '1' },
+      { label: 'Rescues', href: '#' },
+      { label: 'Stories', href: '#' },
+      { label: 'Guide', href: '#' },
+    ],
+    rightNav: `<span class="role-indicator guest" style="margin-right:var(--sp-2)">Reporter</span>
+               <div class="nav-badge" data-count="1"><div class="nav-avatar">CL</div></div>`,
+    hero: {
+      title: 'Welcome back, Chen Li',
+      subtitle: 'Your report PH-2025-0042 is being reviewed. 3 volunteers have been notified.',
+      actions: `<a href="#" class="btn btn-primary btn-lg">Report Another Stray</a>
+                <a href="#" class="btn btn-outline btn-lg">Track PH-2025-0042</a>`,
+    },
+    quickActions: [
+      { icon: '🐾', bg: 'var(--orange-2)', title: 'Report a Stray', desc: 'Found another animal? Report it.' },
+      { icon: '📋', bg: 'var(--blue-2)', title: 'My Reports', desc: 'Track your reported cases. 1 active.' },
+      { icon: '📖', bg: 'var(--green-2)', title: 'Rescue Guide', desc: 'What to do while waiting for help.' },
+      { icon: '💝', bg: 'var(--brown-3)', title: 'Rescue Stories', desc: 'See how other rescues turned out.' },
+    ],
+    showStats: false,
+    showRescuerDashboard: false,
+    showAdopterMatch: false,
+    showContributorPanel: false,
+    sectionTitle: 'Latest Rescue Updates',
+  },
+
+  rescuer: {
+    name: 'Wang Qiang',
+    avatar: 'WQ',
+    isLoggedIn: true,
+    roleTag: 'rescuer',
+    navItems: [
+      { label: 'Dashboard', href: '#', active: true },
+      { label: 'Nearby Cases', href: '#', badge: '5' },
+      { label: 'My Claims', href: '#', badge: '2' },
+      { label: 'Rescues', href: '#' },
+      { label: 'Stories', href: '#' },
+      { label: 'Guide', href: '#' },
+    ],
+    rightNav: `<span class="role-indicator rescuer" style="margin-right:var(--sp-2)">Volunteer</span>
+               <div class="nav-badge" data-count="3"><div class="nav-avatar">WQ</div></div>`,
+    hero: null,
+    quickActions: [],
+    showStats: true,
+    stats: [
+      { value: '15', label: 'Total Rescues' },
+      { value: '12', label: 'Animals Helped' },
+      { value: '2', label: 'Active Claims' },
+      { value: '23min', label: 'Avg Response' },
+    ],
+    showRescuerDashboard: true,
+    showAdopterMatch: false,
+    showContributorPanel: false,
+    sectionTitle: 'Nearby Cases Needing Help',
+  },
+
+  adopter: {
+    name: 'Zhang Wei',
+    avatar: 'ZW',
+    isLoggedIn: true,
+    roleTag: 'adopter',
+    navItems: [
+      { label: 'Home', href: '#', active: true },
+      { label: 'Browse Animals', href: '#', primary: true },
+      { label: 'My Applications', href: '#', badge: '1' },
+      { label: 'Stories', href: '#' },
+      { label: 'Guide', href: '#' },
+    ],
+    rightNav: `<span class="role-indicator adopter" style="margin-right:var(--sp-2)">Adopter</span>
+               <div class="nav-badge" data-count="1"><div class="nav-avatar">ZW</div></div>`,
+    hero: {
+      title: 'Find Your Forever Friend',
+      subtitle: 'Every adopted animal has been rescued, treated, and loved. Now they need a home.',
+      actions: `<a href="#" class="btn btn-primary btn-lg">Browse Adoptable Animals</a>
+                <a href="#" class="btn btn-outline btn-lg">Read Adoption Guide</a>`,
+    },
+    quickActions: [
+      { icon: '🔍', bg: 'var(--green-2)', title: 'Browse Animals', desc: 'View all animals ready for adoption.' },
+      { icon: '📋', bg: 'var(--blue-2)', title: 'My Applications', desc: 'Track your adoption applications.' },
+      { icon: '📖', bg: 'var(--brown-3)', title: 'Adoption Guide', desc: 'Everything about adopting.' },
+      { icon: '💝', bg: 'var(--orange-2)', title: 'Success Stories', desc: 'Read adoption success stories.' },
+    ],
+    showStats: false,
+    showRescuerDashboard: false,
+    showAdopterMatch: true,
+    showContributorPanel: false,
+    sectionTitle: 'Recommended Matches for You',
+  },
+
+  contributor: {
+    name: 'Dr. Liu',
+    avatar: 'DL',
+    isLoggedIn: true,
+    roleTag: 'contributor',
+    navItems: [
+      { label: 'Home', href: '#', active: true },
+      { label: 'Knowledge Base', href: '#', primary: true },
+      { label: 'My Articles', href: '#', badge: '3' },
+      { label: 'Pending Reviews', href: '#', badge: '2' },
+      { label: 'Stories', href: '#' },
+    ],
+    rightNav: `<span class="role-indicator contributor" style="margin-right:var(--sp-2)">Veterinarian</span>
+               <div class="nav-badge" data-count="2"><div class="nav-avatar">DL</div></div>`,
+    hero: {
+      title: 'Share Your Expertise',
+      subtitle: 'Your knowledge saves lives. 2 articles are waiting for your review.',
+      actions: `<a href="#" class="btn btn-primary btn-lg">Write New Article</a>
+                <a href="#" class="btn btn-outline btn-lg">Review Pending (2)</a>`,
+    },
+    quickActions: [
+      { icon: '✍️', bg: 'var(--orange-2)', title: 'Write Article', desc: 'Share your rescue knowledge.' },
+      { icon: '✅', bg: 'var(--green-2)', title: 'Review Queue', desc: '2 articles pending review.' },
+      { icon: '📚', bg: 'var(--blue-2)', title: 'My Articles', desc: '3 published articles.' },
+      { icon: '📊', bg: 'var(--brown-3)', title: 'Article Stats', desc: '12,450 total reads this month.' },
+    ],
+    showStats: true,
+    stats: [
+      { value: '3', label: 'Articles Published' },
+      { value: '12.4K', label: 'Total Reads' },
+      { value: '2', label: 'Pending Reviews' },
+      { value: '89%', label: 'Helpfulness Score' },
+    ],
+    showRescuerDashboard: false,
+    showAdopterMatch: false,
+    showContributorPanel: true,
+    sectionTitle: 'Articles Pending Your Review',
+  },
+
+  multi: {
+    name: 'Li Ming',
+    avatar: 'LM',
+    isLoggedIn: true,
+    roleTag: null,
+    navItems: [
+      { label: 'Home', href: '#', active: true },
+      { label: 'Dashboard', href: '#' },
+      { label: 'Rescues', href: '#' },
+      { label: 'Report', href: '#' },
+      { label: 'Stories', href: '#' },
+      { label: 'Adopt', href: '#' },
+      { label: 'Guide', href: '#' },
+    ],
+    rightNav: `<div style="position:relative">
+                 <div class="nav-avatar" onclick="document.getElementById('multiDropdown').classList.toggle('hidden')" style="display:flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3)">
+                   <span>LM</span>
+                   <span style="font-size:10px">▼</span>
+                 </div>
+                 <div id="multiDropdown" class="profile-dropdown hidden">
+                   <div class="profile-dropdown-header">
+                     <div class="name">Li Ming</div>
+                     <div class="email">liming@email.com</div>
+                   </div>
+                   <div class="profile-dropdown-body">
+                     <div class="role-switch-section">
+                       <div class="section-label">Active Role</div>
+                       <div class="role-option active">🐾 Reporter · Rescuer · Storyteller</div>
+                     </div>
+                     <div class="divider"></div>
+                     <a href="#">👤 My Profile</a>
+                     <a href="#">📊 My Dashboard</a>
+                     <a href="#">📋 My Reports (3)</a>
+                     <a href="#">🤝 My Rescues (15)</a>
+                     <a href="#">💝 My Stories (2)</a>
+                     <a href="#">🏠 My Adoption (1)</a>
+                     <div class="divider"></div>
+                     <a href="#">⚙️ Settings</a>
+                     <button>🚪 Sign Out</button>
+                   </div>
+                 </div>
+               </div>`,
+    hero: {
+      title: 'Welcome back, Li Ming',
+      subtitle: 'You\'ve helped 15 animals find safety. 2 new rescue cases near you.',
+      actions: `<a href="#" class="btn btn-primary btn-lg">View Nearby Cases</a>
+                <a href="#" class="btn btn-outline btn-lg">Write a Story</a>`,
+    },
+    quickActions: [
+      { icon: '🐾', bg: 'var(--orange-2)', title: 'Report Stray', desc: 'Found an animal? Report now.' },
+      { icon: '🤝', bg: 'var(--blue-2)', title: 'Nearby Cases', desc: '2 new cases in your area.' },
+      { icon: '💝', bg: 'var(--green-2)', title: 'Write Story', desc: 'Share a rescue story.' },
+      { icon: '🏠', bg: 'var(--brown-3)', title: 'My Dashboard', desc: 'View your impact overview.' },
+    ],
+    showStats: true,
+    stats: [
+      { value: '3', label: 'Reports Made' },
+      { value: '15', label: 'Rescues Joined' },
+      { value: '1', label: 'Adopted' },
+      { value: '2', label: 'Stories Written' },
+    ],
+    showRescuerDashboard: false,
+    showAdopterMatch: false,
+    showContributorPanel: false,
+    sectionTitle: 'Latest Rescue Updates',
+  }
+};
+
+// ============================================================
+// Rescue mock data
+// ============================================================
+const rescueCases = [
+  { id:'PH-2025-0051', name:'Little Orange', img:'🐱', imgBg:'var(--orange-3)', location:'Chaoyang, Beijing', time:'2 hours ago', desc:'Injured kitten found behind a restaurant. Limping, needs urgent care.', status:'pending', urgency:'urgent' },
+  { id:'PH-2025-0048', name:'Max', img:'🐕', imgBg:'var(--brown-4)', location:'Haidian, Beijing', time:'5 hours ago', desc:'Large stray dog near the university campus. Friendly but appears hungry and thin.', status:'inProgress', urgency:null },
+  { id:'PH-2025-0042', name:'Snowball', img:'🐱', imgBg:'var(--gray-3)', location:'Dongcheng, Beijing', time:'3 days ago', desc:'White cat with blue eyes. Healthy, friendly. Currently recovering at shelter.', status:'recovering', urgency:null },
+  { id:'PH-2025-0038', name:'Brownie', img:'🐕', imgBg:'var(--brown-5)', location:'Fengtai, Beijing', time:'1 week ago', desc:'Abandoned puppy found near the subway station. Vaccinated and waiting for adoption.', status:'awaitingAdoption', urgency:null },
+  { id:'PH-2025-0030', name:'Luna', img:'🐱', imgBg:'var(--orange-2)', location:'Xicheng, Beijing', time:'3 weeks ago', desc:'Rescued from a tree during a storm. Fully recovered and adopted by a loving family.', status:'adopted', urgency:null },
+  { id:'PH-2025-0025', name:'Shadow', img:'🐕', imgBg:'var(--gray-4)', location:'Shijingshan, Beijing', time:'1 month ago', desc:'Elderly dog found wandering. Despite best efforts, did not survive due to severe illness.', status:'failed', urgency:null },
+];
+
+const reviewArticles = [
+  { id:1, title:'Emergency First Aid for Car Accident Animals', author:'Dr. Wang', submitted:'1 day ago', type:'Medical' },
+  { id:2, title:'How to Set Up a Temporary Foster Space at Home', author:'Chen Li', submitted:'2 days ago', type:'Guide' },
+];
+
+const adoptableAnimals = [
+  { id:1, name:'Brownie', type:'Dog · Puppy · Male', location:'Fengtai', match:'92%', img:'🐕', imgBg:'var(--brown-5)' },
+  { id:2, name:'Mimi', type:'Cat · Adult · Female', location:'Haidian', match:'85%', img:'🐱', imgBg:'var(--orange-2)' },
+  { id:3, name:'Cookie', type:'Dog · Adult · Male', location:'Chaoyang', match:'78%', img:'🐕', imgBg:'var(--brown-6)' },
+];
+
+// ============================================================
+// Render functions
+// ============================================================
+function statusClass(s){ return 'status-'+s; }
+function urgencyBadge(u){ if(!u)return''; return `<span class="urgency-badge urgency-${u}">⚡ ${u.toUpperCase()}</span>`; }
+
+function renderNav(role) {
+  const r = roles[role];
+  const links = r.navItems.map(item => {
+    const badge = item.badge ? `<span style="background:var(--color-error);color:white;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px">${item.badge}</span>` : '';
+    const cls = item.active ? 'active' : '';
+    const primary = item.primary ? 'style="color:var(--color-primary);font-weight:700"' : '';
+    return `<a href="${item.href}" class="${cls}" ${primary}>${item.label}${badge}</a>`;
+  }).join('');
+
+  return `
+    <nav class="nav-bar">
+      <div class="nav-left">
+        <a href="#" class="nav-logo">🐾 PawHaven</a>
+        <div class="nav-links">${links}</div>
+      </div>
+      <div class="nav-right">${r.rightNav}</div>
+    </nav>`;
+}
+
+function renderHero(role) {
+  const r = roles[role];
+  if (!r.hero) return '';
+  return `
+    <div class="hero" style="margin:var(--sp-5);margin-bottom:var(--sp-6)">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <h1>${r.hero.title}</h1>
+        <p>${r.hero.subtitle}</p>
+        <div class="hero-actions">${r.hero.actions}</div>
+      </div>
+    </div>`;
+}
+
+function renderStats(role) {
+  const r = roles[role];
+  if (!r.showStats) return '';
+  return `
+    <div class="stats-grid" style="padding:0 var(--sp-5)">
+      ${r.stats.map(s => `
+        <div class="card stat-card">
+          <div class="card-body">
+            <div class="stat-value">${s.value}</div>
+            <div class="stat-label">${s.label}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function renderQuickActions(role) {
+  const r = roles[role];
+  if (!r.quickActions.length) return '';
+  return `
+    <div class="quick-actions" style="padding:0 var(--sp-5)">
+      ${r.quickActions.map(a => `
+        <a href="#" class="quick-action">
+          <div class="quick-action-icon" style="background:${a.bg}">${a.icon}</div>
+          <div class="quick-action-text">
+            <h4>${a.title}</h4>
+            <p>${a.desc}</p>
+          </div>
+        </a>
+      `).join('')}
+    </div>`;
+}
+
+function renderRescuerDashboard() {
+  return `
+    <div style="padding:0 var(--sp-5);margin-bottom:var(--sp-6)">
+      <div class="section-header">
+        <h2>My Active Claims</h2>
+        <a href="#" class="view-all">View All →</a>
+      </div>
+      <div class="two-col">
+        <div class="card" style="border-left:4px solid var(--color-info)">
+          <div class="card-body">
+            <div class="flex-between" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-2)">
+              <h3 style="font-size:var(--text-lg)">PH-2025-0048 — Max</h3>
+              <span class="status-badge status-inProgress">In Progress</span>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--sp-3)">Large stray dog near Haidian University. You claimed this case 5 hours ago.</p>
+            <div style="display:flex;gap:var(--sp-2)">
+              <a href="#" class="btn btn-primary btn-sm">Update Progress</a>
+              <a href="#" class="btn btn-outline btn-sm">View Details</a>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="border-left:4px solid var(--color-success)">
+          <div class="card-body">
+            <div class="flex-between" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-2)">
+              <h3 style="font-size:var(--text-lg)">PH-2025-0042 — Snowball</h3>
+              <span class="status-badge status-recovering">Recovering</span>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--color-text-secondary);margin-bottom:var(--sp-3)">White cat recovering at shelter. Needs follow-up visit this week.</p>
+            <div style="display:flex;gap:var(--sp-2)">
+              <a href="#" class="btn btn-primary btn-sm">Update Progress</a>
+              <a href="#" class="btn btn-outline btn-sm">View Timeline</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderAdopterMatch() {
+  return `
+    <div style="padding:0 var(--sp-5);margin-bottom:var(--sp-6)">
+      <div class="three-col">
+        ${adoptableAnimals.map(a => `
+          <div class="card rescue-card">
+            <div class="rescue-card-img" style="background:${a.imgBg};display:flex;align-items:center;justify-content:center;font-size:4rem">${a.img}</div>
+            <div class="rescue-card-body">
+              <h3>${a.name}</h3>
+              <div class="meta"><span>${a.type}</span><span>📍 ${a.location}</span></div>
+              <div style="display:flex;align-items:center;gap:var(--sp-2);margin:var(--sp-2) 0">
+                <div style="flex:1;height:4px;background:var(--gray-3);border-radius:2px;overflow:hidden">
+                  <div style="width:${a.match};height:100%;background:var(--color-success);border-radius:2px"></div>
+                </div>
+                <span style="font-size:var(--text-xs);font-weight:600;color:var(--color-success)">${a.match} Match</span>
+              </div>
+              <a href="#" class="btn btn-primary btn-sm" style="width:100%;margin-top:var(--sp-2)">View & Apply</a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderContributorPanel() {
+  return `
+    <div style="padding:0 var(--sp-5);margin-bottom:var(--sp-6)">
+      <div class="two-col">
+        ${reviewArticles.map(a => `
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:var(--sp-2)">
+                <div>
+                  <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--sp-1)">${a.type} · Submitted ${a.submitted}</div>
+                  <h3 style="font-size:var(--text-lg)">${a.title}</h3>
+                  <p style="font-size:var(--text-sm);color:var(--color-text-secondary)">By ${a.author}</p>
+                </div>
+              </div>
+              <div style="display:flex;gap:var(--sp-2)">
+                <a href="#" class="btn btn-primary btn-sm">Review</a>
+                <a href="#" class="btn btn-outline btn-sm">View Article</a>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function renderRescueGrid(title) {
+  return `
+    <div style="padding:0 var(--sp-5)">
+      <div class="section-header">
+        <h2>${title}</h2>
+        <a href="#" class="view-all">View All →</a>
+      </div>
+      <div class="rescue-grid">
+        ${rescueCases.map(c => `
+          <div class="card rescue-card">
+            <div class="rescue-card-img" style="background:${c.imgBg};display:flex;align-items:center;justify-content:center;font-size:4rem">${c.img}</div>
+            <div class="rescue-card-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-1)">
+                <h3>${c.name}</h3>
+                ${urgencyBadge(c.urgency)}
+              </div>
+              <div class="meta"><span>📍 ${c.location}</span><span>${c.time}</span></div>
+              <p class="desc">${c.desc}</p>
+              <span class="status-badge ${statusClass(c.status)}">${c.status.replace(/([A-Z])/g,' $1').replace(/^./,s=>s.toUpperCase())}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function render(role) {
+  const r = roles[role];
+  let html = renderNav(role);
+  html += '<div style="padding-top:var(--sp-5)">';
+  html += renderHero(role);
+  html += renderStats(role);
+  html += renderQuickActions(role);
+  if (r.showRescuerDashboard) html += renderRescuerDashboard();
+  if (r.showAdopterMatch) html += renderAdopterMatch();
+  if (r.showContributorPanel) html += renderContributorPanel();
+  html += renderRescueGrid(r.sectionTitle);
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
+}
+
+function switchRole(role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.role-btn[onclick="switchRole('${role}')"]`).classList.add('active');
+  render(role);
+}
+
+// Initial render
+render('reporter');
+document.querySelector('.role-btn[onclick="switchRole(\'reporter\')"]').classList.add('active');
+document.querySelector('.role-btn.active')?.classList.remove('active');
+document.querySelector('.role-btn:nth-child(3)').classList.add('active');
+</script>
+
+</body>
+</html>
