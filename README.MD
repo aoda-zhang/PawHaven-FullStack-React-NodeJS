@@ -80,21 +80,19 @@ Detailed documentation can be found in the `/docs` directory.
 
 ### Product & Architecture
 
-| Document | Description |
-|----------|-------------|
-| [Product Strategy](./docs/PawHaven-Product-Strategy-EN.md) | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
-| [System Architecture](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs |
-| [Design System](./packages/design-system/README.MD) | Design tokens, Tailwind v4 + MUI v7 theme, CSS utilities |
+| Document                                                      | Description                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Product Strategy](./docs/PawHaven-Product-Strategy-EN.md)    | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
+| [System Architecture](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs         |
+| [Design System](./packages/design-system/README.MD)           | Design tokens, Tailwind v4 + MUI v7 theme, CSS utilities                  |
 
 ### Engineering
 
-| Document | Description |
-|----------|-------------|
-| [Application Overview](./docs/application_overview.md) | High-level application overview |
-| [Project Structure](./docs/project_structure.md) | Monorepo layout and module organization |
-| [Monorepo & Project Standards](./docs/project_standards.md) | Coding conventions, tooling, workflows |
-| [Authentication & Authorization Architecture](./docs/authentication_architecture.md) | JWT-based auth flow and RBAC design |
-| [Route-Level Authentication](./docs/route_authentication.md) | Frontend route guard implementation |
+| Document                                                                             | Description                            |
+| ------------------------------------------------------------------------------------ | -------------------------------------- |
+| [Monorepo & Project Standards](./docs/project_standards.md)                          | Coding conventions, tooling, workflows |
+| [Authentication & Authorization Architecture](./docs/authentication_architecture.md) | JWT-based auth flow and RBAC design    |
+| [Route-Level Authentication](./docs/route_authentication.md)                         | Frontend route guard implementation    |
 
 ---
 

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven — Design System Component Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:ital@0;1&family=Nunito:wght@400;500;600;700;800&family=Patrick+Hand&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* === Color Primitives === */
+  --color-gray-1:#ffffff;--color-gray-2:#f8f8f8;--color-gray-3:#f0f0f0;--color-gray-4:#e5e5e5;--color-gray-5:#d4d4d4;--color-gray-6:#a3a3a3;--color-gray-7:#737373;--color-gray-8:#525252;--color-gray-9:#2f2f2f;--color-gray-10:#171717;
+  --color-orange-1:#fff7ed;--color-orange-2:#ffedd5;--color-orange-3:#fed7aa;--color-orange-4:#fdb87a;--color-orange-5:#fb923c;--color-orange-6:#f7823a;--color-orange-7:#f66b26;--color-orange-8:#e65a1a;--color-orange-9:#c2410b;--color-orange-10:#7a2b08;
+  --color-green-1:#f0fdf4;--color-green-2:#dcfce7;--color-green-3:#bbf7d0;--color-green-4:#86efac;--color-green-5:#4ade80;--color-green-6:#4caf50;--color-green-7:#16a34a;--color-green-8:#15803d;--color-green-9:#166534;--color-green-10:#14532d;
+  --color-red-1:#fff1f2;--color-red-2:#fee2e2;--color-red-3:#fecaca;--color-red-4:#fca5a5;--color-red-5:#f87171;--color-red-6:#ef4444;--color-red-7:#dc2626;--color-red-8:#b91c1c;--color-red-9:#991b1b;--color-red-10:#7f1d1d;
+  --color-yellow-1:#fffbeb;--color-yellow-2:#fef3c7;--color-yellow-3:#fde68a;--color-yellow-4:#fcd34d;--color-yellow-5:#fbbf24;--color-yellow-6:#f59e0b;--color-yellow-7:#d97706;--color-yellow-8:#b45309;--color-yellow-9:#92400e;--color-yellow-10:#78350f;
+  --color-blue-1:#eff6ff;--color-blue-2:#dbeafe;--color-blue-3:#bfdbfe;--color-blue-4:#93c5fd;--color-blue-5:#60a5fa;--color-blue-6:#3b82f6;--color-blue-7:#2563eb;--color-blue-8:#1d4ed8;--color-blue-9:#1e40af;--color-blue-10:#1e3a8a;
+  --color-brown-1:#fffaf6;--color-brown-2:#fff5ec;--color-brown-3:#f6e9df;--color-brown-4:#ecdccf;--color-brown-5:#e1cfbf;--color-brown-6:#d3c3b3;--color-brown-7:#b9a596;--color-brown-8:#8f7b69;--color-brown-9:#6b5642;--color-brown-10:#4a392c;
+
+  /* === Semantic Colors === */
+  --color-primary:var(--color-orange-6);--color-primary-hover:var(--color-orange-7);--color-primary-active:var(--color-orange-8);--color-primary-light:var(--color-orange-1);--color-primary-subtle:var(--color-orange-2);
+  --color-secondary:var(--color-green-6);--color-surface:var(--color-gray-1);--color-surface-hover:var(--color-brown-2);--color-surface-dark:var(--color-gray-9);
+  --color-background:var(--color-brown-4);--color-background-subtle:var(--color-brown-3);
+  --color-text:var(--color-gray-9);--color-text-secondary:var(--color-gray-7);--color-text-tertiary:var(--color-gray-6);--color-text-inverse:var(--color-gray-1);--color-text-placeholder:var(--color-gray-5);
+  --color-border:var(--color-gray-4);--color-border-focus:var(--color-primary);
+  --color-error:var(--color-red-6);--color-success:var(--color-green-6);--color-warning:var(--color-yellow-6);--color-info:var(--color-blue-6);
+
+  /* Rescue Status Colors */
+  --rs-pending:var(--color-yellow-6);--rs-inProgress:var(--color-blue-6);--rs-treated:var(--color-blue-10);--rs-recovering:var(--color-green-6);--rs-awaiting:var(--color-yellow-5);--rs-adopted:var(--color-green-8);--rs-failed:var(--color-gray-6);
+
+  /* Typography */
+  --font-sans:'Inter','Nunito',system-ui,sans-serif;--font-heading:'Poppins','Nunito',system-ui,sans-serif;--font-serif:'Merriweather',serif;--font-handwriting:'Patrick Hand',cursive;
+
+  /* Spacing */
+  --s-1:.25rem;--s-2:.5rem;--s-3:.75rem;--s-4:1rem;--s-5:1.5rem;--s-6:2rem;--s-8:3rem;--s-10:4rem;--s-12:5rem;
+
+  /* Radius */
+  --r-xs:2px;--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-2xl:24px;--r-3xl:32px;--r-full:9999px;
+
+  /* Shadows */
+  --shadow-xs:0 1px 2px rgba(0,0,0,.04);--shadow-sm:0 1px 3px rgba(0,0,0,.12);--shadow-md:0 3px 6px rgba(0,0,0,.16);--shadow-lg:0 8px 20px rgba(0,0,0,.18);--shadow-xl:0 12px 28px rgba(0,0,0,.22);
+
+  /* Motion */
+  --dur-150:150ms;--dur-200:200ms;--dur-300:300ms;--dur-500:500ms;--ease-out:cubic-bezier(0,0,0.2,1);--ease-standard:cubic-bezier(0.4,0,0.2,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-sans);color:var(--color-text);background:#fafafa;line-height:1.5}
+h1{font-family:var(--font-heading);font-size:2.25rem;font-weight:700;letter-spacing:-.025em}
+h2{font-family:var(--font-heading);font-size:1.5rem;font-weight:600;margin-bottom:var(--s-5)}
+h3{font-family:var(--font-heading);font-size:1.125rem;font-weight:600;margin-bottom:var(--s-3)}
+
+/* Layout */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--color-surface-dark);color:#fff;padding:var(--s-6) var(--s-5);overflow-y:auto;z-index:100}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:var(--s-8);font-family:var(--font-heading);font-weight:700;font-size:1.25rem}
+.sidebar-logo span{width:36px;height:36px;background:var(--color-primary);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:18px}
+.sidebar-section{margin-bottom:24px}
+.sidebar-section-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.075em;color:rgba(255,255,255,.4);margin-bottom:12px}
+.sidebar a{display:block;padding:6px 0;font-size:.8125rem;color:rgba(255,255,255,.6);transition:color var(--dur-200)}
+.sidebar a:hover{color:var(--color-primary)}
+.main{padding:var(--s-8) var(--s-8) var(--s-8) calc(260px + var(--s-8));max-width:1400px}
+
+/* Section */
+.section{margin-bottom:var(--s-10)}
+.section-header{margin-bottom:var(--s-5)}
+.section-desc{font-size:.9375rem;color:var(--color-text-secondary);margin-bottom:var(--s-5);max-width:640px}
+
+/* Color Swatch Grid */
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:var(--s-5)}
+.swatch{height:64px;border-radius:var(--r-md);display:flex;align-items:flex-end;padding:8px;font-size:.75rem;font-weight:500;position:relative}
+.swatch-label{position:absolute;top:8px;left:8px;font-size:.6875rem;opacity:.8}
+.swatch-hex{font-size:.6875rem;opacity:.7}
+
+/* Color Scale Row */
+.scale-row{display:flex;gap:0;height:48px;border-radius:var(--r-md);overflow:hidden;margin-bottom:8px}
+.scale-item{flex:1;position:relative;display:flex;align-items:flex-end;justify-content:center;padding:6px;font-size:.6875rem;font-weight:500;transition:all var(--dur-200)}
+.scale-item:hover{flex:1.5}
+
+/* Semantic grid */
+.semantic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.semantic-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--color-gray-4)}
+.semantic-swatch{height:80px;display:flex;align-items:flex-end;padding:10px;font-size:.75rem;font-weight:600}
+.semantic-info{padding:12px;font-size:.75rem}
+.semantic-info .name{font-weight:600;margin-bottom:2px}
+.semantic-info .var{color:var(--color-text-tertiary);font-size:.6875rem;font-family:monospace}
+.semantic-info .hex{color:var(--color-text-secondary);font-size:.6875rem;margin-top:2px}
+
+/* Status badge display */
+.badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--s-5)}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--r-full);font-size:.8125rem;font-weight:600}
+.badge-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Type Scale */
+.type-sample{font-family:var(--font-heading);margin-bottom:4px;line-height:1.2}
+.type-sample-body{font-family:var(--font-sans)}
+.type-meta{font-size:.75rem;color:var(--color-text-tertiary);margin-bottom:24px;display:flex;gap:16px}
+.type-meta span{font-family:monospace;font-size:.6875rem}
+
+/* Component preview cards */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--s-5)}
+.comp-card{background:var(--color-surface);border-radius:var(--r-lg);padding:var(--s-5);border:1px solid var(--color-gray-4)}
+.comp-title{font-size:.875rem;font-weight:600;margin-bottom:12px;color:var(--color-text-secondary)}
+.comp-demo{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:16px;background:var(--color-background-subtle);border-radius:var(--r-md)}
+
+/* Button demos */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:.875rem;border-radius:var(--r-md);transition:all var(--dur-200);cursor:pointer;white-space:nowrap;font-family:inherit;border:none}
+.btn-sm{padding:6px 14px;font-size:.75rem;height:32px}
+.btn-md{padding:10px 20px;height:40px;font-size:.8125rem}
+.btn-lg{padding:14px 28px;height:48px;font-size:1rem}
+.btn-primary{background:var(--color-primary);color:#fff}.btn-primary:hover{background:var(--color-primary-hover)}
+.btn-secondary{background:var(--color-primary-light);color:var(--color-primary)}
+.btn-outline{background:transparent;border:1px solid var(--color-border);color:var(--color-text-secondary)}
+.btn-ghost{color:var(--color-text-secondary);background:transparent}.btn-ghost:hover{background:var(--color-background-subtle)}
+.btn-danger{background:var(--color-error);color:#fff}.btn-disabled{opacity:.4;pointer-events:none}
+
+/* Input demos */
+.demo-input{padding:10px 14px;border:1px solid var(--color-border);border-radius:var(--r-md);font-size:.875rem;font-family:inherit;outline:none;width:100%}
+.demo-input:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-light)}
+.demo-input-error{border-color:var(--color-error)}
+
+/* Card demo */
+.demo-card{background:var(--color-surface);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-sm);width:100%}
+.demo-card-img{height:140px;border-radius:var(--r-md);margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:48px}
+
+/* Spacing display */
+.spacing-bar{height:24px;background:var(--color-primary);border-radius:2px;margin-bottom:8px}
+.spacing-label{font-size:.75rem;color:var(--color-text-tertiary);display:flex;justify-content:space-between}
+
+/* Radius display */
+.radius-demo{width:80px;height:80px;background:var(--color-primary-light);border:2px solid var(--color-primary);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:500;color:var(--color-primary);margin:0 8px 8px 0}
+
+/* Shadow display */
+.shadow-demo{width:160px;height:80px;background:var(--color-surface);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--color-text-tertiary);margin:0 8px 8px 0}
+
+/* Step indicator */
+.step-demo{display:flex;align-items:center;gap:0}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600}
+.step-line{width:40px;height:2px;background:var(--color-gray-4)}
+
+/* Table */
+.token-table{width:100%;border-collapse:collapse;font-size:.8125rem}
+.token-table th{text-align:left;font-weight:600;padding:10px 14px;border-bottom:2px solid var(--color-gray-4);color:var(--color-text-secondary);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+.token-table td{padding:10px 14px;border-bottom:1px solid var(--color-gray-3)}
+.token-table code{font-family:monospace;font-size:.75rem;background:var(--color-gray-2);padding:2px 6px;border-radius:3px}
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{padding:var(--s-5);margin-left:0}
+  .comp-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo"><span>🐾</span>Design System</div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Design Tokens</div>
+    <a href="#colors">Color System</a>
+    <a href="#semantic">Semantic Colors</a>
+    <a href="#status">Rescue Status</a>
+    <a href="#typography">Typography</a>
+    <a href="#spacing">Spacing & Layout</a>
+    <a href="#radius">Border Radius</a>
+    <a href="#shadows">Shadows</a>
+    <a href="#motion">Motion</a>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Components</div>
+    <a href="#comp-buttons">Buttons</a>
+    <a href="#comp-inputs">Inputs</a>
+    <a href="#comp-cards">Cards</a>
+    <a href="#comp-badges">Badges</a>
+    <a href="#comp-steps">Step Indicator</a>
+    <a href="#comp-timeline">Timeline</a>
+    <a href="#comp-others">Other Components</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="main">
+
+<h1>PawHaven Design System</h1>
+<p class="section-desc" style="margin-top:8px">
+  This catalog maps every design token and component to Figma-ready specifications.
+  All values mirror <code style="font-size:.8125rem">@pawhaven/design-system</code> CSS tokens exactly.
+</p>
+
+<!-- ====================================================
+     COLOR PRIMITIVES
+     ==================================================== -->
+<section class="section" id="colors">
+  <div class="section-header"><h2>Color Primitives</h2><p class="section-desc">7 color scales, each with 10 steps (1 = lightest, 10 = darkest). Create these as Figma Color Styles.</p></div>
+
+  <h3>Gray Scale — Neutral UI</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#ffffff;color:#000">1</div><div class="scale-item" style="background:#f8f8f8">2</div><div class="scale-item" style="background:#f0f0f0">3</div><div class="scale-item" style="background:#e5e5e5">4</div><div class="scale-item" style="background:#d4d4d4">5</div><div class="scale-item" style="background:#a3a3a3;color:#fff">6</div><div class="scale-item" style="background:#737373;color:#fff">7</div><div class="scale-item" style="background:#525252;color:#fff">8</div><div class="scale-item" style="background:#2f2f2f;color:#fff">9</div><div class="scale-item" style="background:#171717;color:#fff">10</div>
+  </div>
+
+  <h3>Orange — Brand Primary</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#fff7ed">1</div><div class="scale-item" style="background:#ffedd5">2</div><div class="scale-item" style="background:#fed7aa">3</div><div class="scale-item" style="background:#fdb87a">4</div><div class="scale-item" style="background:#fb923c">5</div><div class="scale-item" style="background:#f7823a;color:#fff">6</div><div class="scale-item" style="background:#f66b26;color:#fff">7</div><div class="scale-item" style="background:#e65a1a;color:#fff">8</div><div class="scale-item" style="background:#c2410b;color:#fff">9</div><div class="scale-item" style="background:#7a2b08;color:#fff">10</div>
+  </div>
+
+  <h3>Green — Secondary / Success</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#f0fdf4">1</div><div class="scale-item" style="background:#dcfce7">2</div><div class="scale-item" style="background:#bbf7d0">3</div><div class="scale-item" style="background:#86efac">4</div><div class="scale-item" style="background:#4ade80">5</div><div class="scale-item" style="background:#4caf50;color:#fff">6</div><div class="scale-item" style="background:#16a34a;color:#fff">7</div><div class="scale-item" style="background:#15803d;color:#fff">8</div><div class="scale-item" style="background:#166534;color:#fff">9</div><div class="scale-item" style="background:#14532d;color:#fff">10</div>
+  </div>
+
+  <h3>Red — Error</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#fff1f2">1</div><div class="scale-item" style="background:#fee2e2">2</div><div class="scale-item" style="background:#fecaca">3</div><div class="scale-item" style="background:#fca5a5">4</div><div class="scale-item" style="background:#f87171">5</div><div class="scale-item" style="background:#ef4444;color:#fff">6</div><div class="scale-item" style="background:#dc2626;color:#fff">7</div><div class="scale-item" style="background:#b91c1c;color:#fff">8</div><div class="scale-item" style="background:#991b1b;color:#fff">9</div><div class="scale-item" style="background:#7f1d1d;color:#fff">10</div>
+  </div>
+
+  <h3>Yellow — Warning</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#fffbeb">1</div><div class="scale-item" style="background:#fef3c7">2</div><div class="scale-item" style="background:#fde68a">3</div><div class="scale-item" style="background:#fcd34d">4</div><div class="scale-item" style="background:#fbbf24">5</div><div class="scale-item" style="background:#f59e0b">6</div><div class="scale-item" style="background:#d97706;color:#fff">7</div><div class="scale-item" style="background:#b45309;color:#fff">8</div><div class="scale-item" style="background:#92400e;color:#fff">9</div><div class="scale-item" style="background:#78350f;color:#fff">10</div>
+  </div>
+
+  <h3>Blue — Info</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#eff6ff">1</div><div class="scale-item" style="background:#dbeafe">2</div><div class="scale-item" style="background:#bfdbfe">3</div><div class="scale-item" style="background:#93c5fd">4</div><div class="scale-item" style="background:#60a5fa">5</div><div class="scale-item" style="background:#3b82f6;color:#fff">6</div><div class="scale-item" style="background:#2563eb;color:#fff">7</div><div class="scale-item" style="background:#1d4ed8;color:#fff">8</div><div class="scale-item" style="background:#1e40af;color:#fff">9</div><div class="scale-item" style="background:#1e3a8a;color:#fff">10</div>
+  </div>
+
+  <h3>Brown — Warm Neutral / Background</h3>
+  <div class="scale-row">
+    <div class="scale-item" style="background:#fffaf6">1</div><div class="scale-item" style="background:#fff5ec">2</div><div class="scale-item" style="background:#f6e9df">3</div><div class="scale-item" style="background:#ecdccf">4</div><div class="scale-item" style="background:#e1cfbf">5</div><div class="scale-item" style="background:#d3c3b3">6</div><div class="scale-item" style="background:#b9a596;color:#fff">7</div><div class="scale-item" style="background:#8f7b69;color:#fff">8</div><div class="scale-item" style="background:#6b5642;color:#fff">9</div><div class="scale-item" style="background:#4a392c;color:#fff">10</div>
+  </div>
+</section>
+
+<!-- ====================================================
+     SEMANTIC COLORS
+     ==================================================== -->
+<section class="section" id="semantic">
+  <div class="section-header"><h2>Semantic Colors</h2><p class="section-desc">How primitives map to functional roles. Create these as Figma Color Styles with `/` naming.</p></div>
+
+  <h3>Brand / Primary</h3>
+  <div class="semantic-grid">
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-primary);color:#fff">Text inverse</div><div class="semantic-info"><div class="name">primary/default</div><div class="var">--color-primary</div><div class="hex">#F7823A</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-primary-hover);color:#fff">Hover</div><div class="semantic-info"><div class="name">primary/hover</div><div class="var">--color-primary-hover</div><div class="hex">#F66B26</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-primary-active);color:#fff">Active</div><div class="semantic-info"><div class="name">primary/active</div><div class="var">--color-primary-active</div><div class="hex">#E65A1A</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-primary-light)">Light BG</div><div class="semantic-info"><div class="name">primary/light</div><div class="var">--color-primary-light</div><div class="hex">#FFF7ED</div></div></div>
+  </div>
+
+  <h3>Surfaces</h3>
+  <div class="semantic-grid">
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-surface);border:1px solid var(--color-gray-4)">Cards</div><div class="semantic-info"><div class="name">surface/default</div><div class="var">--color-surface</div><div class="hex">#FFFFFF</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-surface-hover)">Hover</div><div class="semantic-info"><div class="name">surface/hover</div><div class="var">--color-surface-hover</div><div class="hex">#FFF5EC</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-background)">Page BG</div><div class="semantic-info"><div class="name">background/default</div><div class="var">--color-background</div><div class="hex">#ECDCCF</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-background-subtle)">Section</div><div class="semantic-info"><div class="name">background/subtle</div><div class="var">--color-background-subtle</div><div class="hex">#F6E9DF</div></div></div>
+  </div>
+
+  <h3>Text</h3>
+  <div class="semantic-grid">
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-text);color:#fff">Primary</div><div class="semantic-info"><div class="name">text/primary</div><div class="hex">#2F2F2F</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-text-secondary);color:#fff">Secondary</div><div class="semantic-info"><div class="name">text/secondary</div><div class="hex">#737373</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-text-tertiary);color:#fff">Tertiary</div><div class="semantic-info"><div class="name">text/tertiary</div><div class="hex">#A3A3A3</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-text-placeholder);color:#fff">Placeholder</div><div class="semantic-info"><div class="name">text/placeholder</div><div class="hex">#D4D4D4</div></div></div>
+  </div>
+
+  <h3>Status</h3>
+  <div class="semantic-grid">
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-error);color:#fff">Error</div><div class="semantic-info"><div class="name">status/error</div><div class="hex">#EF4444</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-success);color:#fff">Success</div><div class="semantic-info"><div class="name">status/success</div><div class="hex">#4CAF50</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-warning)">Warning</div><div class="semantic-info"><div class="name">status/warning</div><div class="hex">#F59E0B</div></div></div>
+    <div class="semantic-card"><div class="semantic-swatch" style="background:var(--color-info);color:#fff">Info</div><div class="semantic-info"><div class="name">status/info</div><div class="hex">#3B82F6</div></div></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     RESCUE STATUS COLORS
+     ==================================================== -->
+<section class="section" id="status">
+  <h2>Rescue Status Colors</h2>
+  <p class="section-desc">Semantic colors for the 7-stage rescue state machine. Each maps to a Figma Color Style: <code>rescue/[status]</code>.</p>
+  <div class="badge-row">
+    <span class="badge" style="background:#fef3c7;color:#b45309"><span class="badge-dot" style="background:var(--rs-pending)"></span> 待响应 Pending · #F59E0B</span>
+    <span class="badge" style="background:#dbeafe;color:var(--rs-inProgress)"><span class="badge-dot" style="background:var(--rs-inProgress)"></span> 救助中 In Progress · #3B82F6</span>
+    <span class="badge" style="background:#dbeafe;color:var(--rs-treated)"><span class="badge-dot" style="background:var(--rs-treated)"></span> 已治疗 Treated · #1E3A8A</span>
+    <span class="badge" style="background:#dcfce7;color:var(--rs-recovering)"><span class="badge-dot" style="background:var(--rs-recovering)"></span> 康复中 Recovering · #4CAF50</span>
+    <span class="badge" style="background:#fef3c7;color:#b45309"><span class="badge-dot" style="background:var(--rs-awaiting)"></span> 待领养 Awaiting · #FBBF24</span>
+    <span class="badge" style="background:#dcfce7;color:var(--rs-adopted)"><span class="badge-dot" style="background:var(--rs-adopted)"></span> 已领养 Adopted · #15803D</span>
+    <span class="badge" style="background:#f0f0f0;color:var(--rs-failed)"><span class="badge-dot" style="background:var(--rs-failed)"></span> 已结束 Failed · #A3A3A3</span>
+  </div>
+</section>
+
+<!-- ====================================================
+     TYPOGRAPHY
+     ==================================================== -->
+<section class="section" id="typography">
+  <h2>Typography</h2>
+  <p class="section-desc">Font stacks and type scale. Create these as Figma Text Styles.</p>
+
+  <h3>Font Stacks</h3>
+  <table class="token-table">
+    <tr><th>Role</th><th>Font Stack</th><th>CSS Variable</th></tr>
+    <tr><td><strong>Headings / Display</strong></td><td style="font-family:var(--font-heading);font-size:1.25rem">Poppins, Nunito, system-ui, sans-serif</td><td><code>--font-heading</code></td></tr>
+    <tr><td><strong>Body / UI</strong></td><td style="font-family:var(--font-sans)">Inter, Nunito, system-ui, sans-serif</td><td><code>--font-sans</code></td></tr>
+    <tr><td><strong>Story Articles</strong></td><td style="font-family:var(--font-serif);font-size:1.125rem">Merriweather, serif, system-ui</td><td><code>--font-serif</code></td></tr>
+    <tr><td><strong>Handwriting / Quotes</strong></td><td style="font-family:var(--font-handwriting);font-size:1.25rem">Patrick Hand, cursive</td><td><code>--font-handwriting</code></td></tr>
+  </table>
+
+  <h3>Type Scale</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-5)">
+    <div>
+      <div class="type-sample" style="font-size:3.75rem;font-weight:800">Display Hero</div>
+      <div class="type-meta"><span>--font-size-6xl</span><span>3.75rem / 60px</span><span>Weight 800</span><span>Heading: h1</span></div>
+    </div>
+    <div>
+      <div class="type-sample" style="font-size:3rem;font-weight:700">Display Large</div>
+      <div class="type-meta"><span>--font-size-5xl</span><span>3rem / 48px</span><span>Weight 700</span><span>Page titles</span></div>
+    </div>
+    <div>
+      <div class="type-sample" style="font-size:2.25rem;font-weight:700">Heading H1</div>
+      <div class="type-meta"><span>--font-size-4xl</span><span>2.25rem / 36px</span><span>Weight 700</span></div>
+    </div>
+    <div>
+      <div class="type-sample" style="font-size:1.875rem;font-weight:600">Heading H2</div>
+      <div class="type-meta"><span>--font-size-3xl</span><span>1.875rem / 30px</span><span>Weight 600</span></div>
+    </div>
+    <div>
+      <div class="type-sample" style="font-size:1.5rem;font-weight:600">Heading H3</div>
+      <div class="type-meta"><span>--font-size-2xl</span><span>1.5rem / 24px</span><span>Weight 600</span></div>
+    </div>
+    <div>
+      <div class="type-sample" style="font-size:1.25rem;font-weight:600">Heading H4</div>
+      <div class="type-meta"><span>--font-size-xl</span><span>1.25rem / 20px</span><span>Weight 600</span></div>
+    </div>
+  </div>
+
+  <h3>Body Scale</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-5)">
+    <div>
+      <div class="type-sample type-sample-body" style="font-size:1.125rem;font-weight:400;line-height:1.625">Body Large — Lead paragraphs and story introductions. Used sparingly to create breathing room around important introductory text.</div>
+      <div class="type-meta"><span>--font-size-lg</span><span>1.125rem / 18px</span><span>Weight 400</span><span>LH: 1.625</span></div>
+    </div>
+    <div>
+      <div class="type-sample type-sample-body" style="font-size:1rem;font-weight:400;line-height:1.5">Body Default — The workhorse. Main body copy across all screens. Set at 16px with comfortable 1.5 line-height for readability.</div>
+      <div class="type-meta"><span>--font-size-base</span><span>1rem / 16px</span><span>Weight 400</span><span>LH: 1.5</span></div>
+    </div>
+    <div>
+      <div class="type-sample type-sample-body" style="font-size:.875rem;font-weight:400;line-height:1.5">Body Small — Supporting text, metadata, and secondary information that should recede visually from primary content.</div>
+      <div class="type-meta"><span>--font-size-sm</span><span>0.875rem / 14px</span><span>Weight 400</span></div>
+    </div>
+    <div>
+      <div class="type-sample type-sample-body" style="font-size:.75rem;font-weight:400;line-height:1.5">Body Caption — Timestamps, legal text, and tertiary labels. The smallest readable size before micro-text.</div>
+      <div class="type-meta"><span>--font-size-xs</span><span>0.75rem / 12px</span><span>Weight 400</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====================================================
+     SPACING
+     ==================================================== -->
+<section class="section" id="spacing">
+  <h2>Spacing & Layout</h2>
+  <p class="section-desc">Based on a 24px baseline grid (16px body × 1.5 line-height). All spacing values are multiples of 4px.</p>
+  <div>
+    <div class="spacing-label"><span>spacing-1 · 4px</span></div><div class="spacing-bar" style="width:4px"></div>
+    <div class="spacing-label"><span>spacing-2 · 8px</span></div><div class="spacing-bar" style="width:8px"></div>
+    <div class="spacing-label"><span>spacing-3 · 12px</span></div><div class="spacing-bar" style="width:12px"></div>
+    <div class="spacing-label"><span>spacing-4 · 16px</span></div><div class="spacing-bar" style="width:16px"></div>
+    <div class="spacing-label"><span>spacing-5 · 24px ← BASELINE</span></div><div class="spacing-bar" style="width:24px"></div>
+    <div class="spacing-label"><span>spacing-6 · 32px</span></div><div class="spacing-bar" style="width:32px"></div>
+    <div class="spacing-label"><span>spacing-8 · 48px</span></div><div class="spacing-bar" style="width:48px"></div>
+    <div class="spacing-label"><span>spacing-10 · 64px</span></div><div class="spacing-bar" style="width:64px"></div>
+    <div class="spacing-label"><span>spacing-12 · 80px</span></div><div class="spacing-bar" style="width:80px"></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     RADIUS
+     ==================================================== -->
+<section class="section" id="radius">
+  <h2>Border Radius</h2>
+  <div style="display:flex;flex-wrap:wrap">
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-xs)">xs 2px</div><span class="body-caption">Inputs</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-sm)">sm 4px</div><span class="body-caption">Inputs</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-md)">md 8px</div><span class="body-caption">Buttons</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-lg)">lg 12px</div><span class="body-caption">Cards</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-xl)">xl 16px</div><span class="body-caption">Dialogs</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-2xl)">2xl 24px</div><span class="body-caption">Banners</span></div>
+    <div style="text-align:center;margin:0 12px 12px 0"><div class="radius-demo" style="border-radius:var(--r-full)">full</div><span class="body-caption">Badges</span></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     SHADOWS
+     ==================================================== -->
+<section class="section" id="shadows">
+  <h2>Shadows</h2>
+  <div style="display:flex;flex-wrap:wrap">
+    <div style="text-align:center;margin:0 16px 16px 0"><div class="shadow-demo" style="box-shadow:var(--shadow-xs)">xs · Cards</div></div>
+    <div style="text-align:center;margin:0 16px 16px 0"><div class="shadow-demo" style="box-shadow:var(--shadow-sm)">sm · Card hover</div></div>
+    <div style="text-align:center;margin:0 16px 16px 0"><div class="shadow-demo" style="box-shadow:var(--shadow-md)">md · Dropdown</div></div>
+    <div style="text-align:center;margin:0 16px 16px 0"><div class="shadow-demo" style="box-shadow:var(--shadow-lg)">lg · Modal</div></div>
+    <div style="text-align:center;margin:0 16px 16px 0"><div class="shadow-demo" style="box-shadow:var(--shadow-xl)">xl · Toast</div></div>
+  </div>
+</section>
+
+<!-- ====================================================
+     MOTION
+     ==================================================== -->
+<section class="section" id="motion">
+  <h2>Motion Tokens</h2>
+  <table class="token-table">
+    <tr><th>Token</th><th>Value</th><th>Usage</th></tr>
+    <tr><td><code>--duration-75</code></td><td>75ms</td><td>Micro-interactions (ripple)</td></tr>
+    <tr><td><code>--duration-150</code></td><td>150ms</td><td>Hover, focus, toggle</td></tr>
+    <tr><td><code>--duration-200</code></td><td>200ms</td><td>Button press, input focus</td></tr>
+    <tr><td><code>--duration-300</code></td><td>300ms</td><td>Page transitions, modal open</td></tr>
+    <tr><td><code>--duration-500</code></td><td>500ms</td><td>Card entrance, hero transition</td></tr>
+    <tr><td><code>--duration-700</code></td><td>700ms</td><td>Story reveal, before/after</td></tr>
+    <tr style="border-top:2px solid var(--color-gray-4)"><td><code>--ease-out</code></td><td><code>cubic-bezier(0, 0, 0.2, 1)</code></td><td>Entrances, appearing</td></tr>
+    <tr><td><code>--ease-in</code></td><td><code>cubic-bezier(0.4, 0, 1, 1)</code></td><td>Exits, disappearing</td></tr>
+    <tr><td><code>--ease-standard</code></td><td><code>cubic-bezier(0.4, 0, 0.2, 1)</code></td><td>Most transitions</td></tr>
+    <tr><td><code>--ease-bounce</code></td><td><code>cubic-bezier(0.68, -0.55, 0.265, 1.55)</code></td><td>Delight, achievements</td></tr>
+  </table>
+</section>
+
+<!-- ====================================================
+     COMPONENTS
+     ==================================================== -->
+<section class="section" id="comp-buttons">
+  <h2>Components: Buttons</h2>
+  <p class="section-desc">Variants: primary, secondary, outline, ghost, danger. Sizes: lg (48px), md (40px), sm (32px). States: default, hover, active, focus, disabled, loading.</p>
+
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-title">Primary Buttons</div>
+      <div class="comp-demo" style="flex-direction:column;align-items:flex-start">
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-lg">Primary Large</button><button class="btn btn-primary btn-md">Medium</button><button class="btn btn-primary btn-sm">Small</button></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn btn-primary btn-md" style="background:var(--color-primary-hover)">Hover</button><button class="btn btn-primary btn-md" style="background:var(--color-primary-active)">Active</button><button class="btn btn-primary btn-md btn-disabled">Disabled</button></div>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-title">Secondary & Outline</div>
+      <div class="comp-demo" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <button class="btn btn-secondary btn-md">Secondary</button>
+        <button class="btn btn-outline btn-md">Outline</button>
+        <button class="btn btn-ghost btn-md">Ghost</button>
+        <button class="btn btn-danger btn-md">Danger</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Inputs -->
+<section class="section" id="comp-inputs">
+  <h2>Components: Inputs</h2>
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-title">Text Input</div>
+      <div class="comp-demo" style="flex-direction:column;gap:12px">
+        <div><label style="font-size:.8125rem;font-weight:500;display:block;margin-bottom:4px">Label</label><input class="demo-input" placeholder="Placeholder text..."></div>
+        <div><label style="font-size:.8125rem;font-weight:500;display:block;margin-bottom:4px">Focused</label><input class="demo-input" style="border-color:var(--color-primary);box-shadow:0 0 0 3px var(--color-primary-light)" value="Typed text"></div>
+        <div><label style="font-size:.8125rem;font-weight:500;display:block;margin-bottom:4px">Error</label><input class="demo-input demo-input-error" value="Invalid value"><span style="font-size:.75rem;color:var(--color-error)">Error message here</span></div>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-title">Search</div>
+      <div class="comp-demo">
+        <div style="display:flex;align-items:center;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--r-md);padding:0 16px;height:44px;width:100%"><span style="margin-right:8px">🔍</span><input style="border:none;outline:none;flex:1;font-size:.875rem;font-family:inherit;background:transparent" placeholder="搜索救助案例..."></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cards -->
+<section class="section" id="comp-cards">
+  <h2>Components: Cards</h2>
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-title">Rescue Card</div>
+      <div class="demo-card">
+        <div class="demo-card-img" style="background:linear-gradient(135deg,#f6e9df,#ecdccf)">🐱</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-weight:600">小白</span>
+          <span style="font-size:.75rem;color:var(--color-text-tertiary)">PH-2025-0089</span>
+        </div>
+        <div style="display:flex;gap:12px;font-size:.8125rem;color:var(--color-text-secondary);margin-bottom:6px">
+          <span>📍 朝阳区</span><span>🐱 猫</span>
+        </div>
+        <p style="font-size:.8125rem;color:var(--color-text-secondary)">右前腿轻微受伤，已由志愿者救助...</p>
+        <div style="text-align:right;font-size:.75rem;color:var(--color-text-tertiary);margin-top:12px">30 分钟前</div>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-title">Stat Card</div>
+      <div class="demo-card" style="text-align:center">
+        <div style="width:48px;height:48px;border-radius:var(--r-lg);background:var(--color-primary-light);display:inline-flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px">🐾</div>
+        <div style="font-family:var(--font-heading);font-size:2rem;font-weight:700">1,200+</div>
+        <div style="color:var(--color-text-tertiary);font-size:.8125rem">累计救助</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Badges -->
+<section class="section" id="comp-badges">
+  <h2>Components: Badges & Chips</h2>
+  <div class="comp-card">
+    <div class="comp-title">Status Badges (Figma Variants)</div>
+    <div class="comp-demo" style="flex-wrap:wrap;gap:8px">
+      <span class="badge" style="background:#fef3c7;color:#b45309"><span class="badge-dot" style="background:var(--rs-pending)"></span>待响应</span>
+      <span class="badge" style="background:#dbeafe;color:var(--rs-inProgress)"><span class="badge-dot" style="background:var(--rs-inProgress)"></span>救助中</span>
+      <span class="badge" style="background:#dbeafe;color:var(--rs-treated)"><span class="badge-dot" style="background:var(--rs-treated)"></span>已治疗</span>
+      <span class="badge" style="background:#dcfce7;color:var(--rs-recovering)"><span class="badge-dot" style="background:var(--rs-recovering)"></span>康复中</span>
+      <span class="badge" style="background:#fef3c7;color:#b45309"><span class="badge-dot" style="background:var(--rs-awaiting)"></span>待领养</span>
+      <span class="badge" style="background:#dcfce7;color:var(--rs-adopted)"><span class="badge-dot" style="background:var(--rs-adopted)"></span>已领养</span>
+      <span class="badge" style="background:#f0f0f0;color:var(--rs-failed)"><span class="badge-dot" style="background:var(--rs-failed)"></span>已结束</span>
+    </div>
+  </div>
+</section>
+
+<!-- Step Indicator -->
+<section class="section" id="comp-steps">
+  <h2>Components: Step Indicator</h2>
+  <div class="comp-card">
+    <div class="comp-title">6-Step Report Flow Indicator</div>
+    <div class="comp-demo" style="justify-content:center">
+      <div class="step-demo">
+        <div style="text-align:center"><div class="step-circle" style="background:var(--color-primary);color:#fff">✓</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">拍照</span></div>
+        <div class="step-line" style="background:var(--color-primary)"></div>
+        <div style="text-align:center"><div class="step-circle" style="background:var(--color-primary);color:#fff">✓</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">位置</span></div>
+        <div class="step-line" style="background:var(--color-primary)"></div>
+        <div style="text-align:center"><div class="step-circle" style="background:#fff;border:2px solid var(--color-primary);color:var(--color-primary)">3</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">信息</span></div>
+        <div class="step-line"></div>
+        <div style="text-align:center"><div class="step-circle" style="background:#fff;border:2px solid var(--color-gray-4);color:var(--color-text-tertiary)">4</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">状态</span></div>
+        <div class="step-line"></div>
+        <div style="text-align:center"><div class="step-circle" style="background:#fff;border:2px solid var(--color-gray-4);color:var(--color-text-tertiary)">5</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">紧急</span></div>
+        <div class="step-line"></div>
+        <div style="text-align:center"><div class="step-circle" style="background:#fff;border:2px solid var(--color-gray-4);color:var(--color-text-tertiary)">6</div><span style="display:block;font-size:.625rem;color:var(--color-text-tertiary);margin-top:4px">确认</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="section" id="comp-timeline">
+  <h2>Components: Timeline</h2>
+  <div class="comp-card">
+    <div class="comp-title">Rescue Timeline (Vertical)</div>
+    <div class="comp-demo" style="flex-direction:column;align-items:flex-start">
+      <div style="position:relative;padding-left:44px;padding-bottom:28px">
+        <div style="position:absolute;left:15px;top:24px;bottom:0;width:2px;background:var(--color-gray-4)"></div>
+        <div style="position:absolute;left:9px;top:6px;width:14px;height:14px;border-radius:50%;border:3px solid #fff;background:var(--rs-inProgress);box-shadow:var(--shadow-xs)"></div>
+        <span class="badge" style="background:#dbeafe;color:var(--rs-inProgress)">救助中</span>
+        <span style="font-size:.75rem;color:var(--color-text-tertiary);margin-left:8px">2025-07-01 08:30</span>
+        <p style="font-size:.8125rem;color:var(--color-text-secondary);margin-top:4px">志愿者李明到达现场，已将猫安全转移至爱心宠物医院。</p>
+      </div>
+      <div style="position:relative;padding-left:44px;padding-bottom:0">
+        <div style="position:absolute;left:9px;top:6px;width:14px;height:14px;border-radius:50%;border:3px solid #fff;background:var(--rs-pending);box-shadow:var(--shadow-xs)"></div>
+        <span class="badge" style="background:#fef3c7;color:#b45309">待响应</span>
+        <span style="font-size:.75rem;color:var(--color-text-tertiary);margin-left:8px">2025-07-01 07:15</span>
+        <p style="font-size:.8125rem;color:var(--color-text-secondary);margin-top:4px">陈女士在花园路发现一只受伤白猫，已完成上报。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Other Components -->
+<section class="section" id="comp-others">
+  <h2>Components: Pagination, Tabs, Chips</h2>
+  <div class="comp-grid">
+    <div class="comp-card">
+      <div class="comp-title">Pagination</div>
+      <div class="comp-demo" style="gap:4px">
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:36px">←</button>
+        <button class="btn btn-primary btn-sm" style="width:36px;height:36px">1</button>
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:36px">2</button>
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:36px">3</button>
+        <span style="padding:0 4px;color:var(--color-text-tertiary)">...</span>
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:36px">8</button>
+        <button class="btn btn-ghost btn-sm" style="width:36px;height:36px">→</button>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-title">Filter Chips</div>
+      <div class="comp-demo" style="gap:6px">
+        <span class="chip active" style="padding:6px 16px;border-radius:var(--r-full);font-size:.8125rem;font-weight:500;border:1px solid var(--color-primary);background:var(--color-primary);color:#fff">全部</span>
+        <span class="chip" style="padding:6px 16px;border-radius:var(--r-full);font-size:.8125rem;border:1px solid var(--color-border);color:var(--color-text-secondary)">🐱 猫</span>
+        <span class="chip" style="padding:6px 16px;border-radius:var(--r-full);font-size:.8125rem;border:1px solid var(--color-border);color:var(--color-text-secondary)">🐕 狗</span>
+        <span style="padding:6px 16px;border-radius:var(--r-full);font-size:.8125rem;border:1px solid var(--color-red-6);color:var(--color-error);font-weight:500">🔴 紧急</span>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-title">Empty State</div>
+      <div class="comp-demo" style="flex-direction:column;align-items:center;text-align:center;padding:32px">
+        <div style="font-size:48px;margin-bottom:16px;opacity:.4">📭</div>
+        <div style="font-weight:600;font-size:1.125rem;margin-bottom:4px">暂无内容</div>
+        <div style="font-size:.8125rem;color:var(--color-text-tertiary);margin-bottom:16px">当前没有符合条件的救助案例</div>
+        <button class="btn btn-primary btn-md">发起上报</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer note -->
+<section class="section" style="padding:var(--s-8) 0;border-top:1px solid var(--color-gray-4);margin-top:var(--s-10)">
+  <p style="font-size:.8125rem;color:var(--color-text-tertiary);text-align:center">
+    PawHaven Design System · All tokens derived from <code>@pawhaven/design-system</code> ·
+    Use this catalog as Figma implementation reference
+  </p>
+</section>
+
+</div>
+</body>
+</html>

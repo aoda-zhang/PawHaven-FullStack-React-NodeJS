@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PawHaven — 流浪动物上报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Design Tokens */
+:root {
+  --color-gray-1: #ffffff; --color-gray-2: #f8f8f8; --color-gray-3: #f0f0f0;
+  --color-gray-4: #e5e5e5; --color-gray-5: #d4d4d4; --color-gray-6: #a3a3a3;
+  --color-gray-7: #737373; --color-gray-8: #525252; --color-gray-9: #2f2f2f;
+  --color-orange-1: #fff7ed; --color-orange-2: #ffedd5; --color-orange-6: #f7823a; --color-orange-7: #f66b26; --color-orange-8: #e65a1a; --color-orange-9: #c2410b;
+  --color-green-1: #f0fdf4; --color-green-6: #4caf50;
+  --color-red-1: #fff1f2; --color-red-6: #ef4444;
+  --color-yellow-2: #fef3c7; --color-yellow-6: #f59e0b;
+  --color-blue-1: #eff6ff; --color-blue-6: #3b82f6;
+  --color-brown-3: #f6e9df; --color-brown-4: #ecdccf;
+
+  --color-primary: var(--color-orange-6); --color-primary-hover: var(--color-orange-7); --color-primary-light: var(--color-orange-1);
+  --color-surface: var(--color-gray-1); --color-background: var(--color-brown-4);
+  --color-text: var(--color-gray-9); --color-text-secondary: var(--color-gray-7); --color-text-tertiary: var(--color-gray-6);
+  --color-border: var(--color-gray-4); --color-error: var(--color-red-6); --color-success: var(--color-green-6);
+
+  --font-sans: 'Inter', 'Nunito', system-ui, sans-serif; --font-heading: 'Poppins', 'Nunito', system-ui, sans-serif;
+  --spacing-2: 0.5rem; --spacing-3: 0.75rem; --spacing-4: 1rem; --spacing-5: 1.5rem; --spacing-6: 2rem; --spacing-8: 3rem;
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px; --radius-xl: 16px; --radius-2xl: 24px; --radius-full: 9999px;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.12);
+  --duration-150: 150ms; --duration-200: 200ms; --duration-300: 300ms;
+  --ease-out: cubic-bezier(0,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-sans); color: var(--color-text); background: var(--color-background); line-height: 1.5; }
+
+/* Mobile Frame — for demo */
+.app-frame { max-width: 420px; margin: 0 auto; background: var(--color-surface); min-height: 100vh; position: relative; box-shadow: var(--shadow-card); }
+.app-header { padding: 16px 20px; border-bottom: 1px solid var(--color-gray-3); display: flex; align-items: center; gap: 12px; position: sticky; top: 0; background: var(--color-surface); z-index: 10; }
+.app-header-back { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); border: none; background: none; cursor: pointer; font-size: 20px; }
+.app-header-title { font-family: var(--font-heading); font-weight: 600; font-size: 1.125rem; flex: 1; }
+.app-body { padding: 24px 20px 100px; }
+
+/* Step Indicator */
+.step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 32px; }
+.step-item { display: flex; align-items: center; }
+.step-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8125rem; font-weight: 600; transition: all var(--duration-200); }
+.step-circle--completed { background: var(--color-primary); color: #fff; }
+.step-circle--active { background: #fff; border: 2px solid var(--color-primary); color: var(--color-primary); }
+.step-circle--pending { background: #fff; border: 2px solid var(--color-gray-5); color: var(--color-text-tertiary); }
+.step-line { width: 32px; height: 2px; background: var(--color-gray-4); margin: 0 4px; transition: all var(--duration-200); }
+.step-line--completed { background: var(--color-primary); }
+.step-label { text-align: center; font-size: 0.6875rem; color: var(--color-text-tertiary); margin-top: 6px; max-width: 56px; line-height: 1.3; }
+
+/* Form elements */
+.form-group { margin-bottom: 24px; }
+.form-label { display: block; font-size: 0.9375rem; font-weight: 600; margin-bottom: 8px; color: var(--color-text); }
+.form-hint { font-size: 0.8125rem; color: var(--color-text-tertiary); margin-bottom: 12px; line-height: 1.5; }
+.form-input {
+  width: 100%; height: 48px; padding: 0 16px; border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); font-size: 0.9375rem; font-family: inherit; color: var(--color-text);
+  background: var(--color-surface); transition: all var(--duration-200); outline: none;
+}
+.form-input:focus { border-color: var(--color-primary); box-shadow: 0 0 0 3px var(--color-primary-light); }
+.form-input::placeholder { color: var(--color-gray-5); }
+.form-textarea { height: 120px; padding: 14px 16px; resize: vertical; }
+
+/* Photo Upload */
+.photo-upload-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.photo-upload-slot {
+  aspect-ratio: 1; border: 2px dashed var(--color-gray-4); border-radius: var(--radius-lg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; transition: all var(--duration-200); background: var(--color-gray-2);
+  color: var(--color-text-tertiary); font-size: 0.75rem;
+}
+.photo-upload-slot:hover { border-color: var(--color-primary); background: var(--color-primary-light); color: var(--color-primary); }
+.photo-upload-icon { font-size: 28px; }
+.photo-upload-main { grid-column: span 2; grid-row: span 2; }
+.photo-preview { position: relative; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 1; }
+.photo-preview-delete { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+
+/* Type Selector */
+.type-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.type-card {
+  padding: 20px 12px; border: 2px solid var(--color-gray-4); border-radius: var(--radius-lg);
+  text-align: center; cursor: pointer; transition: all var(--duration-200); background: var(--color-surface);
+}
+.type-card:hover { border-color: var(--color-primary); background: var(--color-primary-light); }
+.type-card.active { border-color: var(--color-primary); background: var(--color-primary-light); }
+.type-card-icon { font-size: 40px; margin-bottom: 8px; }
+.type-card-label { font-weight: 600; font-size: 0.9375rem; }
+
+/* Condition Questions */
+.condition-question {
+  padding: 16px 20px; background: var(--color-gray-2); border-radius: var(--radius-lg);
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; transition: all var(--duration-200);
+}
+.condition-question.active-yes { background: var(--color-red-1); border: 2px solid var(--color-error); }
+.condition-question.active-no { background: var(--color-green-1); border: 2px solid var(--color-success); }
+.condition-label { font-size: 0.9375rem; font-weight: 500; }
+.condition-toggle { display: flex; gap: 4px; background: var(--color-gray-4); border-radius: var(--radius-md); padding: 2px; }
+.condition-toggle button {
+  padding: 8px 20px; border-radius: 6px; font-size: 0.8125rem; font-weight: 600;
+  background: transparent; color: var(--color-text-secondary); border: none; cursor: pointer; transition: all var(--duration-150);
+}
+.condition-toggle button.active-yes { background: var(--color-error); color: #fff; }
+.condition-toggle button.active-no { background: var(--color-success); color: #fff; }
+
+/* Behavior Chips */
+.behavior-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.behavior-chip {
+  padding: 10px 18px; border: 1.5px solid var(--color-gray-4); border-radius: var(--radius-full);
+  font-size: 0.8125rem; cursor: pointer; transition: all var(--duration-200); background: var(--color-surface);
+}
+.behavior-chip:hover { border-color: var(--color-primary); }
+.behavior-chip.active { background: var(--color-primary-light); border-color: var(--color-primary); color: var(--color-primary); font-weight: 600; }
+
+/* Emergency Card */
+.emergency-card {
+  padding: 24px; border-radius: var(--radius-xl); text-align: center; margin-bottom: 24px; transition: all var(--duration-300);
+}
+.emergency-card--urgent { background: var(--color-red-1); border: 2px solid var(--color-error); }
+.emergency-card--normal { background: var(--color-green-1); border: 2px solid var(--color-success); }
+.emergency-card-icon { font-size: 48px; margin-bottom: 12px; }
+.emergency-card h3 { font-family: var(--font-heading); font-size: 1.25rem; margin-bottom: 8px; }
+.emergency-card--urgent h3 { color: var(--color-error); }
+.emergency-card--normal h3 { color: var(--color-success); }
+.emergency-card p { font-size: 0.875rem; color: var(--color-text-secondary); line-height: 1.6; }
+
+/* Summary Card */
+.summary-card { background: var(--color-gray-2); border-radius: var(--radius-lg); padding: 20px; }
+.summary-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 0.875rem; }
+.summary-row + .summary-row { border-top: 1px solid var(--color-gray-4); }
+.summary-label { color: var(--color-text-tertiary); width: 80px; flex-shrink: 0; }
+
+/* Success Screen */
+.success-icon { width: 80px; height: 80px; background: var(--color-green-1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; font-size: 40px; color: var(--color-success); }
+.success-message { margin-top: 16px; }
+.success-message p { font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.7; margin-bottom: 16px; }
+
+/* Bottom Bar */
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 420px; background: var(--color-surface); padding: 16px 20px 24px; border-top: 1px solid var(--color-gray-3); display: flex; gap: 12px; z-index: 20; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.9375rem; border-radius: var(--radius-md); transition: all var(--duration-200); cursor: pointer; white-space: nowrap; border: none; font-family: inherit; }
+.btn-primary { background: var(--color-primary); color: #fff; flex: 1; height: 48px; }
+.btn-primary:hover { background: var(--color-primary-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(247,130,58,0.35); }
+.btn-secondary { background: var(--color-gray-3); color: var(--color-text-secondary); height: 48px; padding: 0 24px; }
+.btn-secondary:hover { background: var(--color-gray-4); }
+.btn-lg { height: 52px; font-size: 1rem; width: 100%; }
+
+/* Disclaimer */
+.disclaimer { padding: 12px 16px; background: var(--color-blue-1); border-radius: var(--radius-md); font-size: 0.75rem; color: var(--color-text-secondary); line-height: 1.6; }
+
+/* Stepper detail */
+.step-counter { font-size: 0.8125rem; color: var(--color-text-tertiary); margin-bottom: 8px; }
+
+/* Hidden step toggle */
+.step { display: none; }
+.step.active { display: block; animation: fadeSlideIn var(--duration-300) var(--ease-out); }
+@keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Skip link */
+.skip-link { font-size: 0.8125rem; color: var(--color-text-tertiary); cursor: pointer; margin-top: 8px; display: inline-block; }
+.skip-link:hover { color: var(--color-primary); }
+
+@media (min-width: 768px) {
+  .app-frame { max-width: 720px; border-radius: var(--radius-xl); margin: 40px auto; min-height: auto; }
+  .bottom-bar { position: static; transform: none; max-width: 100%; padding: 24px; border-top: none; }
+  .app-body { padding: 24px 40px 0; }
+}
+</style>
+</head>
+<body>
+<div class="app-frame">
+
+<!-- Header -->
+<div class="app-header">
+  <button class="app-header-back" onclick="location.href='pawhaven-homepage.html'">←</button>
+  <span class="app-header-title">上报流浪动物</span>
+  <span style="font-size:0.8125rem;color:var(--color-text-tertiary)" id="stepCounter">步骤 1/6</span>
+</div>
+
+<div class="app-body">
+
+<!-- Step Indicator -->
+<div class="step-indicator">
+  <div class="step-item">
+    <div><div class="step-circle step-circle--active" id="dot1">1</div><div class="step-label">拍照</div></div>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-item">
+    <div><div class="step-circle step-circle--pending" id="dot2">2</div><div class="step-label">位置</div></div>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-item">
+    <div><div class="step-circle step-circle--pending" id="dot3">3</div><div class="step-label">信息</div></div>
+  </div>
+  <div class="step-line" id="line3"></div>
+  <div class="step-item">
+    <div><div class="step-circle step-circle--pending" id="dot4">4</div><div class="step-label">状态</div></div>
+  </div>
+  <div class="step-line" id="line4"></div>
+  <div class="step-item">
+    <div><div class="step-circle step-circle--pending" id="dot5">5</div><div class="step-label">紧急</div></div>
+  </div>
+  <div class="step-line" id="line5"></div>
+  <div class="step-item">
+    <div><div class="step-circle step-circle--pending" id="dot6">6</div><div class="step-label">确认</div></div>
+  </div>
+</div>
+
+<!-- Step 1: Photo Upload -->
+<div class="step active" id="step1">
+  <p class="step-counter">步骤 1 · 拍摄照片</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:8px">拍摄或上传照片</h2>
+  <p class="form-hint">清晰的照片能帮助志愿者更快确认动物的情况和位置。建议从不同角度拍摄。</p>
+
+  <div class="photo-upload-grid">
+    <div class="photo-upload-slot photo-upload-main" onclick="this.innerHTML='<span style=font-size:40px>📸</span><span style=font-size:0.75rem>点击更换</span>'">
+      <span class="photo-upload-icon">📷</span>
+      <span>点击拍摄/上传</span>
+      <span style="font-size:0.6875rem">第一张为封面</span>
+    </div>
+    <div class="photo-upload-slot">
+      <span class="photo-upload-icon">+</span>
+    </div>
+    <div class="photo-upload-slot">
+      <span class="photo-upload-icon">+</span>
+    </div>
+    <div class="photo-upload-slot">
+      <span class="photo-upload-icon">+</span>
+    </div>
+    <div class="photo-upload-slot">
+      <span class="photo-upload-icon">+</span>
+    </div>
+  </div>
+  <p class="form-hint" style="margin-top:12px;text-align:center">最多上传 5 张照片</p>
+</div>
+
+<!-- Step 2: Location -->
+<div class="step" id="step2">
+  <p class="step-counter">步骤 2 · 标记位置</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:8px">标记动物位置</h2>
+  <p class="form-hint">GPS 自动定位，你可以手动调整地址。你的精确位置不会公开。</p>
+
+  <div style="height:200px;background:var(--color-gray-3);border-radius:var(--radius-lg);margin-bottom:16px;display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--color-gray-5)">📍</div>
+
+  <div class="form-group">
+    <label class="form-label">地址</label>
+    <input type="text" class="form-input" value="北京市朝阳区花园路 · 地铁站B口附近" placeholder="输入地址">
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;font-size:0.75rem;color:var(--color-green-6);margin-bottom:16px">
+    <span>📍</span> 定位精度：15 米 ✓
+  </div>
+  <span class="skip-link">地址不正确？点击手动修正</span>
+</div>
+
+<!-- Step 3: Animal Info -->
+<div class="step" id="step3">
+  <p class="step-counter">步骤 3 · 基础信息</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:8px">动物基本信息</h2>
+
+  <div class="form-group">
+    <label class="form-label">动物类型 <span style="color:var(--color-error)">*</span></label>
+    <div class="type-selector">
+      <div class="type-card active" onclick="document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+        <div class="type-card-icon">🐱</div><div class="type-card-label">猫</div>
+      </div>
+      <div class="type-card" onclick="document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+        <div class="type-card-icon">🐕</div><div class="type-card-label">狗</div>
+      </div>
+      <div class="type-card" onclick="document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('active'));this.classList.add('active')">
+        <div class="type-card-icon">🐾</div><div class="type-card-label">其他</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">数量</label>
+    <div style="display:flex;align-items:center;gap:16px">
+      <button class="btn" style="width:40px;height:40px;border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:1.25rem">−</button>
+      <span style="font-size:1.125rem;font-weight:600;min-width:20px;text-align:center">1</span>
+      <button class="btn" style="width:40px;height:40px;border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:1.25rem">+</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">外观特征 <span style="font-size:0.75rem;color:var(--color-text-tertiary)">(选填)</span></label>
+    <input type="text" class="form-input" placeholder="例如：白色短毛、蓝色眼睛、约2-3岁">
+  </div>
+  <span class="skip-link">这些信息帮助志愿者更快识别动物</span>
+</div>
+
+<!-- Step 4: Condition -->
+<div class="step" id="step4">
+  <p class="step-counter">步骤 4 · 状态评估</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:8px">动物当前状态</h2>
+  <p class="form-hint">请根据实际观察到的情况回答以下问题，我们会自动评估紧急程度。</p>
+
+  <div class="condition-question" id="q1">
+    <span class="condition-label">动物是否在明显流血或受伤？</span>
+    <div class="condition-toggle">
+      <button onclick="setCondition('q1','yes',this)">是</button>
+      <button onclick="setCondition('q1','no',this)" class="active-no">否</button>
+    </div>
+  </div>
+  <div class="condition-question" id="q2">
+    <span class="condition-label">动物是否无法移动或行动困难？</span>
+    <div class="condition-toggle">
+      <button onclick="setCondition('q2','yes',this)">是</button>
+      <button onclick="setCondition('q2','no',this)" class="active-no">否</button>
+    </div>
+  </div>
+  <div class="condition-question" id="q3">
+    <span class="condition-label">动物是否在危险位置（马路/高处）？</span>
+    <div class="condition-toggle">
+      <button onclick="setCondition('q3','yes',this)">是</button>
+      <button onclick="setCondition('q3','no',this)" class="active-no">否</button>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:24px">
+    <label class="form-label">行为特征 <span style="font-size:0.75rem;color:var(--color-text-tertiary)">(选填)</span></label>
+    <div class="behavior-chips">
+      <span class="behavior-chip active">亲近人</span><span class="behavior-chip">警惕</span><span class="behavior-chip">有攻击性</span><span class="behavior-chip">不确定</span>
+    </div>
+  </div>
+</div>
+
+<!-- Step 5: Urgency -->
+<div class="step" id="step5">
+  <p class="step-counter">步骤 5 · 紧急程度</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:20px">系统自动评估</h2>
+
+  <div class="emergency-card emergency-card--normal" id="emergencyCard">
+    <div class="emergency-card-icon">🟢</div>
+    <h3>非紧急</h3>
+    <p>根据你的回答，动物目前没有明显的生命危险。案例已记录，附近的志愿者将尽快查看。</p>
+  </div>
+
+  <p class="form-hint" style="text-align:center">系统会根据你的回答自动判断紧急程度。你觉得评估不准确？可以<a href="#" style="color:var(--color-primary)" onclick="document.getElementById('emergencyCard').className='emergency-card emergency-card--urgent';this.parentElement.querySelector('.emergency-card-icon').textContent='🔴';this.parentElement.querySelector('h3').textContent='紧急';this.parentElement.querySelector('p').textContent='根据你的回答，动物可能处于危险中。案例将优先推送给附近的志愿者和救助站。'">手动标记为紧急</a></p>
+</div>
+
+<!-- Step 6: Confirm -->
+<div class="step" id="step6">
+  <p class="step-counter">步骤 6 · 确认信息</p>
+  <h2 style="font-family:var(--font-heading);font-size:1.5rem;font-weight:700;margin-bottom:20px">确认上报信息</h2>
+
+  <div class="summary-card">
+    <div class="summary-row"><span class="summary-label">照片</span><span style="color:var(--color-primary);font-weight:500">1 张</span></div>
+    <div class="summary-row"><span class="summary-label">位置</span><span>朝阳区花园路 · 地铁站B口</span></div>
+    <div class="summary-row"><span class="summary-label">类型</span><span>猫 · 1只 · 成年</span></div>
+    <div class="summary-row"><span class="summary-label">状态</span><span>无明显外伤，精神状态良好</span></div>
+    <div class="summary-row"><span class="summary-label">紧急程度</span><span style="color:var(--color-success);font-weight:600">🟢 非紧急</span></div>
+  </div>
+
+  <div class="form-group" style="margin-top:20px">
+    <label class="form-label">联系方式 <span style="font-size:0.75rem;color:var(--color-text-tertiary)">(选填)</span></label>
+    <input type="text" class="form-input" placeholder="手机号码，用于后续跟进（不会公开）">
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ 你的联系方式仅用于救助跟进，不会公开显示。位置信息在救助完成后将自动模糊化处理。提交即表示你同意平台的<a href="#" style="color:var(--color-primary)">隐私政策</a>。
+  </div>
+</div>
+
+<!-- Success Screen -->
+<div class="step" id="stepSuccess" style="text-align:center;padding-top:40px">
+  <div class="success-icon">✓</div>
+  <h2 style="font-family:var(--font-heading);font-size:1.75rem;font-weight:700;margin-bottom:16px">上报成功！</h2>
+  <div class="success-message">
+    <p>我们已通知了附近的 <strong>12 名志愿者</strong>和 <strong>3 个救助站</strong>。他们会尽快查看这个案例。</p>
+    <p style="font-size:0.8125rem;color:var(--color-text-tertiary)">案例编号：<strong>PH-2025-0092</strong></p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-top:32px">
+    <button class="btn btn-primary btn-lg" onclick="location.href='pawhaven-rescue-detail.html'">查看我的案例</button>
+    <button class="btn btn-secondary btn-lg" onclick="alert('跳转到知识库')">了解救助知识</button>
+  </div>
+
+  <p style="margin-top:24px;font-size:0.8125rem;color:var(--color-text-tertiary)">
+    <a href="#" onclick="goToStep(1);document.getElementById('stepSuccess').classList.remove('active');return false" style="color:var(--color-primary)">继续上报另一只动物</a>
+  </p>
+</div>
+
+</div>
+
+<!-- Bottom Bar -->
+<div class="bottom-bar" id="bottomBar">
+  <button class="btn btn-secondary" id="btnBack" onclick="prevStep()" style="display:none">上一步</button>
+  <button class="btn btn-primary" id="btnNext" onclick="nextStep()">下一步</button>
+</div>
+
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 6;
+
+function goToStep(n) {
+  if (n < 1 || n > totalSteps || n === currentStep) return;
+  document.getElementById('step' + currentStep).classList.remove('active');
+  document.getElementById('step' + n).classList.add('active');
+  currentStep = n;
+  updateUI();
+}
+
+function nextStep() {
+  if (currentStep === totalSteps) {
+    // Submit — show success
+    document.getElementById('step' + currentStep).classList.remove('active');
+    document.getElementById('stepSuccess').classList.add('active');
+    document.getElementById('bottomBar').style.display = 'none';
+    document.getElementById('stepCounter').textContent = '完成';
+    return;
+  }
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep++;
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function prevStep() {
+  if (currentStep === 1) return;
+  document.getElementById('step' + currentStep).classList.remove('active');
+  currentStep--;
+  document.getElementById('step' + currentStep).classList.add('active');
+  updateUI();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateUI() {
+  document.getElementById('stepCounter').textContent = '步骤 ' + currentStep + '/' + totalSteps;
+  document.getElementById('btnBack').style.display = currentStep > 1 ? '' : 'none';
+  document.getElementById('btnNext').textContent = currentStep === totalSteps ? '提交上报' : '下一步';
+
+  // Update step indicators
+  for (let i = 1; i <= totalSteps; i++) {
+    const dot = document.getElementById('dot' + i);
+    dot.className = 'step-circle';
+    if (i < currentStep) { dot.classList.add('step-circle--completed'); dot.textContent = '✓'; }
+    else if (i === currentStep) { dot.classList.add('step-circle--active'); dot.textContent = i; }
+    else { dot.classList.add('step-circle--pending'); dot.textContent = i; }
+  }
+  // Step lines
+  for (let i = 1; i < totalSteps; i++) {
+    const line = document.getElementById('line' + i);
+    line.className = 'step-line';
+    if (i < currentStep) line.classList.add('step-line--completed');
+  }
+}
+
+function setCondition(id, value, btn) {
+  const q = document.getElementById(id);
+  q.classList.remove('active-yes', 'active-no');
+  const buttons = q.querySelectorAll('.condition-toggle button');
+  buttons.forEach(b => { b.className = ''; });
+  if (value === 'yes') { q.classList.add('active-yes'); btn.className = 'active-yes'; }
+  else { q.classList.add('active-no'); btn.className = 'active-no'; }
+}
+
+// Chip toggle
+document.querySelectorAll('.behavior-chip').forEach(chip => {
+  chip.addEventListener('click', function() { this.classList.toggle('active'); });
+});
+</script>
+
+</body>
+</html>

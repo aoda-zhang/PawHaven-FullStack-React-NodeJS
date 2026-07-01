@@ -1,6 +1,6 @@
 # PawHaven — System Architecture Design
 
-> **Version**: v2.0 | **Date**: 2025-07-01 | **Architect**: Software Architect  
+> **Version**: v2.0 | **Date**: 2024-12-01
 > **Based on**: [PawHaven-Product-Strategy.md](./PawHaven-Product-Strategy.md)  
 > **Design Philosophy**: Pragmatic service decomposition. Modular monolith inside core-service. Extract only when necessary.
 
@@ -33,18 +33,19 @@
 
 ### Core Principles
 
-| # | Principle | What It Means |
-|---|-----------|---------------|
-| P1 | **Split by operational need, not domain count** | Extract a service only when it needs independent scaling, different tech stack, separate team, or different deployment cadence |
-| P2 | **Monolith-first, module-always** | core-service is a single deployable. Internally, every bounded context is a strict NestJS module |
-| P3 | **Internal modules = future services** | Module boundaries are enforced by lint rules. Extraction is a deployment change, not a code rewrite |
-| P4 | **Gateway as the only public surface** | All external traffic flows through gateway. Internal services never exposed to the internet |
-| P5 | **Event-driven within, REST between** | In-process EventEmitter for module-to-module within core-service. HTTP (via gateway proxy) between services |
-| P6 | **One database, logically partitioned** | MongoDB with collection-per-context naming convention. Separate DB only when data isolation is legally/operationally required |
+| #   | Principle                                       | What It Means                                                                                                                  |
+| --- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| P1  | **Split by operational need, not domain count** | Extract a service only when it needs independent scaling, different tech stack, separate team, or different deployment cadence |
+| P2  | **Monolith-first, module-always**               | core-service is a single deployable. Internally, every bounded context is a strict NestJS module                               |
+| P3  | **Internal modules = future services**          | Module boundaries are enforced by lint rules. Extraction is a deployment change, not a code rewrite                            |
+| P4  | **Gateway as the only public surface**          | All external traffic flows through gateway. Internal services never exposed to the internet                                    |
+| P5  | **Event-driven within, REST between**           | In-process EventEmitter for module-to-module within core-service. HTTP (via gateway proxy) between services                    |
+| P6  | **One database, logically partitioned**         | MongoDB with collection-per-context naming convention. Separate DB only when data isolation is legally/operationally required  |
 
 ### The Extraction Trigger Rule
 
 > **Don't extract a module from core-service until at least TWO of these are true:**
+>
 > 1. It needs **independent scaling** (different traffic/load patterns)
 > 2. It needs a **different tech stack** (e.g., Python for ML matching)
 > 3. A **different team** owns it
@@ -106,13 +107,13 @@
 
 ### 2.2 Why Each Service Exists
 
-| # | Service | Why Separate? | If Merged, What Breaks? |
-|---|---------|---------------|------------------------|
-| 1 | **gateway** | Stateless. Handles ALL traffic. Needs independent horizontal scaling. TLS termination, rate limiting, CORS — infrastructure concerns, not business logic. | Merging into core-service couples infrastructure scaling with business logic scaling. Gateway may need 5 pods while core needs 2. |
-| 2 | **auth-service** | Different security posture. Holds bcrypt hashes + JWT secrets. Independent security auditing. If auth is down, nothing works — circuit breaker needed. | Merging into core-service means any core deployment risks auth downtime. Security audit scope expands to all business code. |
-| 3 | **core-service** | The modular monolith. All 7 business modules live here as strict NestJS modules. Single deployable, single database. Internal module boundaries enforced by lint rules. | This IS the merge target. Everything that doesn't need operational isolation lives here. |
-| 4 | **document-service** | Heavy dependencies (Puppeteer ~300MB). Different resource profile — CPU/memory spikes during PDF generation. Different scaling model. | Merging into core-service means every core pod carries Puppeteer. PDF generation spikes affect rescue API latency. |
-| 5 | **config-service** | Currently serves static menu/route config. Future: centralized feature flags, dynamic config. Separate so config changes don't require core-service redeploy. | Could merge into core-service today. Kept separate for future centralized config strategy. Re-evaluate in 3 months. |
+| #   | Service              | Why Separate?                                                                                                                                                           | If Merged, What Breaks?                                                                                                           |
+| --- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **gateway**          | Stateless. Handles ALL traffic. Needs independent horizontal scaling. TLS termination, rate limiting, CORS — infrastructure concerns, not business logic.               | Merging into core-service couples infrastructure scaling with business logic scaling. Gateway may need 5 pods while core needs 2. |
+| 2   | **auth-service**     | Different security posture. Holds bcrypt hashes + JWT secrets. Independent security auditing. If auth is down, nothing works — circuit breaker needed.                  | Merging into core-service means any core deployment risks auth downtime. Security audit scope expands to all business code.       |
+| 3   | **core-service**     | The modular monolith. All 7 business modules live here as strict NestJS modules. Single deployable, single database. Internal module boundaries enforced by lint rules. | This IS the merge target. Everything that doesn't need operational isolation lives here.                                          |
+| 4   | **document-service** | Heavy dependencies (Puppeteer ~300MB). Different resource profile — CPU/memory spikes during PDF generation. Different scaling model.                                   | Merging into core-service means every core pod carries Puppeteer. PDF generation spikes affect rescue API latency.                |
+| 5   | **config-service**   | Currently serves static menu/route config. Future: centralized feature flags, dynamic config. Separate so config changes don't require core-service redeploy.           | Could merge into core-service today. Kept separate for future centralized config strategy. Re-evaluate in 3 months.               |
 
 ### 2.3 Service-to-Service Communication
 
@@ -253,8 +254,8 @@ Enforcement: eslint-plugin-import with custom rules
 @Injectable()
 export class SubmitReportUseCase {
   constructor(
-    private readonly eventBus: EventEmitter2,  // NestJS event bus
-    private readonly prisma: PrismaClient,       // Own module's DB access
+    private readonly eventBus: EventEmitter2, // NestJS event bus
+    private readonly prisma: PrismaClient, // Own module's DB access
   ) {}
 
   async execute(dto: SubmitReportDto): Promise<StrayReport> {
@@ -290,9 +291,7 @@ export class SubmitReportUseCase {
 
 @Injectable()
 export class RescueEventHandlers {
-  constructor(
-    private readonly createRescueCase: CreateRescueCaseUseCase,
-  ) {}
+  constructor(private readonly createRescueCase: CreateRescueCaseUseCase) {}
 
   @OnEvent('stray.animal.reported')
   async handleStrayReported(event: StrayAnimalReportedEvent) {
@@ -312,6 +311,7 @@ export class RescueEventHandlers {
 ```
 
 **Key points:**
+
 - Reporting module does NOT import anything from Rescue module
 - Reporting module does NOT know how RescueCase is created
 - Communication is through a typed event (defined in `@pawhaven/shared`)
@@ -361,67 +361,67 @@ export class RescueEventHandlers {
 
 #### Rescue Module (the heart of the system)
 
-| Aspect | Detail |
-|--------|--------|
-| **Responsibility** | Rescue case lifecycle: creation → 7-stage state machine → timeline → outcome |
-| **Core Aggregates** | `RescueCase`, `StatusTransition` (timeline entry) |
-| **Invariants** | Status can only transition along defined paths; every transition records timestamp + actor |
-| **Owns Collections** | `rescueCases`, `statusTransitions` |
-| **Publishes** | `RescueCaseReported`, `RescueStatusChanged`, `RescueCaseCompleted` |
-| **Subscribes to** | `StrayAnimalReported`, `VolunteerClaimed`, `AdoptionFinalized` |
+| Aspect               | Detail                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------ |
+| **Responsibility**   | Rescue case lifecycle: creation → 7-stage state machine → timeline → outcome               |
+| **Core Aggregates**  | `RescueCase`, `StatusTransition` (timeline entry)                                          |
+| **Invariants**       | Status can only transition along defined paths; every transition records timestamp + actor |
+| **Owns Collections** | `rescueCases`, `statusTransitions`                                                         |
+| **Publishes**        | `RescueCaseReported`, `RescueStatusChanged`, `RescueCaseCompleted`                         |
+| **Subscribes to**    | `StrayAnimalReported`, `VolunteerClaimed`, `AdoptionFinalized`                             |
 
 #### Reporting Module
 
-| Aspect | Detail |
-|--------|--------|
-| **Responsibility** | Stray animal report intake: photos, GPS, condition assessment, urgency auto-determination |
-| **Core Aggregates** | `StrayReport`, `UrgencyAssessment` |
-| **Invariants** | Report must have photos + location + animal type; urgency auto-calculated |
-| **Owns Collections** | `strayReports`, `urgencyAssessments` |
-| **Publishes** | `StrayAnimalReported` |
-| **Subscribes to** | Nothing (upstream only) |
+| Aspect               | Detail                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| **Responsibility**   | Stray animal report intake: photos, GPS, condition assessment, urgency auto-determination |
+| **Core Aggregates**  | `StrayReport`, `UrgencyAssessment`                                                        |
+| **Invariants**       | Report must have photos + location + animal type; urgency auto-calculated                 |
+| **Owns Collections** | `strayReports`, `urgencyAssessments`                                                      |
+| **Publishes**        | `StrayAnimalReported`                                                                     |
+| **Subscribes to**    | Nothing (upstream only)                                                                   |
 
 #### Adoption Module
 
-| Aspect | Detail |
-|--------|--------|
-| **Responsibility** | Adoption listing, application, matching, approval, post-adoption follow-up |
-| **Core Aggregates** | `AdoptionListing`, `AdoptionApplication`, `AdoptionAgreement` |
-| **Invariants** | Only "Awaiting Adoption" animals can be listed; one animal = one active listing |
-| **Owns Collections** | `adoptionListings`, `adoptionApplications`, `adoptionAgreements` |
-| **Publishes** | `AdoptionFinalized`, `AdoptionApplicationSubmitted` |
-| **Subscribes to** | `RescueStatusChanged` (to "awaitingAdoption") |
+| Aspect               | Detail                                                                          |
+| -------------------- | ------------------------------------------------------------------------------- |
+| **Responsibility**   | Adoption listing, application, matching, approval, post-adoption follow-up      |
+| **Core Aggregates**  | `AdoptionListing`, `AdoptionApplication`, `AdoptionAgreement`                   |
+| **Invariants**       | Only "Awaiting Adoption" animals can be listed; one animal = one active listing |
+| **Owns Collections** | `adoptionListings`, `adoptionApplications`, `adoptionAgreements`                |
+| **Publishes**        | `AdoptionFinalized`, `AdoptionApplicationSubmitted`                             |
+| **Subscribes to**    | `RescueStatusChanged` (to "awaitingAdoption")                                   |
 
 #### Content Module (Stories + Knowledge Base)
 
-| Aspect | Detail |
-|--------|--------|
-| **Responsibility** | Rescue stories, knowledge base articles, content moderation |
-| **Core Aggregates** | `Story`, `KnowledgeArticle`, `ContentReview` |
-| **Invariants** | Stories must reference a completed RescueCase; medical articles require expert review |
-| **Owns Collections** | `stories`, `knowledgeArticles`, `contentReviews`, `tags` |
-| **Publishes** | `StoryPublished`, `ArticlePublished` |
-| **Subscribes to** | `RescueCaseCompleted` (triggers story invitation) |
+| Aspect               | Detail                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| **Responsibility**   | Rescue stories, knowledge base articles, content moderation                           |
+| **Core Aggregates**  | `Story`, `KnowledgeArticle`, `ContentReview`                                          |
+| **Invariants**       | Stories must reference a completed RescueCase; medical articles require expert review |
+| **Owns Collections** | `stories`, `knowledgeArticles`, `contentReviews`, `tags`                              |
+| **Publishes**        | `StoryPublished`, `ArticlePublished`                                                  |
+| **Subscribes to**    | `RescueCaseCompleted` (triggers story invitation)                                     |
 
 #### Volunteer Module
 
-| Aspect | Detail |
-|--------|--------|
-| **Responsibility** | Volunteer profile, capability matching, case claiming, availability management |
-| **Core Aggregates** | `VolunteerProfile`, `CaseClaim`, `VolunteerStats` |
-| **Invariants** | One active claim per volunteer per case; capability must match case requirements |
-| **Owns Collections** | `volunteerProfiles`, `caseClaims`, `volunteerStats` |
-| **Publishes** | `VolunteerClaimed`, `VolunteerUnavailable` |
-| **Subscribes to** | `RescueCaseReported` (triggers matching + notification) |
+| Aspect               | Detail                                                                           |
+| -------------------- | -------------------------------------------------------------------------------- |
+| **Responsibility**   | Volunteer profile, capability matching, case claiming, availability management   |
+| **Core Aggregates**  | `VolunteerProfile`, `CaseClaim`, `VolunteerStats`                                |
+| **Invariants**       | One active claim per volunteer per case; capability must match case requirements |
+| **Owns Collections** | `volunteerProfiles`, `caseClaims`, `volunteerStats`                              |
+| **Publishes**        | `VolunteerClaimed`, `VolunteerUnavailable`                                       |
+| **Subscribes to**    | `RescueCaseReported` (triggers matching + notification)                          |
 
 ### 4.3 Module Details (Supporting/Generic)
 
-| Module | Type | Responsibility | Owns Collections |
-|--------|------|---------------|-----------------|
-| **Notification** | Subscribe-only | Consumes domain events → push/email/in-app notifications | `notifications`, `notificationPreferences` |
-| **Achievement** | Subscribe-only | Consumes domain events → badge/milestone calculation | `achievements`, `milestones` |
-| **Profile** | Read-only aggregator | Aggregates user data across modules (reports, rescues, adoptions, stories) | None (reads from other modules' services) |
-| **Bootstrap** | System | Menu/route configuration, app initialization (existing) | `menus`, `routes`, `roles`, `permissions` |
+| Module           | Type                 | Responsibility                                                             | Owns Collections                           |
+| ---------------- | -------------------- | -------------------------------------------------------------------------- | ------------------------------------------ |
+| **Notification** | Subscribe-only       | Consumes domain events → push/email/in-app notifications                   | `notifications`, `notificationPreferences` |
+| **Achievement**  | Subscribe-only       | Consumes domain events → badge/milestone calculation                       | `achievements`, `milestones`               |
+| **Profile**      | Read-only aggregator | Aggregates user data across modules (reports, rescues, adoptions, stories) | None (reads from other modules' services)  |
+| **Bootstrap**    | System               | Menu/route configuration, app initialization (existing)                    | `menus`, `routes`, `roles`, `permissions`  |
 
 ---
 
@@ -641,14 +641,14 @@ model VolunteerProfile {
 
 ### 6.3 Data Access Rules
 
-| Rule | Enforcement |
-|------|-------------|
-| Each module owns its collections | Only the owning module's Prisma service accesses its collections |
-| Cross-module data access | Through the owning module's public service class, never direct DB access |
-| Collection naming | `{module}_{entity}` — makes ownership clear, enables future DB split |
-| Shared Prisma extensions | Soft-delete + versioning via `@pawhaven/backend-core` — applied to all modules |
-| Geo queries | MongoDB `$near` via Prisma raw queries (Volunteer module) |
-| Full-text search | MongoDB Atlas Search on `knowledge_articles` collection (Content module) |
+| Rule                             | Enforcement                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------ |
+| Each module owns its collections | Only the owning module's Prisma service accesses its collections               |
+| Cross-module data access         | Through the owning module's public service class, never direct DB access       |
+| Collection naming                | `{module}_{entity}` — makes ownership clear, enables future DB split           |
+| Shared Prisma extensions         | Soft-delete + versioning via `@pawhaven/backend-core` — applied to all modules |
+| Geo queries                      | MongoDB `$near` via Prisma raw queries (Volunteer module)                      |
+| Full-text search                 | MongoDB Atlas Search on `knowledge_articles` collection (Content module)       |
 
 ---
 
@@ -823,14 +823,14 @@ export const RescueStatusChangedEventSchema = z.object({
 
 ### 9.2 What Goes Where
 
-| Package | Contains | Must NOT Contain |
-|---------|----------|-----------------|
-| `@pawhaven/shared` | Zod schemas, TypeScript types, constants, event definitions, pure utility functions | React code, NestJS code, database logic |
-| `@pawhaven/backend-core` | SharedModule, PrismaModule, HttpClientModule, decorators, guards, interceptors, Prisma extensions | Business logic, domain entities |
-| `@pawhaven/frontend-core` | React hooks, API client, storage utilities, lazy loading helpers | Business-specific components |
-| `@pawhaven/design-system` | CSS tokens, Tailwind theme, MUI theme, CSS utilities | React components |
-| `@pawhaven/ui` | Reusable React components (Form*, Loading, Toast, etc.) | Business logic, API calls |
-| `@pawhaven/i18n` | Translation provider, locale files, language detection | Business content |
+| Package                   | Contains                                                                                          | Must NOT Contain                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `@pawhaven/shared`        | Zod schemas, TypeScript types, constants, event definitions, pure utility functions               | React code, NestJS code, database logic |
+| `@pawhaven/backend-core`  | SharedModule, PrismaModule, HttpClientModule, decorators, guards, interceptors, Prisma extensions | Business logic, domain entities         |
+| `@pawhaven/frontend-core` | React hooks, API client, storage utilities, lazy loading helpers                                  | Business-specific components            |
+| `@pawhaven/design-system` | CSS tokens, Tailwind theme, MUI theme, CSS utilities                                              | React components                        |
+| `@pawhaven/ui`            | Reusable React components (Form\*, Loading, Toast, etc.)                                          | Business logic, API calls               |
+| `@pawhaven/i18n`          | Translation provider, locale files, language detection                                            | Business content                        |
 
 ---
 
@@ -903,13 +903,13 @@ apps/frontend/portal/src/
 
 ### 10.2 State Management Strategy
 
-| State Type | Tool | Rationale |
-|-----------|------|-----------|
-| **Server state** | **TanStack Query** | Caching, background refetch, optimistic updates, pagination |
-| **Client state** | **Redux Toolkit** (existing) | Auth status, UI toggles |
-| **Form state** | **React Hook Form + Zod** | Existing pattern, type-safe validation |
-| **URL state** | **React Router search params** | Filters, pagination, search — shareable/bookmarkable |
-| **Persistent state** | **Redux Persist + localStorage** | Auth tokens, preferences |
+| State Type           | Tool                             | Rationale                                                   |
+| -------------------- | -------------------------------- | ----------------------------------------------------------- |
+| **Server state**     | **TanStack Query**               | Caching, background refetch, optimistic updates, pagination |
+| **Client state**     | **Redux Toolkit** (existing)     | Auth status, UI toggles                                     |
+| **Form state**       | **React Hook Form + Zod**        | Existing pattern, type-safe validation                      |
+| **URL state**        | **React Router search params**   | Filters, pagination, search — shareable/bookmarkable        |
+| **Persistent state** | **Redux Persist + localStorage** | Auth tokens, preferences                                    |
 
 ### 10.3 Component Design Rules
 
@@ -951,16 +951,16 @@ Client → gateway (Authorization: Bearer <access_token>)
 
 ### 11.2 Security Layers
 
-| Layer | Mechanism |
-|-------|-----------|
-| Transport | HTTPS (TLS 1.3) |
-| Authentication | JWT (RS256), verified at gateway |
-| Authorization | RBAC — roles + permissions, checked at gateway + service |
-| Input Validation | Zod schemas via nestjs-zod global pipe |
-| Rate Limiting | Token bucket per IP + per user at gateway |
-| Data Privacy | GPS fuzzing (displayArea, not exact coords post-rescue) |
-| CSRF | SameSite cookies + token header |
-| CORS | Whitelist origins per environment |
+| Layer            | Mechanism                                                |
+| ---------------- | -------------------------------------------------------- |
+| Transport        | HTTPS (TLS 1.3)                                          |
+| Authentication   | JWT (RS256), verified at gateway                         |
+| Authorization    | RBAC — roles + permissions, checked at gateway + service |
+| Input Validation | Zod schemas via nestjs-zod global pipe                   |
+| Rate Limiting    | Token bucket per IP + per user at gateway                |
+| Data Privacy     | GPS fuzzing (displayArea, not exact coords post-rescue)  |
+| CSRF             | SameSite cookies + token header                          |
+| CORS             | Whitelist origins per environment                        |
 
 ---
 
@@ -1042,57 +1042,57 @@ this.logger.log({
 
 ### ADR-001: Modular Monolith Inside core-service
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | Product strategy defines 7 business modules. Premature microservice decomposition adds distribution complexity without proven value. All modules share NestJS + MongoDB tech stack, same team, same deployment cadence. |
-| **Decision** | All 7 business modules live inside core-service as strict NestJS modules. Module boundaries enforced by ESLint rules. Communication via in-process EventEmitter2. |
+| Field            | Detail                                                                                                                                                                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                                                                                          |
+| **Context**      | Product strategy defines 7 business modules. Premature microservice decomposition adds distribution complexity without proven value. All modules share NestJS + MongoDB tech stack, same team, same deployment cadence.                                           |
+| **Decision**     | All 7 business modules live inside core-service as strict NestJS modules. Module boundaries enforced by ESLint rules. Communication via in-process EventEmitter2.                                                                                                 |
 | **Consequences** | **Easier**: Fast iteration, simple deployment, zero network overhead for inter-module calls, easier debugging. **Harder**: Must maintain module boundary discipline; risk of accidental coupling. Mitigated by lint rules + architecture fitness functions in CI. |
 
 ### ADR-002: 5-Service Split Rationale
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | Need to determine which capabilities deserve their own deployable vs. living in core-service. |
-| **Decision** | 5 services: gateway (stateless, scaling), auth (security isolation), core (modular monolith), document (heavy deps, different resource profile), config (separate deploy for config changes). |
+| Field            | Detail                                                                                                                                                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                                                                        |
+| **Context**      | Need to determine which capabilities deserve their own deployable vs. living in core-service.                                                                                                                                                   |
+| **Decision**     | 5 services: gateway (stateless, scaling), auth (security isolation), core (modular monolith), document (heavy deps, different resource profile), config (separate deploy for config changes).                                                   |
 | **Consequences** | **Easier**: Each service scales independently, auth can be security-audited in isolation, PDF generation doesn't affect API latency. **Harder**: 5 deployables to manage. Acceptable — each has a clear operational reason to exist separately. |
 
 ### ADR-003: MongoDB with Collection-per-Module
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | All core-service modules share one MongoDB database. Need to prevent accidental cross-module data access while keeping operational simplicity. |
-| **Decision** | Single database `pawhaven-core` with collection naming convention `{module}_{entity}`. Each module's Prisma service only accesses its own collections. Cross-module data access through public service classes only. |
+| Field            | Detail                                                                                                                                                                                                                                                     |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                                                                                   |
+| **Context**      | All core-service modules share one MongoDB database. Need to prevent accidental cross-module data access while keeping operational simplicity.                                                                                                             |
+| **Decision**     | Single database `pawhaven-core` with collection naming convention `{module}_{entity}`. Each module's Prisma service only accesses its own collections. Cross-module data access through public service classes only.                                       |
 | **Consequences** | **Easier**: Single DB to operate, backup, and monitor. **Harder**: No DB-level access control between modules (mitigated by code-level enforcement). Future: if a module needs data isolation, split its collections into a separate DB — no code changes. |
 
 ### ADR-004: Zod for Shared Schema Validation
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | Need type-safe validation working identically in frontend (form validation) and backend (request validation). |
-| **Decision** | All DTOs, event schemas, and domain types defined as Zod schemas in `@pawhaven/shared`. Frontend uses `@hookform/resolvers/zod`. Backend uses `nestjs-zod` validation pipe. |
-| **Consequences** | Single source of truth for validation. Automatic TypeScript type inference. ~12KB gzipped Zod in frontend — acceptable. |
+| Field            | Detail                                                                                                                                                                      |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                    |
+| **Context**      | Need type-safe validation working identically in frontend (form validation) and backend (request validation).                                                               |
+| **Decision**     | All DTOs, event schemas, and domain types defined as Zod schemas in `@pawhaven/shared`. Frontend uses `@hookform/resolvers/zod`. Backend uses `nestjs-zod` validation pipe. |
+| **Consequences** | Single source of truth for validation. Automatic TypeScript type inference. ~12KB gzipped Zod in frontend — acceptable.                                                     |
 
 ### ADR-005: In-Process Events → Future Message Broker
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | Modules need to react to events in other modules without tight coupling. |
-| **Decision** | Phase 1: NestJS EventEmitter2 (in-process). Phase 3+: migrate to message broker only if/when modules are extracted from core-service. |
+| Field            | Detail                                                                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                     |
+| **Context**      | Modules need to react to events in other modules without tight coupling.                                                                                                                     |
+| **Decision**     | Phase 1: NestJS EventEmitter2 (in-process). Phase 3+: migrate to message broker only if/when modules are extracted from core-service.                                                        |
 | **Consequences** | **Easier**: Zero infrastructure, zero latency, simple debugging. **Harder**: Events are lost on process restart (acceptable for Phase 1 — events are not the system of record; database is). |
 
 ### ADR-006: Feature-Based Frontend Modules
 
-| Field | Detail |
-|-------|--------|
-| **Status** | Accepted |
-| **Context** | 7 product modules need clear frontend organization. |
-| **Decision** | `features/{module}/` with apis/, components/, hooks/, types.ts, index.tsx per feature. No cross-feature imports. |
-| **Consequences** | Clear ownership, independent development, easier code splitting. Lint rules enforce feature isolation. |
+| Field            | Detail                                                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                         |
+| **Context**      | 7 product modules need clear frontend organization.                                                              |
+| **Decision**     | `features/{module}/` with apis/, components/, hooks/, types.ts, index.tsx per feature. No cross-feature imports. |
+| **Consequences** | Clear ownership, independent development, easier code splitting. Lint rules enforce feature isolation.           |
 
 ---
 
@@ -1148,18 +1148,19 @@ echo "✅ Module boundaries clean"
 
 ### 16.1 The Pragmatic Balance
 
-| Concern | How It's Addressed |
-|---------|-------------------|
-| **Scalability** | Gateway + core scale independently. Document scales separately (heavy PDF). |
-| **Maintainability** | 7 modules with enforced boundaries. Each module is independently understandable. |
-| **Extensibility** | New product module = new folder in `modules/`. No new service needed. |
-| **Deployability** | 5 services. Each has a clear reason to exist. No "microservice for the sake of it." |
-| **Observability** | Structured logging with module tag. Trace ID across all services. |
+| Concern             | How It's Addressed                                                                           |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| **Scalability**     | Gateway + core scale independently. Document scales separately (heavy PDF).                  |
+| **Maintainability** | 7 modules with enforced boundaries. Each module is independently understandable.             |
+| **Extensibility**   | New product module = new folder in `modules/`. No new service needed.                        |
+| **Deployability**   | 5 services. Each has a clear reason to exist. No "microservice for the sake of it."          |
+| **Observability**   | Structured logging with module tag. Trace ID across all services.                            |
 | **Future-proofing** | Modules can be extracted to separate services without code changes — just deployment config. |
 
 ### 16.2 When to Add a 6th Service
 
 > **Only when at least TWO of these are true for a module:**
+>
 > 1. It needs independent scaling (e.g., Notification module gets 10x traffic)
 > 2. It needs a different tech stack (e.g., Python ML for adoption matching)
 > 3. A different team takes ownership
