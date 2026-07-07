@@ -177,6 +177,52 @@
     "download_guide": "Laden Sie die Details des Rettungsleitfadens herunter",
     "download_failed": "Download fehlgeschlagen. Bitte versuchen Sie es erneut."
   },
+  "footer": {
+    "columns": {
+      "platform": {
+        "heading": "Plattform",
+        "browseRescues": "Rettungen durchsuchen",
+        "reportStray": "Streuner melden",
+        "adoptAnimal": "Tier adoptieren",
+        "volunteer": "Freiwilliger werden"
+      },
+      "resources": {
+        "heading": "Ressourcen",
+        "knowledgeBase": "Wissensdatenbank",
+        "rescueStories": "Rettungsgeschichten",
+        "emergencyGuide": "Notfallleitfaden"
+      },
+      "community": {
+        "heading": "Community",
+        "volunteerNetwork": "Freiwilligen-Netzwerk",
+        "partnerShelters": "Partner-Tierheime",
+        "shareStory": "Geschichte teilen"
+      },
+      "company": {
+        "heading": "Unternehmen",
+        "aboutPawHaven": "Über PawHaven",
+        "openSource": "Open Source",
+        "privacyPolicy": "Datenschutz",
+        "termsOfService": "Nutzungsbedingungen"
+      }
+    },
+    "brandDescription": "Eine Plattform, die Melder, Retter und Adoptierende verbindet — von der ersten Sichtung bis zum sicheren Zuhause.",
+    "stats": {
+      "animalsRescued": "Gerettete Tiere",
+      "activeVolunteers": "Aktive Freiwillige",
+      "adopted": "Adoptiert"
+    },
+    "social": {
+      "github": "GitHub",
+      "twitter": "Twitter",
+      "email": "E-Mail"
+    },
+    "bottomBar": {
+      "license": "Open Source — MIT-Lizenz.",
+      "systemsOperational": "Alle Systeme betriebsbereit",
+      "builtWith": "Mit ❤️ für jedes streunende Leben gebaut"
+    }
+  },
   "errorMessage": {
     "TOKEN_EXPIRED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "INVALID_TOKEN": "Ungültiges Zugriffstoken. Bitte melden Sie sich erneut an.",

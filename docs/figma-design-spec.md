@@ -1,7 +1,7 @@
 # PawHaven Figma Design Specification
 
 > Source: [pawhaven.figma.site](https://pawhaven.figma.site)
-> Analyzed: 2026-07-04
+> Analyzed: 2025-04-04
 
 ---
 

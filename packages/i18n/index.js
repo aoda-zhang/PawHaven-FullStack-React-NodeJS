@@ -6,15 +6,46 @@ import { supportedLngs } from './supportedLngs';
 
 i18n
   .use(LanguageDetector)
-  .use(resourcesToBackend((locale) => import(`./locales/${locale}.json`)))
+  .use(
+    resourcesToBackend((locale, namespace) => {
+      if (namespace && namespace !== 'translation') {
+        return import(`./locales/${namespace}/${locale}.json`);
+      }
+      return import(`./locales/${locale}.json`);
+    }),
+  )
   .use(initReactI18next)
   .init({
-    supportedLngs: supportedLngs,
-    fallbackLng: 'en-US',
+    supportedLngs,
+    fallbackLng: {
+      default: ['en-US'],
+      'zh-CN': ['zh-CN'],
+      zh: ['zh-CN'],
+      'de-DE': ['de-DE'],
+      de: ['de-DE'],
+    },
+    preload: ['en-US'],
+
     interpolation: {
       escapeValue: false,
+      skipOnVariables: false,
     },
-    react: { useSuspense: true },
+
+    returnObjects: true,
+
+    detection: {
+      order: ['localStorage', 'navigator', 'htmlTag'],
+      lookupLocalStorage: 'i18nextLng',
+      caches: ['localStorage'],
+      cookieMinutes: 365 * 24 * 60,
+    },
+
+    debug: false,
+    react: {
+      useSuspense: true,
+      bindI18n: 'languageChanged loaded',
+      bindI18nStore: 'added removed',
+    },
   });
 
 export default i18n;

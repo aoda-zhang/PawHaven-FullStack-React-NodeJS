@@ -1,4 +1,4 @@
-import { myPersonal } from '@pawhaven/shared';
+import { Github, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -6,62 +6,169 @@ export const RootLayoutFooter = () => {
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
+  const footerColumns = [
+    {
+      heading: t('footer.columns.platform.heading'),
+      links: [
+        { label: t('footer.columns.platform.browseRescues'), to: '/rescues' },
+        {
+          label: t('footer.columns.platform.reportStray'),
+          to: '/report-stray',
+        },
+        { label: t('footer.columns.platform.adoptAnimal'), to: '/adopt' },
+        { label: t('footer.columns.platform.volunteer'), to: '/volunteer' },
+      ],
+    },
+    {
+      heading: t('footer.columns.resources.heading'),
+      links: [
+        {
+          label: t('footer.columns.resources.knowledgeBase'),
+          to: '/knowledge',
+        },
+        { label: t('footer.columns.resources.rescueStories'), to: '/stories' },
+        {
+          label: t('footer.columns.resources.emergencyGuide'),
+          to: '/emergency',
+        },
+      ],
+    },
+    {
+      heading: t('footer.columns.community.heading'),
+      links: [
+        {
+          label: t('footer.columns.community.volunteerNetwork'),
+          to: '/volunteer-network',
+        },
+        {
+          label: t('footer.columns.community.partnerShelters'),
+          to: '/shelters',
+        },
+        { label: t('footer.columns.community.shareStory'), to: '/share-story' },
+      ],
+    },
+    {
+      heading: t('footer.columns.company.heading'),
+      links: [
+        { label: t('footer.columns.company.aboutPawHaven'), to: '/about' },
+        { label: t('footer.columns.company.openSource'), to: '#' },
+        { label: t('footer.columns.company.privacyPolicy'), to: '/privacy' },
+        { label: t('footer.columns.company.termsOfService'), to: '/terms' },
+      ],
+    },
+  ];
+
+  const stats = [
+    { emoji: '🐾', number: '2,841', label: t('footer.stats.animalsRescued') },
+    { emoji: '🙌', number: '384', label: t('footer.stats.activeVolunteers') },
+    { emoji: '🏠', number: '1,203', label: t('footer.stats.adopted') },
+  ];
+
+  const socialLinks = [
+    {
+      icon: Github,
+      label: t('footer.social.github'),
+      href: 'https://github.com/aoda-zhang',
+    },
+    {
+      icon: Mail,
+      label: t('footer.social.email'),
+      href: 'mailto:aoda.zhang.work@gmail.com',
+    },
+  ];
+
   return (
-    <div className="bg-surface-dark text-text-inverse flex flex-col items-center justify-between gap-2 px-4 py-6 text-center lg:flex-row lg:px-16">
-      <p className="flex flex-col items-center justify-between text-left lg:items-start">
-        <span className="text-xl font-bold">{t('common.quick_links')}</span>
-        <Link className="hover:text-primary-hover transition-colors" to="/">
-          {t('home.home_page')}
-        </Link>
-        <Link
-          className="hover:text-primary-hover transition-colors"
-          to="/report-stray"
-        >
-          {t('common.record')}
-        </Link>
-      </p>
-      <p>
-        {t('common.owner_text', {
-          year: currentYear,
-          author: (
-            <a
-              href={t('common.owner_text_author_url')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-primary-hover underline transition-colors"
-            >
-              {t('common.owner_text_author')}
-            </a>
-          ),
-        })}
-      </p>
-      <p className="flex flex-col items-center justify-between text-left lg:items-start">
-        <span className="text-xl font-bold">{t('common.contact_me')}</span>
-        <a
-          href={myPersonal.github}
-          className="hover:text-primary-hover transition-colors"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('common.github')}
-        </a>
-        <a
-          href={myPersonal.email}
-          className="hover:text-primary-hover transition-colors"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('common.email')}
-        </a>
-        <a
-          href={myPersonal.linkedin}
-          className="hover:text-primary-hover transition-colors"
-          target="_blank"
-          rel="noreferrer"
-        >
-          {t('common.linkedin')}
-        </a>
-      </p>
-    </div>
+    <footer className="bg-[var(--color-surface-dark)]">
+      <div className="mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6">
+        {/* Top: Brand + Link columns */}
+        <div className="mb-12 grid gap-10 lg:grid-cols-5">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <Link to="/" className="group mb-4 flex items-center gap-2">
+              <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-xl shadow-md transition-transform group-hover:scale-105">
+                <span className="text-base text-[var(--color-text-inverse)]">
+                  🐾
+                </span>
+              </div>
+              <span
+                className="text-xl font-bold text-[var(--color-text-inverse)]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                PawHaven
+              </span>
+            </Link>
+            <p className="text-brown-7 mb-5 text-sm leading-relaxed">
+              {t('footer.brandDescription')}
+            </p>
+            <div className="flex gap-2">
+              {socialLinks.map(({ icon: Icon, label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brown-6 flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-text-inverse)]/10 transition-colors hover:bg-[var(--color-text-inverse)]/20 hover:text-[var(--color-text-inverse)]"
+                  title={label}
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Link columns */}
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
+            {footerColumns.map((column) => (
+              <div key={column.heading}>
+                <h4 className="text-brown-7 mb-4 text-xs font-semibold tracking-widest uppercase">
+                  {column.heading}
+                </h4>
+                <ul className="flex flex-col gap-2.5">
+                  {column.links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        to={link.to}
+                        className="text-brown-6 block text-left text-sm transition-colors hover:text-[var(--color-text-inverse)]"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="mb-8 grid grid-cols-3 gap-4 border-t border-b border-[var(--color-text-inverse)]/10 py-6">
+          {stats.map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="mb-0.5 text-xl">{stat.emoji}</div>
+              <div
+                className="text-primary mb-0.5 text-2xl leading-none font-bold"
+                style={{ fontFamily: 'var(--font-heading)' }}
+              >
+                {stat.number}
+              </div>
+              <div className="text-brown-8 text-xs">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="text-brown-8 flex flex-col items-center justify-between gap-3 text-xs sm:flex-row">
+          <p>
+            &copy; {currentYear} PawHaven. {t('footer.bottomBar.license')}
+          </p>
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--color-success)]" />
+            <span>{t('footer.bottomBar.systemsOperational')}</span>
+            <span className="mx-2 text-[var(--color-text-inverse)]/10">|</span>
+            <span>{t('footer.bottomBar.builtWith')}</span>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 };

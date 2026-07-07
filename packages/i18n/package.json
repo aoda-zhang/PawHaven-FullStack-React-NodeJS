@@ -18,8 +18,8 @@
     }
   },
   "peerDependencies": {
-    "react": ">=17",
-    "react-dom": ">=17",
+    "react": ">=19",
+    "react-dom": ">=19",
     "react-i18next": ">=13"
   },
   "dependencies": {

@@ -177,6 +177,52 @@
     "download_guide": "Download the rescue guide",
     "download_failed": "Download failed. Please try again."
   },
+  "footer": {
+    "columns": {
+      "platform": {
+        "heading": "Platform",
+        "browseRescues": "Browse Rescues",
+        "reportStray": "Report a Stray",
+        "adoptAnimal": "Adopt an Animal",
+        "volunteer": "Volunteer"
+      },
+      "resources": {
+        "heading": "Resources",
+        "knowledgeBase": "Knowledge Base",
+        "rescueStories": "Rescue Stories",
+        "emergencyGuide": "Emergency Guide"
+      },
+      "community": {
+        "heading": "Community",
+        "volunteerNetwork": "Volunteer Network",
+        "partnerShelters": "Partner Shelters",
+        "shareStory": "Share a Story"
+      },
+      "company": {
+        "heading": "Company",
+        "aboutPawHaven": "About PawHaven",
+        "openSource": "Open Source",
+        "privacyPolicy": "Privacy Policy",
+        "termsOfService": "Terms of Service"
+      }
+    },
+    "brandDescription": "A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.",
+    "stats": {
+      "animalsRescued": "Animals rescued",
+      "activeVolunteers": "Active volunteers",
+      "adopted": "Adopted"
+    },
+    "social": {
+      "github": "GitHub",
+      "twitter": "Twitter",
+      "email": "Email"
+    },
+    "bottomBar": {
+      "license": "Open source — MIT License.",
+      "systemsOperational": "All systems operational",
+      "builtWith": "Built with ❤️ for every stray life"
+    }
+  },
   "errorMessage": {
     "TOKEN_EXPIRED": "Your session has expired. Please log in again.",
     "INVALID_TOKEN": "Invalid access token. Please log in again.",
