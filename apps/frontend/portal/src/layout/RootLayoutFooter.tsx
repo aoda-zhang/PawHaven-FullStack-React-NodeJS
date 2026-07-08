@@ -78,7 +78,7 @@ export const RootLayoutFooter = () => {
   ];
 
   return (
-    <footer className="bg-[var(--color-surface-dark)]">
+    <footer className="bg-surface-dark">
       <div className="mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6">
         {/* Top: Brand + Link columns */}
         <div className="mb-12 grid gap-10 lg:grid-cols-5">
@@ -86,14 +86,9 @@ export const RootLayoutFooter = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="group mb-4 flex items-center gap-2">
               <div className="bg-primary flex h-9 w-9 items-center justify-center rounded-xl shadow-md transition-transform group-hover:scale-105">
-                <span className="text-base text-[var(--color-text-inverse)]">
-                  🐾
-                </span>
+                <span className="text-text-inverse text-base">🐾</span>
               </div>
-              <span
-                className="text-xl font-bold text-[var(--color-text-inverse)]"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
+              <span className="font-heading text-text-inverse text-xl font-bold">
                 PawHaven
               </span>
             </Link>
@@ -107,7 +102,8 @@ export const RootLayoutFooter = () => {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brown-6 flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--color-text-inverse)]/10 transition-colors hover:bg-[var(--color-text-inverse)]/20 hover:text-[var(--color-text-inverse)]"
+                  className="text-brown-6 bg-text-inverse/10 hover:bg-text-inverse/20 hover:text-text-inverse flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+                  aria-label={label}
                   title={label}
                 >
                   <Icon className="h-4 w-4" />
@@ -128,7 +124,7 @@ export const RootLayoutFooter = () => {
                     <li key={link.label}>
                       <Link
                         to={link.to}
-                        className="text-brown-6 block text-left text-sm transition-colors hover:text-[var(--color-text-inverse)]"
+                        className="text-brown-6 hover:text-text-inverse block text-left text-sm transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -141,14 +137,11 @@ export const RootLayoutFooter = () => {
         </div>
 
         {/* Stats row */}
-        <div className="mb-8 grid grid-cols-3 gap-4 border-t border-b border-[var(--color-text-inverse)]/10 py-6">
+        <div className="border-text-inverse/10 mb-8 grid grid-cols-3 gap-4 border-t border-b py-6">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="mb-0.5 text-xl">{stat.emoji}</div>
-              <div
-                className="text-primary mb-0.5 text-2xl leading-none font-bold"
-                style={{ fontFamily: 'var(--font-heading)' }}
-              >
+              <div className="font-heading text-primary mb-0.5 text-2xl leading-none font-bold">
                 {stat.number}
               </div>
               <div className="text-brown-8 text-xs">{stat.label}</div>
@@ -162,9 +155,9 @@ export const RootLayoutFooter = () => {
             &copy; {currentYear} PawHaven. {t('footer.bottomBar.license')}
           </p>
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--color-success)]" />
+            <span className="bg-success h-2 w-2 animate-pulse rounded-full" />
             <span>{t('footer.bottomBar.systemsOperational')}</span>
-            <span className="mx-2 text-[var(--color-text-inverse)]/10">|</span>
+            <span className="text-text-inverse/10 mx-2">|</span>
             <span>{t('footer.bottomBar.builtWith')}</span>
           </div>
         </div>

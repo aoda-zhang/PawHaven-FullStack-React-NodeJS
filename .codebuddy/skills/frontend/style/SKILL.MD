@@ -83,12 +83,20 @@ Every visual value must come from the design system. Never introduce ad-hoc colo
 
 Use semantic tokens, never raw color values.
 
-❌ Bad
+**Key rule**: every CSS variable defined in `theme.css` (e.g. `--color-surface-dark`) already has a corresponding Tailwind utility class (e.g. `bg-surface-dark`). Never write `var(--color-*)` directly — it is the equivalent of hardcoding, just wrapped in a CSS variable that bypasses the utility system.
+
+❌ Bad — all of these are wrong for the same reason: they bypass the semantic utility layer:
 
 ```tsx
+// Hardcoded color names
 text - red - 500;
 bg - blue - 600;
 border - gray - 300;
+
+// CSS variable bypass — use the utility class instead
+bg - [var( --color-surface - dark )];     // → bg - surface - dark
+text - [var( --color - text - inverse )]; // → text - text - inverse
+style = {{ fontFamily: 'var(--font-heading)' }}; // → font-heading class
 ```
 
 ✅ Good — use the semantic tokens defined in `theme.css`:
@@ -121,6 +129,31 @@ Available semantic color tokens (from `theme.css`):
 | Borders         | `border`, `border-hover`, `border-strong`, `border-focus`, `border-error`                                                                                                                   |
 | Status          | `error`, `error-light`, `success`, `success-light`, `warning`, `warning-light`, `info`, `info-light`                                                                                        |
 | Rescue status   | `rescue-status-pending`, `rescue-status-inProgress`, `rescue-status-treated`, `rescue-status-recovering`, `rescue-status-awaitingAdoption`, `rescue-status-adopted`, `rescue-status-failed` |
+
+---
+
+## How to Pick the Right Utility Class
+
+When you need any visual property (color, spacing, font, radius, shadow, etc.), follow this decision flow in order. **This single rule replaces all individual "don't do this" lists** — if you follow it, you will never hardcode, never use magic numbers, and never bypass the design system.
+
+```
+Need a visual value?
+  │
+  ├─ 1. Is there a custom utility class in utilities.css?
+  │     YES → Use it (btn-primary, card, input-field, flex-center, link, etc.)
+  │
+  ├─ 2. Is there a semantic token in theme.css?
+  │     YES → Use the Tailwind utility class directly (bg-primary, text-muted,
+  │            font-heading, shadow-card, duration-200, ease-standard, etc.)
+  │
+  ├─ 3. Is there a primitive token in tokens/*.css?
+  │     YES → Use the standard Tailwind class (p-4, rounded-lg, text-xl, etc.)
+  │
+  └─ 4. None of the above exist
+        → Add a new token to @pawhaven/design-system first, then use it
+```
+
+**Why this matters**: `bg-[var(--color-primary)]` fails at step 2 — the semantic token exists but you're bypassing it. `style={{ fontFamily: '...' }}` fails at step 2 — `font-heading` exists. `w-[317px]` fails at step 3 — it's not a valid spacing token. Every common mistake is a violation of this flow at some step.
 
 ---
 
@@ -545,13 +578,19 @@ Before creating CSS ask:
 
 ## 23. Inline Styles
 
-❌ Avoid:
+❌ Avoid — all static visual values belong in utility classes (see decision flow above):
 
 ```tsx
 style={{ width: 320 }}
+style={{ fontFamily: 'var(--font-heading)' }}
+style={{ color: '#4285F4' }}
 ```
 
-Only use inline styles when the value is truly dynamic and cannot be represented with Tailwind utilities or design tokens.
+✅ Good — inline only for truly dynamic values computed at runtime:
+
+```tsx
+style={{ '--progress': `${progress}%` } as React.CSSProperties}
+```
 
 ---
 
@@ -633,14 +672,17 @@ Never add ad-hoc values directly in components.
 Before completing a feature verify:
 
 - [ ] `@pawhaven/design-system` is imported (`styles.css` in root)
+- [ ] Follows the "How to Pick the Right Utility Class" decision flow
 - [ ] No hardcoded colors — semantic tokens used (`bg-primary`, `text-text`, etc.)
+- [ ] No `var(--color-*)` bypass — every CSS variable reference uses its utility class
 - [ ] No hardcoded spacing — spacing scale used (`p-4`, `gap-2`, etc.)
-- [ ] No hardcoded typography — font tokens used (`font-heading`, `text-xl`, etc.)
+- [ ] No hardcoded typography — font tokens used as classes (`font-heading`, `text-xl`)
 - [ ] No magic numbers — no `w-[317px]`, `mt-[13px]`, etc.
 - [ ] No arbitrary Tailwind values — no `text-[#xxx]`, `rounded-[Npx]`
 - [ ] No arbitrary z-index values — use semantic z-scale
 - [ ] Custom utilities used where applicable (`btn-primary`, `card`, `input-field`, `flex-center`, etc.)
 - [ ] No inline styling (unless truly dynamic)
+- [ ] Icon-only links/buttons have an `aria-label` for accessibility
 - [ ] Responsive layout is supported
 - [ ] Design tokens are used
 - [ ] Semantic colors are used
@@ -657,12 +699,13 @@ Before completing a feature verify:
 
 Avoid:
 
-- `text-[#123456]`
-- `bg-[#ffffff]`
-- `w-[317px]`
-- `mt-[13px]`
-- `rounded-[9px]`
-- `style={{ ... }}`
+- `text-[#123456]` — hardcoded hex
+- `bg-[var(--color-*)]` / `text-[var(--color-*)]` — CSS variable bypass, use the semantic utility class
+- `style={{ fontFamily }}` / `style={{ color }}` / `style={{ width }}` — static values in inline styles
+- `w-[317px]` — magic number
+- `mt-[13px]` — magic number
+- `rounded-[9px]` — magic number
+- `style={{ ... }}` — inline styles for static values
 - Pixel-perfect positioning
 - Random spacing values
 - Random z-index values
@@ -671,6 +714,8 @@ Avoid:
 - Creating new design patterns without updating `@pawhaven/design-system`
 - Re-creating utility classes that already exist in `utilities.css`
 - Using raw Tailwind color names (`text-orange-500`) instead of semantic tokens (`text-primary`)
+
+**If unsure, follow the decision flow in "How to Pick the Right Utility Class" above.**
 
 ---
 

@@ -19,6 +19,9 @@
   "sideEffects": false,
   "dependencies": {
     "@pawhaven/design-system": "workspace:*",
+    "@radix-ui/react-label": "^2.1.11",
+    "@radix-ui/react-slot": "^1.3.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
     "lucide-react": "^0.545.0",
@@ -27,13 +30,13 @@
     "react-loading-skeleton": "^3.5.0"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.3.4",
     "@mui/x-date-pickers": "^8.14.0",
-    "@mui/x-date-pickers-pro": "^8.14.0"
+    "@mui/x-date-pickers-pro": "^8.14.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -59,8 +62,8 @@
     }
   },
   "devDependencies": {
-    "@pawhaven/tsconfig": "workspace:*",
     "@pawhaven/eslint-config": "workspace:*",
+    "@pawhaven/tsconfig": "workspace:*",
     "@types/node": "^24.7.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
