@@ -177,6 +177,52 @@
     "download_guide": "下载救助指南详情",
     "download_failed": "下载失败，请重试"
   },
+  "footer": {
+    "columns": {
+      "platform": {
+        "heading": "平台",
+        "browseRescues": "浏览救助",
+        "reportStray": "上报流浪动物",
+        "adoptAnimal": "领养动物",
+        "volunteer": "成为志愿者"
+      },
+      "resources": {
+        "heading": "资源",
+        "knowledgeBase": "知识库",
+        "rescueStories": "救助故事",
+        "emergencyGuide": "紧急指南"
+      },
+      "community": {
+        "heading": "社区",
+        "volunteerNetwork": "志愿者网络",
+        "partnerShelters": "合作收容所",
+        "shareStory": "分享故事"
+      },
+      "company": {
+        "heading": "关于",
+        "aboutPawHaven": "关于 PawHaven",
+        "openSource": "开源",
+        "privacyPolicy": "隐私政策",
+        "termsOfService": "服务条款"
+      }
+    },
+    "brandDescription": "一个连接上报者、救助者和领养者的协作平台——从第一次发现到永远的归宿。",
+    "stats": {
+      "animalsRescued": "已救助动物",
+      "activeVolunteers": "活跃志愿者",
+      "adopted": "已领养"
+    },
+    "social": {
+      "github": "GitHub",
+      "twitter": "Twitter",
+      "email": "Email"
+    },
+    "bottomBar": {
+      "license": "开源项目——MIT 许可证。",
+      "systemsOperational": "所有系统正常运行",
+      "builtWith": "用 ❤️ 为每一个流浪生命而建"
+    }
+  },
   "errorMessage": {
     "TOKEN_EXPIRED": "登录已过期，请重新登录。",
     "INVALID_TOKEN": "无效的访问令牌，请重新登录。",

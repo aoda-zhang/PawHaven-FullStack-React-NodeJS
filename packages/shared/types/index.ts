@@ -39,3 +39,17 @@ export {
 
 export { AnimalReportSchema } from './report-stray.schema';
 export type { AnimalReportDto } from './report-stray.schema';
+
+export {
+  StoryTypeValues,
+  StoryTypeSchema,
+  StorySchema,
+  CreateStoryDtoSchema,
+  UpdateStoryDtoSchema,
+} from './story.schema';
+export type {
+  StoryType,
+  Story,
+  CreateStoryDto,
+  UpdateStoryDto,
+} from './story.schema';

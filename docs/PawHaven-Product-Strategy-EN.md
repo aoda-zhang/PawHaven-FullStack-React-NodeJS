@@ -1,691 +1,1034 @@
 # PawHaven — Stray Animal Rescue Platform · Complete Product Blueprint
 
-> **Version**: v1.0 | **Date**: 2025-07-01 | **Author**: Product Manager  
+> **Version**: v2.0 | **Date**: 2025-07-03 | **Author**: Product Manager  
 > **One-liner**: A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.
 
 ---
 
 ## Table of Contents
 
-1. [Product Positioning & User Personas](#1-product-positioning--user-personas)
-2. [Module Overview](#2-module-overview)
-3. [Module 1: Stray Animal Reporting](#3-module-1-stray-animal-reporting)
-4. [Module 2: Rescue Progress Tracking](#4-module-2-rescue-progress-tracking)
-5. [Module 3: Rescue Stories](#5-module-3-rescue-stories)
-6. [Module 4: Rescue Knowledge Base](#6-module-4-rescue-knowledge-base)
-7. [Module 5: Adoption Matching](#7-module-5-adoption-matching)
-8. [Module 6: Volunteer Collaboration](#8-module-6-volunteer-collaboration)
-9. [Module 7: Profile & Achievements](#9-module-7-profile--achievements)
-10. [Value Flywheel & Product Roadmap](#10-value-flywheel--product-roadmap)
+1. [The Animal's Journey: Complete Lifecycle Overview](#1-the-animals-journey-complete-lifecycle-overview)
+2. [User Model: Who Can Do What](#2-user-model-who-can-do-what)
+3. [Stage 0: Discovery — How an Animal Becomes Visible](#3-stage-0-discovery--how-an-animal-becomes-visible)
+4. [Stage 1: Pending — Waiting for a Rescuer](#4-stage-1-pending--waiting-for-a-rescuer)
+5. [Stage 2: In Progress — Rescue Underway](#5-stage-2-in-progress--rescue-underway)
+6. [Stage 3: Treated — Medical Care Received](#6-stage-3-treated--medical-care-received)
+7. [Stage 4: Recovering — Rehabilitation Period](#7-stage-4-recovering--rehabilitation-period)
+8. [Stage 5: Awaiting Adoption — Ready for a Forever Home](#8-stage-5-awaiting-adoption--ready-for-a-forever-home)
+9. [Stage 6: Adopted — Mission Complete](#9-stage-6-adopted--mission-complete)
+10. [Endings Alternative: Failed, Duplicate, Cancelled](#10-endings-alternative-failed-duplicate-cancelled)
+11. [Supporting Systems](#11-supporting-systems)
+12. [Value Flywheel & Roadmap](#12-value-flywheel--roadmap)
 
 ---
 
-## 1. Product Positioning & User Personas
+## 1. The Animal's Journey: Complete Lifecycle Overview
 
 ### 1.1 The Core Problem
 
-> A stray animal goes through six stages from discovery to adoption: **Spot → Report → Rescue → Treat → Recover → Adopt**. Today, these stages are deeply fragmented — reporters don't know who to call, rescuers can't get timely information, and adopters can't find trustworthy channels. **This information gap causes low rescue efficiency. Many animals that could have been saved miss their critical rescue window.**
+> A stray animal goes through many stages from discovery to a potential forever home. Today, these stages are deeply fragmented — the person who spots the animal doesn't know who to tell, people who could rescue it never hear about it, and those who might adopt it have no way to trust the animal's history. **Every broken link in this chain means an animal that could have been saved is left behind.**
 
-### 1.2 Product Mission
+### 1.2 The Full Lifecycle (8 Stages)
 
-**Every stray life deserves to be seen, rescued, and treated with compassion.**
+```
+  ┌──────────────┐
+  │  STAGE 0     │  Someone spots a stray animal.
+  │  DISCOVERY   │  A passerby. A resident. Anyone.
+  └──────┬───────┘
+         │ They open PawHaven and submit a report
+         │ (photos + GPS + urgency indicator)
+         ▼
+  ┌──────────────┐
+  │  STAGE 1     │  The case is now PUBLIC.
+  │  PENDING     │  Visible on the homepage map/list.
+  │  (待响应)     │  System notifies nearby volunteers.
+  └──────┬───────┘                            ↑
+         │ A volunteer "claims" the case       │ If no one claims in 24h:
+         │ (publicly declares intent to help)  │ system escalates — wider
+         ▼                                     │ radius, more notifications.
+  ┌──────────────┐
+  │  STAGE 2     │  Rescuer is en route or
+  │  IN PROGRESS │  actively rescuing.
+  │  (救助中)     │  Posts updates — photos, notes.
+  └──────┬───────┘
+         │ Animal is safely relocated
+         │ (trapped / caught / transported)
+         ▼
+  ┌──────────────┐
+  │  STAGE 3     │  Initial medical care done.
+  │  TREATED     │  Cleaning, bandaging, vaccines,
+  │  (已治疗)     │  basic checkup at a clinic.
+  └──────┬───────┘
+         │ Entering recovery period
+         ▼
+  ┌──────────────┐
+  │  STAGE 4     │  Resting at shelter or foster
+  │  RECOVERING  │  home. Periodic progress photos.
+  │  (康复中)     │  Behavioral assessment begins.
+  └──────┬───────┘
+         │ Recovery complete, animal is healthy
+         │
+    ┌────┴─────────────────┐
+    │                      │
+    ▼                      ▼
+  ┌──────────────┐   ┌──────────────┐
+  │  STAGE 5     │   │  STAGE X     │  Did not survive.
+  │  AWAITING    │   │  FAILED      │  Could not be rescued.
+  │  ADOPTION    │   │  (已结束)     │  Escaped / lost.
+  │  (待领养)     │   └──────────────┘
+  └──────┬───────┘
+         │ An adopter applies and is approved
+         ▼
+  ┌──────────────┐
+  │  STAGE 6     │  Animal has a forever home.
+  │  ADOPTED     │  Adopter posts "first day home".
+  │  (已领养)     │  Case archived with full history.
+  └──────────────┘
+```
 
-PawHaven is not "yet another pet community." It is a **collaboration network** — connecting reporters, rescuers (individual volunteers / shelters), veterinary clinics, and adopters on a single transparent workflow.
+### 1.3 Who Does What at Each Stage (At a Glance)
 
-### 1.3 Four Core User Personas
+| Stage                    | Reporter                                 | Volunteer (Rescuer)                | Shelter Staff                   | Adopter                            | Guest / Casual User       |
+| ------------------------ | ---------------------------------------- | ---------------------------------- | ------------------------------- | ---------------------------------- | ------------------------- |
+| **0. Discovery**         | **Submits report**                       | —                                  | —                               | —                                  | Can browse knowledge base |
+| **1. Pending**           | Tracks progress, can add info            | **Claims case**, asks questions    | Browses cases, can claim        | —                                  | Sees case on map/list     |
+| **2. In Progress**       | Watches updates                          | **Executes rescue, posts updates** | Can offer transport / support   | —                                  | Views rescue progress     |
+| **3. Treated**           | Watches medical updates                  | **Uploads medical records**        | Provides vet contacts           | —                                  | Views medical timeline    |
+| **4. Recovering**        | Follows recovery                         | Posts progress photos              | **Approves adoption readiness** | —                                  | Views recovery photos     |
+| **5. Awaiting Adoption** | Sees case is adoptable                   | Helps screen applicants            | **Reviews applications**        | **Browses & applies**              | Views adoption listing    |
+| **6. Adopted**           | Receives "mission complete" notification | Invited to write story             | Case archived                   | **Posts home photo, writes story** | Reads rescue story        |
 
-| Persona | One-line Description | Core Need | Usage Frequency |
-|---------|---------------------|-----------|-----------------|
-| **Reporter** | A passerby or resident who spots a stray and wants to help but doesn't know how | "Who do I contact? How do I report this? What if the animal is injured?" | Low (sporadic events) |
-| **Rescuer** | Individual volunteer or shelter staff who physically carries out rescues | "Are there new cases nearby? Who is handling them? Should I step in?" | High (daily work) |
-| **Adopter** | Someone looking to adopt a rescued animal from a trusted source | "Is this animal healthy? What's its temperament? What's the adoption process?" | Medium (long decision cycle) |
-| **Contributor** | Veterinarian or experienced rescuer who shares professional knowledge | "Are people reading my rescue guides? Can my experience help others?" | Low (content production) |
-
-> **Key insight**: A single user may play multiple roles. Today you're a reporter, tomorrow you might be an adopter, and next week a rescuer. The product must support this **role fluidity**.
-
-### 1.4 Competitive Differentiation
-
-| Dimension | Traditional Adoption Platforms | Social Media Requests | **PawHaven** |
-|-----------|-------------------------------|----------------------|-------------|
-| Information Structure | Only shows adoptable animals | Fragmented posts | **Full pipeline structured (Report → Rescue → Adopt)** |
-| Rescue Transparency | None | None | **7-stage status tracking, every step public** |
-| Collaboration Mechanism | None | Spontaneous comments | **Volunteer claim + shelter coordination** |
-| Knowledge Accumulation | None | Scattered posts | **Structured rescue knowledge base** |
-| Trust Foundation | Platform endorsement | Personal reputation | **Public rescue records = natural trust chain** |
+> **Bold** = primary actor for that stage. A regular user who reports becomes the Reporter role. An unregistered passerby is a Guest.
 
 ---
 
-## 2. Module Overview
+## 2. User Model: Who Can Do What
+
+### 2.1 Three Access Tiers (NOT Three User Types)
+
+PaHaven does NOT ask users to "pick a role" at registration. Everyone registers as a single **User**. What they can do depends on their **access tier** — which is progressive:
 
 ```
-                     PawHaven Product Architecture
-
-    ┌──────────────────────────────────────────────────┐
-    │              🏠 Home (Information Hub)             │
-    │    Latest Rescues · Featured Stories · Knowledge  │
-    └────────┬───────────┬──────────┬──────────┬───────┘
-             │           │          │          │
-    ┌────────▼──┐ ┌──────▼───┐ ┌───▼────┐ ┌───▼──────────┐
-    │ 🐾 Stray   │ │ 📋 Rescue│ │ 💝 Love│ │ 📚 Knowledge │
-    │  Reporting │ │ Tracking │ │ Stories│ │    Base      │
-    │  Report    │ │  Track   │ │        │ │              │
-    └─────┬─────┘ └────┬────┘ └───┬────┘ └──────┬───────┘
-          │            │          │              │
-          └────────────┼──────────┼──────────────┘
-                       │          │
-              ┌────────▼──┐ ┌─────▼─────┐
-              │ 🏠 Adoption│ │ 🤝 Volunteer│
-              │  Matching  │ │ Collaboration│
-              └───────────┘ └───────────┘
-                       │          │
-              ┌────────▼──────────▼──────────┐
-              │   👤 Profile & Achievements   │
-              └──────────────────────────────┘
-```
-
-### Inter-Module Data Flow
-
-```
-Reporter submits ──→ Creates rescue case ──→ Volunteer claims ──→ Status progression ──→ Ready for adoption
-                         │                              │
-                         ▼                              ▼
-                   Knowledge Base ◄── referenced by ──── Rescue Stories (written post-adoption)
-                                                           │
-                                                           ▼
-                                                    Adopter browses & matches
-```
-
----
-
-## 3. Module 1: Stray Animal Reporting
-
-### 3.1 Module Purpose
-
-**"Complete an effective stray animal report in under 3 minutes"** — enable anyone, even with zero rescue experience, to provide actionable information.
-
-### 3.2 Core Business Flow
-
-```
-Spot a stray animal
-    │
-    ▼
-┌──────────────┐     ┌─────────────┐     ┌──────────────┐
-│ ① Take/Upload│ ──→ │ ② Tag       │ ──→ │ ③ Basic Info │
-│   Photos     │     │   Location  │     │ Type / Count │
-└──────────────┘     └─────────────┘     └──────────────┘
-                                                 │
-                                                 ▼
-┌──────────────┐     ┌─────────────┐     ┌──────────────┐
-│ ⑥ Submitted  │ ←── │ ⑤ Urgency   │ ←── │ ④ Condition  │
-│  + Next Steps│     │  Assessment │     │ Assessment   │
-└──────────────┘     └─────────────┘     └──────────────┘
-        │
-        ▼
-  System notifies nearby volunteers / shelters
-        │
-        ▼
-  Case enters "Rescue Progress Tracking" module
-```
-
-### 3.3 Key Design Decisions
-
-**Why 6 steps instead of a single-page form?**
-- Reporters are usually stressed or in a hurry. Step-by-step guidance reduces cognitive load.
-- Each step asks one thing: first take photos (most natural), then location (GPS auto-fetch), then describe.
-- Non-critical fields can be skipped, but essential info (photos + location + animal type) is required.
-
-**Urgency assessment logic**
-- The system does NOT ask reporters to self-judge "does this need rescue?" (prone to error).
-- Instead, it asks structured questions: Is the animal bleeding? Unable to move? In a dangerous location (middle of road / highway)?
-- Any "yes" → automatically flagged as **Urgent** → prioritized notification push.
-
-**Immediate feedback after submission**
-- Not a cold "Submitted successfully." Instead, tell the user:
-  1. "We've notified X nearby volunteers and Y shelters"
-  2. "You can track this case's progress (click to view)"
-  3. "Want to learn more about rescue? Read this guide"
-- Goal: Make the reporter feel "I did something meaningful," not "I filled out a form."
-
-### 3.4 Case Data Model (Core Fields)
-
-| Field Group | Field | Required | Notes |
-|-------------|-------|----------|-------|
-| Media | Photos (1-5) | ✅ | First photo used as cover |
-| Location | GPS coordinates + address text | ✅ | GPS auto-fetched, address editable |
-| Basic | Animal type (Cat/Dog/Other) | ✅ | "Other" allows free text |
-| Basic | Count | - | For litters of kittens/puppies |
-| Condition | Appearance (coat color / size) | - | Helps identification |
-| Condition | Urgency indicators (bleeding / immobile / dangerous spot) | ✅ | Auto-determines urgency level |
-| Condition | Behavior (friendly / wary / aggressive) | - | Helps rescuer prepare |
-| Contact | Reporter contact info | - | Optional, for follow-up |
-| Contact | Willing to assist further? | - | Converts reporter into potential volunteer |
-
----
-
-## 4. Module 2: Rescue Progress Tracking
-
-### 4.1 Module Purpose
-
-**"Every rescue has a beginning and an end"** — full-process transparent tracking from report to outcome. This is the foundation of platform trust.
-
-### 4.2 Rescue State Machine (7 Stages)
-
-```
-   ┌─────────┐
-   │ Pending │ ← Reporter submitted, awaiting response
-   └────┬────┘
-        │ Volunteer / Shelter claims the case
-        ▼
-   ┌─────────┐
-   │InProgress│ ← Rescuer en route / actively rescuing
-   └────┬────┘
-        │ Animal safely relocated
-        ▼
-   ┌─────────┐
-   │ Treated │ ← Initial medical care received (cleaning / bandaging / checkup)
-   └────┬────┘
-        │ Entering recovery period
-        ▼
-   ┌─────────┐
-   │Recovering│ ← Recovering at shelter / foster home
-   └────┬────┘
-        │
-   ┌────┴────────────┐
-   │                 │
-   ▼                 ▼
-┌──────────┐   ┌──────────┐
-│ Awaiting │   │  Failed  │ ← Did not survive / lost / unable to rescue
-│ Adoption │   └──────────┘
-└────┬─────┘
-     │ Adoption successful
-     ▼
-┌──────────┐
-│ Adopted  │
-└──────────┘
-```
-
-### 4.3 Core Interactions per Status
-
-| Status | Who Acts | Core Interaction |
-|--------|---------|-----------------|
-| **Pending** | System + Volunteers | System pushes notification to nearby volunteers; volunteers browse and "claim" cases; reporter can add info |
-| **In Progress** | Rescuer | Rescuer posts updates (text + photos); records rescue method (trapping / net / direct carry) |
-| **Treated** | Rescuer + Vet Clinic | Upload medical records (vaccines / deworming / surgery); record treatment costs (optional, supports donation) |
-| **Recovering** | Shelter / Foster | Periodic recovery photos; behavioral assessment (temperament / habits / adoption suitability) |
-| **Awaiting Adoption** | System + Adopters | Publish adoption listing; adopters browse and apply; shelter reviews applications |
-| **Adopted** | Adopter + System | Adopter uploads "first day home" photo; case marked complete; invited to write a rescue story |
-| **Failed** | Rescuer | Record cause (factual, no blame); option to show or hide details; emotional support reminder for rescuer |
-
-### 4.4 Why the State Machine Is Central
-
-- **Transparency builds trust**: Every status change has a timestamp and actor record. Adopters can see an animal's full journey from discovery to adoptability — this is the strongest trust signal.
-- **Collaboration signaling**: Status tells all participants "who is needed now." Pending → needs volunteers. Recovering → needs patience. Awaiting Adoption → needs adopters.
-- **Preventing "zombie cases"**: If a case stays in one status beyond expected time (e.g., Pending for 24+ hours), the system auto-escalates priority or notifies more volunteers.
-
-### 4.5 Rescue Timeline
-
-Every rescue case has a public **timeline view**, showing all status changes in reverse chronological order:
-
-```
-2025-06-15 14:30  🏠 Adopted      — Mr. Zhang adopted Little White, new home in Chaoyang District
-2025-06-10 09:00  ⏳ Awaiting     — Little White fully vaccinated, now open for adoption
-2025-06-03 16:00  💚 Recovering   — Wound healing well, eating normally
-2025-06-01 11:00  💉 Treated      — Love Pet Clinic completed wound care and vaccines
-2025-06-01 08:30  🔵 In Progress  — Volunteer Li Ming arrived on site, cat safely relocated
-2025-06-01 07:15  ⚠️ Pending      — Ms. Chen spotted an injured white cat on Garden Road
-```
-
----
-
-## 5. Module 3: Rescue Stories
-
-### 5.1 Module Purpose
-
-**"Turn every successful rescue into a reason for more people to act"** — Rescue Stories are the platform's **emotional engine** that drives broader participation.
-
-### 5.2 Core Business Flow
-
-```
-Rescue case marked "Adopted"
-        │
-        ▼
-System auto-invites ──→ Rescuer / Adopter to write the story
-        │
-        ▼
-┌────────────────────────────────────┐
-│ Story Editor (structured + freeform)│
-│                                    │
-│ ① Title: "From Trash Bin to Couch  │
-│    — Little Orange's 180 Days"     │
-│ ② Before/After comparison photos  │
-│ ③ Story body (rich text + inline   │
-│    images)                         │
-│ ④ Auto-embedded key stats          │
-│    (rescue duration / people helped)│
-│ ⑤ Tags (#CarCrashSurvivor #Orange  │
-│    #TripodWarrior)                 │
-└────────────────────────────────────┘
-        │
-        ▼
-  Publish Review (anti-abuse)
-        │
-        ▼
-┌────────────────────────────────────┐
-│ Story Display                      │
-│ · Homepage "Featured Stories"      │
-│   carousel                         │
-│ · Story listing page (filterable   │
-│   by tag / animal type)            │
-│ · Linked to original rescue case   │
-│   (full traceability)              │
-│ · Engagement: like / comment /     │
-│   share                            │
-└────────────────────────────────────┘
-```
-
-### 5.3 Why This Module Matters (Beyond a Simple List)
-
-**Emotion drives action.** Data tells us:
-- Rational information ("X animals awaiting adoption") drives ~20% of actions
-- Emotional stories ("This cat was found in a trash bin — now it has a home") drives ~80% of actions
-
-**Story → Action conversion chain**:
-```
-Read story → Moved → Browse adoptable animals → Submit adoption application
-          → Moved → Learn rescue knowledge → Spot stray → Report it
-          → Moved → Want to help → Register as volunteer
-```
-
-### 5.4 Story Content Strategy
-
-| Story Type | Example | Target Emotion | Target Action |
-|------------|---------|---------------|---------------|
-| **Before/After** | From injured stray to a new life | Hope, warmth | Browse adoptions |
-| **Rescue Documentary** | A midnight rescue — the full story | Admiration, resonance | Become a volunteer |
-| **Adoption Diary** | 30 days after adoption | Trust, warmth | Submit adoption application |
-| **Knowledge Sharing** | "5 mistakes I made on my first rescue" | Learning, empathy | Read knowledge base |
-| **Community Story** | A neighborhood rallied to rescue a cat colony | Community spirit, participation | Report / Share |
-
----
-
-## 6. Module 4: Rescue Knowledge Base
-
-### 6.1 Module Purpose
-
-**"Professional knowledge shouldn't stay locked in experienced rescuers' heads"** — systematically accumulate rescue knowledge to lower the barrier for ordinary people to participate.
-
-### 6.2 Knowledge Taxonomy
-
-```
-Rescue Knowledge Base
-├── 🚨 Emergency Situations
-│   ├── What to do when you find an injured animal
-│   ├── First aid for animals hit by vehicles
-│   ├── Identifying and handling poisoning
-│   └── How to safely approach an aggressive animal
-│
-├── 🐱 Feline Rescue
-│   ├── Complete kitten rescue guide
-│   ├── Adult stray cat TNR (Trap-Neuter-Return) guide
-│   ├── Identifying common cat illnesses
-│   └── How to assess if a cat is ready for adoption
-│
-├── 🐕 Canine Rescue
-│   ├── Stray dog rescue safety guide
-│   ├── Identifying & isolating distemper / parvovirus
-│   └── Transporting and housing large dogs
-│
-├── 📋 Rescue Process
-│   ├── Complete checklist for your first rescue
-│   ├── How to contact shelters and animal welfare orgs
-│   ├── Rescue supply checklist (what to keep on hand)
-│   └── Relevant laws and regulations
-│
-├── 🏠 Adoption & Placement
-│   ├── Adoption screening criteria reference
-│   ├── New pet at home: the first 7 days
-│   └── Introducing a new pet to a multi-pet household
-│
-└── 💡 Experience Sharing
-    ├── Stories and insights from veteran rescuers
-    ├── Regional rescue resource directory (user-contributed)
-    └── Common myths and pitfalls to avoid
-```
-
-### 6.3 Core Business Flow
-
-```
-┌────────────────┐
-│ Contributor     │ ← Certified vet / experienced rescuer / platform editor
-│ writes article  │
-│ (structured     │
-│  editor)        │
-└───────┬────────┘
-        │
-        ▼
-┌────────────────┐
-│ Review Process  │ ← Content review (accuracy + safety)
-│ (expert review) │   Medical advice MUST include disclaimer:
-│                 │   "For reference only. Consult a veterinarian."
-└───────┬────────┘
-        │
-        ▼
-┌────────────────┐
-│ Publish         │
-│ · Category index│
-│ · Full-text     │
-│   search        │
-│ · Linked rescue │ ← "About TNR — see this case study..."
-│   cases         │
-│ · Related       │
-│   articles      │
-│ · Downloadable  │ ← Offline reading, useful in the field
-│   PDF           │
-└───────┬────────┘
-        │
-        ▼
-┌────────────────┐
-│ Feedback Loop   │
-│ · "Was this     │ ← Collect feedback, optimize content
-│   helpful?"     │
-│ · Comments &    │
-│   discussion    │
-│ · Contribute    │ ← Users can add experience in comments
-│   additions     │
-└────────────────┘
-```
-
-### 6.4 Key Design Decisions
-
-**Why review is mandatory?**
-Rescue knowledge involves animal lives. Wrong advice (e.g., "give the cat human medicine") can be fatal. Every article must:
-- Be reviewed by at least one certified vet or experienced rescuer
-- Include disclaimer on all medical advice
-- Label whether content is "experiential knowledge" or "veterinary professional knowledge"
-
-**Knowledge Base ↔ Rescue Flow integration**
-- When a user reports a stray, auto-recommend relevant articles based on "animal type" and "urgency indicators"
-- Example: reporting "injured cat" → recommend "What to do with an injured animal" + "Kitten/Adult cat rescue guide"
-- When a volunteer claims a case, recommend "Rescue checklist" and "How to contact nearby shelters"
-
----
-
-## 7. Module 5: Adoption Matching
-
-### 7.1 Module Purpose
-
-**"Not a listing — a matchmaking service"** — match animals to adopters based on living conditions and preferences to increase adoption success rates and reduce return rates.
-
-### 7.2 Core Business Flow
-
-```
-┌──────────────────────────────────────┐
-│          Adopter Side                │
-│                                      │
-│  Browse adoptable animals            │
-│  ← linked to full rescue case history│
-│       │                              │
-│       ▼                              │
-│  View animal detail                  │
-│  · Full rescue timeline (transparency│
-│    = trust)                          │
-│  · Recovery + medical records        │
-│  · Behavioral assessment (temperament│
-│    / habits / special needs)         │
-│  · Rescuer / shelter info            │
-│       │                              │
-│       ▼                              │
-│  Submit adoption application         │
-│  · Basic info (housing / pet         │
-│    experience / household members)   │
-│  · Adoption intent (why this animal?)│
-│  · Upload home photos (optional)     │
-│       │                              │
-└───────┼──────────────────────────────┘
-        │
-        ▼
-┌──────────────────────────────────────┐
-│          Shelter Side                │
-│                                      │
-│  Receive application → Review → Chat │
-│  → Interview / Home visit            │
-│       │                              │
-│       ▼                              │
-│  Decision: Approve / Reject (with    │
-│  reason) / Pending                   │
-│       │                              │
-│       ▼                              │
-│  Approved → Sign adoption agreement  │
-│           → Transfer animal          │
-│           → Case marked "Adopted"    │
-│           → Invite to write story    │
-└──────────────────────────────────────┘
-```
-
-### 7.3 Matching Algorithm (Lightweight)
-
-Not a complex recommendation engine — **condition-based filtering + weighted ranking**:
-
-| Match Dimension | Weight | Description |
-|-----------------|--------|-------------|
-| Adopter preference (type / age / size) | ⭐⭐⭐⭐⭐ | Hard match |
-| Geographic proximity | ⭐⭐⭐⭐ | Closer = easier follow-up visits |
-| Adopter experience match | ⭐⭐⭐ | Beginners → gentle-tempered animals; Experienced → special-needs animals |
-| Animal wait time | ⭐⭐ | Longer wait = slightly higher weight (not primary factor) |
-| Living condition match | ⭐⭐⭐⭐ | Apartment ≠ large dog; families with children need stable-temperament animals |
-
-### 7.4 Adoption Return Prevention
-
-> Returning an adopted animal causes secondary trauma. Preventing returns is more important than handling them.
-
-| Stage | Prevention Measure |
-|-------|-------------------|
-| **Application** | Require adoption motivation and housing details; educational prompt ("Adoption is a 15-year commitment") |
-| **Review** | Shelter thoroughly communicates with adopter; discloses special needs and potential issues |
-| **Transfer** | Provide "New Pet Home Guide" (linked to knowledge base); sign adoption agreement |
-| **Post-Adoption** | 7-day / 30-day / 90-day follow-up reminders; adopter can keep a "new home diary" on the platform |
-
----
-
-## 8. Module 6: Volunteer Collaboration
-
-### 8.1 Module Purpose
-
-**"Let people who want to help know exactly how to help"** — volunteers aren't "sign up and done." They get a clear capability profile and a task-matching system.
-
-### 8.2 Volunteer Capability Model
-
-```
-Volunteer Profile
-├── Basic Info
-│   ├── City / District (CRITICAL — determines notification radius)
-│   ├── Availability (weekday evenings / weekends / anytime)
-│   └── Transportation (walking / bike / car → determines response radius)
-│
-├── Rescue Capabilities
-│   ├── Experience level (Beginner / Experienced / Veteran / Professional Vet)
-│   ├── Specialty (Cats / Dogs / Small animals)
-│   ├── Task types (On-site rescue / Transport / Temporary foster / Trap assistance)
-│   └── Verification status (platform identity verified or not)
-│
-├── Rescue Statistics
-│   ├── Total rescues participated
-│   ├── Successful rescues
-│   ├── Response speed (average claim time)
-│   └── Ratings (from reporters / shelters)
-│
-└── Preferences
-    ├── Receive emergency notifications?
-    ├── Notification radius (5km / 10km / city-wide)
-    └── Willing to foster temporarily?
-```
-
-### 8.3 Core Business Flow
-
-```
-Reporter submits case (with location)
-        │
-        ▼
-System matches ──→ Filter: within radius + capability match + online volunteers
-        │
-        ▼
-Push notification ──→ "An injured cat needs help 2.3km from you"
-        │
-        ▼
-Volunteer views case → Decides: "Claim" or "Pass"
-        │
-        ▼
-After claiming ──→ Case status → In Progress
-               │  → Other volunteers see "1 person handling"
-               │  → Can request to "Assist" (if multiple people needed)
-               │
+  ┌─────────────────────────────────────────────────────────────┐
+  │                        GUEST                                 │
+  │  (Not logged in. Arrived via link, search, or homepage.)     │
+  │                                                             │
+  │  CAN:                                                        │
+  │  • Browse the homepage map/list of pending rescue cases      │
+  │  • View any rescue case detail + full timeline               │
+  │  • Browse adoption listings                                  │
+  │  • Read knowledge base articles                              │
+  │  • Read rescue stories                                       │
+  │                                                             │
+  │  CANNOT:                                                     │
+  │  • Submit a report (must register first)                     │
+  │  • Claim a case                                              │
+  │  • Comment, follow, or interact                              │
+  │  • Apply to adopt                                            │
+  └────────────┬────────────────────────────────────────────────┘
+               │ Register (email or social login)
                ▼
-Rescue complete ──→ Update case status
-                → Volunteer earns rescue points / achievements
-                → Rescue record added to personal stats
+  ┌─────────────────────────────────────────────────────────────┐
+  │                     REGISTERED USER                          │
+  │  (Logged in. Has a profile. Default tier.)                   │
+  │                                                             │
+  │  Everything Guest CAN, PLUS:                                  │
+  │                                                             │
+  │  • Submit a stray animal report → becomes the REPORTER       │
+  │  • Follow any rescue case → get notified of status changes   │
+  │  • Comment on rescue cases + stories                         │
+  │  • "Like" stories and cases                                  │
+  │  • Bookmark knowledge articles                               │
+  │  • Apply to adopt an animal (submits application to shelter) │
+  │  • View personal profile (my reports, my follows, my apps)   │
+  │                                                             │
+  │  CANNOT:                                                     │
+  │  • Claim a rescue case (must opt into volunteer tier first)  │
+  │  • Update case status                                       │
+  └────────────┬────────────────────────────────────────────────┘
+               │ Opt-in: Complete volunteer profile
+               │ (set location, capabilities, availability)
+               ▼
+  ┌─────────────────────────────────────────────────────────────┐
+  │                     VOLUNTEER (Registered + Opt-in)          │
+  │  (Has completed volunteer onboarding. Capability profile.)   │
+  │                                                             │
+  │  Everything Registered User CAN, PLUS:                        │
+  │                                                             │
+  │  • Claim pending rescue cases                                │
+  │  • Update case status (only for cases they claimed)          │
+  │  • Receive push notifications for nearby new cases           │
+  │  • Post rescue progress updates (photos + text)              │
+  │  • Upload medical records                                    │
+  │  • Request assistance from other volunteers                  │
+  │  • Mark a case as ready for adoption                         │
+  │  • Earn volunteer achievements and stats                     │
+  │  • Be thanked by reporters and adopters                      │
+  └─────────────────────────────────────────────────────────────┘
 ```
 
-### 8.4 Volunteer Motivation System
+### 2.2 Key Design Principle: Role Is Fluid, Actions Are Permission-Based
 
-Not gamification — **meaning-driven + light achievement**:
+A single user account can do ALL of the above **simultaneously**:
 
-| Motivation | Implementation |
-|-----------|---------------|
-| **Rescue Record** | Profile shows "You've helped X animals" |
-| **Gratitude System** | Reporters and adopters can send thank-you notes to volunteers |
-| **Skill Growth** | Progress from "Beginner" to "Veteran" reflecting real experience |
-| **Community Recognition** | Monthly featured volunteer showcase (with consent) |
-| **Priority Access** | High-activity volunteers see new cases earlier |
+- Alice is a **Registered User** who reports a stray cat (now she's a Reporter for that case)
+- Alice also opted into **Volunteer** tier, so she can claim rescue cases
+- Alice later applies to **adopt** a dog — now she's also an Adopter
+
+The system tracks these **per-case** or **action-based** roles. There is no profile setting that says "I am only a Reporter." The user is simply a User; what they can do depends on their tier.
+
+### 2.4 What Each Tier Sees on the Homepage
+
+| Area                                    | Guest                     | Registered User            | Volunteer                                |
+| --------------------------------------- | ------------------------- | -------------------------- | ---------------------------------------- |
+| **Map/List of pending cases**           | ✅ Full view              | ✅ Full view               | ✅ Full view + distance + urgency badges |
+| **"Report a stray" CTA**                | ✅ Button → prompts login | ✅ Active button           | ✅ Active button                         |
+| **Nearby pending cases (personalized)** | ❌ No personalization     | ✅ Based on saved city     | ✅ Based on GPS + volunteer radius pref  |
+| **"Cases you're following" section**    | ❌                        | ✅ Shows followed cases    | ✅ Shows followed cases                  |
+| **"Cases you claimed" quick access**    | ❌                        | ❌                         | ✅ Quick action panel                    |
+| **New case push notifications**         | ❌                        | ❌ (opt-in via follow)     | ✅ Automatic for nearby urgent cases     |
+| **Adoptable animals**                   | ✅ Public listings        | ✅ Public + "apply" button | ✅ Same as registered                    |
+| **Knowledge base**                      | ✅ Full access            | ✅ Full + bookmark         | ✅ Full + bookmark                       |
+| **Stories**                             | ✅ Full access            | ✅ Full + like/comment     | ✅ Same as registered                    |
 
 ---
 
-## 9. Module 7: Profile & Achievements
+## 3. Stage 0: Discovery — How an Animal Becomes Visible
 
-### 9.1 Module Purpose
-
-**"Every act of kindness is recorded"** — the Profile is the user's identity and footprint on the platform.
-
-### 9.2 Unified Identity
-
-Since a user can simultaneously be a reporter, volunteer, and adopter, the profile aggregates data across all roles:
+### 3.1 The Moment of Discovery
 
 ```
-Profile
-├── 📊 My Data
-│   ├── Cases I reported (X total, Y successfully rescued)
-│   ├── Rescues I participated in (X volunteer actions)
-│   ├── Animals I adopted
-│   └── Stories I wrote (X stories, Y total likes)
+                 A person spots a stray animal.
+                 Could be anyone.
+
+       ┌─────────┴────────────┐
+       │                      │
+       ▼                      ▼
+  They know PawHaven?    They don't know PawHaven?
+       │                      │
+       ▼                      ▼
+  Open app → Report       They search "how to help stray
+       │                  animal near me" → Find PawHaven
+       │                  via search / social share →
+       │                  Land on homepage as Guest →
+       │                  See existing cases nearby →
+       │                  "Oh, I can report too!" →
+       │                  Register → Report
+       │                      │
+       └──────────┬───────────┘
+                  ▼
+         THE REPORT WIZARD
+         (6 steps, mobile-first)
+```
+
+### 3.2 The Report Wizard (6 Steps)
+
+This is the single most critical form in the entire product. It must work for someone stressed, in a hurry, possibly outdoors, with one hand on a phone.
+
+```
+Step 1: PHOTOS        Step 2: LOCATION      Step 3: ANIMAL TYPE
+┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│ Take or upload   │   │ GPS auto-fetched │   │ ○ Cat           │
+│ 1-5 photos.      │   │ Address shown    │   │ ○ Dog           │
+│ First = cover.   │   │ (editable).      │   │ ○ Other: [____] │
+│                  │   │ Pin on map       │   │                 │
+│ [Tap to capture] │   │ draggable.       │   │ Count: [1]      │
+│                  │   │                  │   │                 │
+│ Required ✅       │   │ Required ✅       │   │ Required ✅      │
+└─────────────────┘   └─────────────────┘   └─────────────────┘
+
+Step 4: CONDITION    Step 5: URGENCY       Step 6: CONFIRM
+┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│ Appearance:      │   │ Structured Q's:  │   │ ┌─────────────┐ │
+│ • Coat color     │   │                  │   │ │ Case summary │ │
+│ • Approx size    │   │ □ Bleeding?      │   │ │ Photo · Type │ │
+│                  │   │ □ Cannot move?   │   │ │ · Location   │ │
+│ Behavior:        │   │ □ In danger zone │   │ │ · Urgency    │ │
+│ ○ Friendly       │   │   (road/highway) │   │ └─────────────┘ │
+│ ○ Wary/avoidant  │   │ □ Breathing      │   │                 │
+│ ○ Aggressive     │   │   difficulty?    │   │ Your contact?   │
+│                  │   │                  │   │ (optional)      │
+│ Optional          │   │ Any YES → Urgent │   │                 │
+└─────────────────┘   └─────────────────┘   │ [Submit Report] │
+                                             └─────────────────┘
+```
+
+### 3.3 What Happens IMMEDIATELY After Submission
+
+The reporter sees a **confirmation screen** — not a cold "Success" toast:
+
+```
+  ┌──────────────────────────────────────────────┐
+  │                                              │
+  │         🙏 Thank you for reporting!           │
+  │                                              │
+  │  We've notified X volunteers and Y shelters   │
+  │  near Garden Road, Chaoyang District.         │
+  │                                              │
+  │  ┌──────────────────────────────────────┐    │
+  │  │  Case #PAW-0421 — "Injured White Cat" │    │
+  │  │  Status: 🟡 Pending — Awaiting rescue │    │
+  │  │  Reported: Just now                   │    │
+  │  └──────────────────────────────────────┘    │
+  │                                              │
+  │  [📱 Track this case's progress]             │
+  │                                              │
+  │  While you wait:                              │
+  │  • 📖 Read: "What to do when you find an     │
+  │    injured animal" (from our knowledge base)  │
+  │  • 🔔 We'll notify you when someone claims   │
+  │    this case                                  │
+  │                                              │
+  │  Want to help more? [Become a Volunteer →]   │
+  │                                              │
+  └──────────────────────────────────────────────┘
+```
+
+### 3.4 Behind the Scenes: The System's Actions
+
+Simultaneously, the system:
+
+1. **Creates the case** in the database with status = `PENDING`
+2. **Geocodes the location** → determines city, district, and approximate radius area
+3. **Matches volunteers** within the configurable radius who:
+   - Have "Online" volunteer status
+   - Can handle this animal type (Cat / Dog / Small animal)
+   - Are within their own notification radius setting
+4. **Sends push notifications** to matched volunteers:
+   - Normal urgency: "A stray cat needs help 2.1km from you"
+   - **Urgent**: `"🚨 URGENT: Injured cat needs immediate help 2.1km from you"` (with critical alert sound)
+5. **Pushes the case to the public homepage** map and list — visible to EVERYONE
+6. **Starts an escalation timer**: if not claimed within 24 hours (or 2 hours for urgent), escalate
+
+---
+
+## 4. Stage 1: Pending — Waiting for a Rescuer
+
+### 4.1 What EVERYONE Sees
+
+The case appears on the **public homepage** in two views:
+
+**Map View:**
+
+```
+  ┌─────────────────────────────────────────┐
+  │       🗺️ Map (leaflet / Mapbox)          │
+  │                                          │
+  │            📍 Pine Rd                     │
+  │         🐱 (urgent)                       │
+  │                                          │
+  │   📍 Oak Ave         📍 5th St            │
+  │   🐕                🐱                    │
+  │                                          │
+  │  [List View] [Map View]  Filters: ▾      │
+  └─────────────────────────────────────────┘
+```
+
+- Blue dot = normal pending case
+- Red pulsing dot = urgent pending case
+- Tapping a dot shows a mini-card with photo + animal type + distance
+
+**List View:**
+
+```
+  ┌──────────────────────────────────────────┐
+  │  Pending Rescue Cases                   │
+  │  ┌──────────────────────────────────────┐│
+  │  │ [photo] 🐱 Injured White Cat         ││
+  │  │        Garden Road · 2.1km away      ││
+  │  │        🟡 Pending · 5 min ago        ││
+  │  │        Urgency: High 🚨              ││
+  │  └──────────────────────────────────────┘│
+  │  ┌──────────────────────────────────────┐│
+  │  │ [photo] 🐕 Brown Dog                 ││
+  │  │        Oak Avenue · 3.5km away       ││
+  │  │        🟡 Pending · 23 min ago       ││
+  │  │        Urgency: Normal               ││
+  │  └──────────────────────────────────────┘│
+  └──────────────────────────────────────────┘
+```
+
+### 4.2 What the REPORTER Sees
+
+After submitting, the reporter sees this case in two places:
+
+1. **Post-submit confirmation screen** (shown above)
+2. **Profile → "My Reports"** — a dashboard of all cases they've reported
+
+```
+  ┌──────────────────────────────────────────┐
+  │  MY REPORTS                              │
+  │                                          │
+  │  Case #PAW-0421                          │
+  │  🐱 Injured White Cat                    │
+  │  Garden Road · Reported 2 hours ago      │
+  │  Status: 🟡 PENDING                      │
+  │  "We've notified 12 volunteers near you"  │
+  │                                          │
+  │  [View Full Timeline]                    │
+  │  [Add More Information]                  │
+  └──────────────────────────────────────────┘
+```
+
+The reporter can **add more information** at any point while the case is pending — more photos, better description, correction of location.
+
+### 4.3 What a VOLUNTEER Sees
+
+A volunteer receives a **push notification** (if within radius):
+
+> `"A stray cat needs help near Garden Road (2.1km away)"`  
+> or  
+> `"🚨 URGENT: Injured cat — Garden Road (2.1km away)"`
+
+Tapping it opens the case detail page, which for a volunteer includes:
+
+```
+  ┌──────────────────────────────────────────┐
+  │  🐱 Injured White Cat                     │
+  │  Garden Road, Chaoyang District           │
+  │  🟡 Pending · Reported 5 min ago          │
+  │  Urgency: 🚨 HIGH                         │
+  │                                          │
+  │  [Photo 1]  [Photo 2]  [Photo 3]         │
+  │                                          │
+  │  Description:                             │
+  │  "White cat with injured right hind       │
+  │   leg. Hiding under a parked car near     │
+  │   the bus stop. Seems wary of people."    │
+  │                                          │
+  │  Animal: Cat · Adult · White             │
+  │  Behavior: Wary/Avoidant                 │
+  │  Location: 📍 Garden Road (approx)        │
+  │                                          │
+  │  Reported by: Anonymous Reporter          │
+  │                                          │
+  │  ┌────────────────────────────────────┐   │
+  │  │   CURRENTLY 0 VOLUNTEERS CLAIMED   │   │
+  │  │                                    │   │
+  │  │   [🙋 I'LL RESCUE THIS ANIMAL]     │   │
+  │  │   (Claim this case)                │   │
+  │  │                                    │   │
+  │  │   Or: [Ask a Question]  [Share]    │   │
+  │  └────────────────────────────────────┘   │
+  └──────────────────────────────────────────┘
+```
+
+### 4.4 The Claiming Mechanism (Core Collaboration Action)
+
+When a volunteer clicks **"I'll Rescue This Animal"**:
+
+1. **Confirmation dialog:**
+
+   ```
+   ┌─────────────────────────────────┐
+   │  Claim "Injured White Cat"?     │
+   │                                 │
+   │  By claiming, you are committing│
+   │  to:                            │
+   │  • Go to the location           │
+   │  • Attempt to rescue the animal │
+   │  • Post status updates          │
+   │  • Transfer to vet/shelter if   │
+   │    needed                       │
+   │                                 │
+   │  [Yes, I'm on it]  [Cancel]    │
+   └─────────────────────────────────┘
+   ```
+
+2. **Case status changes**: `PENDING` → `IN_PROGRESS`
+
+3. **Everyone sees the update:**
+   - The claimer's name appears on the case: "Rescued by: Li Ming (Volunteer, 12 rescues)"
+   - Other volunteers see: "1 volunteer handling this case" — they can still offer to **Assist**
+   - The reporter receives a notification: "Li Ming has claimed your case and is on the way!"
+
+4. **The claimed case moves to a different section** on the homepage:
+   - Map: dot changes from yellow to blue
+   - List: moves from "Pending" to "In Progress" tab
+
+### 4.5 What if NO ONE Claims the Case?
+
+**Escalation timeline:**
+
+| Time Since Report | Normal Urgency                    | Urgent                                     |
+| ----------------- | --------------------------------- | ------------------------------------------ |
+| 0 min             | Push to nearby volunteers         | Push to nearby volunteers (critical alert) |
+| 30 min            | —                                 | Push to wider radius                       |
+| 2 hours           | Push to wider radius              | Push to ALL volunteers in city             |
+| 24 hours          | Push to ALL volunteers in city    | Auto-escalate to partner shelters          |
+| 48 hours          | Auto-escalate to partner shelters | Platform admin reviews manually            |
+
+At any point, the reporter can also **share the case link** on social media to crowdsource help.
+
+---
+
+## 5. Stage 2: In Progress — Rescue Underway
+
+### 5.1 Who Can Update Status
+
+**Only the volunteer who claimed the case** (or a shelter staff member who claimed it) can advance the status.
+
+An assistant volunteer can post comments and upload photos, but cannot change the status.
+
+### 5.2 What the Rescuer DOES
+
+After claiming, the rescuer is expected to:
+
+1. **Arrive at the location** (travel time varies)
+2. **Post an arrival update**: "I'm at Garden Road. Can see the cat under the third parked car. Preparing the carrier."
+3. **Execute the rescue** — this may involve:
+   - Direct capture (animal is friendly, can be picked up)
+   - Trapping (requires trap cage, may take hours/days)
+   - Coordinating with property management (animal in a locked area)
+   - Calling for backup (animal is aggressive or large) → "Request Assistance" button
+4. **Post rescue complete update**: "Cat secured in carrier. Transporting to Love Pet Clinic."
+5. **Advance status** to `TREATED`
+
+### 5.3 What the REPORTER Sees During Rescue
+
+The reporter follows the rescue via:
+
+1. **Push notifications** for each update:
+   - "Li Ming has arrived at the location"
+   - "Li Ming posted a new photo"
+   - "The cat has been safely secured!"
+
+2. **The case timeline** (accessible from their profile):
+
+```
+  ┌──────────────────────────────────────────┐
+  │  Rescue Timeline: Injured White Cat       │
+  │                                          │
+  │  TODAY, 14:30                            │
+  │  🔵 IN PROGRESS                          │
+  │  Cat secured in carrier. Transporting     │
+  │  to Love Pet Clinic.                      │
+  │  📸 [photo of cat in carrier]            │
+  │  — Li Ming, Volunteer                    │
+  │                                          │
+  │  TODAY, 14:00                            │
+  │  🔵 IN PROGRESS                          │
+  │  I'm at Garden Road. Located the cat      │
+  │  under the third parked car near the      │
+  │  bus stop. Preparing carrier.             │
+  │  — Li Ming, Volunteer                    │
+  │                                          │
+  │  TODAY, 08:15                            │
+  │  🟡 PENDING                              │
+  │  Case reported by you.                    │
+  └──────────────────────────────────────────┘
+```
+
+### 5.4 What GUESTS and REGISTERED USERS See
+
+Anyone browsing the homepage can click into the case and see the same timeline — minus private contact details. This transparency is the **foundation of trust** for the platform.
+
+---
+
+## 6. Stage 3: Treated — Medical Care Received
+
+### 6.1 Transition Trigger
+
+The rescuer (or shelter staff) advances the case to `TREATED` and uploads:
+
+```
+  ┌──────────────────────────────────────────┐
+  │  Update: Medical Treatment               │
+  │                                          │
+  │  Facility: Love Pet Clinic, Chaoyang     │
+  │                                          │
+  │  Treatment received:                      │
+  │  ☑ Wound cleaning and bandaging          │
+  │  ☑ Rabies vaccine                        │
+  │  ☑ Deworming                             │
+  │  ☑ Blood test                            │
+  │  ☐ Surgery: ___________                  │
+  │                                          │
+  │  Medical notes:                           │
+  │  "Right hind leg has a 3cm laceration.   │
+  │   No fracture confirmed by X-ray.         │
+  │   Expected recovery: 2-3 weeks."          │
+  │                                          │
+  │  Cost (optional, for transparency):       │
+  │  ¥680 — [View Breakdown]                 │
+  │                                          │
+  │  📸 Upload medical documents / receipts   │
+  │  [Upload Photos]                         │
+  │                                          │
+  │  [Save & Advance to Treated]             │
+  └──────────────────────────────────────────┘
+```
+
+### 6.2 What Changes for Viewers
+
+- The case now has **verified medical records** — this establishes the animal's health baseline
+- Future adopters can see exactly what medical care was received
+- The health record is immutable and timestamped (prevents later disputes about health status)
+
+---
+
+## 7. Stage 4: Recovering — Rehabilitation Period
+
+### 7.1 Transition Trigger
+
+After initial treatment, the animal is placed in a recovery environment:
+
+- **Shelter/facility** — managed by a partner shelter
+- **Foster home** — managed by a volunteer foster
+
+The rescuer or shelter staff advances to `RECOVERING` and specifies:
+
+```
+  Recovery Location:
+  ○ Happy Paws Shelter (partner)
+  ○ Foster Home: [Volunteer Name]
+  ○ Other: ___________
+
+  Expected recovery duration: [2 weeks]
+```
+
+### 7.2 Ongoing Recovery Updates
+
+The caretaker (shelter staff or foster volunteer) posts periodic updates:
+
+```
+  ┌──────────────────────────────────────────┐
+  │  Recovery Update — Day 5                  │
+  │                                          │
+  │  "Wound is healing well. Stitches removed │
+  │   today. White Cat is eating normally and  │
+  │   has started to purr when petted. She's   │
+  │   much calmer now."                        │
+  │                                          │
+  │  📸 [Photo of cat resting]               │
+  │                                          │
+  │  Weight: 3.2kg (up from 2.8kg)            │
+  └──────────────────────────────────────────┘
+```
+
+### 7.3 Behavioral Assessment (Critical for Adoption)
+
+When the caretaker deems the animal physically recovered, they complete a **behavioral assessment**:
+
+| Trait                     | Assessment                                      | Notes |
+| ------------------------- | ----------------------------------------------- | ----- |
+| **Temperament**           | Gentle / Playful / Independent / Timid          |       |
+| **Human interaction**     | Seeks attention / Tolerates / Avoids            |       |
+| **Other animals**         | Friendly / Indifferent / Reactive / Not tested  |       |
+| **Children**              | Suitable / Caution / Not tested                 |       |
+| **Leash trained** (dogs)  | Yes / In progress / No                          |       |
+| **Litter trained** (cats) | Yes / In progress / No                          |       |
+| **Special needs**         | None / Medication / Diet / Mobility aid / Other |       |
+| **Adoption suitability**  | ✅ Ready for adoption / ⚠️ Needs more time      |       |
+
+This becomes the **adoption profile** and is visible to adopters.
+
+### 7.4 Advancing to Adoption
+
+When:
+
+- Physical recovery is confirmed
+- Behavioral assessment is complete
+- Vaccinations are up to date
+- The animal has been spayed/neutered (or a commitment is in place)
+
+→ The caretaker advances the case to `AWAITING_ADOPTION`.
+
+---
+
+## 8. Stage 5: Awaiting Adoption — Ready for a Forever Home
+
+### 8.1 The Adoption Listing
+
+Once marked `AWAITING_ADOPTION`, the case automatically appears on the **Adoption page**:
+
+```
+  ┌──────────────────────────────────────────┐
+  │  🏠 ADOPTABLE ANIMALS                    │
+  │                                          │
+  │  ┌──────────────────────────────────────┐│
+  │  │ [photo] 🐱 White Cat                  ││
+  │  │        Adult · Female · 1 year       ││
+  │  │        Happy Paws Shelter · Chaoyang  ││
+  │  │        ⏳ Waiting 3 days              ││
+  │  │        Tags: Gentle, Litter-trained   ││
+  │  └──────────────────────────────────────┘│
+  │                                          │
+  │  ┌──────────────────────────────────────┐│
+  │  │ [photo] 🐕 Brown Dog                  ││
+  │  │        Adult · Male · 2 years        ││
+  │  │        Sunshine Shelter · Haidian    ││
+  │  │        ⏳ Waiting 12 days             ││
+  │  │        Tags: Playful, Leash-trained   ││
+  │  └──────────────────────────────────────┘│
+  └──────────────────────────────────────────┘
+```
+
+### 8.2 What an ADOPTER Sees (Full Detail)
+
+```
+  ┌──────────────────────────────────────────┐
+  │  🐱 White Cat — Available for Adoption    │
+  │  Happy Paws Shelter · Chaoyang District   │
+  │                                          │
+  │  [Photo Gallery: 5 recovery photos]       │
+  │                                          │
+  │  ─── QUICK INFO ───                      │
+  │  Age: ~1 year     Sex: Female (spayed)   │
+  │  Breed: Domestic Shorthair               │
+  │  Weight: 3.5kg                            │
+  │                                          │
+  │  ─── TEMPERAMENT ───                     │
+  │  Gentle, seeks human attention.           │
+  │  Good with other cats. Litter-trained.    │
+  │  Suitable for families with children.     │
+  │                                          │
+  │  ─── MEDICAL RECORDS ───                 │
+  │  ✅ Rabies vaccine (June 1)               │
+  │  ✅ Deworming (June 1)                    │
+  │  ✅ Spayed (June 15)                      │
+  │  ✅ Blood test — negative for FIV/FeLV    │
+  │                                          │
+  │  ─── FULL RESCUE HISTORY ───             │
+  │  ▶ See complete timeline (6 stages)       │
+  │    From discovery on Garden Road to       │
+  │    recovery at Happy Paws Shelter.        │
+  │                                          │
+  │  ─── RESCUER INFO ───                   │
+  │  Rescued by: Li Ming (🏅 12 rescues)     │
+  │  Sheltered by: Happy Paws Shelter         │
+  │                                          │
+  │  [💌 Apply to Adopt]                     │
+  │  [🔔 Follow This Animal]                 │
+  └──────────────────────────────────────────┘
+```
+
+### 8.3 The Adoption Application
+
+When the adopter clicks **"Apply to Adopt"**:
+
+```
+  ┌──────────────────────────────────────────┐
+  │  Adoption Application: White Cat          │
+  │                                          │
+  │  ─── ABOUT YOU ───                       │
+  │  Name: [________]  Phone: [________]     │
+  │                                          │
+  │  Housing type:                           │
+  │  ○ Own house  ○ Rented apartment         │
+  │  ○ Own apartment  ○ Other               │
+  │                                          │
+  │  Do you have a fenced yard/balcony?       │
+  │  ○ Yes, secured  ○ Yes, not secured     │
+  │  ○ No                                    │
+  │                                          │
+  │  Household members:                      │
+  │  □ Adults only  □ Children under 12      │
+  │  □ Children 12+  □ Elderly               │
+  │                                          │
+  │  ─── PET EXPERIENCE ───                  │
+  │  Have you owned pets before?              │
+  │  ○ Yes, currently have pets              │
+  │  ○ Yes, had before but not now           │
+  │  ○ No, first time                         │
+  │                                          │
+  │  If currently have pets, please describe: │
+  │  [___________________________________]    │
+  │                                          │
+  │  ─── YOUR MOTIVATION ───                 │
+  │  Why do you want to adopt White Cat?      │
+  │  [___________________________________]    │
+  │                                          │
+  │  ─── HOME ENVIRONMENT ───                │
+  │  Upload photos of your home (optional):   │
+  │  [Upload Photos (1-3)]                   │
+  │                                          │
+  │  ⚠️ Adoption is a 15+ year commitment.    │
+  │  Please consider carefully before         │
+  │  applying.                                │
+  │                                          │
+  │  [Submit Application]                    │
+  └──────────────────────────────────────────┘
+```
+
+### 8.4 The Shelter Review Process
+
+The shelter (or managing volunteer) receives the application and follows a review workflow:
+
+```
+  Application received → Review → Interview/Chat (in-app messaging)
+       │
+       ├── APPROVE → Schedule transfer → Adopter signs agreement
+       │                                     │
+       │                                     ▼
+       │                              Case → ADOPTED
+       │
+       ├── PENDING → Request more info from adopter
+       │
+       └── REJECT → Provide reason (with kindness)
+                     Adopter can apply for other animals
+```
+
+---
+
+## 9. Stage 6: Adopted — Mission Complete
+
+### 9.1 The Adoption Handoff
+
+When the shelter approves the adoption:
+
+1. **Adoption agreement** is signed (digital or physical)
+2. **Animal transfer** happens — the adopter picks up the animal
+3. The shelter marks the case `ADOPTED`
+
+### 9.2 What Happens After Adoption
+
+**Immediately:**
+
+- The reporter receives a notification: "The White Cat you reported on Garden Road has been adopted! 🏠"
+- The rescuer(s) receive: "White Cat has found a forever home. Thank you for your rescue!"
+- All followers of the case receive the adoption notification
+
+**The Adopter can:**
+
+- Post a "First Day Home" photo — this is added to the timeline
+- Keep a "New Home Diary" (optional) — periodic updates visible to the shelter
+
+**The System triggers:**
+
+- Auto-invitation to write a **Rescue Story** for the rescuer and/or adopter
+- Case archived as a completed rescue — full timeline preserved permanently
+
+### 9.3 The Rescue Story (Post-Adoption Content)
+
+```
+  Case marked ADOPTED
+       │
+       ▼
+  ┌──────────────────────────────────────────┐
+  │  SYSTEM INVITATION                        │
+  │  "White Cat's rescue journey is complete! │
+  │   Would you share her story?"             │
+  │                                          │
+  │  Sent to: Rescuer & Adopter               │
+  └──────────────┬───────────────────────────┘
+                 │
+                 ▼
+  ┌──────────────────────────────────────────┐
+  │  STORY EDITOR (structured + freeform)     │
+  │                                          │
+  │  Title: [_____________________________]   │
+  │                                          │
+  │  Before/After comparison:                 │
+  │  [Before photo] → [After photo]          │
+  │  (auto-suggested from rescue timeline)    │
+  │                                          │
+  │  Story body (rich text):                  │
+  │  [___________________________________]    │
+  │                                          │
+  │  Auto-embedded stats:                     │
+  │  • Rescue duration: 32 days               │
+  │  • 1 reporter + 2 volunteers helped       │
+  │  • Medical costs: ¥680                    │
+  │                                          │
+  │  Tags: [ #InjuredRescue #WhiteCat        │
+  │          #HappyEnding #Adopted ]         │
+  └──────────────────────────────────────────┘
+```
+
+These stories appear on the homepage **Featured Stories** carousel and feed the platform's emotional engine.
+
+---
+
+## 10. Endings: Alternative — Failed, Duplicate, Cancelled
+
+Not every rescue ends in adoption. The system must handle non-happy endings with dignity.
+
+### 10.1 Failed
+
+The case can be marked `FAILED` by the rescuer at any point after claiming if:
+
+- The animal did not survive (found deceased, or passed during treatment)
+- The animal could not be found at the reported location
+- The animal escaped during rescue or recovery
+- Rescue was impossible (dangerous location, aggressive behavior beyond safe handling)
+
+**What happens:**
+
+- The rescuer records the reason (factual, no blame language)
+- They can choose to show or hide detailed reason from public view
+- The case timeline freezes at the last active stage
+- A respectful status message is shown: "This rescue could not be completed. We're grateful to everyone who tried."
+- The rescuer receives an emotional support message with links to resources
+- Supportive comments are allowed; blaming comments are moderated
+
+### 10.2 Duplicate
+
+If multiple people report the same animal, a volunteer or admin can merge cases:
+
+- The newer case is marked `DUPLICATE` and links to the primary case
+- The duplicate reporter is notified: "Thank you for reporting! Someone else also spotted this animal — you can follow the rescue here [link]."
+
+### 10.3 False Report / Cancelled
+
+If a case is determined to be invalid (false information, animal is actually owned, etc.), an admin can mark it `CANCELLED` with a reason visible internally.
+
+---
+
+## 11. Supporting Systems
+
+### 11.1 Rescue Knowledge Base
+
+**Purpose:** Professionally curated educational content that lowers the barrier for everyone to participate.
+
+**Where it appears:**
+
+- **Post-report recommendation**: After someone submits a report, show relevant guides ("What to do when you find an injured cat")
+- **Volunteer toolkit**: When a volunteer claims a case, show "Rescue checklist" and "First aid basics"
+- **Adopter education**: When someone applies to adopt, show "New pet at home: the first 7 days"
+- **Standalone browsing**: Searchable, categorized knowledge base accessible from homepage
+
+**Content categories:**
+
+```
+├── 🚨 Emergency Situations (what to do immediately)
+├── 🐱 Feline Rescue (kitten care, TNR, common illnesses)
+├── 🐕 Canine Rescue (safety, distemper/parvo, large dog handling)
+├── 📋 Rescue Process (checklists, legal info, organization contacts)
+├── 🏠 Adoption & Placement (screening, introduction to home)
+└── 💡 Experience Sharing (veteran rescuer insights)
+```
+
+**Quality control:** All medical advice must be reviewed by a certified vet. Articles are labeled "Professional Medical Knowledge" vs "Community Experience."
+
+### 11.2 Volunteer Network & Notification Engine
+
+**Matching algorithm (simplified):**
+
+1. New case created → get GPS coordinates
+2. Query volunteers where:
+   - `volunteer.status = ONLINE`
+   - `distance(case_location, volunteer_location) <= volunteer.notification_radius`
+   - `volunteer.animal_specialty IN (case.animal_type, 'ALL')`
+3. Rank by: proximity + response history + experience level
+4. Send tiered push notifications (urgent cases get critical alerts)
+5. First-come-first-claim — first volunteer to click "Claim" gets the case
+
+**Escalation rules:**
+| Case Urgency | First Notification | Escalation 1 | Escalation 2 |
+|-------------|-------------------|--------------|--------------|
+| Normal | 5km radius | 15km at 24h | City-wide at 48h |
+| Urgent | 10km radius | City-wide at 2h | Partner shelters at 6h |
+
+### 11.3 Profile & Achievements
+
+Every user's profile aggregates all their contributions:
+
+```
+PROFILE: Alice
+├── 📊 MY DATA
+│   ├── Cases I reported: 3 (2 successfully rescued)
+│   ├── Rescues I participated: 8
+│   ├── Animals I adopted: 1
+│   └── Stories I wrote: 2 (48 likes)
 │
-├── 🏅 My Achievements (lightweight badges)
-│   ├── "First Report" / "First Rescue" / "First Adoption"
-│   ├── "Rescue Pro" (10+ rescues participated)
-│   ├── "Storyteller" (5+ rescue stories written)
-│   ├── "Knowledge Contributor" (X knowledge base articles)
-│   └── "Community Hero" (thanked X times)
+├── 🏅 ACHIEVEMENTS (lightweight badges)
+│   ├── 🔰 "First Report"
+│   ├── 🔰 "First Rescue"
+│   ├── ⭐ "Rescue Pro" (10+ rescue participations)
+│   ├── 📝 "Storyteller" (3+ rescue stories)
+│   └── 💚 "Community Hero" (received 5+ thank-you notes)
 │
-├── 📝 My Activity
-│   ├── Progress of cases I'm following
-│   ├── New updates on cases I reported
-│   └── Knowledge / stories I bookmarked
+├── 📝 ACTIVITY FEED
+│   ├── Cases I'm following
+│   ├── My cases' status updates
+│   └── Bookmarked knowledge
 │
-└── ⚙️ Settings
+└── ⚙️ SETTINGS
     ├── Notification preferences
-    ├── Volunteer status (Online / Away / Long-term unavailable)
-    └── Privacy settings (which info is public)
+    ├── Volunteer settings (Online / Away / Off, radius, animal types)
+    └── Privacy (which data is public)
 ```
 
-### 9.3 Why an Achievement System?
+Achievements serve three purposes:
 
-Not for "gamification." It exists because:
-1. **Identity anchoring**: "I'm a volunteer who has helped 15 animals" — this is a real identity, not a virtual level
-2. **New user guidance**: Achievements guide users to discover platform features ("You haven't reported a stray animal yet!")
-3. **Trust credential**: Adopters seeing a rescuer with the "Rescue Pro" badge → more trust
+1. **Identity anchoring** — "I've helped 8 animals" is a real identity
+2. **New user onboarding** — achievements guide users to try platform features
+3. **Trust credential** — adopters trust rescuers with the "Rescue Pro" badge
 
 ---
 
-## 10. Value Flywheel & Product Roadmap
+## 12. Value Flywheel & Roadmap
 
-### 10.1 Platform Value Flywheel
+### 12.1 Platform Value Flywheel
 
 ```
-                     ┌──────────────┐
-                     │  More Animals │
-                     │    Rescued    │
-                     └──────┬───────┘
-                            │
-          ┌─────────────────┼─────────────────┐
-          │                 │                 │
-          ▼                 ▼                 ▼
-   ┌────────────┐   ┌────────────┐   ┌────────────┐
-   │ Reporters  │   │ Rescuers   │   │ Adopters   │
-   │ (Info In)  │   │ (Execute)  │   │ (Forever   │
-   │            │   │            │   │  Home)     │
-   └──────┬─────┘   └──────┬─────┘   └──────┬─────┘
-          │                 │                 │
-          │    ┌────────────┼────────────┐    │
-          │    │            │            │    │
-          ▼    ▼            ▼            ▼    ▼
-   ┌────────────────────────────────────────────┐
-   │           Platform Value Accumulation       │
-   │                                            │
-   │  · Knowledge Base (ever-improving)          │
-   │  · Rescue Stories (emotional assets)        │
-   │  · Volunteer Network (collaboration infra)  │
-   │  · Rescue Data (can inform animal policy)   │
-   │  · Trust Relationships (Rescuer ↔ Adopter) │
-   └────────────────────┬───────────────────────┘
-                        │
-                        ▼
-               ┌──────────────┐
-               │  More People  │
-               │ Participate   │
-               │  More Animals │
-               │   Are Seen    │
-               └──────────────┘
+        More reports → More animals visible
+              │
+              ▼
+    More animals rescued (volunteer network)
+              │
+              ▼
+    More animals ready for adoption
+              │
+      ┌───────┴───────┐
+      ▼               ▼
+  More adoptions   More rescue stories
+      │               │
+      └───────┬───────┘
+              ▼
+    Emotional impact → Word of mouth → New users
+              │
+              ▼
+    More reporters + volunteers + adopters
+              │
+              ▼
+        (Back to start — flywheel spins)
 ```
 
-### 10.2 Product Roadmap
+### 12.2 MVP Scope (Phase 1)
 
-| Phase | Timeline | Deliverables | Goal |
-|-------|----------|-------------|------|
-| **Phase 1: MVP** | Months 1-3 | Stray reporting + Rescue tracking + Basic profile | Prove the "Report → Rescue" loop, validate core value |
-| **Phase 2: Activate Network** | Months 3-6 | Volunteer collaboration + Push notifications + Knowledge base | Activate volunteer network, ensure cases get responses |
-| **Phase 3: Emotional Engine** | Months 6-9 | Rescue stories + Adoption matching + Achievements | Drive broader participation, generate word-of-mouth |
-| **Phase 4: Ecosystem** | Months 9-12 | Shelter admin dashboard + Data analytics + Open API | Make shelters core platform users, build two-sided network effects |
+| Feature                               | Priority | Why                                             |
+| ------------------------------------- | -------- | ----------------------------------------------- |
+| Guest browsing (homepage map + list)  | P0       | Without visibility, no volunteers can help      |
+| Stray reporting wizard (6 steps)      | P0       | Entry point — no reports, no platform           |
+| Case detail page + timeline           | P0       | Rescue transparency = platform trust            |
+| 7-stage status machine                | P0       | The backbone — defines the entire workflow      |
+| Volunteer opt-in + capability profile | P0       | Must exist for claiming to work                 |
+| Volunteer case claiming               | P0       | Core collaboration action                       |
+| Case status updates by rescuer        | P0       | Progress must be shareable                      |
+| Basic user registration/login         | P0       | Need identity for reporting + claiming          |
+| Push notifications for volunteers     | P0       | Without notifications, volunteers won't respond |
+| Reporter tracking (My Reports)        | P1       | Essential for reporter satisfaction             |
+| Follow a case                         | P1       | Drives return visits                            |
+| Profile page (basic)                  | P1       | Shows user activity summary                     |
 
-### 10.3 MVP Minimum Viable Feature Set
+### 12.3 Phase 2-4
 
-> Core principle: **Get one rescue to flow end-to-end first, then expand.**
-
-| Feature | Priority | Rationale |
-|---------|----------|-----------|
-| Stray reporting (photos + GPS + urgency indicators) | P0 | Entry point — no reports, no platform |
-| Rescue case browsing (list + detail + timeline) | P0 | Volunteers need to see animals needing help |
-| 7-stage status progression | P0 | The "spine" of rescue — no status, no collaboration |
-| Basic user registration / login | P0 | Identity |
-| Profile (my reports / my rescues) | P1 | MVP can be rough, but basic display needed |
-| Volunteer case claiming | P1 | Core collaboration action |
-| Case status updates (text + photos) | P1 | Rescuer posts progress |
-| Nearby case push notifications | P2 | Manual browsing works first, notifications later |
-| Rescue stories | P3 | Needs successful cases before stories can be written |
-| Adoption matching | P3 | Needs "Awaiting Adoption" animal inventory |
-| Knowledge base | P2 | Start with 5-10 core articles |
+| Phase                         | Timeline   | Focus                                                                                |
+| ----------------------------- | ---------- | ------------------------------------------------------------------------------------ |
+| **Phase 2: Activate Network** | Month 3-6  | Knowledge base, volunteer achievements, wider notification logic, shelter onboarding |
+| **Phase 3: Emotional Engine** | Month 6-9  | Rescue stories, adoption matching with applications, full achievement system         |
+| **Phase 4: Ecosystem**        | Month 9-12 | Shelter admin dashboard, analytics, open API, regional resource directory            |
 
 ---
 
 ## Appendix: Key Design Principles
 
-1. **Mobile-first**: Reporters typically use phones to report. Volunteers check cases on phones outdoors. All core flows must be mobile-friendly.
+1. **Mobile-first**: Reporters and volunteers operate on phones, often outdoors. Every core flow must work on mobile first.
 
-2. **Offline-tolerant**: Rescue scenarios may have unstable connectivity. Report forms should support offline drafts with GPS caching.
+2. **Progressive tier access**: Guest → Registered → Volunteer. No one is locked out of information; actions require appropriate permissions.
 
-3. **Safety-first**: Never expose reporter's exact GPS (show approximate area only). Never expose volunteer's phone number (use in-app messaging). Animal location auto-fuzzed after rescue completion.
+3. **Transparency builds trust**: Every status change is timestamped and attributed. The full rescue timeline is public. This is what makes adopters trust the animal's history.
 
-4. **Information authenticity**: Reports must include photos. Volunteer identity verification is optional (lower barrier to entry). Adopters must submit real information.
+4. **Safety-first**: Never expose exact GPS (show approximate area). Never expose phone numbers (in-app messaging only). Animal location is fuzzed after rescue completion.
 
-5. **Emotional safety**: "Failed" status displays with respect for the animal and rescuer. No blaming rescuers in comments ("Why didn't you go sooner?"). Provide emotional support resources for rescuers.
+5. **Emotional safety**: Failed cases are treated with respect. No blame language is allowed in comments toward reporters or rescuers. Emotional support resources are available for rescuers.
+
+6. **Information authenticity**: Reports require photos. Volunteer verification is optional (lower barrier). Medical records are immutable.
+
+7. **One user, many roles**: A single account can report, rescue, and adopt. The system tracks actions per case, not persona per user.
 
 ---
 
-> **Next step**: Based on this product blueprint, proceed to UI/UX design phase — produce page designs and interaction prototypes for each module.
+> **Next step**: Based on this product blueprint, proceed to UI/UX design phase — produce page designs and interaction prototypes for each stage of the animal lifecycle.
