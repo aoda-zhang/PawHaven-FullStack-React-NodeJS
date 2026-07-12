@@ -19,6 +19,12 @@ export const RootLayoutSidebar = ({
   onCloseSidebar,
   navigate,
 }: RootLayoutSidebarProps) => {
+  const navigateAndClose: NavigateFunction = (...args) => {
+    onCloseSidebar();
+    // @ts-expect-error: react-router types are complex, spreading args is safe
+    navigate(...args);
+  };
+
   return (
     <Drawer
       open={isSidebarOpen}
@@ -29,7 +35,7 @@ export const RootLayoutSidebar = ({
       <div className="flex justify-end px-4 pb-4">
         <LanguageSelector />
       </div>
-      <RootLayoutMenuRender menuItems={menuItems} navigate={navigate} />
+      <RootLayoutMenuRender menuItems={menuItems} navigate={navigateAndClose} />
     </Drawer>
   );
 };

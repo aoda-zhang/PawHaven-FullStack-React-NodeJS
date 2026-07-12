@@ -1,63 +1,44 @@
-import type { MenuItem } from '@pawhaven/shared/types';
 import clsx from 'clsx';
-import { useTranslation } from 'react-i18next';
+import { BookOpen, FileText, Heart, House } from 'lucide-react';
 
-import { useLogout } from '@/features/Auth/apis/queries';
+import { useMenuNavigation } from './hooks/useMenuNavigation';
+
 import { type MenuRenderType } from '@/features/Landing/landing.type';
-import { routePaths } from '@/router/routePaths';
-import { useGlobalState } from '@/store/globalReducer';
 
-const rootLayoutClassNames = {
-  menuItem:
-    'cursor-pointer flex justify-center items-center px-3 border-b border-border md:border-none hover:text-primary',
-  activeMenuItem: 'block text-primary',
-  login:
-    'px-3 py-2 rounded-sm bg-primary text-text-inverse m-4 lg:m-0 flex justify-center items-center cursor-pointer',
+const NAV_ICONS: Record<string, typeof House> = {
+  '/rescues': House,
+  '/adopt': Heart,
+  '/knowledge': BookOpen,
+  '/stories': FileText,
 };
 
 export const RootLayoutMenuRender = (
   props: MenuRenderType & { className?: string },
 ) => {
-  const { menuItems, activePath, navigate, className } = props;
-  const { t } = useTranslation();
-  const { profile } = useGlobalState();
-  const { mutate: logout, isPending: isLogoutPending } = useLogout();
-  const isLoggedIn = !!profile?.baseUserInfo?.userID;
-
-  const handleLinkMenu = (item: MenuItem) => {
-    const isActiveMenuItem = activePath === item.to;
-    let itemClassNames = [
-      rootLayoutClassNames[
-        item?.classNames as unknown as keyof typeof rootLayoutClassNames
-      ] ?? '',
-    ];
-    if (isActiveMenuItem) {
-      itemClassNames = [...itemClassNames, rootLayoutClassNames.activeMenuItem];
-    }
-
-    const handleClick = () => {
-      if (item.to === routePaths.login && isLoggedIn && !isLogoutPending) {
-        logout();
-        return;
-      }
-      navigate(item.to || '/');
-    };
-
-    return (
-      <button
-        type="button"
-        className={clsx(itemClassNames)}
-        key={item.label}
-        onClick={handleClick}
-      >
-        {t(item.label)}
-      </button>
-    );
-  };
+  const { menuItems, activePath = '', navigate, className } = props;
+  const { resolvedItems, handleMenuClick } = useMenuNavigation({
+    menuItems,
+    activePath,
+    navigate,
+  });
 
   return (
-    <div className={clsx('flex', className)}>
-      {menuItems?.map(handleLinkMenu)}
+    <div className={clsx('flex gap-1', className)}>
+      {resolvedItems.map((item) => {
+        const Icon = NAV_ICONS[item.to];
+        return (
+          <button
+            type="button"
+            className={item.className}
+            key={item.label}
+            onClick={() => handleMenuClick(item)}
+            aria-current={activePath === item.to ? 'page' : undefined}
+          >
+            {Icon && <Icon size={16} aria-hidden="true" />}
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 };

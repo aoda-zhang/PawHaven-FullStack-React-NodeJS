@@ -2,7 +2,6 @@ import { Skeleton } from '@mui/material';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { ArrowRight } from 'lucide-react';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -105,7 +104,7 @@ export const LatestRescue = () => {
               <RescueItemSkeleton key={`skeleton-${i}`} />
             ))
           : rescues?.map((item) => (
-              <RescueItem {...item} key={item.animalID} />
+              <RescueItem key={item.animalID} {...item} />
             ))}
       </div>
     </div>

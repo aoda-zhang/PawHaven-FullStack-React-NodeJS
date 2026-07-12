@@ -1,0 +1,6 @@
+{
+  "enabledPlugins": {
+    "ardot-design-generator@cb_teams_marketplace": true,
+    "design-to-code@cb_teams_marketplace": true
+  }
+}
