@@ -102,3 +102,35 @@ BUG REPORT
 2. Fix directly — skip the plan presentation step
 3. Add security test to prevent re-introduction
 4. Consider if this warrants an ADR
+
+## Failure Recovery
+
+Bug fixes have a tighter recovery loop due to urgency:
+
+```
+IF ANY STEP FAILS:
+
+1. Regression test failure after fix:
+   → Fix introduced a new bug → re-analyze the fix, apply corrected fix → re-test
+   → Max 2 attempts before escalating for a different approach
+
+2. Review finds the fix is incomplete or wrong:
+   → Review reports specific issue → implementing agent corrects → re-test → re-review
+   → Max 2 review rounds
+
+3. Root cause misidentified:
+   → Symptoms fixed but root cause remains → back to Step 1 (Diagnose)
+   → This is a blocking issue — do not close the bug
+
+4. Fix is confirmed but requires architecture change:
+   → Route through architecture-change workflow instead
+   → Flag as "Fix requires architectural change — see ADR-XXX"
+```
+
+### Critical Bug Recovery
+
+For critical bugs (auth broken, data loss, crash on load):
+
+- Skip plan → diagnose → fix → minimal test → review
+- If fix fails first attempt: escalate to architect immediately
+- Document the root cause after the fix is deployed (not before)

@@ -159,3 +159,46 @@ Skip Steps 1, 4. Run Steps 2 or 3 → 5 → 7.
 | Include architect step? | New module, new service, cross-module impact, DB schema changes   | YES for complex, NO for simple  |
 | Sequential vs parallel? | Frontend depends on backend API? Backend needs frontend contract? | Sequential (frontend → backend) |
 | Team mode vs sync?      | Task needs >300s? Reads architecture docs? Creates 2+ files?      | Team mode for complex           |
+
+## Failure Recovery
+
+Every step in the pipeline has a failure path. When a step fails, the orchestrator MUST handle it:
+
+```
+IF STEP N FAILS:
+
+1. Identify the failure type:
+   - Validation failure (typecheck/lint/test → fixable by the same agent)
+   - Implementation gap (missing feature/edge case → agent re-implements)
+   - Architecture issue (design wrong → back to architect)
+   - Blocking review issue (violations found → back to implementing agent)
+
+2. Route to the responsible agent:
+   - Validation/test failure → same agent re-fixes and re-validates
+   - Implementation gap → same agent extends implementation
+   - Architecture issue → back to architect agent (Step 1)
+   - Review blocking issue → back to frontend/backend agent (Step 2 or 3)
+
+3. After fix:
+   - Fix → Re-test → Re-review (Step 4 → Step 5)
+   - NEVER skip re-testing after a fix
+   - NEVER skip re-review after re-testing
+
+4. Maximum retries:
+   - IMPLEMENTATION: 3 attempts per step before escalating to architect
+   - REVIEW: 2 blocking-issue rounds before flagging for user decision
+
+5. If maximum retries exceeded:
+   - Report to the user with: what was attempted, why it failed, what decision is needed
+   - Do NOT loop indefinitely
+```
+
+### Common Failure Scenarios
+
+| Failure                                                                     | Occurrence | Recovery                                                                                  |
+| --------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------- |
+| Typecheck fails after implementation                                        | Step 2/3   | Agent fixes type errors → re-runs typecheck                                               |
+| Tests fail after implementation                                             | Step 4     | Testing reports to orchestrator → implementing agent fixes → re-test                      |
+| Review finds blocking violation                                             | Step 5     | Orchestrator re-spawns implementing agent with specific issue → fix → re-test → re-review |
+| API contract mismatch (frontend vs backend)                                 | Step 3     | Backend reports mismatch → orchestrator notifies frontend → frontend aligns               |
+| Architect design incomplete (missing edge case found during implementation) | Step 2/3   | Agent reports gap → orchestrator re-spawns architect for amendment                        |

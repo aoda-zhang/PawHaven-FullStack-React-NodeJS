@@ -302,6 +302,17 @@ When spawning a subagent, provide:
 
 **Do NOT provide**: file lists, directory paths, implementation details. Subagents handle that themselves.
 
+### 4.4 Receiving Structured Outputs
+
+When subagents report back, they use structured output formats defined in [agent-communication-protocol.md](../knowledge/agent-communication-protocol.md). Parse these reports to:
+
+1. Extract API contracts for handoff between frontend and backend
+2. Identify blocking issues that require re-spawning an agent
+3. Route testing failures to the responsible implementing agent
+4. Extract the final API contract from backend for frontend alignment
+
+**Forwarding rule**: When Agent A's output contains a contract needed by Agent B, pass the contract STRUCTURED — do NOT summarize or reinterpret it. The contract is the agent's authoritative output.
+
 ---
 
 ## 5. Validation Commands
@@ -327,10 +338,11 @@ pnpm build
 
 Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover most classification needs. Only read external docs when:
 
-| Situation                               | Read                                                            |
-| --------------------------------------- | --------------------------------------------------------------- |
-| Uncertain which service owns a feature  | `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md` |
-| Need to understand the full service map | (same — skim the overview)                                      |
+| Situation                                | Read                                                            |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| Uncertain which service owns a feature   | `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md` |
+| Need to understand the full service map  | (same — skim the overview)                                      |
+| Need to parse subagent structured output | `.codebuddy/knowledge/agent-communication-protocol.md`          |
 
 **Subagents own their domain docs** — they read `Frontend-Architecture.md`, `Backend-Architecture.md`, `figma-design-spec.md`, etc. You don't need to.
 

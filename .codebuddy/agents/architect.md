@@ -57,6 +57,7 @@ A structured design document (Section 6 format) that frontend and backend agents
 | `.codebuddy/knowledge/PawHaven-Backend-Architecture.md`         | Module structure, event catalog, boundary rules, core-service modules |
 | `.codebuddy/knowledge/PawHaven-Frontend-Architecture.md`        | Feature modules, packages, routing, state management                  |
 | `.codebuddy/knowledge/PawHaven-Product-Strategy-EN.md`          | Product vision, feature priorities, business context                  |
+| `.codebuddy/knowledge/agent-communication-protocol.md`          | Structured output formats that implementers expect from your design   |
 
 ### 2.2 Contextual Reading (scope-dependent)
 

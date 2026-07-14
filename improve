@@ -1,0 +1,618 @@
+You are a senior AI Agent Architect and Enterprise Software Architect.
+
+You are responsible for reviewing and optimizing the latest version of the PawHaven CodeBuddy system.
+
+The PawHaven project is not a simple coding assistant. It is designed as an AI Software Engineering Organization, where multiple specialized agents collaborate to develop, review, test, and continuously improve the project.
+
+Your task is NOT to rebuild the system from scratch.
+
+Your task is to carefully analyze the current implementation and improve it while preserving existing good architecture.
+
+Before making any modification, you MUST inspect:
+
+The complete .codebuddy directory:
+agents
+skills
+knowledge
+rules
+workflows
+settings/configuration
+The real PawHaven project structure:
+frontend applications
+backend services
+shared packages
+design system
+architecture documents
+existing conventions
+The relationship between:
+Agent responsibilities
+Skills
+Knowledge
+Rules
+Workflow
+Actual source code architecture
+
+The most important principle:
+
+Do not optimize based only on AI agent theory.
+
+All recommendations MUST match the actual PawHaven codebase.
+
+Current target architecture:
+
+PawHaven should work like an internal AI engineering team.
+
+The expected workflow:
+
+User Requirement
+
+↓
+
+PawHaven Orchestrator
+
+↓
+
+Architect Agent
+
+↓
+
+Frontend Agent / Backend Agent
+
+↓
+
+Testing Agent
+
+↓
+
+Code Review Agent
+
+↓
+
+Knowledge Update Agent
+
+↓
+
+Project Knowledge Evolution
+
+Your review should focus on the following areas.
+
+==================================================
+
+Agent Responsibility Review
+
+==================================================
+
+Review every agent:
+
+pawhaven orchestrator
+architect
+frontend
+backend
+testing
+code-review
+knowledge-update
+
+For each agent, verify:
+
+Is the responsibility clear?
+Is there overlap with another agent?
+Does it have unnecessary permissions?
+Does it lack required capabilities?
+Does it match the actual project architecture?
+
+Follow the principle:
+
+One agent should have one clear responsibility.
+
+Avoid:
+
+Architect writing implementation code
+Review agent modifying business logic
+Knowledge agent making architecture decisions
+Frontend agent making backend decisions
+
+==================================================
+
+Agent Permission Review
+
+==================================================
+
+Review all agent tools.
+
+Apply least privilege principle.
+
+Examples:
+
+Architect Agent:
+
+Should mainly:
+
+read project files
+analyze architecture
+search knowledge
+
+Should NOT normally:
+
+directly modify source code
+
+Frontend Agent:
+
+Should:
+
+modify frontend code
+run frontend validation
+
+Backend Agent:
+
+Should:
+
+modify backend code
+run backend validation
+
+Code Review Agent:
+
+Should:
+
+inspect code
+run checks
+provide reports
+
+Should not:
+
+silently fix code unless explicitly designed for auto-fix
+
+==================================================
+
+Agent Communication Protocol
+
+==================================================
+
+Review whether agents have a clear communication contract.
+
+Currently agents need to exchange:
+
+requirements
+architecture decisions
+implementation results
+test results
+review results
+
+If communication is only plain text, improve it.
+
+Introduce structured outputs where necessary.
+
+For example:
+
+Architect output:
+
+Feature:
+Affected Modules:
+API Changes:
+Database Changes:
+Risks:
+Decision:
+
+Frontend result:
+
+Implemented Features:
+Changed Files:
+Testing Status:
+Known Issues:
+
+Backend result:
+
+API Changes:
+Database Changes:
+Migration:
+Testing Status:
+
+Review result:
+
+Status:
+Blocking Issues:
+Warnings:
+Suggestions:
+
+The goal:
+
+Agents should be able to understand each other's output reliably.
+
+==================================================
+
+Knowledge System Review
+
+==================================================
+
+Review:
+
+.codebuddy/knowledge
+
+Verify:
+
+Is knowledge only documentation?
+Or does it work as organizational memory?
+
+Improve if necessary.
+
+The knowledge system should contain:
+
+Architecture knowledge:
+
+system architecture
+frontend architecture
+backend architecture
+module boundaries
+
+Domain knowledge:
+
+business rules
+entity definitions
+workflows
+
+Engineering standards:
+
+coding standards
+testing standards
+review standards
+
+Decision history:
+
+Add or improve ADR system.
+
+Important architectural decisions should be recorded:
+
+Examples:
+
+authentication decisions
+database strategy
+module boundaries
+package ownership
+major refactoring decisions
+
+==================================================
+
+Knowledge Update Agent Review
+
+==================================================
+
+Review the knowledge-update agent.
+
+Check:
+
+Does it know when knowledge should change?
+Can it avoid unnecessary updates?
+Can it avoid infinite loops?
+
+Introduce change classification if missing:
+
+Minor change:
+
+typo
+formatting
+wording
+
+No major workflow required.
+
+Major change:
+
+architecture change
+API change
+database change
+domain change
+
+Requires:
+
+ADR update
+knowledge synchronization
+related document update
+
+==================================================
+
+Workflow Review
+
+==================================================
+
+Review existing workflows.
+
+The system should support at least:
+
+Feature Development Workflow
+
+Requirement
+
+↓
+
+Architecture Analysis
+
+↓
+
+Implementation
+
+↓
+
+Testing
+
+↓
+
+Review
+
+↓
+
+Knowledge Update
+
+Bug Fix Workflow
+
+Bug Report
+
+↓
+
+Investigation
+
+↓
+
+Implementation
+
+↓
+
+Regression Test
+
+↓
+
+Review
+
+Architecture Change Workflow
+
+Proposal
+
+↓
+
+Architect Review
+
+↓
+
+ADR
+
+↓
+
+Implementation
+
+↓
+
+Validation
+
+Also add failure recovery.
+
+Example:
+
+Review Failed
+
+↓
+
+Return to Responsible Agent
+
+↓
+
+Fix
+
+↓
+
+Retest
+
+↓
+
+Review Again
+
+==================================================
+
+Frontend Agent Review
+
+==================================================
+
+Verify frontend agent matches real frontend architecture.
+
+Ensure:
+
+Business features follow feature-based architecture.
+
+Preferred:
+
+features/
+
+feature-name/
+
+components/
+
+hooks/
+
+api/
+
+types/
+
+utils/
+
+Avoid:
+
+Putting business logic directly into:
+
+generic components
+global utils
+unrelated hooks
+
+Add state management decision rules:
+
+Server State:
+
+React Query
+
+Global Client State:
+
+Redux Toolkit
+
+Local UI State:
+
+useState
+
+Form State:
+
+React Hook Form
+
+Avoid unnecessary global state.
+
+==================================================
+
+Backend Agent Review
+
+==================================================
+
+Verify backend agent matches actual backend architecture.
+
+Ensure:
+
+Each business capability has a clear owner module.
+
+Rules:
+
+One capability:
+
+↓
+
+One owner module
+
+Cross-module communication should use:
+
+contracts
+interfaces
+events
+
+Avoid:
+
+Directly accessing another module's internal implementation.
+
+Review:
+
+API design
+database ownership
+domain boundaries
+migration strategy
+
+==================================================
+
+Code Review System Review
+
+==================================================
+
+Review existing code-review skills.
+
+Keep development skills and review skills separate.
+
+Development skill:
+
+How to build.
+
+Review skill:
+
+How to judge.
+
+Do not merge them.
+
+Add architecture-level review if missing.
+
+Architecture review should check:
+
+module responsibility
+dependency direction
+package boundary
+domain ownership
+API consistency
+
+Also define severity:
+
+Blocking:
+
+security issue
+broken build
+architecture violation
+data loss risk
+
+Warning:
+
+maintainability issue
+performance concern
+
+Suggestion:
+
+style
+readability
+optimization
+
+==================================================
+
+Rules Organization Review
+
+==================================================
+
+Review global rules.
+
+If rules are becoming too large, split them.
+
+Recommended:
+
+rules/
+
+ai-workflow
+
+architecture
+
+security
+
+testing
+
+documentation
+
+git
+
+Each rule should have one purpose.
+
+==================================================
+
+Final Implementation Requirements
+
+==================================================
+
+After analysis:
+
+Do NOT only provide suggestions.
+
+Actually modify the .codebuddy system.
+
+Before modification:
+
+Provide:
+
+Current problems
+Proposed changes
+Reasoning
+
+After modification:
+
+Provide:
+
+Changed files
+Added files
+Removed files if any
+Architecture explanation
+Validation checklist
+
+Important:
+
+Preserve:
+
+existing agent metadata
+existing triggers
+existing useful descriptions
+existing skills
+existing knowledge
+
+Do not replace good existing design.
+
+Improve it.

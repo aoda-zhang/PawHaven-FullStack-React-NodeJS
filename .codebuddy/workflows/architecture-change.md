@@ -152,3 +152,43 @@ ARCHITECTURE CHANGE REQUEST
 3. **Test at every step** — don't wait until the end to verify
 4. **Document the migration** — future maintainers need to understand why
 5. **Rollback plan required** — every step must be reversible until final cutover
+
+## Failure Recovery
+
+Architecture changes are the highest-risk pipeline. Recovery is more conservative:
+
+```
+IF ANY STEP FAILS:
+
+1. Design rejected by user (Step 3):
+   → Architect revises design based on user feedback
+   → Re-present for approval
+   → Max 3 design iterations before suggesting a different approach
+
+2. Implementation uncovers design flaw:
+   → Stop implementation immediately
+   → Back to Step 1 (Analysis) — architect re-analyzes with the new information
+   → Update ADR with the correction
+   → Re-implement from the corrected design
+
+3. Migration fails (Step 4):
+   → Execute rollback plan for the completed sub-step
+   → Architect revises migration path
+   → Re-attempt with revised migration
+   → Max 2 migration attempts before reverting ALL changes and reassessing
+
+4. Validation fails at Step 6:
+   → Re-spawn the relevant agent (frontend/backend) for fixes
+   → Re-test ALL levels (not just the failing one)
+   → Re-validate full project
+
+5. ADR becomes invalid mid-change:
+   → This is a critical failure — the architecture premise was wrong
+   → Mark ADR as "Superseded" with explanation
+   → Create new ADR with corrected decision
+   → Back to Step 1
+
+Rule: Architecture changes have NO maximum retry limit on design.
+       But they have a HARD LIMIT of 3 implementation attempts before requiring
+       a complete re-assessment by the architect.
+```
