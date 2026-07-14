@@ -1,43 +1,30 @@
-import { useRouterInfo } from '@pawhaven/frontend-core';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { NavigateFunction, UIMatch } from 'react-router-dom';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
+import { useMenuVisibility } from './hooks/useMenuVisibility';
 import { RootLayoutFooter } from './RootLayoutFooter';
 import { RootLayoutMenu } from './RootLayoutMenu';
 
 import { useLandingContext } from '@/features/Landing/landingContext';
 import { useGlobalState } from '@/store/globalReducer';
-import type { MenuItemType, RouterInfoType } from '@/types/LayoutType';
-
-export interface LayoutProps {
-  menuItems: MenuItemType[];
-  navigate: NavigateFunction;
-  routerMatches: Array<UIMatch<unknown, unknown>>;
-}
 
 export const RootLayout = () => {
   const { isSysMaintain } = useGlobalState();
   const { menus } = useLandingContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const currentRouterInfo = useRouterInfo<RouterInfoType>();
-  const { isMenuAvailable = true, isFooterAvailable = true } =
-    currentRouterInfo?.handle ?? {};
-  const location = useLocation();
+  const { isMenuAvailable, isFooterAvailable } = useMenuVisibility();
+  const { pathname } = useLocation();
 
-  // Depend on the whole location object (from useLocation) — not location.pathname.
-  // useLocation() is reactive: React re-runs the effect when location changes.
-  // This avoids the oxlint false positive triggered by the string 'location.pathname'.
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [location]);
+  }, [pathname]);
 
   return (
     <div>
-      <header className="bg-surface z-sticky sticky top-0 shadow-sm">
+      <header className="z-sticky border-border sticky top-0 border-b bg-[rgba(255,250,245,0.88)] backdrop-blur-[12px]">
         <Toast />
         {isSysMaintain && (
           <NotificationBanner
@@ -54,14 +41,14 @@ export const RootLayout = () => {
           <RootLayoutMenu
             menuItems={menus}
             navigate={navigate}
-            currentRouterInfo={currentRouterInfo}
+            activePath={pathname}
           />
         )}
       </header>
 
       <main className="flex flex-1 flex-col">
         <div className="flex-1">
-          <Suspense fallback={<Loading></Loading>}>
+          <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
         </div>

@@ -1,0 +1,124 @@
+---
+description: Global engineering principles for all agents — English Only and Comment discipline. Applies to all code generation in this project.
+alwaysApply: true
+enabled: true
+---
+
+# AI Workflow Rules
+
+> Global rules that apply to ALL agents and ALL code generation in this project.
+> These are **language/framework-agnostic engineering principles**.
+> For technology-specific standards (styling, i18n, feature isolation, type safety),
+> see the authoritative skill files referenced in Section 2.
+
+## 0. Language — English Only
+
+All documentation and comments MUST be written in English. This includes:
+
+- **Markdown files** (`.md`): SKILL.MD, README, architecture docs, agent definitions, knowledge base
+- **Code comments**: inline comments (`//`, `/* */`), JSDoc/TSDoc, block headers
+- **Git messages**: commit messages, PR descriptions
+- **Terminal output**: log messages, error messages, CLI help text
+
+**Exceptions**: User-facing UI strings (handled via i18n `t()`), and existing Chinese-only files explicitly maintained for Chinese-speaking audiences (e.g., `READMECN.MD`).
+
+## 1. Comments
+
+### Purpose
+
+Keep the codebase clean and self-explanatory by writing comments only when they provide meaningful context that cannot be expressed through the code itself.
+
+### Principles
+
+- Treat comments as a limited resource.
+- The default is **not** to add a comment.
+- Prefer improving code clarity through better naming, smaller functions, and cleaner structure instead of adding comments.
+- Every comment must explain **why**, not **what**.
+
+### Do Not Add Comments For
+
+Never add comments that simply describe what the code is doing.
+
+```tsx
+// Update the state
+setCount(count + 1)
+
+// Get the user
+const user = await getUser()
+
+// Loop through users
+users.forEach(...)
+
+// Return the response
+return response
+
+// Handle button click
+const handleClick = () => {}
+```
+
+Also avoid comments for:
+
+- Obvious control flow (`if`, `else`, `switch`, `for`, `while`)
+- Simple assignments
+- Straightforward data transformations
+- React component structure
+- React hooks (`useEffect`, `useMemo`, `useCallback`, etc.)
+- Function names that already describe their purpose
+- TODO/FIXME placeholders unless explicitly requested
+
+### Add Comments Only When They Provide Value
+
+Comments are appropriate when they explain information that cannot be understood from reading the code.
+
+```tsx
+// Preserve the previous selection to avoid focus loss after list reconciliation.
+// Debounced because the backend enforces request rate limits.
+// Safari does not reliably restore scroll position after history navigation.
+// Required because the payment provider retries webhook delivery.
+```
+
+Examples include:
+
+- Business rules
+- Domain-specific behavior
+- Non-obvious implementation decisions
+- Algorithm rationale
+- Performance optimizations
+- Security considerations
+- Browser or framework workarounds
+- Third-party library limitations
+- Edge cases
+- Important assumptions
+- Compatibility requirements
+- Public API documentation (JSDoc/TSDoc) when required by the project
+
+### Before Writing a Comment
+
+Ask yourself:
+
+1. Does this explain **why** instead of **what**?
+2. Would better naming or refactoring eliminate the need for this comment?
+3. If this comment were removed, would the code become significantly harder to understand?
+
+If the answer to the last question is **No**, do **not** write the comment.
+
+### Goal
+
+Write code that is self-explanatory. Comments should be rare, intentional, and reserved for information that cannot be expressed through code alone.
+
+## 2. Technology-Specific Standards
+
+The following standards are defined in their authoritative skill files.
+Global rules above take precedence; skill-specific rules add enforcement detail.
+
+| Domain | Authoritative Skill |
+|--------|---------------------|
+| Styling & Design Tokens | `skills/frontend/style/SKILL.MD` + `code-review/style-doctor/SKILL.MD` |
+| i18n / Internationalization | `skills/frontend/i18n/SKILL.MD` + `code-review/i18n-doctor/SKILL.MD` |
+| Feature Isolation & Boundaries | `code-review/boundary-doctor/SKILL.MD` |
+| Type Safety | `code-review/typecheck-doctor/SKILL.MD` + `code-review/react-doctor/SKILL.MD` |
+| React Development | `skills/frontend/react/SKILL.MD` |
+| State Management | `skills/frontend/redux/SKILL.MD` + `skills/frontend/react-query/SKILL.MD` |
+| Forms | `skills/frontend/react-hook-form/SKILL.MD` |
+| Components | `skills/frontend/component/SKILL.MD` |
+| Backend | `knowledge/PawHaven-Backend-Architecture.md` + `code-review/backend-doctor/SKILL.MD` |

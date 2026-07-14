@@ -1,6 +1,10 @@
 ---
 name: i18n
-description: Enterprise-grade internationalization standards for React/Next.js applications. Use this skill whenever creating or modifying user-facing content.
+description: >
+  国际化标准 / Enterprise-Grade Internationalization (i18n) Standards.
+  定义项目国际化规范：所有用户可见文案必须通过 t() 函数、语义化 key 命名（module.key 格式）、三语同步（zh-CN/en-US/de-DE 必须同时更新）、禁止硬编码字符串、禁止拼接翻译、复数处理、日期/货币格式化、常用文案放入 common 模块。
+  适用于 React/Next.js 应用的 i18next + react-i18next 技术栈。
+  触发场景 / Trigger: 国际化 i18n internationalization localization l10n globalization g11n locale adaptation, 翻译 translation translate text string message copy localisation, 多语言 multi-language multilingual language support locale detection switching, locale language code region zh-CN en-US de-DE ja-JP ko-KR fr-FR es-ES, 文案 UX copy microcopy user-facing text label message string content wording, 硬编码字符串 hardcoded strings inline text literal string direct text embedding, t() function translate function i18n key lookup interpolation namespace, i18next react-i18next useTranslation Trans component HOC withTranslation, key naming semantic namespace module.key convention structure organization, pluralization singular plural forms count variable interpolation, date formatting currency number formatting Intl locale-aware display, common module shared keys reusable translations frequently used, error messages empty state toast notification banner alert text, button labels CTA call to action action text label affordance, accessibility a11y aria-label lang attribute screen reader locale, concatenation avoidance string interpolation template literal translation, three-language sync simultaneous update consistency across locales.
 version: 4.0
 ---
 

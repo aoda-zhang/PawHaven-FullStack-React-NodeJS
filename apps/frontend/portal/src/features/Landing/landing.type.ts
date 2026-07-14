@@ -13,8 +13,3 @@ export interface RouterInfoType extends RouterItem {
   params: Record<string, unknown> | undefined;
   pathname: string;
 }
-export interface RootLayoutHeaderProps {
-  menuItems: MenuItem[];
-  navigate: NavigateFunction;
-  currentRouterInfo?: RouterInfoType;
-}
