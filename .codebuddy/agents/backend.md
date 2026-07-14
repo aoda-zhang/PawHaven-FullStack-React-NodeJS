@@ -52,19 +52,43 @@ apps/backend/
 ├── auth-service/        # Auth — register, login, JWT issue, token refresh, RBAC
 ├── core-service/        # Modular monolith (YOUR PRIMARY WORKSPACE)
 │   └── src/modules/
+│       ├── bootstrap/    # Menu/route config, app initialization
 │       ├── rescue/       # Rescue case lifecycle, 7-stage state machine
-│       ├── reporting/    # Stray animal report intake, urgency assessment
-│       ├── adoption/     # Adoption listing, application, matching
-│       ├── content/      # Stories, knowledge base, content moderation
-│       ├── volunteer/    # Volunteer profile, capability matching, case claiming
-│       ├── notification/ # Push/email/in-app notifications (subscribe-only)
-│       ├── achievement/  # Badges & milestones (subscribe-only)
-│       ├── profile/      # Aggregated user profile view (read-only)
-│       └── bootstrap/    # Menu/route config, app initialization
+│       └── report-stray/ # Stray animal report intake
 │
 ├── document-service/    # File upload, PDF gen, email, image processing
 └── config-service/      # Configuration management
 ```
+
+### 2.1b Existing vs Planned Modules (CRITICAL)
+
+**Existing (implemented — verify with `list_dir`):**
+
+```
+apps/backend/core-service/src/modules/
+├── bootstrap/         # ✅ EXISTS: Menu/route config, app initialization
+├── rescue/            # ✅ EXISTS: Rescue case lifecycle
+└── report-stray/      # ✅ EXISTS: Stray animal report intake
+```
+
+**Planned (NOT yet implemented — do NOT assume they exist):**
+
+```
+apps/backend/core-service/src/modules/
+├── adoption/          # ❌ PLANNED: Adoption listing, application, matching
+├── content/           # ❌ PLANNED: Stories, knowledge base, content moderation
+├── volunteer/         # ❌ PLANNED: Volunteer profile, capability matching, case claiming
+├── notification/      # ❌ PLANNED: Push/email/in-app notifications (subscribe-only)
+├── achievement/       # ❌ PLANNED: Badges & milestones (subscribe-only)
+└── profile/           # ❌ PLANNED: Aggregated user profile view (read-only)
+```
+
+**Rules for planned modules:**
+
+1. **ALWAYS verify with `list_dir apps/backend/core-service/src/modules/` before assuming a module exists.**
+2. **When a feature maps to a planned module, CREATE the module skeleton from scratch** following the template in Section 2.2.
+3. **When extending an existing module** (rescue, report-stray, bootstrap), explore its current structure first to follow existing patterns.
+4. **Auth, document, and config are separate services** — not core-service modules. Do not add new modules in those services unless the task explicitly requires it.
 
 ### 2.2 Core-Service Module Template
 

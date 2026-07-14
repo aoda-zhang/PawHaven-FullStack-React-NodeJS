@@ -30,15 +30,16 @@ You are the **code review gatekeeper**. Your job:
 
 All sub-skills live under `.codebuddy/skills/code-review/`. Each sub-skill's `SKILL.MD` contains explicit rules with exact tool invocations — NO shell scripts.
 
-| Type     | Skill            | SKILL.MD Path                                             | Scope                 |
-| -------- | ---------------- | --------------------------------------------------------- | --------------------- |
-| **GATE** | figma-doctor     | `.codebuddy/skills/code-review/figma-doctor/SKILL.MD`     | frontend (runs FIRST) |
-| parallel | typecheck-doctor | `.codebuddy/skills/code-review/typecheck-doctor/SKILL.MD` | all                   |
-| parallel | react-doctor     | `.codebuddy/skills/code-review/react-doctor/SKILL.MD`     | frontend              |
-| parallel | style-doctor     | `.codebuddy/skills/code-review/style-doctor/SKILL.MD`     | frontend              |
-| parallel | boundary-doctor  | `.codebuddy/skills/code-review/boundary-doctor/SKILL.MD`  | all                   |
-| parallel | i18n-doctor      | `.codebuddy/skills/code-review/i18n-doctor/SKILL.MD`      | frontend              |
-| parallel | backend-doctor   | `.codebuddy/skills/code-review/backend-doctor/SKILL.MD`   | backend               |
+| Type     | Skill               | SKILL.MD Path                                                | Scope                 |
+| -------- | ------------------- | ------------------------------------------------------------ | --------------------- |
+| **GATE** | figma-doctor        | `.codebuddy/skills/code-review/figma-doctor/SKILL.MD`        | frontend (runs FIRST) |
+| parallel | typecheck-doctor    | `.codebuddy/skills/code-review/typecheck-doctor/SKILL.MD`    | all                   |
+| parallel | react-doctor        | `.codebuddy/skills/code-review/react-doctor/SKILL.MD`        | frontend              |
+| parallel | style-doctor        | `.codebuddy/skills/code-review/style-doctor/SKILL.MD`        | frontend              |
+| parallel | boundary-doctor     | `.codebuddy/skills/code-review/boundary-doctor/SKILL.MD`     | all                   |
+| parallel | i18n-doctor         | `.codebuddy/skills/code-review/i18n-doctor/SKILL.MD`         | frontend              |
+| parallel | backend-doctor      | `.codebuddy/skills/code-review/backend-doctor/SKILL.MD`      | backend               |
+| parallel | architecture-doctor | `.codebuddy/skills/code-review/architecture-doctor/SKILL.MD` | all                   |
 
 ## 3. Workflow
 
@@ -81,9 +82,10 @@ RECEIVE TASK from main agent
 │ Primary path: use use_skill() to load each applicable sub-skill. │
 │                                                                  │
 │ Frontend: typecheck-doctor, react-doctor, style-doctor,          │
-│           boundary-doctor, i18n-doctor                            │
-│ Backend:  typecheck-doctor, boundary-doctor, backend-doctor       │
-│ Full-stack: ALL 6                                                 │
+│           boundary-doctor, i18n-doctor, architecture-doctor       │
+│ Backend:  typecheck-doctor, boundary-doctor, backend-doctor,     │
+│           architecture-doctor                                     │
+│ Full-stack: ALL 7                                                 │
 │                                                                  │
 │ Fallback path (if use_skill fails or is unavailable):            │
 │ 1. read_file the SKILL.MD of each applicable sub-skill           │
@@ -123,14 +125,20 @@ RECEIVE TASK from main agent
 ┌──────────────────────────────────────────────────────────────────┐
 │ STEP 5: DEEP REVIEW — ARCHITECTURE & DESIGN (Layer 2)            │
 │                                                                  │
-│ □ Feature-based: Code in correct feature folder?                 │
-│ □ Package layers: imports follow dependency direction?            │
-│ □ Graduation: Components shared by 2+ features graduated?        │
-│ □ Component placement: App-shell in layout/, features in         │
-│   features/? NOT mixed in generic components/                    │
-│ □ Design tokens: All from @pawhaven/design-system?               │
-│ □ Server-driven data: Navigation fetched from backend?           │
-│   (hardcoded menus/routes = Blocking)                            │
+│ Backed by: architecture-doctor + boundary-doctor                  │
+│                                                                  │
+│ □ Module responsibility: Each module owns its domain?             │
+│ □ Dependency direction: No reversed or circular dependencies?     │
+│ □ Package boundaries: Imports follow shared ← ui ← core ← apps?   │
+│ □ Feature isolation: No cross-feature imports?                    │
+│ □ Feature placement: Business logic in features/, not generic     │
+│   components/? App-shell only in components/?                     │
+│ □ Graduation: Components shared by 2+ features graduated?         │
+│ □ API consistency: REST patterns, DTO placement, event contracts? │
+│ □ Design tokens: All from @pawhaven/design-system?                │
+│ □ Server-driven data: Navigation fetched from backend?            │
+│   (hardcoded menus/routes = Blocking)                             │
+│ □ ADR coverage: Significant decisions documented?                 │
 └──────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -165,7 +173,7 @@ RECEIVE TASK from main agent
 │ ### Gate — Figma Design Spec Match                               │
 │   ✅ PASS / ❌ FAIL                                               │
 │                                                                  │
-│ ### Layer 1 — Automated Scans (6 sub-skills)                     │
+│ ### Layer 1 — Automated Scans (7 sub-skills)                     │
 │   ❌ X Blocking / ⚠️ X Warnings / 💡 X Suggestions               │
 │                                                                  │
 │ ### Layer 2 — Architecture & Design                              │

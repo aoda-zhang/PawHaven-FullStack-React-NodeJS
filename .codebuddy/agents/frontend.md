@@ -90,11 +90,48 @@ FeatureName/
 ├── index.tsx          # Public entry — only file importable by router
 ├── apis/              # TanStack Query hooks + Axios request functions
 │   ├── queries.ts     # useQuery hooks
-│   └── mutations.ts   # useMutation hooks
+│   └── requests.ts    # Raw API call functions (or mutations.ts for writes)
 ├── components/        # Feature-private components
 ├── hooks/             # Feature-private hooks
-└── types.ts           # Feature-specific TypeScript types
+├── types.ts           # Feature-specific TypeScript types
+└── utils/             # Feature-private utilities (optional)
 ```
+
+### 2.2b Feature-Based Architecture Principles
+
+**CRITICAL: Business logic MUST live inside features, never in generic components.**
+
+```
+✅ CORRECT:
+  features/ReportStray/components/ReportForm.tsx   # Business logic in feature
+  features/ReportStray/apis/queries.ts              # API calls in feature
+  features/ReportStray/types.ts                     # Types in feature
+  features/ReportStray/hooks/useReportValidation.ts # Custom hooks in feature
+
+❌ WRONG:
+  components/ReportForm.tsx        # Business logic in generic components/
+  hooks/useReportSubmission.ts     # Feature-specific hook in global hooks/
+  utils/reportHelpers.ts           # Feature-specific util in global utils/
+  lib/reportApi.ts                 # Feature API code in lib/
+```
+
+**What belongs where:**
+
+| Location                  | Purpose                                                       | Examples                                                  |
+| ------------------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
+| `features/<Name>/`        | Feature-specific business logic, API calls, types, components | `ReportForm.tsx`, `useRescueCases()`, `RescueStatusBadge` |
+| `src/components/`         | App-shell components only                                     | `Brand`, `NotFound`, `RequireAuth`, `RouterErrorFallback` |
+| `src/hooks/`              | App-wide shared hooks only                                    | `reduxHooks.ts`, `useIsStableEnv.ts`                      |
+| `src/layout/`             | Root layout (header, sidebar, footer)                         | `RootLayoutFooter`, `RootLayoutSidebar`                   |
+| `src/providers/`          | App providers (query, store, i18n)                            | `QueryProvider`, `StoreProvider`                          |
+| `src/store/`              | Redux store (global client state only)                        | `globalReducer`, `reduxStore`                             |
+| `src/router/`             | Route configuration and component registry                    | `AppRouterProvider`, `routerElementMapping`               |
+| `src/types/`              | App-wide type definitions                                     | `AnimalType.ts`, `LayoutType.ts`                          |
+| `src/config/`             | Environment configuration                                     | `config.schema.ts`, YAML env files                        |
+| `src/utils/`              | App-wide utilities (API client, helpers)                      | `apiClient.ts`                                            |
+| `@pawhaven/ui`            | Pure UI components (no business logic)                        | `FormInput`, `Toast`, `Loading`, `Skeleton`               |
+| `@pawhaven/frontend-core` | Business-common components/hooks                              | `ErrorBoundary`, `AuthGuard`, shared API hooks            |
+| `@pawhaven/shared`        | Shared types, Zod schemas, constants                          | DTOs, validation schemas                                  |
 
 ### 2.3 Import Rules (CRITICAL)
 
