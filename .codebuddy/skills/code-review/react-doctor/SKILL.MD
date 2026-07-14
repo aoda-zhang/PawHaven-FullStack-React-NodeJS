@@ -1,11 +1,11 @@
 ---
 name: code-review/react-doctor
 description: >
-  React code quality validation. PRIMARY: runs npx react-doctor@latest (security, performance,
+  React code quality validation. PRIMARY: runs npx react-doctor@0.7.6 (security, performance,
   correctness, architecture, a11y, bundle size). SUPPLEMENTARY: project-specific convention
   checks (Redux typed hooks, TanStack Query key factories, React Hook Form, console.log, any type).
   Trigger: React code quality scan triage cleanup anti-pattern.
-version: "3.1.0"
+version: "3.2.0"
 ---
 
 # react-doctor — React Code Quality Validation
@@ -14,10 +14,10 @@ version: "3.1.0"
 
 Two-layer validation for React code:
 
-1. **Primary**: `npx react-doctor@latest` — the canonical tool for security, performance, correctness, architecture, accessibility, and bundle size.
+1. **Primary**: `npx react-doctor@0.7.6` — the canonical tool for security, performance, correctness, architecture, accessibility, and bundle size.
 2. **Supplementary**: manual `search_content` rules for project-specific conventions the generic CLI cannot know (Redux patterns, TanStack Query key factories, RHF enforcement).
 
----
+**Version is pinned** to avoid `latest` instability. Do not change to `latest` without explicit approval.
 
 ## Layer 1: Official React Doctor CLI
 

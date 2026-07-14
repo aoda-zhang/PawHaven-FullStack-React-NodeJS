@@ -16,13 +16,39 @@ Detect all styling violations against the design system. All styles must use `@p
 
 ## Step 0: Discover Frontend Source Directories
 
-Dynamically locate frontend source directories so rules are project-agnostic:
+Dynamically locate frontend source directories so rules are project-agnostic and robust across Tailwind v3/v4 and Vite plugin setups. **Never rely solely on `tailwind.config.*` for discovery.**
+
+### Strategy 1: known frontend apps
+Find every `src/` directory under `apps/frontend/`:
+
+```
+search_file: pattern="**/src/" target_directory=<workspace_root>/apps/frontend recursive=true
+```
+
+### Strategy 2: Vite + source projects
+Find every project directory that contains both `vite.config.ts` (or `vite.config.js`) and a `src/` folder:
+
+```
+search_file: pattern="**/vite.config.ts" target_directory=<workspace_root> recursive=true
+search_file: pattern="**/vite.config.js" target_directory=<workspace_root> recursive=true
+```
+
+For each `vite.config.*` found, derive its parent project directory and verify that a `src/` directory exists at the same level.
+
+### Strategy 3: tailwind config (last resort)
+If the first two strategies return nothing, fall back to:
 
 ```
 search_file: pattern="**/tailwind.config.*" target_directory=<workspace_root> recursive=true
 ```
 
-From each tailwind config found, derive the parent project's `src/` directory. These are the frontend source roots where styling rules apply.
+From each tailwind config, derive the parent project's `src/` directory.
+
+### Fail-fast
+If none of the strategies return at least one frontend source directory, **STOP** and report a configuration error. Do not silently run scans on an empty target set.
+
+### Target list output
+Before running any style rule, list every discovered frontend source directory in the report. This prevents silent empty scans.
 
 Use the discovered paths throughout all search rules below.
 
@@ -127,8 +153,9 @@ Use the discovered paths throughout all search rules below.
 
 ## Execution
 
-1. Run Step 0 to discover frontend source directories.
-2. Run Rules 1-5 (search_content) in PARALLEL on the discovered paths.
-3. Run Rule 6 (execute_command) in the same parallel batch.
-4. Categorize each match by severity.
-5. Report: list each violation with filePath, lineNumber, matched content, and which rule it violates.
+1. Run Step 0 to discover frontend source directories. **Output the discovered directories explicitly.**
+2. If zero directories are discovered, **fail-fast** with a configuration error.
+3. Run Rules 1-5 (search_content) in PARALLEL on the discovered paths.
+4. Run Rule 6 (execute_command) in the same parallel batch.
+5. Categorize each match by severity.
+6. Report: list discovered directories, then list each violation with filePath, lineNumber, matched content, and which rule it violates.

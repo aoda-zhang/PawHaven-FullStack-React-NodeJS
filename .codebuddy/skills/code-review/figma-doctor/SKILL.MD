@@ -12,10 +12,18 @@ version: 3.0
 
 ## Responsibility
 
-Verify that the implementation matches the **actual Figma design** for the specific feature/section being built. This is a **gate step** — must PASS before any other code-review checks.
+Verify that the implementation matches the design spec for the specific feature/section being built. This is a **gate step**, but it is **degradable** — live Figma is preferred, yet the review must not be blocked by network/permission/MCP failures for ordinary UI changes.
 
-Uses Playwright MCP to open the real Figma page directly.
+Uses Playwright MCP to open the real Figma page when possible; falls back to the static `figma-design-spec.md` plus code-structure comparison when live Figma is unavailable.
 
+## Gate Severity
+
+| Target type | Live Figma unavailable | Mismatch found |
+|-------------|------------------------|----------------|
+| Core visual page (hero, landing, homepage, brand-heavy section) | Warning + manual confirmation | Blocking |
+| High-risk change (redesign, layout refactor, new component system) | Warning + manual confirmation | Blocking |
+| Ordinary UI / small tweak (button text, spacing tweak, form label) | Use spec fallback; continue with Warning | Warning |
+| Non-UI task | Skip gate entirely | N/A |
 ## Token Budget Awareness
 
 **Screenshots are token-expensive.** Workflow is designed to minimize image analysis:
@@ -145,13 +153,24 @@ Compare in this order (cheapest first):
 
 ```
 figma-doctor runs FIRST
-  1. Navigate to Figma page
-  2. Extract visible text (cheap)
-  3. Extract visible HTML (cheap)
-  4. Read design spec (cheap)
-  5. ONE screenshot of target section (only expensive step)
-  6. Compare → ✅ PASS or ❌ FAIL
+  1. Attempt to navigate to live Figma page
+     - On success: extract visible text, visible HTML, take ONE screenshot
+     - On failure (network/permission/MCP): DEGRADE to Tier 2
+  2. Tier 2 fallback: read figma-design-spec.md + compare implementation code structure
+  3. Apply gate severity table above
+  4. Report ✅ PASS / ⚠️ DEGRADED / ❌ FAIL with severity classification
 ```
+
+## Two-Tier Fallback
+
+If Playwright MCP cannot access the live Figma page:
+
+1. Read `.codebuddy/knowledge/figma-design-spec.md`.
+2. Locate the {target} section in the spec.
+3. Read the implementation files for the same {target}.
+4. Compare structure, content, tokens, and responsive behavior from the spec.
+5. If the spec is ambiguous or missing visual details, mark the gate as ⚠️ DEGRADED and surface the risk in the report. Continue with other doctors.
+6. Only treat missing live Figma as Blocking for core visual pages or high-risk changes.
 
 ## Tools Required
 

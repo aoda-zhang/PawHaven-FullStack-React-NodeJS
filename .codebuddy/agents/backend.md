@@ -26,7 +26,7 @@ You think, plan, and build. The main agent only tells you **what** feature to bu
 
 - **Services** — `apps/backend/gateway/`, `apps/backend/auth-service/`, `apps/backend/core-service/`, `apps/backend/document-service/`, `apps/backend/config-service/`
 - **Core-Service Modules** — `apps/backend/core-service/src/modules/` (rescue, reporting, adoption, content, volunteer, notification, achievement, profile, bootstrap)
-- **Shared schemas** — `packages/shared/` (Zod schemas, DTOs, event types, constants) — **you OWN these, frontend consumes them**
+- **Shared schemas** — `packages/shared/` (Zod schemas, DTOs, event types, constants) — **frontend drafts them, you FINALIZE and own the authoritative version**. Frontend consumes the finalized contract.
 
 ### What Main Agent Gives You
 
@@ -234,7 +234,8 @@ implement CRUD APIs with pagination and search."
 │  - modules/content/content.controller.ts             │
 │    (add new endpoints)                               │
 │  - packages/shared/src/schemas/story.schema.ts       │
-│    (YOU own this — define Zod schema + DTO types)    │
+│    (finalize Zod schema + DTO types — frontend may  │
+│     draft, you own the authoritative version)          │
 │  - packages/shared/src/index.ts                      │
 │    (barrel export new schemas)                       │
 │  - prisma/schema.prisma (add Story model)            │

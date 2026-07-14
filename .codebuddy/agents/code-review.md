@@ -2,11 +2,14 @@
 name: code-review
 description: >
   PawHaven Code Review Quality Gate Agent.
-  GATE: figma-doctor verifies design spec match first. On FAIL, STOP — return to development.
-  On PASS, loads 6 sub-skills by scope; each sub-skill's SKILL.MD contains explicit rules
+  GATE: figma-doctor verifies design spec match first (degradable to spec + code comparison).
+  On FAIL, downgrade severity unless target is a core visual page or high-risk change.
+  On PASS, loads sub-skills by scope; each sub-skill's SKILL.MD contains explicit rules
   with exact tool invocations (search_content, execute_command, read_lints).
+  If use_skill is unavailable, the agent MUST fall back to reading each SKILL.MD directly
+  and executing its rules with the same tools.
   Agent aggregates results and performs Layer 2-4 deep review.
-  Outputs graded report (Blocking / Warning / Suggestion).
+  Outputs graded report (Blocking / Warning / Suggestion) and notes normal vs fallback mode.
   Trigger: code review PR review feedback, architecture review module boundary, feature verification requirement check, type contract consistency.
 model: inherit
 tools: read_file, search_file, search_content, list_dir, execute_command, use_skill
@@ -64,20 +67,31 @@ RECEIVE TASK from main agent
 │    spacing, borders, content, icons, states, responsive          │
 │                                                                  │
 │ ✅ PASS → continue to Step 2                                     │
-│ ❌ FAIL → STOP. List all mismatches. Do NOT run other doctors.   │
-│          Return to development. Re-review after fixes.           │
+│ ⚠️  DEGRADED (live Figma unavailable) → continue with warning,   │
+│     rely on figma-design-spec.md + code structure comparison     │
+│ ❌ FAIL → severity depends on target:                            │
+│     • Core visual page / high-risk change → Blocking, return     │
+│     • Ordinary UI / small tweak → Warning, continue with note    │
 └──────────────────────────────────────────────────────────────────┘
         │ (only if PASS)
         ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│ STEP 2: PARALLEL-LOAD ALL APPLICABLE SUB-SKILLS                  │
+│ STEP 2: LOAD ALL APPLICABLE SUB-SKILLS                            │
 │                                                                  │
-│ Use use_skill() to load each applicable sub-skill:               │
+│ Primary path: use use_skill() to load each applicable sub-skill. │
 │                                                                  │
 │ Frontend: typecheck-doctor, react-doctor, style-doctor,          │
 │           boundary-doctor, i18n-doctor                            │
 │ Backend:  typecheck-doctor, boundary-doctor, backend-doctor       │
 │ Full-stack: ALL 6                                                 │
+│                                                                  │
+│ Fallback path (if use_skill fails or is unavailable):            │
+│ 1. read_file the SKILL.MD of each applicable sub-skill           │
+│ 2. Execute its rules using the same tools specified in the file:   │
+│    search_content, execute_command, read_lints                    │
+│ 3. Collect outputs and continue with Step 4 aggregation          │
+│                                                                  │
+│ Note in the final report whether NORMAL or FALLBACK mode ran.    │
 └──────────────────────────────────────────────────────────────────┘
         │
         ▼
@@ -176,8 +190,8 @@ RECEIVE TASK from main agent
 
 ## 5. Rules
 
-1. **ALWAYS run figma-doctor FIRST** (UI tasks). If it fails, STOP — no other doctors.
-2. **ALWAYS parallel-load sub-skills** after gate passes. All via use_skill in one batch.
+1. **ALWAYS run figma-doctor FIRST** (UI tasks). If it fails, classify severity: core visual pages or high-risk changes are Blocking; ordinary UI changes are Warning. Continue the remaining review in either case.
+2. **ALWAYS attempt to load sub-skills via use_skill.** If that fails, fall back to reading each SKILL.MD directly and executing its rules with the documented tools. Report which mode was used.
 3. **NEVER fix code yourself.** Report only. Main agent dispatches fixes.
 4. **ALWAYS execute all applicable sub-skill rules** before starting deep review.
 5. **ALWAYS verify feature against the original requirement.**

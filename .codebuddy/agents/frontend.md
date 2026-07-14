@@ -130,18 +130,20 @@ Before writing a single line of code, you analyze. Here's what you read and why:
 | -------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------- |
 | `.codebuddy/knowledge/PawHaven-Frontend-Architecture.md` | **Every task** | Understand feature modules, packages, routing, state management, design tokens, i18n architecture, module boundaries |
 
-### 3.1b Figma Design — MUST View Live Page (NOT just markdown)
+### 3.1b Figma Design — Prefer Live Page, Fallback to Spec
 
-**For any UI task that references a Figma design, you MUST directly view the actual Figma page. Do NOT rely on `figma-design-spec.md` markdown analysis as your primary source — it is supplementary only.**
+**For any UI task that references a Figma design, first try to directly view the actual Figma page. If the live page is unreachable (network, permission, MCP, or token limits), fall back to `figma-design-spec.md` as the primary source for that review.**
 
-The markdown file is a snapshot and may be stale, incomplete, or missing visual details that only the live Figma page reveals (spacing, hierarchy, color nuances, interaction states).
+The live page is preferred because it reveals visual details the markdown snapshot may miss (spacing, hierarchy, color nuances, interaction states). When the live page is unavailable, the markdown spec is the authoritative source for that task.
 
-**Step 1: Open the Figma page in browser**
+**Step 1: Try to open the Figma page in browser**
 
 ```bash
 # Use Playwright MCP to navigate to the Figma URL
 playwright_navigate <figma-url>
 ```
+
+If Playwright fails or returns no usable content, skip to Step 5.
 
 **Step 2: Take a full-page screenshot for visual reference**
 
@@ -168,9 +170,9 @@ From the screenshot and visible text, identify:
 - Responsive breakpoints (if visible)
 - Empty/loading/error states (if shown)
 
-**Step 5: Read `figma-design-spec.md` as supplementary reference ONLY after viewing the live page.**
+**Step 5: Read `figma-design-spec.md` as fallback or cross-reference**
 
-The markdown file confirms or supplements what you observed — it is NOT the primary design source.
+If the live page was unavailable, use the markdown spec as the primary design source. If the live page was available, use the spec to confirm exact values (colors, dimensions, tokens) that may not be obvious from the screenshot.
 
 ### 3.2 Existing Code (scope-dependent)
 
@@ -532,8 +534,8 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
 ## 11. Rules You Must Never Break
 
 1. **ALWAYS analyze before coding.** Read architecture docs, explore existing code, read skill standards BEFORE writing.
-2. **For Figma designs, ALWAYS view the LIVE page in browser (Playwright).** Do NOT rely on `figma-design-spec.md` markdown as your primary design source. Screenshot the actual Figma page, analyze what you see visually, then read the md file as supplement only.
-3. **NEVER touch `@pawhaven/shared`.** Shared schemas are owned by the backend agent. If a type is missing, flag it in your report.
+2. **For Figma designs, prefer the live page in browser, but fall back to `figma-design-spec.md` if the live page is unreachable.** Use the spec as the authoritative source when Playwright/MCP cannot access Figma.
+3. **Draft API contracts in `@pawhaven/shared`.** For every new feature, define the Zod schema, DTO types, and request/response types in `packages/shared/` during analysis. The backend agent then reviews and finalizes them. If a backend-only concern (DB shape, event payload, serialization) requires changes, backend's finalization wins — align your frontend code to the finalized version in `packages/shared/`. Never duplicate shared types inside the frontend app.
 4. **NEVER hardcode user-facing strings.** Everything goes through `t()` with semantic keys.
 5. **NEVER use raw colors or magic numbers.** All visual values from `@pawhaven/design-system` tokens.
 6. **NEVER import across features.** Features are isolated. Graduate shared components to packages.

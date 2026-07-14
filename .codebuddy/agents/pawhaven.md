@@ -214,12 +214,18 @@ Features can run in parallel ONLY when:
 ### 4.1 Shared Types (`packages/shared/`)
 
 ```
-⚠ CRITICAL: shared types are the contract between frontend and backend.
+⚠️ CRITICAL: shared types are the contract between frontend and backend.
 
-- Frontend DEFINES the API contract (types/DTOs) during step 1
-- Backend IMPLEMENTS against the contract in step 2
-- When adding a new feature: frontend drafts the schema → backend validates and refines
-- Never let frontend and backend define duplicate types for the same concept
+- Frontend **DRAFTS** the API contract (Zod schemas, DTOs, request/response types)
+  during step 1 as the consumer-facing interface.
+- Backend **FINALIZES** the contract in step 2: validates for DB/serialization/
+  event constraints, adjusts names/fields, and owns the authoritative version in
+  `packages/shared/`.
+- Final source of truth: `packages/shared/`. Frontend consumes; backend owns.
+- When frontend and backend disagree on a shared schema, **backend finalizes the
+  version and reports changes back to frontend**; frontend aligns its implementation
+  to the final `packages/shared/` version.
+- Never let frontend and backend define duplicate types for the same concept.
 ```
 
 ### 4.2 Package Dependency Direction
