@@ -1,3 +1,14 @@
+---
+name: code-review/architecture-doctor
+description: >
+  Architecture & design compliance detection. Covers cross-module imports (forbidden),
+  package dependency direction (ui -> frontend-core inverted, forbidden),
+  cross-feature imports (forbidden), component graduation (2+ features must promote),
+  feature folder structure, API design consistency, shared type ownership, ADR references.
+  Trigger: architecture boundaries dependency direction module isolation graduation package layering.
+version: 3.0
+---
+
 # Architecture Doctor
 
 > **Part of**: Code Review Skill Set
@@ -301,4 +312,10 @@ ls .codebuddy/knowledge/ADR/
 ### Summary
 - X Blocking, Y Warnings, Z Suggestions
 - Architecture health: 🟢 Good / 🟡 Needs Attention / 🔴 Critical Issues
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Boundaries: [boundary-doctor](../boundary-doctor/SKILL.MD) · styling: [style-doctor](../style-doctor/SKILL.MD)
+- Component graduation: [component](../../frontend/component/SKILL.MD)
 ```

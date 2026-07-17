@@ -159,3 +159,9 @@ Use the discovered paths throughout all search rules below.
 4. Run Rule 6 (execute_command) in the same parallel batch.
 5. Categorize each match by severity.
 6. Report: list discovered directories, then list each violation with filePath, lineNumber, matched content, and which rule it violates.
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Design system tokens: [styling skill](../../frontend/style/SKILL.MD)
+- Gate: [figma-doctor](../figma-doctor/SKILL.MD)

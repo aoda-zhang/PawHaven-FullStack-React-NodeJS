@@ -898,3 +898,8 @@ And a feature satisfies linguistic safety only if:
 - Localization libraries handle pluralization and formatting
 - The layout remains usable across supported languages
 - Business logic is completely decoupled from translated content
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Hardcoded-string detection: [i18n-doctor](../../code-review/i18n-doctor/SKILL.MD)

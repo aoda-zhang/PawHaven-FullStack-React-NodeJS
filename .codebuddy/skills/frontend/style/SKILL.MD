@@ -736,3 +736,9 @@ A component satisfies this skill only if:
 - Dark mode is supported via semantic tokens
 - Interactive states are handled consistently
 - The component remains visually consistent with the rest of the application
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Styling violations detection: [style-doctor](../../code-review/style-doctor/SKILL.MD)
+- Components: [component](../component/SKILL.MD)

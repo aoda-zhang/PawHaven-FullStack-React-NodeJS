@@ -404,3 +404,9 @@ A component is complete when:
 - [ ] Keyboard accessible and has ARIA labels (if interactive)
 - [ ] Reused via import, not copy-pasted across features
 - [ ] Single responsibility — does one thing well
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Architecture & graduation: [architecture-doctor](../../code-review/architecture-doctor/SKILL.MD)
+- Styling tokens: [styling skill](../style/SKILL.MD)

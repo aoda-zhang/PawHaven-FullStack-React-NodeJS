@@ -386,3 +386,9 @@ A Redux change is complete when:
 - [ ] Redux Persist `whitelist` explicitly specifies persisted reducers
 - [ ] No server/API data stored in Redux (use TanStack Query instead)
 - [ ] No raw `useSelector` returning new object references without `createSelector`
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Server state (use TanStack Query instead): [react-query](../react-query/SKILL.MD)
+- React core: [react](../react/SKILL.MD)

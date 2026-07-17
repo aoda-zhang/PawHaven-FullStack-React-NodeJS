@@ -105,3 +105,8 @@ Only flag content that is truly visible to the end user: button labels, headings
 3. Run Rule 2 (locale check) on the discovered locale directory.
 4. Manually review each Rule 1 match: distinguish true hardcoded text from false positives (URLs, attributes, component names, etc.).
 5. Report: list discovered directories and locale files, then list each true violation with filePath, lineNumber, and the hardcoded text content.
+
+## Related
+
+- i18n standards: [i18n skill](../../frontend/i18n/SKILL.MD)
+- Gate: [figma-doctor](../figma-doctor/SKILL.MD) · styling: [style-doctor](../style-doctor/SKILL.MD)

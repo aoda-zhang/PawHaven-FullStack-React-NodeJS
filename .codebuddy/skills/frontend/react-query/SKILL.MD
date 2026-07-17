@@ -454,3 +454,9 @@ A TanStack Query change is complete when:
 - [ ] No server data is duplicated into Redux
 - [ ] Error boundaries wrap critical query sections
 - [ ] QueryClient is created via a factory function, not raw `new QueryClient()`
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Client state: [redux](../redux/SKILL.MD) · React core: [react](../react/SKILL.MD)
+- Golden rule — never put server state in Redux: [redux](../redux/SKILL.MD)

@@ -142,3 +142,9 @@ From results, derive frontend `src/` directories and the Redux `store/` director
 2. **Layer 1**: Run `npx react-doctor@latest --verbose`. ALL issues are ❌ Blocking.
 3. **Layer 2**: Run Rules S1–S6 in PARALLEL on the discovered paths. All are ❌ Blocking.
 4. Report: combines Layer 1 + Layer 2 findings, organized by severity and source.
+
+## Related
+
+- React standards: [react skill](../../frontend/react/SKILL.MD)
+- Companion doctors: [style-doctor](../style-doctor/SKILL.MD) · [i18n-doctor](../i18n-doctor/SKILL.MD) · [typecheck-doctor](../typecheck-doctor/SKILL.MD)
+- State rules: [redux](../../frontend/redux/SKILL.MD) · [react-query](../../frontend/react-query/SKILL.MD) · [react-hook-form](../../frontend/react-hook-form/SKILL.MD)
