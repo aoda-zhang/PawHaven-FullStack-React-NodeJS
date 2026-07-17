@@ -2,9 +2,9 @@
 name: i18n
 description: >
   国际化标准 / Enterprise-Grade Internationalization (i18n) Standards.
-  定义项目国际化规范：所有用户可见文案必须通过 t() 函数、语义化 key 命名（module.key 格式）、三语同步（zh-CN/en-US/de-DE 必须同时更新）、禁止硬编码字符串、禁止拼接翻译、复数处理、日期/货币格式化、常用文案放入 common 模块。
+  定义项目国际化规范：所有用户可见文案必须通过 t() 函数、语义化 key 命名（module.key 格式，多词 key 一律使用 snake_case 下划线，如 hero_headline_prefix）、三语同步（zh-CN/en-US/de-DE 必须同时更新）、禁止硬编码字符串、禁止拼接翻译、复数处理、日期/货币格式化、常用文案放入 common 模块。
   适用于 React/Next.js 应用的 i18next + react-i18next 技术栈。
-  触发场景 / Trigger: 国际化 i18n internationalization localization l10n globalization g11n locale adaptation, 翻译 translation translate text string message copy localisation, 多语言 multi-language multilingual language support locale detection switching, locale language code region zh-CN en-US de-DE ja-JP ko-KR fr-FR es-ES, 文案 UX copy microcopy user-facing text label message string content wording, 硬编码字符串 hardcoded strings inline text literal string direct text embedding, t() function translate function i18n key lookup interpolation namespace, i18next react-i18next useTranslation Trans component HOC withTranslation, key naming semantic namespace module.key convention structure organization, pluralization singular plural forms count variable interpolation, date formatting currency number formatting Intl locale-aware display, common module shared keys reusable translations frequently used, error messages empty state toast notification banner alert text, button labels CTA call to action action text label affordance, accessibility a11y aria-label lang attribute screen reader locale, concatenation avoidance string interpolation template literal translation, three-language sync simultaneous update consistency across locales.
+  触发场景 / Trigger: 国际化 i18n internationalization localization l10n globalization g11n locale adaptation, 翻译 translation translate text string message copy localisation, 多语言 multi-language multilingual language support locale detection switching, locale language code region zh-CN en-US de-DE ja-JP ko-KR fr-FR es-ES, 文案 UX copy microcopy user-facing text label message string content wording, 硬编码字符串 hardcoded strings inline text literal string direct text embedding, t() function translate function i18n key lookup interpolation namespace, i18next react-i18next useTranslation Trans component HOC withTranslation, key naming semantic namespace module.key convention structure organization snake_case underscore, pluralization singular plural forms count variable interpolation, date formatting currency number formatting Intl locale-aware display, common module shared keys reusable translations frequently used, error messages empty state toast notification banner alert text, button labels CTA call to action action text label affordance, accessibility a11y aria-label lang attribute screen reader locale, concatenation avoidance string interpolation template literal translation, three-language sync simultaneous update consistency across locales.
 version: 4.0
 ---
 
@@ -98,7 +98,7 @@ Each locale file contains **module objects** at the top level. Every module is a
   "auth": {
     "login": "Log in",
     "signup": "Sign up",
-    "loginSubtitle": "Welcome back. Sign in to continue with your PawHaven account.",
+    "login_subtitle": "Welcome back. Sign in to continue with your PawHaven account.",
     ...
   },
   "reportStray": {
@@ -237,7 +237,7 @@ common.save
 common.cancel
 
 auth.login
-auth.loginSubtitle
+auth.login_subtitle
 
 reportStray.animal_type
 reportStray.location
@@ -253,6 +253,37 @@ button2
 saveButton
 text3
 ```
+
+---
+
+## 3a. Key naming format — always `snake_case`
+
+Every key segment (after the module prefix and for sub-objects) MUST be written in `snake_case`: lowercase words separated by underscores. This applies to **all multi-word keys** — short and long alike. Never use `camelCase` or `kebab-case` for keys.
+
+The only exception is error-code / constant maps (e.g. `errorMessage.TOKEN_EXPIRED`), which conventionally use `UPPER_SNAKE_CASE`.
+
+✅ Good — underscores separate words:
+
+```
+hero.headline_prefix
+hero.subtitle
+home.report_stray_now
+reportStray.animal_type
+auth.login_subtitle
+rescueGuide.assess_if_rescue_needed
+```
+
+❌ Bad — `camelCase` or mixed casing:
+
+```
+hero.headlinePrefix
+hero.subTitle
+home.reportStrayNow
+auth.loginSubtitle
+reportStray.animalType
+```
+
+Rule of thumb: if a key has more than one word, it MUST contain an underscore. A key like `hero_headline_prefix` is the canonical format to follow.
 
 ---
 
@@ -812,6 +843,7 @@ Before completing a task verify:
 
 - No hardcoded user-facing strings
 - Translation keys are semantic
+- Translation keys use `snake_case` (multi-word keys separated by underscores, e.g. `hero_headline_prefix`); no `camelCase` keys
 - Module-based organization is followed
 - Common translations are reused
 - No duplicated keys across modules (shared strings must live in `common` only)
@@ -854,6 +886,7 @@ Avoid:
 - Duplicate translation keys
 - Duplicating keys or values across modules (shared strings belong in common; if a duplicate value is found, extract it to common and update all `t()` references)
 - Ambiguous key names
+- `camelCase` or `kebab-case` key names (multi-word keys must be `snake_case`, e.g. `hero_headline_prefix`)
 - Translating internal identifiers
 - Manual pluralization
 - Manual date formatting
@@ -882,6 +915,7 @@ A feature is considered internationalized only if:
 
 - Every user-facing string is translated
 - Translation keys follow project conventions
+- Translation keys use `snake_case` for all multi-word keys (`hero_headline_prefix`), no `camelCase`
 - All supported locales are updated
 - Accessibility text is localized
 - Metadata is localized

@@ -84,7 +84,18 @@
   "home": {
     "home_page": "Startseite",
     "rescue": "Melden",
-    "report": "Tier melden"
+    "report": "Tier melden",
+    "hero_aria_label": "PawHaven Hero-Bereich",
+    "hero_headline_prefix": "Jedes Streunerleben",
+    "hero_headline_highlight": "verdient es",
+    "hero_headline_suffix": "gesehen zu werden.",
+    "hero_subtitle": "Von der ersten Sichtung bis zum sicheren Zuhause — PawHaven verwandelt verstreute Hilferufe in eine transparente Rettungskette.",
+    "hero_report_cta": "Streuner jetzt melden",
+    "hero_adopt_cta": "Adoptierbare Tiere treffen",
+    "hero_stat_rescues": "Abgeschlossene Rettungen",
+    "hero_stat_adopted": "Vermittelte Zuhause",
+    "hero_stat_volunteers": "Aktive Freiwillige",
+    "hero_image_alt": "Eine Freiwillige hält eine gerettete Katze und einen geretteten Hund"
   },
   "reportStray": {
     "report_animal": "Fundtier melden",

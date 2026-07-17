@@ -407,6 +407,32 @@ STEP 8: SUMMARIZE
 
 ---
 
+## 7b. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The update workflow (Section 7, STEP 0-8) is **NON-OPTIONAL**. You MUST execute every STEP in order.
+Skipping any step — especially the anti-loop guard (STEP 0), the root README check (STEP 6), or the
+validation checklist (STEP 7) — is a failure, regardless of change size.
+
+- All of STEP 0 → STEP 8 run in sequence. You may not jump straight to editing files.
+- STEP 6 (root README check) is MANDATORY even when no Tier 1-4 cascade was needed — never skip it.
+- STEP 7 (validation checklist, all 12 items) must pass before you summarize.
+- Omit a STEP ONLY if it genuinely does not apply (e.g., the STEP 0 SKIP path when cascade-lock is
+  fresh), and state the reason explicitly in the Step Completion Checklist.
+- In STEP 8 (SUMMARIZE) you MUST include the **Step Completion Checklist** proving every STEP ran.
+  A summary without it is incomplete and rejected by the orchestrator.
+
+Step Completion Checklist (every step proven run):
+[x] STEP 0 ANTI-LOOP GUARD — ran first; lock wrote/cleared (or skipped with reason)
+[x] STEP 1 CLASSIFY — Minor/Medium/Major determined
+[x] STEP 2 IDENTIFY — Tier determined
+[x] STEP 3 READ DEPENDENTS — dependent files actually read
+[x] STEP 4 DETECT — changes needed identified
+[x] STEP 5 APPLY — cascading updates applied at correct depth
+[x] STEP 6 ROOT READMEs — both root READMEs checked (mandatory)
+[x] STEP 7 VALIDATE — 12-item checklist passed
+[x] STEP 8 SUMMARIZE — files + classification reported
+(mark [x] only if truly done; note any N/A + reason)
+
 ## 8. Quick Reference: Which Files to Update When
 
 | If you change...                           | You MUST also update...                                                              |

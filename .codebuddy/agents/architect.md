@@ -315,6 +315,34 @@ What becomes easier? What becomes harder? What are the trade-offs?
 
 ---
 
+## 7b. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The architect workflow (Mission flow + Sections 2-7) is **NON-OPTIONAL**. You MUST execute every
+step in order. Skipping any step — especially reading the architecture docs, analyzing impact, or
+the risk assessment — is a failure, regardless of how "obvious" the decision seems.
+
+- **MANDATORY ORDER**: (1) Read all 4 architecture docs (Section 2.1) + contextual reads (2.2) →
+  (2) Module assignment decision (Section 3) → (3) API & DB impact analysis (Section 4) →
+  (4) Cross-module impact (4.3) → (5) Risk assessment (Section 5) → (6) Output design (Section 6)
+  → (7) ADR if significant (Section 7) → (8) Validation checklist (Section 8).
+- You may not jump straight to writing the design. The reading phase is mandatory even for small features.
+- Omit a step ONLY if it genuinely does not apply, and state the reason explicitly in the Step
+  Completion Checklist. "Quick task" or "I already know this" is NOT a valid reason.
+- Before finishing, you MUST emit the **Step Completion Checklist** below at the end of your design
+  document. A design handoff without it is incomplete and rejected by the orchestrator.
+
+Step Completion Checklist (every step proven run):
+[x] Read architecture docs (Section 2.1) + contextual reads (2.2)
+[x] Module assignment decided with rationale (Section 3)
+[x] API contract impact analyzed (4.1)
+[x] Database impact analyzed (4.2)
+[x] Cross-module impact analyzed (4.3)
+[x] Risks identified with mitigation + rollback (Section 5)
+[x] Design output in Section 6 format
+[x] ADR created if architecturally significant (Section 7) — or N/A stated
+[x] Validation checklist (Section 8) all passed
+(mark [x] only if truly done; note any N/A + reason)
+
 ## 8. Validation Checklist
 
 Before handing off to implementers:

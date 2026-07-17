@@ -227,6 +227,18 @@ STEP 5: CODE REVIEW
   → Report: Blocking / Warning / Suggestion
   → If blocking issues: re-spawn the relevant agent to fix → re-test → re-review
         │
+STEP 5b: STEP-COMPLETION VERIFICATION (MANDATORY — NO SKIP)
+  → Every subagent (frontend/backend/testing/review) MUST return a
+    Step Completion Checklist proving each of its internal steps ran.
+  → Before advancing to the next pipeline stage, you MUST read each subagent's
+    report and confirm: (a) the checklist is present, (b) every step is marked
+    done or explicitly N/A with a reason, (c) no step was silently skipped.
+  → If a subagent's report is missing the checklist OR shows a skipped step,
+    re-spawn that agent with the explicit instruction: "You skipped step(s);
+    run ALL steps in order and return the Step Completion Checklist."
+  → A pipeline stage may NOT be marked complete while its subagent's steps
+    are unverified. Skipping this verification is itself a violation.
+        │
 STEP 6: KNOWLEDGE CHECK
   → Architecture changed? New ADR? → spawn `knowledge-update` agent
   → Otherwise: skip
@@ -381,3 +393,4 @@ Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover 
 13. **NEVER read domain-specific docs** (Frontend-Architecture, Backend-Architecture, figma-design-spec). Subagents own those.
 14. **ALWAYS verify final state with typecheck + lint before declaring done.**
 15. **NEVER ask the user for design files, Figma JSON exports, or screenshots.** When a task references Figma or a design, trust that the frontend agent will read `figma-design-spec.md` on its own. Just classify and dispatch.
+16. **NEVER advance a pipeline stage without a Step Completion Checklist from the subagent.** Each subagent must prove its internal steps ran (see STEP 5b). A missing or skipped-step report means re-dispatch, not proceed. No stage may be silently skipped.

@@ -185,8 +185,26 @@ RECEIVE TASK from main agent
 │ ### 💡 Suggestions                                               │
 │                                                                  │
 │ ### Verdict: Pass / Needs minor fixes / Blocked                  │
+│                                                                  │
+│ ### Step Completion Checklist (every step proven run)            │
+│   [x] STEP 0 SCOPE — target files identified                     │
+│   [x] STEP 1 GATE — Figma design match verified (or N/A)         │
+│   [x] STEP 2 LOAD — applicable sub-skills loaded/executed        │
+│   [x] STEP 3 RULES — each sub-skill's explicit rules run         │
+│   [x] STEP 4 AGG — results aggregated                            │
+│   [x] STEP 5-7 DEEP — architecture/feature/type reviewed         │
+│   [x] STEP 8 REPORT — graded report produced                    │
+│   (mark [x] only if truly done; note any N/A + reason)           │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+## 3b. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The Workflow (Section 3) is **NON-OPTIONAL**. You MUST execute every STEP in order
+(STEP 0 → STEP 8). Skipping any step — especially the Figma gate (STEP 1) or the deep
+reviews (STEP 5-7) — is a failure. If a step genuinely does not apply (e.g., no Figma for a
+non-UI change), state that explicitly in the Step Completion Checklist. You must produce the
+checklist in STEP 8; a report without it is incomplete.
 
 ## 4. Issue Severity
 

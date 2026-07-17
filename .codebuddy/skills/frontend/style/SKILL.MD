@@ -160,6 +160,143 @@ Need a visual value?
 
 ---
 
+## Token Structure & Ordering Rules (ENFORCED)
+
+The `@theme {}` blocks in `tokens/*.css` follow strict structural rules.
+**Every new or modified token MUST obey them.** Adding a token out of order or with the wrong unit is a violation.
+
+### Rule 1: Numeric ascending order — ALWAYS
+
+Every group of tokens in a `@theme` block is sorted by numerical value, smallest to largest.
+
+```css
+--font-size-xs: 0.75rem;            /* smallest */
+--font-size-sm: 0.875rem;
+--font-size-base: 1rem;
+...
+--font-size-6xl: 3.75rem;           /* largest scale token */
+--font-size-subtitle: 0.9375rem;    /* smallest semantic */
+--font-size-stat: 1.75rem;
+--font-size-display: 4.25rem;       /* largest semantic */
+```
+
+### Rule 2: Scale tokens FIRST, semantic tokens AFTER
+
+Never intersperse semantic tokens inside a numeric scale.
+
+```css
+✅ Correct                          ❌ Wrong
+--font-size-xs: 0.75rem;            --font-size-xs: 0.75rem;
+--font-size-sm: 0.875rem;           --font-size-sm: 0.875rem;
+--font-size-base: 1rem;             --font-size-subtitle: 0.9375rem; /* semantic in scale! */
+...                                 --font-size-base: 1rem;
+--font-size-6xl: 3.75rem;           ...
+--font-size-subtitle: 0.9375rem;    --font-size-6xl: 3.75rem;
+--font-size-stat: 1.75rem;
+--font-size-display: 4.25rem;
+```
+
+### Rule 3: Semantic tokens also sorted ascending
+
+Within the semantic group (AFTER scale tokens), sort by ascending value.
+
+```css
+✅ Correct                          ❌ Wrong
+--font-size-subtitle: 0.9375rem;    --font-size-display: 4.25rem;  /* 4.25 should be last */
+--font-size-stat: 1.75rem;          --font-size-stat: 1.75rem;
+--font-size-display: 4.25rem;       --font-size-subtitle: 0.9375rem;
+```
+
+### Rule 4: Special keywords at the VERY END
+
+`full`, `auto`, `none`, `min`, `max`, `fit` always go after all numeric tokens.
+
+```css
+--size-0: 0;
+--size-px: 1px;
+...
+--size-24: 6rem;                    /* last numeric */
+--size-full: 100%;                  /* keyword */
+--size-min: min-content;
+--size-max: max-content;
+--size-fit: fit-content;
+```
+
+### Rule 5: Color scale — 1 (lightest) to 10 (darkest)
+
+Every color group follows `color-{name}-{1..10}`, ascending.
+
+```css
+--color-orange-1: #fff7ed;          /* lightest */
+--color-orange-2: #ffedd5;
+...
+--color-orange-10: #7a2b08;        /* darkest */
+```
+
+Color groups: `gray`, `orange` (brand), `green` (secondary/success), `red` (error), `yellow` (warning), `blue` (info), `brown` (neutral warm).
+
+### Rule 6: Font families — fixed logical order
+
+Font families are NOT sorted numerically. Fixed order:
+
+```css
+--font-sans → --font-heading → --font-serif → --font-handwriting
+```
+
+### Rule 7: Motion easing — fixed logical order
+
+```css
+ease-in → ease-out → ease-in-out → ease-standard → ease-decelerate → ease-accelerate → ease-bounce
+```
+
+### Rule 8: Units — rem everywhere, ms for durations, px only for borders
+
+| Token category   | Unit      | Example                      |
+|------------------|-----------|------------------------------|
+| Font sizes       | rem       | `--font-size-base: 1rem`     |
+| Spacing / sizing | rem       | `--spacing-4: 1rem`          |
+| Radius           | px        | `--radius-lg: 12px`          |
+| Border width     | px        | `--border-width-1: 1px`      |
+| Motion duration  | ms        | `--duration-200: 200ms`      |
+| Line height      | unitless  | `--leading-normal: 1.5`      |
+| Opacity          | unitless  | `--opacity-50: 0.5`          |
+| Z-index          | unitless  | `--z-index-50: 50`           |
+| Letter spacing   | em        | `--tracking-wide: 0.025em`   |
+
+### Per-file reference
+
+**`tokens/typography.css`** — `@theme` block: font families (logical order). Font sizes: `xs → 6xl` ascending, then semantic `subtitle → stat → display` ascending. Line heights: `none → loose` ascending, then semantic `display` at end. Letter spacing: `tighter → widest` ascending. Font weights: `normal → extrabold` ascending.
+
+**`tokens/color.css`** — Groups: `gray, orange, green, red, yellow, blue, brown`. Each: `name-1 → name-10` ascending.
+
+**`tokens/spacing.css`** — Spacing: `px, 0, 1, 2, 3, 4, 5, 6, 8, 10, 12` ascending. Container: `sm, md, lg, xl, 2xl` ascending.
+
+**`tokens/radius.css`** — `xs → 3xl` ascending, then `full` (keyword at end).
+
+**`tokens/shadow.css`** — Colors: `shadow-light → shadow-dark` ascending opacity, then `shadow-inner` at end. Shadows: `xs → xl` ascending, then `inner, none` at end.
+
+**`tokens/motion.css`** — Duration: `75 → 1000` ascending. Easing: logical order.
+
+**`tokens/border.css`** — `0 → 8` ascending.
+
+**`tokens/breakpoint.css`** — `xs → 2xl` ascending.
+
+**`tokens/opacity.css`** — `0 → 100` ascending.
+
+**`tokens/sizing.css`** — `0 → 24` ascending, then `full, min, max, fit` keywords at end.
+
+**`tokens/z-index.css`** — `0 → 50` ascending, then `auto` keyword at end.
+
+### When adding a new token
+
+1. Choose the correct `tokens/*.css` file
+2. Place it in the correct position (scale before semantic, numeric ascending, keywords at end)
+3. Use the correct unit per Rule 8
+4. If semantic, also add mapping in `theme.css`
+5. If exposed to TypeScript, add to `src/tokens.ts`
+
+---
+
 ## 3. Custom Utility Classes
 
 Use the custom utility classes from `utilities.css` whenever applicable. Do not re-create these patterns manually.
@@ -226,14 +363,27 @@ The design system defines four font families:
 | ------------------ | ------------------ | ------------------------------------ | ----------------------------- |
 | `font-heading`     | `font-heading`     | Poppins, Nunito, sans-serif          | Page headings, section titles |
 | `font-sans`        | `font-sans`        | Inter, Nunito, system-ui, sans-serif | Body text, UI                 |
-| `font-serif`       | `font-serif`       | Merriweather, serif                  | Editorial / long-form         |
+| `font-serif`       | `font-serif`       | Fraunces, Georgia, serif             | Editorial / display / stats   |
 | `font-handwriting` | `font-handwriting` | Patrick Hand, cursive                | Handwritten accents           |
 
-Available font sizes: `text-xs` (0.75rem) → `text-6xl` (3.75rem)
+Available font sizes:
+
+| Scale tokens (ascending) | Semantic tokens |
+|--------------------------|-----------------|
+| `text-xs` (0.75rem) | `text-subtitle` (0.9375rem) |
+| `text-sm` (0.875rem) | `text-stat` (1.75rem) |
+| `text-base` (1rem) | `text-display` (4.25rem) |
+| `text-lg` (1.125rem) | |
+| `text-xl` (1.25rem) | |
+| `text-2xl` (1.5rem) | |
+| `text-3xl` (1.875rem) | |
+| `text-4xl` (2.25rem) | |
+| `text-5xl` (3rem) | |
+| `text-6xl` (3.75rem) | |
 
 Available font weights: `font-normal` (400), `font-medium` (500), `font-semibold` (600), `font-bold` (700), `font-extrabold` (800)
 
-Available line heights: `leading-none` (1), `leading-tight` (1.25), `leading-snug` (1.375), `leading-normal` (1.5), `leading-relaxed` (1.625), `leading-loose` (2)
+Available line heights: `leading-none` (1), `leading-tight` (1.25), `leading-snug` (1.375), `leading-normal` (1.5), `leading-relaxed` (1.625), `leading-loose` (2), `leading-display` (1.08)
 
 ❌ Avoid:
 
@@ -431,6 +581,43 @@ h - 24;
 ```
 
 If a value is reused across the application, promote it into the design system instead of hardcoding it.
+
+---
+
+## 12b. Units — Prefer `rem`, avoid `px`
+
+`px` units are forbidden unless strictly necessary. The design system scale is `rem`-based so that spacing, typography, and layout respect the user's root font size and remain accessible. When a token does not exist and an arbitrary value is unavoidable, express it in `rem`, never `px`.
+
+**Why**: `px` values ignore the user's browser font-size preference and break proportional scaling. `rem` scales with the root and keeps the UI accessible and consistent.
+
+❌ Avoid — arbitrary `px`:
+
+```tsx
+w-[320px]
+text-[15px]
+mt-[12px]
+gap-[10px]
+style={{ width: 320 }}
+style={{ marginTop: '12px' }}
+```
+
+✅ Prefer — design tokens first, then `rem` only if a token truly does not exist:
+
+```tsx
+w-full            // token/utility
+text-base         // token
+mt-4              // spacing scale (1rem)
+w-[20rem]         // rem arbitrary value (only when no token fits)
+style={{ width: '20rem' }}
+```
+
+**Rare, acceptable `px` exceptions** (px is allowed only when rem is technically wrong or produces sub-pixel artifacts):
+
+- Hairline borders / dividers: `border`, `border-[1px]`, `1px` rules where `rem` would round inconsistently
+- Fixed device-pixel assets that must not scale (e.g., a 1px focus ring, retina line art)
+- Third-party/MUI overrides that only accept `px`
+
+When you use a `px` exception, keep it minimal and localized. Everything else must be a token or `rem`.
 
 ---
 
@@ -681,6 +868,7 @@ Before completing a feature verify:
 - [ ] No hardcoded spacing — spacing scale used (`p-4`, `gap-2`, etc.)
 - [ ] No hardcoded typography — font tokens used as classes (`font-heading`, `text-xl`)
 - [ ] No magic numbers — no `w-[317px]`, `mt-[13px]`, etc.
+- [ ] No `px` units — arbitrary values use `rem` (`w-[20rem]`), not `px`; `px` only for justified exceptions (hairline borders, non-scaling assets)
 - [ ] No arbitrary Tailwind values — no `text-[#xxx]`, `rounded-[Npx]`
 - [ ] No arbitrary z-index values — use semantic z-scale
 - [ ] Custom utilities used where applicable (`btn-primary`, `card`, `input-field`, `flex-center`, etc.)
@@ -705,9 +893,10 @@ Avoid:
 - `text-[#123456]` — hardcoded hex
 - `bg-[var(--color-*)]` / `text-[var(--color-*)]` — CSS variable bypass, use the semantic utility class
 - `style={{ fontFamily }}` / `style={{ color }}` / `style={{ width }}` — static values in inline styles
-- `w-[317px]` — magic number
-- `mt-[13px]` — magic number
-- `rounded-[9px]` — magic number
+- `w-[317px]` — magic number (and uses `px`; if truly needed, use `rem`)
+- `mt-[13px]` — magic number (and uses `px`; if truly needed, use `rem`)
+- `rounded-[9px]` — magic number (and uses `px`; if truly needed, use `rem`)
+- `text-[15px]` / `w-[20px]` — `px` units are forbidden unless a justified exception; use tokens or `rem`
 - `style={{ ... }}` — inline styles for static values
 - Pixel-perfect positioning
 - Random spacing values
@@ -731,6 +920,7 @@ A component satisfies this skill only if:
 - Custom utilities from `utilities.css` are reused where applicable
 - No hardcoded visual values exist
 - No magic numbers are introduced
+- No `px` units are used except for justified exceptions (hairline borders, non-scaling assets); all other arbitrary values use `rem`
 - Semantic design tokens are used for all colors, spacing, typography, radius, shadows
 - The layout is responsive across defined breakpoints
 - Dark mode is supported via semantic tokens

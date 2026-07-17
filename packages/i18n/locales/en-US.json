@@ -84,7 +84,18 @@
   "home": {
     "home_page": "Home Page",
     "rescue": "Rescue",
-    "report": "Report"
+    "report": "Report",
+    "hero_aria_label": "PawHaven hero",
+    "hero_headline_prefix": "Every stray life",
+    "hero_headline_highlight": "deserves",
+    "hero_headline_suffix": "to be seen.",
+    "hero_subtitle": "From the first sighting to a forever home — PawHaven turns scattered cries for help into one transparent rescue pipeline.",
+    "hero_report_cta": "Report a stray now",
+    "hero_adopt_cta": "Meet adoptable pets",
+    "hero_stat_rescues": "Rescues completed",
+    "hero_stat_adopted": "Adopted homes",
+    "hero_stat_volunteers": "Active volunteers",
+    "hero_image_alt": "A volunteer holding a rescued cat and dog"
   },
   "reportStray": {
     "report_animal": "Report Stray Animal",

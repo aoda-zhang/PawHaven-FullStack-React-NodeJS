@@ -11,12 +11,25 @@ Companion to `SKILL.MD`. Load when writing or auditing any visual styling.
 4. None exist                        → add token to @pawhaven/design-system, then use it
 ```
 
+## Token Structure & Ordering (MUST FOLLOW)
+
+When adding or modifying ANY token in `tokens/*.css`:
+
+1. **Numeric ascending** — every group sorted smallest → largest
+2. **Scale tokens first, semantic tokens after** — never intersperse
+3. **Semantic tokens also sorted ascending** — within their group
+4. **Special keywords at the end** — `full`, `auto`, `none`, `min`, `max`, `fit`
+5. **Color: name-1 (lightest) to name-10 (darkest)** — always ascending
+6. **Font families: fixed order** — `sans → heading → serif → handwriting`
+7. **Units**: `rem` for sizes/spacing, `ms` for duration, `px` for radius/borders, unitless for line-height/opacity/z-index, `em` for letter-spacing
+
 ## Forbidden
 
 - Hardcoded hex/rgb/hsl colors.
 - `bg-[var(--color-*)]` / `text-[var(--color-*)]` bypass — use the semantic utility class.
 - Static `style={{}}` values (only runtime-dynamic values belong inline).
 - Raw Tailwind color names (`text-orange-500`) instead of semantic `text-primary`.
+- Adding tokens out of order or with wrong units (see Token Structure above).
 
 ## Discouraged
 

@@ -85,7 +85,7 @@ export const LatestRescue = () => {
   const { data: rescues, isLoading } = useFetchLatestRescuesByNumber();
 
   return (
-    <div className="px-4 lg:px-20">
+    <div>
       <div className="my-4 flex items-center justify-between">
         <span className="text-base font-bold lg:text-2xl">
           {t('common.recent_rescue')}

@@ -341,8 +341,34 @@ implement CRUD APIs with pagination and search."
 │                                                     │
 │ Issues for main agent:                               │
 │  - None / Migration needs approval / etc.            │
+│                                                     │
+│ Step Completion Checklist (every step proven run):   │
+│  [x] STEP 1 ANALYZE  — arch docs read, code explored │
+│  [x] STEP 2 PLAN     — modules/files/API planned     │
+│  [x] STEP 3 IMPLEMENT — types→Prisma→use-cases→...    │
+│  [x] STEP 4 VALIDATE — typecheck / lint / build /     │
+│      manual boundary checks all passed (or fixed +    │
+│      re-validated)                                    │
+│  (mark [x] only if truly done; note any N/A + reason) │
 └─────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 5f. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The Core Workflow (Section 5) is **NON-OPTIONAL**. You MUST execute every STEP and every
+numbered sub-step in order. Skipping any step or sub-step is a failure, regardless of task size.
+
+- **STEP 1 (ANALYZE) → STEP 2 (PLAN) → STEP 3 (IMPLEMENT) → STEP 4 (VALIDATE) → STEP 5 (REPORT)**
+  all run in sequence. Do not jump to implementation.
+- Inside **STEP 4 (VALIDATE)**, items **1 through 4 are ALL mandatory** — typecheck, lint, build,
+  AND the manual module-boundary checks. Running only `build` and declaring done is a skip.
+- Omit a sub-step ONLY if it genuinely does not apply, and state the reason explicitly in the
+  Step Completion Checklist. "Quick fix" or "I forgot" is NOT a valid reason.
+- Violations found in STEP 4 must be **fixed and re-validated** before STEP 5.
+- Before STEP 5 you MUST emit the **Step Completion Checklist** proving every step/sub-step ran.
+  A report without it is incomplete and rejected by the orchestrator.
 
 ---
 

@@ -366,8 +366,30 @@ RECEIVE TASK from main agent
 │   - Is it a test issue or a code issue?              │
 │   - Report with file + line + expected vs actual     │
 │   - Do NOT fix code — let the relevant agent fix it  │
+│                                                     │
+│ Step Completion Checklist (every step proven run):   │
+│  [x] STEP 1 ANALYZE     — changed code scope read    │
+│  [x] STEP 2 STRATEGY    — test plan designed         │
+│  [x] STEP 3 IMPLEMENT   — tests written              │
+│  [x] STEP 4 EXECUTE     — tests run, coverage report │
+│      produced, no step skipped                       │
+│  (mark [x] only if truly done; note any N/A + reason)│
 └─────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 5f. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The Workflow (Section 5) is **NON-OPTIONAL**. You MUST execute every STEP in order
+(ANALYZE → STRATEGY → IMPLEMENT → EXECUTE & REPORT). Skipping any step is a failure.
+
+- All 4 steps run in sequence; you may not jump straight to running tests.
+- STEP 4 (EXECUTE & REPORT) is mandatory — you MUST run the test suites AND produce the
+  coverage report. Skipping the coverage report is explicitly forbidden (Rule 11).
+- You MUST NOT modify source code to make tests pass (Rule 3); report bugs instead.
+- Before finishing, emit the **Step Completion Checklist** (in STEP 4) proving each step ran.
+  A report without it is incomplete and rejected by the orchestrator.
 
 ---
 
