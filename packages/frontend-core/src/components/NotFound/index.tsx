@@ -1,11 +1,9 @@
 import Button from '@mui/material/Button';
 import { Home } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { ErrorInfo } from '../RouterErrorFallback';
-
-import { useIsStableEnv } from '@/hooks/useIsStableEnv';
-import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
 const goToHome = () => {
   window.location.href = '/';
@@ -13,11 +11,12 @@ const goToHome = () => {
 
 interface NotFoundProps {
   error?: Partial<ErrorInfo>;
+  isStableEnv: boolean;
+  footer?: ReactNode;
 }
 
-export const NotFound = ({ error }: NotFoundProps) => {
+export const NotFound = ({ error, isStableEnv, footer }: NotFoundProps) => {
   const { t } = useTranslation();
-  const isStableEnv = useIsStableEnv();
 
   return (
     <div
@@ -136,7 +135,7 @@ export const NotFound = ({ error }: NotFoundProps) => {
         )}
       </div>
 
-      <RootLayoutFooter />
+      {footer}
     </div>
   );
 };

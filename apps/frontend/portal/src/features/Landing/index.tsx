@@ -1,3 +1,4 @@
+import { SystemError } from '@pawhaven/frontend-core';
 import { Loading } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 
@@ -5,7 +6,7 @@ import { useGetAppBootstrap } from './apis/queries';
 import type { LandingDataType } from './landingContext';
 import { LandingContext } from './landingContext';
 
-import { SystemError } from '@/components/SystemError';
+import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 import { useGlobalState } from '@/store/globalReducer';
 
 interface LandingProps {
@@ -28,7 +29,7 @@ export const Landing = ({ children }: LandingProps) => {
   return (
     <LandingContext.Provider value={contextValue}>
       {isLoading && <Loading />}
-      {!isLoading && isError && <SystemError />}
+      {!isLoading && isError && <SystemError footer={<RootLayoutFooter />} />}
       {!isLoading && !isError && children}
     </LandingContext.Provider>
   );

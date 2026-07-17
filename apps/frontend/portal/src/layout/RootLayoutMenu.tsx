@@ -1,11 +1,10 @@
-import { LanguageSelector } from '@pawhaven/frontend-core';
+import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
 import { Menu } from 'lucide-react';
 import { useState } from 'react';
 
 import { RootLayoutMenuRender } from './RootLayoutMenuRender';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
 
-import { Brand } from '@/components/Brand';
 import type { MenuItemType } from '@/types/LayoutType';
 
 interface RootLayoutMenuProps {

@@ -1,12 +1,16 @@
-import { lazyImport } from '@pawhaven/frontend-core';
+import {
+  NotFound,
+  RouterErrorFallback,
+  lazyImport,
+} from '@pawhaven/frontend-core';
 import type { ReactElement } from 'react';
 
-import { NotFound } from '@/components/NotFound';
-import { RouterErrorFallback } from '@/components/RouterErrorFallback';
 import { Login } from '@/features/Auth/Login';
 import { Register } from '@/features/Auth/Register';
 import { Home } from '@/features/Home';
+import { useIsStableEnv } from '@/hooks/useIsStableEnv';
 import { RootLayout } from '@/layout';
+import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
 const ReportStray = lazyImport(
   () => import('@/features/ReportStray'),
@@ -21,6 +25,21 @@ const RescueGuide = lazyImport(
   'RescueGuide',
 );
 
+const NotFoundRoute = () => {
+  const isStableEnv = useIsStableEnv();
+  return <NotFound isStableEnv={isStableEnv} footer={<RootLayoutFooter />} />;
+};
+
+const ErrorFallbackRoute = () => {
+  const isStableEnv = useIsStableEnv();
+  return (
+    <RouterErrorFallback
+      isStableEnv={isStableEnv}
+      footer={<RootLayoutFooter />}
+    />
+  );
+};
+
 export const routerElementMapping: Record<string, ReactElement> = {
   rootLayout: <RootLayout />,
   home: <Home />,
@@ -29,6 +48,6 @@ export const routerElementMapping: Record<string, ReactElement> = {
   report_stray: <ReportStray />,
   rescue_guides: <RescueGuide />,
   rescue_detail: <ReportDetail />,
-  notFund: <NotFound />,
-  errorFallback: <RouterErrorFallback />,
+  notFund: <NotFoundRoute />,
+  errorFallback: <ErrorFallbackRoute />,
 };

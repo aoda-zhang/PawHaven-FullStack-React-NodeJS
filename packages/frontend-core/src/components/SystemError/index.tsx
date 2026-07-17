@@ -1,8 +1,9 @@
 import { Button } from '@mui/material';
 import { Home, RotateCw } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
+import type { ErrorInfo } from '../RouterErrorFallback';
 
 const handleGoHome = () => {
   window.location.href = '/';
@@ -12,7 +13,12 @@ const retry = () => {
   window.location.reload();
 };
 
-export const SystemError = () => {
+interface SystemErrorProps {
+  error?: Partial<ErrorInfo>;
+  footer?: ReactNode;
+}
+
+export const SystemError = ({ footer }: SystemErrorProps) => {
   const { t } = useTranslation();
 
   return (
@@ -118,7 +124,7 @@ export const SystemError = () => {
         </div>
       </div>
 
-      <RootLayoutFooter />
+      {footer}
     </div>
   );
 };
