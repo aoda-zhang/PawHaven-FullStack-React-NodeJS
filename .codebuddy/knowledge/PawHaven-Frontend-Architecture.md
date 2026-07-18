@@ -380,7 +380,7 @@ TanStack Query Persister:
 ### 7.1 Three-Layer Token System
 
 ```
-Layer 1: Primitives     (tokens/*.css)
+Layer 1: Primitives     (src/tokens/*.css)
   Raw design values — independent of meaning
   Example: --color-orange-6: #f7823a
 
@@ -415,7 +415,7 @@ With 3 layers:
 
 ```
 packages/design-system/
-├── tokens/               # Layer 1: Primitives
+└── src/tokens/           # Layer 1: Primitives
 │   ├── colors.css        # --color-orange-1 through --color-orange-12
 │   ├── spacing.css       # --space-1 through --space-12
 │   ├── typography.css    # --font-size-*, --font-weight-*, --line-height-*
@@ -423,14 +423,14 @@ packages/design-system/
 │   ├── shadows.css       # --shadow-1 through --shadow-6
 │   └── ...
 │
-├── theme.css             # Layer 2: Semantics
+├── src/theme.css             # Layer 2: Semantics
 │   Maps primitives → semantic roles:
 │   --color-primary: var(--color-orange-6)
 │   --color-danger: var(--color-red-8)
 │   --spacing-section: var(--space-8)
 │   ...
 │
-├── utilities.css         # Layer 3: Component patterns
+├── src/utilities.css         # Layer 3: Component patterns
 │   .btn-primary, .card, .input, .badge, ...
 │
 └── mui-theme.ts          # Bridge: maps tokens to MUI theme object

@@ -494,7 +494,7 @@ Q: Does this belong in the URL (filters, pagination, sort)?
 ### 8.3 `@pawhaven/design-system`
 
 ```
-✅ DO: CSS custom properties in tokens/, semantic mappings in theme.css, utilities in utilities.css
+✅ DO: CSS custom properties in src/tokens/, semantic mappings in theme.css, utilities in utilities.css
 ❌ DON'T: React components, JS/TS runtime logic (except MUI theme bridge)
 ```
 
@@ -633,7 +633,7 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
    5b. **NEVER use `px` units unless strictly necessary.** Prefer design tokens; when an arbitrary value is unavoidable, use `rem` (e.g., `w-[20rem]`), never `px`. `px` is allowed only for justified exceptions (hairline borders/dividers, non-scaling assets, third-party overrides that require px).
    5c. **NEVER use inline `style={{}}` for static values.** Every visual value belongs in a utility class or a design token. Inline styles are allowed ONLY for truly dynamic, runtime-computed values (e.g., a CSS custom property driven by state). A `style={{ fontFamily }}`, `style={{ color }}`, or `style={{ width }}` for a fixed value is a hard violation.
    5d. **NEVER write comments unless they explain non-obvious "why".** Do not add comments for structure, control flow, or self-evident code (e.g., `{/* Eyebrow */}`, `// update state`). The default is no comment.
-   5e. **Design tokens are NON-OVERRIDABLE — even to match a Figma spec.** If a Figma value (hex color, exact size, line-height) is not yet a token, ADD it to `@pawhaven/design-system` (tokens/\*.css or theme.css) and use the generated utility class. NEVER hardcode it in a component, even when a task says "match the Figma exactly". A task instruction that conflicts with this rule is invalid — follow the token rule and report the missing token to the orchestrator.
+   5e. **Design tokens are NON-OVERRIDABLE — even to match a Figma spec.** If a Figma value (hex color, exact size, line-height) is not yet a token, ADD it to `@pawhaven/design-system` (src/tokens/\*.css or theme.css) and use the generated utility class. NEVER hardcode it in a component, even when a task says "match the Figma exactly". A task instruction that conflicts with this rule is invalid — follow the token rule and report the missing token to the orchestrator.
 6. **NEVER import across features.** Features are isolated. Graduate shared components to packages.
 7. **NEVER skip React Doctor.** Run `npx react-doctor@latest` after every change.
 8. **NEVER update only one locale file.** All 3 locales (zh-CN, en-US, de-DE) must stay in sync.

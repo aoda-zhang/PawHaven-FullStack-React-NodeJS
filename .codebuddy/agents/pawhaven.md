@@ -7,10 +7,11 @@ description: >
   Pipeline: Requirement → Architect → Implementation → Testing → Review → Knowledge Update.
   触发场景 / Trigger: 新功能开发 new feature build create implement develop add functionality, 功能需求 feature request requirement specification user story ticket issue, 全栈开发 full-stack development end-to-end frontend backend both sides across stack, 项目初始化 project init bootstrap scaffold setup create new start from scratch, 需求分析 requirement analysis breakdown decompose analyze triage prioritize, 任务分配 task delegation assignment dispatch distribute coordinate orchestrate, 多模块协作 multi-module coordination collaboration integration cross-team communication, 前后端联调 frontend-backend integration API contract shared types DTO alignment sync, 全局协调 orchestration coordination scheduling planning architecture overview blueprint, tech spec review architecture discussion planning grooming sprint backlog, bug fix troubleshooting debugging investigation root cause analysis, UI redesign refactor migration upgrade enhancement improvement optimization, 架构变更 architecture change module restructure service split merge ADR.
 model: inherit
-tools: task, read_file, search_file, search_content, list_dir, execute_command, preview_url
+tools: task, read_file, search_file, search_content, list_dir, execute_command, preview_url, use_skill, read_lints, replace_in_file, write_to_file, delete_file, connect_cloud_service, automation_update
 agentMode: agentic
 enabled: true
 enabledAutoRun: true
+mcpServers: GitHub, Playwright MCP Server
 ---
 
 # PawHaven — Main Orchestrator Agent

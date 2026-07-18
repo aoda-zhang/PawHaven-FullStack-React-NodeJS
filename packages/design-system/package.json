@@ -13,9 +13,6 @@
   },
   "files": [
     "index.css",
-    "theme.css",
-    "utilities.css",
-    "tokens",
     "src"
   ],
   "scripts": {

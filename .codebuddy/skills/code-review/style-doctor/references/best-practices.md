@@ -8,7 +8,7 @@ Companion to `SKILL.MD`. Load when auditing styling against `@pawhaven/design-sy
 Need a visual value?
   ├─ 1. Custom utility in utilities.css?        → use it (btn-primary, card, input-field)
   ├─ 2. Semantic token in theme.css?            → use the class (bg-primary, text-muted)
-  ├─ 3. Primitive token in tokens/*.css?        → use standard class (p-4, rounded-lg)
+  ├─ 3. Primitive token in src/tokens/*.css?        → use standard class (p-4, rounded-lg)
   └─ 4. None exist                              → add a token first, then use it
 ```
 

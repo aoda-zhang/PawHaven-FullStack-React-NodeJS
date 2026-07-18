@@ -7,13 +7,13 @@ Companion to `SKILL.MD`. Load when writing or auditing any visual styling.
 ```
 1. Custom utility in utilities.css?  → use it
 2. Semantic token in theme.css?      → use the class (bg-primary, text-muted)
-3. Primitive token in tokens/*.css?  → use standard class (p-4, rounded-lg)
+3. Primitive token in src/tokens/*.css?  → use standard class (p-4, rounded-lg)
 4. None exist                        → add token to @pawhaven/design-system, then use it
 ```
 
 ## Token Structure & Ordering (MUST FOLLOW)
 
-When adding or modifying ANY token in `tokens/*.css`:
+When adding or modifying ANY token in `src/tokens/*.css`:
 
 1. **Numeric ascending** — every group sorted smallest → largest
 2. **Scale tokens first, semantic tokens after** — never intersperse

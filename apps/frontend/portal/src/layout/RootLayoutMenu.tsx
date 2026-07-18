@@ -32,7 +32,7 @@ export const RootLayoutMenu = ({
 
   return (
     <nav aria-label="Main navigation">
-      <div className="mx-auto flex h-16 max-w-6xl items-center px-30">
+      <div className="mx-auto flex h-10 max-w-6xl items-center px-30">
         <Brand navigate={navigate} />
 
         <div className="flex flex-1 justify-center">

@@ -176,7 +176,7 @@ Use the discovered paths throughout all search rules below.
 - **Pattern**: `(text|leading|font)-\{\[[0-9]+\\.?[0-9]*(rem|px|em)\]\}`
 - **File Types**: `*.tsx`
 - **Exclude**: `node_modules/`, `dist/`
-- **Explanation**: Arbitrary typographic values like `text-[4.25rem]`, `leading-[1.08]`, `text-[15px]`, `font-[550]` bypass the design-system type scale. Prefer the existing scale (`text-display`, `leading-display`, `text-sm`) or, if a value is genuinely needed and missing, ADD it as a token to `@pawhaven/design-system` (tokens/typography.css) and use the generated utility class. Flag all bracketed typographic values and recommend a token.
+- **Explanation**: Arbitrary typographic values like `text-[4.25rem]`, `leading-[1.08]`, `text-[15px]`, `font-[550]` bypass the design-system type scale. Prefer the existing scale (`text-display`, `leading-display`, `text-sm`) or, if a value is genuinely needed and missing, ADD it as a token to `@pawhaven/design-system` (src/tokens/typography.css) and use the generated utility class. Flag all bracketed typographic values and recommend a token.
 - **search_content invocation**:
   ```
   pattern: "(text|leading|font)-\\[[0-9]+\\.?[0-9]*(rem|px|em)\\]"

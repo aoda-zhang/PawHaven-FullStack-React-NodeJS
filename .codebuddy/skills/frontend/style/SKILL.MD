@@ -52,9 +52,12 @@ import { MUITheme } from '@pawhaven/design-system/theme';
 packages/design-system/
 ├── design-system.html  # Visual reference spec (all tokens, typography, layouts)
 ├── index.css           # CSS entry (tailwindcss + tokens + theme + utilities + base)
-├── theme.css           # Semantic token mappings (bg-primary, text-muted, etc.)
-├── utilities.css       # Custom @utility classes (btn-primary, card, input-field, etc.)
-├── tokens/             # Primitive CSS @theme blocks
+└── src/
+    ├── tokens.ts       # Typed token access (CSS var references + raw values)
+    ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
+    ├── theme.css       # Semantic token mappings (bg-primary, text-muted, etc.)
+    ├── utilities.css   # Custom @utility classes (btn-primary, card, input-field, etc.)
+    └── tokens/         # Primitive CSS @theme blocks
 │   ├── color.css       # 7 color scales: gray, orange, green, red, yellow, blue, brown
 │   ├── typography.css  # Fonts: Inter/Nunito (sans), Poppins (heading), Merriweather (serif)
 │   ├── spacing.css     # Spacing scale + container widths
@@ -66,10 +69,6 @@ packages/design-system/
 │   ├── opacity.css     # 0 → 100
 │   ├── sizing.css      # Width/height primitives
 │   └── z-index.css     # 0 → 50 + auto
-└── src/
-    ├── index.ts        # JS/TS barrel export
-    ├── tokens.ts       # Typed TS token references
-    └── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
 ```
 
 ---
@@ -149,7 +148,7 @@ Need a visual value?
   │     YES → Use the Tailwind utility class directly (bg-primary, text-muted,
   │            font-heading, shadow-card, duration-200, ease-standard, etc.)
   │
-  ├─ 3. Is there a primitive token in tokens/*.css?
+  ├─ 3. Is there a primitive token in src/tokens/*.css?
   │     YES → Use the standard Tailwind class (p-4, rounded-lg, text-xl, etc.)
   │
   └─ 4. None of the above exist
@@ -162,7 +161,7 @@ Need a visual value?
 
 ## Token Structure & Ordering Rules (ENFORCED)
 
-The `@theme {}` blocks in `tokens/*.css` follow strict structural rules.
+The `@theme {}` blocks in `src/tokens/*.css` follow strict structural rules.
 **Every new or modified token MUST obey them.** Adding a token out of order or with the wrong unit is a violation.
 
 ### Rule 1: Numeric ascending order — ALWAYS
@@ -265,31 +264,31 @@ ease-in → ease-out → ease-in-out → ease-standard → ease-decelerate → e
 
 ### Per-file reference
 
-**`tokens/typography.css`** — `@theme` block: font families (logical order). Font sizes: `xs → 6xl` ascending, then semantic `subtitle → stat → display` ascending. Line heights: `none → loose` ascending, then semantic `display` at end. Letter spacing: `tighter → widest` ascending. Font weights: `normal → extrabold` ascending.
+**`src/tokens/typography.css`** — `@theme` block: font families (logical order). Font sizes: `xs → 6xl` ascending, then semantic `subtitle → stat → display` ascending. Line heights: `none → loose` ascending, then semantic `display` at end. Letter spacing: `tighter → widest` ascending. Font weights: `normal → extrabold` ascending.
 
-**`tokens/color.css`** — Groups: `gray, orange, green, red, yellow, blue, brown`. Each: `name-1 → name-10` ascending.
+**`src/tokens/color.css`** — Groups: `gray, orange, green, red, yellow, blue, brown`. Each: `name-1 → name-10` ascending.
 
-**`tokens/spacing.css`** — Spacing: `px, 0, 1, 2, 3, 4, 5, 6, 8, 10, 12` ascending. Container: `sm, md, lg, xl, 2xl` ascending.
+**`src/tokens/spacing.css`** — Spacing: `px, 0, 1, 2, 3, 4, 5, 6, 8, 10, 12` ascending. Container: `sm, md, lg, xl, 2xl` ascending.
 
-**`tokens/radius.css`** — `xs → 3xl` ascending, then `full` (keyword at end).
+**`src/tokens/radius.css`** — `xs → 3xl` ascending, then `full` (keyword at end).
 
-**`tokens/shadow.css`** — Colors: `shadow-light → shadow-dark` ascending opacity, then `shadow-inner` at end. Shadows: `xs → xl` ascending, then `inner, none` at end.
+**`src/tokens/shadow.css`** — Colors: `shadow-light → shadow-dark` ascending opacity, then `shadow-inner` at end. Shadows: `xs → xl` ascending, then `inner, none` at end.
 
-**`tokens/motion.css`** — Duration: `75 → 1000` ascending. Easing: logical order.
+**`src/tokens/motion.css`** — Duration: `75 → 1000` ascending. Easing: logical order.
 
-**`tokens/border.css`** — `0 → 8` ascending.
+**`src/tokens/border.css`** — `0 → 8` ascending.
 
-**`tokens/breakpoint.css`** — `xs → 2xl` ascending.
+**`src/tokens/breakpoint.css`** — `xs → 2xl` ascending.
 
-**`tokens/opacity.css`** — `0 → 100` ascending.
+**`src/tokens/opacity.css`** — `0 → 100` ascending.
 
-**`tokens/sizing.css`** — `0 → 24` ascending, then `full, min, max, fit` keywords at end.
+**`src/tokens/sizing.css`** — `0 → 24` ascending, then `full, min, max, fit` keywords at end.
 
-**`tokens/z-index.css`** — `0 → 50` ascending, then `auto` keyword at end.
+**`src/tokens/z-index.css`** — `0 → 50` ascending, then `auto` keyword at end.
 
 ### When adding a new token
 
-1. Choose the correct `tokens/*.css` file
+1. Choose the correct `src/tokens/*.css` file
 2. Place it in the correct position (scale before semantic, numeric ascending, keywords at end)
 3. Use the correct unit per Rule 8
 4. If semantic, also add mapping in `theme.css`
@@ -397,7 +396,7 @@ font-[550]
 
 ## 5. Spacing — Use the spacing scale
 
-Primitive spacing scale from `tokens/spacing.css`:
+Primitive spacing scale from `src/tokens/spacing.css`:
 
 | Token | Value          |
 | ----- | -------------- |
@@ -839,7 +838,7 @@ function App() {
 }
 ```
 
-The MUI theme reads CSS variables at runtime. Changing a token in `tokens/color.css` updates both Tailwind and MUI automatically.
+The MUI theme reads CSS variables at runtime. Changing a token in `src/tokens/color.css` updates both Tailwind and MUI automatically.
 
 ---
 
@@ -847,7 +846,7 @@ The MUI theme reads CSS variables at runtime. Changing a token in `tokens/color.
 
 If a new visual value is truly needed and is not already in the design system:
 
-1. Add it to the appropriate `tokens/*.css` file
+1. Add it to the appropriate `src/tokens/*.css` file
 2. If it's a semantic mapping, add it to `theme.css`
 3. Add the corresponding TS reference in `src/tokens.ts`
 4. Re-export from `src/index.ts` if needed

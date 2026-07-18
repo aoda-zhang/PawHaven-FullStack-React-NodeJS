@@ -20,25 +20,25 @@ import { MUITheme } from '@pawhaven/design-system/theme';
 ```
 packages/design-system/
 ├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
-├── theme.css           # Semantic token mappings
-├── utilities.css       # Custom Tailwind @utility classes
-├── tokens/             # Primitive design tokens (CSS @theme blocks)
-│   ├── index.css       # Barrel import
-│   ├── color.css       # Color scales (gray, orange, green, red, yellow, blue, brown)
-│   ├── typography.css  # Font families, sizes, weights, line heights, letter spacing
-│   ├── spacing.css     # Spacing scale + container widths
-│   ├── border.css      # Border widths
-│   ├── radius.css      # Border radius scale
-│   ├── shadow.css      # Shadow primitives + shadow colors
-│   ├── motion.css      # Durations + easing curves
-│   ├── breakpoint.css  # Responsive breakpoints
-│   ├── opacity.css     # Opacity scale
-│   ├── sizing.css      # Width/height primitives
-│   └── z-index.css     # Z-index primitives
-├── src/                # TypeScript source
+├── src/                # TypeScript + CSS source
 │   ├── index.ts        # JS/TS entry point
 │   ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
-│   └── tokens.ts       # Typed token access (CSS var references + raw values)
+│   ├── tokens.ts       # Typed token access (CSS var references + raw values)
+│   ├── theme.css       # Semantic token mappings (bg-primary, text-muted, etc.)
+│   ├── utilities.css   # Custom Tailwind @utility classes (btn-primary, card, etc.)
+│   └── tokens/         # Primitive design tokens (CSS @theme blocks)
+│       ├── index.css   # Barrel import
+│       ├── color.css   # Color scales (gray, orange, green, red, yellow, blue, brown)
+│       ├── typography.css  # Font families, sizes, weights, line heights, letter spacing
+│       ├── spacing.css     # Spacing scale + container widths
+│       ├── border.css      # Border widths
+│       ├── radius.css      # Border radius scale
+│       ├── shadow.css      # Shadow primitives + shadow colors
+│       ├── motion.css      # Durations + easing curves
+│       ├── breakpoint.css  # Responsive breakpoints
+│       ├── opacity.css     # Opacity scale
+│       ├── sizing.css      # Width/height primitives
+│       └── z-index.css     # Z-index primitives
 └── package.json
 ```
 
@@ -116,7 +116,7 @@ function App() {
 }
 ```
 
-The MUI theme reads CSS variables at runtime, so changing a token in `tokens/color.css` updates both Tailwind and MUI automatically.
+The MUI theme reads CSS variables at runtime, so changing a token in `src/tokens/color.css` updates both Tailwind and MUI automatically.
 
 ### Token Reference
 
