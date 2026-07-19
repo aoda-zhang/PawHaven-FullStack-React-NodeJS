@@ -6,7 +6,27 @@
 
    Note: text-balance, text-pretty, and sr-only are Tailwind v4
    built-ins — use those directly instead of custom utilities.
+
+   Typography utilities are declared explicitly below. The standard size
+   steps (`text-xs`…`text-6xl`) are owned by Tailwind v4's `--text-*` namespace;
+   the only non-default step we add (`text-body`) lives as a `--text-body` theme
+   token in theme.css. Only *composite* typography utilities — those that bundle
+   size + family + weight + line-height into one class — remain here.
    ============================================================ */
+
+@utility text-hero {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-bold);
+}
+
+@utility text-stat {
+  font-size: var(--text-stat);
+  line-height: var(--leading-none);
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-bold);
+}
 
 /* ═══ Flex Utilities ════════════════════════════════════════ */
 

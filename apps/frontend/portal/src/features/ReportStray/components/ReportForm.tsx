@@ -78,7 +78,7 @@ export const ReportForm = ({ onSubmit, isSubmitting }: ReportFormProps) => {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="space-y-6 rounded-lg bg-white p-6 shadow-md"
+        className="bg-surface space-y-6 p-6 shadow-md"
       >
         <FormSection title={t('reportStray.animal_basic_info')}>
           <FormRadio

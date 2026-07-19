@@ -26,7 +26,7 @@ export const Register = () => {
           {t('auth.sighup')}
         </h1>
         <p className="text-text-secondary mt-1 text-sm leading-6">
-          {t('auth.registerSubtitle')}
+          {t('auth.register_subtitle')}
         </p>
 
         <FormProvider {...formProps}>

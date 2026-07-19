@@ -104,17 +104,26 @@ export const color = {
   primaryActive: 'var(--color-primary-active)',
   primaryLight: 'var(--color-primary-light)',
   primarySubtle: 'var(--color-primary-subtle)',
+  primaryFg: 'var(--color-primary-fg)',
   secondary: 'var(--color-secondary)',
   secondaryHover: 'var(--color-secondary-hover)',
   secondaryLight: 'var(--color-secondary-light)',
   surface: 'var(--color-surface)',
-  surfaceElevated: 'var(--color-surface-elevated)',
-  surfaceHover: 'var(--color-surface-hover)',
-  surfaceDark: 'var(--color-surface-dark)',
   background: 'var(--color-background)',
   backgroundSubtle: 'var(--color-background-subtle)',
+  foreground: 'var(--color-foreground)',
+  card: 'var(--color-card)',
+  accent: 'var(--color-accent)',
   muted: 'var(--color-muted)',
   mutedStrong: 'var(--color-muted-strong)',
+  heroBg: 'var(--color-hero-bg)',
+  navBg: 'var(--color-nav-bg)',
+  darkText: 'var(--color-dark-text)',
+  bodyText: 'var(--color-body-text)',
+  statLabels: 'var(--color-stat-labels)',
+  divider: 'var(--color-divider)',
+  footerText: 'var(--color-footer-text)',
+  footerMuted: 'var(--color-footer-muted)',
   text: 'var(--color-text)',
   textSecondary: 'var(--color-text-secondary)',
   textTertiary: 'var(--color-text-tertiary)',
@@ -218,6 +227,13 @@ export const typography = {
   fontSize6xl: 'var(--font-size-6xl)',
 } as const;
 
+export const text = {
+  display: 'var(--text-display)',
+  stat: 'var(--text-stat)',
+  body: 'var(--text-body)',
+  caption: 'var(--text-caption)',
+} as const;
+
 /* ── Type-safe CSS var helper ──────────────────────────────── */
 
 /**
@@ -242,3 +258,4 @@ export type ShadowToken = keyof typeof shadow;
 export type DurationToken = keyof typeof duration;
 export type EasingToken = keyof typeof easing;
 export type TypographyToken = keyof typeof typography;
+export type TextToken = keyof typeof text;

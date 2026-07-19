@@ -51,25 +51,25 @@
     "login": "Log in",
     "auth": "Sign in / Sign up",
     "sighup": "Sign up",
-    "loginSubtitle": "Welcome back. Sign in to continue with your PawHaven account.",
-    "registerSubtitle": "Create an account to record and support more stray-animal rescues.",
-    "securityNotice": "Use a secure email and a strong password to protect your account and rescue data.",
-    "learnMore": "Learn more",
-    "helpTitle": "Need help?",
-    "helpGuideTitle": "View the rescue guide",
-    "helpGuideDesc": "Learn how to help stray animals safely.",
-    "helpHomeTitle": "Browse recent rescue updates",
-    "helpHomeDesc": "Take a quick look at the latest rescue activity on the platform.",
-    "promoTitle": "One account connects rescue records, guides, and community.",
-    "promoDesc": "After signing in, you will get menu and page access that matches your current user state.",
-    "supportGuide": "Rescue guide",
-    "supportHome": "Back to home",
+    "login_subtitle": "Welcome back. Sign in to continue with your PawHaven account.",
+    "register_subtitle": "Create an account to record and support more stray-animal rescues.",
+    "security_notice": "Use a secure email and a strong password to protect your account and rescue data.",
+    "learn_more": "Learn more",
+    "help_title": "Need help?",
+    "help_guide_title": "View the rescue guide",
+    "help_guide_desc": "Learn how to help stray animals safely.",
+    "help_home_title": "Browse recent rescue updates",
+    "help_home_desc": "Take a quick look at the latest rescue activity on the platform.",
+    "promo_title": "One account connects rescue records, guides, and community.",
+    "promo_desc": "After signing in, you will get menu and page access that matches your current user state.",
+    "support_guide": "Rescue guide",
+    "support_home": "Back to home",
     "or": "Or",
-    "continueWithGoogle": "Continue with Google",
-    "continueWithGithub": "Continue with GitHub",
-    "createAccountWithEmail": "Create account with email",
-    "loginWithEmail": "Log in with email",
-    "newUser": "register",
+    "continue_with_google": "Continue with Google",
+    "continue_with_github": "Continue with GitHub",
+    "create_account_with_email": "Create account with email",
+    "login_with_email": "Log in with email",
+    "new_user": "register",
     "email": "Email",
     "password": "Password",
     "email_required": "Email is required",
@@ -192,35 +192,35 @@
     "columns": {
       "platform": {
         "heading": "Platform",
-        "browseRescues": "Browse Rescues",
-        "reportStray": "Report a Stray",
-        "adoptAnimal": "Adopt an Animal",
+        "browse_rescues": "Browse Rescues",
+        "report_stray": "Report a Stray",
+        "adopt_animal": "Adopt an Animal",
         "volunteer": "Volunteer"
       },
       "resources": {
         "heading": "Resources",
-        "knowledgeBase": "Knowledge Base",
-        "rescueStories": "Rescue Stories",
-        "emergencyGuide": "Emergency Guide"
+        "knowledge_base": "Knowledge Base",
+        "rescue_stories": "Rescue Stories",
+        "emergency_guide": "Emergency Guide"
       },
       "community": {
         "heading": "Community",
-        "volunteerNetwork": "Volunteer Network",
-        "partnerShelters": "Partner Shelters",
-        "shareStory": "Share a Story"
+        "volunteer_network": "Volunteer Network",
+        "partner_shelters": "Partner Shelters",
+        "share_story": "Share a Story"
       },
       "company": {
         "heading": "Company",
-        "aboutPawHaven": "About PawHaven",
-        "openSource": "Open Source",
-        "privacyPolicy": "Privacy Policy",
-        "termsOfService": "Terms of Service"
+        "about_pawhaven": "About PawHaven",
+        "open_source": "Open Source",
+        "privacy_policy": "Privacy Policy",
+        "terms_of_service": "Terms of Service"
       }
     },
-    "brandDescription": "A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.",
+    "brand_description": "A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.",
     "stats": {
-      "animalsRescued": "Animals rescued",
-      "activeVolunteers": "Active volunteers",
+      "animals_rescued": "Animals rescued",
+      "active_volunteers": "Active volunteers",
       "adopted": "Adopted"
     },
     "social": {
@@ -228,10 +228,10 @@
       "twitter": "Twitter",
       "email": "Email"
     },
-    "bottomBar": {
+    "bottom_bar": {
       "license": "Open source — MIT License.",
-      "systemsOperational": "All systems operational",
-      "builtWith": "Built with ❤️ for every stray life"
+      "systems_operational": "All systems operational",
+      "built_with": "Built with ❤️ for every stray life"
     }
   },
   "errorMessage": {

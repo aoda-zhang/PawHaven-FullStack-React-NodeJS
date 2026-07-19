@@ -51,24 +51,24 @@
     "login": "登录",
     "auth": "登录 / 注册",
     "sighup": "注册",
-    "loginSubtitle": "欢迎回来，请使用你的 PawHaven 账户继续。",
-    "registerSubtitle": "创建账户，开始记录和帮助更多流浪动物。",
-    "securityNotice": "请使用安全邮箱和强密码登录，保护你的账户与救助数据。",
-    "learnMore": "了解更多",
-    "helpTitle": "需要协助？",
-    "helpGuideTitle": "查看救助指南",
-    "helpGuideDesc": "了解如何安全地帮助流浪动物。",
-    "helpHomeTitle": "浏览近期救助动态",
-    "helpHomeDesc": "快速查看平台上的最新救助内容。",
-    "promoTitle": "一个账户，即可连接救助记录、指南与社区。",
-    "promoDesc": "登录后即可获得更贴合当前用户状态的菜单和页面体验。",
-    "supportGuide": "救助指南",
-    "supportHome": "返回首页",
+    "login_subtitle": "欢迎回来，请使用你的 PawHaven 账户继续。",
+    "register_subtitle": "创建账户，开始记录和帮助更多流浪动物。",
+    "security_notice": "请使用安全邮箱和强密码登录，保护你的账户与救助数据。",
+    "learn_more": "了解更多",
+    "help_title": "需要协助？",
+    "help_guide_title": "查看救助指南",
+    "help_guide_desc": "了解如何安全地帮助流浪动物。",
+    "help_home_title": "浏览近期救助动态",
+    "help_home_desc": "快速查看平台上的最新救助内容。",
+    "promo_title": "一个账户，即可连接救助记录、指南与社区。",
+    "promo_desc": "登录后即可获得更贴合当前用户状态的菜单和页面体验。",
+    "support_guide": "救助指南",
+    "support_home": "返回首页",
     "or": "或",
-    "continueWithGoogle": "使用 Google 继续",
-    "continueWithGithub": "使用 GitHub 继续",
-    "createAccountWithEmail": "使用邮箱创建账号",
-    "loginWithEmail": "使用邮箱登录",
+    "continue_with_google": "使用 Google 继续",
+    "continue_with_github": "使用 GitHub 继续",
+    "create_account_with_email": "使用邮箱创建账号",
+    "login_with_email": "使用邮箱登录",
     "welcome": "让爱不再流浪",
     "email": "邮箱",
     "password": "密码",
@@ -192,35 +192,35 @@
     "columns": {
       "platform": {
         "heading": "平台",
-        "browseRescues": "浏览救助",
-        "reportStray": "上报流浪动物",
-        "adoptAnimal": "领养动物",
+        "browse_rescues": "浏览救助",
+        "report_stray": "上报流浪动物",
+        "adopt_animal": "领养动物",
         "volunteer": "成为志愿者"
       },
       "resources": {
         "heading": "资源",
-        "knowledgeBase": "知识库",
-        "rescueStories": "救助故事",
-        "emergencyGuide": "紧急指南"
+        "knowledge_base": "知识库",
+        "rescue_stories": "救助故事",
+        "emergency_guide": "紧急指南"
       },
       "community": {
         "heading": "社区",
-        "volunteerNetwork": "志愿者网络",
-        "partnerShelters": "合作收容所",
-        "shareStory": "分享故事"
+        "volunteer_network": "志愿者网络",
+        "partner_shelters": "合作收容所",
+        "share_story": "分享故事"
       },
       "company": {
         "heading": "关于",
-        "aboutPawHaven": "关于 PawHaven",
-        "openSource": "开源",
-        "privacyPolicy": "隐私政策",
-        "termsOfService": "服务条款"
+        "about_pawhaven": "关于 PawHaven",
+        "open_source": "开源",
+        "privacy_policy": "隐私政策",
+        "terms_of_service": "服务条款"
       }
     },
-    "brandDescription": "一个连接上报者、救助者和领养者的协作平台——从第一次发现到永远的归宿。",
+    "brand_description": "一个连接上报者、救助者和领养者的协作平台——从第一次发现到永远的归宿。",
     "stats": {
-      "animalsRescued": "已救助动物",
-      "activeVolunteers": "活跃志愿者",
+      "animals_rescued": "已救助动物",
+      "active_volunteers": "活跃志愿者",
       "adopted": "已领养"
     },
     "social": {
@@ -228,10 +228,10 @@
       "twitter": "Twitter",
       "email": "Email"
     },
-    "bottomBar": {
+    "bottom_bar": {
       "license": "开源项目——MIT 许可证。",
-      "systemsOperational": "所有系统正常运行",
-      "builtWith": "用 ❤️ 为每一个流浪生命而建"
+      "systems_operational": "所有系统正常运行",
+      "built_with": "用 ❤️ 为每一个流浪生命而建"
     }
   },
   "errorMessage": {

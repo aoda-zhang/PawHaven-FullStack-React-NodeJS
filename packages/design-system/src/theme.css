@@ -1,10 +1,12 @@
 /* ============================================================
-   Theme — Single semantic mapping layer
+   Theme — Design tokens & semantic mapping layer
    ============================================================
-   Maps semantic names to primitive tokens.
-   Use these in components: bg-primary, text-primary, etc.
+   Defines primitive theme tokens (typography, spacing, radius,
+   shadows) and maps semantic names to them.
+   Use these in components: bg-primary, text-primary, text-display, etc.
 
    Categories:
+   - Typography: families, sizes, line-heights, letter-spacing, weights
    - Colors: primary, secondary, surfaces, text, borders, status
    - Layout: spacing aliases, z-index, radius, shadows
    ============================================================ */
@@ -16,6 +18,7 @@
   --color-primary-active: var(--color-orange-8);
   --color-primary-light: var(--color-orange-1);
   --color-primary-subtle: var(--color-orange-2);
+  --color-primary-fg: var(--color-gray-1);
 
   /* ═══ Secondary ══════════════════════════════════════════════ */
   --color-secondary: var(--color-green-6);
@@ -24,14 +27,13 @@
   --color-secondary-light: var(--color-green-1);
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
-  --color-surface: var(--color-gray-1);
-  --color-surface-elevated: var(--color-gray-1);
-  --color-surface-hover: var(--color-brown-2);
-  --color-surface-active: var(--color-brown-3);
-  --color-surface-dark: var(--color-gray-9);
-  --color-background: var(--color-brown-4);
+  --color-background: var(--color-gray-2); /* #f7f7f5 — page background */
+  --color-foreground: var(--color-gray-10); /* #1c1c1c — main text, headings */
+  --color-muted: var(--color-gray-3); /* #f3f3f1 — secondary bg, inactive */
+  --color-accent: var(--color-brown-2); /* #fff4ee — highlights, light pills */
+  --color-card: var(--color-gray-1); /* #ffffff — card surfaces */
+  --color-surface: var(--color-gray-1); /* alias of card */
   --color-background-subtle: var(--color-brown-3);
-  --color-muted: var(--color-brown-2);
   --color-muted-strong: var(--color-brown-4);
 
   /* ═══ Text ═════════════════════════════════════════════ */
@@ -49,6 +51,24 @@
   --color-border-strong: var(--color-gray-7);
   --color-border-focus: var(--color-primary);
   --color-border-error: var(--color-red-6);
+  --color-divider: var(--color-brown-6); /* #d4c4b4 — hero stats divider */
+
+  /* ═══ Text on Dark Surfaces ═════════════════════════════ */
+  --color-hero-bg: var(--color-brown-3); /* #f5ede3 — warm beige hero */
+  --color-nav-bg: color-mix(
+    in srgb,
+    var(--color-brown-1) 88%,
+    transparent
+  ); /* frosted nav */
+  --color-dark-text: var(
+    --color-gray-10
+  ); /* #1c1a17 — hero headline, dark buttons */
+  --color-body-text: var(--color-brown-9); /* #6b6258 — hero/body copy */
+  --color-stat-labels: var(--color-brown-8); /* #9e8e82 — stat captions */
+  --color-footer-text: var(--color-brown-6); /* #d3c3b3 — footer links */
+  --color-footer-muted: var(
+    --color-brown-8
+  ); /* #8f7b69 — footer muted labels */
 
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6);
@@ -57,6 +77,7 @@
   --color-success-light: var(--color-green-2);
   --color-warning: var(--color-yellow-6);
   --color-warning-light: var(--color-yellow-2);
+  --color-warning-hover: var(--color-yellow-7);
   --color-info: var(--color-blue-6);
   --color-info-light: var(--color-blue-2);
 
@@ -95,5 +116,9 @@
   --shadow-dropdown: var(--shadow-md);
   --shadow-modal: var(--shadow-lg);
   --shadow-toast: var(--shadow-xl);
-}
 
+  --text-display: var(--font-size-5xl);
+  --text-stat: var(--font-size-3xl);
+  --text-body: var(--font-size-base);
+  --text-caption: var(--font-size-xs);
+}

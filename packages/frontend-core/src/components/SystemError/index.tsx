@@ -109,7 +109,7 @@ export const SystemError = ({ footer }: SystemErrorProps) => {
             variant="contained"
             onClick={retry}
             startIcon={<RotateCw size={18} />}
-            className="bg-primary rounded-xl px-8 py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-[#d97706]"
+            className="bg-primary text-text-inverse hover:bg-primary-active rounded-xl px-8 py-3 text-base font-semibold transition-all duration-300"
           >
             {t('common.retry', 'Try Again')}
           </Button>
@@ -117,7 +117,7 @@ export const SystemError = ({ footer }: SystemErrorProps) => {
             variant="outlined"
             onClick={handleGoHome}
             startIcon={<Home size={18} />}
-            className="rounded-xl border-[#f59e0b] px-8 py-3 text-base font-semibold text-[#f59e0b] transition-all duration-300 hover:bg-[#f59e0b]/10"
+            className="border-warning text-warning hover:bg-warning/10 rounded-xl px-8 py-3 text-base font-semibold transition-all duration-300"
           >
             {t('common.go_to_home', 'Go Home')}
           </Button>

@@ -3,7 +3,6 @@
    ============================================================ */
 
 @import './color.css';
-@import './typography.css';
 @import './spacing.css';
 @import './border.css';
 @import './radius.css';
@@ -13,3 +12,4 @@
 @import './opacity.css';
 @import './sizing.css';
 @import './z-index.css';
+@import './typography.css';

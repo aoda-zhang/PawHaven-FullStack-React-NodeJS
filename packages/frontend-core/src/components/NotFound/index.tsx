@@ -113,7 +113,7 @@ export const NotFound = ({ error, isStableEnv, footer }: NotFoundProps) => {
           variant="contained"
           onClick={goToHome}
           startIcon={<Home size={18} />}
-          className="!rounded-xl !bg-[#f59e0b] !px-8 !py-3 !text-base !font-semibold !text-white !transition-all !duration-300 hover:!bg-[#d97706]"
+          className="!bg-warning !text-text-inverse hover:!bg-warning-hover !rounded-xl !px-8 !py-3 !text-base !font-semibold !transition-all !duration-300"
         >
           {t('common.go_to_home', 'Go to Home')}
         </Button>

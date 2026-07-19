@@ -20,4 +20,8 @@
   --size-min: min-content;
   --size-max: max-content;
   --size-fit: fit-content;
+  --size-95: 23.75rem; /* 380px — hero subtitle max-width (Figma) */
+  --size-130: 32.5rem; /* 520px — hero min-height / image height (Figma) */
+  --width-54: 54%; /* hero text column (Figma) */
+  --width-46: 46%; /* hero image column (Figma) */
 }

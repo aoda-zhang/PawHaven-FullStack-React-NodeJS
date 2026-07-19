@@ -118,7 +118,7 @@ const showErrorToast = (
     position: notificationOption?.position ?? 'top-center',
     className:
       notificationOption?.className ??
-      'bg-red-600 text-white rounded-lg shadow-lg max-w-2xl',
+      'bg-error text-text-inverse rounded-lg shadow-lg max-w-2xl',
     ...(() => {
       if (!notificationOption) return {};
       const { duration, position, className, ...rest } = notificationOption;

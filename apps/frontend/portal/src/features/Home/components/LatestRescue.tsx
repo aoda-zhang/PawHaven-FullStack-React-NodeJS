@@ -26,7 +26,7 @@ const RescueItem = ({
   return (
     <Link
       to={`/rescue/detail/${animalID}`}
-      className="border-border mb-4 flex cursor-pointer flex-col gap-1 rounded-md border-1 bg-white p-4"
+      className="border-border bg-surface mb-4 flex cursor-pointer flex-col gap-1 rounded-md border-1 p-4"
     >
       <img src={img} alt={name} className="mb-3 h-3/4 w-full rounded-md" />
       <p className="text-primary text-xl">{name}</p>
@@ -37,7 +37,7 @@ const RescueItem = ({
       <p className="text-text-secondary">{description}</p>
       <div
         className={clsx([
-          'rounded-full py-2 text-center text-white',
+          'text-text-inverse rounded-full py-2 text-center',
           getStatusColorByPrefix({ status, prefix: 'bg' }),
         ])}
       >
@@ -48,7 +48,7 @@ const RescueItem = ({
 };
 
 const RescueItemSkeleton = () => (
-  <div className="border-border mb-4 rounded-md border-1 bg-white p-4">
+  <div className="border-border bg-surface mb-4 rounded-md border-1 p-4">
     <Skeleton
       variant="rounded"
       width="100%"
@@ -94,7 +94,7 @@ export const LatestRescue = () => {
           <span>{t('common.view_all')}</span>
           <ArrowRight
             size="1.875rem"
-            className="bg-primary rounded-full text-white"
+            className="bg-primary text-text-inverse rounded-full"
           />
         </Link>
       </div>
