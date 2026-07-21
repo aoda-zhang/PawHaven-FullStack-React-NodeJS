@@ -25,14 +25,15 @@
 
 ### Core Principles
 
-| #   | Principle                              | What It Means                                                                                        |
-| --- | -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| P1  | **Feature-based, not layer-based**     | All code for a business capability (components, API calls, hooks, types) co-locates in one folder.   |
-| P2  | **Features are isolated**              | No cross-feature imports. Features communicate through the routing layer only.                       |
-| P3  | **Packages are the shared foundation** | Reusable code graduates into versioned packages. Packages have strict dependency direction.          |
-| P4  | **App layer orchestrates, not owns**   | The app shell provides providers, routing, and layout. Business logic belongs in features.           |
-| P5  | **One schema, two contexts**           | Zod schemas in `@pawhaven/shared` validate frontend forms AND backend DTOs — single source of truth. |
-| P6  | **CSS token layers enable rebranding** | Design tokens flow primitives → semantics → utilities. Change one file to rebrand.                   |
+| #   | Principle                                      | What It Means                                                                                                                                                                                                                                                                   |
+| --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | **Feature-based, not layer-based**             | All code for a business capability (components, API calls, hooks, types) co-locates in one folder.                                                                                                                                                                              |
+| P2  | **Features are isolated**                      | No cross-feature imports. Features communicate through the routing layer only.                                                                                                                                                                                                  |
+| P3  | **Packages are the shared foundation**         | Reusable code graduates into versioned packages. Packages have strict dependency direction.                                                                                                                                                                                     |
+| P4  | **App layer orchestrates, not owns**           | The app shell provides providers, routing, and layout. Business logic belongs in features.                                                                                                                                                                                      |
+| P5  | **One schema, two contexts**                   | Zod schemas in `@pawhaven/shared` validate frontend forms AND backend DTOs — single source of truth.                                                                                                                                                                            |
+| P6  | **CSS token layers enable rebranding**         | Design tokens flow primitives → semantics → utilities. Change one file to rebrand.                                                                                                                                                                                              |
+| P7  | **Figma is the single source of truth for UI** | Every feature's visual design originates from `packages/design-system/figma/src/app/App.tsx`. Before implementing any feature UI, read the relevant sections of this file. The knowledge doc `figma-design-spec.md` is a convenience reference — the App.tsx code is canonical. |
 
 ### The Graduation Rule
 
@@ -169,7 +170,7 @@ apps/frontend/admin   ──depends on──►  ALL packages above
 | Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                                                                      | Must NOT Contain                                        |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                                                              | React, NestJS, Prisma, Node APIs. Must work in browser. |
-| `@pawhaven/design-system` | Design tokens decoupled from components. Rebrand by changing one CSS file.                                           | CSS custom properties (tokens), theme.css, utilities.css, MUI theme.                                                                                                                          | React components, JS runtime. CSS-only.                 |
+| `@pawhaven/design-system` | Design tokens + canonical Figma source of truth.                                                                     | CSS custom properties (tokens), theme.css, utilities.css, MUI theme, `figma/src/app/App.tsx` (canonical design — all feature UIs MUST reference this).                                        | React components, JS runtime. CSS-only.                 |
 | `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                                                            | Business logic, feature-specific translations.          |
 | `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback. | Feature-specific business logic.                        |
 | `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                                                                     | API calls, auth checks, business logic, domain types.   |
@@ -376,6 +377,8 @@ TanStack Query Persister:
 ---
 
 ## 7. Design Token Architecture
+
+> The canonical Figma design source is `packages/design-system/figma/src/app/App.tsx`. All tokens, colors, layout dimensions, and component structures are derived from this file. When implementing any feature, start by reading the relevant sections of App.tsx.
 
 ### 7.1 Three-Layer Token System
 

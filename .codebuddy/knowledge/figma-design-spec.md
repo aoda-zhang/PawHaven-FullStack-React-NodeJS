@@ -1,6 +1,9 @@
 # PawHaven Figma Design Specification
 
-> Source: [pawhaven.figma.site](https://pawhaven.figma.site)
+> **CANONICAL SOURCE**: `packages/design-system/figma/src/app/App.tsx`
+>
+> All design decisions — colors, layout dimensions, typography, spacing, icons, copy, and component structure — MUST be verified against this file. This document is a convenience reference and MAY be outdated. When there is any discrepancy, the App.tsx code wins.
+>
 > Analyzed: 2025-04-04
 
 ---
