@@ -5,7 +5,7 @@ import type { NavigateFunction } from 'react-router-dom';
 
 import { MENU_CLASSES, type MenuClassKey } from '../menuClasses';
 
-import { useLogout } from '@/features/Auth/apis/queries';
+import { useLogout } from '@/features/Auth/api/auth.mutations';
 import { routePaths } from '@/router/routePaths';
 import { useGlobalState } from '@/store/globalReducer';
 

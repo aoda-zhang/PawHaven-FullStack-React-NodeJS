@@ -170,7 +170,11 @@ ls -d apps/frontend/portal/src/features/*/
 For each feature, check:
 - Has `index.tsx` (entry point)?
 - Has `types.ts` (feature types)?
-- Has `apis/` directory with `queries.ts` + `requests.ts`/`mutations.ts`?
+- Has `api/` directory with `<module>.api.ts` + `<module>.queryKeys.ts`, plus `queries.ts` / `mutations.ts` ONLY when a relevant hook exists?
+- `queries.ts` (if present) only exports `useQuery` hooks (GET requests) — no `useMutation`?
+- `mutations.ts` (if present) only exports `useMutation` hooks (POST/PUT/PATCH/DELETE) — no `useQuery`?
+- No duplication between `queries.ts` and `mutations.ts`?
+- No empty `queries.ts` / `mutations.ts` (no `export {};` placeholders)?
 - Components are in `components/` subdirectory (not at feature root)?
 - No business logic in generic `src/components/`?
 

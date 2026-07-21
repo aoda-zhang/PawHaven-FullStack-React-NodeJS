@@ -86,9 +86,7 @@
     "rescue": "Melden",
     "report": "Tier melden",
     "hero_aria_label": "PawHaven Hero-Bereich",
-    "hero_headline_prefix": "Jedes Streunerleben",
-    "hero_headline_highlight": "verdient es",
-    "hero_headline_suffix": "gesehen zu werden.",
+    "hero_headline": "Jedes Streunerleben<highlight> verdient es </highlight>gesehen zu werden.",
     "hero_subtitle": "Von der ersten Sichtung bis zum sicheren Zuhause — PawHaven verwandelt verstreute Hilferufe in eine transparente Rettungskette.",
     "hero_report_cta": "Streuner jetzt melden",
     "hero_adopt_cta": "Adoptierbare Tiere treffen",
@@ -188,6 +186,37 @@
     "download_guide": "Laden Sie die Details des Rettungsleitfadens herunter",
     "download_failed": "Download fehlgeschlagen. Bitte versuchen Sie es erneut."
   },
+  "rescue_cases": {
+    "section_title": "Rettungsfälle",
+    "section_subtitle": "Verfolgen und unterstützen Sie laufende Rettungseinsätze in Ihrer Nähe",
+    "pending_count": "{{count}} ausstehend",
+    "in_progress_count": "{{count}} in Bearbeitung",
+    "filter_all": "Alle Fälle",
+    "view_list": "Liste",
+    "view_map": "Karte",
+    "no_cases_found": "Keine Rettungsfälle gefunden",
+    "urgency_high": "Dringend",
+    "urgency_normal": "Normal",
+    "animal_cat": "Katze",
+    "animal_dog": "Hund",
+    "volunteer_rescues_count": "{{count}} Rettungen",
+    "back_to_cases": "Zurück zu allen Fällen",
+    "case_not_found": "Fall nicht gefunden",
+    "what_reported": "Was wurde gemeldet",
+    "info_animal": "Tier",
+    "info_reporter": "Melder",
+    "info_reported": "Gemeldet",
+    "info_distance": "Entfernung",
+    "claim_rescue": "Rettung übernehmen",
+    "provide_transport": "Transport anbieten",
+    "map_aria_label": "Karte der Rettungsfälle",
+    "map_legend_urgent": "Dringend",
+    "map_legend_other": "Andere",
+    "timeline_status_reported": "Gemeldet",
+    "timeline_status_rescue_assigned": "Rettung zugewiesen",
+    "timeline_status_rescue_started": "Rettung gestartet",
+    "timeline_status_rescued": "Gerettet"
+  },
   "footer": {
     "columns": {
       "platform": {
@@ -200,7 +229,6 @@
       "resources": {
         "heading": "Ressourcen",
         "knowledge_base": "Wissensdatenbank",
-        "medication_library": "Medikamentenbibliothek",
         "rescue_stories": "Rettungsgeschichten",
         "emergency_guide": "Notfallleitfaden"
       },

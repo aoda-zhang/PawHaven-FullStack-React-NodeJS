@@ -610,12 +610,12 @@ this.logger.log({
 
 ### ADR-006: Feature-Based Frontend Modules
 
-| Field            | Detail                                                                                                           |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **Status**       | Accepted                                                                                                         |
-| **Context**      | 7 product modules need clear frontend organization.                                                              |
-| **Decision**     | `features/{module}/` with apis/, components/, hooks/, types.ts, index.tsx per feature. No cross-feature imports. |
-| **Consequences** | Clear ownership, independent development, easier code splitting. Lint rules enforce feature isolation.           |
+| Field            | Detail                                                                                                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                          |
+| **Context**      | 7 product modules need clear frontend organization.                                                                                                                                               |
+| **Decision**     | `features/{module}/` with api/<module>.api.ts, <module>.queries.ts, <module>.queryKeys.ts, <module>.mutations.ts, components/, hooks/, types.ts, index.tsx per feature. No cross-feature imports. |
+| **Consequences** | Clear ownership, independent development, easier code splitting. Lint rules enforce feature isolation.                                                                                            |
 
 ---
 

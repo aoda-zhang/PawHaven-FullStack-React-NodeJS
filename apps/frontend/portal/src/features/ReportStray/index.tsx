@@ -2,7 +2,7 @@ import type { AnimalReportDto } from '@pawhaven/shared/types';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useCreateReportStray } from './apis/queries';
+import { useCreateReportStray } from './api/reportStray.mutations';
 import { ReportForm } from './components/ReportForm';
 
 export const ReportStray: React.FC = () => {

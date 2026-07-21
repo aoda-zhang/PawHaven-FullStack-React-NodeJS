@@ -386,12 +386,13 @@ Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover 
 5. **For complex full-stack features, ALWAYS consider the architect first.** Architect analyzes requirements, defines design, then frontend and backend implement against that design.
 6. **ALWAYS do frontend first for full-stack features** — backend finalizes the API contracts that frontend drafts.
 7. **ALWAYS pass frontend contracts to backend** when dispatching a full-stack feature.
-8. **ALWAYS run testing after implementation completes**, before code review.
-9. **ALWAYS trigger code-review after testing passes.**
-10. **ALWAYS check if knowledge docs need updating** when architecture changes or new ADRs are created.
-11. **NEVER modify `.codebuddy/agents/` or `.codebuddy/knowledge/` directly.** Use `knowledge-update` agent.
-12. **NEVER parallelize features with cross-dependencies.** Default to sequential.
-13. **NEVER read domain-specific docs** (Frontend-Architecture, Backend-Architecture, figma-design-spec). Subagents own those.
-14. **ALWAYS verify final state with typecheck + lint before declaring done.**
-15. **NEVER ask the user for design files, Figma JSON exports, or screenshots.** When a task references Figma or a design, trust that the frontend agent will read `figma-design-spec.md` on its own. Just classify and dispatch.
-16. **NEVER advance a pipeline stage without a Step Completion Checklist from the subagent.** Each subagent must prove its internal steps ran (see STEP 5b). A missing or skipped-step report means re-dispatch, not proceed. No stage may be silently skipped.
+8. **Do NOT write test files unless explicitly requested by the user.**
+9. **Figma mock data belongs in each feature's own `mockData.ts` file.** NEVER put mock data in the design-system package; each feature owns its demo data under `src/features/<FeatureName>/mockData.ts`. This will be removed when real API integration happens.
+10. **ALWAYS trigger code-review after testing passes.**
+11. **ALWAYS check if knowledge docs need updating** when architecture changes or new ADRs are created.
+12. **NEVER modify `.codebuddy/agents/` or `.codebuddy/knowledge/` directly.** Use `knowledge-update` agent.
+13. **NEVER parallelize features with cross-dependencies.** Default to sequential.
+14. **NEVER read domain-specific docs** (Frontend-Architecture, Backend-Architecture, figma-design-spec). Subagents own those.
+15. **ALWAYS verify final state with typecheck + lint before declaring done.**
+16. **NEVER ask the user for design files, Figma JSON exports, or screenshots.** When a task references Figma or a design, trust that the frontend agent will read `figma-design-spec.md` on its own. Just classify and dispatch.
+17. **NEVER advance a pipeline stage without a Step Completion Checklist from the subagent.** Each subagent must prove its internal steps ran (see STEP 5b). A missing or skipped-step report means re-dispatch, not proceed. No stage may be silently skipped.

@@ -86,9 +86,7 @@
     "rescue": " 救助",
     "report": "上报",
     "hero_aria_label": "PawHaven 主页主视觉",
-    "hero_headline_prefix": "每一只流浪的生命",
-    "hero_headline_highlight": "都值得",
-    "hero_headline_suffix": "被看见。",
+    "hero_headline": "每个流浪生命<highlight>都值得</highlight>被看见",
     "hero_subtitle": "从第一次发现到永远的归宿——PawHaven 把零散的求助声汇聚成一条透明可见的救助链路。",
     "hero_report_cta": "立即上报流浪动物",
     "hero_adopt_cta": "认识待领养的毛孩子",
@@ -188,6 +186,37 @@
     "download_guide": "下载救助指南详情",
     "download_failed": "下载失败，请重试"
   },
+  "rescue_cases": {
+    "section_title": "救助案例",
+    "section_subtitle": "追踪并支持您所在区域的救援行动",
+    "pending_count": "{{count}} 待处理",
+    "in_progress_count": "{{count}} 进行中",
+    "filter_all": "全部案例",
+    "view_list": "列表",
+    "view_map": "地图",
+    "no_cases_found": "未找到救助案例",
+    "urgency_high": "紧急",
+    "urgency_normal": "普通",
+    "animal_cat": "猫",
+    "animal_dog": "狗",
+    "volunteer_rescues_count": "{{count}} 次救助",
+    "back_to_cases": "返回全部案例",
+    "case_not_found": "未找到该案例",
+    "what_reported": "上报信息",
+    "info_animal": "动物",
+    "info_reporter": "上报人",
+    "info_reported": "上报时间",
+    "info_distance": "距离",
+    "claim_rescue": "认领救助",
+    "provide_transport": "提供运输",
+    "map_aria_label": "救助案例地图",
+    "map_legend_urgent": "紧急",
+    "map_legend_other": "其他",
+    "timeline_status_reported": "已上报",
+    "timeline_status_rescue_assigned": "已分配救援",
+    "timeline_status_rescue_started": "救援开始",
+    "timeline_status_rescued": "已救出"
+  },
   "footer": {
     "columns": {
       "platform": {
@@ -200,7 +229,6 @@
       "resources": {
         "heading": "资源",
         "knowledge_base": "知识库",
-        "medication_library": "药物库",
         "rescue_stories": "救助故事",
         "emergency_guide": "紧急指南"
       },

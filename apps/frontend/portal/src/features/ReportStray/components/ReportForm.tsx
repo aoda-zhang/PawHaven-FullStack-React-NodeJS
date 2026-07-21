@@ -11,6 +11,7 @@ import {
 } from '@pawhaven/ui';
 import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 import { ageOptions, animalTypeOptions, statusOptions } from '../constants';
 
@@ -33,6 +34,7 @@ interface ReportFormProps {
 
 export const ReportForm = ({ onSubmit, isSubmitting }: ReportFormProps) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const defaultValues: AnimalReportDto = {
     animalType: 'cat',
@@ -197,11 +199,7 @@ export const ReportForm = ({ onSubmit, isSubmitting }: ReportFormProps) => {
         </FormSection>
 
         <div className="mt-8 flex justify-end gap-4">
-          <Button
-            variant="outlined"
-            onClick={() => window.history.back()}
-            size="medium"
-          >
+          <Button variant="outlined" onClick={() => navigate(-1)} size="medium">
             {t('common.cancel')}
           </Button>
           <Button

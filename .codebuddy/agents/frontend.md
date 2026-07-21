@@ -88,9 +88,11 @@ packages/
 ```
 FeatureName/
 ├── index.tsx          # Public entry — only file importable by router
-├── apis/              # TanStack Query hooks + Axios request functions
-│   ├── queries.ts     # useQuery hooks
-│   └── requests.ts    # Raw API call functions (or mutations.ts for writes)
+├── api/               # <name>.api.ts + <name>.queries.ts + <name>.queryKeys.ts + <name>.mutations.ts
+│   ├── <name>.api.ts      # Raw API request functions
+│   ├── <name>.queries.ts  # useQuery hooks
+│   ├── <name>.queryKeys.ts # Query key factories
+│   └── <name>.mutations.ts # useMutation hooks
 ├── components/        # Feature-private components
 ├── hooks/             # Feature-private hooks
 ├── types.ts           # Feature-specific TypeScript types
@@ -104,7 +106,7 @@ FeatureName/
 ```
 ✅ CORRECT:
   features/ReportStray/components/ReportForm.tsx   # Business logic in feature
-  features/ReportStray/apis/queries.ts              # API calls in feature
+  features/ReportStray/api/reportStray.mutations.ts    # API mutations in feature
   features/ReportStray/types.ts                     # Types in feature
   features/ReportStray/hooks/useReportValidation.ts # Custom hooks in feature
 
@@ -352,8 +354,8 @@ connect to backend APIs."
 │ Files to create:                                     │
 │  - features/LoveStories/index.tsx (entry + route)    │
 │  - features/LoveStories/types.ts                     │
-│  - features/LoveStories/apis/queries.ts              │
-│  - features/LoveStories/apis/mutations.ts            │
+│  - features/LoveStories/api/loveStories.queries.ts    │
+│  - features/LoveStories/api/loveStories.mutations.ts  │
 │  - features/LoveStories/components/StoryList.tsx     │
 │  - features/LoveStories/components/StoryCard.tsx     │
 │  - features/LoveStories/components/StoryDetail.tsx   │
@@ -382,7 +384,7 @@ connect to backend APIs."
 │                                                     │
 │ Create files in order:                               │
 │  1. types.ts (feature-specific types)                │
-│  2. apis/queries.ts + mutations.ts (data layer)      │
+│  2. api/<feature>.queries.ts + <feature>.mutations.ts + <feature>.queryKeys.ts + <feature>.api.ts (data layer)     │
 │  3. components/ (from leaf to root)                  │
 │  4. index.tsx (feature entry + route)                │
 │  5. i18n locale files (all 3 languages)              │
@@ -572,16 +574,28 @@ export { NewFeaturePage };
 ### 10.2 Adding API Queries
 
 ```ts
-// features/NewFeature/apis/queries.ts
-import { useQuery } from '@tanstack/react-query';
-import { httpClient } from '@pawhaven/frontend-core';
+// features/NewFeature/api/newFeature.api.ts
+import { apiClient } from '@/utils/apiClient';
 import type { NewFeatureItem } from '@pawhaven/shared';
+
+export const getNewFeatureList = (params: {
+  page: number;
+  search?: string;
+}) => {
+  return apiClient.get<NewFeatureItem[]>('/api/new-feature', { params });
+};
+```
+
+```ts
+// features/NewFeature/api/newFeature.queries.ts
+import { useQuery } from '@tanstack/react-query';
+import { getNewFeatureList } from './newFeature.api';
+import { newFeatureQueryKeys } from './newFeature.queryKeys';
 
 export function useNewFeatureList(params: { page: number; search?: string }) {
   return useQuery({
-    queryKey: ['newFeature', 'list', params],
-    queryFn: () =>
-      httpClient.get<NewFeatureItem[]>('/api/new-feature', { params }),
+    queryKey: newFeatureQueryKeys.list(params),
+    queryFn: () => getNewFeatureList(params),
   });
 }
 ```

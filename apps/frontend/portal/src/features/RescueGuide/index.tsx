@@ -4,7 +4,7 @@ import { showToast } from '@pawhaven/ui';
 import { ArrowDownToLine } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { getRescueGuideDocs } from './apis/request';
+import { getRescueGuideDocs } from './api/rescueGuide.api';
 import { StepCard } from './components/StepCard';
 
 export const RescueGuide = () => {

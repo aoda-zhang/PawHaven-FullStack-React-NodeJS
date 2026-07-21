@@ -50,7 +50,7 @@ flowchart LR
 ```tsx
 // apps/frontend/portal/src/router/AppRouterProvider.tsx
 import { RequireAuth } from '@/components/RequireAuth';
-import { useCurrentUser } from '@/features/Auth/apis/queries';
+import { useCurrentUser } from '@/features/Auth/api/auth.queries';
 
 const createRouteElement = (route: RouterEle): ReactNode => {
   const page = routerElementMapping[route.element];

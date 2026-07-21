@@ -25,14 +25,15 @@
 
 ### Core Principles
 
-| #   | Principle                              | What It Means                                                                                        |
-| --- | -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| P1  | **Feature-based, not layer-based**     | All code for a business capability (components, API calls, hooks, types) co-locates in one folder.   |
-| P2  | **Features are isolated**              | No cross-feature imports. Features communicate through the routing layer only.                       |
-| P3  | **Packages are the shared foundation** | Reusable code graduates into versioned packages. Packages have strict dependency direction.          |
-| P4  | **App layer orchestrates, not owns**   | The app shell provides providers, routing, and layout. Business logic belongs in features.           |
-| P5  | **One schema, two contexts**           | Zod schemas in `@pawhaven/shared` validate frontend forms AND backend DTOs — single source of truth. |
-| P6  | **CSS token layers enable rebranding** | Design tokens flow primitives → semantics → utilities. Change one file to rebrand.                   |
+| #   | Principle                                      | What It Means                                                                                                                                                                                                                                                                   |
+| --- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | **Feature-based, not layer-based**             | All code for a business capability (components, API calls, hooks, types) co-locates in one folder.                                                                                                                                                                              |
+| P2  | **Features are isolated**                      | No cross-feature imports. Features communicate through the routing layer only.                                                                                                                                                                                                  |
+| P3  | **Packages are the shared foundation**         | Reusable code graduates into versioned packages. Packages have strict dependency direction.                                                                                                                                                                                     |
+| P4  | **App layer orchestrates, not owns**           | The app shell provides providers, routing, and layout. Business logic belongs in features.                                                                                                                                                                                      |
+| P5  | **One schema, two contexts**                   | Zod schemas in `@pawhaven/shared` validate frontend forms AND backend DTOs — single source of truth.                                                                                                                                                                            |
+| P6  | **CSS token layers enable rebranding**         | Design tokens flow primitives → semantics → utilities. Change one file to rebrand.                                                                                                                                                                                              |
+| P7  | **Figma is the single source of truth for UI** | Every feature's visual design originates from `packages/design-system/figma/src/app/App.tsx`. Before implementing any feature UI, read the relevant sections of this file. The knowledge doc `figma-design-spec.md` is a convenience reference — the App.tsx code is canonical. |
 
 ### The Graduation Rule
 
@@ -44,7 +45,7 @@
 
 There is NO `apps/*/src/components/` layer — if a component is shared, it belongs in a package.
 
-When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/apis/queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
+When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/api/auth.queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
 
 ---
 
@@ -69,7 +70,7 @@ Feature-based organization flips this:
 features/
 ├── Landing/          # App bootstrap — runs first, fetches menus + routes
 │   ├── index.tsx
-│   ├── apis/
+│   ├── api/
 │   ├── components/
 │   └── types.ts
 │
@@ -89,9 +90,11 @@ Each feature contains:
 ```
 FeatureName/
 ├── index.tsx          # Public entry — only this is importable by the router
-├── apis/              # React Query hooks + request functions
-│   ├── queries.ts
-│   └── mutations.ts
+├── api/               # feature.api.ts + feature.queries.ts + feature.queryKeys.ts + feature.mutations.ts
+│   ├── <name>.api.ts
+│   ├── <name>.queries.ts
+│   ├── <name>.queryKeys.ts
+│   └── <name>.mutations.ts
 ├── components/        # Feature-private components
 ├── hooks/             # Feature-private hooks
 └── types.ts           # Feature-specific types
@@ -106,7 +109,7 @@ FeatureName/
 
 ❌ FORBIDDEN:
   Feature A → Feature B (any import)
-  Feature → Another feature's apis/, components/, hooks/, types.ts
+  Feature → Another feature's api/, components/, hooks/, types.ts
 
 Enforcement: ESLint import/no-restricted-paths
   "features/*" → cannot import from "features/*" (except self)
@@ -169,7 +172,7 @@ apps/frontend/admin   ──depends on──►  ALL packages above
 | Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                                                                      | Must NOT Contain                                        |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                                                              | React, NestJS, Prisma, Node APIs. Must work in browser. |
-| `@pawhaven/design-system` | Design tokens decoupled from components. Rebrand by changing one CSS file.                                           | CSS custom properties (tokens), theme.css, utilities.css, MUI theme.                                                                                                                          | React components, JS runtime. CSS-only.                 |
+| `@pawhaven/design-system` | Design tokens + canonical Figma source of truth.                                                                     | CSS custom properties (tokens), theme.css, utilities.css, MUI theme, `figma/src/app/App.tsx` (canonical design — all feature UIs MUST reference this).                                        | React components, JS runtime. CSS-only.                 |
 | `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                                                            | Business logic, feature-specific translations.          |
 | `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback. | Feature-specific business logic.                        |
 | `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                                                                     | API calls, auth checks, business logic, domain types.   |
@@ -298,9 +301,14 @@ routerElementMapping.tsx — static map of page keys → React components
 ✅ Route-to-component mapping is the ONLY legal cross-feature reference
 ✅ All routes go through AppRouterProvider — no manual <Route> in features
 ✅ Lazy-loaded features use React.lazy + SuspenseWrapper from @pawhaven/ui
+✅ All internal navigation uses React Router (`useNavigate().navigate(path)` / `<Link>` / `<Navigate>`)
+✅ External links use a real anchor (`<a href="https://...">`) or `window.open`
 
 ❌ Features do NOT import from other features' index.tsx
 ❌ Features do NOT reference other features' route paths
+❌ Features do NOT use `window.history.pushState` / `window.history.replaceState` for internal navigation
+❌ Features do NOT use `window.history.back()` / `window.history.forward()` for internal navigation (use `navigate(-1)` / `navigate(1)`)
+❌ Features do NOT use `window.location.href = ...` / `window.location.assign(...)` for internal navigation
 ```
 
 ---
@@ -376,6 +384,8 @@ TanStack Query Persister:
 ---
 
 ## 7. Design Token Architecture
+
+> The canonical Figma design source is `packages/design-system/figma/src/app/App.tsx`. All tokens, colors, layout dimensions, and component structures are derived from this file. When implementing any feature, start by reading the relevant sections of App.tsx.
 
 ### 7.1 Three-Layer Token System
 

@@ -13,7 +13,9 @@ enabled: true
 
 ## 0. Language — English Only
 
-All documentation and comments MUST be written in English. This includes:
+**ALL assistant responses MUST be in English.** This includes chat replies, code explanations, reasoning, and any communication with the user. Regardless of the language of the user's query, you must reply in English.
+
+All documentation and comments MUST also be written in English. This includes:
 
 - **Markdown files** (`.md`): SKILL.MD, README, architecture docs, agent definitions, knowledge base
 - **Code comments**: inline comments (`//`, `/* */`), JSDoc/TSDoc, block headers
