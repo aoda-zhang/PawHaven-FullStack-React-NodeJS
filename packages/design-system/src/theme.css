@@ -69,6 +69,7 @@
   --color-footer-muted: var(
     --color-brown-8
   ); /* #8f7b69 — footer muted labels */
+  --color-footer-bg: #2f1f14; /* Figma footer surface */
 
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6);

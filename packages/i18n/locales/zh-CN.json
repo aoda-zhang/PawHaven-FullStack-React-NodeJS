@@ -200,6 +200,7 @@
       "resources": {
         "heading": "资源",
         "knowledge_base": "知识库",
+        "medication_library": "药物库",
         "rescue_stories": "救助故事",
         "emergency_guide": "紧急指南"
       },
@@ -218,6 +219,10 @@
       }
     },
     "brand_description": "一个连接上报者、救助者和领养者的协作平台——从第一次发现到永远的归宿。",
+    "cta_title": "看到流浪动物？你可以帮忙。",
+    "cta_description": "在 PawHaven 上花 60 秒上报，就能让训练有素的志愿者行动起来。你不需要任何特殊技能——只需要一部手机。",
+    "cta_button": "上报流浪动物",
+    "cta_button_secondary": "成为志愿者",
     "stats": {
       "animals_rescued": "已救助动物",
       "active_volunteers": "活跃志愿者",
@@ -225,8 +230,8 @@
     },
     "social": {
       "github": "GitHub",
-      "twitter": "Twitter",
-      "email": "Email"
+      "email": "Email",
+      "instagram": "Instagram"
     },
     "bottom_bar": {
       "license": "开源项目——MIT 许可证。",

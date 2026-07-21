@@ -25,3 +25,4 @@ packages/i18n
 libs/tsconfig
 libs/eslint-config
 **/config/**
+packages/design-system/figma

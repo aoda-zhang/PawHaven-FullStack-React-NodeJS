@@ -200,6 +200,7 @@
       "resources": {
         "heading": "Ressourcen",
         "knowledge_base": "Wissensdatenbank",
+        "medication_library": "Medikamentenbibliothek",
         "rescue_stories": "Rettungsgeschichten",
         "emergency_guide": "Notfallleitfaden"
       },
@@ -218,6 +219,10 @@
       }
     },
     "brand_description": "Eine Plattform, die Melder, Retter und Adoptierende verbindet — von der ersten Sichtung bis zum sicheren Zuhause.",
+    "cta_title": "Streunendes Tier gesehen? Du kannst helfen.",
+    "cta_description": "Eine 60-sekündige Meldung auf PawHaven setzt ausgebildete Freiwillige in Bewegung. Du brauchst keine besonderen Fähigkeiten — nur ein Handy.",
+    "cta_button": "Streuner melden",
+    "cta_button_secondary": "Freiwillig werden",
     "stats": {
       "animals_rescued": "Gerettete Tiere",
       "active_volunteers": "Aktive Freiwillige",
@@ -225,8 +230,8 @@
     },
     "social": {
       "github": "GitHub",
-      "twitter": "Twitter",
-      "email": "E-Mail"
+      "email": "E-Mail",
+      "instagram": "Instagram"
     },
     "bottom_bar": {
       "license": "Open Source — MIT-Lizenz.",

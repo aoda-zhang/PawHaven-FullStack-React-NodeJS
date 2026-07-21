@@ -200,6 +200,7 @@
       "resources": {
         "heading": "Resources",
         "knowledge_base": "Knowledge Base",
+        "medication_library": "Medication Library",
         "rescue_stories": "Rescue Stories",
         "emergency_guide": "Emergency Guide"
       },
@@ -218,6 +219,10 @@
       }
     },
     "brand_description": "A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.",
+    "cta_title": "See a stray animal? You can help.",
+    "cta_description": "A 60-second report on PawHaven puts trained volunteers in motion. You don't need any special skills — just a phone.",
+    "cta_button": "Report a Stray",
+    "cta_button_secondary": "Become a Volunteer",
     "stats": {
       "animals_rescued": "Animals rescued",
       "active_volunteers": "Active volunteers",
@@ -225,8 +230,8 @@
     },
     "social": {
       "github": "GitHub",
-      "twitter": "Twitter",
-      "email": "Email"
+      "email": "Email",
+      "instagram": "Instagram"
     },
     "bottom_bar": {
       "license": "Open source — MIT License.",

@@ -20,7 +20,7 @@ export const Hero = () => {
       <div className="flex w-full flex-col lg:w-54">
         <h1 className="text-dark-text text-hero">
           {t('home.hero_headline_prefix')}
-          <em className="text-primary not-italic">
+          <em className="text-primary mx-2 not-italic">
             {t('home.hero_headline_highlight')}
           </em>
           {t('home.hero_headline_suffix')}
