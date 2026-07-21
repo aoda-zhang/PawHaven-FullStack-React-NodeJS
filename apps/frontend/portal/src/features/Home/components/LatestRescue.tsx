@@ -5,7 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-import { useFetchLatestRescuesByNumber } from '../apis/queries';
+import { useFetchLatestRescuesByNumber } from '../api/home.queries';
 import type { RescueItemType } from '../types';
 
 import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';

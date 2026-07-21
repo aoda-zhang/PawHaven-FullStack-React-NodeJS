@@ -86,9 +86,7 @@
     "rescue": " 救助",
     "report": "上报",
     "hero_aria_label": "PawHaven 主页主视觉",
-    "hero_headline_prefix": "每一只流浪的生命",
-    "hero_headline_highlight": "都值得",
-    "hero_headline_suffix": "被看见。",
+    "hero_headline": "每个流浪生命<highlight>都值得</highlight>被看见",
     "hero_subtitle": "从第一次发现到永远的归宿——PawHaven 把零散的求助声汇聚成一条透明可见的救助链路。",
     "hero_report_cta": "立即上报流浪动物",
     "hero_adopt_cta": "认识待领养的毛孩子",
@@ -200,7 +198,6 @@
       "resources": {
         "heading": "资源",
         "knowledge_base": "知识库",
-        "medication_library": "药物库",
         "rescue_stories": "救助故事",
         "emergency_guide": "紧急指南"
       },

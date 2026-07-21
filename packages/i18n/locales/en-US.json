@@ -86,9 +86,7 @@
     "rescue": "Rescue",
     "report": "Report",
     "hero_aria_label": "PawHaven hero",
-    "hero_headline_prefix": "Every stray life",
-    "hero_headline_highlight": "deserves",
-    "hero_headline_suffix": "to be seen.",
+    "hero_headline": "Every stray life<highlight> deserves </highlight>to be seen.",
     "hero_subtitle": "From the first sighting to a forever home — PawHaven turns scattered cries for help into one transparent rescue pipeline.",
     "hero_report_cta": "Report a stray now",
     "hero_adopt_cta": "Meet adoptable pets",
@@ -200,7 +198,6 @@
       "resources": {
         "heading": "Resources",
         "knowledge_base": "Knowledge Base",
-        "medication_library": "Medication Library",
         "rescue_stories": "Rescue Stories",
         "emergency_guide": "Emergency Guide"
       },

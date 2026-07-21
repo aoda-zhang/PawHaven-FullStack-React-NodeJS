@@ -6,7 +6,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useLogin } from '../apis/queries';
+import { useLogin } from '../api/auth.mutations';
 import { AuthLayout } from '../authLayout';
 
 import { routePaths } from '@/router/routePaths';

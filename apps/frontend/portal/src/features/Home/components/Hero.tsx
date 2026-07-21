@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 const STATS = [
@@ -9,7 +9,7 @@ const STATS = [
 ] as const;
 
 export const Hero = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -19,11 +19,13 @@ export const Hero = () => {
     >
       <div className="flex w-full flex-col lg:w-54">
         <h1 className="text-dark-text text-hero">
-          {t('home.hero_headline_prefix')}
-          <em className="text-primary mx-2 not-italic">
-            {t('home.hero_headline_highlight')}
-          </em>
-          {t('home.hero_headline_suffix')}
+          <Trans
+            i18nKey="home.hero_headline"
+            key={i18n.language}
+            components={{
+              highlight: <em className="text-primary not-italic" />,
+            }}
+          />
         </h1>
 
         <p className="text-body-text text-body mt-4 max-w-95">

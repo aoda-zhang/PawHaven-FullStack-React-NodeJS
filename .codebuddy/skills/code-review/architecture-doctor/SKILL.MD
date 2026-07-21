@@ -170,7 +170,7 @@ ls -d apps/frontend/portal/src/features/*/
 For each feature, check:
 - Has `index.tsx` (entry point)?
 - Has `types.ts` (feature types)?
-- Has `apis/` directory with `queries.ts` + `requests.ts`/`mutations.ts`?
+- Has `api/` directory with `<module>.api.ts` + `<module>.queries.ts` + `<module>.queryKeys.ts` + `<module>.mutations.ts`?
 - Components are in `components/` subdirectory (not at feature root)?
 - No business logic in generic `src/components/`?
 

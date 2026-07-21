@@ -28,10 +28,6 @@ export const RootLayoutFooter = () => {
           label: t('footer.columns.resources.knowledge_base'),
           to: '/knowledge',
         },
-        {
-          label: t('footer.columns.resources.medication_library'),
-          to: '/medication',
-        },
         { label: t('footer.columns.resources.rescue_stories'), to: '/stories' },
         {
           label: t('footer.columns.resources.emergency_guide'),

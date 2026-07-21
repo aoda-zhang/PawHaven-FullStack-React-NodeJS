@@ -2,7 +2,7 @@ import { SystemError } from '@pawhaven/frontend-core';
 import { Loading } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 
-import { useGetAppBootstrap } from './apis/queries';
+import { useGetAppBootstrap } from './api/landing.queries';
 import type { LandingDataType } from './landingContext';
 import { LandingContext } from './landingContext';
 

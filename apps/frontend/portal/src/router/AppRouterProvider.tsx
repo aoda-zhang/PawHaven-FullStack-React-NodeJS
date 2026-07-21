@@ -6,7 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { routerElementMapping } from './routerElementMapping';
 
-import { useCurrentUser } from '@/features/Auth/apis/queries';
+import { useCurrentUser } from '@/features/Auth/api/auth.queries';
 import { useLandingContext } from '@/features/Landing/landingContext';
 import { routePaths } from '@/router/routePaths';
 import type { RouterEle } from '@/types/LayoutType';

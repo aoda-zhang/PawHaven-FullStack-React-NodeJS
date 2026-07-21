@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 
-import { useFetchAnimalDetail } from './apis/queries';
+import { useFetchAnimalDetail } from './api/rescueDetail.queries';
 import { AnimalBasicInfo } from './components/AnimalBasicInfo';
 import { RescueTimeline } from './components/RescueTimeline';
 import type { RescueUpdate } from './types';

@@ -86,9 +86,7 @@
     "rescue": "Melden",
     "report": "Tier melden",
     "hero_aria_label": "PawHaven Hero-Bereich",
-    "hero_headline_prefix": "Jedes Streunerleben",
-    "hero_headline_highlight": "verdient es",
-    "hero_headline_suffix": "gesehen zu werden.",
+    "hero_headline": "Jedes Streunerleben<highlight> verdient es </highlight>gesehen zu werden.",
     "hero_subtitle": "Von der ersten Sichtung bis zum sicheren Zuhause — PawHaven verwandelt verstreute Hilferufe in eine transparente Rettungskette.",
     "hero_report_cta": "Streuner jetzt melden",
     "hero_adopt_cta": "Adoptierbare Tiere treffen",
@@ -200,7 +198,6 @@
       "resources": {
         "heading": "Ressourcen",
         "knowledge_base": "Wissensdatenbank",
-        "medication_library": "Medikamentenbibliothek",
         "rescue_stories": "Rettungsgeschichten",
         "emergency_guide": "Notfallleitfaden"
       },

@@ -42,7 +42,7 @@ ALLOWED:
   Feature A → @pawhaven/i18n (translation)
 
 FORBIDDEN (enforced by ESLint):
-  Feature A → Feature B's internal files (components/, hooks/, apis/)
+  Feature A → Feature B's internal files (components/, hooks/, api/)
   Feature A → Feature B's index.tsx (direct component import)
 ```
 

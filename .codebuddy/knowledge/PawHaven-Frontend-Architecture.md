@@ -45,7 +45,7 @@
 
 There is NO `apps/*/src/components/` layer — if a component is shared, it belongs in a package.
 
-When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/apis/queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
+When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/api/auth.queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
 
 ---
 
@@ -70,7 +70,7 @@ Feature-based organization flips this:
 features/
 ├── Landing/          # App bootstrap — runs first, fetches menus + routes
 │   ├── index.tsx
-│   ├── apis/
+│   ├── api/
 │   ├── components/
 │   └── types.ts
 │
@@ -90,9 +90,11 @@ Each feature contains:
 ```
 FeatureName/
 ├── index.tsx          # Public entry — only this is importable by the router
-├── apis/              # React Query hooks + request functions
-│   ├── queries.ts
-│   └── mutations.ts
+├── api/               # feature.api.ts + feature.queries.ts + feature.queryKeys.ts + feature.mutations.ts
+│   ├── <name>.api.ts
+│   ├── <name>.queries.ts
+│   ├── <name>.queryKeys.ts
+│   └── <name>.mutations.ts
 ├── components/        # Feature-private components
 ├── hooks/             # Feature-private hooks
 └── types.ts           # Feature-specific types
@@ -107,7 +109,7 @@ FeatureName/
 
 ❌ FORBIDDEN:
   Feature A → Feature B (any import)
-  Feature → Another feature's apis/, components/, hooks/, types.ts
+  Feature → Another feature's api/, components/, hooks/, types.ts
 
 Enforcement: ESLint import/no-restricted-paths
   "features/*" → cannot import from "features/*" (except self)
