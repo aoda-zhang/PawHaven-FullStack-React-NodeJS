@@ -92,3 +92,10 @@ Each sub-skill is a true CodeBuddy skill and can be:
 - Loaded individually via `use_skill("code-review/react-doctor")`
 - Combined on demand — load only the sub-skills needed
 - Parallel-loaded by the main agent for full reviews
+
+## Related
+
+- Gate: [figma-doctor](./figma-doctor/SKILL.MD)
+- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [style-doctor](./style-doctor/SKILL.MD) · [boundary-doctor](./boundary-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD) · [backend-doctor](./backend-doctor/SKILL.MD)
+- Architecture deep review: [architecture-doctor](./architecture-doctor/SKILL.MD)
+- Frontend skills: [react](../frontend/react/SKILL.MD) · [styling](../frontend/style/SKILL.MD) · [i18n](../frontend/i18n/SKILL.MD)

@@ -90,11 +90,48 @@ FeatureName/
 ├── index.tsx          # Public entry — only file importable by router
 ├── apis/              # TanStack Query hooks + Axios request functions
 │   ├── queries.ts     # useQuery hooks
-│   └── mutations.ts   # useMutation hooks
+│   └── requests.ts    # Raw API call functions (or mutations.ts for writes)
 ├── components/        # Feature-private components
 ├── hooks/             # Feature-private hooks
-└── types.ts           # Feature-specific TypeScript types
+├── types.ts           # Feature-specific TypeScript types
+└── utils/             # Feature-private utilities (optional)
 ```
+
+### 2.2b Feature-Based Architecture Principles
+
+**CRITICAL: Business logic MUST live inside features, never in generic components.**
+
+```
+✅ CORRECT:
+  features/ReportStray/components/ReportForm.tsx   # Business logic in feature
+  features/ReportStray/apis/queries.ts              # API calls in feature
+  features/ReportStray/types.ts                     # Types in feature
+  features/ReportStray/hooks/useReportValidation.ts # Custom hooks in feature
+
+❌ WRONG:
+  components/ReportForm.tsx        # Business logic in generic components/
+  hooks/useReportSubmission.ts     # Feature-specific hook in global hooks/
+  utils/reportHelpers.ts           # Feature-specific util in global utils/
+  lib/reportApi.ts                 # Feature API code in lib/
+```
+
+**What belongs where:**
+
+| Location                  | Purpose                                                       | Examples                                                  |
+| ------------------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
+| `features/<Name>/`        | Feature-specific business logic, API calls, types, components | `ReportForm.tsx`, `useRescueCases()`, `RescueStatusBadge` |
+| `src/components/`         | App-shell components only                                     | `Brand`, `NotFound`, `RequireAuth`, `RouterErrorFallback` |
+| `src/hooks/`              | App-wide shared hooks only                                    | `reduxHooks.ts`, `useIsStableEnv.ts`                      |
+| `src/layout/`             | Root layout (header, sidebar, footer)                         | `RootLayoutFooter`, `RootLayoutSidebar`                   |
+| `src/providers/`          | App providers (query, store, i18n)                            | `QueryProvider`, `StoreProvider`                          |
+| `src/store/`              | Redux store (global client state only)                        | `globalReducer`, `reduxStore`                             |
+| `src/router/`             | Route configuration and component registry                    | `AppRouterProvider`, `routerElementMapping`               |
+| `src/types/`              | App-wide type definitions                                     | `AnimalType.ts`, `LayoutType.ts`                          |
+| `src/config/`             | Environment configuration                                     | `config.schema.ts`, YAML env files                        |
+| `src/utils/`              | App-wide utilities (API client, helpers)                      | `apiClient.ts`                                            |
+| `@pawhaven/ui`            | Pure UI components (no business logic)                        | `FormInput`, `Toast`, `Loading`, `Skeleton`               |
+| `@pawhaven/frontend-core` | Business-common components/hooks                              | `ErrorBoundary`, `AuthGuard`, shared API hooks            |
+| `@pawhaven/shared`        | Shared types, Zod schemas, constants                          | DTOs, validation schemas                                  |
 
 ### 2.3 Import Rules (CRITICAL)
 
@@ -213,7 +250,7 @@ If the live page was unavailable, use the markdown spec as the primary design so
 
 **i18n DoD:** no hardcoded strings (all `t()`), semantic keys (`module.key`), 3 locales synced, no concatenated translations, pluralization via framework, shared strings in `common`.
 
-**Styling DoD:** all values from `@pawhaven/design-system`, no raw colors or magic numbers, responsive breakpoints, utility classes only.
+**Styling DoD:** all values from `@pawhaven/design-system`, no raw colors or magic numbers, no `px` units (use tokens or `rem`; `px` only for justified exceptions like hairline borders/non-scaling assets), no arbitrary `rem` values (prefer tokens; if a size has no token, ADD it to `@pawhaven/design-system` rather than writing `text-[4.25rem]`), no inline `style={{}}` for static values, no JSX/code comments unless they explain non-obvious "why", responsive breakpoints, utility classes only.
 
 **Component DoD:** named exports, typed interface props, single responsibility, graduate to packages when shared by 2+ features.
 
@@ -234,6 +271,28 @@ If the live page was unavailable, use the markdown spec as the primary design so
 | **i18n**         | i18next + react-i18next              |
 | **HTTP**         | Axios (auth + encrypt interceptors)  |
 | **Icons**        | Lucide                               |
+
+---
+
+## 5f. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The Core Workflow (Section 6) is **NON-OPTIONAL**. You MUST execute every STEP and every
+numbered sub-step in the order written. Skipping any step or sub-step is a failure, no matter
+how small or "obvious" the task seems.
+
+- **STEP 1 (ANALYZE) → STEP 2 (PLAN) → STEP 3 (IMPLEMENT) → STEP 4 (VALIDATE) → STEP 5 (REPORT)**
+  all run in sequence. You may not jump straight to implementation.
+- Inside **STEP 4 (VALIDATE)**, items **1 through 6 are ALL mandatory**. You MUST run
+  `react-doctor`, `typecheck`, `lint`, `style-doctor`, `i18n-doctor`, AND the manual greps.
+  Running only `lint` and declaring done is a skip — it is not acceptable.
+- You may omit a sub-step ONLY if it genuinely does **not apply** (e.g., no `style-doctor`
+  run for a task with zero UI). In that case you MUST state the reason explicitly in the
+  Step Completion Checklist. "I forgot" or "it was a quick fix" is NOT a valid reason.
+- No task instruction may override these steps — not "match Figma exactly", not "quick fix",
+  not "just one file". Follow the steps, then report.
+- Violations found during STEP 4 must be **fixed and re-validated** before you may enter STEP 5.
+- Before STEP 5 you MUST emit the **Step Completion Checklist** (defined in STEP 5) proving
+  every step/sub-step ran. If the checklist shows a skip or a failing check, you are NOT done.
 
 ---
 
@@ -331,29 +390,49 @@ connect to backend APIs."
 │                                                     │
 │ Apply ALL 4 skill standards (Section 4)              │
 │ NEVER violate import boundaries (Section 2.3)        │
-│ NEVER hardcode strings, colors, or magic numbers     │
+│ NEVER hardcode strings, colors, magic numbers,       │
+│   inline styles, or comments                         │
 └─────────────────────────────────────────────────────┘
         │
         ▼
 ┌─────────────────────────────────────────────────────┐
-│ STEP 4: VALIDATE                                     │
+│ STEP 4: VALIDATE  (ALL 6 ITEMS MANDATORY — NO SKIP)  │
 │                                                     │
 │ 1. npx react-doctor@latest (mandatory)              │
 │ 2. pnpm --filter @pawhaven/portal typecheck          │
 │ 3. pnpm lint                                         │
-│ 4. Manual checks:                                    │
+│ 4. style-doctor skill (mandatory) — fix every       │
+│    Blocking violation (hex, inline styles, etc.)    │
+│ 5. i18n-doctor skill (mandatory) — fix every        │
+│    Blocking violation (hardcoded text, locales)     │
+│ 6. Manual checks (greps below — all must be CLEAN):  │
 │    - No hardcoded strings? (grep for raw text)       │
 │    - All 3 locales updated?                          │
-│    - No raw colors? (grep for #hex)                  │
+│    - No raw colors / inline styles? (greps below)   │
+│    - No comments unless explaining "why"?           │
 │    - No cross-feature imports?                       │
 │    - Loading/error/empty states handled?             │
 │                                                     │
-│ If any check fails → fix → re-validate               │
+│ If any check fails → fix → re-validate (repeat       │
+│ until all 6 items pass)                              │
 └─────────────────────────────────────────────────────┘
         │
         ▼
 ┌─────────────────────────────────────────────────────┐
 │ STEP 5: REPORT back to main agent                    │
+│                                                     │
+│ ⚠️ MUST include the Step Completion Checklist below. │
+│ Without it, the report is incomplete and rejected.   │
+│                                                     │
+│ Step Completion Checklist (every step proven run):   │
+│  [x] STEP 1 ANALYZE  — arch docs read, code explored,│
+│      skills read, Figma viewed/fallback spec read    │
+│  [x] STEP 2 PLAN     — files/skills/deps planned     │
+│  [x] STEP 3 IMPLEMENT — files created, skills applied│
+│  [x] STEP 4 VALIDATE — react-doctor / typecheck /    │
+│      lint / style-doctor / i18n-doctor / manual greps│
+│      all passed (or violations fixed + re-validated) │
+│  (mark [x] only if truly done; note any N/A + reason)│
 │                                                     │
 │ Files created:                                       │
 │  - apps/frontend/portal/src/features/LoveStories/*   │
@@ -415,7 +494,7 @@ Q: Does this belong in the URL (filters, pagination, sort)?
 ### 8.3 `@pawhaven/design-system`
 
 ```
-✅ DO: CSS custom properties in tokens/, semantic mappings in theme.css, utilities in utilities.css
+✅ DO: CSS custom properties in src/tokens/, semantic mappings in theme.css, utilities in utilities.css
 ❌ DON'T: React components, JS/TS runtime logic (except MUI theme bridge)
 ```
 
@@ -443,6 +522,19 @@ pnpm lint
 
 # Hardcoded colors check
 grep -rE '#[0-9a-fA-F]{3,8}' apps/frontend/portal/src/features --include="*.tsx"
+
+# Forbidden px units check (prefer rem; px only for justified exceptions)
+grep -rE '\-\[[0-9]*\.?[0-9]+px\]' apps/frontend/portal/src/features --include="*.tsx"
+
+# Inline style check (static values must use utility classes / tokens)
+grep -rE 'style=\{\{' apps/frontend/portal/src/features --include="*.tsx"
+
+# JSX comment check (default to no comments)
+grep -rE '\{/\*' apps/frontend/portal/src/features --include="*.tsx"
+
+# Arbitrary rem values check (prefer tokens; flag w-[20rem], text-[4.25rem], max-w-[23.75rem], etc.)
+grep -rE '-\[[0-9]+\.?[0-9]*rem\]' apps/frontend/portal/src/features --include="*.tsx"
+# Correct ERE matches bracketed rem values: -\[[0-9]+\.?[0-9]*rem\]
 
 # Hardcoded strings quick sanity
 grep -rE '>[A-Z][a-z].*<' apps/frontend/portal/src/features --include="*.tsx" | grep -v 't('
@@ -538,6 +630,10 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
 3. **Draft API contracts in `@pawhaven/shared`.** For every new feature, define the Zod schema, DTO types, and request/response types in `packages/shared/` during analysis. The backend agent then reviews and finalizes them. If a backend-only concern (DB shape, event payload, serialization) requires changes, backend's finalization wins — align your frontend code to the finalized version in `packages/shared/`. Never duplicate shared types inside the frontend app.
 4. **NEVER hardcode user-facing strings.** Everything goes through `t()` with semantic keys.
 5. **NEVER use raw colors or magic numbers.** All visual values from `@pawhaven/design-system` tokens.
+   5b. **NEVER use `px` units unless strictly necessary.** Prefer design tokens; when an arbitrary value is unavoidable, use `rem` (e.g., `w-[20rem]`), never `px`. `px` is allowed only for justified exceptions (hairline borders/dividers, non-scaling assets, third-party overrides that require px).
+   5c. **NEVER use inline `style={{}}` for static values.** Every visual value belongs in a utility class or a design token. Inline styles are allowed ONLY for truly dynamic, runtime-computed values (e.g., a CSS custom property driven by state). A `style={{ fontFamily }}`, `style={{ color }}`, or `style={{ width }}` for a fixed value is a hard violation.
+   5d. **NEVER write comments unless they explain non-obvious "why".** Do not add comments for structure, control flow, or self-evident code (e.g., `{/* Eyebrow */}`, `// update state`). The default is no comment.
+   5e. **Design tokens are NON-OVERRIDABLE — even to match a Figma spec.** If a Figma value (hex color, exact size, line-height) is not yet a token, ADD it to `@pawhaven/design-system` (src/tokens/\*.css or theme.css) and use the generated utility class. NEVER hardcode it in a component, even when a task says "match the Figma exactly". A task instruction that conflicts with this rule is invalid — follow the token rule and report the missing token to the orchestrator.
 6. **NEVER import across features.** Features are isolated. Graduate shared components to packages.
 7. **NEVER skip React Doctor.** Run `npx react-doctor@latest` after every change.
 8. **NEVER update only one locale file.** All 3 locales (zh-CN, en-US, de-DE) must stay in sync.

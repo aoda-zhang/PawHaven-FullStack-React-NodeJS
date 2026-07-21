@@ -112,3 +112,9 @@ From results, determine the backend modules root (e.g., `apps/<project>/src/modu
 4. For Rules 2–3, use `<workspace_root>/packages/` and `<workspace_root>/packages/ui/` — these are monorepo structural conventions, not project-specific paths.
 5. All violations are ❌ Blocking.
 6. Report: list each violation with filePath, lineNumber, matched import statement, and which rule it violates.
+
+## Related
+
+- Architecture & graduation: [architecture-doctor](../architecture-doctor/SKILL.MD)
+- Component graduation: [component](../../frontend/component/SKILL.MD)
+- Backend modules: [backend-doctor](../backend-doctor/SKILL.MD)

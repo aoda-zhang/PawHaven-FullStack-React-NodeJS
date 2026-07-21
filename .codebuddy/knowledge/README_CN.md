@@ -41,9 +41,9 @@
 | 文件                                                               | 类型               | 说明                                                          |
 | ------------------------------------------------------------------ | ------------------ | ------------------------------------------------------------- |
 | [design-system.html](../packages/design-system/design-system.html) | HTML（浏览器打开） | 可视化设计系统 — 颜色、字体、布局、图标、图片均以实际样式渲染 |
-| [tokens/](../packages/design-system/tokens/)                       | CSS                | 12 组设计 Token CSS 变量文件                                  |
-| [theme.css](../packages/design-system/theme.css)                   | CSS                | 全局主题定义                                                  |
-| [utilities.css](../packages/design-system/utilities.css)           | CSS                | 工具类样式                                                    |
+| [tokens/](../packages/design-system/src/tokens/)                   | CSS                | 12 组设计 Token CSS 变量文件                                  |
+| [theme.css](../packages/design-system/src/theme.css)               | CSS                | 全局主题定义                                                  |
+| [utilities.css](../packages/design-system/src/utilities.css)       | CSS                | 工具类样式                                                    |
 | [src/](../packages/design-system/src/)                             | TypeScript         | 设计系统源码                                                  |
 
 **核心内容**：`#f7823a` 暖橙主色、Fraunces + Plus Jakarta Sans 字体体系、Badge / Button / Card 组件规范、Lucide 图标映射、Unsplash 图片尺寸标准。

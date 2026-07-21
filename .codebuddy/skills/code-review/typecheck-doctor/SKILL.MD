@@ -61,3 +61,8 @@ Examples of how `<packageName>` is derived from `apps/<project>/package.json`:
 | `apps/backend/core-service/tsconfig.json` | `@pawhaven/core-service` | `pnpm --filter @pawhaven/core-service typecheck` |
 
 These are **illustrative examples** — actual projects and names are discovered at runtime.
+
+## Related
+
+- Frontend/backend standards: [react](../../frontend/react/SKILL.MD) · [redux](../../frontend/redux/SKILL.MD)
+- Companion doctors: [react-doctor](../react-doctor/SKILL.MD) · [style-doctor](../style-doctor/SKILL.MD)

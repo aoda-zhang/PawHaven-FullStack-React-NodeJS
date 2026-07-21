@@ -67,3 +67,8 @@ Alternatively, search across the entire workspace and filter by backend-specific
 2. Run both `search_content` calls in PARALLEL on the discovered paths.
 3. All violations are ❌ Blocking.
 4. Report: list each violation with filePath, lineNumber, matched content, and which rule it violates.
+
+## Related
+
+- Architecture: [architecture-doctor](../architecture-doctor/SKILL.MD) · boundaries: [boundary-doctor](../boundary-doctor/SKILL.MD)
+- Frontend pairing: [react-doctor](../react-doctor/SKILL.MD)

@@ -483,3 +483,9 @@ A form implementation is complete when:
 - [ ] `<form>` has `noValidate` attribute
 - [ ] All field errors have `role="alert"` for accessibility
 - [ ] Dependent fields use scoped `watch` + `useEffect` to reset
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- React core: [react](../react/SKILL.MD) · client state: [redux](../redux/SKILL.MD)
+- a11y form patterns: [react](../react/SKILL.MD)

@@ -2,7 +2,7 @@
    Design System — Main entry point
    ============================================================
    1. tailwindcss (base)
-   2. tokens   (via tokens/index.css barrel)
+   2. tokens   (via src/tokens/index.css barrel)
    3. theme    (semantic mappings)
    4. utilities (custom utilities + component styles)
    ============================================================ */
@@ -10,13 +10,20 @@
 @import 'tailwindcss';
 
 /* 1. Tokens — barrel import */
-@import './tokens/index.css';
+@import './src/tokens/index.css';
 
 /* 2. Theme — Semantic mappings */
-@import './theme.css';
+@import './src/theme.css';
 
 /* 3. Utilities — Custom utilities + component styles */
-@import './utilities.css';
+@import './src/utilities.css';
+
+/* Additional content sources — scan workspace packages that export compiled JS.
+   Source globs (with **) stay current without a rebuild; the running app
+   still resolves the packages' build/ output via their package.json exports. */
+@source '../frontend-core/src/**/*.{tsx,jsx}';
+@source '../../apps/frontend/**/*.{tsx,jsx}';
+@source '../ui/src/**/*.{tsx,jsx}';
 
 /* ── Base styles ─────────────────────────────────────────── */
 

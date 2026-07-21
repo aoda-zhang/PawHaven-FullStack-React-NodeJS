@@ -51,25 +51,25 @@
     "login": "ANMELDEN",
     "auth": "Anmelden / Registrieren",
     "sighup": "REGISTRIEREN",
-    "loginSubtitle": "Willkommen zurück. Melden Sie sich mit Ihrem PawHaven-Konto an.",
-    "registerSubtitle": "Erstellen Sie ein Konto, um mehr Rettungen für Streunertiere zu dokumentieren und zu unterstützen.",
-    "securityNotice": "Verwenden Sie eine sichere E-Mail-Adresse und ein starkes Passwort, um Ihr Konto und Ihre Rettungsdaten zu schützen.",
-    "learnMore": "Mehr erfahren",
-    "helpTitle": "Benötigen Sie Hilfe?",
-    "helpGuideTitle": "Rettungsleitfaden ansehen",
-    "helpGuideDesc": "Erfahren Sie, wie Sie Streunertieren sicher helfen können.",
-    "helpHomeTitle": "Neueste Rettungs-Updates ansehen",
-    "helpHomeDesc": "Verschaffen Sie sich schnell einen Überblick über die neuesten Aktivitäten auf der Plattform.",
-    "promoTitle": "Ein Konto verbindet Rettungsberichte, Leitfäden und Community.",
-    "promoDesc": "Nach der Anmeldung erhalten Sie Menüs und Seitenzugriffe, die zu Ihrem aktuellen Benutzerstatus passen.",
-    "supportGuide": "Rettungsleitfaden",
-    "supportHome": "Zur Startseite",
+    "login_subtitle": "Willkommen zurück. Melden Sie sich mit Ihrem PawHaven-Konto an.",
+    "register_subtitle": "Erstellen Sie ein Konto, um mehr Rettungen für Streunertiere zu dokumentieren und zu unterstützen.",
+    "security_notice": "Verwenden Sie eine sichere E-Mail-Adresse und ein starkes Passwort, um Ihr Konto und Ihre Rettungsdaten zu schützen.",
+    "learn_more": "Mehr erfahren",
+    "help_title": "Benötigen Sie Hilfe?",
+    "help_guide_title": "Rettungsleitfaden ansehen",
+    "help_guide_desc": "Erfahren Sie, wie Sie Streunertieren sicher helfen können.",
+    "help_home_title": "Neueste Rettungs-Updates ansehen",
+    "help_home_desc": "Verschaffen Sie sich schnell einen Überblick über die neuesten Aktivitäten auf der Plattform.",
+    "promo_title": "Ein Konto verbindet Rettungsberichte, Leitfäden und Community.",
+    "promo_desc": "Nach der Anmeldung erhalten Sie Menüs und Seitenzugriffe, die zu Ihrem aktuellen Benutzerstatus passen.",
+    "support_guide": "Rettungsleitfaden",
+    "support_home": "Zur Startseite",
     "or": "Oder",
-    "continueWithGoogle": "Mit Google fortfahren",
-    "continueWithGithub": "Mit GitHub fortfahren",
-    "createAccountWithEmail": "Konto mit E-Mail erstellen",
-    "loginWithEmail": "Mit E-Mail anmelden",
-    "newUser": "registrieren",
+    "continue_with_google": "Mit Google fortfahren",
+    "continue_with_github": "Mit GitHub fortfahren",
+    "create_account_with_email": "Konto mit E-Mail erstellen",
+    "login_with_email": "Mit E-Mail anmelden",
+    "new_user": "registrieren",
     "email": "E-Mail",
     "password": "Passwort",
     "email_required": "E-Mail ist erforderlich",
@@ -84,7 +84,18 @@
   "home": {
     "home_page": "Startseite",
     "rescue": "Melden",
-    "report": "Tier melden"
+    "report": "Tier melden",
+    "hero_aria_label": "PawHaven Hero-Bereich",
+    "hero_headline_prefix": "Jedes Streunerleben",
+    "hero_headline_highlight": "verdient es",
+    "hero_headline_suffix": "gesehen zu werden.",
+    "hero_subtitle": "Von der ersten Sichtung bis zum sicheren Zuhause — PawHaven verwandelt verstreute Hilferufe in eine transparente Rettungskette.",
+    "hero_report_cta": "Streuner jetzt melden",
+    "hero_adopt_cta": "Adoptierbare Tiere treffen",
+    "hero_stat_rescues": "Abgeschlossene Rettungen",
+    "hero_stat_adopted": "Vermittelte Zuhause",
+    "hero_stat_volunteers": "Aktive Freiwillige",
+    "hero_image_alt": "Eine Freiwillige hält eine gerettete Katze und einen geretteten Hund"
   },
   "reportStray": {
     "report_animal": "Fundtier melden",
@@ -181,46 +192,51 @@
     "columns": {
       "platform": {
         "heading": "Plattform",
-        "browseRescues": "Rettungen durchsuchen",
-        "reportStray": "Streuner melden",
-        "adoptAnimal": "Tier adoptieren",
+        "browse_rescues": "Rettungen durchsuchen",
+        "report_stray": "Streuner melden",
+        "adopt_animal": "Tier adoptieren",
         "volunteer": "Freiwilliger werden"
       },
       "resources": {
         "heading": "Ressourcen",
-        "knowledgeBase": "Wissensdatenbank",
-        "rescueStories": "Rettungsgeschichten",
-        "emergencyGuide": "Notfallleitfaden"
+        "knowledge_base": "Wissensdatenbank",
+        "medication_library": "Medikamentenbibliothek",
+        "rescue_stories": "Rettungsgeschichten",
+        "emergency_guide": "Notfallleitfaden"
       },
       "community": {
         "heading": "Community",
-        "volunteerNetwork": "Freiwilligen-Netzwerk",
-        "partnerShelters": "Partner-Tierheime",
-        "shareStory": "Geschichte teilen"
+        "volunteer_network": "Freiwilligen-Netzwerk",
+        "partner_shelters": "Partner-Tierheime",
+        "share_story": "Geschichte teilen"
       },
       "company": {
         "heading": "Unternehmen",
-        "aboutPawHaven": "Über PawHaven",
-        "openSource": "Open Source",
-        "privacyPolicy": "Datenschutz",
-        "termsOfService": "Nutzungsbedingungen"
+        "about_pawhaven": "Über PawHaven",
+        "open_source": "Open Source",
+        "privacy_policy": "Datenschutz",
+        "terms_of_service": "Nutzungsbedingungen"
       }
     },
-    "brandDescription": "Eine Plattform, die Melder, Retter und Adoptierende verbindet — von der ersten Sichtung bis zum sicheren Zuhause.",
+    "brand_description": "Eine Plattform, die Melder, Retter und Adoptierende verbindet — von der ersten Sichtung bis zum sicheren Zuhause.",
+    "cta_title": "Streunendes Tier gesehen? Du kannst helfen.",
+    "cta_description": "Eine 60-sekündige Meldung auf PawHaven setzt ausgebildete Freiwillige in Bewegung. Du brauchst keine besonderen Fähigkeiten — nur ein Handy.",
+    "cta_button": "Streuner melden",
+    "cta_button_secondary": "Freiwillig werden",
     "stats": {
-      "animalsRescued": "Gerettete Tiere",
-      "activeVolunteers": "Aktive Freiwillige",
+      "animals_rescued": "Gerettete Tiere",
+      "active_volunteers": "Aktive Freiwillige",
       "adopted": "Adoptiert"
     },
     "social": {
       "github": "GitHub",
-      "twitter": "Twitter",
-      "email": "E-Mail"
+      "email": "E-Mail",
+      "instagram": "Instagram"
     },
-    "bottomBar": {
+    "bottom_bar": {
       "license": "Open Source — MIT-Lizenz.",
-      "systemsOperational": "Alle Systeme betriebsbereit",
-      "builtWith": "Mit ❤️ für jedes streunende Leben gebaut"
+      "systems_operational": "Alle Systeme betriebsbereit",
+      "built_with": "Mit ❤️ für jedes streunende Leben gebaut"
     }
   },
   "errorMessage": {

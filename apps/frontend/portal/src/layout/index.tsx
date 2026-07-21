@@ -47,7 +47,7 @@ export const RootLayout = () => {
       </header>
 
       <main className="flex flex-1 flex-col">
-        <div className="flex-1">
+        <div className="flex-1 px-30">
           <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>

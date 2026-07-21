@@ -12,6 +12,7 @@ allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
   '@scarf/scarf': true
+  '@tailwindcss/oxide': true
   bcrypt: true
   esbuild: true
   prisma: true

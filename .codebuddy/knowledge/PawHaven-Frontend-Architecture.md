@@ -1,6 +1,6 @@
 # PawHaven — Frontend Architecture
 
-> **Version**: v3.0 | **Date**: 2026-07-10
+> **Version**: v3.1 | **Date**: 2026-07-17
 > **Related**: [System Overview](./PawHaven-System-Architecture-Overview.md) | [Backend](./PawHaven-Backend-Architecture.md)
 
 ---
@@ -43,6 +43,8 @@
 > - Cross-cutting logic & infrastructure → `@pawhaven/frontend-core`
 
 There is NO `apps/*/src/components/` layer — if a component is shared, it belongs in a package.
+
+When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/apis/queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
 
 ---
 
@@ -164,13 +166,13 @@ apps/frontend/admin   ──depends on──►  ALL packages above
 
 ### 3.2 Package Purpose & Boundaries
 
-| Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                          | Must NOT Contain                                        |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                  | React, NestJS, Prisma, Node APIs. Must work in browser. |
-| `@pawhaven/design-system` | Design tokens decoupled from components. Rebrand by changing one CSS file.                                           | CSS custom properties (tokens), theme.css, utilities.css, MUI theme.                                                                              | React components, JS runtime. CSS-only.                 |
-| `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                | Business logic, feature-specific translations.          |
-| `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand. | Feature-specific business logic.                        |
-| `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                         | API calls, auth checks, business logic, domain types.   |
+| Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                                                                      | Must NOT Contain                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                                                              | React, NestJS, Prisma, Node APIs. Must work in browser. |
+| `@pawhaven/design-system` | Design tokens decoupled from components. Rebrand by changing one CSS file.                                           | CSS custom properties (tokens), theme.css, utilities.css, MUI theme.                                                                                                                          | React components, JS runtime. CSS-only.                 |
+| `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                                                            | Business logic, feature-specific translations.          |
+| `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback. | Feature-specific business logic.                        |
+| `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                                                                     | API calls, auth checks, business logic, domain types.   |
 
 ### 3.3 Package Dependency Rules
 
@@ -236,7 +238,7 @@ Feature A needs Component X
         ├── Pure UI (Form control, Loading, Toast, Badge...)
         │     → graduate to @pawhaven/ui
         │
-        └── Business-common (RequireAuth, ErrorBoundary, Brand, domain widgets...)
+        └── Business-common (RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback, domain widgets...)
               → graduate to @pawhaven/frontend-core
 ```
 
@@ -378,7 +380,7 @@ TanStack Query Persister:
 ### 7.1 Three-Layer Token System
 
 ```
-Layer 1: Primitives     (tokens/*.css)
+Layer 1: Primitives     (src/tokens/*.css)
   Raw design values — independent of meaning
   Example: --color-orange-6: #f7823a
 
@@ -413,7 +415,7 @@ With 3 layers:
 
 ```
 packages/design-system/
-├── tokens/               # Layer 1: Primitives
+└── src/tokens/           # Layer 1: Primitives
 │   ├── colors.css        # --color-orange-1 through --color-orange-12
 │   ├── spacing.css       # --space-1 through --space-12
 │   ├── typography.css    # --font-size-*, --font-weight-*, --line-height-*
@@ -421,14 +423,14 @@ packages/design-system/
 │   ├── shadows.css       # --shadow-1 through --shadow-6
 │   └── ...
 │
-├── theme.css             # Layer 2: Semantics
+├── src/theme.css             # Layer 2: Semantics
 │   Maps primitives → semantic roles:
 │   --color-primary: var(--color-orange-6)
 │   --color-danger: var(--color-red-8)
 │   --spacing-section: var(--space-8)
 │   ...
 │
-├── utilities.css         # Layer 3: Component patterns
+├── src/utilities.css         # Layer 3: Component patterns
 │   .btn-primary, .card, .input, .badge, ...
 │
 └── mui-theme.ts          # Bridge: maps tokens to MUI theme object

@@ -1,0 +1,27 @@
+/* ============================================================
+   Sizing Tokens — Width and height primitives from Figma
+   ============================================================ */
+
+@theme {
+  --size-0: 0;
+  --size-px: 1px;
+  --size-1: 0.25rem;
+  --size-2: 0.5rem;
+  --size-3: 0.75rem;
+  --size-4: 1rem;
+  --size-6: 1.5rem;
+  --size-8: 2rem;
+  --size-10: 2.5rem;
+  --size-12: 3rem;
+  --size-16: 4rem;
+  --size-20: 5rem;
+  --size-24: 6rem;
+  --size-full: 100%;
+  --size-min: min-content;
+  --size-max: max-content;
+  --size-fit: fit-content;
+  --size-95: 23.75rem; /* 380px — hero subtitle max-width (Figma) */
+  --size-130: 32.5rem; /* 520px — hero min-height / image height (Figma) */
+  --width-54: 54%; /* hero text column (Figma) */
+  --width-46: 46%; /* hero image column (Figma) */
+}

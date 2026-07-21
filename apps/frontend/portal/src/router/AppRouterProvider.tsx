@@ -1,3 +1,4 @@
+import { RequireAuth } from '@pawhaven/frontend-core';
 import { SuspenseWrapper } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 import type { RouteObject } from 'react-router-dom';
@@ -5,9 +6,24 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 import { routerElementMapping } from './routerElementMapping';
 
-import { RequireAuth } from '@/components/RequireAuth';
+import { useCurrentUser } from '@/features/Auth/apis/queries';
 import { useLandingContext } from '@/features/Landing/landingContext';
+import { routePaths } from '@/router/routePaths';
 import type { RouterEle } from '@/types/LayoutType';
+
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+  const { isLoading, isError } = useCurrentUser();
+
+  return (
+    <RequireAuth
+      isLoading={isLoading}
+      isError={isError}
+      loginPath={routePaths.login}
+    >
+      {children}
+    </RequireAuth>
+  );
+};
 
 const createRouteElement = (route: RouterEle): ReactNode => {
   const handle = route.handle ?? {};
@@ -18,7 +34,7 @@ const createRouteElement = (route: RouterEle): ReactNode => {
   );
 
   if (handle?.isRequireUserLogin) {
-    return <RequireAuth>{page}</RequireAuth>;
+    return <ProtectedRoute>{page}</ProtectedRoute>;
   }
 
   return page;

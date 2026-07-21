@@ -26,7 +26,7 @@ export const Login = () => {
           {t('auth.login')}
         </h1>
         <p className="text-text-secondary mt-1 text-sm leading-6">
-          {t('auth.loginSubtitle')}
+          {t('auth.login_subtitle')}
         </p>
 
         <FormProvider {...formProps}>

@@ -3,8 +3,9 @@ name: code-review/i18n-doctor
 description: >
   Internationalization compliance detection. Scans JSX for hardcoded English text (missing t() function),
   ensuring all user-visible text goes through i18next translation. Technical attributes (URLs, test IDs) are exempt.
-  Trigger: i18n internationalization hardcoded string t() translation locale.
-version: 3.0
+  Also detects non-snake_case translation keys (multi-word keys must use underscores, e.g. hero_headline_prefix).
+  Trigger: i18n internationalization hardcoded string t() translation locale snake_case key naming underscore.
+version: 3.1
 ---
 
 # i18n-doctor — Internationalization Compliance
@@ -81,6 +82,24 @@ Use the discovered paths throughout all search rules below.
 - **Explanation**: All three supported locales must be present. Missing a locale file means the feature cannot be fully localized.
 - **Validation**: Verify `zh-CN.json`, `en-US.json`, and `de-DE.json` exist in the locale directory.
 
+### Rule 3: Non-snake_case translation keys
+
+- **Severity**: ⚠️ Warning
+- **Tool**: `search_content`
+- **Path**: Frontend source directories discovered in Step 0
+- **Exclude**: `node_modules/`, `dist/`, `*.test.tsx`, `*.spec.tsx`
+- **Pattern**: `t\(['"][\w]+\.[\w]*[a-z][A-Z][\w]*['"]`
+- **File Types**: `*.tsx`, `*.ts`
+- **Explanation**: Translation keys must be `snake_case` (lowercase words joined by underscores, e.g. `hero_headline_prefix`). The module prefix (before the first dot) may remain camelCase (`reportStray`, `rescueGuide`), but every key segment after the dot must use underscores. A `camelCase` segment after the dot is a violation. This rule scans `t()` call arguments for a lowercase-then-uppercase letter within the key segment.
+- **search_content invocation**:
+  ```
+  pattern: "t\(['\"][\w]+\.[\w]*[a-z][A-Z][\w]*['\"]"
+  path: <frontend_src_dirs_from_step0>
+  type: "tsx"
+  outputMode: "content"
+  ```
+- **False positive handling**: `errorMessage.TOKEN_EXPIRED`-style UPPER_SNAKE_CASE error-code maps are allowed and must NOT be flagged. Only flag keys where a lowercase letter is immediately followed by an uppercase letter (true `camelCase`).
+
 ## False Positive Handling
 
 This regex-based check will produce false positives. For each match, manually verify whether it is genuinely user-visible text. Exclude the following from violations:
@@ -103,5 +122,11 @@ Only flag content that is truly visible to the end user: button labels, headings
 1. Run Step 0 to discover frontend source directories and locale files. **Output the discovered directories and verified locale files explicitly.**
 2. Run Rule 1 (search_content) on the discovered source directories.
 3. Run Rule 2 (locale check) on the discovered locale directory.
-4. Manually review each Rule 1 match: distinguish true hardcoded text from false positives (URLs, attributes, component names, etc.).
-5. Report: list discovered directories and locale files, then list each true violation with filePath, lineNumber, and the hardcoded text content.
+4. Run Rule 3 (search_content) on the discovered source directories to detect non-snake_case keys.
+5. Manually review each Rule 1 match: distinguish true hardcoded text from false positives (URLs, attributes, component names, etc.).
+6. Report: list discovered directories and locale files, then list each true violation with filePath, lineNumber, and the hardcoded text content or the offending key.
+
+## Related
+
+- i18n standards: [i18n skill](../../frontend/i18n/SKILL.MD)
+- Gate: [figma-doctor](../figma-doctor/SKILL.MD) · styling: [style-doctor](../style-doctor/SKILL.MD)

@@ -417,3 +417,10 @@ When writing React code, always prefer:
 - Declarative code over imperative code
 
 Write React code that is easy to understand, easy to maintain, and easy to extend.
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Client state: [redux](../redux/SKILL.MD) · server state: [react-query](../react-query/SKILL.MD) · forms: [react-hook-form](../react-hook-form/SKILL.MD)
+- Components: [component](../component/SKILL.MD) · styling: [styling](../style/SKILL.MD) · i18n: [i18n](../i18n/SKILL.MD)
+- Automated check: [react-doctor](../../code-review/react-doctor/SKILL.MD)

@@ -13,7 +13,7 @@ interface Props {
 export const Phase = (props: Props) => {
   const { title, sections } = props;
   return (
-    <div className="mb-3 border-b border-neutral-200 pb-5">
+    <div className="border-border mb-3 border-b pb-5">
       {title && <p className="text-2xl font-bold">{title}</p>}
       {sections?.map((section, idx) => (
         <p
@@ -21,7 +21,7 @@ export const Phase = (props: Props) => {
           key={idx}
           className="mt-4 flex flex-row items-center justify-between text-lg"
         >
-          <span className="text-neutral-500">{section.label}</span>
+          <span className="text-text-secondary">{section.label}</span>
           <span> {section.value}</span>
         </p>
       ))}

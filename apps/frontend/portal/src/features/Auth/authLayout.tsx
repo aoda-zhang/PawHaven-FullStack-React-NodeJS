@@ -1,7 +1,5 @@
-import { LanguageSelector } from '@pawhaven/frontend-core';
+import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
 import { useNavigate } from 'react-router-dom';
-
-import { Brand } from '@/components/Brand';
 
 export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();

@@ -183,3 +183,8 @@ If Playwright MCP cannot access the live Figma page:
 | Visual spot-check | `playwright_screenshot` (target only, 1 shot) | **High** |
 | Find code | `search_file`, `search_content` | Low |
 | Read code | `read_file` (implementation) | Low |
+
+## Related
+
+- Design spec source: `.codebuddy/knowledge/figma-design-spec.md`
+- After gate passes, run: [style-doctor](./style-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD)

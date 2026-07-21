@@ -52,19 +52,43 @@ apps/backend/
 ├── auth-service/        # Auth — register, login, JWT issue, token refresh, RBAC
 ├── core-service/        # Modular monolith (YOUR PRIMARY WORKSPACE)
 │   └── src/modules/
+│       ├── bootstrap/    # Menu/route config, app initialization
 │       ├── rescue/       # Rescue case lifecycle, 7-stage state machine
-│       ├── reporting/    # Stray animal report intake, urgency assessment
-│       ├── adoption/     # Adoption listing, application, matching
-│       ├── content/      # Stories, knowledge base, content moderation
-│       ├── volunteer/    # Volunteer profile, capability matching, case claiming
-│       ├── notification/ # Push/email/in-app notifications (subscribe-only)
-│       ├── achievement/  # Badges & milestones (subscribe-only)
-│       ├── profile/      # Aggregated user profile view (read-only)
-│       └── bootstrap/    # Menu/route config, app initialization
+│       └── report-stray/ # Stray animal report intake
 │
 ├── document-service/    # File upload, PDF gen, email, image processing
 └── config-service/      # Configuration management
 ```
+
+### 2.1b Existing vs Planned Modules (CRITICAL)
+
+**Existing (implemented — verify with `list_dir`):**
+
+```
+apps/backend/core-service/src/modules/
+├── bootstrap/         # ✅ EXISTS: Menu/route config, app initialization
+├── rescue/            # ✅ EXISTS: Rescue case lifecycle
+└── report-stray/      # ✅ EXISTS: Stray animal report intake
+```
+
+**Planned (NOT yet implemented — do NOT assume they exist):**
+
+```
+apps/backend/core-service/src/modules/
+├── adoption/          # ❌ PLANNED: Adoption listing, application, matching
+├── content/           # ❌ PLANNED: Stories, knowledge base, content moderation
+├── volunteer/         # ❌ PLANNED: Volunteer profile, capability matching, case claiming
+├── notification/      # ❌ PLANNED: Push/email/in-app notifications (subscribe-only)
+├── achievement/       # ❌ PLANNED: Badges & milestones (subscribe-only)
+└── profile/           # ❌ PLANNED: Aggregated user profile view (read-only)
+```
+
+**Rules for planned modules:**
+
+1. **ALWAYS verify with `list_dir apps/backend/core-service/src/modules/` before assuming a module exists.**
+2. **When a feature maps to a planned module, CREATE the module skeleton from scratch** following the template in Section 2.2.
+3. **When extending an existing module** (rescue, report-stray, bootstrap), explore its current structure first to follow existing patterns.
+4. **Auth, document, and config are separate services** — not core-service modules. Do not add new modules in those services unless the task explicitly requires it.
 
 ### 2.2 Core-Service Module Template
 
@@ -317,8 +341,34 @@ implement CRUD APIs with pagination and search."
 │                                                     │
 │ Issues for main agent:                               │
 │  - None / Migration needs approval / etc.            │
+│                                                     │
+│ Step Completion Checklist (every step proven run):   │
+│  [x] STEP 1 ANALYZE  — arch docs read, code explored │
+│  [x] STEP 2 PLAN     — modules/files/API planned     │
+│  [x] STEP 3 IMPLEMENT — types→Prisma→use-cases→...    │
+│  [x] STEP 4 VALIDATE — typecheck / lint / build /     │
+│      manual boundary checks all passed (or fixed +    │
+│      re-validated)                                    │
+│  (mark [x] only if truly done; note any N/A + reason) │
 └─────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 5f. Step Execution Integrity — NO STEP MAY BE SKIPPED
+
+The Core Workflow (Section 5) is **NON-OPTIONAL**. You MUST execute every STEP and every
+numbered sub-step in order. Skipping any step or sub-step is a failure, regardless of task size.
+
+- **STEP 1 (ANALYZE) → STEP 2 (PLAN) → STEP 3 (IMPLEMENT) → STEP 4 (VALIDATE) → STEP 5 (REPORT)**
+  all run in sequence. Do not jump to implementation.
+- Inside **STEP 4 (VALIDATE)**, items **1 through 4 are ALL mandatory** — typecheck, lint, build,
+  AND the manual module-boundary checks. Running only `build` and declaring done is a skip.
+- Omit a sub-step ONLY if it genuinely does not apply, and state the reason explicitly in the
+  Step Completion Checklist. "Quick fix" or "I forgot" is NOT a valid reason.
+- Violations found in STEP 4 must be **fixed and re-validated** before STEP 5.
+- Before STEP 5 you MUST emit the **Step Completion Checklist** proving every step/sub-step ran.
+  A report without it is incomplete and rejected by the orchestrator.
 
 ---
 

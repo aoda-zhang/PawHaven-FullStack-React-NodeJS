@@ -1,83 +1,107 @@
 import { Popover } from '@mui/material';
 import { supportedLngs } from '@pawhaven/i18n/supportedLngs';
-import { ChevronDown, Globe } from 'lucide-react';
-import React, { useState } from 'react';
+import clsx from 'clsx';
+import { Check, ChevronDown, Globe } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const LanguageSelect = () => {
-  const { i18n, t } = useTranslation();
-  const setLanguage = (language: string) => {
-    i18n.changeLanguage(language);
-  };
+const shortCode = (language: string) => language.split('-')[0].toUpperCase();
+
+interface LanguageMenuProps {
+  current: string;
+  onSelect: (language: string) => void;
+}
+
+const LanguageMenu = ({ current, onSelect }: LanguageMenuProps) => {
+  const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-[.625rem] rounded-[10%] border border-gray-400 p-[.625rem] text-[.875rem] text-gray-600">
-      {supportedLngs.map((item) => (
-        <button
-          key={item}
-          className="cursor-pointer text-left hover:border-b hover:border-gray-500"
-          onClick={() => setLanguage(item)}
-          type="button"
-        >
-          {t(`common.${item}`)}
-        </button>
-      ))}
-    </div>
+    <ul className="flex min-w-44 flex-col gap-1" role="menu">
+      {supportedLngs.map((language) => {
+        const active = language === current;
+        return (
+          <li key={language} role="none">
+            <button
+              type="button"
+              role="menuitemradio"
+              aria-checked={active}
+              onClick={() => onSelect(language)}
+              className={clsx(
+                'flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-left text-sm transition-colors',
+                active
+                  ? 'bg-primary-light text-primary font-medium'
+                  : 'text-text-secondary hover:bg-muted hover:text-text',
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className="bg-accent text-text-tertiary flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold tracking-wide"
+              >
+                {shortCode(language)}
+              </span>
+              <span className="flex-1 font-medium">
+                {t(`common.${language}`)}
+              </span>
+              {active && (
+                <Check className="size-4 shrink-0" aria-hidden="true" />
+              )}
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 };
 
 export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const current = i18n.language;
 
-  const handleClose = () => {
+  const handleSelect = (language: string) => {
+    i18n.changeLanguage(language);
     setAnchorEl(null);
   };
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      setAnchorEl(event.currentTarget);
-    }
-  };
-
-  const open = Boolean(anchorEl);
-
   return (
     <>
-      <div className="border-border shrink-0 rounded-full border bg-white px-[2px] py-1 shadow-sm">
-        <div
-          className="mb-0 flex cursor-pointer items-center justify-center gap-[.625rem] px-2 text-sm"
-          onClick={handleClick}
-          onKeyDown={handleKeyDown}
-          role="button"
-          tabIndex={0}
-          aria-haspopup="true"
-          aria-expanded={open}
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t('common.select_language')}
+        onClick={(event) => setAnchorEl(event.currentTarget)}
+        className="border-border bg-surface text-text-secondary hover:border-border-hover hover:text-text focus-ring rounded-button inline-flex shrink-0 items-center gap-2 border px-2.5 py-1.5 text-sm shadow-sm transition-colors"
+      >
+        <Globe className="size-4 shrink-0" aria-hidden="true" />
+        <span
+          aria-hidden="true"
+          className="bg-accent text-text-tertiary flex items-center justify-center rounded px-1.5 py-0.5 text-xs font-semibold tracking-wide"
         >
-          <Globe />
-          {t(`common.${i18n.language}`)}
-          <ChevronDown size={26} />
-        </div>
-      </div>
+          {shortCode(current)}
+        </span>
+        <ChevronDown
+          className={clsx(
+            'size-4 shrink-0 transition-transform duration-200',
+            open && 'rotate-180',
+          )}
+          aria-hidden="true"
+        />
+      </button>
       <Popover
         open={open}
         anchorEl={anchorEl}
-        onClose={handleClose}
-        PaperProps={{
-          className: 'p-2 bg-white rounded-lg shadow-lg ml-9 mt-1',
-        }}
+        onClose={() => setAnchorEl(null)}
         disableScrollLock
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        PaperProps={{
+          className:
+            'bg-surface border-border mt-1.5 rounded-dialog border p-1.5 shadow-dropdown',
         }}
       >
-        <LanguageSelect />
+        <LanguageMenu current={current} onSelect={handleSelect} />
       </Popover>
     </>
   );

@@ -47,11 +47,35 @@ You need Component X
         → Requires: dedicated README, tests, design review
 ```
 
+## Hard Rule — No App-Level `components/` Folder
+
+> **There is NO `apps/*/src/components/` layer.** A frontend app may only contain
+> `providers/`, `layout/`, `router/`, `features/`, `hooks/`, and `store/`. Any component
+> that is shared across features or apps MUST graduate into a package — never live in an
+> app-level `components/` folder.
+
+- Feature-private components → `features/{Feature}/components/`
+- Shared pure-UI components → `@pawhaven/ui`
+- Shared business-common components → `@pawhaven/frontend-core`
+
+## Decoupling Before Graduation
+
+A component often depends on app-level modules (`@/hooks/...`, `@/layout/...`,
+feature APIs). Packages MUST NOT import from apps. Inject those dependencies via props
+before moving the component:
+
+- App hook results (e.g. `useIsStableEnv`, `useCurrentUser`) → pass the resolved value/state as props
+- App-level layout (e.g. `RootLayoutFooter`) → pass as a `footer?: ReactNode` / `ReactElement` prop
+- App-level route paths (e.g. `routePaths.login`) → pass the literal string as a prop
+
+Keep only peer-dependency imports (React, `react-router-dom`, `react-i18next`, MUI) inside the package.
+
 ## Graduation Checklist
 
 Before moving a component from feature to package:
 
-- [ ] Remove all feature-specific imports (no `from '../'` or domain types)
+- [ ] Remove ALL app-level imports (`@/...`) — no feature, hook, layout, or config imports
+- [ ] Inject app-level dependencies (hooks, footer, route paths) via props
 - [ ] Props use only `@pawhaven/shared` types or generic primitives
 - [ ] No hardcoded feature-specific text (all content via props or i18n keys)
 - [ ] Component has a clear, single responsibility
@@ -404,3 +428,9 @@ A component is complete when:
 - [ ] Keyboard accessible and has ARIA labels (if interactive)
 - [ ] Reused via import, not copy-pasted across features
 - [ ] Single responsibility — does one thing well
+
+## Related
+
+- Best practices: [references/best-practices.md](references/best-practices.md)
+- Architecture & graduation: [architecture-doctor](../../code-review/architecture-doctor/SKILL.MD)
+- Styling tokens: [styling skill](../style/SKILL.MD)

@@ -20,25 +20,25 @@ import { MUITheme } from '@pawhaven/design-system/theme';
 ```
 packages/design-system/
 ├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
-├── theme.css           # Semantic token mappings
-├── utilities.css       # Custom Tailwind @utility classes
-├── tokens/             # Primitive design tokens (CSS @theme blocks)
-│   ├── index.css       # Barrel import
-│   ├── color.css       # Color scales (gray, orange, green, red, yellow, blue, brown)
-│   ├── typography.css  # Font families, sizes, weights, line heights, letter spacing
-│   ├── spacing.css     # Spacing scale + container widths
-│   ├── border.css      # Border widths
-│   ├── radius.css      # Border radius scale
-│   ├── shadow.css      # Shadow primitives + shadow colors
-│   ├── motion.css      # Durations + easing curves
-│   ├── breakpoint.css  # Responsive breakpoints
-│   ├── opacity.css     # Opacity scale
-│   ├── sizing.css      # Width/height primitives
-│   └── z-index.css     # Z-index primitives
-├── src/                # TypeScript source
+├── src/                # TypeScript + CSS source
 │   ├── index.ts        # JS/TS entry point
 │   ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
-│   └── tokens.ts       # Typed token access (CSS var references + raw values)
+│   ├── tokens.ts       # Typed token access (CSS var references + raw values)
+│   ├── theme.css       # Semantic mappings (bg-primary, text-muted, etc.) + --text-* font-size aliases
+│   ├── utilities.css   # Custom Tailwind @utility classes (btn-primary, card, text-hero, text-stat, etc.)
+│   └── tokens/         # Primitive design tokens (CSS @theme blocks)
+│       ├── index.css   # Barrel import
+│       ├── color.css   # Color scales (gray, orange, green, red, yellow, blue, brown)
+│       ├── typography.css # Font families, sizes, line-heights, tracking, weights
+│       ├── spacing.css     # Spacing scale + container widths
+│       ├── border.css      # Border widths
+│       ├── radius.css      # Border radius scale
+│       ├── shadow.css      # Shadow primitives + shadow colors
+│       ├── motion.css      # Durations + easing curves
+│       ├── breakpoint.css  # Responsive breakpoints
+│       ├── opacity.css     # Opacity scale
+│       ├── sizing.css      # Width/height primitives
+│       └── z-index.css     # Z-index primitives
 └── package.json
 ```
 
@@ -116,7 +116,7 @@ function App() {
 }
 ```
 
-The MUI theme reads CSS variables at runtime, so changing a token in `tokens/color.css` updates both Tailwind and MUI automatically.
+The MUI theme reads CSS variables at runtime, so changing a token in `src/tokens/color.css` updates both Tailwind and MUI automatically.
 
 ### Token Reference
 
@@ -133,18 +133,74 @@ Each color has a 1–10 scale (1 = lightest, 10 = darkest):
 
 #### Semantic Mappings
 
+Semantic token names and values are the single source of truth defined in
+[`design-system.html`](./design-system.html) (the Figma design system reference).
+Primitive hue/scale tokens (`--color-gray-*`, `--color-brown-*`, etc.) MUST NOT be
+used directly in components — always reference a semantic token from the table below.
+
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--color-primary` | `--color-orange-6` | Primary actions, brand |
-| `--color-secondary` | `--color-green-6` | Secondary actions |
-| `--color-surface` | `--color-gray-1` | Card/paper backgrounds |
-| `--color-background` | `--color-brown-4` | Page background |
+| `--color-primary` | `--color-orange-6` | Primary actions, brand (Primary `#f7823a`) |
+| `--color-primary-fg` | `--color-gray-1` | Text on primary (Primary FG `#ffffff`) |
+| `--color-secondary` | `--color-green-6` | Secondary actions, success |
+| `--color-background` | `--color-gray-2` | Page background (Background `#f7f7f5`) |
+| `--color-foreground` | `--color-gray-10` | Main text, headings (Foreground `#1c1c1c`) |
+| `--color-muted` | `--color-gray-3` | Secondary bg, inactive (Muted `#f3f3f1`) |
+| `--color-accent` | `--color-brown-2` | Highlights, light pills (Accent `#fff4ee`) |
+| `--color-card` | `--color-gray-1` | Card surfaces (Card `#ffffff`) |
+| `--color-surface` | `--color-gray-1` | Alias of `card` |
+| `--color-border` | `--color-gray-4` | Card borders, dividers (Border `#e4e4e2`) |
+| `--color-hero-bg` | `--color-brown-3` | Warm beige hero (Hero BG `#f5ede3`) |
+| `--color-nav-bg` | `brown-1` @ 88% | Frosted nav (Nav BG) |
+| `--color-dark-text` | `--color-gray-10` | Hero headline, dark buttons (Dark Text `#1c1a17`) |
+| `--color-body-text` | `--color-brown-9` | Hero/body copy (Body Text `#6b6258`) |
+| `--color-stat-labels` | `--color-brown-8` | Stat captions (Stat Labels `#9e8e82`) |
+| `--color-divider` | `--color-brown-6` | Hero stats divider (Divider `#d4c4b4`) |
+| `--color-footer-text` | `--color-brown-6` | Footer links (Footer Text `#d3c3b3`) |
+| `--color-footer-muted` | `--color-brown-8` | Footer muted labels (Footer Muted `#8f7b69`) |
 | `--color-text` | `--color-gray-9` | Body text |
 | `--color-text-secondary` | `--color-gray-7` | Subtle text |
+| `--color-text-muted` | `--color-gray-5` | Disabled/muted text |
+| `--color-text-inverse` | `--color-gray-1` | Text on dark/primary surfaces |
+| `--color-text-link` | `--color-primary` | Links |
 | `--color-error` | `--color-red-6` | Error states |
 | `--color-success` | `--color-green-6` | Success states |
 | `--color-warning` | `--color-yellow-6` | Warning states |
 | `--color-info` | `--color-blue-6` | Info states |
+
+#### Typography Tokens
+
+Font families, sizes, weights, line heights, and letter spacing are **primitive
+tokens** defined in [`tokens/typography.css`](./src/tokens/typography.css) (the
+`@theme` block). The raw `--font-size-*` / `--leading-*` / `--font-*` variables
+are the single source of truth.
+
+The neutral scale (`text-xs` … `text-6xl`) is a **primitive** in
+[`tokens/typography.css`](./src/tokens/typography.css) — declared there so the
+project owns the scale (its values mirror Tailwind v4's default `--text-*`).
+Two kinds of `--text-*` entries live in [`theme.css`](./src/theme.css):
+
+1. **Role/usage semantics** (not scale steps) — these name a purpose, so they
+   belong in the semantic layer, not the primitive file:
+
+   | Token | Value | Meaning |
+   |-------|-------|---------|
+   | `--text-display` | `var(--font-size-6xl)` | hero/display heading |
+   | `--text-stat` | `var(--font-size-3xl)` | big stat numbers |
+   | `--text-body` | `var(--font-size-base)` | body copy (`text-md` is invalid — `md` is a breakpoint) |
+   | `--text-caption` | `var(--font-size-xs)` | tiny caption text |
+
+| Utility | Source | Generated by |
+|---------|--------|--------------|
+| `text-xs` … `text-6xl` | `--font-size-*` primitive (Tailwind default scale) | Tailwind v4 |
+| `text-display` / `text-stat` / `text-body` / `text-caption` | `--text-*` semantic token | `--text-*` theme token |
+| `text-hero` | `font-size: --text-display` + `line-height` + `font-family` + `font-weight` | composite `@utility` |
+| `text-stat` | `font-size: --text-stat` + `line-height` + `font-family` + `font-weight` | composite `@utility` |
+
+`text-hero` / `text-stat` are **composite `@utility` styles** in `utilities.css`
+because they bundle size + family + weight + line-height into one class.
+`--font-serif` / `--font-heading` / `--font-sans` provide the `font-serif` /
+`font-heading` / `font-sans` utilities.
 
 ## Scripts
 

@@ -41,9 +41,9 @@
 | File                                                               | Type                   | Description                                                                                      |
 | ------------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------ |
 | [design-system.html](../packages/design-system/design-system.html) | HTML (open in browser) | Visual design system — Colors, Typography, Layout, Icons, and Images rendered with actual styles |
-| [tokens/](../packages/design-system/tokens/)                       | CSS                    | 12 design token CSS variable files                                                               |
-| [theme.css](../packages/design-system/theme.css)                   | CSS                    | Global theme definitions                                                                         |
-| [utilities.css](../packages/design-system/utilities.css)           | CSS                    | Utility classes                                                                                  |
+| [tokens/](../packages/design-system/src/tokens/)                   | CSS                    | 12 design token CSS variable files                                                               |
+| [theme.css](../packages/design-system/src/theme.css)               | CSS                    | Global theme definitions                                                                         |
+| [utilities.css](../packages/design-system/src/utilities.css)       | CSS                    | Utility classes                                                                                  |
 | [src/](../packages/design-system/src/)                             | TypeScript             | Design system source code                                                                        |
 
 **Key contents**: `#f7823a` warm orange primary, Fraunces + Plus Jakarta Sans type system, Badge / Button / Card component specs, Lucide icon mapping, Unsplash image size standards.
