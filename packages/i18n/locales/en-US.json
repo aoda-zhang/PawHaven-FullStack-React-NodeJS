@@ -186,6 +186,37 @@
     "download_guide": "Download the rescue guide",
     "download_failed": "Download failed. Please try again."
   },
+  "rescue_cases": {
+    "section_title": "Rescue Cases",
+    "section_subtitle": "Track and support ongoing rescue operations in your area",
+    "pending_count": "{{count}} pending",
+    "in_progress_count": "{{count}} in progress",
+    "filter_all": "All Cases",
+    "view_list": "List",
+    "view_map": "Map",
+    "no_cases_found": "No rescue cases found",
+    "urgency_high": "Urgent",
+    "urgency_normal": "Normal",
+    "animal_cat": "Cat",
+    "animal_dog": "Dog",
+    "volunteer_rescues_count": "{{count}} rescues",
+    "back_to_cases": "Back to all cases",
+    "case_not_found": "Case not found",
+    "what_reported": "What was reported",
+    "info_animal": "Animal",
+    "info_reporter": "Reporter",
+    "info_reported": "Reported",
+    "info_distance": "Distance",
+    "claim_rescue": "Claim Rescue",
+    "provide_transport": "Provide Transport",
+    "map_aria_label": "Rescue cases map",
+    "map_legend_urgent": "Urgent",
+    "map_legend_other": "Other",
+    "timeline_status_reported": "Reported",
+    "timeline_status_rescue_assigned": "Rescue Assigned",
+    "timeline_status_rescue_started": "Rescue Started",
+    "timeline_status_rescued": "Rescued"
+  },
   "footer": {
     "columns": {
       "platform": {

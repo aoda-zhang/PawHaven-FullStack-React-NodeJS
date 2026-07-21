@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { getRescueDetail } from './rescueDetail.api';
 import { rescueDetailQueryKeys } from './rescueDetail.queryKeys';
 
-import { getAnimalDetail } from '@/features/Animal/animal.api';
-
-export const useFetchAnimalDetail = (animalId: number) => {
+export const useFetchRescueDetail = (animalId: string) => {
   return useQuery({
     queryKey: rescueDetailQueryKeys.detail(animalId),
-    queryFn: () => getAnimalDetail(animalId),
+    queryFn: () => getRescueDetail(animalId),
     enabled: !!animalId,
   });
 };

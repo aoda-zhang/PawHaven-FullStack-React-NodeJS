@@ -407,6 +407,25 @@ src/
 
 ✅ One mutation hook per file. ✅ Keys and queryOptions in separate files. ✅ No scattered query keys.
 
+## 10.1 Feature API Directory Structure
+
+Within each feature, queries and mutations MUST be kept in separate files:
+
+```
+features/{Feature}/api/
+├── {feature}.api.ts       # raw fetch functions (no React hooks)
+├── {feature}.queryKeys.ts # query key factory
+├── {feature}.queries.ts   # useQuery / useSuspenseQuery hooks ONLY (GET requests)
+└── {feature}.mutations.ts # useMutation hooks ONLY (POST/PUT/PATCH/DELETE)
+```
+
+**Critical rules:**
+
+- `queries.ts` — ONLY exports `useQuery` / `useSuspenseQuery` hooks. Must NOT contain `useMutation`.
+- `mutations.ts` — ONLY exports `useMutation` hooks. Must NOT contain `useQuery`.
+- No duplication — every hook must live in exactly ONE of these two files. If a hook appears in both, it is a violation.
+- Never create an empty `queries.ts` or `mutations.ts`. Only create the file when there is at least one relevant API hook to put in it. If a feature has no queries, do not create `queries.ts`; if it has no mutations, do not create `mutations.ts`.
+
 ---
 
 # 11. Common Anti-Patterns
@@ -423,6 +442,9 @@ src/
 | Using `isLoading` as key for Suspense | Breaks transitions; flickering | Use `placeholderData: keepPrevious` or Suspense boundary |
 | Disabling `refetchOnWindowFocus` for all queries | Misses stale data when user returns | Only disable for static data |
 | Mutation not calling `invalidateQueries` on success | Stale cache after mutation | Always invalidate affected queries in `onSuccess` or `onSettled` |
+| `useQuery` in mutations.ts | Mixes concerns; GET hooks belong in queries.ts | Move useQuery to queries.ts; mutations.ts only exports useMutation |
+| Duplicate hooks in queries.ts and mutations.ts | Stale copies; merge conflicts; confusion | Keep each hook in exactly one file |
+| Empty `queries.ts` / `mutations.ts` (`export {};` placeholder) | Dead files; rule violation | Delete the file when there is no relevant hook |
 
 ---
 
@@ -454,6 +476,8 @@ A TanStack Query change is complete when:
 - [ ] No server data is duplicated into Redux
 - [ ] Error boundaries wrap critical query sections
 - [ ] QueryClient is created via a factory function, not raw `new QueryClient()`
+- [ ] `queries.ts` only exports `useQuery` hooks (GET); `mutations.ts` only exports `useMutation` hooks
+- [ ] No hook is duplicated across `queries.ts` and `mutations.ts`
 
 ## Related
 

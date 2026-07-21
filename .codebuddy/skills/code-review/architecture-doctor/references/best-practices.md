@@ -34,3 +34,6 @@ shared ← backend services
 - Defining DTOs in both frontend and backend → Blocking (single source in `@pawhaven/shared`).
 - Business logic for module B living in module A's service.
 - Creating a module with no clear aggregate root.
+- `useQuery` in `mutations.ts` or `useMutation` in `queries.ts` → move to the correct file.
+- Duplicate exports across `queries.ts` and `mutations.ts` → keep each hook in exactly one file.
+- Empty `queries.ts` / `mutations.ts` (`export {};` placeholder) → delete the file when no hook exists.

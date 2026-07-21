@@ -24,6 +24,10 @@ const RescueGuide = lazyImport(
   () => import('@/features/RescueGuide'),
   'RescueGuide',
 );
+const RescueCases = lazyImport(
+  () => import('@/features/RescueCases'),
+  'RescueCasesPage',
+);
 
 const NotFoundRoute = () => {
   const isStableEnv = useIsStableEnv();
@@ -47,6 +51,7 @@ export const routerElementMapping: Record<string, ReactElement> = {
   auth_register: <Register />,
   report_stray: <ReportStray />,
   rescue_guides: <RescueGuide />,
+  rescue_cases: <RescueCases />,
   rescue_detail: <ReportDetail />,
   notFund: <NotFoundRoute />,
   errorFallback: <ErrorFallbackRoute />,

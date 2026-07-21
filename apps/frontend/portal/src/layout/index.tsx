@@ -1,5 +1,5 @@
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -17,10 +17,6 @@ export const RootLayout = () => {
   const { t } = useTranslation();
   const { isMenuAvailable, isFooterAvailable } = useMenuVisibility();
   const { pathname } = useLocation();
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
 
   return (
     <div>

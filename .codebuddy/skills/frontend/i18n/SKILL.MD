@@ -837,6 +837,30 @@ Business logic should never depend on localized text.
 
 ---
 
+## 28. Never import from @pawhaven/i18n directly in pages/components
+
+Features, pages, and components MUST NOT import from `@pawhaven/i18n` directly. Only use `react-i18next` hooks (`useTranslation`, `t()`) for accessing translations.
+
+The `@pawhaven/i18n` package is an infrastructure layer (provider config, language detection, resource loading) consumed only by the app root. Features access translation functionality through the standard `react-i18next` public API.
+
+❌ Bad
+
+```tsx
+import { i18n } from '@pawhaven/i18n';
+i18n.t('common.save');
+```
+
+✅ Good
+
+```tsx
+import { useTranslation } from 'react-i18next';
+
+const { t } = useTranslation();
+t('common.save');
+```
+
+---
+
 # Code Review Checklist
 
 Before completing a task verify:
@@ -858,6 +882,7 @@ Before completing a task verify:
 - No backend messages are exposed directly
 - New keys exist in every supported language (`zh-CN`, `en-US`, `de-DE`)
 - No unused translation keys were introduced
+- No direct imports from `@pawhaven/i18n` in pages/components (use `react-i18next` instead)
 
 And also verify:
 
@@ -895,6 +920,7 @@ Avoid:
 - Renaming existing keys without migration
 - Exposing backend error messages
 - Creating feature-specific keys for common wording
+- Importing from `@pawhaven/i18n` directly in pages/components (use `react-i18next` instead)
 
 And also avoid:
 
@@ -923,6 +949,7 @@ A feature is considered internationalized only if:
 - Formatting is locale-aware
 - CI passes all i18n validation
 - No hardcoded UI strings remain
+- No direct imports from `@pawhaven/i18n` in pages/components
 
 And a feature satisfies linguistic safety only if:
 

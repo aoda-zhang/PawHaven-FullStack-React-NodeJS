@@ -301,9 +301,14 @@ routerElementMapping.tsx — static map of page keys → React components
 ✅ Route-to-component mapping is the ONLY legal cross-feature reference
 ✅ All routes go through AppRouterProvider — no manual <Route> in features
 ✅ Lazy-loaded features use React.lazy + SuspenseWrapper from @pawhaven/ui
+✅ All internal navigation uses React Router (`useNavigate().navigate(path)` / `<Link>` / `<Navigate>`)
+✅ External links use a real anchor (`<a href="https://...">`) or `window.open`
 
 ❌ Features do NOT import from other features' index.tsx
 ❌ Features do NOT reference other features' route paths
+❌ Features do NOT use `window.history.pushState` / `window.history.replaceState` for internal navigation
+❌ Features do NOT use `window.history.back()` / `window.history.forward()` for internal navigation (use `navigate(-1)` / `navigate(1)`)
+❌ Features do NOT use `window.location.href = ...` / `window.location.assign(...)` for internal navigation
 ```
 
 ---

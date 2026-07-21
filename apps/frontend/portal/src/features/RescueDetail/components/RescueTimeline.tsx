@@ -2,20 +2,9 @@ import clsx from 'clsx';
 import { Clock, CheckCircle, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import type { RescueStatusType } from '@/features/Home/types';
-import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
+import type { RescueUpdate } from '../types';
 
-export interface RescueUpdate {
-  id: string;
-  timestamp: string;
-  status: RescueStatusType;
-  content: string;
-  operator: {
-    name: string;
-    avatar?: string;
-  };
-  images?: string[];
-}
+import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
 
 interface RescueTimelineProps {
   updates: RescueUpdate[];
@@ -23,9 +12,12 @@ interface RescueTimelineProps {
 
 export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
-  const sortedUpdates = updates.toSorted(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-  );
+  const sortedUpdates = updates
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
 
   return (
     <div className="bg-surface rounded-card shadow-card mt-6 w-full p-6">

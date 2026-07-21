@@ -9,6 +9,7 @@ Companion to `SKILL.MD`. Load when adding or auditing user-facing text.
 - Three locales always in sync: `zh-CN`, `en-US`, `de-DE`.
 - Shared strings live only in `common`; never duplicate a key/value across modules.
 - If the same translation value appears in 2+ modules → extract to `common`, update all `t()` calls.
+- Never import from `@pawhaven/i18n` directly in pages/components — use `react-i18next` hooks (`useTranslation`, `t()`) instead.
 
 ## Think in messages, not strings
 

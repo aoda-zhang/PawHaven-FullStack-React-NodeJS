@@ -104,6 +104,31 @@ From results, determine the backend modules root (e.g., `apps/<project>/src/modu
   outputMode: "content"
   ```
 
+### Rule 5: Feature importing @pawhaven/i18n directly
+
+- **Severity**: ❌ Blocking
+- **Scope**: frontend / full-stack
+- **Tool**: `search_content`
+- **Path**: Feature directories root (discovered in Step 0)
+- **Pattern**: `from '@pawhaven/i18n'`
+- **File Types**: `*.ts`, `*.tsx`
+- **Explanation**: Features and components MUST NOT import from `@pawhaven/i18n` directly. This package is an infrastructure layer (provider config, language detection, resource loading) consumed only by the app root. Features access translation functionality through `react-i18next` hooks (`useTranslation`, `t()`).
+
+### Rule 6: Internal navigation must use React Router
+
+- **Severity**: ❌ Blocking
+- **Scope**: frontend / full-stack
+- **Tool**: `search_content`
+- **Path**: Feature directories root (discovered in Step 0)
+- **Pattern**: `window\.history\.(pushState|replaceState|back|forward)|window\.location\.(href|assign|replace)|window\.location\s*=`
+- **File Types**: `*.ts`, `*.tsx`
+- **Explanation**: All internal page navigation MUST use React Router (`useNavigate().navigate(path)`, `<Link>`, `<Navigate>`). Only external links may use a real anchor (`<a href="https://...">`) or `window.open`. Raw `window.history.pushState`/`replaceState`/`back`/`forward` and `window.location` assignments for internal routes are forbidden — they bypass React Router, break scroll restoration, and desync route state.
+
+**Accepted exceptions:**
+
+- `src/components/ScrollToTop.tsx` — monkey-patches `history.pushState`/`replaceState` to delegate to the original method and add scroll restoration; it does NOT perform navigation.
+- Auth-failure hard redirect (`window.location.href = '/auth/login'`) in `src/providers/QueryProvider.tsx` — a forced full-page reload to clear broken session state is intentional, not page-to-page navigation.
+
 ## Execution
 
 1. Run Step 0 first to discover feature and module directories.
