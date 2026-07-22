@@ -9,7 +9,7 @@ export const RescueDetail = () => {
   const { data: animal } = useFetchRescueDetail(animalID ?? '');
 
   return (
-    <div className="mx-auto max-w-5xl py-4 md:py-6 lg:py-8">
+    <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 md:py-6 lg:py-8">
       {animal && <AnimalBasicInfo animal={animal} />}
 
       {animal?.updates && <RescueTimeline updates={animal.updates} />}

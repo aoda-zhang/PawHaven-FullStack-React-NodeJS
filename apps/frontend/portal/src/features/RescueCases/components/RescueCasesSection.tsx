@@ -27,15 +27,15 @@ export const RescueCasesSection = ({
   const displayedCases = filteredCases();
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <section className="max-w-6xl py-10">
       <div className="mb-6">
         <h2 className="text-foreground font-serif text-2xl font-bold">
           {t('rescue_cases.section_title')}
         </h2>
         <p className="text-muted-foreground mt-0.5 text-sm">
-          {displayedCases.filter((c) => c.status === 'pending').length}{' '}
-          {t('common.rescue_status_pending')} ·{' '}
-          {displayedCases.filter((c) => c.status === 'inProgress').length}{' '}
+          {displayedCases.filter((c) => c.status === 'pending').length}
+          {t('common.rescue_status_pending')}
+          {displayedCases.filter((c) => c.status === 'inProgress').length}
           {t('common.rescue_status_inProgress')}
         </p>
       </div>

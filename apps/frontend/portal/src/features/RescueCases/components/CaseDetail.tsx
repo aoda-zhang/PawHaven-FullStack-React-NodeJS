@@ -73,7 +73,7 @@ export const CaseDetail = ({
               alt={caseData.title}
               className="h-full w-full object-cover"
             />
-            <div className="from-gray-9/60 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute right-4 bottom-4 left-4">
               <div className="flex items-center gap-2">
                 <StatusBadge status={caseData.status} />
@@ -88,7 +88,7 @@ export const CaseDetail = ({
             </h1>
             <p className="text-text-secondary mt-2">{caseData.description}</p>
 
-            <div className="border-border mt-6 grid grid-cols-2 gap-4 border-t pt-6">
+            <div className="border-border mt-6 grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-2">
               <div className="text-text-secondary flex items-center gap-2 text-sm">
                 <MapPin className="h-4 w-4" aria-hidden="true" />
                 <span>{caseData.location}</span>
@@ -114,7 +114,7 @@ export const CaseDetail = ({
               <RescueTimeline currentStatus={caseData.status} />
             </div>
 
-            <div className="border-border mt-8 flex gap-3 border-t pt-6">
+            <div className="border-border mt-8 flex flex-col gap-3 border-t pt-6 sm:flex-row">
               <button
                 type="button"
                 className="bg-primary text-primary-fg hover:bg-primary-hover flex-1 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors"

@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@pawhaven/frontend-core';
 import { Clock, CheckCircle, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,7 +35,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
             <div key={update.id} className="relative mb-8">
               <div className="absolute top-3.5 -left-6 flex flex-col items-center">
                 <div
-                  className={clsx(
+                  className={cn(
                     'z-base flex h-7 w-7 items-center justify-center rounded-full',
                     getStatusColorByPrefix({
                       status: update?.status,
@@ -54,7 +54,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
                 <div className="mb-3 flex flex-col items-start justify-between sm:flex-row sm:items-center">
                   <div className="flex items-center gap-2">
                     <span
-                      className={clsx([
+                      className={cn([
                         'font-medium',
                         getStatusColorByPrefix({
                           status: update?.status,

@@ -1,5 +1,5 @@
+import { cn } from '@pawhaven/frontend-core';
 import type { MenuItem } from '@pawhaven/shared/types';
-import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ export const useMenuNavigation = ({
     const baseClass = MENU_CLASSES[classKey] ?? '';
     const isActive = activePath === item.to;
     const activeClass = isActive ? MENU_CLASSES.activeMenuItem : '';
-    return clsx(baseClass, activeClass);
+    return cn(baseClass, activeClass);
   };
 
   const handleMenuClick = (item: MenuItem) => {

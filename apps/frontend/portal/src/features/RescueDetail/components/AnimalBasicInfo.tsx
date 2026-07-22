@@ -16,7 +16,7 @@ export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
       <div className="p-6">
         <h1 className="text-primary mb-4 text-2xl font-bold">{animal?.name}</h1>
 
-        <div className="mb-6 grid grid-cols-2 gap-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="text-text flex items-center gap-2">
             <MapPin size={16} className="text-primary" />
             <span>{animal?.location.address}</span>

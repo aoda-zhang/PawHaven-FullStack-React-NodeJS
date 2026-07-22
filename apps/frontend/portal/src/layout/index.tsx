@@ -19,8 +19,8 @@ export const RootLayout = () => {
   const { pathname } = useLocation();
 
   return (
-    <div>
-      <header className="z-sticky border-border sticky top-0 border-b bg-[rgba(255,250,245,0.88)] backdrop-blur-[12px]">
+    <div className="overflow-x-hidden">
+      <header className="z-sticky border-border bg-background/88 sticky top-0 border-b backdrop-blur-md">
         <Toast />
         {isSysMaintain && (
           <NotificationBanner
@@ -43,7 +43,7 @@ export const RootLayout = () => {
       </header>
 
       <main className="flex flex-1 flex-col">
-        <div className="flex-1 px-30">
+        <div className="flex-1 px-4 lg:px-28">
           <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
