@@ -1,7 +1,7 @@
 import type {
   RescueParticipantType,
   RescueUpdate,
-} from '@/features/RescueDetail/types';
+} from '@/features/RescueCases/types';
 
 export type AnimalRescueStatus =
   | 'pending'

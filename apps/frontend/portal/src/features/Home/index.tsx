@@ -11,7 +11,7 @@ export const Home = () => {
 
   const handleCaseClick = useCallback(
     (id: string) => {
-      navigate(`/rescue-cases/${id}`);
+      navigate(`/rescue/detail/${id}`);
     },
     [navigate],
   );

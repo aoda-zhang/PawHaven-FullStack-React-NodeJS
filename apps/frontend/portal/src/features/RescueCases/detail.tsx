@@ -2,9 +2,9 @@ import { useParams } from 'react-router-dom';
 
 import { useFetchRescueDetail } from './api/rescueDetail.queries';
 import { AnimalBasicInfo } from './components/AnimalBasicInfo';
-import { RescueTimeline } from './components/RescueTimeline';
+import { RescueUpdateTimeline } from './components/RescueUpdateTimeline';
 
-export const RescueDetail = () => {
+const RescueDetail = () => {
   const { animalID } = useParams<{ animalID: string }>();
   const { data: animal } = useFetchRescueDetail(animalID ?? '');
 
@@ -12,7 +12,9 @@ export const RescueDetail = () => {
     <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 md:py-6 lg:py-8">
       {animal && <AnimalBasicInfo animal={animal} />}
 
-      {animal?.updates && <RescueTimeline updates={animal.updates} />}
+      {animal?.updates && <RescueUpdateTimeline updates={animal.updates} />}
     </div>
   );
 };
+
+export { RescueDetail };

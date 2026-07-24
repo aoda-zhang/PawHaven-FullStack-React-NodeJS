@@ -17,7 +17,7 @@ const ReportStray = lazyImport(
   'ReportStray',
 );
 const ReportDetail = lazyImport(
-  () => import('@/features/RescueDetail'),
+  () => import('@/features/RescueCases/detail'),
   'RescueDetail',
 );
 const RescueGuide = lazyImport(

@@ -1,5 +1,7 @@
 import type { RescueStatus } from '@pawhaven/shared/types';
 
+import type { AnimalRescueStatus } from '@/types/AnimalType';
+
 export type { RescueStatus };
 
 export interface RescueCase {
@@ -17,3 +19,30 @@ export interface RescueCase {
 }
 
 export type FilterStatus = 'all' | RescueStatus;
+
+export interface RescueUpdate {
+  id: string;
+  timestamp: string;
+  status: AnimalRescueStatus;
+  operator: {
+    id: string;
+    name: string;
+    avatar: string;
+    role: 'reporter' | 'rescuer' | 'admin';
+  };
+  content: string;
+  images?: string[];
+  location?: {
+    address: string;
+    latitude: number;
+    longitude: number;
+  };
+}
+
+export interface RescueParticipantType {
+  id: string;
+  name: string;
+  avatar?: string;
+  role: 'reporter' | 'rescuer' | 'admin';
+  joinedAt: string;
+}
