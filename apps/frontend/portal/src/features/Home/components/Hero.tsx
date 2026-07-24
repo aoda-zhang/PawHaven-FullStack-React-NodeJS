@@ -1,6 +1,9 @@
 import { ChevronRight } from 'lucide-react';
+import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+
+preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
 const STATS = [
   { value: '8,412', labelKey: 'home.hero_stat_rescues' },
@@ -69,12 +72,17 @@ export const Hero = () => {
       </div>
 
       <div className="relative hidden w-full lg:block lg:w-5/12">
-        <img
-          src="/images/hero-rescue.jpg"
-          alt={t('home.hero_image_alt')}
-          className="h-96 w-full rounded-2xl object-cover lg:h-[30rem]"
-          fetchPriority="high"
-        />
+        <picture>
+          <source srcSet="/images/hero-banner.webp" type="image/webp" />
+          <img
+            src="/images/hero-rescue.jpg"
+            alt={t('home.hero_image_alt')}
+            className="h-96 w-full rounded-2xl object-cover lg:h-[30rem]"
+            width={640}
+            height={480}
+            fetchPriority="high"
+          />
+        </picture>
       </div>
     </section>
   );

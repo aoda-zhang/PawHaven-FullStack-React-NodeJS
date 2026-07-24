@@ -1,5 +1,7 @@
+import { ContentFallback } from '@pawhaven/frontend-core';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -44,9 +46,11 @@ export const RootLayout = () => {
 
       <main className="flex flex-1 flex-col">
         <div className="flex-1 px-4 lg:px-28">
-          <Suspense fallback={<Loading />}>
-            <Outlet />
-          </Suspense>
+          <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </div>
         {isFooterAvailable && (
           <footer>

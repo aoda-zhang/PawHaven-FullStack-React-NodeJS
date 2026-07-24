@@ -70,4 +70,27 @@ module.exports = {
     // React Query plugin rules
     '@tanstack/query/exhaustive-deps': 'error',
   },
+
+  overrides: [
+    {
+      files: ['**/tests/**/*.{ts,tsx,js,jsx}'],
+      rules: {
+        'import/no-extraneous-dependencies': [
+          'error',
+          { devDependencies: true },
+        ],
+        'no-magic-numbers': 'off',
+      },
+    },
+    {
+      files: ['vitest.config.*', 'vite.config.*'],
+      rules: {
+        'import/no-extraneous-dependencies': [
+          'error',
+          { devDependencies: true },
+        ],
+        'import/no-default-export': 'off',
+      },
+    },
+  ],
 };

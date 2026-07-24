@@ -1,8 +1,8 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, type ThemeOptions } from '@mui/material/styles';
 
 import { color, easing, radius, shadow, typography } from './tokens';
 
-export const MUITheme = createTheme({
+const baseOptions: ThemeOptions = {
   cssVariables: true,
   palette: {
     primary: {
@@ -32,9 +32,9 @@ export const MUITheme = createTheme({
     info: { main: color.info },
   },
   shape: {
-    borderRadius: 8, // aligns with --radius-md
+    borderRadius: 8,
   },
-  spacing: 4, // 4px base → matches --spacing-1
+  spacing: 4,
   typography: {
     fontFamily: typography.fontSans,
     h1: { fontFamily: typography.fontHeading },
@@ -132,4 +132,18 @@ export const MUITheme = createTheme({
       },
     },
   },
-});
+};
+
+export const MUITheme = createTheme(baseOptions);
+
+export function createMUITheme(overrides?: ThemeOptions) {
+  return createTheme(
+    overrides
+      ? {
+          ...baseOptions,
+          ...overrides,
+          components: { ...baseOptions.components, ...overrides.components },
+        }
+      : baseOptions,
+  );
+}

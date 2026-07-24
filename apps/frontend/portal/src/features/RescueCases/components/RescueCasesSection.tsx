@@ -1,5 +1,5 @@
 import { cn } from '@pawhaven/frontend-core';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { FILTER_OPTIONS } from '../constants';
@@ -19,12 +19,19 @@ export const RescueCasesSection = ({
   const { t } = useTranslation();
   const [activeFilter, setActiveFilter] = useState<FilterStatus>('all');
 
-  const filteredCases = () => {
+  const displayedCases = useMemo(() => {
     if (activeFilter === 'all') return cases;
     return cases.filter((c) => c.status === activeFilter);
-  };
+  }, [cases, activeFilter]);
 
-  const displayedCases = filteredCases();
+  const pendingCount = useMemo(
+    () => displayedCases.filter((c) => c.status === 'pending').length,
+    [displayedCases],
+  );
+  const inProgressCount = useMemo(
+    () => displayedCases.filter((c) => c.status === 'inProgress').length,
+    [displayedCases],
+  );
 
   return (
     <section className="max-w-6xl py-10">
@@ -33,9 +40,9 @@ export const RescueCasesSection = ({
           {t('rescue_cases.section_title')}
         </h2>
         <p className="text-muted-foreground mt-0.5 text-sm">
-          {displayedCases.filter((c) => c.status === 'pending').length}
+          {pendingCount}
           {t('common.rescue_status_pending')}
-          {displayedCases.filter((c) => c.status === 'inProgress').length}
+          {inProgressCount}
           {t('common.rescue_status_inProgress')}
         </p>
       </div>

@@ -9,6 +9,10 @@ import { loadConfig } from '../config';
 
 import { useIsStableEnv } from '@/hooks/useIsStableEnv';
 
+const FIVE_MINUTES_MS = 300_000;
+const THIRTY_MINUTES_MS = 1_800_000;
+const TWENTY_FOUR_HOURS_MS = 86_400_000;
+
 export const QueryProvider = ({ children }: { children: ReactNode }) => {
   const IsStableEnv = useIsStableEnv();
   const [queryClient] = useState(() => {
@@ -18,10 +22,9 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
       getRequestQueryOptions({
         refetchOnReconnect: queryConfig?.refetchOnReconnect ?? true,
         refetchOnWindowFocus: queryConfig?.refetchOnWindowFocus ?? false,
-        staleTime: queryConfig?.staleTime ?? 5 * 60 * 1000,
-        gcTime: queryConfig?.gcTime ?? 30 * 60 * 1000,
+        staleTime: queryConfig?.staleTime ?? FIVE_MINUTES_MS,
+        gcTime: queryConfig?.gcTime ?? THIRTY_MINUTES_MS,
         onAuthError: () => {
-          // Backend/gateway 401 -> hard redirect to reset app state and enter login flow
           window.location.href = '/auth/login';
         },
         onPermissionError: () => {},
@@ -41,6 +44,7 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
       client={queryClient}
       persistOptions={{
         persister: asyncStoragePersister,
+        maxAge: TWENTY_FOUR_HOURS_MS,
         dehydrateOptions: {
           shouldDehydrateQuery: (query) => {
             return query.meta?.persist === true;
