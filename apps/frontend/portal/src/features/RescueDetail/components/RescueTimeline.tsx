@@ -6,13 +6,11 @@ import type { RescueUpdate } from '../types';
 
 import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
 
-interface RescueUpdateTimelineProps {
+interface RescueTimelineProps {
   updates: RescueUpdate[];
 }
 
-export const RescueUpdateTimeline = ({
-  updates,
-}: RescueUpdateTimelineProps) => {
+export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
   const sortedUpdates = updates
     .slice()
