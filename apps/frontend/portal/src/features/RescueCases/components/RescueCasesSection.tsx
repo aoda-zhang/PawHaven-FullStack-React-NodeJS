@@ -1,11 +1,25 @@
 import { cn } from '@pawhaven/frontend-core';
+import { RescueStatusSchema } from '@pawhaven/shared/types';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { FILTER_OPTIONS } from '../constants';
 import type { FilterStatus, RescueCase } from '../types';
 
 import { CaseCard } from './CaseCard';
+
+const FILTER_ALL: FilterStatus = 'all';
+
+const FILTER_OPTIONS: Array<{ value: FilterStatus; labelKey: string }> = [
+  { value: FILTER_ALL, labelKey: 'rescue_cases.filter_all' },
+  {
+    value: RescueStatusSchema.enum.pending,
+    labelKey: 'common.rescue_status_pending',
+  },
+  {
+    value: RescueStatusSchema.enum.inProgress,
+    labelKey: 'common.rescue_status_inProgress',
+  },
+];
 
 interface RescueCasesSectionProps {
   cases: RescueCase[];
@@ -17,19 +31,24 @@ export const RescueCasesSection = ({
   onCaseClick,
 }: RescueCasesSectionProps) => {
   const { t } = useTranslation();
-  const [activeFilter, setActiveFilter] = useState<FilterStatus>('all');
+  const [activeFilter, setActiveFilter] = useState<FilterStatus>(FILTER_ALL);
 
   const displayedCases = useMemo(() => {
-    if (activeFilter === 'all') return cases;
+    if (activeFilter === FILTER_ALL) return cases;
     return cases.filter((c) => c.status === activeFilter);
   }, [cases, activeFilter]);
 
   const pendingCount = useMemo(
-    () => displayedCases.filter((c) => c.status === 'pending').length,
+    () =>
+      displayedCases.filter((c) => c.status === RescueStatusSchema.enum.pending)
+        .length,
     [displayedCases],
   );
   const inProgressCount = useMemo(
-    () => displayedCases.filter((c) => c.status === 'inProgress').length,
+    () =>
+      displayedCases.filter(
+        (c) => c.status === RescueStatusSchema.enum.inProgress,
+      ).length,
     [displayedCases],
   );
 
@@ -66,7 +85,7 @@ export const RescueCasesSection = ({
         ))}
       </div>
 
-      {displayedCases.length === 0 ? (
+      {displayedCases?.length === 0 ? (
         <p className="text-text-secondary py-16 text-center">
           {t('rescue_cases.no_cases_found')}
         </p>

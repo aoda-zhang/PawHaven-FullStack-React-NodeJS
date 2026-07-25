@@ -414,6 +414,8 @@ connect to backend APIs."
 │    - No comments unless explaining "why"?           │
 │    - No cross-feature imports?                       │
 │    - Loading/error/empty states handled?             │
+│    - No magic values? (status strings, filter        │
+│      literals — must use named constants)            │
 │                                                     │
 │ If any check fails → fix → re-validate (repeat       │
 │ until all 6 items pass)                              │
@@ -540,6 +542,9 @@ grep -rE '-\[[0-9]+\.?[0-9]*rem\]' apps/frontend/portal/src/features --include="
 
 # Hardcoded strings quick sanity
 grep -rE '>[A-Z][a-z].*<' apps/frontend/portal/src/features --include="*.tsx" | grep -v 't('
+
+# Magic values check — string literals used in comparisons/filters
+grep -rEn "===\s*'[a-z_]+'|==\s*'[a-z_]+'" apps/frontend/portal/src/features --include="*.tsx" --include="*.ts"
 ```
 
 ---
@@ -657,3 +662,4 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
 12. **ALWAYS type props with an interface.** No `any`, no inline types in function signatures.
 13. **ALWAYS run typecheck before reporting done.**
 14. **If you can't proceed (missing API contract, blocked by backend), report back immediately** — don't guess or work around.
+15. **NEVER use magic string/number values.** Extract all literal values used in comparisons, filters, or logic into named constants or reference the source type/enum. Magic values are invisible bugs waiting to happen.
