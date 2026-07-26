@@ -149,6 +149,46 @@ queryClient.prefetchQuery(userQueryOptions(userId));
 
 ---
 
+## Mock Data Fallback Pattern
+
+During development, mock data lives in `mockData.ts` and is consumed by the API layer as a fallback. Pages and components MUST NEVER import mockData directly — the data flow is strictly one-way:
+
+```
+mockData.ts → api.ts (try/catch fallback) → queries.ts (useQuery) → Page component
+```
+
+```typescript
+// features/Feature/api/feature.api.ts
+import { apiClient } from '@/utils/apiClient';
+import { mockItems } from '../mockData';
+
+export const fetchItems = async (): Promise<Item[]> => {
+  try {
+    return await apiClient.get<Item[]>('/api/items');
+  } catch {
+    return mockItems;
+  }
+};
+
+// features/Feature/api/feature.queries.ts
+export const useFetchItems = () => {
+  return useQuery({
+    queryKey: featureKeys.list(),
+    queryFn: fetchItems,
+  });
+};
+
+// ✅ Correct — Page uses query hook
+const { data } = useFetchItems();
+
+// ❌ WRONG — Page must never import mockData directly
+import { mockItems } from '../mockData';
+```
+
+✅ **Mock data is owned by `api.ts` exclusively. Pages only see query hooks.**
+
+---
+
 # 5. `useQuery` Patterns
 
 ## 5.1 Basic Query

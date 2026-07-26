@@ -582,12 +582,19 @@ export { NewFeaturePage };
 // features/NewFeature/api/newFeature.api.ts
 import { apiClient } from '@/utils/apiClient';
 import type { NewFeatureItem } from '@pawhaven/shared';
+import { mockNewFeatureList } from '../mockData';
 
-export const getNewFeatureList = (params: {
+export const getNewFeatureList = async (params: {
   page: number;
   search?: string;
-}) => {
-  return apiClient.get<NewFeatureItem[]>('/api/new-feature', { params });
+}): Promise<NewFeatureItem[]> => {
+  try {
+    return await apiClient.get<NewFeatureItem[]>('/api/new-feature', {
+      params,
+    });
+  } catch {
+    return mockNewFeatureList;
+  }
 };
 ```
 
@@ -604,6 +611,8 @@ export function useNewFeatureList(params: { page: number; search?: string }) {
   });
 }
 ```
+
+**Mock data flow: `mockData.ts` → `api.ts` (fallback) → `queries.ts` (hook) → Page. Pages NEVER import mockData directly.** The API function calls the real endpoint and falls back to mockData on failure. Query hooks wrap API functions. Pages consume through query hooks only.
 
 ### 10.3 Adding Forms
 

@@ -48,6 +48,7 @@ vi.mock('react-i18next', async () => {
 
 vi.mock('lucide-react', () => ({
   ArrowLeft: () => null,
+  ArrowRight: () => null,
   Clock: () => null,
   MapPin: () => null,
   User: () => null,

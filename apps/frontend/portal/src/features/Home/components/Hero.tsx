@@ -3,22 +3,30 @@ import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
+import { useFetchHeroStats } from '../api/home.queries';
 
-const STATS = [
-  { value: '8,412', labelKey: 'home.hero_stat_rescues' },
-  { value: '3,207', labelKey: 'home.hero_stat_adopted' },
-  { value: '1,940', labelKey: 'home.hero_stat_volunteers' },
-] as const;
+preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
 export const Hero = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { data: heroStatValues } = useFetchHeroStats();
+
+  const stats = heroStatValues
+    ? ([
+        { value: heroStatValues.rescues, labelKey: 'home.hero_stat_rescues' },
+        { value: heroStatValues.adopted, labelKey: 'home.hero_stat_adopted' },
+        {
+          value: heroStatValues.volunteers,
+          labelKey: 'home.hero_stat_volunteers',
+        },
+      ] as const)
+    : null;
 
   return (
     <section
       aria-label={t('home.hero_aria_label')}
-      className="bg-hero-bg -mx-4 flex min-h-96 flex-col items-center gap-10 px-4 sm:-mx-8 sm:px-8 lg:-mx-28 lg:min-h-[30rem] lg:flex-row lg:gap-10 lg:px-28"
+      className="bg-hero-bg -mx-4 flex min-h-96 flex-col items-center gap-10 px-4 py-10 sm:-mx-8 sm:px-8 lg:-mx-28 lg:min-h-[30rem] lg:flex-row lg:gap-10 lg:px-28 lg:py-0"
     >
       <div className="flex w-full flex-col lg:w-7/12">
         <h1 className="text-dark-text text-hero">
@@ -56,19 +64,21 @@ export const Hero = () => {
           </button>
         </div>
 
-        <div className="divide-dark-text/15 text-dark-text mt-10 flex flex-row divide-x">
-          {STATS.map((stat) => (
-            <div
-              key={stat.labelKey}
-              className="flex flex-col px-2 py-0 first:pl-0 last:pr-0 sm:px-6 sm:first:pl-0 sm:last:pr-0"
-            >
-              <span className="sm:text-stat text-xl">{stat.value}</span>
-              <span className="text-stat-labels mt-1 text-xs">
-                {t(stat.labelKey)}
-              </span>
-            </div>
-          ))}
-        </div>
+        {stats && (
+          <div className="divide-dark-text/15 text-dark-text mt-10 flex flex-row divide-x">
+            {stats.map((stat) => (
+              <div
+                key={stat.labelKey}
+                className="flex flex-col px-2 py-0 first:pl-0 last:pr-0 sm:px-6 sm:first:pl-0 sm:last:pr-0"
+              >
+                <span className="sm:text-stat text-xl">{stat.value}</span>
+                <span className="text-stat-labels mt-1 text-xs">
+                  {t(stat.labelKey)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="relative hidden w-full lg:block lg:w-5/12">
