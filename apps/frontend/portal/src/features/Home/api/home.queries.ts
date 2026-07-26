@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getHeroStats, getLatestRescuesByNumber } from './home.api';
+import {
+  getAdoptablePets,
+  getHeroStats,
+  getLatestRescuesByNumber,
+} from './home.api';
 import { homeQueryKeys } from './home.queryKeys';
 
 export const useFetchLatestRescuesByNumber = () => {
@@ -15,5 +19,12 @@ export const useFetchHeroStats = () => {
     queryKey: homeQueryKeys.heroStats(),
     queryFn: getHeroStats,
     staleTime: Infinity,
+  });
+};
+
+export const useFetchAdoptablePets = () => {
+  return useQuery({
+    queryKey: homeQueryKeys.adoptablePets(),
+    queryFn: getAdoptablePets,
   });
 };

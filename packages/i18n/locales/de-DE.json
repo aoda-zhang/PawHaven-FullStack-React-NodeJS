@@ -93,7 +93,14 @@
     "hero_stat_rescues": "Abgeschlossene Rettungen",
     "hero_stat_adopted": "Vermittelte Zuhause",
     "hero_stat_volunteers": "Aktive Freiwillige",
-    "hero_image_alt": "Eine Freiwillige hält eine gerettete Katze und einen geretteten Hund"
+    "hero_image_alt": "Eine Freiwillige hält eine gerettete Katze und einen geretteten Hund",
+    "forever_home_title": "Bereit für ein Zuhause für immer",
+    "forever_home_subtitle": "Diese Tiere haben ihre Rettungsreise abgeschlossen und warten auf dich.",
+    "forever_home_see_all": "Alle ansehen",
+    "forever_home_no_pets": "Derzeit keine adoptierbaren Tiere",
+    "forever_home_aria_label": "Bereich für adoptierbare Tiere",
+    "adoptable_badge": "Adoptierbar",
+    "waiting_days": "Wartet {{days}} Tage"
   },
   "reportStray": {
     "report_animal": "Fundtier melden",

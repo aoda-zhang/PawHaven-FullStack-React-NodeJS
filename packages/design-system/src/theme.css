@@ -31,7 +31,10 @@
   --color-foreground: var(--color-gray-10); /* #1c1c1c — main text, headings */
   --color-muted: var(--color-gray-3); /* #f3f3f1 — secondary bg, inactive */
   --color-accent: var(--color-brown-2); /* #fff4ee — highlights, light pills */
+  --color-accent-foreground: var(--color-orange-9); /* #c2410b — text on accent backgrounds */
   --color-card: var(--color-gray-1); /* #ffffff — card surfaces */
+  --color-adoptable-bg: var(--color-green-2); /* #dcfce7 — "Adoptable" badge bg */
+  --color-adoptable-text: var(--color-green-8); /* #15803d — "Adoptable" badge text */
   --color-surface: var(--color-gray-1); /* alias of card */
   --color-background-subtle: var(--color-brown-3);
   --color-muted-strong: var(--color-brown-4);
