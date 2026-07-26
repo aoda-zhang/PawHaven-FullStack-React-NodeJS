@@ -3,12 +3,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteLogout, postLogin, postRegister } from './auth.api';
 import { authQueryKeys } from './auth.queryKeys';
 
+import { landingQueryKeys } from '@/features/Landing/api/landing.queryKeys';
+
 export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: postLogin,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: landingQueryKeys.all });
     },
   });
 };
@@ -25,6 +28,7 @@ export const useLogout = () => {
     mutationFn: deleteLogout,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: landingQueryKeys.all });
     },
   });
 };

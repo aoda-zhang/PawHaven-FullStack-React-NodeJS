@@ -11,9 +11,13 @@
     "prepare": "husky",
     "format": "prettier --write .",
     "lint-staged": "lint-staged",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "build": "turbo run build",
     "build:backend-core": "turbo run build --filter=@pawhaven/backend-core...",
     "build:frontend-core": "turbo run build --filter=@pawhaven/frontend-core...",
     "build:shared": "turbo run build --filter=@pawhaven/shared...",
+    "token-check": "node packages/design-system/scripts/token-check.cjs",
     "doctor": "npx react-doctor@latest"
   },
   "lint-staged": {

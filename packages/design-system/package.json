@@ -2,30 +2,51 @@
   "name": "@pawhaven/design-system",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
   "sideEffects": [
     "*.css"
   ],
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
     "./styles.css": "./index.css",
-    "./theme": "./src/MUI-theme.ts",
-    "./tokens": "./src/tokens.ts"
+    "./theme": {
+      "types": "./src/MUI-theme.ts",
+      "import": "./src/MUI-theme.ts",
+      "default": "./src/MUI-theme.ts"
+    },
+    "./tokens": {
+      "types": "./src/tokens.ts",
+      "import": "./src/tokens.ts",
+      "default": "./src/tokens.ts"
+    }
   },
   "files": [
     "index.css",
-    "src"
+    "src/**"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "token-check": "node scripts/token-check.cjs"
   },
-  "dependencies": {
-    "react": "^19.2.0",
+  "peerDependencies": {
     "@mui/material": "^7.3.4",
-    "tailwindcss": "^4.1.14",
-    "typescript": "^5.9.3",
-    "@pawhaven/eslint-config": "workspace:*"
+    "react": "^19.2.0"
   },
   "devDependencies": {
-    "@pawhaven/tsconfig": "workspace:*"
+    "@mui/material": "^7.3.4",
+    "@pawhaven/eslint-config": "workspace:*",
+    "@pawhaven/tsconfig": "workspace:*",
+    "react": "^19.2.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3"
   }
 }

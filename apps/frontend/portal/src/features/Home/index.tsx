@@ -1,37 +1,52 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { CaseDetail } from '../RescueCases/components/CaseDetail';
+import { useFetchRescueCases } from '../RescueCases/api/rescueCases.queries';
 import { RescueCasesSection } from '../RescueCases/components/RescueCasesSection';
-import { mockRescueCases } from '../RescueCases/mockData';
 
+import { useFetchAdoptablePets } from './api/home.queries';
+import { AdoptablePetsSection } from './components/AdoptablePetsSection';
 import { Hero } from './components/Hero';
 
 export const Home = () => {
-  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { data: cases = [] } = useFetchRescueCases();
+  const { data: pets = [] } = useFetchAdoptablePets();
 
-  const selectedCase = selectedCaseId
-    ? mockRescueCases.find((c) => c.id === selectedCaseId)
-    : undefined;
+  const handleCaseClick = useCallback(
+    (id: string) => {
+      navigate(`/rescue/detail/${id}`);
+    },
+    [navigate],
+  );
 
-  if (selectedCaseId && selectedCase) {
-    return (
-      <div className="flex flex-col">
-        <CaseDetail
-          caseData={selectedCase}
-          isLoading={false}
-          isError={false}
-          onBack={() => setSelectedCaseId(null)}
-        />
-      </div>
-    );
-  }
+  const handleSeeAll = useCallback(() => {
+    navigate('/rescue-cases');
+  }, [navigate]);
+
+  const handlePetClick = useCallback(
+    (id: string) => {
+      navigate(`/adopt/detail/${id}`);
+    },
+    [navigate],
+  );
+
+  const handleSeeAllPets = useCallback(() => {
+    navigate('/adopt');
+  }, [navigate]);
 
   return (
     <div className="flex flex-col">
       <Hero />
       <RescueCasesSection
-        cases={mockRescueCases}
-        onCaseClick={setSelectedCaseId}
+        cases={cases}
+        onCaseClick={handleCaseClick}
+        onSeeAll={handleSeeAll}
+      />
+      <AdoptablePetsSection
+        pets={pets}
+        onPetClick={handlePetClick}
+        onSeeAll={handleSeeAllPets}
       />
     </div>
   );

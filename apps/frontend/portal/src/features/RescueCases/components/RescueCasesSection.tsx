@@ -1,71 +1,64 @@
-import { cn } from '@pawhaven/frontend-core';
-import { useState } from 'react';
+import { RescueStatusSchema } from '@pawhaven/shared/types';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { FILTER_OPTIONS } from '../constants';
-import type { FilterStatus, RescueCase } from '../types';
+import type { RescueCase } from '../types';
 
 import { CaseCard } from './CaseCard';
 
 interface RescueCasesSectionProps {
   cases: RescueCase[];
   onCaseClick: (id: string) => void;
+  onSeeAll?: () => void;
 }
 
 export const RescueCasesSection = ({
   cases,
   onCaseClick,
+  onSeeAll,
 }: RescueCasesSectionProps) => {
   const { t } = useTranslation();
-  const [activeFilter, setActiveFilter] = useState<FilterStatus>('all');
 
-  const filteredCases = () => {
-    if (activeFilter === 'all') return cases;
-    return cases.filter((c) => c.status === activeFilter);
-  };
-
-  const displayedCases = filteredCases();
+  const pendingCount = cases.filter(
+    (c) => c.status === RescueStatusSchema.enum.pending,
+  ).length;
+  const inProgressCount = cases.filter(
+    (c) => c.status === RescueStatusSchema.enum.inProgress,
+  ).length;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div className="mb-6">
-        <h2 className="text-foreground font-serif text-2xl font-bold">
-          {t('rescue_cases.section_title')}
-        </h2>
-        <p className="text-muted-foreground mt-0.5 text-sm">
-          {displayedCases.filter((c) => c.status === 'pending').length}{' '}
-          {t('common.rescue_status_pending')} ·{' '}
-          {displayedCases.filter((c) => c.status === 'inProgress').length}{' '}
-          {t('common.rescue_status_inProgress')}
-        </p>
-      </div>
-
-      {/* Filter tabs */}
-      <div className="mb-6 flex gap-1 overflow-x-auto pb-1">
-        {FILTER_OPTIONS.map((option) => (
+    <section className="max-w-6xl py-10">
+      <div className="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="text-foreground font-serif text-2xl font-bold">
+            {t('rescue_cases.section_title')}
+          </h2>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            {pendingCount}
+            {t('common.rescue_status_pending')}
+            {inProgressCount}
+            {t('common.rescue_status_inProgress')}
+          </p>
+        </div>
+        {onSeeAll && (
           <button
-            key={option.value}
             type="button"
-            onClick={() => setActiveFilter(option.value)}
-            className={cn(
-              'flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
-              activeFilter === option.value
-                ? 'bg-primary text-primary-fg shadow-sm'
-                : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted border',
-            )}
+            onClick={onSeeAll}
+            className="text-primary hover:text-primary/80 flex flex-shrink-0 cursor-pointer items-center gap-1 text-sm font-medium transition-colors"
           >
-            {t(option.labelKey)}
+            {t('rescue_cases.see_all')}
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
-        ))}
+        )}
       </div>
 
-      {displayedCases.length === 0 ? (
+      {cases?.length === 0 ? (
         <p className="text-text-secondary py-16 text-center">
           {t('rescue_cases.no_cases_found')}
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          {displayedCases.map((caseData) => (
+          {cases.map((caseData) => (
             <CaseCard
               key={caseData.id}
               caseData={caseData}

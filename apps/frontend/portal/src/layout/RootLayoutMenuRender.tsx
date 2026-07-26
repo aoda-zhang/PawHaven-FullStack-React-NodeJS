@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { cn } from '@pawhaven/frontend-core';
 import { BookOpen, FileText, Heart, House } from 'lucide-react';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';
@@ -23,7 +23,7 @@ export const RootLayoutMenuRender = (
   });
 
   return (
-    <div className={clsx('flex gap-1', className)}>
+    <div className={cn('flex gap-1', className)}>
       {resolvedItems.map((item) => {
         const Icon = NAV_ICONS[item.to];
         return (

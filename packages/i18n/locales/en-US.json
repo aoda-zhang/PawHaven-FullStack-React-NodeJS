@@ -93,7 +93,14 @@
     "hero_stat_rescues": "Rescues completed",
     "hero_stat_adopted": "Adopted homes",
     "hero_stat_volunteers": "Active volunteers",
-    "hero_image_alt": "A volunteer holding a rescued cat and dog"
+    "hero_image_alt": "A volunteer holding a rescued cat and dog",
+    "forever_home_title": "Ready for a Forever Home",
+    "forever_home_subtitle": "These animals completed their rescue journey and are waiting for you.",
+    "forever_home_see_all": "See all",
+    "forever_home_no_pets": "No adoptable pets at the moment",
+    "forever_home_aria_label": "Adoptable pets section",
+    "adoptable_badge": "Adoptable",
+    "waiting_days": "Waiting {{days}} days"
   },
   "reportStray": {
     "report_animal": "Report Stray Animal",
@@ -195,6 +202,7 @@
     "view_list": "List",
     "view_map": "Map",
     "no_cases_found": "No rescue cases found",
+    "see_all": "See all",
     "urgency_high": "Urgent",
     "urgency_normal": "Normal",
     "animal_cat": "Cat",

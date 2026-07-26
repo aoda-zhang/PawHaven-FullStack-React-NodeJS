@@ -1,6 +1,6 @@
 import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
 import { Menu } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { RootLayoutMenuRender } from './RootLayoutMenuRender';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
@@ -20,19 +20,23 @@ export const RootLayoutMenu = ({
 }: RootLayoutMenuProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const onOpenSidebar = () => setSidebarOpen(true);
-  const onCloseSidebar = () => setSidebarOpen(false);
+  const onOpenSidebar = useCallback(() => setSidebarOpen(true), []);
+  const onCloseSidebar = useCallback(() => setSidebarOpen(false), []);
 
-  const navItems = menuItems.filter(
-    (item) => !(item.classNames as string[]).includes('login'),
-  );
-  const loginItem = menuItems.filter((item) =>
-    (item.classNames as string[]).includes('login'),
-  );
+  // Memoize derived menu splits to avoid re-filtering on every render.
+  const { navItems, loginItem } = useMemo(() => {
+    const nav = menuItems.filter(
+      (item) => !(item.classNames as string[]).includes('login'),
+    );
+    const login = menuItems.filter((item) =>
+      (item.classNames as string[]).includes('login'),
+    );
+    return { navItems: nav, loginItem: login };
+  }, [menuItems]);
 
   return (
     <nav aria-label="Main navigation">
-      <div className="mx-auto flex h-10 max-w-6xl items-center px-30">
+      <div className="mx-auto flex h-10 max-w-6xl items-center px-4 sm:px-8 lg:px-32">
         <Brand navigate={navigate} />
 
         <div className="flex flex-1 justify-center">

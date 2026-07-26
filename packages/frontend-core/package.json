@@ -41,9 +41,13 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
+    "react-error-boundary": "^4.0.0 || ^5.0.0",
     "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "peerDependenciesMeta": {
+    "react-error-boundary": {
+      "optional": true
+    },
     "react-router-dom": {
       "optional": true
     }

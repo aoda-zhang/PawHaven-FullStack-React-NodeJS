@@ -26,3 +26,5 @@ export type {
   EasingToken,
   TypographyToken,
 } from './tokens';
+
+export { MUITheme, createMUITheme } from './MUI-theme';

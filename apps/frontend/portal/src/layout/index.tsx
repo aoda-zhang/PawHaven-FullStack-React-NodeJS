@@ -1,5 +1,7 @@
+import { ContentFallback } from '@pawhaven/frontend-core';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -19,8 +21,8 @@ export const RootLayout = () => {
   const { pathname } = useLocation();
 
   return (
-    <div>
-      <header className="z-sticky border-border sticky top-0 border-b bg-[rgba(255,250,245,0.88)] backdrop-blur-[12px]">
+    <div className="overflow-x-hidden">
+      <header className="z-sticky border-border bg-background/88 sticky top-0 border-b backdrop-blur-md">
         <Toast />
         {isSysMaintain && (
           <NotificationBanner
@@ -43,10 +45,12 @@ export const RootLayout = () => {
       </header>
 
       <main className="flex flex-1 flex-col">
-        <div className="flex-1 px-30">
-          <Suspense fallback={<Loading />}>
-            <Outlet />
-          </Suspense>
+        <div className="flex-1 px-4 lg:px-28">
+          <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </div>
         {isFooterAvailable && (
           <footer>

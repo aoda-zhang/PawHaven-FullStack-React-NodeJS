@@ -93,7 +93,14 @@
     "hero_stat_rescues": "已完成救助",
     "hero_stat_adopted": "已找到家",
     "hero_stat_volunteers": "活跃志愿者",
-    "hero_image_alt": "一名志愿者怀抱获救的猫和狗"
+    "hero_image_alt": "一名志愿者怀抱获救的猫和狗",
+    "forever_home_title": "等待一个永远的家",
+    "forever_home_subtitle": "这些动物已完成救助旅程，正在等待你",
+    "forever_home_see_all": "查看全部",
+    "forever_home_no_pets": "暂无可领养宠物",
+    "forever_home_aria_label": "待领养宠物区域",
+    "adoptable_badge": "可领养",
+    "waiting_days": "已等待 {{days}} 天"
   },
   "reportStray": {
     "report_animal": "上报流浪动物",
@@ -195,6 +202,7 @@
     "view_list": "列表",
     "view_map": "地图",
     "no_cases_found": "未找到救助案例",
+    "see_all": "查看全部",
     "urgency_high": "紧急",
     "urgency_normal": "普通",
     "animal_cat": "猫",
