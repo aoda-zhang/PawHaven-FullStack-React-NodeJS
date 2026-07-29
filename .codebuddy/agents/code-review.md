@@ -226,3 +226,4 @@ checklist in STEP 8; a report without it is incomplete.
 8. **ALWAYS distinguish blocking vs warning vs suggestion.**
 9. **NEVER skip a review layer** because "it's a small change."
 10. **ALWAYS scan ALL source directories** (features/, layout/, components/), not just features/.
+11. **Flag related sequential constants defined as separate top-level exports.** They should be grouped into a single object (e.g., `export const Step = { ... } as const`). If a data structure already defines the order, derived counts should use `.length`, not duplicated numbers.

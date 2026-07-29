@@ -672,3 +672,4 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
 13. **ALWAYS run typecheck before reporting done.**
 14. **If you can't proceed (missing API contract, blocked by backend), report back immediately** — don't guess or work around.
 15. **NEVER use magic string/number values.** Extract all literal values used in comparisons, filters, or logic into named constants or reference the source type/enum. Magic values are invisible bugs waiting to happen.
+16. **NEVER define related sequential constants as separate top-level exports.** Group them into a single object (e.g., `export const Step = { PHOTOS: 1, LOCATION: 2 } as const`). If an array already defines the order, derive counts from `.length` instead of duplicating.

@@ -26,7 +26,7 @@ export const Hero = () => {
   return (
     <section
       aria-label={t('home.hero_aria_label')}
-      className="bg-hero-bg -mx-4 flex min-h-96 flex-col items-center gap-10 px-4 py-10 sm:-mx-8 sm:px-8 lg:-mx-28 lg:min-h-[30rem] lg:flex-row lg:gap-10 lg:px-28 lg:py-0"
+      className="bg-hero-bg full-width flex min-h-96 flex-col items-center gap-10 px-4 py-10 sm:px-8 lg:min-h-[30rem] lg:flex-row lg:gap-10 lg:px-28 lg:py-0"
     >
       <div className="flex w-full flex-col lg:w-7/12">
         <h1 className="text-dark-text text-hero">

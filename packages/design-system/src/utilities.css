@@ -14,6 +14,11 @@
    size + family + weight + line-height into one class — remain here.
    ============================================================ */
 
+@utility full-width {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
 @utility text-hero {
   font-size: var(--text-display);
   line-height: var(--leading-display);

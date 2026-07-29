@@ -120,7 +120,39 @@ Before delivering ANY generated or edited code, you MUST perform a self-review p
 
 This validation is NOT optional. Failure to strip unnecessary comments is a rule violation.
 
-The following standards are defined in their authoritative skill files.
+## 2. Constants — Group Related Sequential Values
+
+When defining multiple constants that represent the same category of sequential/related values (e.g., wizard step numbers, status codes, config keys, enum-like values), **group them under a single object**. Never define them as separate top-level exports.
+
+```ts
+// ❌ WRONG — six noisy exports, fragile duplication
+export const STEP_PHOTOS = 1;
+export const STEP_LOCATION = 2;
+export const STEP_ANIMAL = 3;
+export const STEP_CONDITION = 4;
+export const STEP_URGENCY = 5;
+export const STEP_CONFIRM = 6;
+
+// ✅ CORRECT — one export, one namespace
+export const Step = {
+  PHOTOS: 1,
+  LOCATION: 2,
+  ANIMAL: 3,
+  CONDITION: 4,
+  URGENCY: 5,
+  CONFIRM: 6,
+} as const;
+```
+
+If a data structure already defines the order (like an array), **derive counts from it** rather than duplicating the number:
+
+```ts
+const STEPS = [...];
+const TOTAL_STEPS = STEPS.length; // ✅ derived
+const TOTAL_STEPS = 6;            // ❌ duplicated
+```
+
+This applies to both TypeScript constants and any configuration that shares a common category name.
 Global rules above take precedence; skill-specific rules add enforcement detail.
 
 | Domain | Authoritative Skill |
