@@ -23,7 +23,7 @@ export const RootLayoutMenuRender = (
   });
 
   return (
-    <div className={cn('flex gap-1', className)}>
+    <div className={cn('flex flex-col gap-3 md:flex-row md:gap-1', className)}>
       {resolvedItems.map((item) => {
         const Icon = NAV_ICONS[item.to];
         return (
