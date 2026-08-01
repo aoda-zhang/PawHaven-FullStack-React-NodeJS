@@ -1,5 +1,6 @@
-import { Drawer, useMediaQuery, useTheme } from '@mui/material';
+import { Drawer, useMediaQuery, useTheme, type Theme } from '@mui/material';
 import { LanguageSelector } from '@pawhaven/frontend-core';
+import { useEffect } from 'react';
 import type { NavigateFunction } from 'react-router-dom';
 
 import { RootLayoutMenuRender } from './RootLayoutMenuRender';
@@ -19,8 +20,14 @@ export const RootLayoutSidebar = ({
   onCloseSidebar,
   navigate,
 }: RootLayoutSidebarProps) => {
-  const theme = useTheme();
-  const Desktop = useMediaQuery('(min-width: 768px)');
+  const theme: Theme = useTheme();
+  const isDesktop: boolean = useMediaQuery('(min-width: 768px)');
+
+  useEffect(() => {
+    if (isDesktop && isSidebarOpen) {
+      onCloseSidebar();
+    }
+  }, [isDesktop, isSidebarOpen, onCloseSidebar]);
 
   const navigateAndClose: NavigateFunction = (...args) => {
     onCloseSidebar();
@@ -30,10 +37,10 @@ export const RootLayoutSidebar = ({
 
   return (
     <Drawer
-      open={Desktop ? false : isSidebarOpen}
+      open={isDesktop ? false : isSidebarOpen}
       transitionDuration={{
         enter: theme.transitions.duration.enteringScreen,
-        exit: Desktop ? 0 : theme.transitions.duration.leavingScreen,
+        exit: isDesktop ? 0 : theme.transitions.duration.leavingScreen,
       }}
       anchor="right"
       onClose={onCloseSidebar}
