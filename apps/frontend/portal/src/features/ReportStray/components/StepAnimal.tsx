@@ -8,15 +8,19 @@ import { ANIMAL_TYPES, type AnimalType } from './types';
 interface StepAnimalProps {
   animalType: AnimalType;
   animalCount: number;
+  otherAnimalType: string;
   onAnimalTypeChange: (type: AnimalType) => void;
   onAnimalCountChange: (count: number) => void;
+  onOtherAnimalTypeChange: (value: string) => void;
 }
 
 export const StepAnimal: React.FC<StepAnimalProps> = ({
   animalType,
   animalCount,
+  otherAnimalType,
   onAnimalTypeChange,
   onAnimalCountChange,
+  onOtherAnimalTypeChange,
 }) => {
   const { t } = useTranslation();
 
@@ -48,6 +52,24 @@ export const StepAnimal: React.FC<StepAnimalProps> = ({
           </button>
         ))}
       </div>
+      {animalType === 'other' && (
+        <div className="mb-5">
+          <label
+            htmlFor="other-animal-type"
+            className="text-foreground mb-1.5 block text-sm font-medium"
+          >
+            {t('reportStray.wizard.step3_other_label')}
+          </label>
+          <input
+            id="other-animal-type"
+            type="text"
+            value={otherAnimalType}
+            onChange={(e) => onOtherAnimalTypeChange(e.target.value)}
+            placeholder={t('reportStray.wizard.step3_other_placeholder')}
+            className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary aors w-full rounded-lg border px-3 py-2 text-sm outline-none"
+          />
+        </div>
+      )}
       <div>
         <label className="text-foreground mb-3 block text-sm font-medium">
           {t('reportStray.wizard.step3_count_label')}

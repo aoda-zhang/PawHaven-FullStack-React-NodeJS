@@ -179,6 +179,8 @@
       "step3_title": "What kind of animal?",
       "step3_subtitle": "This helps us match the right volunteer.",
       "step3_count_label": "Number of animals",
+      "step3_other_label": "What kind of animal?",
+      "step3_other_placeholder": "e.g. Rabbit, bird, turtle...",
       "step4_label": "Condition",
       "step4_title": "Appearance & condition",
       "step4_subtitle": "Describe what you see so volunteers come prepared.",

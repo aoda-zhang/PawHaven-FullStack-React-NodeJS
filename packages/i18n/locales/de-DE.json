@@ -179,6 +179,8 @@
       "step3_title": "Was für ein Tier?",
       "step3_subtitle": "Das hilft uns, den richtigen Freiwilligen zu finden.",
       "step3_count_label": "Anzahl der Tiere",
+      "step3_other_label": "Welche Art von Tier?",
+      "step3_other_placeholder": "z.B. Kaninchen, Vogel, Schildkröte...",
       "step4_label": "Zustand",
       "step4_title": "Aussehen & Zustand",
       "step4_subtitle": "Beschreiben Sie, was Sie sehen, damit Freiwillige vorbereitet sind.",

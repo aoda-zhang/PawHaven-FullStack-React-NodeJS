@@ -25,6 +25,7 @@ import type { ReportDraft } from './types';
 const initialDraft: ReportDraft = {
   animalType: 'cat',
   animalCount: 1,
+  otherAnimalType: '',
   coatColor: '',
   size: null,
   behavior: null,
@@ -77,8 +78,14 @@ export const ReportWizard: React.FC = () => {
           <StepAnimal
             animalType={draft.animalType}
             animalCount={draft.animalCount}
-            onAnimalTypeChange={(animalType) => update({ animalType })}
+            otherAnimalType={draft.otherAnimalType}
+            onAnimalTypeChange={(animalType) =>
+              update({ animalType, otherAnimalType: '' })
+            }
             onAnimalCountChange={(animalCount) => update({ animalCount })}
+            onOtherAnimalTypeChange={(otherAnimalType) =>
+              update({ otherAnimalType })
+            }
           />
         );
       case Step.CONDITION:

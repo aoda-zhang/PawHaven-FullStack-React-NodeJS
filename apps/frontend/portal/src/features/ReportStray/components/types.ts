@@ -37,6 +37,7 @@ export type UrgencyCheck = Record<UrgencyKey, boolean>;
 export interface ReportDraft {
   animalType: AnimalType;
   animalCount: number;
+  otherAnimalType: string;
   coatColor: string;
   size: Size | null;
   behavior: Behavior | null;

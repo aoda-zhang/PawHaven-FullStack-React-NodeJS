@@ -201,7 +201,7 @@ export class BootstrapService {
   }
 
   async addAppRouter(
-    router: RouterItem & { parentId?: string; authRequired?: boolean },
+    router: RouterItem & { parentId?: string },
   ): Promise<CreatedRouteDTO> {
     const parentDepth = await this.validateAndGetParentDepth(router.parentId);
     const newRouteDepth = parentDepth + 1;
@@ -214,13 +214,12 @@ export class BootstrapService {
 
     const createdRouterItem = await this.prisma.route.create({
       data: {
-        path: router.path,
-        element: router.element,
+        path: router?.path,
+        element: router?.element,
         handle: this.normalizeRouteHandle(router.handle),
-        authRequired: router.authRequired ?? false,
         ...(router?.parentId
           ? {
-              parent: { connect: { id: router.parentId } },
+              parent: { connect: { id: router?.parentId } },
             }
           : {}),
       },
@@ -262,7 +261,6 @@ export class BootstrapService {
         parentId: true,
         order: true,
         status: true,
-        authRequired: true,
         routePermissions: {
           select: {
             permissionId: true,
@@ -322,7 +320,7 @@ export class BootstrapService {
             ? (route.handle as RouterItem['handle'])
             : {};
 
-        const isRequireUserLogin = Boolean((route as any).authRequired);
+        const isRequireUserLogin = Boolean(rawHandle.isRequireUserLogin);
 
         routeMap.set(route.id, {
           path: route.path,

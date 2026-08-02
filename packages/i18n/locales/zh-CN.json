@@ -179,6 +179,8 @@
       "step3_title": "什么动物？",
       "step3_subtitle": "这有助于我们匹配合适的志愿者。",
       "step3_count_label": "动物数量",
+      "step3_other_label": "是什么动物？",
+      "step3_other_placeholder": "例如：兔子、鸟、乌龟……",
       "step4_label": "状况",
       "step4_title": "外观与状况",
       "step4_subtitle": "描述你看到的，让志愿者做好准备。",

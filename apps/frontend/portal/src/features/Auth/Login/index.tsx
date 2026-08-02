@@ -4,7 +4,7 @@ import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
 import { FormInput } from '@pawhaven/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useLogin } from '../api/auth.mutations';
 import { AuthLayout } from '../authLayout';
@@ -16,8 +16,13 @@ export const Login = () => {
     resolver: zodResolver(CredentialsSchema),
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { mutate, isPending } = useLogin();
+
+  const from =
+    (location.state as { from?: { pathname?: string } })?.from?.pathname ||
+    routePaths.home;
 
   return (
     <AuthLayout>
@@ -34,10 +39,15 @@ export const Login = () => {
             className="mt-5 space-y-3"
             noValidate
             onSubmit={formProps.handleSubmit((data) => {
-              mutate({
-                email: data.email,
-                password: data.password,
-              });
+              mutate(
+                {
+                  email: data.email,
+                  password: data.password,
+                },
+                {
+                  onSuccess: () => navigate(from, { replace: true }),
+                },
+              );
             })}
           >
             <FormInput
