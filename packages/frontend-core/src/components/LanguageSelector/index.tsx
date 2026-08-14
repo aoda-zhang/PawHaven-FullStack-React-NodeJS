@@ -1,8 +1,7 @@
-import { Popover } from '@mui/material';
 import { supportedLngs } from '@pawhaven/i18n/supportedLngs';
 import clsx from 'clsx';
 import { Check, ChevronDown, Globe } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const shortCode = (language: string) => language.split('-')[0].toUpperCase();
@@ -55,23 +54,48 @@ const LanguageMenu = ({ current, onSelect }: LanguageMenuProps) => {
 
 export const LanguageSelector = () => {
   const { i18n, t } = useTranslation();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const current = i18n.language;
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
 
   const handleSelect = (language: string) => {
     i18n.changeLanguage(language);
-    setAnchorEl(null);
+    setOpen(false);
   };
 
   return (
-    <>
+    <div ref={containerRef} className="relative inline-block">
       <button
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('common.select_language')}
-        onClick={(event) => setAnchorEl(event.currentTarget)}
+        onClick={() => setOpen((value) => !value)}
         className="border-border bg-surface text-text-secondary hover:border-border-hover hover:text-text focus-ring rounded-button inline-flex shrink-0 items-center gap-2 border px-2.5 py-1.5 text-sm shadow-sm transition-colors"
       >
         <Globe className="size-4 shrink-0" aria-hidden="true" />
@@ -89,20 +113,11 @@ export const LanguageSelector = () => {
           aria-hidden="true"
         />
       </button>
-      <Popover
-        open={open}
-        anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
-        disableScrollLock
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{
-          className:
-            'bg-surface border-border mt-1.5 rounded-dialog border p-1.5 shadow-dropdown',
-        }}
-      >
-        <LanguageMenu current={current} onSelect={handleSelect} />
-      </Popover>
-    </>
+      {open && (
+        <div className="bg-surface border-border -dialog shadow-dropdown-dropdown righmt-1.5 t-0 mt- absolute top-full z-50 shadow">
+          <LanguageMenu current={current} onSelect={handleSelect} />
+        </div>
+      )}
+    </div>
   );
 };

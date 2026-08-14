@@ -1,5 +1,4 @@
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
+import { Button } from '@pawhaven/ui';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -16,12 +15,6 @@ export interface FileDownloadButtonProps {
   contentClassName?: string;
 }
 
-/**
- * FileDownloadButton
- *
- * Reusable button for downloading arbitrary files with loading state.
- * Explicit file type is required to make download intent clear to callers.
- */
 export const FileDownloadButton = ({
   fileFetchRequest,
   fileName,
@@ -56,7 +49,6 @@ export const FileDownloadButton = ({
       onSuccess?.(blob, fileType);
     } catch (error) {
       onError?.(error, fileType);
-      // In real projects, replace this with centralized error reporting (e.g. Sentry)
       console.error('[FileDownloadButton] Download failed:', error);
     } finally {
       setIsDownloading(false);
@@ -65,10 +57,9 @@ export const FileDownloadButton = ({
 
   return (
     <Button
-      variant="contained"
       onClick={handleDownload}
       disabled={disabled || isDownloading}
-      startIcon={isDownloading ? <CircularProgress size={16} /> : null}
+      loading={isDownloading}
       className={buttonClassName}
     >
       <span className={contentClassName}>{children ?? label}</span>

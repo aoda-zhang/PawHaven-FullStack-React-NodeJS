@@ -46,7 +46,7 @@ apps/
 packages/
 ├── shared/               # Shared types, Zod schemas, constants (used by ALL)
 ├── frontend-core/        # Shared hooks, API client, auth state, error handling
-├── design-system/        # Design tokens, Tailwind v4 + MUI v7 theme, CSS utilities
+├── design-system/        # Design tokens, Tailwind v4 theme, CSS utilities
 ├── i18n/                 # Locale support, t() function, translation files (en-US, zh-CN, de-DE)
 └── ui/                   # Shared UI components
 ```

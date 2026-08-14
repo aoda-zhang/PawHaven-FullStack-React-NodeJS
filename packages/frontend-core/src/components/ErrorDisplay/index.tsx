@@ -1,14 +1,9 @@
-import type { ReactElement } from 'react';
-import type { ToastOptions } from 'react-hot-toast';
-import toast from 'react-hot-toast';
+import { notificationType, showToast, type ShowToastInput } from '@pawhaven/ui';
+import type { ReactNode } from 'react';
 
 import { httpRequestErrors } from '../../api/types';
 import type { HttpRequestErrorType } from '../../api/types';
 
-/**
- * Default error messages for each error type.
- * These can be overridden with i18n translations at runtime.
- */
 const DEFAULT_ERROR_MESSAGES: Record<HttpRequestErrorType, string> = {
   NETWORK:
     'Network connection error. Please check your internet connection and try again.',
@@ -24,48 +19,44 @@ const DEFAULT_ERROR_MESSAGES: Record<HttpRequestErrorType, string> = {
 
 export interface ErrorDisplayProps {
   errorType: HttpRequestErrorType;
-  message?: string | ReactElement;
+  message?: string | ReactNode;
   onRetry?: () => void;
   onDismiss?: () => void;
-  notificationOption?: ToastOptions;
+  notificationOption?: Omit<ShowToastInput, 'message'>;
 }
 
-/**
- * Renders error message with appropriate styling and actions
- * Uses Tailwind CSS classes for styling
- */
+const getErrorTypeLabel = (type: HttpRequestErrorType): string => {
+  switch (type) {
+    case httpRequestErrors.NETWORK:
+      return 'Network Error';
+    case httpRequestErrors.SERVER:
+      return 'Server Error';
+    case httpRequestErrors.AUTH:
+      return 'Auth Error';
+    case httpRequestErrors.PERMISSION:
+      return 'Permission Denied';
+    case httpRequestErrors.BADREQUEST:
+      return 'Invalid Request';
+    case httpRequestErrors.RATELIMIT:
+      return 'Too Many Requests';
+    case httpRequestErrors.MAINTENANCE:
+      return 'Maintenance Mode';
+    default:
+      return 'Error';
+  }
+};
+
 const ErrorMessage = ({
   message,
   errorType,
   onRetry,
   onDismiss,
 }: {
-  message: string | ReactElement;
+  message: string | ReactNode;
   errorType: HttpRequestErrorType;
   onRetry?: () => void;
   onDismiss?: () => void;
 }) => {
-  const getErrorTypeLabel = (type: HttpRequestErrorType): string => {
-    switch (type) {
-      case httpRequestErrors.NETWORK:
-        return '🌐 Network Error';
-      case httpRequestErrors.SERVER:
-        return '⚠️ Server Error';
-      case httpRequestErrors.AUTH:
-        return '🔐 Auth Error';
-      case httpRequestErrors.PERMISSION:
-        return '🚫 Permission Denied';
-      case httpRequestErrors.BADREQUEST:
-        return '❌ Invalid Request';
-      case httpRequestErrors.RATELIMIT:
-        return '⏱️ Too Many Requests';
-      case httpRequestErrors.MAINTENANCE:
-        return '🔧 Maintenance Mode';
-      default:
-        return '⚠️ Error';
-    }
-  };
-
   return (
     <div className="flex flex-col gap-2">
       <div className="text-xs font-semibold tracking-wide uppercase opacity-80">
@@ -99,60 +90,6 @@ const ErrorMessage = ({
   );
 };
 
-/**
- * Display error with toast notification
- */
-const showErrorToast = (
-  message: string | ReactElement,
-  errorType: HttpRequestErrorType,
-  onRetry?: () => void,
-  onDismiss?: () => void,
-  notificationOption?: ToastOptions,
-) => {
-  const globalErrorID = `PAWHAVEN_ERROR_${errorType}`;
-
-  // Merge options carefully: only override defaults if explicitly provided
-  const toastOptions: ToastOptions = {
-    id: globalErrorID,
-    duration: notificationOption?.duration ?? Infinity,
-    position: notificationOption?.position ?? 'top-center',
-    className:
-      notificationOption?.className ??
-      'bg-error text-text-inverse rounded-lg shadow-lg max-w-2xl',
-    ...(() => {
-      if (!notificationOption) return {};
-      const { duration, position, className, ...rest } = notificationOption;
-      return rest;
-    })(),
-  };
-
-  toast.error(
-    (t) => (
-      <div
-        onClick={() => {
-          if (onDismiss) {
-            onDismiss();
-          }
-          toast.dismiss(t.id);
-        }}
-        className="cursor-pointer"
-      >
-        <ErrorMessage
-          message={message}
-          errorType={errorType}
-          onRetry={onRetry}
-          onDismiss={onDismiss}
-        />
-      </div>
-    ),
-    toastOptions,
-  );
-};
-
-/**
- * Main exported function for displaying errors
- * Supports customization via message, callbacks, and toast options
- */
 export const showError = ({
   errorType,
   message,
@@ -161,37 +98,36 @@ export const showError = ({
   notificationOption,
 }: ErrorDisplayProps) => {
   const displayMessage = message ?? DEFAULT_ERROR_MESSAGES[errorType];
-  showErrorToast(
-    displayMessage,
-    errorType,
-    onRetry,
-    onDismiss,
-    notificationOption,
+  const globalErrorID = `PAWHAVEN_ERROR_${errorType}`;
+
+  const content: ReactNode = (
+    <div onClick={() => onDismiss?.()} className="cursor-pointer">
+      <ErrorMessage
+        message={displayMessage}
+        errorType={errorType}
+        onRetry={onRetry}
+        onDismiss={onDismiss}
+      />
+    </div>
   );
+
+  showToast({
+    id: globalErrorID,
+    type: notificationType.error,
+    message: content,
+    duration: notificationOption?.duration ?? Number.POSITIVE_INFINITY,
+  });
 };
 
-/**
- * Hook for using error display in components
- * Provides convenient access to error display functionality
- */
 export const useErrorDisplay = () => {
   return {
     show: showError,
-    dismiss: toast.dismiss,
   };
 };
 
-/**
- * Context provider component for future enhancements
- */
-export const ErrorDisplayProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+export const ErrorDisplayProvider = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
 };
 
-// Re-export error types for convenient access
 export { httpRequestErrors };
 export type { HttpRequestErrorType };

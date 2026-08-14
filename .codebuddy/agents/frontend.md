@@ -269,7 +269,7 @@ If the live page was unavailable, use the markdown spec as the primary design so
 | **Forms**        | React Hook Form + Zod                |
 | **Routing**      | React Router (server-driven)         |
 | **CSS**          | Tailwind CSS + CSS Custom Properties |
-| **Components**   | MUI v7 (complex widgets only)        |
+| **Components**   | shadcn/ui (Radix primitives)         |
 | **i18n**         | i18next + react-i18next              |
 | **HTTP**         | Axios (auth + encrypt interceptors)  |
 | **Icons**        | Lucide                               |
@@ -499,7 +499,7 @@ Q: Does this belong in the URL (filters, pagination, sort)?
 
 ```
 ✅ DO: CSS custom properties in src/tokens/, semantic mappings in theme.css, utilities in utilities.css
-❌ DON'T: React components, JS/TS runtime logic (except MUI theme bridge)
+❌ DON'T: React components, JS/TS runtime logic
 ```
 
 ### 8.4 `@pawhaven/i18n`

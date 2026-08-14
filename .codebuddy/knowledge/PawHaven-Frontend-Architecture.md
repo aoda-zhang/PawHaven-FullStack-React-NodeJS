@@ -172,7 +172,7 @@ apps/frontend/admin   ──depends on──►  ALL packages above
 | Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                                                                      | Must NOT Contain                                        |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                                                              | React, NestJS, Prisma, Node APIs. Must work in browser. |
-| `@pawhaven/design-system` | Design tokens + canonical Figma source of truth.                                                                     | CSS custom properties (tokens), theme.css, utilities.css, MUI theme, `figma/src/app/App.tsx` (canonical design — all feature UIs MUST reference this).                                        | React components, JS runtime. CSS-only.                 |
+| `@pawhaven/design-system` | Design tokens + canonical Figma source of truth.                                                                     | CSS custom properties (tokens), theme.css, utilities.css, `figma/src/app/App.tsx` (canonical design — all feature UIs MUST reference this).                                                   | React components, JS runtime. CSS-only.                 |
 | `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                                                            | Business logic, feature-specific translations.          |
 | `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback. | Feature-specific business logic.                        |
 | `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                                                                     | API calls, auth checks, business logic, domain types.   |
@@ -443,8 +443,7 @@ packages/design-system/
 ├── src/utilities.css         # Layer 3: Component patterns
 │   .btn-primary, .card, .input, .badge, ...
 │
-└── mui-theme.ts          # Bridge: maps tokens to MUI theme object
-    For components that still use MUI (DatePicker)
+└── (tokens consumed via Tailwind + CSS variables)
 ```
 
 ### 7.4 How Code Consumes Tokens
@@ -455,7 +454,7 @@ packages/design-system/
 
 ✅ GOOD:   <div className="bg-primary">           Semantic utility
 ✅ GOOD:   <Button className="btn-primary">        Component utility
-✅ GOOD:   <MuiDatePicker sx={{ color: tokens.colorPrimary }}>  TS token (MUI only)
+✅ GOOD:   <DatePicker className="bg-primary text-primary">   Token-driven styling
 ```
 
 ---
@@ -598,12 +597,12 @@ echo "✅ Frontend boundaries clean"
 
 ### 10.3 UI & Styling
 
-| Category              | Technology            | Notes                          |
-| --------------------- | --------------------- | ------------------------------ |
-| **CSS Framework**     | Tailwind CSS          | Utility-first                  |
-| **Component Library** | MUI (Material UI)     | DatePicker and complex widgets |
-| **Design Tokens**     | CSS Custom Properties | 3-layer token system           |
-| **Icons**             | Lucide                |                                |
+| Category              | Technology                   | Notes                                     |
+| --------------------- | ---------------------------- | ----------------------------------------- |
+| **CSS Framework**     | Tailwind CSS                 | Utility-first                             |
+| **Component Library** | shadcn/ui (Radix primitives) | Form controls, dialogs, date picker, etc. |
+| **Design Tokens**     | CSS Custom Properties        | 3-layer token system                      |
+| **Icons**             | Lucide                       |                                           |
 
 ### 10.4 Routing & i18n
 

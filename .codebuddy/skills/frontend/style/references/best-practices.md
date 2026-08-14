@@ -43,5 +43,5 @@ When adding or modifying ANY token in `src/tokens/*.css`:
 - Icons: Lucide, `currentColor`, `viewBox="0 0 24 24"`, consistent sizing per context.
 - Responsive by default (`grid-cols-1 md:grid-cols-2 xl:grid-cols-3`).
 - Dark mode via semantic tokens (never hardcoded light colors).
-- MUI components use `MUITheme` from `@pawhaven/design-system/theme`.
+- Components are built with shadcn/ui (Radix primitives) and consume design tokens via Tailwind.
 - New visual value needed? Add it to the design system, don't hardcode in a component.

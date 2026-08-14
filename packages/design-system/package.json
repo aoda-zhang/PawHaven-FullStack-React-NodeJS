@@ -3,29 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "types": "./src/index.ts",
   "sideEffects": [
     "*.css"
   ],
   "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
-      "default": "./src/index.ts"
-    },
     "./styles.css": "./index.css",
-    "./theme": {
-      "types": "./src/MUI-theme.ts",
-      "import": "./src/MUI-theme.ts",
-      "default": "./src/MUI-theme.ts"
-    },
-    "./tokens": {
-      "types": "./src/tokens.ts",
-      "import": "./src/tokens.ts",
-      "default": "./src/tokens.ts"
-    }
+    "./tokens": "./src/tokens/index.css"
   },
   "files": [
     "index.css",
@@ -38,11 +21,9 @@
     "token-check": "node scripts/token-check.cjs"
   },
   "peerDependencies": {
-    "@mui/material": "^7.3.4",
     "react": "^19.2.0"
   },
   "devDependencies": {
-    "@mui/material": "^7.3.4",
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
     "react": "^19.2.0",
