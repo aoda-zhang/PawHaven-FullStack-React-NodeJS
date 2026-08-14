@@ -1,3 +1,5 @@
+
+
 [English](./README.MD) | [中文](./READMECN.MD)
 
 # 🐾 PawHaven - Animal Rescue Platform
@@ -15,6 +17,15 @@
 The platform allows users to report rescue cases, track rescue progress, share rescue stories, and improve the visibility and coordination of rescue efforts.
 
 In addition to the application itself, PawHaven also serves as a **practice of modern full-stack engineering**, focusing on scalable architecture, maintainable code, and efficient development workflows.
+
+---
+
+# 🛠 Prerequisites
+
+- **Node.js**: `25.x`
+- **pnpm**: `11.x`
+
+Ensure you meet these version requirements before installing dependencies or running the project.
 
 ---
 
