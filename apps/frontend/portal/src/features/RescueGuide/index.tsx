@@ -1,4 +1,3 @@
-import { Box, Container, Typography } from '@mui/material';
 import { FileDownloadButton } from '@pawhaven/frontend-core';
 import { showToast } from '@pawhaven/ui';
 import { ArrowDownToLine } from 'lucide-react';
@@ -18,29 +17,16 @@ export const RescueGuide = () => {
   }>;
   return (
     <div className="bg-[url('/images/hero1.png')] bg-cover bg-center">
-      <Container sx={{ py: 6 }}>
-        <Typography variant="h3" gutterBottom fontWeight="bold">
-          {t('rescueGuide.title')}
-        </Typography>
+      <div className="py-6">
+        <h2 className="mb-1 font-bold">{t('rescueGuide.title')}</h2>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          {t('rescueGuide.intro')}
-        </Typography>
+        <p className="text-text-secondary mb-4">{t('rescueGuide.intro')}</p>
 
-        <Box
-          display="grid"
-          gap={3}
-          gridTemplateColumns={{
-            xs: '1fr',
-            sm: 'repeat(2,1fr)',
-            md: 'repeat(4,1fr)',
-            lg: 'repeat(5,1fr)',
-          }}
-        >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5">
           {stepsContent.map((step) => (
             <StepCard key={step.title} {...step} />
           ))}
-        </Box>
+        </div>
 
         <p className="m-6 flex justify-center">
           <FileDownloadButton
@@ -58,7 +44,7 @@ export const RescueGuide = () => {
             <span>{t('rescueGuide.download_guide')}</span>
           </FileDownloadButton>
         </p>
-      </Container>
+      </div>
     </div>
   );
 };

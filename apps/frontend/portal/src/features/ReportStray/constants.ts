@@ -1,19 +1,20 @@
-export const animalTypeOptions = [
-  { value: 'cat', label: 'reportStray.cat' },
-  { value: 'dog', label: 'reportStray.dog' },
-  { value: 'other', label: 'reportStray.other' },
-];
+import { AlertTriangle, CheckCircle, MapPin, PawPrint } from 'lucide-react';
 
-export const ageOptions = [
-  { value: 'baby', label: 'reportStray.baby' },
-  { value: 'young', label: 'reportStray.young' },
-  { value: 'adult', label: 'reportStray.adult' },
-  { value: 'senior', label: 'reportStray.senior' },
-];
+export const STEPS = [
+  { icon: MapPin },
+  { icon: PawPrint },
+  { icon: AlertTriangle },
+  { icon: AlertTriangle },
+  { icon: CheckCircle },
+] as const;
 
-export const statusOptions = [
-  { value: 'dangerous', label: 'reportStray.dangerous' },
-  { value: 'friendly', label: 'reportStray.friendly' },
-  { value: 'scared', label: 'reportStray.scared' },
-  { value: 'other', label: 'reportStray.other' },
-];
+export const TOTAL_STEPS = STEPS.length;
+export const FALLBACK_ID_SUFFIX_LENGTH = 8;
+
+export const Step = {
+  LOCATION: 1,
+  ANIMAL: 2,
+  CONDITION: 3,
+  URGENCY: 4,
+  CONFIRM: 5,
+} as const;

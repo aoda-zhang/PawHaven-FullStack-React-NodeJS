@@ -49,7 +49,6 @@ model Route {
   handle  Json?
 
   order        Int?
-  authRequired Boolean @default(false)
 
   routePermissions RoutePermission[]
 

@@ -7,6 +7,7 @@ import { RescueCasesSection } from '../RescueCases/components/RescueCasesSection
 import { useFetchAdoptablePets } from './api/home.queries';
 import { AdoptablePetsSection } from './components/AdoptablePetsSection';
 import { Hero } from './components/Hero';
+import { StrayCTA } from './components/StrayCTA';
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -48,6 +49,8 @@ export const Home = () => {
         onPetClick={handlePetClick}
         onSeeAll={handleSeeAllPets}
       />
+
+      <StrayCTA />
     </div>
   );
 };

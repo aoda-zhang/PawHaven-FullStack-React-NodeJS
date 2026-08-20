@@ -42,8 +42,7 @@ import {
   colorPrimitives,
 } from '@pawhaven/design-system';
 
-// MUI v7 theme (reads CSS variables at runtime)
-import { MUITheme } from '@pawhaven/design-system/theme';
+// Tokens are consumed via Tailwind utility classes and CSS variables.
 ```
 
 ### Package structure
@@ -54,7 +53,7 @@ packages/design-system/
 ├── index.css           # CSS entry (tailwindcss + tokens + theme + utilities + base)
 └── src/
     ├── tokens.ts       # Typed token access (CSS var references + raw values)
-    ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
+    ├── theme.css       # Semantic token mappings (consumed by Tailwind)
     ├── theme.css       # Semantic token mappings (bg-primary, text-muted, etc.)
     ├── utilities.css   # Custom @utility classes (btn-primary, card, input-field, etc.)
     └── tokens/         # Primitive CSS @theme blocks
@@ -614,7 +613,7 @@ style={{ width: '20rem' }}
 
 - Hairline borders / dividers: `border`, `border-[1px]`, `1px` rules where `rem` would round inconsistently
 - Fixed device-pixel assets that must not scale (e.g., a 1px focus ring, retina line art)
-- Third-party/MUI overrides that only accept `px`
+- Third-party overrides that only accept `px`
 
 When you use a `px` exception, keep it minimal and localized. Everything else must be a token or `rem`.
 
@@ -785,7 +784,7 @@ style={{ '--progress': `${progress}%` } as React.CSSProperties}
 
 ## 24. TypeScript Token Access
 
-For JS-driven styling (inline styles, MUI overrides, canvas, charts), use the typed TS tokens:
+For JS-driven styling (inline styles, canvas, charts), use the typed TS tokens:
 
 ```ts
 import {
@@ -800,7 +799,7 @@ import {
   colorPrimitives,
 } from '@pawhaven/design-system';
 
-// CSS variable references — use in inline styles, MUI overrides, etc.
+// CSS variable references — use in inline styles, charts, etc.
 const style = { color: color.primary, padding: spacing.card };
 
 // Type-safe tokenVar helper
@@ -821,24 +820,23 @@ const headingFont = typography.fontHeading; // → 'var(--font-heading)'
 
 ---
 
-## 25. MUI Components
+## 25. Component Styling
 
-When using MUI, apply the shared MUI theme:
+All React components are built with shadcn/ui (Radix UI primitives + Tailwind design tokens). They consume the shared design tokens automatically via Tailwind utility classes and CSS variables — no separate theme provider is required.
 
 ```tsx
-import { ThemeProvider } from '@mui/material/styles';
-import { MUITheme } from '@pawhaven/design-system/theme';
+import { Button } from '@pawhaven/ui';
 
-function App() {
+function Example() {
   return (
-    <ThemeProvider theme={MUITheme}>
-      {/* MUI components now share the same tokens as Tailwind */}
-    </ThemeProvider>
+    <Button variant="primary" className="bg-primary text-primary">
+      {/* shadcn/ui components already share the same tokens as Tailwind */}
+    </Button>
   );
 }
 ```
 
-The MUI theme reads CSS variables at runtime. Changing a token in `src/tokens/color.css` updates both Tailwind and MUI automatically.
+Changing a token in `src/tokens/color.css` updates both Tailwind and all components automatically.
 
 ---
 

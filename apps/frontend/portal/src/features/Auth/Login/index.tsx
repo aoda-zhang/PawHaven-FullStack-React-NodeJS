@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mui/material';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
-import { FormInput } from '@pawhaven/ui';
+import { Button, FormInput } from '@pawhaven/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useLogin } from '../api/auth.mutations';
 import { AuthLayout } from '../authLayout';
@@ -16,8 +15,13 @@ export const Login = () => {
     resolver: zodResolver(CredentialsSchema),
   });
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const { mutate, isPending } = useLogin();
+
+  const from =
+    (location.state as { from?: { pathname?: string } })?.from?.pathname ||
+    routePaths.home;
 
   return (
     <AuthLayout>
@@ -34,10 +38,15 @@ export const Login = () => {
             className="mt-5 space-y-3"
             noValidate
             onSubmit={formProps.handleSubmit((data) => {
-              mutate({
-                email: data.email,
-                password: data.password,
-              });
+              mutate(
+                {
+                  email: data.email,
+                  password: data.password,
+                },
+                {
+                  onSuccess: () => navigate(from, { replace: true }),
+                },
+              );
             })}
           >
             <FormInput
@@ -64,11 +73,7 @@ export const Login = () => {
               loading={isPending}
               disabled={isPending}
               type="submit"
-              fullWidth
-              color="primary"
-              disableElevation
-              className="!mt-4 !h-11 !rounded-full !text-sm !font-semibold"
-              variant="contained"
+              className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
             >
               {t('auth.login')}
             </Button>

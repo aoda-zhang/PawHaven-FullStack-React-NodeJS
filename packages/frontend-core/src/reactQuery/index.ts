@@ -2,7 +2,6 @@ import { type ToastType, notificationType, showToast } from '@pawhaven/ui';
 import { QueryCache, MutationCache } from '@tanstack/react-query';
 import i18n, { t } from 'i18next';
 import '@pawhaven/i18n';
-import type { ToastOptions } from 'react-hot-toast';
 
 import { type ApiErrorInfo, httpRequestErrors } from '../api/types';
 
@@ -10,7 +9,7 @@ interface RequestMeta {
   isNetworkError?: boolean;
   isShowClientError?: boolean;
   isCriticalRequest?: boolean;
-  toastOptions?: { type: ToastType } & ToastOptions;
+  toastOptions?: { type?: ToastType; duration?: number };
 }
 
 interface QueryOptionsType {
@@ -32,7 +31,7 @@ interface ErrorHandleType {
 
 const showErrorToast = (
   errorMessage: string,
-  errorNotificationOptions?: { type: ToastType } & ToastOptions,
+  errorNotificationOptions?: { type?: ToastType; duration?: number },
 ) => {
   showToast({
     message: errorMessage,

@@ -33,11 +33,11 @@ const createRouteElement = (route: RouterEle): ReactNode => {
     routerElementMapping[route.element]
   );
 
-  if (handle?.isRequireUserLogin) {
-    return <ProtectedRoute>{page}</ProtectedRoute>;
+  if (!handle?.isRequireUserLogin) {
+    return page;
   }
 
-  return page;
+  return <ProtectedRoute>{page}</ProtectedRoute>;
 };
 
 const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {

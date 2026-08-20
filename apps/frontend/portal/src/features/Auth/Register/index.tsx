@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@mui/material';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
-import { FormInput } from '@pawhaven/ui';
+import { Button, FormInput } from '@pawhaven/ui';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -64,11 +63,7 @@ export const Register = () => {
               loading={isPending}
               disabled={isPending}
               type="submit"
-              fullWidth
-              color="primary"
-              disableElevation
-              className="!mt-4 !h-11 !rounded-full !text-sm !font-semibold"
-              variant="contained"
+              className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
             >
               {t('auth.sighup')}
             </Button>

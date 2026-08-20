@@ -7,7 +7,6 @@ import { QueryProvider } from './QueryProvider';
 import { StoreProvider } from './StoreProvider';
 
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
-import '@pawhaven/design-system/styles.css';
 
 type AppProviderProps = {
   children: ReactNode;

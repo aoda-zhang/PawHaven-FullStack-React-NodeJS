@@ -1,7 +1,7 @@
-import * as React from 'react';
+import type { JSX } from 'react';
 import './index.css';
 
-export const CommonHeader: React.FC = () => {
+export const CommonHeader = (): JSX.Element => {
   return (
     <div className="pdf-header">
       <div className="pdf-header-brand">PawHaven</div>

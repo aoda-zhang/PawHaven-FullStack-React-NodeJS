@@ -2,14 +2,16 @@
 name: component
 description: >
   组件设计模式与共享组件规范 / Component Design Patterns & Graduation Rules.
-  定义 PawHaven 共享组件的设计原则：组件 API 设计、组合模式 vs 继承、组件分层（feature 私有 vs packages/ui vs packages/frontend-core）、毕业规则（2+ feature 使用的组件必须晋升到共享包）、Props 接口设计、Single Responsibility 原则、命名导出规范。
+  定义 PawHaven 共享组件的设计原则：组件 API 设计、组合模式 vs 继承、组件分层（feature 私有 vs packages/ui vs packages/frontend-core）、毕业规则（2+ feature 使用的组件必须晋升到共享包）、Props 接口设计、Single Responsibility 原则、命名导出规范、纯组件约束（UI = f(props)，禁止业务/副作用）。
   触发场景 / Trigger: 组件设计 component design API surface interface signature props contract, 共享组件 shared component reusable common UI building block library, 组件开发 component development build create implement authoring compose, 组件拆分 component decomposition split break down extract decouple separate, 组件提取 extract component pull out lift up promote abstract isolate, 组件重构 component refactor restructure reorganize redesign improve clean up, 组件 API component props children slots render prop composition pattern, packages/ui shared UI library graduation promote publish export package, frontend-core shared core logic utility hook helper, 组件毕业 graduation promote to shared elevate to reusable component promotion, 组件复用 component reuse DRY don't repeat yourself deduplication consolidation, 纯 UI 组件 pure UI component presentational dumb component stateless, composition vs inheritance hoc higher order component render props custom hook, single responsibility SRP separation of concerns cohesion coupling, naming conventions export default named export barrel index.
-version: 1.0
+version: 2.0
 ---
 
 # Purpose
 
 This skill defines how to design, build, and graduate components in PawHaven. Every shared component must be intentional — well-designed APIs, correct placement (feature vs package), and consistent patterns across the application.
+
+PawHaven components follow a **pure component** discipline: a component describes *how the UI looks and behaves* (`UI = f(props)`) and must not answer *how the application works*. Business logic, data fetching, routing, and auth live outside the component — in features, hooks, and providers.
 
 Apply this skill whenever:
 
@@ -18,6 +20,170 @@ Apply this skill whenever:
 - Designing component APIs (props, callbacks, composition slots)
 - Deciding between composition, configuration, or inheritance
 - Splitting large components
+
+---
+
+# Pure Component Principles
+
+A pure React component focuses only on UI rendering and user interaction.
+
+It should not contain:
+
+- Business logic
+- Data fetching
+- API calls
+- Global application state
+- Side effects (routing, auth, browser storage)
+
+The component should be predictable:
+
+```ts
+UI = f(props)
+```
+
+A pure component should:
+
+- Receive data through props
+- Render UI based on props
+- Notify parent components through callback functions
+- Be reusable across different features
+- Be easy to test
+
+A pure component should not:
+
+- Fetch data
+- Call APIs
+- Manage business workflows
+- Access routing directly
+- Access authentication logic
+
+## TypeScript Requirements
+
+Always define explicit prop types.
+
+Good:
+
+```tsx
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';
+  loading?: boolean;
+  disabled?: boolean;
+  children: React.ReactNode;
+  onClick?: () => void;
+}
+```
+
+Avoid:
+
+```tsx
+function Button(props: any) {}
+```
+
+## Event Handling
+
+Pure components communicate through callbacks.
+
+```tsx
+interface ModalProps {
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+```
+
+## State Management
+
+Avoid internal state by default.
+
+Allowed:
+
+- Hover state
+- Animation state
+- Temporary UI interaction state
+
+Avoid:
+
+- Business data state
+- Server state
+- Application workflows
+
+## Composition
+
+Prefer composition over excessive props.
+
+Good:
+
+```tsx
+<Card>
+  <CardHeader />
+  <CardContent />
+</Card>
+```
+
+Avoid:
+
+```tsx
+<Card showHeader headerTitle="Title" />
+```
+
+## Performance
+
+Do not automatically use:
+
+- `React.memo`
+- `useMemo`
+- `useCallback`
+
+Only optimize when there is measurable performance impact.
+
+## Accessibility
+
+Components should:
+
+- Use semantic HTML
+- Support keyboard interaction
+- Provide proper ARIA attributes when needed
+
+## Pure Component Example
+
+```tsx
+import type { ReactNode } from 'react';
+
+interface ButtonProps {
+  variant?: 'primary' | 'secondary';
+  loading?: boolean;
+  disabled?: boolean;
+  children: ReactNode;
+  onClick?: () => void;
+}
+
+export function Button({
+  variant = 'primary',
+  loading = false,
+  disabled = false,
+  children,
+  onClick,
+}: ButtonProps) {
+  return (
+    <button
+      disabled={disabled || loading}
+      onClick={onClick}
+    >
+      {loading ? 'Loading...' : children}
+    </button>
+  );
+}
+```
+
+## Golden Rule
+
+A pure React component should answer:
+
+> "How should this UI look and behave?"
+
+It should NOT answer:
+
+> "How does the application work?"
 
 ---
 
@@ -68,7 +234,7 @@ before moving the component:
 - App-level layout (e.g. `RootLayoutFooter`) → pass as a `footer?: ReactNode` / `ReactElement` prop
 - App-level route paths (e.g. `routePaths.login`) → pass the literal string as a prop
 
-Keep only peer-dependency imports (React, `react-router-dom`, `react-i18next`, MUI) inside the package.
+Keep only peer-dependency imports (React, `react-router-dom`, `react-i18next`, Radix UI primitives) inside the package.
 
 ## Graduation Checklist
 
@@ -155,11 +321,13 @@ Prefer children/render slots over complex config props.
 ```
 
 **When to use composition (compound components):**
+
 - The component has distinct visual sections (header, body, footer)
 - Different usages need different content in each section
 - The component is a layout container, not a data display widget
 
 **When props are fine:**
+
 - Simple, single-purpose display components
 - The structure is truly fixed across all usages
 - Less than 5 props total
@@ -240,6 +408,46 @@ interface ButtonProps {
 
 ---
 
+# Button Component Best Practices (shadcn + Tailwind v4 + React 19)
+
+The canonical Button in `@pawhaven/ui` is a shadcn-style pure component. It defines the
+house pattern for interactive control components. Full reference: [references/button.md](references/button.md).
+
+## Structure: `cva` + `buttonVariants` + `Slot` + `data-slot`
+
+- **`cva` (class-variance-authority)** manages the `variant × size` cartesian matrix.
+  Never hand-write `if/else` class selection. Style stays decoupled from the component.
+- **`buttonVariants()`** is exported standalone so it can be reused on non-button elements.
+- **`asChild` via `Slot`** enables polymorphic reuse. Use it to merge styles into a child element.
+- **`data-slot="button"`** exposes a styling hook for parent overrides.
+
+## React 19: no `forwardRef`
+
+- Use `React.ComponentProps<'button'>` instead of `React.forwardRef<...>`.
+- `ref` is a normal prop in React 19; it flows through `...props` automatically.
+- Use named function components; drop `displayName`.
+
+## Pure component discipline
+
+- `UI = f(props)`: no state, no data fetching, no global store, no side effects.
+- Loading is props-driven: `<Button disabled><Spinner data-icon="inline-start" />...</Button>`.
+- Business logic lives in the caller.
+
+## Semantic correctness — links are NOT buttons
+
+- Use `<Button>` for real buttons (native `<button>`, keyboard + focus built in).
+- Use `buttonVariants()` on a plain `<a>` for links — never force a link through
+  `asChild`/`render`, which overrides `<a>` semantics with `role="button"`.
+
+## Tailwind v4 specifics
+
+- `size-*` instead of `w-* h-*`; `has-[>svg]:px-*` for icon-aware padding.
+- Icons via lucide-react with `data-icon="inline-start|inline-end"` — never emojis.
+- Restore `cursor: pointer` in `@layer base` (Tailwind v4 changed the default).
+- Accessible: native element + `disabled:opacity-50` + `focus-visible:ring-*`.
+
+---
+
 # Component Patterns
 
 ## Compound Components
@@ -284,7 +492,7 @@ export function ModalBody({ children }: { children: React.ReactNode }) {
   return <div className="modal-body">{children}</div>;
 }
 
-// Barrel: packages/ui/src/Modal/index.ts
+// Barrel: packages/ui/src/components/Modal/index.ts
 export { Modal, ModalHeader, ModalBody } from './Modal';
 ```
 
@@ -323,6 +531,30 @@ ComponentName.module.css # Co-located CSS modules (only when Tailwind can't expr
 index.ts                # Barrel export — ONLY re-exports public components
 ```
 
+## Directory Layout — All Pure Components Live in `components/`
+
+In `@pawhaven/ui`, **every pure component folder lives under `src/components/`**:
+
+```
+packages/ui/src/
+  components/
+    Loading/index.tsx
+    Button/index.tsx
+    Form/
+      FormInput/index.tsx
+      formBase.type.ts
+  utils/cn.ts
+  index.ts              # barrel → re-exports from ./components/*
+```
+
+- Component folder → `src/components/<Name>/`, entry file `index.tsx`.
+- Shared helpers (e.g. `cn`) → `src/utils/cn.ts`, **package-local per package, always imported with a relative path**:
+  - `@pawhaven/ui` imports its own `cn` relatively (e.g. `../../utils/cn` from a component).
+  - `@pawhaven/frontend-core` keeps its **own** `src/utils/cn.ts` and imports it relatively (`../../utils/cn`) — it must NOT depend on `@pawhaven/ui` for `cn`. This keeps `@pawhaven/ui` pure with no dependency on `frontend-core`.
+  - Do NOT use package subpaths (`@pawhaven/ui/utils/cn`) for an internal util in a `tsc`-compiled package.
+- The top-level barrel re-exports each `components/<Name>` path.
+- Compound families (e.g. `Form/*`) group under `components/Form/<SubName>/`.
+
 ## Export Rules
 
 ```tsx
@@ -330,19 +562,20 @@ index.ts                # Barrel export — ONLY re-exports public components
 export function Button({ ... }: ButtonProps) { ... }
 export function Modal({ ... }: ModalProps) { ... }
 
-// ✅ Barrel files — packages/ui/src/index.ts
-export { Button } from './Button';
-export { Card } from './Card';
-export { Modal, ModalHeader, ModalBody } from './Modal';
+// ✅ Barrel files — packages/ui/src/index.ts (re-export from components/)
+export { Button } from './components/Button';
+export { Card } from './components/Card';
+export { Modal, ModalHeader, ModalBody } from './components/Modal';
 
 // ❌ Default exports — never
 export default function Button() { ... }
 ```
 
 Named exports ensure:
+
 - IDE auto-imports use the correct name
 - Rename refactoring is safe
-- Barrel re-exports are explicit
+- Barrel re-expoorts are explicit
 
 ---
 
@@ -359,6 +592,7 @@ Split when ANY of these are true:
 ## Splitting Example
 
 ❌ Before — one monolithic component:
+
 ```tsx
 function RescueDetail({ rescueId }: { rescueId: string }) {
   // Fetching (40 lines)
@@ -373,6 +607,7 @@ function RescueDetail({ rescueId }: { rescueId: string }) {
 ```
 
 ✅ After — decomposed:
+
 ```tsx
 // RescueDetail/index.tsx — orchestrator only
 export function RescueDetail({ rescueId }: { rescueId: string }) {
@@ -393,11 +628,14 @@ export function RescueDetail({ rescueId }: { rescueId: string }) {
 }
 ```
 
+> Note: the orchestrator above pulls data via a hook — that is a *feature* component, not a pure component. Pure components in `@pawhaven/ui` receive `data`/`isLoading`/`error` as props instead of fetching themselves.
+
 ---
 
 # Common Mistakes
 
 Avoid:
+
 - Giant components (150+ lines without clear decomposition)
 - Prop soup (10+ flat props that should be grouped or replaced with composition)
 - Over-engineering (compound components for a single-use label)
@@ -409,6 +647,21 @@ Avoid:
 - Boolean props that toggle behavior instead of a `variant` prop
 - Components that know too much (fetching data + rendering + routing)
 - Duplicate components across features (check packages first)
+- Impure components that fetch data, call APIs, or touch routing/auth inside a shared UI package
+
+---
+
+# Quality Checklist (Pure Component)
+
+Before completing a component:
+
+- [ ] UI only, no business logic
+- [ ] No API calls
+- [ ] Strong TypeScript types
+- [ ] Events exposed through callbacks
+- [ ] Reusable component API
+- [ ] Accessible markup
+- [ ] No unnecessary optimizations (`React.memo`/`useMemo`/`useCallback`)
 
 ---
 
@@ -424,13 +677,16 @@ A component is complete when:
 - [ ] All text comes from i18n keys or callers (no hardcoded strings)
 - [ ] All visual values from `@pawhaven/design-system`
 - [ ] Callback naming follows project convention
-- [ ] Loading, empty, and error states handled (if it fetches data)
+- [ ] Loading, empty, and error states handled (if it fetches data — features only)
 - [ ] Keyboard accessible and has ARIA labels (if interactive)
 - [ ] Reused via import, not copy-pasted across features
 - [ ] Single responsibility — does one thing well
 
-## Related
+---
+
+# Related
 
 - Best practices: [references/best-practices.md](references/best-practices.md)
+- Button (shadcn + React 19 canonical): [references/button.md](references/button.md)
 - Architecture & graduation: [architecture-doctor](../../code-review/architecture-doctor/SKILL.MD)
 - Styling tokens: [styling skill](../style/SKILL.MD)

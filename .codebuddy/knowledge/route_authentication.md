@@ -41,60 +41,82 @@ flowchart LR
 
 ### Step 1: Route Registration (Bootstrap)
 
-- Admin sets `authRequired: true` on a route record in the database.
-- On app startup, `BootstrapService` reads all routes from the database and injects `authRequired` into each route's `handle` object.
+- Admin sets `handle.isRequireUserLogin: true` directly on a route record in the database (stored in the route's `handle` JSON column).
+- On app startup, `BootstrapService` reads all routes from the database and returns `handle.isRequireUserLogin` as-is in the bootstrap response.
 - Frontend receives the route config via `GET /core/app/bootstrap`, which includes `handle.isRequireUserLogin: true`.
+
+> Note: `isRequireUserLogin` is the single source of truth for route-level auth gating. The legacy `authRequired` database column has been removed — auth gating is now driven entirely by the `handle.isRequireUserLogin` field.
 
 ### Step 2: Route Rendering (AppRouterProvider)
 
 ```tsx
 // apps/frontend/portal/src/router/AppRouterProvider.tsx
-import { RequireAuth } from '@/components/RequireAuth';
+import { RequireAuth } from '@pawhaven/frontend-core';
 import { useCurrentUser } from '@/features/Auth/api/auth.queries';
+import { routePaths } from '@/router/routePaths';
+
+const ProtectedRoute = ({ children }: { children: ReactNode }) => {
+  const { isLoading, isError } = useCurrentUser();
+
+  return (
+    <RequireAuth
+      isLoading={isLoading}
+      isError={isError}
+      loginPath={routePaths.login}
+    >
+      {children}
+    </RequireAuth>
+  );
+};
 
 const createRouteElement = (route: RouterEle): ReactNode => {
-  const page = routerElementMapping[route.element];
+  const handle = route.handle ?? {};
+  const page = handle.isLazyLoad ? (
+    <SuspenseWrapper>{routerElementMapping[route.element]}</SuspenseWrapper>
+  ) : (
+    routerElementMapping[route.element]
+  );
 
-  if (route.handle?.isRequireUserLogin) {
-    // Pass useCurrentUser hook as authQuery parameter
-    return <RequireAuth authQuery={useCurrentUser}>{page}</RequireAuth>;
+  if (!handle?.isRequireUserLogin) {
+    return page;
   }
 
-  return page;
+  return <ProtectedRoute>{page}</ProtectedRoute>;
 };
 ```
 
 ### Step 3: Auth Verification (RequireAuth)
 
 ```tsx
-// apps/frontend/portal/src/components/RequireAuth/index.tsx
-import { useQuery } from '@tanstack/react-query';
+// packages/frontend-core/src/components/RequireAuth/index.tsx
 import { Navigate, useLocation } from 'react-router-dom';
-
-import { routePaths } from '@/router/routePaths';
 
 interface RequireAuthProps {
   children: React.ReactNode;
-  authQuery: () => ReturnType<typeof useQuery>;
+  isLoading: boolean;
+  isError: boolean;
+  loginPath: string;
 }
 
-export const RequireAuth = ({ children, authQuery }: RequireAuthProps) => {
+export const RequireAuth = ({
+  children,
+  isLoading,
+  isError,
+  loginPath,
+}: RequireAuthProps) => {
   const location = useLocation();
-  const { isLoading, isError } = authQuery();
 
   if (isLoading) return null;
 
   if (isError) {
-    return (
-      <Navigate to={routePaths.login} state={{ from: location }} replace />
-    );
+    return <Navigate to={loginPath} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;
 };
 ```
 
-The component is intentionally minimal — it receives the query hook as a parameter so it's reusable and doesn't hard-code any specific API call.
+The component is intentionally minimal — it receives the auth query result (`isLoading`/`isError`) as props so it stays decoupled from any specific API call.
 
 ### Step 4: Backend JWT Verification (Gateway)
 
@@ -117,11 +139,11 @@ The component is intentionally minimal — it receives the query hook as a param
 
 ## Key Design Decisions
 
-| Decision                                          | Reason                                                                                                     |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Frontend doesn't read httpOnly cookie             | httpOnly prevents JavaScript access; protects against XSS token theft                                      |
-| Verify via `/auth/me` API instead of local state  | Backend is the only source of truth; detects expired, revoked, or tampered tokens                          |
-| RequireAuth receives `authQuery` as a parameter   | Keeps the component reusable; caller controls the exact hook and API                                       |
-| `authQueryKeys` uses factory functions `() => []` | Consistent with `homeQueryKeys`; ensures fresh query key on each render                                    |
-| Redirect stores `location` in state               | Enables "redirect back after login" UX pattern                                                             |
-| useCurrentUser has no side effects in queryFn     | Avoids ESLint exhaustive-deps warnings; dispatch logic is handled in a `useEffect` in consuming components |
+| Decision                                            | Reason                                                                                                     |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Frontend doesn't read httpOnly cookie               | httpOnly prevents JavaScript access; protects against XSS token theft                                      |
+| Verify via `/auth/me` API instead of local state    | Backend is the only source of truth; detects expired, revoked, or tampered tokens                          |
+| RequireAuth receives `isLoading`/`isError` as props | Keeps the component reusable; caller controls the exact hook and API                                       |
+| `authQueryKeys` uses factory functions `() => []`   | Consistent with `homeQueryKeys`; ensures fresh query key on each render                                    |
+| Redirect stores `location` in state                 | Enables "redirect back after login" UX pattern                                                             |
+| useCurrentUser has no side effects in queryFn       | Avoids ESLint exhaustive-deps warnings; dispatch logic is handled in a `useEffect` in consuming components |

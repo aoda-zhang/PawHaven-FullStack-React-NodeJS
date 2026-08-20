@@ -1,8 +1,9 @@
-import Button from '@mui/material/Button';
+import { Button } from '@pawhaven/ui';
 import { Home } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { cn } from '../../utils/cn';
 import type { ErrorInfo } from '../RouterErrorFallback';
 
 const goToHome = () => {
@@ -19,40 +20,18 @@ export const NotFound = ({ error, isStableEnv, footer }: NotFoundProps) => {
   const { t } = useTranslation();
 
   return (
-    <div
-      style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}
-    >
-      <div
-        style={{
-          backgroundColor: 'white',
-          display: 'block',
-          width: '100%',
-          padding: '60px 20px',
-          textAlign: 'center',
-          boxSizing: 'border-box',
-          flex: '1',
-        }}
-      >
-        <div style={{ marginBottom: '40px' }}>
-          <div
-            style={{
-              width: '112px',
-              height: '112px',
-              borderRadius: '50%',
-              backgroundColor: '#fffbeb',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+    <div className="flex min-h-screen flex-col">
+      <div className="bg-background flex w-full flex-1 flex-col px-5 pt-10 pb-10 text-center">
+        <div className="mb-8">
+          <div className="bg-warning-light text-warning mx-auto inline-flex size-28 items-center justify-center rounded-full">
             <svg
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#f59e0b"
+              stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              style={{ width: '64px', height: '64px' }}
+              className="size-16"
             >
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
               <path d="M8 14s1.5 2 4 2 4-2 4-2" />
@@ -62,46 +41,17 @@ export const NotFound = ({ error, isStableEnv, footer }: NotFoundProps) => {
           </div>
         </div>
 
-        <div style={{ marginBottom: '32px' }}>
-          <span
-            style={{
-              color: '#f59e0b',
-              fontSize: '120px',
-              fontWeight: 900,
-              lineHeight: 1,
-              letterSpacing: '-0.05em',
-            }}
-          >
+        <div className="mb-8">
+          <span className="text-warning text-9xl leading-none font-black tracking-tighter">
             404
           </span>
         </div>
 
-        <div
-          style={{
-            marginBottom: '48px',
-            maxWidth: '560px',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        >
-          <h2
-            style={{
-              color: '#111827',
-              fontSize: '32px',
-              fontWeight: 700,
-              marginBottom: '16px',
-              lineHeight: 1.2,
-            }}
-          >
+        <div className="mx-auto mb-12 max-w-xl">
+          <h2 className="text-text mb-4 text-3xl leading-tight font-bold">
             {t('common.not_found', 'Page Not Found')}
           </h2>
-          <p
-            style={{
-              color: '#6b7280',
-              fontSize: '18px',
-              lineHeight: 1.6,
-            }}
-          >
+          <p className="text-text-secondary text-lg leading-relaxed">
             {t(
               'common.not_found_info',
               'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
@@ -110,26 +60,17 @@ export const NotFound = ({ error, isStableEnv, footer }: NotFoundProps) => {
         </div>
 
         <Button
-          variant="contained"
           onClick={goToHome}
-          startIcon={<Home size={18} />}
-          className="!bg-warning !text-text-inverse hover:!bg-warning-hover !rounded-xl !px-8 !py-3 !text-base !font-semibold !transition-all !duration-300"
+          className={cn(
+            'bg-warning text-text-inverse hover:bg-warning-hover mx-auto rounded-xl px-8 py-3 text-base font-semibold',
+          )}
         >
+          <Home size={18} />
           {t('common.go_to_home', 'Go to Home')}
         </Button>
 
         {!isStableEnv && error?.data && (
-          <p
-            style={{
-              marginTop: '40px',
-              color: '#9ca3af',
-              fontSize: '12px',
-              wordBreak: 'break-all',
-              maxWidth: '560px',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
+          <p className="text-text-tertiary mx-auto mt-10 max-w-xl text-xs break-all">
             {String(error.data)}
           </p>
         )}
