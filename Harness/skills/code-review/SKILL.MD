@@ -1,11 +1,13 @@
 ---
 name: code-review
 description: >
-  Code Review Orchestrator. GATE: figma-doctor verifies design spec match first.
-  On PASS, loads 6 sub-skills in parallel based on scope
-  (frontend|backend|full-stack): typecheck-doctor, react-doctor, style-doctor,
-  boundary-doctor, i18n-doctor, backend-doctor.
-  Each sub-skill is independently composable and can be loaded via use_skill.
+  Code Review Orchestrator. Two passes:
+  TECH REVIEW — is the code written well? (figma gate, typecheck/react/style/
+  i18n/backend doctors, feature & logic deep review).
+  PATTERN REVIEW — does the change fit the project? (boundary/architecture
+  doctors, architecture & design, type contracts).
+  GATE: figma-doctor verifies design spec match first. Each sub-skill is
+  independently composable and can be loaded via use_skill.
   Trigger: code review PR feedback quality check automated scans anti-pattern detection.
 version: 5.0
 ---
@@ -19,28 +21,48 @@ This skill is the **orchestration entry point** for code review. All rules live 
 ```
 code-review (this skill)
   │
-  ├── GATE: figma-doctor       — Design spec verification (runs FIRST)
-  │     ├── ✅ PASS → continue
-  │     └── ❌ FAIL → STOP, return to development
+  ├── PASS A — TECH REVIEW (is the code written well?)
+  │     ├── GATE: figma-doctor       — Design spec verification (runs FIRST)
+  │     │     ├── ✅ PASS → continue
+  │     │     └── ❌ FAIL → STOP, return to development
+  │     ├── PARALLEL (only if gate passes):
+  │     │     ├── typecheck-doctor    — TypeScript type check
+  │     │     ├── react-doctor        — React/Redux/Query/Form anti-patterns
+  │     │     ├── style-doctor        — Styling & design token compliance
+  │     │     ├── i18n-doctor         — Hardcoded string detection
+  │     │     └── backend-doctor      — Backend code quality
+  │     └── Deep review: Layer 3 — feature & logic
+  │           (completeness, data flow, edge cases, adversarial pass)
   │
-  └── PARALLEL (only if gate passes):
-        ├── typecheck-doctor    — TypeScript type check
-        ├── react-doctor        — React/Redux/Query/Form anti-patterns
-        ├── style-doctor        — Styling & design token compliance
-        ├── boundary-doctor     — Import boundaries & package dependency direction
-        ├── i18n-doctor         — Hardcoded string detection
-        └── backend-doctor      — Backend code quality
+  └── PASS B — PATTERN REVIEW (does the change fit the project?)
+        ├── PARALLEL:
+        │     ├── boundary-doctor     — Import boundaries & dependency direction
+        │     └── architecture-doctor — Project architecture & design rules
+        └── Deep review:
+              ├── Layer 2 — architecture & design
+              └── Layer 4 — type contract (full-stack only)
 ```
 
 Each sub-skill is a standalone SKILL.MD containing explicit rules with exact tool invocations to use (search_content, execute_command, read_lints). No shell scripts. Each sub-skill can be loaded individually or composed.
 
+## Two Passes
+
+Every review produces **two verdicts**, because they answer different questions:
+
+| Pass | Question | Findings from |
+| ---- | -------- | ------------- |
+| **TECH REVIEW** | Is the code written well? Best practices, anti-patterns, code quality | figma gate + typecheck/react/style/i18n/backend doctors + Layer 3 feature & logic deep review |
+| **PATTERN REVIEW** | Does the change fit the project? Follows the project's overall development rules/patterns, fits the current architecture | boundary/architecture doctors + Layer 2 architecture & design + Layer 4 type contract deep review |
+
+Either pass can block independently. A change that is well-written but breaks the project's architecture is blocked by Pattern Review; a change that fits the architecture but is full of anti-patterns is blocked by Tech Review.
+
 ## Scope → Skills Mapping
 
-| Scope | Gate | Parallel Sub-skills |
-|-------|------|---------------------|
-| `frontend` | figma-doctor | typecheck-doctor, react-doctor, style-doctor, boundary-doctor, i18n-doctor |
-| `backend` | (skip, no UI) | typecheck-doctor, boundary-doctor, backend-doctor |
-| `full-stack` | figma-doctor | All 6 |
+| Scope | Gate (TECH) | TECH Review sub-skills | PATTERN Review sub-skills |
+|-------|-------------|------------------------|---------------------------|
+| `frontend` | figma-doctor | typecheck, react, style, i18n | boundary, architecture |
+| `backend` | (skip, no UI) | typecheck, backend | boundary, architecture |
+| `full-stack` | figma-doctor | typecheck, react, style, i18n, backend | boundary, architecture |
 
 Figma gate only applies to UI tasks (frontend / full-stack). Pure backend reviews skip the gate.
 
@@ -68,7 +90,7 @@ Each sub-skill's SKILL.MD lists explicit check rules. Execute them using the too
 
 All independent checks within and across sub-skills SHOULD run in parallel.
 
-### Step 4: Aggregate results
+### Step 4: Aggregate results and assign each finding to a pass
 Collect all sub-skill outputs and categorize:
 
 | Severity | Meaning | Action |
@@ -77,14 +99,22 @@ Collect all sub-skill outputs and categorize:
 | ⚠️ Warning | Should fix, does not block | Fix recommended; track as follow-up |
 | 💡 Suggestion | Optional improvement | Informational only |
 
-### Step 5: Output graded report
-Present findings organized by sub-skill, with file paths, line numbers, and severity.
+Then tag every finding with its pass (see Two Passes above): findings from the gate and the typecheck/react/style/i18n/backend doctors belong to **TECH REVIEW**; findings from boundary/architecture doctors belong to **PATTERN REVIEW**.
 
-### Step 6: Deep Review (Optional, for thorough reviews)
-After the rule-based scan, manually verify:
-1. **Architecture** — module placement, package layering, component graduation rules
-2. **Feature** — feature completeness, data flow, edge cases, i18n 3-locale sync, a11y
-3. **Type Contracts** — frontend/backend type consistency, API route matching (full-stack only)
+### Step 5: TECH REVIEW deep pass — Layer 3, Feature & Logic
+Verify the implementation quality itself:
+1. **Feature completeness** against the original requirement
+2. **Data flow** end-to-end
+3. **Edge cases** — empty/null/error states, i18n 3-locale sync, a11y
+4. **Adversarial pass** — try to break the change before confirming it
+
+### Step 6: PATTERN REVIEW deep pass — Layer 2 + Layer 4, Architecture & Contracts
+Verify the change fits the project's overall patterns and architecture:
+1. **Architecture & Design (Layer 2)** — module placement, package layering, dependency direction, component graduation rules, API/event consistency, design tokens, server-driven data, ADR coverage
+2. **Type Contracts (Layer 4, full-stack only)** — frontend/backend type consistency, API route matching
+
+### Step 7: Output graded report with per-pass verdicts
+Present findings organized by sub-skill, with file paths, line numbers, and severity. Report **two verdicts** — Tech Review verdict and Pattern Review verdict — plus the overall verdict. Either pass can block independently.
 
 ## Sub-Skill Composition
 

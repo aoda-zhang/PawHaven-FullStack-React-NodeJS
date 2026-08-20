@@ -34,26 +34,23 @@ In addition to the application itself, PawHaven also serves as a **practice of m
 
 ---
 
-# 🧠 Technical Highlights
+# 🚀 Tech Stack & Highlights
 
-- **Monorepo architecture** using `pnpm workspace`
-- **Full-stack TypeScript** with shared types between frontend and backend
-- **React + React Query + React Hook Form** for scalable frontend architecture
-- **NestJS microservices** for backend service isolation
-- **Engineering practices** including ESLint, Prettier, Husky, and CI/CD pipelines
+| Layer              | Technology                                      | Highlights                                                      |
+| ------------------ | ----------------------------------------------- | --------------------------------------------------------------- |
+| Frontend           | React, TypeScript, React Query, React Hook Form | Scalable component-based architecture                           |
+| Backend            | NestJS, Node.js                                 | Microservices for service isolation                             |
+| Architecture       | Monorepo + `pnpm workspace`                     | Full-stack TypeScript with shared types across frontend/backend |
+| Code Quality       | ESLint, Prettier, Husky                         | Enforced standards, pre-commit hooks                            |
+| CI/CD              | GitHub Actions                                  | Automated pipelines                                             |
 
 ---
 
-# 🚀 Tech Stack
+# 🤖 AI Driver
 
-| Layer              | Technology                                      |
-| ------------------ | ----------------------------------------------- |
-| Frontend           | React, TypeScript, React Query, React Hook Form |
-| Backend            | NestJS, Node.js                                 |
-| Architecture       | Microservices, Monorepo                         |
-| Package Management | pnpm workspace                                  |
-| Code Quality       | ESLint, Prettier, Husky                         |
-| CI/CD              | GitHub Actions                                  |
+**Harness** is the **AI-driven development engine** behind PawHaven — an agent orchestrator that turns every coding request into a structured pipeline: `plan → dispatch agents → verify with tests → review against architecture & patterns → update knowledge`.
+
+👉 [Enter the Harness engine](./Harness/README.md) — workflows, agents, skills, principles & the task log
 
 ---
 
@@ -76,23 +73,23 @@ You can use the Discord server to:
 
 # 📚 Documentation
 
-Detailed documentation can be found in the `/docs` directory.
+Detailed documentation can be found in the [`Harness/docs`](./Harness/docs/README.md) directory.
 
 ### Product & Architecture
 
-| Document                                                      | Description                                                               |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [Product Strategy](./docs/PawHaven-Product-Strategy-EN.md)    | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
-| [System Architecture](./docs/PawHaven-System-Architecture.md) | 5-service architecture, modular monolith, DDD, event-driven, ADRs         |
-| [Design System](./packages/design-system/README.MD)           | Design tokens, Tailwind v4 theme, CSS utilities                           |
+| Document                                                                   | Description                                                               |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| [Product Strategy](./Harness/docs/PawHaven-Product-Strategy-EN.md)         | Complete product blueprint — 7 modules, personas, value flywheel, roadmap |
+| [System Architecture](./Harness/docs/PawHaven-System-Architecture.md)      | 5-service architecture, modular monolith, DDD, event-driven, ADRs         |
+| [Design System](./packages/design-system/README.MD)                        | Design tokens, Tailwind v4 theme, CSS utilities                           |
 
 ### Engineering
 
-| Document                                                                             | Description                            |
-| ------------------------------------------------------------------------------------ | -------------------------------------- |
-| [Monorepo & Project Standards](./docs/project_standards.md)                          | Coding conventions, tooling, workflows |
-| [Authentication & Authorization Architecture](./docs/authentication_architecture.md) | JWT-based auth flow and RBAC design    |
-| [Route-Level Authentication](./docs/route_authentication.md)                         | Frontend route guard implementation    |
+| Document                                                                              | Description                            |
+| ------------------------------------------------------------------------------------- | -------------------------------------- |
+| [Monorepo & Project Standards](./Harness/docs/project_standards.md)                   | Coding conventions, tooling, workflows |
+| [Authentication & Authorization Architecture](./Harness/docs/authentication-architecture.md) | JWT-based auth flow and RBAC design    |
+| [Route-Level Authentication](./Harness/docs/route_authentication.md)                  | Frontend route guard implementation    |
 
 ---
 

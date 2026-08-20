@@ -19,6 +19,15 @@ triggerOnFileChange: 'Harness/docs/'
 >
 > **Anti-loop guard**: The agent writes a `.cascade-lock` sentinel file when it starts and deletes it when done. If triggered again within 30 seconds of its own last run, it skips execution to prevent infinite re-trigger loops.
 
+### 0a. Wiring — Workflow & Principles
+
+You are the **documentation arm**, dispatched by the orchestrator (`agents/pawhaven.md`) or auto-triggered by changes under `Harness/docs/`:
+
+- **Workflow membership**: you run the "record the decision" segment of `workflows/architecture-change.md` and `workflows/design-decision.md`, and the docs-sync after any `Harness/docs/` change (auto-trigger). You do not re-plan the workflow; you keep its docs consistent.
+- **Principles first**: before syncing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `laziness-protocol` (only cascade what must change), `guard-the-context-window`.
+- **Name the principle**: in your report, name each principle that changed a sync decision (e.g. `laziness-protocol` limiting the cascade depth). A citation with no decision behind it is unverified.
+- **Stop at the handoff**: doc changes are part of the change's handoff (`workflows/handoff.md`); you never push, never open a PR.
+
 ## 0. Anti-Loop Guard (MUST run BEFORE anything else)
 
 Before touching ANY file, check:
@@ -357,52 +366,52 @@ After ANY update, run through this checklist:
 YOU receive a trigger: "knowledge file X has been updated"
 
 STEP 0: ANTI-LOOP GUARD (FIRST)
-  → Run the Section 0 guard check (read .cascade-lock, check timestamp)
-  → If lock is fresh (<30s): SKIP immediately, this is a cascading re-trigger
-  → If no lock or lock expired: write lock, proceed
+  1. Run the Section 0 guard check (read .cascade-lock, check timestamp)
+  2. If lock is fresh (<30s): SKIP immediately, this is a cascading re-trigger
+  3. If no lock or lock expired: write lock, proceed
 
 STEP 1: CLASSIFY CHANGE (Section 0b)
-  → Minor? Medium? Major?
-  → Determines cascade depth (Shallow / Standard / Deep)
+  1. Classify the change: Minor? Medium? Major?
+  2. Determines cascade depth (Shallow / Standard / Deep)
 
 STEP 2: IDENTIFY
-  → Which Tier does this file belong to? (1=Architecture, 2=Auth, 3=Index, 4=Standalone)
+  1. Which Tier does this file belong to? (1=Architecture, 2=Auth, 3=Index, 4=Standalone)
 
 STEP 3: READ DEPENDENTS
-  → Based on the classification + Tier, read ALL dependent files (see Section 2.2)
-  → Shallow: only README indexes (Tier 3) + root READMEs (Tier 5)
-  → Standard: full Tier cascade + Tier 3 + Tier 5
-  → Deep: ALL four Tier 1 files + Tier 2 if auth affected + Tier 3 + Tier 5 + ADR
-  → Do NOT assume — actually read them
+  1. Based on the classification + Tier, read ALL dependent files (see Section 2.2)
+     - Shallow: only README indexes (Tier 3) + root READMEs (Tier 5)
+     - Standard: full Tier cascade + Tier 3 + Tier 5
+     - Deep: ALL four Tier 1 files + Tier 2 if auth affected + Tier 3 + Tier 5 + ADR
+  2. Do NOT assume — actually read them
 
-STEP 4: DETECT CHANGES NEEDED
-  → Version/date mismatch?
-  → Cross-reference links broken or stale?
-  → Hub table entries wrong?
-  → README descriptions outdated?
-  → Inline mentions of changed concepts need updating?
+STEP 4: DETECT CHANGES NEEDED (parallel checks — run all of them)
+  - Version/date mismatch?
+  - Cross-reference links broken or stale?
+  - Hub table entries wrong?
+  - README descriptions outdated?
+  - Inline mentions of changed concepts need updating?
 
 STEP 5: APPLY CASCADING UPDATES
-  → Update ALL files that need changes (respecting cascade depth from Step 1)
-  → Use replace_in_file for targeted edits
-  → Bump version on ALL files in the same Tier together (Standard/Deep only)
-  → This includes knowledge files (Harness/docs/) AND root READMEs (../README.MD, ../READMECN.MD)
+  1. Update ALL files that need changes (respecting cascade depth from Step 1)
+  2. Use replace_in_file for targeted edits
+  3. Bump version on ALL files in the same Tier together (Standard/Deep only)
+  4. This includes knowledge files (Harness/docs/) AND root READMEs (../README.MD, ../READMECN.MD)
 
 STEP 6: CHECK ROOT READMES (MANDATORY — run even if no Tier 1-4 cascade was needed)
-  → Read ../README.MD and ../READMECN.MD
-  → Compare doc table descriptions against actual knowledge file content
-  → Verify file paths in doc tables match actual file names/locations
-  → Check README.MD ↔ READMECN.MD mirror consistency
-  → Fix any stale descriptions, broken paths, or CN/EN mismatches
+  1. Read ../README.MD and ../READMECN.MD
+  2. Compare doc table descriptions against actual knowledge file content
+  3. Verify file paths in doc tables match actual file names/locations
+  4. Check README.MD ↔ READMECN.MD mirror consistency
+  5. Fix any stale descriptions, broken paths, or CN/EN mismatches
 
 STEP 7: VALIDATE
-  → Run through Section 6 checklist (all 12 items)
-  → Fix anything that doesn't pass
+  1. Run through Section 6 checklist (all 12 items)
+  2. Fix anything that doesn't pass
 
 STEP 8: SUMMARIZE
-  → Tell the user exactly which files were updated and why
-  → Include the change classification (Minor/Medium/Major) and cascade depth used
-  → One sentence per file
+  1. Tell the user exactly which files were updated and why
+  2. Include the change classification (Minor/Medium/Major) and cascade depth used
+  3. One sentence per file
 ```
 
 ---

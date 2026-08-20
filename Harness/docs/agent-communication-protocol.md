@@ -174,21 +174,31 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 ### Scope: {frontend / backend / full-stack}
 ### Mode: {normal / fallback}
 
-### Gate — Figma Design Match (UI tasks only)
+### Gate — Figma Design Match (UI tasks only, feeds TECH verdict)
 ✅ Pass / ⚠️ Degraded / ❌ Fail (with severity classification)
 
-### Layer 1 — Automated Scans
+### TECH REVIEW — Layer 1 scans + Layer 3 feature & logic
 | Sub-Skill | ❌ Blocking | ⚠️ Warning | 💡 Suggestion |
 |-----------|------------|------------|---------------|
 | typecheck-doctor | X | 0 | 0 |
 | react-doctor | X | 0 | 0 |
 | style-doctor | X | Y | Z |
-| boundary-doctor | X | 0 | 0 |
 | i18n-doctor | 0 | Y | 0 |
 | backend-doctor | X | 0 | 0 |
+
+| Check | Status | Detail |
+|-------|--------|--------|
+| Feature completeness | ✅/❌ | ... |
+| Data flow | ✅/❌ | ... |
+| Error/loading/empty states | ✅/⚠️ | ... |
+| Accessibility | ✅/⚠️ | ... |
+
+### PATTERN REVIEW — Layer 1 scans + Layer 2 architecture + Layer 4 contracts
+| Sub-Skill | ❌ Blocking | ⚠️ Warning | 💡 Suggestion |
+|-----------|------------|------------|---------------|
+| boundary-doctor | X | 0 | 0 |
 | architecture-doctor | X | Y | Z |
 
-### Layer 2 — Architecture & Design
 | Check | Status | Detail |
 |-------|--------|--------|
 | Module responsibility | ✅/❌/⚠️ | ... |
@@ -197,35 +207,28 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 | API consistency | ✅/⚠️ | ... |
 | ADR coverage | ✅/💡 | ... |
 
-### Layer 3 — Feature Requirements
 | Check | Status | Detail |
 |-------|--------|--------|
-| Feature completeness | ✅/❌ | ... |
-| Data flow | ✅/❌ | ... |
-| Error/loading/empty states | ✅/⚠️ | ... |
-| Accessibility | ✅/⚠️ | ... |
-
-### Layer 4 — Type Contract (full-stack only)
-| Check | Status | Detail |
-|-------|--------|--------|
-| Zod schema match | ✅/❌ | ... |
-| Endpoint path match | ✅/❌ | ... |
+| Zod schema match (full-stack) | ✅/❌ | ... |
+| Endpoint path match (full-stack) | ✅/❌ | ... |
 
 ### ❌ Blocking Issues
-| # | Layer | Rule | File:Line | Issue |
-|---|-------|------|-----------|-------|
-| 1 | ... | ... | ... | ... |
+| # | Pass | Layer | Rule | File:Line | Issue |
+|---|------|-------|------|-----------|-------|
+| 1 | TECH/PATTERN | ... | ... | ... | ... |
 
 ### ⚠️ Warnings
-| # | Layer | Rule | File:Line | Issue |
-|---|-------|------|-----------|-------|
+| # | Pass | Layer | Rule | File:Line | Issue |
+|---|------|-------|------|-----------|-------|
 
 ### 💡 Suggestions
-| # | Layer | Rule | File:Line | Issue |
-|---|-------|------|-----------|-------|
+| # | Pass | Layer | Rule | File:Line | Issue |
+|---|------|-------|------|-----------|-------|
 
-### Verdict
-✅ Pass / ⚠️ Needs minor fixes / ❌ Blocked — {which agent must fix what}
+### Verdicts
+- **Tech Review verdict**: ✅ Pass / ⚠️ Needs minor fixes / ❌ Blocked
+- **Pattern Review verdict**: ✅ Pass / ⚠️ Needs minor fixes / ❌ Blocked
+- **Overall**: ✅ Pass / ⚠️ Needs minor fixes / ❌ Blocked — {which agent must fix what}
 ```
 
 ## 3. Communication Rules
@@ -251,7 +254,7 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 
 - Testing reports failures → orchestrator routes to the implementing agent (not review)
 - Review reports blocking issues → orchestrator routes to the responsible agent
-- Never skip the chain: Fix → Retest → Re-review
+- Never skip the chain: Step 1 Fix → Step 2 Retest → Step 3 Re-review
 
 ### 3.4 Structured Parsing
 
@@ -260,6 +263,18 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 - Statuses: ✅ Pass, ❌ Fail, ⚠️ Warning, 💡 Suggestion
 - Severity: ❌ Blocking, ⚠️ Warning, 💡 Suggestion
 
+### 3.5 Task Log — The Progress Document
+
+All workflow progress goes to **one** temporary runtime file, `Harness/task-log.md` (Harness root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never committed. The orchestrator alone writes it:
+
+- **Per task**: append a new `## Task: {Task ID}` section when the plan is approved.
+- **Per stage**: append a `## Phase:` digest (what the agent produced, validation result, whether its Step Completion Checklist was present) plus a pointer to the full structured report above.
+- **Per loop**: a blocking finding routes back to the responsible implementer (Step 1 Fix → Step 2 Retest → Step 3 Re-review); each pass is recorded.
+- **Per stuck point**: append to the Stuck Log (what timed out, what was partially done, how it was recovered).
+- **At completion**: append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"** — **Yes** → clear the file contents (keep the header), **No** → keep; the next task appends below.
+
+If a task stalls, the log is the single place to read the latest progress: the Stuck Log says where it stopped, the last `## Phase:` says what finished, the Handoff section says whether it is done on purpose.
+
 ## 4. Cross-Reference
 
-**Related Docs**: [System Architecture Overview](./PawHaven-System-Architecture-Overview.md) | [Frontend Architecture](./PawHaven-Frontend-Architecture.md) | [Backend Architecture](./PawHaven-Backend-Architecture.md)
+**Related Docs**: [Task Log](./task-log.md) | [System Architecture Overview](./PawHaven-System-Architecture-Overview.md) | [Frontend Architecture](./PawHaven-Frontend-Architecture.md) | [Backend Architecture](./PawHaven-Backend-Architecture.md)

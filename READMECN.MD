@@ -32,26 +32,23 @@
 
 ---
 
-# 🧠 技术亮点
+# 🚀 技术栈与亮点
 
-- **Monorepo 架构**，使用 `pnpm workspace`
-- **全栈 TypeScript**，前后端共享类型
-- **React + React Query + React Hook Form** 实现可扩展前端架构
-- **NestJS 微服务** 提供后台服务隔离
-- **工程实践**：ESLint、Prettier、Husky、CI/CD 自动化流程
+| 层级     | 技术                                            | 亮点                                      |
+| -------- | ----------------------------------------------- | ----------------------------------------- |
+| 前端     | React, TypeScript, React Query, React Hook Form | 可扩展的组件化架构                        |
+| 后端     | NestJS, Node.js                                 | 微服务隔离，模块化单体                    |
+| 架构     | Monorepo + `pnpm workspace`                     | 全栈 TypeScript，前后端共享类型           |
+| 代码规范 | ESLint, Prettier, Husky                         | 强制代码标准、pre-commit 钩子             |
+| CI/CD    | GitHub Actions                                  | 自动化流水线                              |
 
 ---
 
-# 🚀 技术栈
+# 🤖 AI Driver
 
-| 层级     | 技术                                            |
-| -------- | ----------------------------------------------- |
-| 前端     | React, TypeScript, React Query, React Hook Form |
-| 后端     | NestJS, Node.js                                 |
-| 架构     | 微服务, Monorepo                                |
-| 包管理   | pnpm workspace                                  |
-| 代码规范 | ESLint, Prettier, Husky                         |
-| CI/CD    | GitHub Actions                                  |
+**Harness** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent 编排器，将每个开发请求转化为结构化流水线：`规划 → 分发 Agent → 测试验证 → 对照架构与模式审查 → 知识更新`。
+
+👉 [进入 Harness 引擎](./Harness/README.md) —— 工作流、Agent、技能、原则与任务日志
 
 ---
 
@@ -73,23 +70,23 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 # 📚 文档
 
-详细文档请查看 `/docs` 目录：
+详细文档请查看 [`Harness/docs`](./Harness/docs/README.md) 目录：
 
 ### 产品与架构
 
-| 文档                                                  | 说明                                                    |
-| ----------------------------------------------------- | ------------------------------------------------------- |
-| [产品策略](./docs/PawHaven-Product-Strategy.md)       | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
-| [系统架构](./docs/PawHaven-System-Architecture-CN.md) | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录     |
-| [设计系统](./packages/design-system/README.MD)        | Design tokens、Tailwind v4 主题、CSS 工具类            |
+| 文档                                                              | 说明                                                    |
+| ----------------------------------------------------------------- | ------------------------------------------------------- |
+| [产品策略](./Harness/docs/PawHaven-Product-Strategy-EN.md) (英文) | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
+| [系统架构](./Harness/docs/PawHaven-System-Architecture.md)       | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录     |
+| [设计系统](./packages/design-system/README.MD)                    | Design tokens、Tailwind v4 主题、CSS 工具类            |
 
 ### 工程
 
-| 文档                                                        | 说明                     |
-| ----------------------------------------------------------- | ------------------------ |
-| [Monorepo 与项目规范](./docs/project_standards.md)          | 编码规范、工具链、工作流 |
-| [身份认证与授权架构](./docs/authentication_architecture.md) | JWT 认证流程与 RBAC 设计 |
-| [路由级认证](./docs/route_authentication.md)                | 前端路由守卫实现         |
+| 文档                                                                | 说明                     |
+| ------------------------------------------------------------------- | ------------------------ |
+| [Monorepo 与项目规范](./Harness/docs/project_standards.md)          | 编码规范、工具链、工作流 |
+| [身份认证与授权架构](./Harness/docs/authentication-architecture.md) | JWT 认证流程与 RBAC 设计 |
+| [路由级认证](./Harness/docs/route_authentication.md)                | 前端路由守卫实现         |
 
 ---
 

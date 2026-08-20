@@ -11,7 +11,7 @@
 | [PawHaven-Product-Strategy-EN.md](./PawHaven-Product-Strategy-EN.md)  | Complete product blueprint v2.0 — animal lifecycle, persona model, feature map, MVP roadmap |
 | [PawHaven-Product-Strategy.md](./PawHaven-Product-Strategy.md) (中文) | Chinese version of the product strategy                                                     |
 
-**Key contents**: Full collaborative pipeline from discovery → rescue → medical → adoption, user role definitions (reporter / rescuer / adopter / clinic), core feature matrix, phased delivery plan.
+**Key contents**: Full collaborative pipeline — Step 1 discovery → Step 2 rescue → Step 3 medical → Step 4 adoption, user role definitions (reporter / rescuer / adopter / clinic), core feature matrix, phased delivery plan.
 
 ---
 
@@ -123,4 +123,4 @@ AGENTS.md ───────────────────────�
   (AI Agent Constraints)
 ```
 
-> **Suggested reading order**: Product Strategy → System Architecture → Figma Design → Design System → Auth Architecture → Engineering Standards
+> **Suggested reading order**: Step 1 Product Strategy → Step 2 System Architecture → Step 3 Figma Design → Step 4 Design System → Step 5 Auth Architecture → Step 6 Engineering Standards
