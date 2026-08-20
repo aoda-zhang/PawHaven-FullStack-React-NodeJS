@@ -51,19 +51,19 @@ A structured design document (Section 6 format) that frontend and backend agents
 
 ### 2.1 Required Reading (ALWAYS, before any decision)
 
-| Doc                                                             | Purpose                                                               |
-| --------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md` | Full system C4 model, service map, data flow, gateway, events         |
-| `.codebuddy/knowledge/PawHaven-Backend-Architecture.md`         | Module structure, event catalog, boundary rules, core-service modules |
-| `.codebuddy/knowledge/PawHaven-Frontend-Architecture.md`        | Feature modules, packages, routing, state management                  |
-| `.codebuddy/knowledge/PawHaven-Product-Strategy-EN.md`          | Product vision, feature priorities, business context                  |
-| `.codebuddy/knowledge/agent-communication-protocol.md`          | Structured output formats that implementers expect from your design   |
+| Doc                                                     | Purpose                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------- |
+| `Harness/docs/PawHaven-System-Architecture-Overview.md` | Full system C4 model, service map, data flow, gateway, events         |
+| `Harness/docs/PawHaven-Backend-Architecture.md`         | Module structure, event catalog, boundary rules, core-service modules |
+| `Harness/docs/PawHaven-Frontend-Architecture.md`        | Feature modules, packages, routing, state management                  |
+| `Harness/docs/PawHaven-Product-Strategy-EN.md`          | Product vision, feature priorities, business context                  |
+| `Harness/docs/agent-communication-protocol.md`          | Structured output formats that implementers expect from your design   |
 
 ### 2.2 Contextual Reading (scope-dependent)
 
 | What             | Tool                                                       | Why                                         |
 | ---------------- | ---------------------------------------------------------- | ------------------------------------------- |
-| Existing ADRs    | `list_dir .codebuddy/knowledge/ADR/`                       | Past decisions constrain new ones           |
+| Existing ADRs    | `list_dir Harness/docs/ADR/`                               | Past decisions constrain new ones           |
 | Similar features | `list_dir apps/backend/core-service/src/modules/`          | Existing patterns to follow or deviate from |
 | API contracts    | `search_content "FeatureName" packages/shared/`            | What types/schemas already exist?           |
 | Prisma schema    | `read_file apps/backend/core-service/prisma/schema.prisma` | Current data model                          |
@@ -269,7 +269,7 @@ Frontend → API Gateway → Core-Service Controller → Use-Case → Prisma →
 
 ✅ Proceed with {proposed solution}.
 
-ADR created: `.codebuddy/knowledge/ADR/ADR-{NNN}-{slug}.md` (if architecturally significant)
+ADR created: `Harness/docs/ADR/ADR-{NNN}-{slug}.md` (if architecturally significant)
 
 ````
 

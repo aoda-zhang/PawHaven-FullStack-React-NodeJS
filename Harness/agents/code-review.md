@@ -28,18 +28,18 @@ You are the **code review gatekeeper**. Your job:
 
 ## 2. Sub-Skills Reference
 
-All sub-skills live under `.codebuddy/skills/code-review/`. Each sub-skill's `SKILL.MD` contains explicit rules with exact tool invocations — NO shell scripts.
+All sub-skills live under `Harness/skills/code-review/`. Each sub-skill's `SKILL.MD` contains explicit rules with exact tool invocations — NO shell scripts.
 
-| Type     | Skill               | SKILL.MD Path                                                | Scope                 |
-| -------- | ------------------- | ------------------------------------------------------------ | --------------------- |
-| **GATE** | figma-doctor        | `.codebuddy/skills/code-review/figma-doctor/SKILL.MD`        | frontend (runs FIRST) |
-| parallel | typecheck-doctor    | `.codebuddy/skills/code-review/typecheck-doctor/SKILL.MD`    | all                   |
-| parallel | react-doctor        | `.codebuddy/skills/code-review/react-doctor/SKILL.MD`        | frontend              |
-| parallel | style-doctor        | `.codebuddy/skills/code-review/style-doctor/SKILL.MD`        | frontend              |
-| parallel | boundary-doctor     | `.codebuddy/skills/code-review/boundary-doctor/SKILL.MD`     | all                   |
-| parallel | i18n-doctor         | `.codebuddy/skills/code-review/i18n-doctor/SKILL.MD`         | frontend              |
-| parallel | backend-doctor      | `.codebuddy/skills/code-review/backend-doctor/SKILL.MD`      | backend               |
-| parallel | architecture-doctor | `.codebuddy/skills/code-review/architecture-doctor/SKILL.MD` | all                   |
+| Type     | Skill               | SKILL.MD Path                                             | Scope                 |
+| -------- | ------------------- | --------------------------------------------------------- | --------------------- |
+| **GATE** | figma-doctor        | `Harness/skills/code-review/figma-doctor/SKILL.MD`        | frontend (runs FIRST) |
+| parallel | typecheck-doctor    | `Harness/skills/code-review/typecheck-doctor/SKILL.MD`    | all                   |
+| parallel | react-doctor        | `Harness/skills/code-review/react-doctor/SKILL.MD`        | frontend              |
+| parallel | style-doctor        | `Harness/skills/code-review/style-doctor/SKILL.MD`        | frontend              |
+| parallel | boundary-doctor     | `Harness/skills/code-review/boundary-doctor/SKILL.MD`     | all                   |
+| parallel | i18n-doctor         | `Harness/skills/code-review/i18n-doctor/SKILL.MD`         | frontend              |
+| parallel | backend-doctor      | `Harness/skills/code-review/backend-doctor/SKILL.MD`      | backend               |
+| parallel | architecture-doctor | `Harness/skills/code-review/architecture-doctor/SKILL.MD` | all                   |
 
 ## 3. Workflow
 
@@ -61,7 +61,7 @@ RECEIVE TASK from main agent
 │ STEP 1 (GATE): FIGMA-DOCTOR — Design Spec Verification           │
 │ (UI tasks only; skip for pure backend reviews)                   │
 │                                                                  │
-│ 1. Read .codebuddy/knowledge/figma-design-spec.md                │
+│ 1. Read Harness/docs/figma-design-spec.md                │
 │ 2. Find the section matching {target}                            │
 │ 3. Find the implementation code for {target}                     │
 │ 4. Compare EVERY property: structure, colors, typography,        │

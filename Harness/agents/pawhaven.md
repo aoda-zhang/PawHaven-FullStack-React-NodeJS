@@ -60,7 +60,7 @@ packages/
 | `backend`          | `apps/backend/*`, Prisma schemas, NestJS modules, event handling                                                                  | Any API work, service logic, database changes, auth flow, module creation                       |
 | `testing`          | All test files, test strategy, coverage                                                                                           | After implementation completes, before code review                                              |
 | `code-review`      | All changed files                                                                                                                 | After testing passes, before declaring done                                                     |
-| `knowledge-update` | `.codebuddy/knowledge/`, root `README.MD`, `READMECN.MD`                                                                          | Auto-triggers on knowledge file changes; manually invoke if architecture docs need update       |
+| `knowledge-update` | `Harness/docs/`, root `README.MD`, `READMECN.MD`                                                                                  | Auto-triggers on knowledge file changes; manually invoke if architecture docs need update       |
 
 ### 2.3 Available Skills (delegated to subagents)
 
@@ -74,11 +74,11 @@ packages/
 
 ### 2.4 Workflow Templates (reference for pipeline decisions)
 
-| Workflow            | File                                          | When to Use                                        |
-| ------------------- | --------------------------------------------- | -------------------------------------------------- |
-| Feature Development | `.codebuddy/workflows/feature-development.md` | New feature (default pipeline)                     |
-| Bug Fix             | `.codebuddy/workflows/bug-fix.md`             | Bug fixes and patches                              |
-| Architecture Change | `.codebuddy/workflows/architecture-change.md` | Service split, module restructure, paradigm change |
+| Workflow            | File                                       | When to Use                                        |
+| ------------------- | ------------------------------------------ | -------------------------------------------------- |
+| Feature Development | `Harness/workflows/feature-development.md` | New feature (default pipeline)                     |
+| Bug Fix             | `Harness/workflows/bug-fix.md`             | Bug fixes and patches                              |
+| Architecture Change | `Harness/workflows/architecture-change.md` | Service split, module restructure, paradigm change |
 
 ---
 
@@ -88,7 +88,7 @@ packages/
 
 **This is the DEFAULT behavior for ALL feature requests.** When you receive a feature request:
 
-1. **Classify** — Use your built-in service map (Section 2.1) and subagent roster (Section 2.2) to classify the request. If uncertain, skim `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md`.
+1. **Classify** — Use your built-in service map (Section 2.1) and subagent roster (Section 2.2) to classify the request. If uncertain, skim `Harness/docs/PawHaven-System-Architecture-Overview.md`.
 2. **Plan** — Output which agents are needed and their **high-level task description** (one sentence each). Do NOT break into files, APIs, or implementation details — subagents own that.
 3. **Present** — Show the agent-level plan to the user.
 4. **Wait** — Do NOT start until the user explicitly confirms.
@@ -351,11 +351,11 @@ pnpm build
 
 Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover most classification needs. Only read external docs when:
 
-| Situation                                | Read                                                            |
-| ---------------------------------------- | --------------------------------------------------------------- |
-| Uncertain which service owns a feature   | `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md` |
-| Need to understand the full service map  | (same — skim the overview)                                      |
-| Need to parse subagent structured output | `.codebuddy/knowledge/agent-communication-protocol.md`          |
+| Situation                                | Read                                                    |
+| ---------------------------------------- | ------------------------------------------------------- |
+| Uncertain which service owns a feature   | `Harness/docs/PawHaven-System-Architecture-Overview.md` |
+| Need to understand the full service map  | (same — skim the overview)                              |
+| Need to parse subagent structured output | `Harness/docs/agent-communication-protocol.md`          |
 
 **Subagents own their domain docs** — they read `Frontend-Architecture.md`, `Backend-Architecture.md`, `figma-design-spec.md`, etc. You don't need to.
 
@@ -390,7 +390,7 @@ Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover 
 9. **Figma mock data belongs in each feature's own `mockData.ts` file.** NEVER put mock data in the design-system package; each feature owns its demo data under `src/features/<FeatureName>/mockData.ts`. This will be removed when real API integration happens.
 10. **ALWAYS trigger code-review after testing passes.**
 11. **ALWAYS check if knowledge docs need updating** when architecture changes or new ADRs are created.
-12. **NEVER modify `.codebuddy/agents/` or `.codebuddy/knowledge/` directly.** Use `knowledge-update` agent.
+12. **NEVER modify `Harness/agents/` or `Harness/docs/` directly.** Use `knowledge-update` agent.
 13. **NEVER parallelize features with cross-dependencies.** Default to sequential.
 14. **NEVER read domain-specific docs** (Frontend-Architecture, Backend-Architecture, figma-design-spec). Subagents own those.
 15. **ALWAYS verify final state with typecheck + lint before declaring done.**

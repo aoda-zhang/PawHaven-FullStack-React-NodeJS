@@ -18,22 +18,23 @@ Uses Playwright MCP to open the real Figma page when possible; falls back to the
 
 ## Gate Severity
 
-| Target type | Live Figma unavailable | Mismatch found |
-|-------------|------------------------|----------------|
-| Core visual page (hero, landing, homepage, brand-heavy section) | Warning + manual confirmation | Blocking |
-| High-risk change (redesign, layout refactor, new component system) | Warning + manual confirmation | Blocking |
-| Ordinary UI / small tweak (button text, spacing tweak, form label) | Use spec fallback; continue with Warning | Warning |
-| Non-UI task | Skip gate entirely | N/A |
+| Target type                                                        | Live Figma unavailable                   | Mismatch found |
+| ------------------------------------------------------------------ | ---------------------------------------- | -------------- |
+| Core visual page (hero, landing, homepage, brand-heavy section)    | Warning + manual confirmation            | Blocking       |
+| High-risk change (redesign, layout refactor, new component system) | Warning + manual confirmation            | Blocking       |
+| Ordinary UI / small tweak (button text, spacing tweak, form label) | Use spec fallback; continue with Warning | Warning        |
+| Non-UI task                                                        | Skip gate entirely                       | N/A            |
+
 ## Token Budget Awareness
 
 **Screenshots are token-expensive.** Workflow is designed to minimize image analysis:
 
-| Data Source | Token Cost | Use For |
-|------------|------------|---------|
-| `playwright_get_visible_text` | Low (plain text) | Structure, content, text hierarchy, labels, headings |
-| `playwright_get_visible_html` | Medium (HTML) | Component types, nesting, class names, layout patterns |
-| `figma-design-spec.md` | Low (markdown) | Cross-reference property values (colors, dimensions, tokens) |
-| **1 screenshot of target section** | High (image) | Visual-only checks: spacing feel, color nuance, icon rendering, alignment |
+| Data Source                        | Token Cost       | Use For                                                                   |
+| ---------------------------------- | ---------------- | ------------------------------------------------------------------------- |
+| `playwright_get_visible_text`      | Low (plain text) | Structure, content, text hierarchy, labels, headings                      |
+| `playwright_get_visible_html`      | Medium (HTML)    | Component types, nesting, class names, layout patterns                    |
+| `figma-design-spec.md`             | Low (markdown)   | Cross-reference property values (colors, dimensions, tokens)              |
+| **1 screenshot of target section** | High (image)     | Visual-only checks: spacing feel, color nuance, icon rendering, alignment |
 
 **Rule: ONE screenshot maximum.** Only the target section — not full page. Only take it after structural checks via text/HTML are done.
 
@@ -64,6 +65,7 @@ playwright_get_visible_text
 ```
 
 Parse the visible text to identify:
+
 - Section boundaries and hierarchy
 - All text content, headings, labels
 - Content order and reading sequence
@@ -76,6 +78,7 @@ playwright_get_visible_html
 ```
 
 Parse the HTML to identify:
+
 - Component types and nesting
 - Layout patterns (grid, flex, columns)
 - CSS class names (infer spacing, sizing, colors)
@@ -84,10 +87,11 @@ Parse the HTML to identify:
 ### Step 4: Cross-reference with design spec (cheap)
 
 ```
-read_file: .codebuddy/knowledge/figma-design-spec.md
+read_file: Harness/docs/figma-design-spec.md
 ```
 
 Use the spec to confirm exact values that may not be obvious from HTML:
+
 - Color hex values → design token mapping
 - Exact dimensions (h-16, max-w-6xl, etc.)
 - Font families and sizes
@@ -104,6 +108,7 @@ playwright_screenshot:
 ```
 
 **Only for visual spot-checking** what text/HTML cannot convey:
+
 - Spacing proportions and alignment
 - Color harmony and contrast
 - Icon appearance and sizing
@@ -122,16 +127,19 @@ read_file: the implementation source files
 Compare in this order (cheapest first):
 
 **Text-level** (from Step 2 visible text + implementation):
+
 - All text content matches
 - Same headings, labels, CTAs
 - Same content order
 
 **Structure-level** (from Step 3 HTML + implementation):
+
 - Same layout pattern (grid, flex, columns)
 - Same nesting hierarchy
 - Same component types
 
 **Property-level** (from Step 4 spec + implementation):
+
 - Same color tokens
 - Same dimensions (width, height, padding, margin)
 - Same typography (font, size, weight)
@@ -139,6 +147,7 @@ Compare in this order (cheapest first):
 - Same responsive breakpoints
 
 **Visual-level** (from Step 5 screenshot + implementation):
+
 - Spacing feels proportional
 - Colors look harmonious
 - No visual anomalies
@@ -165,7 +174,7 @@ figma-doctor runs FIRST
 
 If Playwright MCP cannot access the live Figma page:
 
-1. Read `.codebuddy/knowledge/figma-design-spec.md`.
+1. Read `Harness/docs/figma-design-spec.md`.
 2. Locate the {target} section in the spec.
 3. Read the implementation files for the same {target}.
 4. Compare structure, content, tokens, and responsive behavior from the spec.
@@ -174,17 +183,17 @@ If Playwright MCP cannot access the live Figma page:
 
 ## Tools Required
 
-| Step | Tool | Cost |
-|------|------|------|
-| Navigate | `playwright_navigate` | Low |
-| Structure | `playwright_get_visible_text` | Low |
-| Structure | `playwright_get_visible_html` | Medium |
-| Reference | `read_file` (spec) | Low |
+| Step              | Tool                                          | Cost     |
+| ----------------- | --------------------------------------------- | -------- |
+| Navigate          | `playwright_navigate`                         | Low      |
+| Structure         | `playwright_get_visible_text`                 | Low      |
+| Structure         | `playwright_get_visible_html`                 | Medium   |
+| Reference         | `read_file` (spec)                            | Low      |
 | Visual spot-check | `playwright_screenshot` (target only, 1 shot) | **High** |
-| Find code | `search_file`, `search_content` | Low |
-| Read code | `read_file` (implementation) | Low |
+| Find code         | `search_file`, `search_content`               | Low      |
+| Read code         | `read_file` (implementation)                  | Low      |
 
 ## Related
 
-- Design spec source: `.codebuddy/knowledge/figma-design-spec.md`
+- Design spec source: `Harness/docs/figma-design-spec.md`
 - After gate passes, run: [style-doctor](./style-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD)

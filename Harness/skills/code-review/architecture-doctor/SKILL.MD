@@ -19,6 +19,7 @@ version: 3.0
 ## Purpose
 
 Verify that the codebase follows the defined architecture rules:
+
 - Module responsibility and domain boundaries
 - Dependency direction (no circular or reversed dependencies)
 - Package boundary enforcement
@@ -36,6 +37,7 @@ git diff --name-only develop...HEAD
 ```
 
 Classify by scope:
+
 - `backend/**` → backend architecture checks
 - `apps/frontend/**` → frontend architecture checks
 - `packages/**` → package boundary checks
@@ -58,11 +60,13 @@ grep -rn "from '\.\.\/.*\/modules\/" apps/backend/core-service/src/ \
 ```
 
 **What to look for:**
+
 - `modules/rescue/` importing from `modules/content/entities/` → Blocking
 - `modules/rescue/` importing from `modules/content/content.service.ts` → OK (public API via DI)
 - `modules/rescue/` importing from `modules/content/DTO/` → Blocking
 
 **Report format:**
+
 ```
 ❌ [Blocking] Cross-module import: modules/rescue/use-cases/foo.usecase.ts:5
    imports from '../../content/DTO/story.dto' — use ContentService facade instead
@@ -95,6 +99,7 @@ grep -rn "from '@pawhaven/frontend-core'" packages/design-system/ --include="*.t
 ```
 
 **Report format:**
+
 ```
 ❌ [Blocking] Package dependency violation: packages/ui/src/Button.tsx:3
    imports from '@pawhaven/frontend-core' — ui cannot depend on frontend-core
@@ -117,11 +122,13 @@ grep -rn "from '.*features/" apps/frontend/portal/src/features/ \
 ```
 
 **What to look for:**
+
 - `features/Home/` importing from `features/RescueDetail/` → Blocking
 - `features/RescueGuide/` importing from `features/Home/` → Blocking
 - Importing from `features/queryKeys.ts` → OK (shared key re-export hub)
 
 **Report format:**
+
 ```
 ❌ [Blocking] Cross-feature import: features/Home/components/Hero.tsx:4
    imports from 'features/RescueDetail/types' — graduate shared types to @pawhaven/shared
@@ -144,10 +151,12 @@ grep -rn "from '.*components/" apps/frontend/portal/src/features/ \
 ```
 
 **What to look for:**
+
 - Same component imported from 2+ different feature directories → Warning (should graduate)
 - Component in `packages/ui/` imported from only 1 feature → Suggestion (could be feature-private)
 
 **Report format:**
+
 ```
 ⚠️ [Warning] Component needs graduation: RescueCard is imported by features/Home/components/Hero.tsx
    and features/RescueDetail/components/RescueTimeline.tsx
@@ -168,6 +177,7 @@ ls -d apps/frontend/portal/src/features/*/
 ```
 
 For each feature, check:
+
 - Has `index.tsx` (entry point)?
 - Has `types.ts` (feature types)?
 - Has `api/` directory with `<module>.api.ts` + `<module>.queryKeys.ts`, plus `queries.ts` / `mutations.ts` ONLY when a relevant hook exists?
@@ -179,6 +189,7 @@ For each feature, check:
 - No business logic in generic `src/components/`?
 
 **Report format:**
+
 ```
 ⚠️ [Warning] Feature structure: features/RescueGuide/ is missing types.ts
    → Add types.ts for RescueGuide-specific type definitions
@@ -201,11 +212,13 @@ done
 ```
 
 **What to look for:**
+
 - Module A's service contains business logic for Module B's domain → Warning
 - Module has no clear aggregate root → Warning
 - Module exports internal entities/use-cases (not just service facade) → Warning
 
 **Report format:**
+
 ```
 ⚠️ [Warning] Module responsibility: modules/rescue/content.service.ts
    contains story management logic — should be in modules/content/
@@ -226,12 +239,14 @@ grep -rn "@Controller\|@Get\|@Post\|@Put\|@Delete\|@Patch" \
 ```
 
 **What to look for:**
+
 - Inconsistent URL patterns (e.g., `/api/rescue-cases` vs `/api/rescues`)
 - Inconsistent response shapes (some wrap in `{ data }`, others don't)
 - Missing validation pipes (no `ZodValidationPipe`)
 - Controllers directly calling use-cases (should go through service facade)
 
 **Report format:**
+
 ```
 ⚠️ [Warning] API inconsistency: modules/report-stray/report-stray.controller.ts
    uses URL pattern /api/stray-reports but rescue module uses /api/rescues
@@ -255,11 +270,13 @@ grep -rn "interface.*Dto\|type.*Dto\|interface.*Type" \
 ```
 
 **What to look for:**
+
 - Frontend defines DTO types that should be in `@pawhaven/shared` → Warning
 - Backend defines types outside `@pawhaven/shared` → Warning
 - Same Zod schema defined in both frontend and backend → Blocking
 
 **Report format:**
+
 ```
 ⚠️ [Warning] Duplicate type: features/RescueDetail/types.ts defines RescueDetailType
    but @pawhaven/shared already has RescueCase type — use the shared type
@@ -275,14 +292,16 @@ Verify architecture decisions are documented:
 
 ```bash
 # List existing ADRs
-ls .codebuddy/knowledge/ADR/
+ls Harness/docs/ADR/
 ```
 
 **What to look for:**
+
 - Significant architecture change without a corresponding ADR → Suggestion
 - ADR metadata out of date (status not updated when superseded) → Warning
 
 **Report format:**
+
 ```
 💡 [Suggestion] Missing ADR: The new notification module introduces a new event pattern.
    Consider creating ADR-003-notification-events.md to document the decision.

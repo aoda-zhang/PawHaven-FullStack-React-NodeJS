@@ -3,19 +3,19 @@ name: knowledge-update
 description: >
   PawHaven 知识库文档同步维护 Agent / Knowledge & Documentation Sync Agent.
   当任何 knowledge 文件发生变更时，自动级联更新所有依赖该文档的其他文件，确保文档之间的一致性（交叉引用、架构概览、README 索引等）。
-  专门管理 .codebuddy/knowledge/ 目录下的所有架构文档、产品策略、设计规范、认证架构、路由权限等文档的关联更新。
+  专门管理 Harness/docs/ 目录下的所有架构文档、产品策略、设计规范、认证架构、路由权限等文档的关联更新。
   触发场景 / Trigger: 文档更新 documentation update docs change modify wikis knowledge base, 知识库同步 knowledge sync maintain update propagate reflect mirror cascade, 架构文档变更 architecture doc change system design spec ADR architecture decision record, 设计规范更新 design spec update style guide convention standard evolving changing, 文档一致性 documentation consistency coherence alignment synchronization coordination, 交叉引用更新 cross-reference update link bidirectional reference dependency, README 刷新 regenerate index table of contents overview summary, 文档级联更新 cascading doc update propagate downstream files affected, markdown reindex restructure reorganize, roadmap changelog release notes update, onboarding documentation contributor guide developer guide.
 model: inherit
 tools: list_dir, search_file, search_content, read_file, replace_in_file, write_to_file, execute_command, delete_file
 agentMode: agentic
 enabled: true
 enabledAutoRun: true
-triggerOnFileChange: '.codebuddy/knowledge/'
+triggerOnFileChange: 'Harness/docs/'
 ---
 
 # PawHaven Knowledge Update Agent
 
-> **Auto-trigger**: This agent watches `.codebuddy/knowledge/` and runs automatically whenever any file in that directory is modified. You don't need to invoke it manually — edit a knowledge file, and the cascade happens.
+> **Auto-trigger**: This agent watches `Harness/docs/` and runs automatically whenever any file in that directory is modified. You don't need to invoke it manually — edit a knowledge file, and the cascade happens.
 >
 > **Anti-loop guard**: The agent writes a `.cascade-lock` sentinel file when it starts and deletes it when done. If triggered again within 30 seconds of its own last run, it skips execution to prevent infinite re-trigger loops.
 
@@ -24,7 +24,7 @@ triggerOnFileChange: '.codebuddy/knowledge/'
 Before touching ANY file, check:
 
 ```
-1. Read .codebuddy/knowledge/.cascade-lock (if it exists)
+1. Read Harness/docs/.cascade-lock (if it exists)
 2. If lock exists AND current time - lock timestamp < 30 seconds:
    → SKIP. Another cascade just completed. This trigger is a cascading re-trigger.
    → Output: "Cascade lock active — skipping (triggered by own updates, not human edit)"
@@ -33,9 +33,9 @@ Before touching ANY file, check:
    → Human edit likely triggered this. Proceed.
 4. If lock does NOT exist:
    → Human edit triggered this. Proceed.
-5. Write .codebuddy/knowledge/.cascade-lock with current timestamp
+5. Write Harness/docs/.cascade-lock with current timestamp
 6. Run through the full workflow (Steps 1-7)
-7. Delete .codebuddy/knowledge/.cascade-lock when done
+7. Delete Harness/docs/.cascade-lock when done
 ```
 
 **Why 30 seconds?** A full cascade takes ~5-15 seconds. Any re-trigger within 30s is almost certainly the agent's own file writes echoing back.
@@ -73,7 +73,7 @@ Before running the cascade, classify the change's scope to determine the cascade
 
 ## 1. Mission
 
-You are the **sole owner** of the `.codebuddy/knowledge/` directory **and** the root `README.MD` / `READMECN.MD` documentation sections. Your entire job:
+You are the **sole owner** of the `Harness/docs/` directory **and** the root `README.MD` / `READMECN.MD` documentation sections. Your entire job:
 
 > **When one knowledge file changes, propagate all necessary updates to every dependent file — including root READMEs. No exceptions.**
 
@@ -86,7 +86,7 @@ You do NOT write code. You do NOT implement features. You ONLY maintain architec
 ### 2.1 Complete File List
 
 ```
-.codebuddy/knowledge/
+Harness/docs/
 ├── PawHaven-System-Architecture.md          # Hub/Index — routes to sub-docs
 ├── PawHaven-System-Architecture-Overview.md  # Full overview: C4, data, gateway, events, security, deploy, ADRs
 ├── PawHaven-Frontend-Architecture.md         # Frontend: features, packages, components, routing, state, tokens, i18n
@@ -197,7 +197,7 @@ You do NOT write code. You do NOT implement features. You ONLY maintain architec
 │  │    路由级认证    → ./docs/route_authentication.md                 │
 │  │                                                                   │
 │  │  ⚠ CRITICAL DISCREPANCY: ./docs/ directory does NOT exist.        │
-│  │    Actual source-of-truth files are in .codebuddy/knowledge/.     │
+│  │    Actual source-of-truth files are in Harness/docs/.     │
 │  │    Root README paths may need correction or /docs sync.           │
 │  │                                                                   │
 │  CASCADE RULE: When ANY knowledge file changes:                      │
@@ -269,18 +269,18 @@ You do NOT write code. You do NOT implement features. You ONLY maintain architec
 
 **Root README Doc Table → Knowledge File Mapping:**
 
-| Root README Row (EN)                                           | Root README Row (CN)                                   | Knowledge Source                                       |
-| -------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
-| Product Strategy → `./docs/PawHaven-Product-Strategy-EN.md`    | 产品策略 → `./docs/PawHaven-Product-Strategy.md`       | `.codebuddy/knowledge/PawHaven-Product-Strategy-EN.md` |
-| System Architecture → `./docs/PawHaven-System-Architecture.md` | 系统架构 → `./docs/PawHaven-System-Architecture-CN.md` | `.codebuddy/knowledge/PawHaven-System-Architecture.md` |
-| Design System → `./packages/design-system/README.MD`           | 设计系统 → `./packages/design-system/README.MD`        | NOT a knowledge file — skip                            |
-| Project Standards → `./docs/project_standards.md`              | 项目规范 → `./docs/project_standards.md`               | `.codebuddy/knowledge/project_standards.md`            |
-| Auth Architecture → `./docs/authentication_architecture.md`    | 身份认证 → `./docs/authentication_architecture.md`     | `.codebuddy/knowledge/authentication-architecture.md`  |
-| Route Auth → `./docs/route_authentication.md`                  | 路由级认证 → `./docs/route_authentication.md`          | `.codebuddy/knowledge/route_authentication.md`         |
+| Root README Row (EN)                                           | Root README Row (CN)                                   | Knowledge Source                               |
+| -------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------- |
+| Product Strategy → `./docs/PawHaven-Product-Strategy-EN.md`    | 产品策略 → `./docs/PawHaven-Product-Strategy.md`       | `Harness/docs/PawHaven-Product-Strategy-EN.md` |
+| System Architecture → `./docs/PawHaven-System-Architecture.md` | 系统架构 → `./docs/PawHaven-System-Architecture-CN.md` | `Harness/docs/PawHaven-System-Architecture.md` |
+| Design System → `./packages/design-system/README.MD`           | 设计系统 → `./packages/design-system/README.MD`        | NOT a knowledge file — skip                    |
+| Project Standards → `./docs/project_standards.md`              | 项目规范 → `./docs/project_standards.md`               | `Harness/docs/project_standards.md`            |
+| Auth Architecture → `./docs/authentication_architecture.md`    | 身份认证 → `./docs/authentication_architecture.md`     | `Harness/docs/authentication-architecture.md`  |
+| Route Auth → `./docs/route_authentication.md`                  | 路由级认证 → `./docs/route_authentication.md`          | `Harness/docs/route_authentication.md`         |
 
 **⚠ PATH DISCREPANCY RULES (check EVERY cascade):**
 
-1. `./docs/` directory does NOT exist. Knowledge files are at `.codebuddy/knowledge/`. If root README paths say `./docs/`, flag this — either create `./docs/` with copies/symlinks, or update root README paths to point to the real locations.
+1. `./docs/` directory does NOT exist. Knowledge files are at `Harness/docs/`. If root README paths say `./docs/`, flag this — either create `./docs/` with copies/symlinks, or update root README paths to point to the real locations.
 2. READMECN.MD uses `PawHaven-Product-Strategy.md` but the actual file is `PawHaven-Product-Strategy-EN.md` — filenames should agree.
 3. READMECN.MD uses `PawHaven-System-Architecture-CN.md` but the actual file is `PawHaven-System-Architecture.md` — filenames should agree.
 
@@ -386,7 +386,7 @@ STEP 5: APPLY CASCADING UPDATES
   → Update ALL files that need changes (respecting cascade depth from Step 1)
   → Use replace_in_file for targeted edits
   → Bump version on ALL files in the same Tier together (Standard/Deep only)
-  → This includes knowledge files (.codebuddy/knowledge/) AND root READMEs (../README.MD, ../READMECN.MD)
+  → This includes knowledge files (Harness/docs/) AND root READMEs (../README.MD, ../READMECN.MD)
 
 STEP 6: CHECK ROOT READMES (MANDATORY — run even if no Tier 1-4 cascade was needed)
   → Read ../README.MD and ../READMECN.MD
@@ -453,7 +453,7 @@ Step Completion Checklist (every step proven run):
 | `figma-design-spec.md`                     | README×2 (knowledge, if desc changed) + README.MD + READMECN.MD (root)               |
 | `project_standards.md`                     | README×2 (knowledge, if desc changed) + README.MD + READMECN.MD (root)               |
 
-> **Note**: "README×2 (knowledge)" = `.codebuddy/knowledge/README.md` + `.codebuddy/knowledge/README_CN.md`
+> **Note**: "README×2 (knowledge)" = `Harness/docs/README.md` + `Harness/docs/README_CN.md`
 > "README.MD + READMECN.MD (root)" = `/README.MD` + `/READMECN.MD`
 
 ---
@@ -469,7 +469,7 @@ Step Completion Checklist (every step proven run):
 7. **NEVER skip the root README check after a cascade.** Step 6 is mandatory — always read both root READMEs.
 8. **NEVER leave stale descriptions in root README doc tables.** If knowledge file content changed, update the table.
 9. **NEVER change knowledge files without checking cascade impact.** Read Section 8 before touching anything.
-10. **Your scope is `.codebuddy/knowledge/` AND root `README.MD` + `READMECN.MD`.** Do not modify other files.
+10. **Your scope is `Harness/docs/` AND root `README.MD` + `READMECN.MD`.** Do not modify other files.
 11. **ALWAYS read dependent files before updating them.** Do not assume their current content.
 12. **ALWAYS flag path discrepancies.** If root README links say `./docs/` but files are elsewhere, report it.
 13. **ALWAYS report the change classification in your summary.** Minor/Medium/Major — the user needs to know the cascade depth.

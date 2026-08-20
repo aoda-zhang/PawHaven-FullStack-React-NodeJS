@@ -221,12 +221,13 @@ Full-width section with warm background:
 - Text: white and `#d3c3b3` (warm light brown)
 
 **Grid** (4 columns):
-| Column | Heading | Links |
-|--------|---------|-------|
-| Platform | PLATFORM | Browse Rescues, Report a Stray, Adopt an Animal, Volunteer |
+
+| Column    | Heading   | Links                                                               |
+| --------- | --------- | ------------------------------------------------------------------- |
+| Platform  | PLATFORM  | Browse Rescues, Report a Stray, Adopt an Animal, Volunteer          |
 | Resources | RESOURCES | Knowledge Base, Medication Library, Rescue Stories, Emergency Guide |
-| Community | COMMUNITY | Volunteer Network, Partner Shelters, Vet Directory, Share a Story |
-| Company | COMPANY | About PawHaven, Open Source, Privacy Policy, Terms of Service |
+| Community | COMMUNITY | Volunteer Network, Partner Shelters, Vet Directory, Share a Story   |
+| Company   | COMPANY   | About PawHaven, Open Source, Privacy Policy, Terms of Service       |
 
 **Brand intro** (above grid):
 

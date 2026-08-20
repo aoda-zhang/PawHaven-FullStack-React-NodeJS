@@ -12,7 +12,7 @@
 
 ## 2. Architecture Documentation
 
-Location: `.codebuddy/knowledge/`
+Location: `Harness/docs/`
 
 - `PawHaven-System-Architecture-Overview.md` — Complete system C4 model
 - `PawHaven-Frontend-Architecture.md` — Frontend architecture and conventions
@@ -23,7 +23,7 @@ These docs are the **single source of truth** for the project architecture. All 
 
 ## 3. ADR (Architecture Decision Records)
 
-Location: `.codebuddy/knowledge/ADR/`
+Location: `Harness/docs/ADR/`
 
 - ADRs document WHY a decision was made, not just WHAT was decided.
 - Template: `ADR/ADR-001-template.md`.
@@ -32,7 +32,7 @@ Location: `.codebuddy/knowledge/ADR/`
 
 ## 4. Workflow Documentation
 
-Location: `.codebuddy/workflows/`
+Location: `Harness/workflows/`
 
 - Feature development, bug fix, and architecture change workflows.
 - Each workflow defines: pipeline steps, decision points, failure recovery.

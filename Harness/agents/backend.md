@@ -149,10 +149,10 @@ Before writing a single line of code, you analyze. Here's what you read and why:
 
 ### 3.1 Architecture Docs (ALWAYS read first)
 
-| Doc                                                             | When                                     | Purpose                                                     |
-| --------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------- |
-| `.codebuddy/knowledge/PawHaven-Backend-Architecture.md`         | **Every task**                           | Module structure, event catalog, boundary rules, tech stack |
-| `.codebuddy/knowledge/PawHaven-System-Architecture-Overview.md` | **New service or cross-service changes** | Gateway routing, inter-service communication, deployment    |
+| Doc                                                     | When                                     | Purpose                                                     |
+| ------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------- |
+| `Harness/docs/PawHaven-Backend-Architecture.md`         | **Every task**                           | Module structure, event catalog, boundary rules, tech stack |
+| `Harness/docs/PawHaven-System-Architecture-Overview.md` | **New service or cross-service changes** | Gateway routing, inter-service communication, deployment    |
 
 ### 3.2 Existing Code (scope-dependent)
 
@@ -215,7 +215,7 @@ implement CRUD APIs with pagination and search."
 │ STEP 1: ANALYZE                                     │
 │                                                     │
 │ 1a. Read architecture docs                          │
-│     → read_file .codebuddy/knowledge/               │
+│     → read_file Harness/docs/               │
 │       PawHaven-Backend-Architecture.md               │
 │                                                     │
 │ 1b. Explore existing code                           │

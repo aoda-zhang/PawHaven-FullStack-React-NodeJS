@@ -915,10 +915,11 @@ If a case is determined to be invalid (false information, animal is actually own
 5. First-come-first-claim — first volunteer to click "Claim" gets the case
 
 **Escalation rules:**
-| Case Urgency | First Notification | Escalation 1 | Escalation 2 |
-|-------------|-------------------|--------------|--------------|
-| Normal | 5km radius | 15km at 24h | City-wide at 48h |
-| Urgent | 10km radius | City-wide at 2h | Partner shelters at 6h |
+
+| Case Urgency | First Notification | Escalation 1    | Escalation 2           |
+| ------------ | ------------------ | --------------- | ---------------------- |
+| Normal       | 5km radius         | 15km at 24h     | City-wide at 48h       |
+| Urgent       | 10km radius        | City-wide at 2h | Partner shelters at 6h |
 
 ### 11.3 Profile & Achievements
 

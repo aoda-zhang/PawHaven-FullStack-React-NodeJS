@@ -1,10 +1,10 @@
-# .codebuddy — System Onboarding
+# Harness — System Onboarding
 
 Orientation for any agent or session entering this repository. Read this first; load the rest on demand.
 
 ## What this folder is
 
-`.codebuddy` is the project's agent + skill operating system:
+`Harness` is the project's agent + skill operating system:
 
 - **`agents/`** — role definitions (pawhaven, architect, frontend, backend, testing, code-review, knowledge-update). Each has a scope and escalation path.
 - **`skills/`** — self-contained skill folders, each with a `SKILL.MD` (frontmatter `name`/`description`/`version`) plus optional `references/`.
