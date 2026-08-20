@@ -172,7 +172,9 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
         PDFData: payload?.PDFContentData,
       });
       await page.setContent(PDFMainContent, {
-        waitUntil: ['networkidle2', 'domcontentloaded'],
+        waitUntil: ['networkidle2', 'domcontentloaded'] as Array<
+          'load' | 'domcontentloaded'
+        >,
       });
       const PDFSettings = await this.getPDFSettings(payload);
       const PDFBuffer = await page.pdf(PDFSettings);

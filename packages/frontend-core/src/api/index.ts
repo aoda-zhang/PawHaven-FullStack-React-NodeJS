@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
@@ -10,7 +9,7 @@ import { getLocale } from '../utils/locale/getLocale';
 
 import { getUTCTimestamp } from './encrypt';
 import { normalizeHttpError } from './errorHandle';
-import type { ApiClientOptions } from './types';
+import type { ApiClientOptions, ApiResponseType } from './types';
 import { RequestMode } from './types';
 
 /**
@@ -38,7 +37,7 @@ export const createApiClient = (options: ApiClientOptions) => {
 
   const getHttpHeaders = () => {
     const timestamp = `${getUTCTimestamp()}`;
-    const headers: Record<string, any> = {
+    const headers: Record<string, string> = {
       'X-timestamp': timestamp,
       'X-locale': getLocale(),
     };
@@ -63,7 +62,7 @@ export const createApiClient = (options: ApiClientOptions) => {
 
   // ✅ Response interceptor
   Http.interceptors.response.use(
-    (response: AxiosResponse<any>) => {
+    (response: AxiosResponse<ApiResponseType>) => {
       if (requestMode === RequestMode.resource) {
         return response;
       }
@@ -73,7 +72,7 @@ export const createApiClient = (options: ApiClientOptions) => {
         response?.data?.status < 400 &&
         response?.data?.isSuccess
       ) {
-        return response.data.data;
+        return response.data.data as AxiosResponse<ApiResponseType>;
       }
 
       return Promise.reject(normalizeHttpError(response.data));
@@ -84,33 +83,33 @@ export const createApiClient = (options: ApiClientOptions) => {
   );
 
   return {
-    get<T>(
+    get<T, P = Record<string, unknown>>(
       url: string,
-      params?: Record<string, any>,
+      params?: P,
       config?: AxiosRequestConfig,
     ): Promise<T> {
-      return Http.get(url, { params, ...config });
+      return Http.get(url, { params, ...config }) as Promise<T>;
     },
-    delete<T>(
+    delete<T, P = Record<string, unknown>>(
       url: string,
-      params?: Record<string, any>,
+      params?: P,
       config?: AxiosRequestConfig,
     ): Promise<T> {
-      return Http.delete(url, { params, ...config });
+      return Http.delete(url, { params, ...config }) as Promise<T>;
     },
-    post<T>(
+    post<T, D = Record<string, unknown>>(
       url: string,
-      data?: Record<string, any>,
+      data?: D,
       config?: AxiosRequestConfig,
     ): Promise<T> {
-      return Http.post(url, data, { ...config });
+      return Http.post(url, data, { ...config }) as Promise<T>;
     },
-    put<T>(
+    put<T, D = Record<string, unknown>>(
       url: string,
-      data?: Record<string, any>,
+      data?: D,
       config?: AxiosRequestConfig,
     ): Promise<T> {
-      return Http.put(url, data, { ...config });
+      return Http.put(url, data, { ...config }) as Promise<T>;
     },
     download(url: string, config?: AxiosRequestConfig): Promise<Blob> {
       return Http.get(url, {
