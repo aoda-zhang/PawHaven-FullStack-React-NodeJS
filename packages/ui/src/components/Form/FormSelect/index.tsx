@@ -38,6 +38,12 @@ export const FormSelect = ({
               disabled={disabled}
               value={field.value ?? ''}
               aria-invalid={!!error}
+              onChange={(event) => {
+                const matched = options?.find(
+                  (item) => String(item.value) === event.target.value,
+                );
+                field.onChange(matched ? matched.value : event.target.value);
+              }}
               className="border-border bg-background focus:border-primary text-text w-full appearance-none rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {placeholder && <option value="">{placeholder}</option>}

@@ -1,5 +1,4 @@
 import { AlertTriangle } from 'lucide-react';
-import type React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ANIMAL_TYPES, type AnimalType, type Behavior } from './types';
@@ -11,6 +10,7 @@ interface StepConfirmProps {
   address: string;
   isUrgent: boolean;
   contactPhone: string;
+  contactError: boolean;
   onContactPhoneChange: (phone: string) => void;
 }
 
@@ -21,6 +21,7 @@ export const StepConfirm: React.FC<StepConfirmProps> = ({
   address,
   isUrgent,
   contactPhone,
+  contactError,
   onContactPhoneChange,
 }) => {
   const { t } = useTranslation();
@@ -28,10 +29,10 @@ export const StepConfirm: React.FC<StepConfirmProps> = ({
   return (
     <div>
       <h2 className="text-foreground mb-1 text-lg font-semibold">
-        {t('reportStray.wizard.step6_title')}
+        {t('reportStray.wizard.step5_title')}
       </h2>
       <p className="text-muted-foreground mb-5 text-sm">
-        {t('reportStray.wizard.step6_subtitle')}
+        {t('reportStray.wizard.step5_subtitle')}
       </p>
       <div className="bg-muted mb-4 flex gap-3 rounded-xl p-4">
         <div className="bg-border flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg text-2xl">
@@ -43,10 +44,12 @@ export const StepConfirm: React.FC<StepConfirmProps> = ({
             {address ? ` · ${address}` : ''}
           </div>
           <div className="text-muted-foreground mt-0.5 text-xs">
-            {animalCount} {t('reportStray.wizard.step6_animal_count')}
-            {animalCount !== 1 ? 's' : ''}
+            {animalCount}{' '}
+            {t('reportStray.wizard.step5_animal_count', {
+              count: animalCount,
+            })}
             {behavior
-              ? ` · ${t(`reportStray.wizard.step4_behavior_${behavior}`)}`
+              ? ` · ${t(`reportStray.wizard.step3_behavior_${behavior}`)}`
               : ''}
           </div>
           <div className="mt-1.5">
@@ -65,19 +68,25 @@ export const StepConfirm: React.FC<StepConfirmProps> = ({
       </div>
       <div className="mb-4">
         <label className="text-foreground mb-1.5 block text-sm font-medium">
-          {t('reportStray.wizard.step6_contact_label')}
+          {t('reportStray.wizard.step5_contact_label')}
         </label>
         <input
           type="text"
           value={contactPhone}
           onChange={(e) => onContactPhoneChange(e.target.value)}
-          placeholder={t('reportStray.wizard.step6_contact_placeholder')}
+          placeholder={t('reportStray.wizard.step5_contact_placeholder')}
+          aria-invalid={contactError}
           className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
         />
+        {contactError && (
+          <p className="text-error mt-1 text-xs">
+            {t('reportStray.wizard.step5_contact_required')}
+          </p>
+        )}
       </div>
       <div className="bg-info-light border-info/30 rounded-xl p-3 text-xs leading-relaxed">
         <span className="text-foreground">
-          {t('reportStray.wizard.step6_privacy')}
+          {t('reportStray.wizard.step5_privacy')}
         </span>
       </div>
     </div>

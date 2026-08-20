@@ -1,9 +1,8 @@
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { ReportWizard } from './components/ReportWizard';
 
-export const ReportStray: React.FC = () => {
+export const ReportStray = () => {
   const { t } = useTranslation();
 
   return (

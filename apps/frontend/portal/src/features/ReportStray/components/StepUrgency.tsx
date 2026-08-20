@@ -21,15 +21,15 @@ export const StepUrgency: React.FC<StepUrgencyProps> = ({
   return (
     <div>
       <h2 className="text-foreground mb-1 text-lg font-semibold">
-        {t('reportStray.wizard.step5_title')}
+        {t('reportStray.wizard.step4_title')}
       </h2>
       <p className="text-muted-foreground mb-5 text-sm">
-        {t('reportStray.wizard.step5_subtitle')}
+        {t('reportStray.wizard.step4_subtitle')}
       </p>
       <div className="bg-error-light border-error/20 mb-4 flex items-start gap-2 rounded-xl border p-3 text-sm">
         <AlertTriangle className="text-error mt-0.5 h-4 w-4 flex-shrink-0" />
         <span className="text-foreground">
-          {t('reportStray.wizard.step5_emergency_note')}
+          {t('reportStray.wizard.step4_emergency_note')}
         </span>
       </div>
       <div className="flex flex-col gap-3">
@@ -50,7 +50,7 @@ export const StepUrgency: React.FC<StepUrgencyProps> = ({
               className="accent-error mt-0.5"
             />
             <span className="text-foreground text-sm">
-              {t(`reportStray.wizard.step5_urgency_${u.key}`)}
+              {t(`reportStray.wizard.step4_urgency_${u.key}`)}
             </span>
           </label>
         ))}
@@ -59,7 +59,7 @@ export const StepUrgency: React.FC<StepUrgencyProps> = ({
         <div className="bg-primary-light border-primary/30 mt-4 flex items-start gap-2 rounded-xl border p-3 text-sm">
           <AlertTriangle className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
           <span className="text-foreground">
-            {t('reportStray.wizard.step5_response_note')}
+            {t('reportStray.wizard.step4_response_note')}
           </span>
         </div>
       )}

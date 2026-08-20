@@ -18,7 +18,6 @@ import { StepAnimal } from './StepAnimal';
 import { StepCondition } from './StepCondition';
 import { StepConfirm } from './StepConfirm';
 import { StepLocation } from './StepLocation';
-import { StepPhotos } from './StepPhotos';
 import { StepUrgency } from './StepUrgency';
 import type { ReportDraft } from './types';
 
@@ -46,9 +45,10 @@ export const ReportWizard: React.FC = () => {
   const navigate = useNavigate();
   const { mutate: createReport, isPending } = useCreateReportStray();
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<number>(Step.LOCATION);
   const [submitted, setSubmitted] = useState(false);
   const [caseId, setCaseId] = useState('');
+  const [contactError, setContactError] = useState(false);
   const [draft, setDraft] = useState<ReportDraft>(initialDraft);
 
   const update = (patch: Partial<ReportDraft>) =>
@@ -64,13 +64,16 @@ export const ReportWizard: React.FC = () => {
 
   const renderStep = () => {
     switch (step) {
-      case Step.PHOTOS:
-        return <StepPhotos />;
       case Step.LOCATION:
         return (
           <StepLocation
             address={draft.address}
+            latitude={draft.latitude}
+            longitude={draft.longitude}
             onAddressChange={(address) => update({ address })}
+            onCoordinatesChange={(latitude, longitude) =>
+              update({ latitude, longitude })
+            }
           />
         );
       case Step.ANIMAL:
@@ -120,7 +123,11 @@ export const ReportWizard: React.FC = () => {
             address={draft.address}
             isUrgent={isUrgent}
             contactPhone={draft.contactPhone}
-            onContactPhoneChange={(contactPhone) => update({ contactPhone })}
+            contactError={contactError}
+            onContactPhoneChange={(contactPhone) => {
+              setContactError(false);
+              update({ contactPhone });
+            }}
           />
         );
       default:
@@ -128,20 +135,36 @@ export const ReportWizard: React.FC = () => {
     }
   };
 
+  const phoneRegex = /^[\d\s\-+()]{7,20}$/;
+
   const handleSubmit = () => {
+    if (!phoneRegex.test(draft.contactPhone)) {
+      setContactError(true);
+      return;
+    }
     const dto: AnimalReportDto = {
       animalType: draft.animalType,
+      animalTypeOther:
+        draft.animalType === 'other' ? draft.otherAnimalType : undefined,
       age: 'adult',
       appearance: {
         color: draft.coatColor || t('reportStray.wizard.unknown'),
         hasInjury: draft.urgencyChecks.bleeding,
         injuryDescription: draft.urgencyChecks.bleeding
-          ? t('reportStray.wizard.urgency_bleeding')
+          ? t('reportStray.wizard.step4_urgency_bleeding')
           : '',
         otherFeatures: [
-          draft.size ? t(`reportStray.wizard.step4_size_${draft.size}`) : '',
+          draft.size ? t(`reportStray.wizard.step3_size_${draft.size}`) : '',
+          draft.animalType === 'other' && draft.otherAnimalType
+            ? draft.otherAnimalType
+            : '',
           draft.animalCount > 1
-            ? `${draft.animalCount} ${t('reportStray.wizard.step6_animal_count')}s`
+            ? `${draft.animalCount} ${t(
+                'reportStray.wizard.step5_animal_count',
+                {
+                  count: draft.animalCount,
+                },
+              )}`
             : '',
         ]
           .filter(Boolean)
@@ -149,17 +172,18 @@ export const ReportWizard: React.FC = () => {
       },
       location: {
         address: draft.address,
-        latitude: draft.latitude ?? 0,
-        longitude: draft.longitude ?? 0,
+        ...(draft.latitude !== null && draft.longitude !== null
+          ? { latitude: draft.latitude, longitude: draft.longitude }
+          : {}),
       },
       foundTime: new Date().toISOString(),
       status: isUrgent ? 'dangerous' : 'other',
       statusDescription: draft.behavior
-        ? t(`reportStray.wizard.step4_behavior_${draft.behavior}`)
+        ? t(`reportStray.wizard.step3_behavior_${draft.behavior}`)
         : '',
       contactInfo: {
         name: 'Anonymous',
-        phone: draft.contactPhone || '000-000-0000',
+        phone: draft.contactPhone,
         email: '',
       },
     };
@@ -191,20 +215,12 @@ export const ReportWizard: React.FC = () => {
         <p className="text-muted-foreground mb-6 text-sm">
           {t('reportStray.wizard.success_volunteers')}
         </p>
-        <div className="flex flex-col gap-2">
-          <button
-            onClick={() => navigate('/')}
-            className="bg-primary text-primary-fg w-full rounded-xl py-3 text-sm font-semibold transition-opacity hover:opacity-90"
-          >
-            {t('reportStray.wizard.success_track')}
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="border-border text-muted-foreground hover:bg-muted w-full rounded-xl border py-3 text-sm font-medium transition-colors"
-          >
-            {t('reportStray.wizard.success_home')}
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/')}
+          className="bg-primary text-primary-fg w-full rounded-xl py-3 text-sm font-semibold transition-opacity hover:opacity-90"
+        >
+          {t('reportStray.wizard.success_home')}
+        </button>
       </div>
     );
   }
@@ -261,7 +277,7 @@ export const ReportWizard: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-2">
-        {step > Step.PHOTOS && (
+        {step > Step.LOCATION && (
           <button
             type="button"
             onClick={() => setStep((s) => s - 1)}

@@ -1,10 +1,9 @@
 import { Camera, Upload } from 'lucide-react';
-import type React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const ADDITIONAL_PHOTO_SLOTS = 2;
 
-export const StepPhotos: React.FC = () => {
+export const StepPhotos = () => {
   const { t } = useTranslation();
 
   return (

@@ -26,26 +26,26 @@ export const StepCondition: React.FC<StepConditionProps> = ({
   return (
     <div>
       <h2 className="text-foreground mb-1 text-lg font-semibold">
-        {t('reportStray.wizard.step4_title')}
+        {t('reportStray.wizard.step3_title')}
       </h2>
       <p className="text-muted-foreground mb-5 text-sm">
-        {t('reportStray.wizard.step4_subtitle')}
+        {t('reportStray.wizard.step3_subtitle')}
       </p>
       <div className="mb-4">
         <label className="text-foreground mb-2 block text-sm font-medium">
-          {t('reportStray.wizard.step4_color_label')}
+          {t('reportStray.wizard.step3_color_label')}
         </label>
         <input
           type="text"
           value={coatColor}
           onChange={(e) => onCoatColorChange(e.target.value)}
-          placeholder={t('reportStray.wizard.step4_color_placeholder')}
+          placeholder={t('reportStray.wizard.step3_color_placeholder')}
           className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
         />
       </div>
       <div className="mb-4">
         <label className="text-foreground mb-2 block text-sm font-medium">
-          {t('reportStray.wizard.step4_size_label')}
+          {t('reportStray.wizard.step3_size_label')}
         </label>
         <div className="flex gap-2">
           {SIZES.map((s) => (
@@ -60,14 +60,14 @@ export const StepCondition: React.FC<StepConditionProps> = ({
                   : 'border-border text-foreground hover:border-primary/40 hover:bg-muted',
               )}
             >
-              {t(`reportStray.wizard.step4_size_${s.value}`)}
+              {t(`reportStray.wizard.step3_size_${s.value}`)}
             </button>
           ))}
         </div>
       </div>
       <div>
         <label className="text-foreground mb-2 block text-sm font-medium">
-          {t('reportStray.wizard.step4_behavior_label')}
+          {t('reportStray.wizard.step3_behavior_label')}
         </label>
         <div className="flex flex-col gap-2">
           {BEHAVIORS.map((b) => (
@@ -88,7 +88,7 @@ export const StepCondition: React.FC<StepConditionProps> = ({
                 className="accent-primary"
               />
               <span className="text-foreground text-sm">
-                {t(`reportStray.wizard.step4_behavior_${b.value}`)}
+                {t(`reportStray.wizard.step3_behavior_${b.value}`)}
               </span>
             </label>
           ))}

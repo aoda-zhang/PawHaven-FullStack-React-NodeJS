@@ -27,10 +27,10 @@ export const StepAnimal: React.FC<StepAnimalProps> = ({
   return (
     <div>
       <h2 className="text-foreground mb-1 text-lg font-semibold">
-        {t('reportStray.wizard.step3_title')}
+        {t('reportStray.wizard.step2_title')}
       </h2>
       <p className="text-muted-foreground mb-5 text-sm">
-        {t('reportStray.wizard.step3_subtitle')}
+        {t('reportStray.wizard.step2_subtitle')}
       </p>
       <div className="mb-5 grid grid-cols-3 gap-3">
         {ANIMAL_TYPES.map((a) => (
@@ -58,21 +58,21 @@ export const StepAnimal: React.FC<StepAnimalProps> = ({
             htmlFor="other-animal-type"
             className="text-foreground mb-1.5 block text-sm font-medium"
           >
-            {t('reportStray.wizard.step3_other_label')}
+            {t('reportStray.wizard.step2_other_label')}
           </label>
           <input
             id="other-animal-type"
             type="text"
             value={otherAnimalType}
             onChange={(e) => onOtherAnimalTypeChange(e.target.value)}
-            placeholder={t('reportStray.wizard.step3_other_placeholder')}
+            placeholder={t('reportStray.wizard.step2_other_placeholder')}
             className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary aors w-full rounded-lg border px-3 py-2 text-sm outline-none"
           />
         </div>
       )}
       <div>
         <label className="text-foreground mb-3 block text-sm font-medium">
-          {t('reportStray.wizard.step3_count_label')}
+          {t('reportStray.wizard.step2_count_label')}
         </label>
         <div className="flex items-center gap-3">
           <button
