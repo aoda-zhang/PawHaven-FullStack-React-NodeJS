@@ -1,6 +1,6 @@
 # @pawhaven/design-system
 
-Shared design tokens, theme, utilities, and MUI theme for the PawHaven monorepo. Provides the single source of truth for all visual primitives used across `apps/frontend/*`, `packages/ui`, and `packages/frontend-core`.
+Shared design tokens, theme, and utilities for the PawHaven monorepo. Provides the single source of truth for all visual primitives used across `apps/frontend/*`, `packages/ui`, and `packages/frontend-core`.
 
 ## Quick Start
 
@@ -10,9 +10,6 @@ import '@pawhaven/design-system/styles.css';
 
 // TypeScript token access
 import { color, spacing, radius, tokenVar } from '@pawhaven/design-system';
-
-// MUI theme (MUI v7, cssVariables mode)
-import { MUITheme } from '@pawhaven/design-system/theme';
 ```
 
 ## Package Structure
@@ -22,7 +19,6 @@ packages/design-system/
 ├── index.css           # CSS entry point (tailwindcss + tokens + theme + utilities + base styles)
 ├── src/                # TypeScript + CSS source
 │   ├── index.ts        # JS/TS entry point
-│   ├── MUI-theme.ts    # MUI v7 theme (derives from CSS variables)
 │   ├── tokens.ts       # Typed token access (CSS var references + raw values)
 │   ├── theme.css       # Semantic mappings (bg-primary, text-muted, etc.) + --text-* font-size aliases
 │   ├── utilities.css   # Custom Tailwind @utility classes (btn-primary, card, text-hero, text-stat, etc.)
@@ -90,7 +86,7 @@ Use semantic tokens directly in Tailwind classes:
 ```ts
 import { color, spacing, radius, shadow, duration, easing, typography, tokenVar } from '@pawhaven/design-system';
 
-// CSS variable references — use in inline styles, MUI overrides, etc.
+// CSS variable references — use in inline styles, chart libraries, etc.
 const style = { color: color.primary, padding: spacing.card };
 
 // Type-safe tokenVar helper
@@ -100,23 +96,6 @@ const primaryVar = tokenVar('color.primary'); // → 'var(--color-primary)'
 import { colorPrimitives } from '@pawhaven/design-system';
 const orange500 = colorPrimitives.orange[5]; // → '#fb923c'
 ```
-
-### MUI Theme
-
-```tsx
-import { ThemeProvider } from '@mui/material/styles';
-import { MUITheme } from '@pawhaven/design-system/theme';
-
-function App() {
-  return (
-    <ThemeProvider theme={MUITheme}>
-      {/* MUI components now share the same tokens as Tailwind */}
-    </ThemeProvider>
-  );
-}
-```
-
-The MUI theme reads CSS variables at runtime, so changing a token in `src/tokens/color.css` updates both Tailwind and MUI automatically.
 
 ### Token Reference
 

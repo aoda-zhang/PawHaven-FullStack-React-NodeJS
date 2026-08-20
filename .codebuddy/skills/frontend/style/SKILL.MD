@@ -878,7 +878,6 @@ Before completing a feature verify:
 - [ ] Interactive states are implemented (hover, focus, active, disabled)
 - [ ] Dark mode is supported via semantic tokens
 - [ ] Tailwind utilities are preferred over custom CSS
-- [ ] MUI components use `MUITheme` from `@pawhaven/design-system/theme`
 - [ ] Icons use Lucide with consistent sizing and `currentColor`
 
 ---

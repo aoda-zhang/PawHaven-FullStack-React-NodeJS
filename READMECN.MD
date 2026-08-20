@@ -81,7 +81,7 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 | ----------------------------------------------------- | ------------------------------------------------------- |
 | [产品策略](./docs/PawHaven-Product-Strategy.md)       | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
 | [系统架构](./docs/PawHaven-System-Architecture-CN.md) | 5 服务架构、模块化单体、DDD、事件驱动、架构决策记录     |
-| [设计系统](./packages/design-system/README.MD)        | Design tokens、Tailwind v4 + MUI v7 主题、CSS 工具类    |
+| [设计系统](./packages/design-system/README.MD)        | Design tokens、Tailwind v4 主题、CSS 工具类            |
 
 ### 工程
 
