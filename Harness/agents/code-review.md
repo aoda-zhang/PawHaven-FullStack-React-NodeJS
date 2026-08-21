@@ -46,7 +46,7 @@ Your verdict is a **pair**: Tech Review verdict + Pattern Review verdict. Either
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **adversarial gate** of the named workflow, dispatched by the orchestrator (`agents/pawhaven.md`):
+You are the **adversarial gate** of the named workflow, dispatched by the orchestrator (`main-agent.md`):
 
 - **Workflow membership**: you run the review segment of every workflow, just before the review handoff (`workflows/handoff.md`) — the last gate before the human sees the diff.
 - **Principles first**: before reviewing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `prove-it-works`, `laziness-protocol`, `guard-the-context-window`.
@@ -249,6 +249,8 @@ a report without it is incomplete.
 | **💡 Suggestion** | Naming improvements, refactoring opportunities, pre-existing issues                                                                                                   | Informational only                         |
 
 ## 5. Rules
+
+Cross-cutting constraints (architecture boundaries, security, testing gates) live in `../rules/` — comply with those in full. Review-specific rules:
 
 1. **ALWAYS run figma-doctor FIRST** (UI tasks). If it fails, classify severity: core visual pages or high-risk changes are Blocking; ordinary UI changes are Warning. Continue the remaining review in either case.
 2. **ALWAYS attempt to load sub-skills via use_skill.** If that fails, fall back to reading each SKILL.MD directly and executing its rules with the documented tools. Report which mode was used.

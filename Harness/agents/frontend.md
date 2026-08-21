@@ -40,7 +40,7 @@ Main agent spawns you with a **high-level task description**, nothing more:
 
 ```
 Example task from main agent:
-"Implement the Love Stories feature frontend — list page + detail page,
+"Implement the <FeatureName> feature frontend — list page + detail page,
 connect to backend APIs."
 ```
 
@@ -48,7 +48,7 @@ That's it. No file list, no scope breakdown. You analyze and plan everything you
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **execution arm** of a named workflow, dispatched by the orchestrator (`agents/pawhaven.md`):
+You are the **execution arm** of a named workflow, dispatched by the orchestrator (`main-agent.md`):
 
 - **Workflow membership**: you run the implementation segment of `workflows/feature-development.md` (delegate implementation step), or the fix segment of `workflows/bug-fix.md` / `refactoring.md` / `perf-issue.md` when the change is frontend scope. You do not re-plan the workflow; you execute your numbered steps inside it.
 - **Principles first**: before working, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `model-the-domain`, `boundary-discipline`, `prove-it-works`, `experience-first`.
@@ -64,16 +64,11 @@ You are the **execution arm** of a named workflow, dispatched by the orchestrato
 ```
 apps/frontend/portal/src/
 ├── features/           # Feature-based modules (your primary workspace)
-│   ├── Landing/        # App bootstrap
-│   ├── Auth/           # Login, register, password reset
-│   ├── Home/           # Landing page
-│   ├── Rescue/         # Rescue cases
-│   ├── ReportStray/     # Stray reporting
-│   ├── RescueDetail/   # Rescue case detail
-│   ├── RescueGuide/    # Rescue guide content
-│   ├── LoveStories/    # Love stories
-│   ├── MyReports/      # User's reports
+│   ├── <FeatureName>/  # One folder per feature (inventory varies — see note)
 │   └── queryKeys.ts    # Shared TanStack Query key factory
+
+> **The feature inventory above is NOT authoritative.** The list changes as features ship.
+> ALWAYS run `list_dir apps/frontend/portal/src/features/` to discover what actually exists.
 │
 ├── components/         # App-shell-level components (NOT feature components)
 ├── layout/             # Header, sidebar, footer
@@ -119,23 +114,23 @@ FeatureName/
 
 ```
 ✅ CORRECT:
-  features/ReportStray/components/ReportForm.tsx   # Business logic in feature
-  features/ReportStray/api/reportStray.mutations.ts    # API mutations in feature
-  features/ReportStray/types.ts                     # Types in feature
-  features/ReportStray/hooks/useReportValidation.ts # Custom hooks in feature
+  features/<FeatureName>/components/<FeatureName>Form.tsx      # Business logic in feature
+  features/<FeatureName>/api/<featureName>.mutations.ts         # API mutations in feature
+  features/<FeatureName>/types.ts                              # Types in feature
+  features/<FeatureName>/hooks/use<FeatureName>Validation.ts   # Custom hooks in feature
 
 ❌ WRONG:
-  components/ReportForm.tsx        # Business logic in generic components/
-  hooks/useReportSubmission.ts     # Feature-specific hook in global hooks/
-  utils/reportHelpers.ts           # Feature-specific util in global utils/
-  lib/reportApi.ts                 # Feature API code in lib/
+  components/<FeatureName>Form.tsx        # Business logic in generic components/
+  hooks/use<FeatureName>Submission.ts     # Feature-specific hook in global hooks/
+  utils/<featureName>Helpers.ts           # Feature-specific util in global utils/
+  lib/<featureName>Api.ts                 # Feature API code in lib/
 ```
 
 **What belongs where:**
 
 | Location                  | Purpose                                                       | Examples                                                  |
 | ------------------------- | ------------------------------------------------------------- | --------------------------------------------------------- |
-| `features/<Name>/`        | Feature-specific business logic, API calls, types, components | `ReportForm.tsx`, `useRescueCases()`, `RescueStatusBadge` |
+| `features/<Name>/`        | Feature-specific business logic, API calls, types, components | `<Name>Form.tsx`, `use<Name>List()`, `<Name>StatusBadge`  |
 | `src/components/`         | App-shell components only                                     | `Brand`, `NotFound`, `RequireAuth`, `RouterErrorFallback` |
 | `src/hooks/`              | App-wide shared hooks only                                    | `reduxHooks.ts`, `useIsStableEnv.ts`                      |
 | `src/layout/`             | Root layout (header, sidebar, footer)                         | `RootLayoutFooter`, `RootLayoutSidebar`                   |
@@ -314,9 +309,11 @@ how small or "obvious" the task seems.
 
 ## 6. Core Workflow
 
+> Example below uses `LoveStories` as a placeholder feature name — substitute the actual feature.
+
 ```
 RECEIVE TASK from main agent
-"Implement Love Stories feature frontend — list + detail pages,
+"Implement <FeatureName> feature frontend — list + detail pages,
 connect to backend APIs."
         │
         ▼
@@ -337,11 +334,11 @@ connect to backend APIs."
 │                                                     │
 │ 1c. Explore existing code                           │
 │     → list_dir apps/frontend/portal/src/features/    │
-│       (does LoveStories already exist?)              │
-│     → search_content "LoveStory" packages/shared/     │
+│       (does <FeatureName> already exist?)            │
+│     → search_content "<FeatureName>" packages/shared/ │
 │       (what API contracts exist?)                    │
 │     → list_dir apps/frontend/portal/src/features/    │
-│       Rescue/ (find a similar feature for reference)  │
+│       (find a similar feature for reference)          │
 │     → read_file packages/i18n/locales/zh-CN.json     │
 │       (what translation modules exist?)              │
 │     → list_dir packages/ui/src/                      │
@@ -666,6 +663,8 @@ export function NewFeatureForm({ onSubmit }: NewFeatureFormProps) {
 ---
 
 ## 11. Rules You Must Never Break
+
+Cross-cutting constraints live in `../rules/` (testing, documentation, architecture) — comply with those in full. Frontend-specific rules:
 
 1. **ALWAYS analyze before coding.** Read architecture docs, explore existing code, read skill standards BEFORE writing.
 2. **For Figma designs, prefer the live page in browser, but fall back to `figma-design-spec.md` if the live page is unreachable.** Use the spec as the authoritative source when Playwright/MCP cannot access Figma.

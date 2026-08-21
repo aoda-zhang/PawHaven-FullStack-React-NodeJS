@@ -6,21 +6,21 @@
 
 ## 1. Who owns it
 
-The **orchestrator only** (`agents/pawhaven.md`) creates, appends to, and clears the task log. Subagents never write to it.
+The **orchestrator only** (`main-agent.md`) creates, appends to, and clears the task log. Subagents never write to it.
 
 Keeping it orchestrator-only preserves hub-and-spoke (`docs/agent-communication-protocol.md` §3.1): a subagent's full structured report stays in its reply, and the orchestrator records a one-paragraph digest plus a pointer to that report in the log. The log is the **index and the recovery trail**, not a second copy of the reports.
 
 ## 2. When it is created and updated
 
-| Event                                                       | Action                                                                               |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Task accepted, plan approved (§3.1 of `agents/pawhaven.md`) | Append a new `## Task: {Task ID}` section to `Harness/task-log.md` (header + plan)   |
-| Each subagent stage completes                               | Append a `## Phase:` section (digest + pointer + validation + checklist status)      |
-| A subagent times out or is re-spawned                       | Append to the `## Stuck Log`                                                         |
-| A blocking finding routes back to an implementer            | Record the loop: finding → agent → re-fix → retest → re-review                       |
-| Task completed (summary presented to the user)              | Append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"** |
-| User answers **Yes**                                        | Clear the file contents (keep only the `# Task Log — The Progress Document` header)  |
-| User answers **No**                                         | Keep the file as-is; the next task appends a new `## Task:` section below            |
+| Event                                                  | Action                                                                               |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Task accepted, plan approved (§3.1 of `main-agent.md`) | Append a new `## Task: {Task ID}` section to `Harness/task-log.md` (header + plan)   |
+| Each subagent stage completes                          | Append a `## Phase:` section (digest + pointer + validation + checklist status)      |
+| A subagent times out or is re-spawned                  | Append to the `## Stuck Log`                                                         |
+| A blocking finding routes back to an implementer       | Record the loop: finding → agent → re-fix → retest → re-review                       |
+| Task completed (summary presented to the user)         | Append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"** |
+| User answers **Yes**                                   | Clear the file contents (keep only the `# Task Log — The Progress Document` header)  |
+| User answers **No**                                    | Keep the file as-is; the next task appends a new `## Task:` section below            |
 
 The task log is a **runtime artifact**, not documentation: it carries progress between stages and explains a stalled task. Because it is git-ignored, nothing deletes or archives it automatically — the human decides. Sequential tasks may accumulate in the single file until the human says "clear".
 
@@ -67,7 +67,7 @@ One file, many tasks. Each task is a top-level `## Task: {Task ID}` section insi
 
 ## Plan
 
-{agent-level dispatch plan from §3.2 of pawhaven.md: who runs, in what order}
+{agent-level dispatch plan from §3.2 of main-agent.md: who runs, in what order}
 
 ## Phase: {Architect}
 
@@ -107,7 +107,7 @@ One file, many tasks. Each task is a top-level `## Task: {Task ID}` section insi
 
 The task log is a runtime file outside git; nothing clears it automatically. The protocol:
 
-1. When the final summary is presented (STEP 7 of `agents/pawhaven.md`), the orchestrator **must** ask: **"是否需要清空运行log？"** (or in English: "Clear the run log? Yes / No").
+1. When the final summary is presented (STEP 7 of `main-agent.md`), the orchestrator **must** ask: **"是否需要清空运行log？"** (or in English: "Clear the run log? Yes / No").
 2. **Yes** → clear the file contents, keeping only the `# Task Log — The Progress Document` header. The file is ready for the next task.
 3. **No** → leave the file untouched; the next task appends a new `## Task:` section below the previous one.
 
@@ -121,4 +121,4 @@ If a task seems stuck, read the log top to bottom:
 
 ## 7. Cross-Reference
 
-**Related Docs**: [Agent Communication Protocol](./agent-communication-protocol.md) | [Orchestrator Agent](../agents/pawhaven.md) | [Review Handoff](../workflows/handoff.md)
+**Related Docs**: [Agent Communication Protocol](./agent-communication-protocol.md) | [Orchestrator Agent](../main-agent.md) | [Review Handoff](../workflows/handoff.md)

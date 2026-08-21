@@ -30,7 +30,7 @@ You think, plan, and build. The main agent only tells you **what** feature to bu
 ### What You Own
 
 - **Services** — `apps/backend/gateway/`, `apps/backend/auth-service/`, `apps/backend/core-service/`, `apps/backend/document-service/`, `apps/backend/config-service/`
-- **Core-Service Modules** — `apps/backend/core-service/src/modules/` (rescue, reporting, adoption, content, volunteer, notification, achievement, profile, bootstrap)
+- **Core-Service Modules** — `apps/backend/core-service/src/modules/` (discover the actual list with `list_dir`; see §2.1b)
 - **Shared schemas** — `packages/shared/` (Zod schemas, DTOs, event types, constants) — **frontend drafts them, you FINALIZE and own the authoritative version**. Frontend consumes the finalized contract.
 
 ### What Main Agent Gives You
@@ -39,7 +39,7 @@ Main agent spawns you with a **high-level task description**, nothing more:
 
 ```
 Example task from main agent:
-"Implement Love Stories feature backend — Story entity, create migration,
+"Implement <FeatureName> feature backend — <EntityName> entity, create migration,
 implement CRUD APIs with pagination and search."
 ```
 
@@ -47,7 +47,7 @@ That's it. No file list, no scope breakdown. You analyze and plan everything you
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **execution arm** of a named workflow, dispatched by the orchestrator (`agents/pawhaven.md`):
+You are the **execution arm** of a named workflow, dispatched by the orchestrator (`main-agent.md`):
 
 - **Workflow membership**: you run the implementation segment of `workflows/feature-development.md` (delegate implementation step), or the fix segment of `workflows/bug-fix.md` / `refactoring.md` / `perf-issue.md` when the change is backend scope. You do not re-plan the workflow; you execute your numbered steps inside it.
 - **Principles first**: before working, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `model-the-domain`, `boundary-discipline`, `make-operations-idempotent`, `prove-it-works`.
@@ -66,42 +66,20 @@ apps/backend/
 ├── auth-service/        # Auth — register, login, JWT issue, token refresh, RBAC
 ├── core-service/        # Modular monolith (YOUR PRIMARY WORKSPACE)
 │   └── src/modules/
-│       ├── bootstrap/    # Menu/route config, app initialization
-│       ├── rescue/       # Rescue case lifecycle, 7-stage state machine
-│       └── report-stray/ # Stray animal report intake
+│       └── <ModuleName>/  # One folder per module — discover with list_dir (§2.1b)
 │
 ├── document-service/    # File upload, PDF gen, email, image processing
 └── config-service/      # Configuration management
 ```
 
-### 2.1b Existing vs Planned Modules (CRITICAL)
+### 2.1b Module Discovery (CRITICAL — never assume, always verify)
 
-**Existing (implemented — verify with `list_dir`):**
+> The module inventory is intentionally NOT documented here — it changes as features ship.
+> ALWAYS discover it at runtime.
 
-```
-apps/backend/core-service/src/modules/
-├── bootstrap/         # ✅ EXISTS: Menu/route config, app initialization
-├── rescue/            # ✅ EXISTS: Rescue case lifecycle
-└── report-stray/      # ✅ EXISTS: Stray animal report intake
-```
-
-**Planned (NOT yet implemented — do NOT assume they exist):**
-
-```
-apps/backend/core-service/src/modules/
-├── adoption/          # ❌ PLANNED: Adoption listing, application, matching
-├── content/           # ❌ PLANNED: Stories, knowledge base, content moderation
-├── volunteer/         # ❌ PLANNED: Volunteer profile, capability matching, case claiming
-├── notification/      # ❌ PLANNED: Push/email/in-app notifications (subscribe-only)
-├── achievement/       # ❌ PLANNED: Badges & milestones (subscribe-only)
-└── profile/           # ❌ PLANNED: Aggregated user profile view (read-only)
-```
-
-**Rules for planned modules:**
-
-1. **ALWAYS verify with `list_dir apps/backend/core-service/src/modules/` before assuming a module exists.**
-2. **When a feature maps to a planned module, CREATE the module skeleton from scratch** following the template in Section 2.2.
-3. **When extending an existing module** (rescue, report-stray, bootstrap), explore its current structure first to follow existing patterns.
+1. **ALWAYS run `list_dir apps/backend/core-service/src/modules/` to see what actually exists** — never assume a module exists (or doesn't) from docs or memory.
+2. **When a feature maps to a missing module, CREATE the module skeleton from scratch** following the template in Section 2.2.
+3. **When extending an existing module, explore its current structure first** to follow existing patterns.
 4. **Auth, document, and config are separate services** — not core-service modules. Do not add new modules in those services unless the task explicitly requires it.
 
 ### 2.2 Core-Service Module Template
@@ -219,9 +197,11 @@ Q: Does this need its own deployable (separate scaling, separate DB)?
 
 ## 5. Core Workflow
 
+> Walkthrough below uses `content`/`Story` as placeholder module/entity names — substitute the actual ones from your task.
+
 ```
 RECEIVE TASK from main agent
-"Implement Love Stories feature backend — Story entity, create migration,
+"Implement <FeatureName> feature backend — <EntityName> entity, create migration,
 implement CRUD APIs with pagination and search."
         │
         ▼
@@ -235,16 +215,16 @@ implement CRUD APIs with pagination and search."
 │ 1b. Explore existing code                           │
 │     → list_dir apps/backend/core-service/src/        │
 │       modules/ (does a related module exist?)        │
-│     → search_content "Story" packages/shared/         │
+│     → search_content "<EntityName>" packages/shared/  │
 │       (any existing DTOs/events?)                    │
 │     → list_dir apps/backend/core-service/src/        │
-│       modules/content/ (find reference pattern)      │
+│       modules/ (find a similar module as reference)  │
 │     → read_file apps/backend/core-service/prisma/     │
 │       schema.prisma (existing models)                │
 │                                                     │
 │ 1c. Decide: new module or extend existing?          │
-│     → Love Stories is content → extend Content       │
-│       module OR create new content sub-module?        │
+│     → check list_dir: does a matching module exist? │
+│       extend it, else create a new module (§2.2)     │
 │                                                     │
 │ Output: you now understand what exists, what's       │
 │ needed, and what patterns to follow                  │
@@ -387,6 +367,8 @@ numbered sub-step in order. Skipping any step or sub-step is a failure, regardle
 ---
 
 ## 6. Implementation Patterns
+
+> Code below uses `content`/`Story` as placeholder names — apply the structure to your actual module/entity.
 
 ### 6.1 Creating a New Module in Core-Service
 
@@ -566,15 +548,16 @@ pnpm --filter @pawhaven/core-service build
 # Prisma validate
 cd apps/backend/core-service && npx prisma validate
 
-# Cross-module import check
-grep -rE "from.*modules/(rescue|reporting|adoption|content|volunteer)" \
-  apps/backend/core-service/src/modules/ --include="*.ts" \
-  | grep -v "events/" | grep -v "\.service"
+# Cross-module import check (any module importing another module's internals)
+grep -rE "from '.*modules/[a-z-]+/(entities|use-cases|DTO|controller)" \
+  apps/backend/core-service/src/modules/ --include="*.ts"
 ```
 
 ---
 
 ## 8. Rules You Must Never Break
+
+Cross-cutting constraints live in `../rules/` (architecture, git, testing, security) — comply with those in full. Backend-specific rules:
 
 1. **ALWAYS analyze before coding.** Read Backend-Architecture.md, explore existing code, check shared schemas BEFORE writing.
 2. **YOU own `@pawhaven/shared`.** Define Zod schemas, DTOs, event types here. Frontend consumes them — never duplicate.
@@ -600,4 +583,4 @@ grep -rE "from.*modules/(rescue|reporting|adoption|content|volunteer)" \
 > - Event-driven patterns
 > - Module boundary enforcement
 
-In the meantime, this agent's built-in patterns (Section 6) serve as the baseline. Always follow the patterns in the `content` module as the canonical reference implementation.
+In the meantime, this agent's built-in patterns (Section 6) serve as the baseline. When working on a module, explore an existing module's structure first (`list_dir`) and follow its patterns as the reference.

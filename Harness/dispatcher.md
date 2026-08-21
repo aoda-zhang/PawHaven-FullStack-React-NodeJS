@@ -70,7 +70,7 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 ## Subagents
 
-**Route every subagent you spawn inside a workflow through the shared agent type** (`agents/pawhaven.md`) so it inherits the same methodology. Routed skills (investigation, code-review) set their own agent; respect what they prescribe.
+**Route every subagent you spawn inside a workflow through the shared agent type** (`main-agent.md`) so it inherits the same methodology. Routed skills (investigation, code-review) set their own agent; respect what they prescribe.
 
 **Defaults for every delegation.** Background where possible, explicit success criteria and named data shape in the prompt, file pointers rather than inlined context. Code delegates tier by difficulty: trivial mechanical edits to a fast model, precisely specified sequences to a strong instruction-following model, gnarly judgment calls (cross-cutting design, subtle logic) to the strongest judgment model.
 

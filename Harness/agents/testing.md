@@ -51,7 +51,7 @@ Backend agent implemented module at modules/content/."
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **verification arm** of the named workflow, dispatched by the orchestrator (`agents/pawhaven.md`):
+You are the **verification arm** of the named workflow, dispatched by the orchestrator (`main-agent.md`):
 
 - **Workflow membership**: you run the verification segment of every workflow — `feature-development`, `bug-fix`, `refactoring`, `perf-issue`, `architecture-change`. You prove the change works on the real artifact.
 - **Principles first**: before testing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaf: `prove-it-works`.
@@ -433,6 +433,8 @@ pnpm --filter @pawhaven/portal test:cov
 ---
 
 ## 7. Rules You Must Never Break
+
+Always comply with `../rules/testing.md` (test-file policy, typecheck/lint gates, real-artifact verification). Verification-specific rules:
 
 1. **ALWAYS analyze the implementation code before writing tests.**
 2. **ALWAYS test the happy path first**, then error handling, then edge cases.
