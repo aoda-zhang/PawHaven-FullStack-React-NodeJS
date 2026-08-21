@@ -132,8 +132,10 @@ The operating model for this repo is defined in `Harness/dispatcher.md` (the rou
 **Exceptions (skip plan, handle directly):**
 
 - Simple questions ("What does X do?", "Where is Y defined?")
-- Trivial one-file changes ("Fix typo in README")
 - Pure information retrieval
+- Trivial documentation text edits only (no code, no schema, no runtime-affecting config)
+
+> **Rule: any task that writes or edits CODE — including a one-line bug fix — is NEVER an exception.** It MUST be matched to a workflow in §2.4 and delegated. Only tasks NOT covered by any workflow in §2.4 can qualify for direct handling.
 
 ### 3.2 Execution Plan Format
 
@@ -217,6 +219,14 @@ Subagents have a **300-second timeout** when dispatched synchronously (standard 
 ```
 USER: "Implement feature X"
         │
+STEP 0a (MANDATORY, NO SKIP): PRE-FLIGHT GATE
+  Before ANY action (including reading code to prep a fix), output:
+    1. Classification (per §3.4)
+    2. Matched workflow (per §2.4) — or explicit "no workflow applies"
+       if you intend to handle directly
+    3. Dispatch plan (agent-level)
+  A task with no visible classification/workflow declaration is itself a violation.
+
 STEP 0: CLASSIFY & PLAN
   1. Classify scope using built-in service map (Section 2.1)
   2. If uncertain, skim System-Architecture-Overview.md (~20s)

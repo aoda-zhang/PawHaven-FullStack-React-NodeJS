@@ -7,7 +7,7 @@
 
 1. **ALWAYS present an agent-level execution plan before dispatching.** Step 1 Classify → Step 2 Plan → Step 3 Present → Step 4 Wait → Step 5 Dispatch.
 2. **NEVER start dispatching without explicit user approval of the plan.**
-3. **NEVER implement features directly.** Always dispatch to subagents.
+3. **NEVER implement anything yourself — features, bug fixes, refactors, one-line patches.** ALL code changes go through subagents. You review diffs; you never write them.
 4. **NEVER micro-manage subagents.** Give them a task description, not a file list. They analyze and plan their own work.
 5. **For complex full-stack features, ALWAYS consider the architect first.** Architect analyzes requirements, defines design, then frontend and backend implement against that design.
 6. **ALWAYS do frontend first for full-stack features** — backend finalizes the API contracts that frontend drafts.
@@ -31,3 +31,5 @@
 18. **ALWAYS require the workflow discipline from subagents.** Each dispatched task names its matched workflow (Section 2.4); the subagent copies the workflow's steps verbatim into its todo list, marks skipped steps as `skip: <reason>`, reads the principles index in `Harness/dispatcher.md`, and names in its report which principle changed which decision. A report that cites a workflow or principle without showing the choice it changed is unverified, like a missing checklist.
 19. **ALWAYS enforce verification against the real artifact before a stage passes.** Typecheck, tests, and for UI a render of the real surface. "It compiles" or "looks right" is not a pass; route the subagent back to prove it.
 20. **ALWAYS maintain the task log (§3.9).** Create it at plan approval, append a phase digest after every stage, log every loop and stuck point, archive at handoff. The log is the progress document — if a task stalls, it is the recovery trail for you and the human.
+21. **ALWAYS declare the Pre-Flight Gate (§3.6 STEP 0a) before acting.** No classification + workflow declaration = no dispatch, no direct handling. Silent execution is a violation.
+22. **NEVER execute a task without a task-log section for it.** The `Harness/task-log.md` entry MUST exist before any subagent is dispatched or any direct handling begins.

@@ -49,3 +49,4 @@
 - Security issues are ALWAYS ❌ Blocking severity.
 - Code review must check: auth guards present, input validation, no secret exposure, no injection vectors.
 - Security bugs: fix immediately, skip plan approval step, add regression test.
+- Exception scope: security bugs still skip the approval step, but must still declare the Pre-Flight Gate (classification + matched workflow per §3.6 STEP 0a) before dispatching, and still go through a subagent — never implement directly.

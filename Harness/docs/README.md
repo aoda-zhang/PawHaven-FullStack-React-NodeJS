@@ -6,10 +6,9 @@
 
 ## 1. Product Strategy
 
-| File                                                                  | Description                                                                                 |
-| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [PawHaven-Product-Strategy-EN.md](./PawHaven-Product-Strategy-EN.md)  | Complete product blueprint v2.0 — animal lifecycle, persona model, feature map, MVP roadmap |
-| [PawHaven-Product-Strategy.md](./PawHaven-Product-Strategy.md) (中文) | Chinese version of the product strategy                                                     |
+| File                                                                 | Description                                                                                 |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [PawHaven-Product-Strategy-EN.md](./PawHaven-Product-Strategy-EN.md) | Complete product blueprint v2.0 — animal lifecycle, persona model, feature map, MVP roadmap |
 
 **Key contents**: Full collaborative pipeline — Step 1 discovery → Step 2 rescue → Step 3 medical → Step 4 adoption, user role definitions (reporter / rescuer / adopter / clinic), core feature matrix, phased delivery plan.
 
@@ -17,10 +16,10 @@
 
 ## 2. System Architecture
 
-| File                                                                              | Description                                                                                               |
-| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| [PawHaven-System-Architecture.md](./PawHaven-System-Architecture.md)              | System architecture design v2.0 — service decomposition, modular monolith, deployment topology, data flow |
-| [PawHaven-System-Architecture-CN.md](./PawHaven-System-Architecture-CN.md) (中文) | Chinese version of the system architecture                                                                |
+| File                                                                                   | Description                                                                                               |
+| -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [PawHaven-System-Architecture.md](./PawHaven-System-Architecture.md)                   | System architecture design v2.0 — service decomposition, modular monolith, deployment topology, data flow |
+| [PawHaven-System-Architecture-Overview.md](./PawHaven-System-Architecture-Overview.md) | System architecture v3.0 — 5 services, API gateway routing, event catalog, data architecture              |
 
 **Key contents**: Monorepo structure (`apps/backend/*` + `apps/frontend/*` + `packages/*` + `libs/*`), pragmatic service decomposition philosophy, modular monolith design inside core-service, API Gateway routing rules, inter-service communication patterns.
 
@@ -54,7 +53,7 @@
 
 | File                                                               | Description                                                                                                              |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| [authentication_architecture.md](./authentication_architecture.md) | Auth architecture overview — Cookie-based JWT flow, Gateway JWT Guard, Token Refresh mechanism, microservice trust chain |
+| [authentication-architecture.md](./authentication-architecture.md) | Auth architecture overview — Cookie-based JWT flow, Gateway JWT Guard, Token Refresh mechanism, microservice trust chain |
 | [route_authentication.md](./route_authentication.md)               | Frontend route-level auth — RequireAuth component, `/auth/me` verification flow, public route declaration                |
 
 **Key contents**: `gateway` unified JWT verification + proactive refresh, `auth-service` handles issuing/rotation, `httpOnly` cookie security strategy, frontend obtains user identity via gateway-injected headers.
@@ -69,11 +68,24 @@
 
 ---
 
-## 7. Feature Plan
+## 7. Feature Workflows
 
-| File                                 | Description                                                                               |
-| ------------------------------------ | ----------------------------------------------------------------------------------------- |
-| [feature_plan.md](./feature_plan.md) | Feature plan by module — infrastructure, auth, animal management, search, community, etc. |
+> One end-to-end workflow doc per feature. The main-agent loads the relevant doc when asked to build a feature.
+
+| File                                                                                           | Feature                                                 | MVP |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --- |
+| [feature-workflows/README.md](./feature-workflows/README.md)                                   | Index of all feature workflows + feature→module mapping | —   |
+| [feature-workflows/01-auth.md](./feature-workflows/01-auth.md)                                 | Authentication & Authorization                          | P0  |
+| [feature-workflows/02-report-animal.md](./feature-workflows/02-report-animal.md)               | Report a Stray Animal                                   | P0  |
+| [feature-workflows/03-rescue-case.md](./feature-workflows/03-rescue-case.md)                   | Rescue Case Lifecycle                                   | P0  |
+| [feature-workflows/04-volunteer.md](./feature-workflows/04-volunteer.md)                       | Volunteer Network & Case Claiming                       | P0  |
+| [feature-workflows/05-adoption.md](./feature-workflows/05-adoption.md)                         | Adoption                                                | P1  |
+| [feature-workflows/06-rescue-stories.md](./feature-workflows/06-rescue-stories.md)             | Rescue Stories                                          | P2  |
+| [feature-workflows/07-knowledge-base.md](./feature-workflows/07-knowledge-base.md)             | Knowledge Base                                          | P2  |
+| [feature-workflows/08-notifications.md](./feature-workflows/08-notifications.md)               | Notifications                                           | P0  |
+| [feature-workflows/09-profile-achievements.md](./feature-workflows/09-profile-achievements.md) | Profile & Achievements                                  | P1  |
+| [feature-workflows/10-homepage-discovery.md](./feature-workflows/10-homepage-discovery.md)     | Homepage & Discovery                                    | P0  |
+| [feature-workflows/11-bootstrap.md](./feature-workflows/11-bootstrap.md)                       | Bootstrap & Server-Driven Routing                       | P0  |
 
 ---
 
@@ -101,26 +113,26 @@
 ## Document Relationship Map
 
 ```
-PawHaven-Product-Strategy.md ──────────────────────┐
-  (Product Blueprint v2.0)                          │
-                                                    ├──→ PawHaven-System-Architecture.md
-                                                    │      (Architecture based on product strategy)
-                                                    │
-figma-design-spec.md ───────────────────────────────┤
-  (Figma Page Analysis)                             │
-                                                    ├──→ design-system.html
-                                                    │      (Design tokens & component specs)
-authentication_architecture.md ─────────────────────┤
-  (Auth Architecture)                               │
-                                                    ├──→ route_authentication.md
-                                                    │      (Frontend route auth implementation)
-project_standards.md ───────────────────────────────┤
-  (Code Standards)                                  │
-                                                    ├──→ feature_plan.md
-                                                    │      (Feature development plan)
-                                                    │
-AGENTS.md ──────────────────────────────────────────┘
+PawHaven-Product-Strategy-EN.md ───────────────────────┐
+  (Product Blueprint v2.0)                              │
+                                                        ├──→ PawHaven-System-Architecture.md
+                                                        │      (Architecture based on product strategy)
+                                                        │
+figma-design-spec.md ───────────────────────────────────┤
+  (Figma Page Analysis)                                 │
+                                                        ├──→ design-system.html
+                                                        │      (Design tokens & component specs)
+authentication-architecture.md ─────────────────────────┤
+  (Auth Architecture)                                   │
+                                                        ├──→ route_authentication.md
+                                                        │      (Frontend route auth implementation)
+project_standards.md ───────────────────────────────────┤
+  (Code Standards)                                      │
+                                                        ├──→ feature-workflows/ (01-auth … 11-bootstrap)
+                                                        │      (Per-feature build workflows)
+                                                        │
+AGENTS.md ──────────────────────────────────────────────┘
   (AI Agent Constraints)
 ```
 
-> **Suggested reading order**: Step 1 Product Strategy → Step 2 System Architecture → Step 3 Figma Design → Step 4 Design System → Step 5 Auth Architecture → Step 6 Engineering Standards
+> **Suggested reading order**: Step 1 Product Strategy → Step 2 System Architecture → Step 3 Figma Design → Step 4 Design System → Step 5 Auth Architecture → Step 6 Engineering Standards → Step 7 Feature Workflows (load the relevant feature doc when building)

@@ -16,4 +16,4 @@ Be scientific. Every shipped line traces to runtime evidence. Reproduce first, t
 
 ## Reply
 
-What was broken, the root cause, the fix, and how you verified it. Paste the failing-then-passing repro output verbatim. Name the principles that changed a decision.
+What was broken, the root cause, the fix, and how you verified it. Paste the failing-then-passing repro output verbatim. Name the principles that changed a decision. Also list: which subagents you dispatched, each subagent's Step Completion Checklist status, and the local-repro evidence or an explicit note of what environment is missing that prevented reproduction.
