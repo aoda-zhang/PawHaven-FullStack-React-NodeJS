@@ -3,8 +3,8 @@
    ============================================================
    Single source of truth for programmatic token access.
    CSS custom properties remain the runtime source of truth;
-   this module provides typed references for MUI, charts,
-   canvas, inline styles, and any JS-driven styling.
+   this module provides typed references for charts, canvas,
+   inline styles, and any JS-driven styling.
    ============================================================ */
 
 /* ── Color Primitives ─────────────────────────────────────── */
