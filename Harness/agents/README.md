@@ -1,12 +1,12 @@
 # Agents
 
-The **execution layer** of the Harness. Each agent is a named role that the orchestrator (`main-agent`) spawns via team mode or sync mode. Every agent follows a strict workflow (numbered steps, no skipping), owns its report format (see `../docs/agent-communication-protocol.md`), and returns a Step Completion Checklist as evidence.
+The **execution layer** of the Harness. Each agent is a named role that the orchestrator (`AGENT`) spawns via team mode or sync mode. Every agent follows a strict workflow (numbered steps, no skipping), owns its report format (see `../docs/agent-communication-protocol.md`), and returns a Step Completion Checklist as evidence.
 
 ## The Orchestrator
 
-| Agent                          | Role                                                                                                                                                                                        | Pipeline Position          |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| [main-agent](../main-agent.md) | **Main dispatcher.** Receives the request, classifies scope, plans the agent-level dispatch, spawns subagents, maintains the task log, triggers review, and reports back. Never implements. | Start · coordination · end |
+| Agent                | Role                                                                                                                                                                                        | Pipeline Position          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [AGENT](../AGENT.md) | **Main dispatcher.** Receives the request, classifies scope, plans the agent-level dispatch, spawns subagents, maintains the task log, triggers review, and reports back. Never implements. | Start · coordination · end |
 
 ## Implementation & Analysis Agents
 
@@ -21,6 +21,6 @@ The **execution layer** of the Harness. Each agent is a named role that the orch
 
 ## Workflow Membership
 
-Each agent declares which workflow segment it runs and which principles it enforces in its `### 1a. Wiring` section. The orchestrator (`main-agent.md`) holds the full dispatch table.
+Each agent declares which workflow segment it runs and which principles it enforces in its `### 1a. Wiring` section. The orchestrator (`AGENT.md`) holds the full dispatch table.
 
 **Related**: [Workflows](../workflows/README.md) · [Communication Protocol](../docs/agent-communication-protocol.md) · [Task Log](../docs/task-log.md)

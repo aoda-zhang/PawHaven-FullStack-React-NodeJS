@@ -2,6 +2,7 @@
 
 > **Applies to**: All agents.
 > **Purpose**: Define documentation standards — what gets documented, where, and how.
+> **Doc Impact**: Every handoff (workflows/handoff.md) MUST classify documentation impact as `none` / `update` / `create`. If `update` or `create`, route to `knowledge-update` agent for permanent documentation.
 
 ## 1. Code Comments
 
@@ -29,6 +30,7 @@ Location: `Harness/docs/ADR/`
 - Template: `ADR/ADR-001-template.md`.
 - Every ADR includes: Context, Decision, Consequences, Alternatives Considered.
 - Mark superseded ADRs — never delete old ADRs.
+- **If `Harness/docs/ADR/` does not exist, create it when the first ADR is needed.** The directory is part of the permanent documentation structure.
 
 ## 4. Workflow Documentation
 
@@ -50,3 +52,13 @@ Location: Project root `README.MD` and `READMECN.MD`
 - Public API methods (backend service facades): JSDoc for parameters and return types.
 - Shared types (`packages/shared/`): JSDoc for non-obvious fields.
 - Feature entry points (`index.tsx`): brief description of the feature.
+
+## 7. Permanent vs Temporary Documentation
+
+| Type          | Location                  | Persistence                 | Trigger                                              | Examples                                                       |
+| ------------- | ------------------------- | --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| **Permanent** | `Harness/docs/`           | Git-tracked, long-lived     | Architecture changes, new ADRs, API contract changes | System architecture, ADRs, feature workflows, design specs     |
+| **Temporary** | `Harness/task-log.md`     | Git-ignored, session-scoped | Every task execution                                 | Runtime logs, task execution traces                            |
+| **Handoff**   | Workflows handoff summary | Ephemeral, per-task         | End of every task                                    | What changed, verification evidence, Doc Impact classification |
+
+> **Rule**: Permanent docs live in `Harness/docs/` and are maintained by the `knowledge-update` agent. Temporary logs live in `task-log.md` and are cleared per session. Never confuse the two — a task log is not documentation, and documentation is not a task log.

@@ -20,6 +20,7 @@
 | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | [PawHaven-System-Architecture.md](./PawHaven-System-Architecture.md)                   | System architecture design v2.0 — service decomposition, modular monolith, deployment topology, data flow |
 | [PawHaven-System-Architecture-Overview.md](./PawHaven-System-Architecture-Overview.md) | System architecture v3.0 — 5 services, API gateway routing, event catalog, data architecture              |
+| [ADR/](./ADR/)                                                                         | Architecture Decision Records — why decisions were made, not just what was decided                        |
 
 **Key contents**: Monorepo structure (`apps/backend/*` + `apps/frontend/*` + `packages/*` + `libs/*`), pragmatic service decomposition philosophy, modular monolith design inside core-service, API Gateway routing rules, inter-service communication patterns.
 
@@ -70,7 +71,7 @@
 
 ## 7. Feature Workflows
 
-> One end-to-end workflow doc per feature. The main-agent loads the relevant doc when asked to build a feature.
+> One end-to-end workflow doc per feature. The AGENT loads the relevant doc when asked to build a feature.
 
 | File                                                                                           | Feature                                                 | MVP |
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --- |
@@ -93,8 +94,8 @@
 
 | File                                          | Description                                                                                                           |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [AGENTS.md](../AGENTS.md)                     | AI Agent development rules — layering constraints, auth architecture notes, operating principles, validation commands |
-| [README.MD](../README.MD)                     | Project README (English)                                                                                              |
+| [AGENT.md](../AGENT.md)                       | AI Agent development rules — layering constraints, auth architecture notes, operating principles, validation commands |
+| [README.MD](../README.MD)                     | Project README (English) — see also `Harness/README.md` for Harness-specific docs                                     |
 | [READMECN.MD](../READMECN.MD)                 | Project README (中文)                                                                                                 |
 | [package.json](../package.json)               | Monorepo root config (pnpm workspace)                                                                                 |
 | [turbo.json](../turbo.json)                   | Turborepo build orchestration config                                                                                  |
@@ -131,8 +132,11 @@ project_standards.md ───────────────────�
                                                         ├──→ feature-workflows/ (01-auth … 11-bootstrap)
                                                         │      (Per-feature build workflows)
                                                         │
-AGENTS.md ──────────────────────────────────────────────┘
+AGENT.md ──────────────────────────────────────────────┘
   (AI Agent Constraints)
+
+ADR/ ───────────────────────────────────────────────────┐
+  (Architecture Decision Records)
 ```
 
-> **Suggested reading order**: Step 1 Product Strategy → Step 2 System Architecture → Step 3 Figma Design → Step 4 Design System → Step 5 Auth Architecture → Step 6 Engineering Standards → Step 7 Feature Workflows (load the relevant feature doc when building)
+> **Suggested reading order**: Step 1 Product Strategy → Step 2 System Architecture → Step 3 Figma Design → Step 4 Design System → Step 5 Auth Architecture → Step 6 Engineering Standards → Step 7 Feature Workflows (load the relevant feature doc when building) → Step 8 ADRs (for architectural context)

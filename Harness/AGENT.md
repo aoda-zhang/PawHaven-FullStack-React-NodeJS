@@ -119,15 +119,32 @@ The operating model for this repo is defined in `Harness/dispatcher.md` (the rou
 
 ## 3. Task Mode: Plan First, Execute After Approval
 
+### 3.0 Complexity-Based Routing (MUST run before §3.1)
+
+> **Purpose**: Not every task needs the full pipeline. Route by complexity to avoid process overhead for trivial work.
+> **Source of truth**: Complexity is determined by the AGENT during Step 1 assessment (§3.1).
+
+| Complexity        | Description                                                                                        | Pipeline                                                                                                                                 | Approval                                   |
+| ----------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Trivial**       | Single-file fix, typo, safe config change, one-liner. No DB/entity/API contract changes.           | **Lightweight**: classify → fix → validate (lint + typecheck) → handoff. Skip architect, skip formal testing, skip code-review pipeline. | Proceed directly; confirm after completion |
+| **Standard**      | New feature, multi-file change, cross-module work. Involves API/UI but no new service or paradigm. | **Full pipeline**: Steps 1-7 per §3.6                                                                                                    | Wait for explicit approval                 |
+| **Architectural** | New service, module, API contract paradigm, or ADR-level change.                                   | **Full pipeline + ADR review + long-term documentation**                                                                                 | Wait for explicit approval                 |
+
+> **Rule**: If a task is Trivial, you may skip spawning the architect, skip formal testing, and skip the two-pass code-review pipeline. You still validate (lint, typecheck, grep) but the `do` step is a single pass — no back-and-forth. You still write the handoff summary (§3.6 Step 7).
+> **Rule**: If a task is Standard or Architectural, you MUST spawn the architect (if architectural) and run the full pipeline. No exceptions.
+> **Rule**: If you are uncertain about complexity, classify UP (treat as Standard) rather than down. The user can override in the next step.
+> **Rule**: A change that touches API contracts, database entities, or cross-module types is NEVER Trivial — it is at least Standard.
+
 ### 3.1 Planning Protocol
 
 **This is the DEFAULT behavior for ALL feature requests.** When you receive a feature request:
 
 1. **Classify** — Use your built-in service map (Section 2.1) and subagent roster (Section 2.2) to classify the request. If uncertain, skim `Harness/docs/PawHaven-System-Architecture-Overview.md`.
-2. **Plan** — Output which agents are needed and their **high-level task description** (one sentence each). Do NOT break into files, APIs, or implementation details — subagents own that.
-3. **Present** — Show the agent-level plan to the user.
-4. **Wait** — Do NOT start until the user explicitly confirms.
-5. **Dispatch** — Spawn subagents in dependency order. Each gets a one-liner task description + any contracts needed.
+2. **Assess complexity** — Route per §3.0: Trivial / Standard / Architectural.
+3. **Plan** — Output which agents are needed and their **high-level task description** (one sentence each). Do NOT break into files, APIs, or implementation details — subagents own that.
+4. **Present** — Show the agent-level plan to the user, including the complexity classification and pipeline.
+5. **Wait** — Do NOT start until the user explicitly confirms (for Standard/Architectural). For Trivial: proceed directly, confirm after completion.
+6. **Dispatch** — Spawn subagents in dependency order. Each gets a one-liner task description + any contracts needed.
 
 **Exceptions (skip plan, handle directly):**
 
@@ -135,7 +152,7 @@ The operating model for this repo is defined in `Harness/dispatcher.md` (the rou
 - Pure information retrieval
 - Trivial documentation text edits only (no code, no schema, no runtime-affecting config)
 
-> **Rule: any task that writes or edits CODE — including a one-line bug fix — is NEVER an exception.** It MUST be matched to a workflow in §2.4 and delegated. Only tasks NOT covered by any workflow in §2.4 can qualify for direct handling.
+> **Rule: any task that writes or edits CODE — including a one-line bug fix — is NEVER an exception to the planning protocol.** It MUST be matched to a workflow in §2.4 and delegated. Tasks that write code may still be classified Trivial per §3.0 (lightweight pipeline, no architect, no testing/review loop), but they still need classification and a plan. Only tasks NOT covered by any workflow in §2.4 can qualify for direct handling.
 
 ### 3.2 Execution Plan Format
 
@@ -229,12 +246,13 @@ STEP 0a (MANDATORY, NO SKIP): PRE-FLIGHT GATE
 
 STEP 0: CLASSIFY & PLAN
   1. Classify scope using built-in service map (Section 2.1)
-  2. If uncertain, skim System-Architecture-Overview.md (~20s)
-  3. Choose dispatch mode (Section 3.5): sync or team mode?
-  4. Produce agent-level plan (Section 3.2 format)
-  5. Present to user
-  6. WAIT for explicit confirmation
-  7. On approval, open the task log: Harness/task-log.md, append
+  2. Assess complexity per §3.0 (Trivial / Standard / Architectural)
+  3. If uncertain, skim System-Architecture-Overview.md (~20s)
+  4. Choose dispatch mode (Section 3.5): sync or team mode?
+  5. Produce agent-level plan (Section 3.2 format)
+  6. Present to user (include complexity classification)
+  7. WAIT for explicit confirmation (Standard/Architectural); proceed directly (Trivial)
+  8. On approval (or immediately for Trivial), open the task log: Harness/task-log.md, append
      a new "## Task: YYYY-MM-DD-{slug}" section (§3.9)
         │
 STEP 1: ARCHITECT (complex changes only)
@@ -302,8 +320,15 @@ STEP 7: SUMMARIZE
   2. Send shutdown_request to all team members → team_delete()
   3. Verify final state: typecheck + lint + full build (§5 Validation Commands)
   4. Append the final Handoff section to the task log (§3.9)
-  5. ASK the user: "是否需要清空运行log？" → Yes → clear the file, No → keep
-  6. Present summary to user: what was built, changes, any follow-ups
+  5. **MANDATORY: Doc Impact Assessment** — classify the handoff into one of:
+     - `none` — no docs need updating (pure bug fix, no API/behavior change)
+     - `update` — existing docs need updating (API changed, behavior modified)
+     - `create` — new docs needed (new feature, new module, new ADR)
+     - Write this classification into the handoff summary (§3.9), AND into the permanent
+       record if this is an Architectural or Standard change. If Doc Impact is `update`
+       or `create`, route to `knowledge-update` agent for permanent documentation.
+  6. ASK the user: "是否需要清空运行log？" → Yes → clear the file, No → keep
+  7. Present summary to user: what was built, changes, any follow-ups
 ```
 
 ### 3.7 Timeout Recovery
@@ -346,12 +371,19 @@ Why: the next stage references prior results from the log; if the task stalls, t
 ```
 ⚠️ CRITICAL: shared types are the contract between frontend and backend.
 
-- Frontend **DRAFTS** the API contract (Zod schemas, DTOs, request/response types)
-  during step 1 as the consumer-facing interface.
-- Backend **FINALIZES** the contract in step 2: validates for DB/serialization/
-  event constraints, adjusts names/fields, and owns the authoritative version in
-  `packages/shared/`.
-- Final source of truth: `packages/shared/`. Frontend consumes; backend owns.
+- **Architect** (Step 1, for Standard/Architectural complexity) defines the shared API
+  contract (Zod schemas, DTOs, request/response types) in `packages/shared/` as the
+  system-level authoritative interface. This is done BEFORE frontend or backend
+  implementation starts. The architect's contract is the starting point for all
+  downstream work.
+- **Frontend** (Step 2) consumes the architect-defined contract to implement UI, mock
+  data, and client hooks. Frontend may request adjustments but cannot override the
+  contract unilaterally.
+- **Backend** (Step 3) FINALIZES the contract in `packages/shared/`: validates for DB/
+  serialization/event constraints, adjusts names/fields, and owns the authoritative
+  version. Backend may modify the contract but must report changes back to frontend.
+- Final source of truth: `packages/shared/`. Architect defines; frontend consumes;
+  backend owns and finalizes.
 - When frontend and backend disagree on a shared schema, **backend finalizes the
   version and reports changes back to frontend**; frontend aligns its implementation
   to the final `packages/shared/` version.

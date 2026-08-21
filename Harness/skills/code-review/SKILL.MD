@@ -121,7 +121,7 @@ Present findings organized by sub-skill, with file paths, line numbers, and seve
 Each sub-skill is a true CodeBuddy skill and can be:
 - Loaded individually via `use_skill("code-review/react-doctor")`
 - Combined on demand — load only the sub-skills needed
-- Parallel-loaded by the main agent for full reviews
+- Parallel-loaded by the AGENT for full reviews
 
 ## Related
 

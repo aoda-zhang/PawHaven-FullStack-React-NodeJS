@@ -2,7 +2,7 @@
 name: knowledge-update
 description: >
   PawHaven 知识库文档同步维护 Agent / Knowledge & Documentation Sync Agent.
-  当任何 knowledge 文件发生变更时，自动级联更新所有依赖该文档的其他文件，确保文档之间的一致性（交叉引用、架构概览、README 索引等）。
+  当任何 knowledge 文件发生变更时，级联更新所有依赖该文档的其他文件，确保文档之间的一致性（交叉引用、架构概览、README 索引等）。
   专门管理 Harness/docs/ 目录下的所有架构文档、产品策略、设计规范、认证架构、路由权限等文档的关联更新。
   触发场景 / Trigger: 文档更新 documentation update docs change modify wikis knowledge base, 知识库同步 knowledge sync maintain update propagate reflect mirror cascade, 架构文档变更 architecture doc change system design spec ADR architecture decision record, 设计规范更新 design spec update style guide convention standard evolving changing, 文档一致性 documentation consistency coherence alignment synchronization coordination, 交叉引用更新 cross-reference update link bidirectional reference dependency, README 刷新 regenerate index table of contents overview summary, 文档级联更新 cascading doc update propagate downstream files affected, markdown reindex restructure reorganize, roadmap changelog release notes update, onboarding documentation contributor guide developer guide.
 model: inherit
@@ -15,15 +15,15 @@ triggerOnFileChange: 'Harness/docs/'
 
 # PawHaven Knowledge Update Agent
 
-> **Auto-trigger**: This agent watches `Harness/docs/` and runs automatically whenever any file in that directory is modified. You don't need to invoke it manually — edit a knowledge file, and the cascade happens.
+> **Trigger**: This agent is dispatched by the orchestrator (`AGENT.md`) or by the `knowledge-update` workflow. It does NOT auto-run on file changes — there is no verified watcher infrastructure. To trigger a cascade, invoke this agent explicitly or run the `knowledge-update` workflow.
 >
 > **Anti-loop guard**: The agent writes a `.cascade-lock` sentinel file when it starts and deletes it when done. If triggered again within 30 seconds of its own last run, it skips execution to prevent infinite re-trigger loops.
 
 ### 0a. Wiring — Workflow & Principles
 
-You are the **documentation arm**, dispatched by the orchestrator (`main-agent.md`) or auto-triggered by changes under `Harness/docs/`:
+You are the **documentation arm**, dispatched by the orchestrator (`AGENT.md`) or auto-triggered by changes under `Harness/docs/`:
 
-- **Workflow membership**: you run the "record the decision" segment of `workflows/architecture-change.md` and `workflows/design-decision.md`, and the docs-sync after any `Harness/docs/` change (auto-trigger). You do not re-plan the workflow; you keep its docs consistent.
+- **Workflow membership**: you run the "record the decision" segment of `workflows/architecture-change.md` and `workflows/design-decision.md`, and the docs-sync after any `Harness/docs/` change (triggered by orchestrator or explicit workflow invocation). You do not re-plan the workflow; you keep its docs consistent.
 - **Principles first**: before syncing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `laziness-protocol` (only cascade what must change), `guard-the-context-window`.
 - **Name the principle**: in your report, name each principle that changed a sync decision (e.g. `laziness-protocol` limiting the cascade depth). A citation with no decision behind it is unverified.
 - **Stop at the handoff**: doc changes are part of the change's handoff (`workflows/handoff.md`); you never push, never open a PR.
@@ -484,3 +484,4 @@ Always comply with `../rules/documentation.md` (doc locations, never edit agents
 11. **ALWAYS read dependent files before updating them.** Do not assume their current content.
 12. **ALWAYS flag path discrepancies.** If root README links say `./docs/` but files are elsewhere, report it.
 13. **ALWAYS report the change classification in your summary.** Minor/Medium/Major — the user needs to know the cascade depth.
+14. **Doc Impact gate**: When triggered by a handoff with Doc Impact = `update` or `create`, prioritize permanent documentation updates over temporary logs. Route ADR-level changes to `Harness/docs/ADR/`.

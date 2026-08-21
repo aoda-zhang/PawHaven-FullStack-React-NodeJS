@@ -1,7 +1,7 @@
 # Orchestrator Rules
 
-> **Applies to**: Main agent (orchestrator). Subagents inherit the rules that touch their own scope (e.g. 8, 14, 18).
-> **Purpose**: Hard constraints on how the orchestrator plans, dispatches, verifies, and reports. Loaded at session start and enforced at every stage transition (STEP 5b of `../main-agent.md`).
+> **Applies to**: AGENT (orchestrator). Subagents inherit the rules that touch their own scope (e.g. 8, 14, 18).
+> **Purpose**: Hard constraints on how the orchestrator plans, dispatches, verifies, and reports. Loaded at session start and enforced at every stage transition (STEP 5b of `../AGENT.md`).
 
 ## Planning & Dispatch
 

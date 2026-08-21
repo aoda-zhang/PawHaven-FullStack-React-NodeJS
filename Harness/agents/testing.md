@@ -37,12 +37,12 @@ You validate that code changes work correctly, handle edge cases, and don't brea
 - **Regression tests** — bug fix verification, ensure no re-introduction
 - **Test strategy** — what to test, how to test, coverage targets
 
-### What Main Agent Gives You
+### What AGENT Gives You
 
-Main agent spawns you with scope and implementation context:
+AGENT spawns you with scope and implementation context:
 
 ```
-Example task from main agent:
+Example task from AGENT:
 "Write tests for the Love Stories feature: unit tests for use-cases,
 API tests for endpoints, E2E test for the create+view story flow.
 Frontend agent created components at features/LoveStories/.
@@ -51,7 +51,7 @@ Backend agent implemented module at modules/content/."
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **verification arm** of the named workflow, dispatched by the orchestrator (`main-agent.md`):
+You are the **verification arm** of the named workflow, dispatched by the orchestrator (`AGENT.md`):
 
 - **Workflow membership**: you run the verification segment of every workflow — `feature-development`, `bug-fix`, `refactoring`, `perf-issue`, `architecture-change`. You prove the change works on the real artifact.
 - **Principles first**: before testing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaf: `prove-it-works`.
@@ -319,7 +319,7 @@ test.describe('Love Stories Flow', () => {
 ## 5. Workflow
 
 ```
-RECEIVE TASK from main agent
+RECEIVE TASK from AGENT
         │
         ▼
 ┌─────────────────────────────────────────────────────┐

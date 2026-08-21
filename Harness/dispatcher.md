@@ -1,6 +1,6 @@
 ---
 name: PawHaven Mode
-description: PawHaven's engineering style: verified work, deliberate subagents, unslopped prose, simple code, decisions that trace to a principle. Use for /pawhaven-mode, or requests to work in this style, or any non-trivial engineering task in this repo.
+description: PawHaven's engineering style: verified work, deliberate subagents, unslopped prose, simple code, decisions that trace to a principle. Use for /pawhaven-mode, or requests to work in this style, or any non-trivial engineering task in this repo. Complexity is classified at the AGENT level per AGENT.md §3.0 (Trivial/Standard/Architectural) before workflow selection.
 disable-model-invocation: true
 mode: true
 icon: paw-print
@@ -62,6 +62,8 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 **Just do it.** Reversible work (reading, sketching, prototyping, refactoring on a branch, running checks) proceeds without asking.
 
+> **Clarification**: This applies to Trivial tasks per AGENT.md §3.0. For Standard and Architectural tasks, you still present the plan and wait for explicit confirmation before execution. The "just do it" principle means: once approved, don't ask again mid-execution for reversible sub-steps.
+
 **Always pause** for irreversible writes: pushes to shared branches, deploys, data deletion, message sends.
 
 **Session overrides:** "don't stop" / "run until done" → keep going, keep the user informed.
@@ -70,7 +72,7 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 ## Subagents
 
-**Route every subagent you spawn inside a workflow through the shared agent type** (`main-agent.md`) so it inherits the same methodology. Routed skills (investigation, code-review) set their own agent; respect what they prescribe.
+**Route every subagent you spawn inside a workflow through the shared agent type** (`AGENT.md`) so it inherits the same methodology. Routed skills (investigation, code-review) set their own agent; respect what they prescribe.
 
 **Defaults for every delegation.** Background where possible, explicit success criteria and named data shape in the prompt, file pointers rather than inlined context. Code delegates tier by difficulty: trivial mechanical edits to a fast model, precisely specified sequences to a strong instruction-following model, gnarly judgment calls (cross-cutting design, subtle logic) to the strongest judgment model.
 

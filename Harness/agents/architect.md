@@ -38,12 +38,12 @@ You think, analyze, and decide. Implementers execute your design.
 - **Cross-module coordination** — event contracts, inter-service communication, shared types
 - **ADR creation** — when a decision is architecturally significant, document it permanently
 
-### What Main Agent Gives You
+### What AGENT Gives You
 
-Main agent spawns you with requirements and context:
+AGENT spawns you with requirements and context:
 
 ```
-Example task from main agent:
+Example task from AGENT:
 "Analyze the Love Stories feature requirements and produce a technical
 design before frontend/backend agents begin implementation."
 ```
@@ -54,7 +54,7 @@ A structured design document (Section 6 format) that frontend and backend agents
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **design authority** of the named workflow, dispatched by the orchestrator (`main-agent.md`):
+You are the **design authority** of the named workflow, dispatched by the orchestrator (`AGENT.md`):
 
 - **Workflow membership**: you run the design segment of `workflows/design-decision.md` and `workflows/architecture-change.md` (parallel design exploration before implementation).
 - **Principles first**: before designing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `model-the-domain`, `boundary-discipline`, `outcome-oriented-execution`, `migrate-callers-then-delete-legacy-apis`.
