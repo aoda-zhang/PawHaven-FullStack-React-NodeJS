@@ -39,6 +39,6 @@ Step 6: Knowledge Update
 Step 7: Review Handoff
 ```
 
-Routing into the right workflow happens in `../dispatcher.md`; the orchestrator (`../AGENT.md`) dispatches agents per workflow segment.
+Routing into the right workflow happens in `../dispatcher.md`; the orchestrator (`../agents/pawhaven.md`) dispatches agents per workflow segment.
 
 **Related**: [Mode](../dispatcher.md) · [Agents](../agents/README.md) · [Task Log](../docs/task-log.md) · [Root README](../README.md)

@@ -4,7 +4,7 @@ You own this task. Plan, review, verify. Delegate investigation and the fix to s
 
 Be scientific. Every shipped line traces to runtime evidence. Reproduce first, then root-cause, then fix, then verify on the same surface. A bug you cannot reproduce, you cannot prove fixed.
 
-> **Complexity classification** (per AGENT.md §3.0): Bug fixes are typically **Standard** (multi-file, cross-module) or **Trivial** (single-file, one-liner). The AGENT classifies before starting this workflow.
+> **Complexity classification** (per pawhaven.md §3.0): Bug fixes are typically **Standard** (multi-file, cross-module) or **Trivial** (single-file, one-liner). pawhaven classifies before starting this workflow.
 >
 > **Trivial path**: If the bug is a single-file fix (typo, null check, missing import, off-by-one, safe config change), you may run a **lightweight pipeline**: reproduce → fix → validate (lint + typecheck + test) → handoff. Skip the architect, skip the testing agent, skip the two-pass code-review loop. You still write the handoff summary with Doc Impact = `none` or `update`.
 >

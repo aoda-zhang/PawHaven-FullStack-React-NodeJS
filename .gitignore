@@ -132,3 +132,6 @@ tsconfig.tsbuildinfo
 
 # prisma dev runtime
 **/prisma/**/client**
+
+# codebuddy memory log
+.codebuddy/memory/*.md

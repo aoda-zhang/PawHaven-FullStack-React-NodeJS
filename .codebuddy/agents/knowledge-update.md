@@ -15,13 +15,13 @@ triggerOnFileChange: '.codebuddy/docs/'
 
 # PawHaven Knowledge Update Agent
 
-> **Trigger**: This agent is dispatched by the orchestrator (`AGENT.md`) or by the `knowledge-update` workflow. It does NOT auto-run on file changes — there is no verified watcher infrastructure. To trigger a cascade, invoke this agent explicitly or run the `knowledge-update` workflow.
+> **Trigger**: This agent is dispatched by the orchestrator (`pawhaven.md`) or by the `knowledge-update` workflow. It does NOT auto-run on file changes — there is no verified watcher infrastructure. To trigger a cascade, invoke this agent explicitly or run the `knowledge-update` workflow.
 >
 > **Anti-loop guard**: The agent writes a `.cascade-lock` sentinel file when it starts and deletes it when done. If triggered again within 30 seconds of its own last run, it skips execution to prevent infinite re-trigger loops.
 
 ### 0a. Wiring — Workflow & Principles
 
-You are the **documentation arm**, dispatched by the orchestrator (`AGENT.md`) or auto-triggered by changes under `.codebuddy/docs/`:
+You are the **documentation arm**, dispatched by the orchestrator (`pawhaven.md`) or auto-triggered by changes under `.codebuddy/docs/`:
 
 - **Workflow membership**: you run the "record the decision" segment of `workflows/architecture-change.md` and `workflows/design-decision.md`, and the docs-sync after any `.codebuddy/docs/` change (triggered by orchestrator or explicit workflow invocation). You do not re-plan the workflow; you keep its docs consistent.
 - **Principles first**: before syncing, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `laziness-protocol` (only cascade what must change), `guard-the-context-window`.

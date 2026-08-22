@@ -16,6 +16,6 @@ The **always-on constraints** of the .codebuddy. Rules are repo facts — they d
 
 - Always-on: loaded whenever the current task touches their domain.
 - Hard gates: a change that violates a rule is a blocking finding, regardless of how well it works otherwise.
-- The orchestrator checks rule compliance at every stage transition (STEP 5b of `AGENT.md`).
+- The orchestrator checks rule compliance at every stage transition (STEP 5b of `pawhaven.md`).
 
 **Related**: [Agents](../agents/README.md) · [Workflows](../workflows/README.md) · [Root README](../README.md)

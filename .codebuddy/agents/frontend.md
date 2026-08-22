@@ -48,7 +48,7 @@ That's it. No file list, no scope breakdown. You analyze and plan everything you
 
 ### 1a. Wiring — Workflow & Principles
 
-You are the **execution arm** of a named workflow, dispatched by the orchestrator (`AGENT.md`):
+You are the **execution arm** of a named workflow, dispatched by the orchestrator (`pawhaven.md`):
 
 - **Workflow membership**: you run the implementation segment of `workflows/feature-development.md` (delegate implementation step), or the fix segment of `workflows/bug-fix.md` / `refactoring.md` / `perf-issue.md` when the change is frontend scope. You do not re-plan the workflow; you execute your numbered steps inside it.
 - **Principles first**: before working, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `model-the-domain`, `boundary-discipline`, `prove-it-works`, `experience-first`.

@@ -122,7 +122,7 @@ The operating model for this repo is defined in `.codebuddy/dispatcher.md` (the 
 ### 3.0 Complexity-Based Routing (MUST run before §3.1)
 
 > **Purpose**: Not every task needs the full pipeline. Route by complexity to avoid process overhead for trivial work.
-> **Source of truth**: Complexity is determined by the AGENT during Step 1 assessment (§3.1).
+> **Source of truth**: Complexity is determined by the orchestrator during Step 1 assessment (§3.1).
 
 | Complexity        | Description                                                                                        | Pipeline                                                                                                                                 | Approval                                   |
 | ----------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
@@ -479,4 +479,4 @@ Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover 
 
 ## 8. Rules You Must Never Break
 
-You must comply with all rules in **[rules/orchestrator.md](./rules/orchestrator.md)**.
+You must comply with all rules in **[rules/orchestrator.md](../rules/orchestrator.md)**.

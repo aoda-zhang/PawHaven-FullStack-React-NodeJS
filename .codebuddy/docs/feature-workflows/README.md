@@ -1,6 +1,6 @@
 # Feature Workflows
 
-This folder contains **one end-to-end workflow document per feature**. The AGENT
+This folder contains **one end-to-end workflow document per feature**. pawhaven
 loads the relevant doc(s) when asked to build a feature (e.g. "build the report animal
 feature", "build rescue cases").
 
@@ -32,7 +32,7 @@ Each doc follows the same template so the flow is always traceable:
 | 10  | Homepage & Discovery              | [`10-homepage-discovery.md`](./10-homepage-discovery.md)     | P0           |
 | 11  | Bootstrap & Server-Driven Routing | [`11-bootstrap.md`](./11-bootstrap.md)                       | P0           |
 
-## How the AGENT uses these
+## How pawhaven uses these
 
 - When the user asks to build "XX feature", load the matching doc above.
 - Cross-cutting docs to load alongside: [Authentication](../authentication-architecture.md),

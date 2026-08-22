@@ -7,8 +7,8 @@
 
 The .codebuddy is a living system. As agents edit docs, rename files, and update references, the following issues accumulate:
 
-- Broken relative links (e.g., `../AGENT.md` that no longer exists)
-- Stale references to renamed files (e.g., `main-agent.md` → `AGENT.md`)
+- Broken relative links (e.g., `../agents/pawhaven.md` that no longer exists)
+- Stale references to renamed files (e.g., `AGENT.md` → `agents/pawhaven.md`)
 - Missing directories referenced by docs (e.g., `ADR/`)
 - Agent names in docs that don't match actual `*.md` files in `<AGENT_DIR>/agents/` (where `<AGENT_DIR>` defaults to `.codebuddy`)
 - Workflow docs referencing steps that no longer exist
@@ -37,13 +37,13 @@ ls "$AGENT_DIR"/agents/*.md
 # Verify every agent name referenced in docs matches a real file
 ```
 
-- Agent names referenced in `AGENT.md`, `dispatcher.md`, `workflows/*.md`, and `docs/README.md` must exist as `<AGENT_DIR>/agents/<name>.md` (default `<AGENT_DIR>` = `.codebuddy`).
-- Example: if `AGENT.md` references `frontend` agent, `<AGENT_DIR>/agents/frontend.md` must exist.
+- Agent names referenced in `pawhaven.md`, `dispatcher.md`, `workflows/*.md`, and `docs/README.md` must exist as `<AGENT_DIR>/agents/<name>.md` (default `<AGENT_DIR>` = `.codebuddy`).
+- Example: if `pawhaven.md` references `frontend` agent, `<AGENT_DIR>/agents/frontend.md` must exist.
 
 ### 3. Workflow Step Consistency
 
 - Every workflow in `<AGENT_DIR>/workflows/*.md` must have numbered steps that are internally consistent (default `<AGENT_DIR>` = `.codebuddy`).
-- Workflows referenced in `AGENT.md` §2.4 must exist as files.
+- Workflows referenced in `pawhaven.md` §2.4 must exist as files.
 - Workflow `description` frontmatter must match the actual workflow content.
 
 ### 4. Directory Existence
@@ -150,10 +150,10 @@ else
   echo "  PASS"
 fi
 
-# 2. Check AGENT.md exists
-echo "[2/6] Checking AGENT.md exists..."
-if [ ! -f "$AGENT_DIR/AGENT.md" ]; then
-  echo "  FAIL: $AGENT_DIR/AGENT.md does not exist"
+# 2. Check pawhaven.md exists
+echo "[2/6] Checking pawhaven.md exists..."
+if [ ! -f "$AGENT_DIR/agents/pawhaven.md" ]; then
+  echo "  FAIL: $AGENT_DIR/agents/pawhaven.md does not exist"
   ERRORS=$((ERRORS + 1))
 else
   echo "  PASS"

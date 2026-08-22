@@ -4,7 +4,7 @@ You own this task. Plan, review, verify. Delegate implementation to subagents, s
 
 A feature is built from a named data shape, through an explicit design pass, to verified behavior on the real surface. Scope is decided before code is written, and every user-visible state is part of the feature.
 
-> **Complexity classification** (per AGENT.md §3.0): Features are typically **Standard** or **Architectural**. The AGENT classifies before starting this workflow. Standard features follow the steps below. Architectural features add an ADR step and mandatory architect review before implementation begins.
+> **Complexity classification** (per pawhaven.md §3.0): Features are typically **Standard** or **Architectural**. pawhaven classifies before starting this workflow. Standard features follow the steps below. Architectural features add an ADR step and mandatory architect review before implementation begins.
 
 ## Steps
 

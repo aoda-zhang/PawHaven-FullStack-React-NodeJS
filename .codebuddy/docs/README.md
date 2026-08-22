@@ -71,7 +71,7 @@
 
 ## 7. Feature Workflows
 
-> One end-to-end workflow doc per feature. The AGENT loads the relevant doc when asked to build a feature.
+> One end-to-end workflow doc per feature. pawhaven loads the relevant doc when asked to build a feature.
 
 | File                                                                                           | Feature                                                 | MVP |
 | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- | --- |
@@ -92,22 +92,14 @@
 
 ## 8. Key Project Files
 
-| File                                          | Description                                                                                                           |
-| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [AGENT.md](../AGENT.md)                       | AI Agent development rules — layering constraints, auth architecture notes, operating principles, validation commands |
-| [README.MD](../README.MD)                     | Project README (English) — see also `.codebuddy/README.md` for .codebuddy-specific docs                               |
-| [READMECN.MD](../READMECN.MD)                 | Project README (中文)                                                                                                 |
-| [package.json](../package.json)               | Monorepo root config (pnpm workspace)                                                                                 |
-| [turbo.json](../turbo.json)                   | Turborepo build orchestration config                                                                                  |
-| [pnpm-workspace.yaml](../pnpm-workspace.yaml) | pnpm workspace declaration                                                                                            |
-
----
-
-## 9. Assets
-
-| Directory            | Description                             |
-| -------------------- | --------------------------------------- |
-| [images/](./images/) | Embedded image assets for documentation |
+| File                                          | Description                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| [pawhaven.md](./agents/pawhaven.md)           | AI Agent orchestration rules — complexity classification, workflow selection, agent dispatch, operating principles |
+| [README.MD](../README.MD)                     | Project README (English) — see also `.codebuddy/README.md` for .codebuddy-specific docs                            |
+| [READMECN.MD](../READMECN.MD)                 | Project README (中文)                                                                                              |
+| [package.json](../package.json)               | Monorepo root config (pnpm workspace)                                                                              |
+| [turbo.json](../turbo.json)                   | Turborepo build orchestration config                                                                               |
+| [pnpm-workspace.yaml](../pnpm-workspace.yaml) | pnpm workspace declaration                                                                                         |
 
 ---
 
@@ -132,8 +124,8 @@ project_standards.md ───────────────────�
                                                         ├──→ feature-workflows/ (01-auth … 11-bootstrap)
                                                         │      (Per-feature build workflows)
                                                         │
-AGENT.md ──────────────────────────────────────────────┘
-  (AI Agent Constraints)
+pawhaven.md ───────────────────────────────────────────┘
+  (AI Agent Orchestration)
 
 ADR/ ───────────────────────────────────────────────────┐
   (Architecture Decision Records)
