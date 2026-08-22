@@ -1,6 +1,6 @@
 # Skills
 
-The **how-to layer** of the Harness. Skills are composable, domain-specific playbooks that agents load on demand via `use_skill`. Each skill is a standalone `SKILL.MD` with explicit rules and tool invocations — no shell scripts, no prose-only guidance.
+The **how-to layer** of the .codebuddy. Skills are composable, domain-specific playbooks that agents load on demand via `use_skill`. Each skill is a standalone `SKILL.MD` with explicit rules and tool invocations — no shell scripts, no prose-only guidance.
 
 Skills are grouped by domain. Sub-skills (e.g. the review doctors) can be loaded individually or composed.
 

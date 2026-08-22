@@ -1,4 +1,4 @@
-# Harness — PawHaven's Agent-Control Layer
+# .codebuddy — PawHaven's Agent-Control Layer
 
 > The agent-control layer for the PawHaven monorepo. It turns "generate code when asked" into a repeatable engineering process: classify the task, follow a fixed workflow, verify against the real artifact, ship.
 
@@ -6,11 +6,11 @@ Orientation for any agent or session entering this repository. Read this file fi
 
 ## 1. What this is and why it exists
 
-`Harness` is PawHaven's agent-control layer: the markdown files (plus `settings.json`) that define how AI agents work on this repo — who they are, what rules they follow, and which workflow each task runs. Its core idea: **don't maximize code output — maximize verified engineering quality** ("write less, but higher quality code").
+`.codebuddy` is PawHaven's agent-control layer: the markdown files (plus `settings.json`) that define how AI agents work on this repo — who they are, what rules they follow, and which workflow each task runs. Its core idea: **don't maximize code output — maximize verified engineering quality** ("write less, but higher quality code").
 
 It holds: a router (`dispatcher.md`), workflows, principles, agents, rules, docs, and `settings.json`. The files do nothing on their own — CodeBuddy's agent runtime reads them and follows them.
 
-For PawHaven specifically — a React 19 + TypeScript monorepo (`apps/`, `packages/`, `libs/`) with a design system, i18n in `zh-CN` / `en-US` / `de-DE`, and multiple engineering roles — the Harness keeps every agent and subagent on the same engineering discipline while each role stays scoped to its job.
+For PawHaven specifically — a React 19 + TypeScript monorepo (`apps/`, `packages/`, `libs/`) with a design system, i18n in `zh-CN` / `en-US` / `de-DE`, and multiple engineering roles — the .codebuddy keeps every agent and subagent on the same engineering discipline while each role stays scoped to its job.
 
 ## 2. How it's built (the layers)
 
@@ -92,16 +92,16 @@ Two verdicts, either can block: **Tech Review** asks "is the code written well" 
 
 ### Folder map
 
-| Folder                                  | Holds                    | Role in the system                                                                                                                                                               |
-| --------------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`dispatcher.md`](./dispatcher.md)      | The router skill         | The router. Classifies tasks, holds the non-negotiables, the 13-principle index, autonomy policy, subagent defaults, reply rules, workflow registry.                             |
-| [`workflows/`](./workflows/README.md)   | 8 fixed step sequences   | The plans. Copied verbatim into the todo list, executed step by step.                                                                                                            |
-| [`principles/`](./principles/README.md) | 13 leaf skills           | Decision rules. Read in full when applied; a citation must trace to a choice it changed.                                                                                         |
-| [`agents/`](./agents/README.md)         | Role definitions         | Who does what (AGENT, architect, frontend, backend, code-review, ...). Each has scope and escalation.                                                                            |
-| [`skills/`](./skills/README.md)         | Skill folders            | Domain knowledge (react, styling, i18n, code-review doctors). Triggered by `description` in frontmatter.                                                                         |
-| [`rules/`](./rules/README.md)           | Always-on constraints    | Repo facts: architecture, security, testing, documentation, git.                                                                                                                 |
-| [`docs/`](./docs/README.md)             | Shared reference         | Product strategy, system architecture, design spec, agent-communication protocol, task-log format, standards.                                                                    |
-| `task-log.md` (runtime, git-ignored)    | Single task progress log | One temporary runtime file at the Harness root, appended per task and per stage. The next stage references it; a stalled task is traced through it; cleared on the user's "Yes". |
+| Folder                                  | Holds                    | Role in the system                                                                                                                                                                  |
+| --------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`dispatcher.md`](./dispatcher.md)      | The router skill         | The router. Classifies tasks, holds the non-negotiables, the 13-principle index, autonomy policy, subagent defaults, reply rules, workflow registry.                                |
+| [`workflows/`](./workflows/README.md)   | 8 fixed step sequences   | The plans. Copied verbatim into the todo list, executed step by step.                                                                                                               |
+| [`principles/`](./principles/README.md) | 13 leaf skills           | Decision rules. Read in full when applied; a citation must trace to a choice it changed.                                                                                            |
+| [`agents/`](./agents/README.md)         | Role definitions         | Who does what (AGENT, architect, frontend, backend, code-review, ...). Each has scope and escalation.                                                                               |
+| [`skills/`](./skills/README.md)         | Skill folders            | Domain knowledge (react, styling, i18n, code-review doctors). Triggered by `description` in frontmatter.                                                                            |
+| [`rules/`](./rules/README.md)           | Always-on constraints    | Repo facts: architecture, security, testing, documentation, git.                                                                                                                    |
+| [`docs/`](./docs/README.md)             | Shared reference         | Product strategy, system architecture, design spec, agent-communication protocol, task-log format, standards.                                                                       |
+| `task-log.md` (runtime, git-ignored)    | Single task progress log | One temporary runtime file at the .codebuddy root, appended per task and per stage. The next stage references it; a stalled task is traced through it; cleared on the user's "Yes". |
 
 Each folder ships a `README.md` — read the folder README before diving into the files inside.
 
@@ -131,7 +131,7 @@ Every task, regardless of entry point (user prompt, `/pawhaven-mode`, or a dispa
 
 - **Verbatim-todo discipline** — workflow steps land in the todo list word-for-word. Each workflow ends in an evidence-gated feedback loop: Step 1 failing repro → Step 2 pass (bug-fix), Step 1 pinned behavior → Step 2 still green (refactoring), Step 1 baseline trace → Step 2 post-fix trace (perf).
 - **Verification is the religion** — _prove-it-works_: verify against the real artifact (typecheck, tests, build, rendered surface), never against "it compiles".
-- **Task log (single runtime file)** — all progress goes to `Harness/task-log.md` (git-ignored, format: `docs/task-log.md`). The orchestrator appends a `## Task:` section per task and a digest after every stage; the next stage references it, and a stalled task is traced through it (Step 1 Stuck Log → Step 2 last Phase → Step 3 Handoff). When a task completes, the orchestrator asks **"是否需要清空运行log？"** — Yes → clear, No → keep.
+- **Task log (single runtime file)** — all progress goes to `.codebuddy/task-log.md` (git-ignored, format: `docs/task-log.md`). The orchestrator appends a `## Task:` section per task and a digest after every stage; the next stage references it, and a stalled task is traced through it (Step 1 Stuck Log → Step 2 last Phase → Step 3 Handoff). When a task completes, the orchestrator asks **"是否需要清空运行log？"** — Yes → clear, No → keep.
 - **Review is two passes** — Tech Review (best practices, anti-patterns) and Pattern Review (fits the project's patterns and architecture). Two verdicts, either can block; blocking findings loop back to the implementer.
 - **Subagent discipline** — every subagent routes through the shared agent type (`AGENT.md`) so it inherits the same methodology; the parent owns every subagent's work, reviews the diff itself, and writes its own summary.
 - **Principles are decision-forcing** — laziness protocol (bias to delete), subtract-before-you-add, model-the-domain, prove-it-works, never-block-on-the-human, migrate-callers-then-delete-legacy.
@@ -160,7 +160,7 @@ The catalog above is the one-line summary — for the full steps and evidence ga
 
 1. **This file** — orientation.
 2. **`docs/agent-communication-protocol.md`** — the structured output formats every agent uses to interoperate.
-3. **`docs/task-log.md`** — the single runtime progress file (`Harness/task-log.md`): what each stage produced, and where to look when a task stalls.
+3. **`docs/task-log.md`** — the single runtime progress file (`.codebuddy/task-log.md`): what each stage produced, and where to look when a task stalls.
 4. **`docs/README.md`** — the documentation index (product strategy, architecture, design spec) for domain context.
 5. **The folder READMEs** — `workflows/` · `principles/` · `agents/` · `skills/` · `rules/` (each directory ships one; read it before the files inside). The router (`dispatcher.md`) lives at the root, introduced in Section 2 and indexed in Section 7.
 6. **`rules/`** — the always-on constraints for the current task.

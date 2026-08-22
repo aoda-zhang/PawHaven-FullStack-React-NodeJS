@@ -265,7 +265,7 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 
 ### 3.5 Task Log — The Progress Document
 
-All workflow progress goes to **one** temporary runtime file, `Harness/task-log.md` (Harness root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never committed. The orchestrator alone writes it:
+All workflow progress goes to **one** temporary runtime file, `.codebuddy/task-log.md` (.codebuddy root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never committed. The orchestrator alone writes it:
 
 - **Per task**: append a new `## Task: {Task ID}` section when the plan is approved.
 - **Per stage**: append a `## Phase:` digest (what the agent produced, validation result, whether its Step Completion Checklist was present) plus a pointer to the full structured report above.

@@ -1,16 +1,16 @@
-# Harness Validator
+# .codebuddy Validator
 
 > **Applies to**: CI / pre-commit / manual validation.
-> **Purpose**: Define integrity checks that verify Harness docs, rules, and workflows are internally consistent and up to date.
+> **Purpose**: Define integrity checks that verify .codebuddy docs, rules, and workflows are internally consistent and up to date.
 
 ## Why This Exists
 
-The Harness is a living system. As agents edit docs, rename files, and update references, the following issues accumulate:
+The .codebuddy is a living system. As agents edit docs, rename files, and update references, the following issues accumulate:
 
 - Broken relative links (e.g., `../AGENT.md` that no longer exists)
 - Stale references to renamed files (e.g., `main-agent.md` → `AGENT.md`)
 - Missing directories referenced by docs (e.g., `ADR/`)
-- Agent names in docs that don't match actual `*.md` files in `Harness/agents/`
+- Agent names in docs that don't match actual `*.md` files in `<AGENT_DIR>/agents/` (where `<AGENT_DIR>` defaults to `.codebuddy`)
 - Workflow docs referencing steps that no longer exist
 
 This rule defines the checks. Run them before every commit, and fix failures immediately.
@@ -20,11 +20,11 @@ This rule defines the checks. Run them before every commit, and fix failures imm
 ### 1. Link Integrity
 
 ```bash
-# Check all relative .md links in Harness/ for broken references
+# Check all relative .md links in <AGENT_DIR>/ for broken references (default: .codebuddy)
 # Tools: markdown-link-check, lychee, or a simple grep + file-exists loop
 ```
 
-- Every `[text](./path)` or `[text](../path)` in `Harness/**/*.md` must resolve to an existing file.
+- Every `[text](./path)` or `[text](../path)` in `<AGENT_DIR>/**/*.md` must resolve to an existing file (where `<AGENT_DIR>` defaults to `.codebuddy`).
 - Every `see <file>.md` prose reference must resolve.
 - External URLs are exempt but should be checked periodically.
 
@@ -32,36 +32,36 @@ This rule defines the checks. Run them before every commit, and fix failures imm
 
 ```bash
 # List all agent files
-ls Harness/agents/*.md
+ls "$AGENT_DIR"/agents/*.md
 # Extract agent names from filenames
 # Verify every agent name referenced in docs matches a real file
 ```
 
-- Agent names referenced in `AGENT.md`, `dispatcher.md`, `workflows/*.md`, and `docs/README.md` must exist as `Harness/agents/<name>.md`.
-- Example: if `AGENT.md` references `frontend` agent, `Harness/agents/frontend.md` must exist.
+- Agent names referenced in `AGENT.md`, `dispatcher.md`, `workflows/*.md`, and `docs/README.md` must exist as `<AGENT_DIR>/agents/<name>.md` (default `<AGENT_DIR>` = `.codebuddy`).
+- Example: if `AGENT.md` references `frontend` agent, `<AGENT_DIR>/agents/frontend.md` must exist.
 
 ### 3. Workflow Step Consistency
 
-- Every workflow in `Harness/workflows/*.md` must have numbered steps that are internally consistent.
+- Every workflow in `<AGENT_DIR>/workflows/*.md` must have numbered steps that are internally consistent (default `<AGENT_DIR>` = `.codebuddy`).
 - Workflows referenced in `AGENT.md` §2.4 must exist as files.
 - Workflow `description` frontmatter must match the actual workflow content.
 
 ### 4. Directory Existence
 
-- `Harness/docs/ADR/` must exist (create with template if missing).
-- `Harness/agents/` must contain at least: `frontend.md`, `backend.md`, `testing.md`, `code-review.md`, `architect.md`, `knowledge-update.md`.
-- `Harness/workflows/` must contain at least: `feature-development.md`, `bug-fix.md`, `handoff.md`.
+- `<AGENT_DIR>/docs/ADR/` must exist (create with template if missing).
+- `<AGENT_DIR>/agents/` must contain at least: `frontend.md`, `backend.md`, `testing.md`, `code-review.md`, `architect.md`, `knowledge-update.md`.
+- `<AGENT_DIR>/workflows/` must contain at least: `feature-development.md`, `bug-fix.md`, `handoff.md`.
 
 ### 5. Cross-Reference Consistency
 
-- `docs/README.md` must reference all docs in `Harness/docs/` (or explicitly exclude them with a reason).
-- `agents/README.md` must reference all agents in `Harness/agents/`.
-- `workflows/README.md` must reference all workflows in `Harness/workflows/`.
-- `rules/README.md` must reference all rules in `Harness/rules/`.
+- `docs/README.md` must reference all docs in `<AGENT_DIR>/docs/` (or explicitly exclude them with a reason).
+- `agents/README.md` must reference all agents in `<AGENT_DIR>/agents/`.
+- `workflows/README.md` must reference all workflows in `<AGENT_DIR>/workflows/`.
+- `rules/README.md` must reference all rules in `<AGENT_DIR>/rules/`.
 
 ### 6. Frontmatter Validity
 
-Every `.md` file in `Harness/` should have valid YAML frontmatter:
+Every `.md` file in `<AGENT_DIR>/` should have valid YAML frontmatter (default `<AGENT_DIR>` = `.codebuddy`):
 
 ```yaml
 ---
@@ -87,11 +87,11 @@ description: >
 Add a step to your CI pipeline:
 
 ```yaml
-- name: Harness Integrity Check
+- name: .codebuddy Integrity Check
   run: |
     ./scripts/harness-check.sh
     if [ $? -ne 0 ]; then
-      echo "Harness integrity check failed. Run ./scripts/harness-check.sh locally to fix."
+      echo ".codebuddy integrity check failed. Run ./scripts/harness-check.sh locally to fix."
       exit 1
     fi
 ```
@@ -104,7 +104,7 @@ repos:
   - repo: local
     hooks:
       - id: harness-check
-        name: Harness Integrity Check
+        name: .codebuddy Integrity Check
         entry: ./scripts/harness-check.sh
         language: system
         pass_filenames: false
@@ -122,22 +122,29 @@ When a check fails:
 
 ## Check Script Reference Implementation
 
+> The directory name is parameterized via `AGENT_DIR` (defaults to `.codebuddy`). If you rename the agent-control directory, set `AGENT_DIR=your-name` before running the script — no other edits needed.
+
 ```bash
 #!/bin/bash
 # scripts/harness-check.sh — Reference implementation
 # Run from repo root
+#
+# AGENT_DIR points at the agent-control directory. Change this single
+# variable if the directory is renamed (e.g. to .cursorrules, .claude, etc.).
 
 set -e
 
+AGENT_DIR="${AGENT_DIR:-.codebuddy}"
+
 ERRORS=0
 
-echo "=== Harness Integrity Check ==="
+echo "=== ${AGENT_DIR} Integrity Check ==="
 
 # 1. Check for stale main-agent.md references
 echo "[1/6] Checking for stale main-agent.md references..."
-if grep -r "main-agent\.md" Harness/ --include="*.md" > /dev/null 2>&1; then
+if grep -r "main-agent\.md" "$AGENT_DIR/" --include="*.md" > /dev/null 2>&1; then
   echo "  FAIL: Found stale main-agent.md references:"
-  grep -rn "main-agent\.md" Harness/ --include="*.md" || true
+  grep -rn "main-agent\.md" "$AGENT_DIR/" --include="*.md" || true
   ERRORS=$((ERRORS + 1))
 else
   echo "  PASS"
@@ -145,8 +152,8 @@ fi
 
 # 2. Check AGENT.md exists
 echo "[2/6] Checking AGENT.md exists..."
-if [ ! -f "Harness/AGENT.md" ]; then
-  echo "  FAIL: Harness/AGENT.md does not exist"
+if [ ! -f "$AGENT_DIR/AGENT.md" ]; then
+  echo "  FAIL: $AGENT_DIR/AGENT.md does not exist"
   ERRORS=$((ERRORS + 1))
 else
   echo "  PASS"
@@ -154,7 +161,7 @@ fi
 
 # 3. Check required directories exist
 echo "[3/6] Checking required directories..."
-for dir in "Harness/docs/ADR" "Harness/agents" "Harness/workflows" "Harness/rules"; do
+for dir in "$AGENT_DIR/docs/ADR" "$AGENT_DIR/agents" "$AGENT_DIR/workflows" "$AGENT_DIR/rules"; do
   if [ ! -d "$dir" ]; then
     echo "  FAIL: $dir does not exist"
     ERRORS=$((ERRORS + 1))
@@ -165,8 +172,8 @@ echo "  PASS"
 # 4. Check required agent files exist
 echo "[4/6] Checking required agent files..."
 for agent in frontend backend testing code-review architect knowledge-update; do
-  if [ ! -f "Harness/agents/${agent}.md" ]; then
-    echo "  FAIL: Harness/agents/${agent}.md does not exist"
+  if [ ! -f "$AGENT_DIR/agents/${agent}.md" ]; then
+    echo "  FAIL: $AGENT_DIR/agents/${agent}.md does not exist"
     ERRORS=$((ERRORS + 1))
   fi
 done
@@ -175,8 +182,8 @@ echo "  PASS"
 # 5. Check required workflow files exist
 echo "[5/6] Checking required workflow files..."
 for workflow in feature-development bug-fix handoff; do
-  if [ ! -f "Harness/workflows/${workflow}.md" ]; then
-    echo "  FAIL: Harness/workflows/${workflow}.md does not exist"
+  if [ ! -f "$AGENT_DIR/workflows/${workflow}.md" ]; then
+    echo "  FAIL: $AGENT_DIR/workflows/${workflow}.md does not exist"
     ERRORS=$((ERRORS + 1))
   fi
 done

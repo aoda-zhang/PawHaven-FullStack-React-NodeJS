@@ -4,8 +4,8 @@ logs
 yarn-debug.log*
 lerna-debug.log*
 
-# Harness runtime task log (single-file, orchestrator-written, never committed)
-Harness/task-log.md
+# .codebuddy runtime task log (single-file, orchestrator-written, never committed)
+.codebuddy/task-log.md
 react-app-env.d.ts
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

@@ -68,7 +68,7 @@ packages/
 | `backend`          | `apps/backend/*`, Prisma schemas, NestJS modules, event handling                                                                  | Any API work, service logic, database changes, auth flow, module creation                       |
 | `testing`          | All test files, test strategy, coverage                                                                                           | After implementation completes, before code review                                              |
 | `code-review`      | All changed files                                                                                                                 | After testing passes, before declaring done                                                     |
-| `knowledge-update` | `Harness/docs/`, root `README.MD`, `READMECN.MD`                                                                                  | Auto-triggers on knowledge file changes; manually invoke if architecture docs need update       |
+| `knowledge-update` | `.codebuddy/docs/`, root `README.MD`, `READMECN.MD`                                                                               | Auto-triggers on knowledge file changes; manually invoke if architecture docs need update       |
 
 **Workflow membership (per subagent):** when you dispatch, name the workflow segment the subagent runs in. The subagent's own `### 1a. Wiring` section states it; you confirm it in the dispatch prompt:
 
@@ -93,20 +93,20 @@ packages/
 
 ### 2.4 Workflow Templates (reference for pipeline decisions)
 
-| Workflow            | File                                       | When to Use                                                                 |
-| ------------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
-| Investigation       | `Harness/workflows/investigation.md`       | Read-only questions: how/why/are-we-sure                                    |
-| Feature Development | `Harness/workflows/feature-development.md` | New feature (default pipeline)                                              |
-| Bug Fix             | `Harness/workflows/bug-fix.md`             | Bug fixes and patches                                                       |
-| Refactoring         | `Harness/workflows/refactoring.md`         | Behavior-preserving structure/shape changes                                 |
-| Perf Issue          | `Harness/workflows/perf-issue.md`          | Measured slowness, trace and optimize                                       |
-| Design Decision     | `Harness/workflows/design-decision.md`     | Architecture/data-model/API choice                                          |
-| Architecture Change | `Harness/workflows/architecture-change.md` | Service split, module restructure, paradigm change                          |
-| Review Handoff      | `Harness/workflows/handoff.md`             | Terminal step of most other workflows: verified diff, stop for human review |
+| Workflow            | File                                          | When to Use                                                                 |
+| ------------------- | --------------------------------------------- | --------------------------------------------------------------------------- |
+| Investigation       | `.codebuddy/workflows/investigation.md`       | Read-only questions: how/why/are-we-sure                                    |
+| Feature Development | `.codebuddy/workflows/feature-development.md` | New feature (default pipeline)                                              |
+| Bug Fix             | `.codebuddy/workflows/bug-fix.md`             | Bug fixes and patches                                                       |
+| Refactoring         | `.codebuddy/workflows/refactoring.md`         | Behavior-preserving structure/shape changes                                 |
+| Perf Issue          | `.codebuddy/workflows/perf-issue.md`          | Measured slowness, trace and optimize                                       |
+| Design Decision     | `.codebuddy/workflows/design-decision.md`     | Architecture/data-model/API choice                                          |
+| Architecture Change | `.codebuddy/workflows/architecture-change.md` | Service split, module restructure, paradigm change                          |
+| Review Handoff      | `.codebuddy/workflows/handoff.md`             | Terminal step of most other workflows: verified diff, stop for human review |
 
 ### 2.5 Engineering Methodology
 
-The operating model for this repo is defined in `Harness/dispatcher.md` (the router skill) and the leaf principles in `Harness/principles/`. You inherit and enforce it when dispatching:
+The operating model for this repo is defined in `.codebuddy/dispatcher.md` (the router skill) and the leaf principles in `.codebuddy/principles/`. You inherit and enforce it when dispatching:
 
 - **Every dispatched subagent matches the task to a workflow** (Section 2.4) and **copies its steps verbatim into its todo list** before any task-specific reasoning. A skipped step stays in the list as `skip: <reason>`. Silently dropping named steps is a failure, not a judgment call.
 - **Every multi-step task starts with the principles read.** The subagent reads the principles index in the mode skill in full, and names in its report which principle changed which decision.
@@ -139,7 +139,7 @@ The operating model for this repo is defined in `Harness/dispatcher.md` (the rou
 
 **This is the DEFAULT behavior for ALL feature requests.** When you receive a feature request:
 
-1. **Classify** — Use your built-in service map (Section 2.1) and subagent roster (Section 2.2) to classify the request. If uncertain, skim `Harness/docs/PawHaven-System-Architecture-Overview.md`.
+1. **Classify** — Use your built-in service map (Section 2.1) and subagent roster (Section 2.2) to classify the request. If uncertain, skim `.codebuddy/docs/PawHaven-System-Architecture-Overview.md`.
 2. **Assess complexity** — Route per §3.0: Trivial / Standard / Architectural.
 3. **Plan** — Output which agents are needed and their **high-level task description** (one sentence each). Do NOT break into files, APIs, or implementation details — subagents own that.
 4. **Present** — Show the agent-level plan to the user, including the complexity classification and pipeline.
@@ -252,7 +252,7 @@ STEP 0: CLASSIFY & PLAN
   5. Produce agent-level plan (Section 3.2 format)
   6. Present to user (include complexity classification)
   7. WAIT for explicit confirmation (Standard/Architectural); proceed directly (Trivial)
-  8. On approval (or immediately for Trivial), open the task log: Harness/task-log.md, append
+  8. On approval (or immediately for Trivial), open the task log: .codebuddy/task-log.md, append
      a new "## Task: YYYY-MM-DD-{slug}" section (§3.9)
         │
 STEP 1: ARCHITECT (complex changes only)
@@ -352,7 +352,7 @@ Features can run in parallel ONLY when:
 
 ### 3.9 Task Log — The Progress Document
 
-All workflow progress goes to **one** temporary runtime file, `Harness/task-log.md` (Harness root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never commit it. You own it:
+All workflow progress goes to **one** temporary runtime file, `.codebuddy/task-log.md` (.codebuddy root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never commit it. You own it:
 
 - **Open** it when the plan is approved (STEP 0): append a new `## Task: {YYYY-MM-DD-{slug}}` section with the header + plan.
 - **Append** a `## Phase:` section after every subagent stage: what the agent produced, the validation result, and whether its Step Completion Checklist was present.
@@ -451,11 +451,11 @@ pnpm build
 
 Your built-in service map (Section 2.1) and subagent roster (Section 2.2) cover most classification needs. Only read external docs when:
 
-| Situation                                | Read                                                    |
-| ---------------------------------------- | ------------------------------------------------------- |
-| Uncertain which service owns a feature   | `Harness/docs/PawHaven-System-Architecture-Overview.md` |
-| Need to understand the full service map  | (same — skim the overview)                              |
-| Need to parse subagent structured output | `Harness/docs/agent-communication-protocol.md`          |
+| Situation                                | Read                                                       |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| Uncertain which service owns a feature   | `.codebuddy/docs/PawHaven-System-Architecture-Overview.md` |
+| Need to understand the full service map  | (same — skim the overview)                                 |
+| Need to parse subagent structured output | `.codebuddy/docs/agent-communication-protocol.md`          |
 
 **Subagents own their domain docs** — they read `Frontend-Architecture.md`, `Backend-Architecture.md`, `figma-design-spec.md`, etc. You don't need to.
 

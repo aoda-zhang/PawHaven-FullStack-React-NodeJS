@@ -292,7 +292,7 @@ Verify architecture decisions are documented:
 
 ```bash
 # List existing ADRs
-ls Harness/docs/ADR/
+ls .codebuddy/docs/ADR/
 ```
 
 **What to look for:**

@@ -95,7 +95,7 @@
 | File                                          | Description                                                                                                           |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | [AGENT.md](../AGENT.md)                       | AI Agent development rules — layering constraints, auth architecture notes, operating principles, validation commands |
-| [README.MD](../README.MD)                     | Project README (English) — see also `Harness/README.md` for Harness-specific docs                                     |
+| [README.MD](../README.MD)                     | Project README (English) — see also `.codebuddy/README.md` for .codebuddy-specific docs                               |
 | [READMECN.MD](../READMECN.MD)                 | Project README (中文)                                                                                                 |
 | [package.json](../package.json)               | Monorepo root config (pnpm workspace)                                                                                 |
 | [turbo.json](../turbo.json)                   | Turborepo build orchestration config                                                                                  |

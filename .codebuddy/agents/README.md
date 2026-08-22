@@ -1,6 +1,6 @@
 # Agents
 
-The **execution layer** of the Harness. Each agent is a named role that the orchestrator (`AGENT`) spawns via team mode or sync mode. Every agent follows a strict workflow (numbered steps, no skipping), owns its report format (see `../docs/agent-communication-protocol.md`), and returns a Step Completion Checklist as evidence.
+The **execution layer** of the .codebuddy. Each agent is a named role that the orchestrator (`AGENT`) spawns via team mode or sync mode. Every agent follows a strict workflow (numbered steps, no skipping), owns its report format (see `../docs/agent-communication-protocol.md`), and returns a Step Completion Checklist as evidence.
 
 ## The Orchestrator
 

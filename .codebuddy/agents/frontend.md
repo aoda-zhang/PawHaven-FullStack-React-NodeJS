@@ -174,9 +174,9 @@ Before writing a single line of code, you analyze. Here's what you read and why:
 
 ### 3.1 Architecture Docs (ALWAYS read first)
 
-| Doc                                              | When           | Purpose                                                                                                              |
-| ------------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `Harness/docs/PawHaven-Frontend-Architecture.md` | **Every task** | Understand feature modules, packages, routing, state management, design tokens, i18n architecture, module boundaries |
+| Doc                                                 | When           | Purpose                                                                                                              |
+| --------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `.codebuddy/docs/PawHaven-Frontend-Architecture.md` | **Every task** | Understand feature modules, packages, routing, state management, design tokens, i18n architecture, module boundaries |
 
 ### 3.1b Figma Design — Prefer Live Page, Fallback to Spec
 
@@ -235,15 +235,15 @@ If the live page was unavailable, use the markdown spec as the primary design so
 
 ### 3.3 Skill Standards (read relevant ones before implementation)
 
-| Skill File                                         | When                    | Applies To                                                         |
-| -------------------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
-| `Harness/skills/frontend/react/SKILL.MD`           | Any new component/page  | State decision tree, effects, performance, a11y, error boundaries  |
-| `Harness/skills/frontend/redux/SKILL.MD`           | Redux state changes     | Typed hooks, createSlice, createAsyncThunk, selectors, persist     |
-| `Harness/skills/frontend/react-query/SKILL.MD`     | API data fetching       | Query key factories, queryOptions, useMutation, optimistic updates |
-| `Harness/skills/frontend/react-hook-form/SKILL.MD` | Any form                | Zod schemas, useForm, useFieldArray, validation, submission        |
-| `Harness/skills/frontend/i18n/SKILL.MD`            | Any user-facing content | Translation keys, 3-locale sync, no hardcoded strings              |
-| `Harness/skills/frontend/style/SKILL.MD`           | Any styling             | Design tokens, Tailwind, no magic numbers, no raw colors           |
-| `Harness/skills/frontend/component/SKILL.MD`       | New shared components   | Component patterns, composition, API design                        |
+| Skill File                                            | When                    | Applies To                                                         |
+| ----------------------------------------------------- | ----------------------- | ------------------------------------------------------------------ |
+| `.codebuddy/skills/frontend/react/SKILL.MD`           | Any new component/page  | State decision tree, effects, performance, a11y, error boundaries  |
+| `.codebuddy/skills/frontend/redux/SKILL.MD`           | Redux state changes     | Typed hooks, createSlice, createAsyncThunk, selectors, persist     |
+| `.codebuddy/skills/frontend/react-query/SKILL.MD`     | API data fetching       | Query key factories, queryOptions, useMutation, optimistic updates |
+| `.codebuddy/skills/frontend/react-hook-form/SKILL.MD` | Any form                | Zod schemas, useForm, useFieldArray, validation, submission        |
+| `.codebuddy/skills/frontend/i18n/SKILL.MD`            | Any user-facing content | Translation keys, 3-locale sync, no hardcoded strings              |
+| `.codebuddy/skills/frontend/style/SKILL.MD`           | Any styling             | Design tokens, Tailwind, no magic numbers, no raw colors           |
+| `.codebuddy/skills/frontend/component/SKILL.MD`       | New shared components   | Component patterns, composition, API design                        |
 
 ---
 
@@ -321,7 +321,7 @@ connect to backend APIs."
 │ STEP 1: ANALYZE                                     │
 │                                                     │
 │ 1a. Read architecture docs                          │
-│     → read_file Harness/docs/PawHaven-      │
+│     → read_file .codebuddy/docs/PawHaven-      │
 │       Frontend-Architecture.md                       │
 │                                                     │
 │ 1b. Figma design: VIEW LIVE PAGE (if UI task)       │
@@ -345,11 +345,11 @@ connect to backend APIs."
 │       (what reusable components exist?)              │
 │                                                     │
 │ 1d. Read skill standards (if needed)                 │
-│     → read_file Harness/skills/frontend/react/     │
+│     → read_file .codebuddy/skills/frontend/react/     │
 │       SKILL.MD                                       │
-│     → read_file Harness/skills/frontend/i18n/      │
+│     → read_file .codebuddy/skills/frontend/i18n/      │
 │       SKILL.MD                                       │
-│     → read_file Harness/skills/frontend/style/     │
+│     → read_file .codebuddy/skills/frontend/style/     │
 │       SKILL.MD                                       │
 │                                                     │
 │ Output: you now understand what exists, what's       │

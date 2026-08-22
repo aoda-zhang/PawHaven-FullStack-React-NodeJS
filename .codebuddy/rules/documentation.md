@@ -13,7 +13,7 @@
 
 ## 2. Architecture Documentation
 
-Location: `Harness/docs/`
+Location: `.codebuddy/docs/`
 
 - `PawHaven-System-Architecture-Overview.md` — Complete system C4 model
 - `PawHaven-Frontend-Architecture.md` — Frontend architecture and conventions
@@ -24,17 +24,17 @@ These docs are the **single source of truth** for the project architecture. All 
 
 ## 3. ADR (Architecture Decision Records)
 
-Location: `Harness/docs/ADR/`
+Location: `.codebuddy/docs/ADR/`
 
 - ADRs document WHY a decision was made, not just WHAT was decided.
 - Template: `ADR/ADR-001-template.md`.
 - Every ADR includes: Context, Decision, Consequences, Alternatives Considered.
 - Mark superseded ADRs — never delete old ADRs.
-- **If `Harness/docs/ADR/` does not exist, create it when the first ADR is needed.** The directory is part of the permanent documentation structure.
+- **If `.codebuddy/docs/ADR/` does not exist, create it when the first ADR is needed.** The directory is part of the permanent documentation structure.
 
 ## 4. Workflow Documentation
 
-Location: `Harness/workflows/`
+Location: `.codebuddy/workflows/`
 
 - Feature development, bug fix, and architecture change workflows.
 - Each workflow defines: pipeline steps, decision points, failure recovery.
@@ -57,8 +57,8 @@ Location: Project root `README.MD` and `READMECN.MD`
 
 | Type          | Location                  | Persistence                 | Trigger                                              | Examples                                                       |
 | ------------- | ------------------------- | --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
-| **Permanent** | `Harness/docs/`           | Git-tracked, long-lived     | Architecture changes, new ADRs, API contract changes | System architecture, ADRs, feature workflows, design specs     |
-| **Temporary** | `Harness/task-log.md`     | Git-ignored, session-scoped | Every task execution                                 | Runtime logs, task execution traces                            |
+| **Permanent** | `.codebuddy/docs/`        | Git-tracked, long-lived     | Architecture changes, new ADRs, API contract changes | System architecture, ADRs, feature workflows, design specs     |
+| **Temporary** | `.codebuddy/task-log.md`  | Git-ignored, session-scoped | Every task execution                                 | Runtime logs, task execution traces                            |
 | **Handoff**   | Workflows handoff summary | Ephemeral, per-task         | End of every task                                    | What changed, verification evidence, Doc Impact classification |
 
-> **Rule**: Permanent docs live in `Harness/docs/` and are maintained by the `knowledge-update` agent. Temporary logs live in `task-log.md` and are cleared per session. Never confuse the two — a task log is not documentation, and documentation is not a task log.
+> **Rule**: Permanent docs live in `.codebuddy/docs/` and are maintained by the `knowledge-update` agent. Temporary logs live in `task-log.md` and are cleared per session. Never confuse the two — a task log is not documentation, and documentation is not a task log.

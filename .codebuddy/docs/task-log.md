@@ -1,8 +1,8 @@
 # Task Log — The Progress Document
 
-> **One temporary runtime file**: `Harness/task-log.md` (Harness root, same level as `README.md`).
+> **One temporary runtime file**: `.codebuddy/task-log.md` (.codebuddy root, same level as `README.md`).
 > It records what each stage produced, so the next stage can reference it, and a stuck task can be traced back through it.
-> It is **git-ignored** (`.gitignore` → `Harness/task-log.md`) and never committed.
+> It is **git-ignored** (`.gitignore` → `.codebuddy/task-log.md`) and never committed.
 
 ## 1. Who owns it
 
@@ -12,21 +12,21 @@ Keeping it orchestrator-only preserves hub-and-spoke (`docs/agent-communication-
 
 ## 2. When it is created and updated
 
-| Event                                             | Action                                                                               |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| Task accepted, plan approved (§3.1 of `AGENT.md`) | Append a new `## Task: {Task ID}` section to `Harness/task-log.md` (header + plan)   |
-| Each subagent stage completes                     | Append a `## Phase:` section (digest + pointer + validation + checklist status)      |
-| A subagent times out or is re-spawned             | Append to the `## Stuck Log`                                                         |
-| A blocking finding routes back to an implementer  | Record the loop: finding → agent → re-fix → retest → re-review                       |
-| Task completed (summary presented to the user)    | Append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"** |
-| User answers **Yes**                              | Clear the file contents (keep only the `# Task Log — The Progress Document` header)  |
-| User answers **No**                               | Keep the file as-is; the next task appends a new `## Task:` section below            |
+| Event                                             | Action                                                                                |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Task accepted, plan approved (§3.1 of `AGENT.md`) | Append a new `## Task: {Task ID}` section to `.codebuddy/task-log.md` (header + plan) |
+| Each subagent stage completes                     | Append a `## Phase:` section (digest + pointer + validation + checklist status)       |
+| A subagent times out or is re-spawned             | Append to the `## Stuck Log`                                                          |
+| A blocking finding routes back to an implementer  | Record the loop: finding → agent → re-fix → retest → re-review                        |
+| Task completed (summary presented to the user)    | Append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"**  |
+| User answers **Yes**                              | Clear the file contents (keep only the `# Task Log — The Progress Document` header)   |
+| User answers **No**                               | Keep the file as-is; the next task appends a new `## Task:` section below             |
 
 The task log is a **runtime artifact**, not documentation: it carries progress between stages and explains a stalled task. Because it is git-ignored, nothing deletes or archives it automatically — the human decides. Sequential tasks may accumulate in the single file until the human says "clear".
 
 ## 3. File structure
 
-One file, many tasks. Each task is a top-level `## Task: {Task ID}` section inside `Harness/task-log.md`:
+One file, many tasks. Each task is a top-level `## Task: {Task ID}` section inside `.codebuddy/task-log.md`:
 
 ```markdown
 # Task Log — The Progress Document

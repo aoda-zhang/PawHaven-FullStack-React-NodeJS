@@ -1,6 +1,6 @@
 # Rules
 
-The **always-on constraints** of the Harness. Rules are repo facts — they do not change per task. Unlike principles (decision-forcing _why_), rules are hard constraints (_what_ must always hold). The orchestrator loads the rules relevant to the current task; subagents must obey them without being reminded.
+The **always-on constraints** of the .codebuddy. Rules are repo facts — they do not change per task. Unlike principles (decision-forcing _why_), rules are hard constraints (_what_ must always hold). The orchestrator loads the rules relevant to the current task; subagents must obey them without being reminded.
 
 | Rule                                        | Covers                                                                                                  |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------- |

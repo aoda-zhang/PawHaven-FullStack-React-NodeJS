@@ -6,7 +6,7 @@
 
 - `develop` — Main development branch. All features merge here.
 - Feature branches: `feature/<short-description>` or `fix/<short-description>`.
-- Never commit directly to `develop` without a feature branch (except for `Harness/` configuration).
+- Never commit directly to `develop` without a feature branch (except for `.codebuddy/` configuration).
 
 ## 2. Commit Conventions
 
@@ -34,7 +34,7 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update archi
 ## 4. Commit Hygiene
 
 - One commit per logical change. Avoid mega-commits.
-- `Harness/` changes: committed as `docs(agents): ...` or `chore(config): ...`.
+- `.codebuddy/` changes: committed as `docs(agents): ...` or `chore(config): ...`.
 - Code changes: committed as `feat|fix|refactor(scope): ...`.
 
 ## 5. Pushes and PRs
@@ -46,5 +46,5 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update archi
 ## 6. Agent's Git Scope
 
 - Agents NEVER commit code unless the user explicitly requests it.
-- Agents CAN stage and commit `Harness/` configuration changes (their own domain).
+- Agents CAN stage and commit `.codebuddy/` configuration changes (their own domain).
 - The orchestrator does NOT commit — only subagents may commit their own work.

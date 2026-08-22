@@ -1,6 +1,6 @@
 # Principles
 
-The **decision-forcing layer** of the Harness. Principles are leaf skills: small, one-idea files that agents must _apply by name_ when a decision point matches them. When a workflow or review changes a decision, the agent must name the principle that changed it.
+The **decision-forcing layer** of the .codebuddy. Principles are leaf skills: small, one-idea files that agents must _apply by name_ when a decision point matches them. When a workflow or review changes a decision, the agent must name the principle that changed it.
 
 Principles are **thin and always loaded conceptually** — they are not workflows, they are the _why_ behind decisions. Workflows and agents reference them by name (`principle: prove-it-works`).
 

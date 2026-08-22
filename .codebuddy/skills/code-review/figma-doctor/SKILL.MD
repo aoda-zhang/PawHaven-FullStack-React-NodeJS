@@ -87,7 +87,7 @@ Parse the HTML to identify:
 ### Step 4: Cross-reference with design spec (cheap)
 
 ```
-read_file: Harness/docs/figma-design-spec.md
+read_file: .codebuddy/docs/figma-design-spec.md
 ```
 
 Use the spec to confirm exact values that may not be obvious from HTML:
@@ -174,7 +174,7 @@ figma-doctor runs FIRST
 
 If Playwright MCP cannot access the live Figma page:
 
-1. Read `Harness/docs/figma-design-spec.md`.
+1. Read `.codebuddy/docs/figma-design-spec.md`.
 2. Locate the {target} section in the spec.
 3. Read the implementation files for the same {target}.
 4. Compare structure, content, tokens, and responsive behavior from the spec.
@@ -195,5 +195,5 @@ If Playwright MCP cannot access the live Figma page:
 
 ## Related
 
-- Design spec source: `Harness/docs/figma-design-spec.md`
+- Design spec source: `.codebuddy/docs/figma-design-spec.md`
 - After gate passes, run: [style-doctor](./style-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD)

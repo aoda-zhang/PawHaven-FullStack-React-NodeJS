@@ -40,7 +40,7 @@ Proposed → Accepted → [Deprecated | Superseded]
 ## Directory Structure
 
 ```
-Harness/docs/ADR/
+.codebuddy/docs/ADR/
 ├── README.md              # This file
 ├── ADR-001-template.md    # Template for new ADRs
 ├── ADR-002-*.md           # Individual ADRs

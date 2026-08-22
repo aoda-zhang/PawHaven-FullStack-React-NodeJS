@@ -19,7 +19,7 @@
 9. **Figma mock data belongs in each feature's own `mockData.ts` file.** NEVER put mock data in the design-system package; each feature owns its demo data under `src/features/<FeatureName>/mockData.ts`. This will be removed when real API integration happens.
 10. **ALWAYS trigger code-review after testing passes.**
 11. **ALWAYS check if knowledge docs need updating** when architecture changes or new ADRs are created.
-12. **NEVER modify `Harness/agents/` or `Harness/docs/` directly.** Use `knowledge-update` agent.
+12. **NEVER modify `.codebuddy/agents/` or `.codebuddy/docs/` directly.** Use `knowledge-update` agent.
 13. **NEVER parallelize features with cross-dependencies.** Default to sequential.
 14. **NEVER read domain-specific docs** (Frontend-Architecture, Backend-Architecture, figma-design-spec). Subagents own those.
 
@@ -28,8 +28,8 @@
 15. **ALWAYS verify final state with typecheck + lint + a full build before declaring done.** A change that typechecks but doesn't package isn't done.
 16. **NEVER ask the user for design files, Figma JSON exports, or screenshots.** When a task references Figma or a design, trust that the frontend agent will read `figma-design-spec.md` on its own. Just classify and dispatch.
 17. **NEVER advance a pipeline stage without a Step Completion Checklist from the subagent.** Each subagent must prove its internal steps ran (see STEP 5b). A missing or skipped-step report means re-dispatch, not proceed. No stage may be silently skipped.
-18. **ALWAYS require the workflow discipline from subagents.** Each dispatched task names its matched workflow (Section 2.4); the subagent copies the workflow's steps verbatim into its todo list, marks skipped steps as `skip: <reason>`, reads the principles index in `Harness/dispatcher.md`, and names in its report which principle changed which decision. A report that cites a workflow or principle without showing the choice it changed is unverified, like a missing checklist.
+18. **ALWAYS require the workflow discipline from subagents.** Each dispatched task names its matched workflow (Section 2.4); the subagent copies the workflow's steps verbatim into its todo list, marks skipped steps as `skip: <reason>`, reads the principles index in `.codebuddy/dispatcher.md`, and names in its report which principle changed which decision. A report that cites a workflow or principle without showing the choice it changed is unverified, like a missing checklist.
 19. **ALWAYS enforce verification against the real artifact before a stage passes.** Typecheck, tests, and for UI a render of the real surface. "It compiles" or "looks right" is not a pass; route the subagent back to prove it.
 20. **ALWAYS maintain the task log (§3.9).** Create it at plan approval, append a phase digest after every stage, log every loop and stuck point, archive at handoff. The log is the progress document — if a task stalls, it is the recovery trail for you and the human.
 21. **ALWAYS declare the Pre-Flight Gate (§3.6 STEP 0a) before acting.** No classification + workflow declaration = no dispatch, no direct handling. Silent execution is a violation.
-22. **NEVER execute a task without a task-log section for it.** The `Harness/task-log.md` entry MUST exist before any subagent is dispatched or any direct handling begins.
+22. **NEVER execute a task without a task-log section for it.** The `.codebuddy/task-log.md` entry MUST exist before any subagent is dispatched or any direct handling begins.

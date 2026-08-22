@@ -1,6 +1,6 @@
 # Workflows
 
-The **procedure layer** of the Harness. A workflow is a numbered, evidence-gated procedure for one kind of task. Workflow steps must be copied **word-for-word** into the agent's todo list (verbatim-todo discipline); skipped steps stay as `skip: <reason>`.
+The **procedure layer** of the .codebuddy. A workflow is a numbered, evidence-gated procedure for one kind of task. Workflow steps must be copied **word-for-word** into the agent's todo list (verbatim-todo discipline); skipped steps stay as `skip: <reason>`.
 
 Every workflow ends the same way: Step 1 verified work → Step 2 **Review Handoff** ([handoff](./handoff.md)) → Step 3 STOP. The human reviews and opens the PR manually — nothing is pushed automatically.
 
