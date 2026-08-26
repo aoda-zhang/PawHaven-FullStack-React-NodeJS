@@ -1,60 +1,28 @@
 import type {
-  ApiResponse,
-  CaptchaRequest,
-  LoginRequest,
-  LoginResponse,
-  LogoutResponse,
-  RegisterRequest,
-  RegisterResponse,
-  UserProfileResponse,
+  AuthUser,
+  CredentialsDto,
+  SessionDto,
 } from '@pawhaven/shared/types';
-import type { AxiosRequestConfig } from 'axios';
 
 import { apiClient } from '@/utils/apiClient';
 
-export const refreshToken = async (config: AxiosRequestConfig) => {
-  const response = await apiClient.post<ApiResponse<LoginResponse>>(
-    '/fe-api/v1/auth/refresh',
-    {},
-    config ? { ...config, _retry: true } : undefined,
-  );
-  return response.data.data;
+// apiClient (frontend-core) unwraps the ApiResponse envelope, so each function resolves directly to its business payload.
+export const postLogin = async (
+  loginRequest: CredentialsDto,
+): Promise<SessionDto> => {
+  return apiClient.post<SessionDto>('/auth/login', loginRequest);
 };
 
-export const getCaptcha = async (params: CaptchaRequest) => {
-  const response = await apiClient.get<ApiResponse<Blob>>(
-    '/fe-api/v1/auth/captcha',
-    { params, responseType: 'blob' },
-  );
-  return response.data.data;
+export const postRegister = async (
+  registerRequest: CredentialsDto,
+): Promise<SessionDto> => {
+  return apiClient.post<SessionDto>('/auth/register', registerRequest);
 };
 
-export const postLogin = async (loginRequest: LoginRequest) => {
-  const response = await apiClient.post<ApiResponse<LoginResponse>>(
-    '/fe-api/v1/auth/login',
-    loginRequest,
-  );
-  return response.data.data;
+export const getUserCurrent = async (): Promise<AuthUser> => {
+  return apiClient.get<AuthUser>('/auth/me');
 };
 
-export const postRegister = async (registerRequest: RegisterRequest) => {
-  const response = await apiClient.post<ApiResponse<RegisterResponse>>(
-    '/fe-api/v1/auth/register',
-    registerRequest,
-  );
-  return response.data.data;
-};
-
-export const getUserCurrent = async () => {
-  const response = await apiClient.get<ApiResponse<UserProfileResponse>>(
-    '/fe-api/v1/auth/current',
-  );
-  return response.data.data;
-};
-
-export const deleteLogout = async () => {
-  const response = await apiClient.delete<ApiResponse<LogoutResponse>>(
-    '/fe-api/v1/auth/logout',
-  );
-  return response.data.data;
+export const postLogout = async (): Promise<{ message: string }> => {
+  return apiClient.post<{ message: string }>('/auth/logout');
 };

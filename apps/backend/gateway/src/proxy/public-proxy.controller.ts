@@ -2,11 +2,11 @@ import { Controller, Get, Next, Post, Req, Res } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
 import { OptionalAuth } from '../decorators/optional-auth.decorator';
+import { Public } from '../decorators/public.decorator';
 
 import { ProxyService } from './proxy.service';
 
 /**
- * Public Proxy Controller
  * Handles public API requests.
  * Routes without @Public require JWT authentication.
  */
@@ -14,6 +14,7 @@ import { ProxyService } from './proxy.service';
 export class PublicProxyController {
   constructor(private readonly proxyService: ProxyService) {}
 
+  @Public()
   @Post('/auth/login')
   proxyAuthLogin(
     @Req() req: Request,
@@ -23,6 +24,7 @@ export class PublicProxyController {
     this.proxyService.proxyRequest(req, res, next);
   }
 
+  @Public()
   @Post('/auth/register')
   proxyAuthRegister(
     @Req() req: Request,
@@ -32,6 +34,7 @@ export class PublicProxyController {
     this.proxyService.proxyRequest(req, res, next);
   }
 
+  @Public()
   @Post('/auth/refresh')
   proxyAuthRefresh(
     @Req() req: Request,
@@ -42,8 +45,8 @@ export class PublicProxyController {
   }
 
   @OptionalAuth()
-  @Get('/core/app/bootstrap')
-  proxyCoreBootstrap(
+  @Get('/core/home')
+  proxyCoreHome(
     @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,
@@ -64,6 +67,26 @@ export class PublicProxyController {
   @OptionalAuth()
   @Get('/core/rescues/:id')
   proxyGetRescueById(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
+  }
+
+  @OptionalAuth()
+  @Get('/core/adoptable-pets')
+  proxyGetAdoptablePets(
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ): void {
+    this.proxyService.proxyRequest(req, res, next);
+  }
+
+  @OptionalAuth()
+  @Get('/core/adoptable-pets/:id')
+  proxyGetAdoptablePetById(
     @Req() req: Request,
     @Res() res: Response,
     @Next() next: NextFunction,

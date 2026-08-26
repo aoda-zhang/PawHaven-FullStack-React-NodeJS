@@ -54,6 +54,7 @@ That's it. No file list, no scope breakdown. You analyze and plan everything you
 You are the **execution arm** of a named workflow, dispatched by the orchestrator (`pawhaven.md`):
 
 - **Workflow membership**: you run the implementation segment of `workflows/feature-development.md` (delegate implementation step), or the fix segment of `workflows/bug-fix.md` / `refactoring.md` / `perf-issue.md` when the change is backend scope. You do not re-plan the workflow; you execute your numbered steps inside it.
+- **Split & Sync units**: when the orchestrator dispatches you as ONE unit (e.g. `U2`) of `workflows/parallel-execution.md`, your prompt will contain the SYNC PROTOCOL — follow it exactly: implement your unit → append your status + report to `.codebuddy/task-log.md` (append-only, your own unit section) → READ THE ENTIRE log → if all sibling units are DONE, report back; if any sibling is NOT DONE, keep re-reading the log until all are DONE, then report back. If your own unit FAILS, append FAILED + reason and report immediately.
 - **Principles first**: before working, read the principles index in `dispatcher.md` (§ Principles) in full; then read in full any leaf you apply (`principles/*.md`). Your strongest leaves: `model-the-domain`, `boundary-discipline`, `make-operations-idempotent`, `prove-it-works`.
 - **Name the principle**: in your report, name each principle that changed a decision and the specific choice it changed. A citation with no decision behind it is unverified.
 - **Stop at the handoff**: you never push, never open a PR. Your work ends at `workflows/handoff.md` — a verified diff, handed to the human.
@@ -580,6 +581,7 @@ Cross-cutting constraints live in `../rules/` (architecture, git, testing, secur
 10. **ALWAYS output API contract in your report.** Frontend agent needs endpoint paths, HTTP methods, and DTO types.
 11. **If you can't proceed (missing Prisma model, blocked by another service), report back immediately** — don't guess or work around.
 12. **NEVER modify auth-service or gateway unless the task explicitly involves auth/routing.** Default scope is core-service.
+13. **NEVER write comments unless they explain non-obvious "why".** Default is no comment — prefer expressive naming over structure/control-flow comments (e.g., `// update status`, section separators). Exception: JSDoc for non-obvious public API fields in `packages/shared/` (see `rules/documentation.md` §6).
 
 ---
 

@@ -1,5 +1,5 @@
 import { cn } from '@pawhaven/frontend-core';
-import { RescueStatusSchema } from '@pawhaven/shared/types';
+import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -13,11 +13,11 @@ const FILTER_ALL: FilterStatus = 'all';
 const FILTER_OPTIONS: Array<{ value: FilterStatus; labelKey: string }> = [
   { value: FILTER_ALL, labelKey: 'rescue_cases.filter_all' },
   {
-    value: RescueStatusSchema.enum.pending,
+    value: AnimalStatusSchema.enum.pending,
     labelKey: 'common.rescue_status_pending',
   },
   {
-    value: RescueStatusSchema.enum.inProgress,
+    value: AnimalStatusSchema.enum.inProgress,
     labelKey: 'common.rescue_status_inProgress',
   },
 ];

@@ -1,17 +1,21 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useFetchRescueCases } from '../RescueCases/api/rescueCases.queries';
 import { RescueCasesSection } from '../RescueCases/components/RescueCasesSection';
 
-import { useFetchAdoptablePets } from './api/home.queries';
+import {
+  useFetchAdoptablePets,
+  useFetchLatestRescues,
+} from './api/home.queries';
 import { AdoptablePetsSection } from './components/AdoptablePetsSection';
 import { Hero } from './components/Hero';
 import { StrayCTA } from './components/StrayCTA';
 
+const LATEST_RESCUE_LIMIT = 4;
+
 export const Home = () => {
   const navigate = useNavigate();
-  const { data: cases = [] } = useFetchRescueCases();
+  const { data: cases = [] } = useFetchLatestRescues(LATEST_RESCUE_LIMIT);
   const { data: pets = [] } = useFetchAdoptablePets();
 
   const handleCaseClick = useCallback(
@@ -43,6 +47,7 @@ export const Home = () => {
         cases={cases}
         onCaseClick={handleCaseClick}
         onSeeAll={handleSeeAll}
+        showStatusSummary={false}
       />
       <AdoptablePetsSection
         pets={pets}

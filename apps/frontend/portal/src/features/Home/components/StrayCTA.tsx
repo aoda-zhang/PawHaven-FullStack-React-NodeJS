@@ -25,7 +25,7 @@ export const StrayCTA = () => {
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
-            onClick={() => navigate('/report-stray')}
+            onClick={() => navigate('/report-animal')}
             className="bg-primary flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-opacity hover:opacity-90"
           >
             <Camera className="h-4 w-4" />

@@ -12,7 +12,7 @@ import { landingQueryKeys } from '@/features/Landing/api/landing.queryKeys';
 // Mock API calls.
 vi.mock('../auth.api', () => ({
   postLogin: vi.fn().mockResolvedValue({ accessToken: 'test-token' }),
-  deleteLogout: vi.fn().mockResolvedValue(undefined),
+  postLogout: vi.fn().mockResolvedValue(undefined),
   postRegister: vi.fn(),
 }));
 

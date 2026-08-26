@@ -17,7 +17,7 @@ const mockCases = [
     location: 'Test Location',
     description: 'Test description',
     reporter: 'Tester',
-    reportedAt: '1 hour ago',
+    reportedAt: '2026-08-22T10:00:00.000Z',
     distance: '1.2 km',
   },
 ];
@@ -46,14 +46,18 @@ vi.mock('react-i18next', async () => {
   };
 });
 
-vi.mock('lucide-react', () => ({
-  ArrowLeft: () => null,
-  ArrowRight: () => null,
-  Clock: () => null,
-  MapPin: () => null,
-  User: () => null,
-  ChevronRight: () => null,
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('lucide-react')>();
+  return {
+    ...actual,
+    ArrowLeft: () => null,
+    ArrowRight: () => null,
+    Clock: () => null,
+    MapPin: () => null,
+    User: () => null,
+    ChevronRight: () => null,
+  };
+});
 
 describe('RescueCasesPage', () => {
   it('renders the case list', () => {

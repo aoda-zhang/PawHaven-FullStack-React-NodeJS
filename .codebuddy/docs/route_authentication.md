@@ -42,8 +42,8 @@ flowchart LR
 ### Step 1: Route Registration (Bootstrap)
 
 - Admin sets `handle.isRequireUserLogin: true` directly on a route record in the database (stored in the route's `handle` JSON column).
-- On app startup, `BootstrapService` reads all routes from the database and returns `handle.isRequireUserLogin` as-is in the bootstrap response.
-- Frontend receives the route config via `GET /core/app/bootstrap`, which includes `handle.isRequireUserLogin: true`.
+- On app startup, `HomeService` reads all routes from the database and returns `handle.isRequireUserLogin` as-is in the home response.
+- Frontend receives the route config via `GET /core/home`, which includes `handle.isRequireUserLogin: true`.
 
 > Note: `isRequireUserLogin` is the single source of truth for route-level auth gating. The legacy `authRequired` database column has been removed — auth gating is now driven entirely by the `handle.isRequireUserLogin` field.
 
@@ -122,9 +122,10 @@ The component is intentionally minimal — it receives the auth query result (`i
 
 1. Frontend's `useCurrentUser` calls `GET /auth/me`; the request automatically includes the `access_token` httpOnly cookie.
 2. Gateway intercepts the request:
-   - `JwtRefreshGuard` runs first: checks if the access token is missing, invalid, or expiring soon. If expiring, it automatically calls `/auth/refresh` to get new tokens.
-   - `JwtVerificationGuard` runs second: validates the JWT signature, extracts the user payload, and attaches `req.user`.
+   - `JwtRefreshGuard` runs first: checks if the access token is missing, invalid, expiring soon, or past the absolute session deadline (30 days from `sessionStartedAt`). If a refresh is needed, it calls `/auth/refresh` (single-flight for concurrent requests); if the refresh is rejected, auth cookies are cleared and the request fails with 401.
+   - `JwtVerificationGuard` runs second: validates the JWT signature and `type: 'access'` claim, checks the session deadline and the jti denylist (revoked on logout), extracts the user payload, and attaches `req.user`.
 3. On success, gateway proxies the request to `AuthService` with `X-Auth-User-Id` and `X-Auth-User-Email` headers.
+4. **After 30 days**, `/auth/me` returns 401 `sessionExpired` regardless of refresh-token validity — `RequireAuth` redirects to `/login` and the user must authenticate again.
 
 ### Step 5: Auth Service Verification
 
@@ -139,11 +140,12 @@ The component is intentionally minimal — it receives the auth query result (`i
 
 ## Key Design Decisions
 
-| Decision                                            | Reason                                                                                                     |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Frontend doesn't read httpOnly cookie               | httpOnly prevents JavaScript access; protects against XSS token theft                                      |
-| Verify via `/auth/me` API instead of local state    | Backend is the only source of truth; detects expired, revoked, or tampered tokens                          |
-| RequireAuth receives `isLoading`/`isError` as props | Keeps the component reusable; caller controls the exact hook and API                                       |
-| `authQueryKeys` uses factory functions `() => []`   | Consistent with `homeQueryKeys`; ensures fresh query key on each render                                    |
-| Redirect stores `location` in state                 | Enables "redirect back after login" UX pattern                                                             |
-| useCurrentUser has no side effects in queryFn       | Avoids ESLint exhaustive-deps warnings; dispatch logic is handled in a `useEffect` in consuming components |
+| Decision                                            | Reason                                                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Frontend doesn't read httpOnly cookie               | httpOnly prevents JavaScript access; protects against XSS token theft                                         |
+| Verify via `/auth/me` API instead of local state    | Backend is the only source of truth; detects expired, revoked, or tampered tokens                             |
+| Session hard-caps at 30 days via `/auth/me` 401     | Absolute session bound: refresh may slide for 7 days, but after `sessionExpiresAt` the user must log in again |
+| RequireAuth receives `isLoading`/`isError` as props | Keeps the component reusable; caller controls the exact hook and API                                          |
+| `authQueryKeys` uses factory functions `() => []`   | Consistent with `homeQueryKeys`; ensures fresh query key on each render                                       |
+| Redirect stores `location` in state                 | Enables "redirect back after login" UX pattern                                                                |
+| useCurrentUser has no side effects in queryFn       | Avoids ESLint exhaustive-deps warnings; dispatch logic is handled in a `useEffect` in consuming components    |

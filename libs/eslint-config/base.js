@@ -95,6 +95,7 @@ module.exports = {
     // Other best practices
     // ----------------------------
     'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
+    'no-void': 'error',
     'no-magic-numbers': [
       'warn',
       { ignore: [0, 1, -1], ignoreArrayIndexes: true },

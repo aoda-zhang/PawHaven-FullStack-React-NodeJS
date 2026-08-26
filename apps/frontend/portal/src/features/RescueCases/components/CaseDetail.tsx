@@ -61,7 +61,7 @@ const BackButton = ({ onClick }: { onClick: () => void }) => {
 const HeroSection = ({ caseData }: { caseData: RescueCase }) => (
   <div className="relative h-64 w-full">
     <img
-      src={caseData.image}
+      src={caseData.image ?? '/images/hero-rescue.jpg'}
       alt={caseData.title}
       className="h-full w-full object-cover"
     />
@@ -92,7 +92,11 @@ const InfoGrid = ({ caseData }: { caseData: RescueCase }) => {
       </div>
       <div className="text-text-secondary flex items-center gap-2 text-sm">
         <span>{t('rescue_cases.info_distance')}</span>
-        <span>{caseData.distance}</span>
+        <span>
+          {caseData.distance > 0
+            ? `${caseData.distance} km`
+            : t('common.unknown')}
+        </span>
       </div>
     </div>
   );

@@ -76,12 +76,24 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 **Defaults for every delegation.** Background where possible, explicit success criteria and named data shape in the prompt, file pointers rather than inlined context. Code delegates tier by difficulty: trivial mechanical edits to a fast model, precisely specified sequences to a strong instruction-following model, gnarly judgment calls (cross-cutting design, subtle logic) to the strongest judgment model.
 
+**Split & Sync for long work.** When a single implementation would exceed one subagent's budget (multi-file, cross-module), do not spawn a giant agent that times out. Split it into small units and dispatch them in parallel (`workflows/parallel-execution.md`). Each unit appends its own status to `.codebuddy/task-log.md`, reads the ENTIRE log, waits for all sibling units, and only reports back when the whole wave has joined. The log is the barrier; never let a unit edit another unit's section.
+
+**Dispatch reliability in this environment.** Empirical failures in this workspace (four aborts, documented in `.codebuddy/task-log.md` and long-term memory) prove that heavy subagent tasks get aborted by the runtime (`code=10003`) or lose their result channel (`No result found`). Small units complete fine. Therefore:
+
+- **Size-limit every dispatch.** A unit is only dispatchable when it is single-concern and completes in seconds, sized like a read-only probe. Anything bigger is implemented by the orchestrator directly (degraded mode), or split into probe-sized units per `workflows/parallel-execution.md`.
+- **First abort degrades immediately.** The first abort of a dispatch triggers degraded mode at once. Do not retry the same task. Repeated retries of a heavy task have caused three separate stalls.
+- **A failed dispatch is not proof nothing happened.** `No result found` can mean edits were applied but the result was lost. Before redoing anything, check `git status` and recently modified files on disk.
+- **Snapshot before dispatch.** Run `git status --short` first so recovery state is known in seconds.
+- **Probe before heavy dispatch.** Run a tiny read-only check first. If the probe fails, skip dispatch entirely.
+- **No silent stalls.** Work in small checkpoints. Log each slice in `.codebuddy/task-log.md` and report after each. Never sit silent waiting on a broken channel.
+
 You own every subagent's work. Review the diff and write your own summary, don't pass through what it said. Interrupt-chained resumes silently drop directives, so fire a fresh subagent with consolidated scope rather than trusting a "done" summary. A second opinion is the same prompt against a different model; agreement is high-signal.
 
 ## Writing the reply
 
 Write the reply clean as you draft it. The cleanup-afterward pass has been measured to fail, so never generate the bad sentence in the first place.
 
+- **English by default.** Reply to the user in English unless the user explicitly asks for a different language, or the user writes in Chinese (then mirror Chinese). Every other case, including English or unspecified messages, is answered in English. This is a global rule: it applies to the orchestrator and every subagent, in every reply, plan, summary, and handoff. Code, identifiers, and internal notes stay in English.
 - **Short declarative sentences.** One thought per sentence, ended with a period.
 - **The long-dash character is banned outright.** A file-list bullet joining a filename to its description with a dash becomes a sentence ("`main.ts` owns persistence and the route handlers"). A bold section header joined to its text by a dash becomes its own sentence ("**Verification.** End to end via the render check").
 - **A colon as a mid-sentence connector is out.** A colon before a list is fine.
@@ -102,4 +114,5 @@ Your first todolist actions are the matched workflow's steps, copied in verbatim
 - **Perf issue.** A measured slowness to trace and improve against a baseline. `workflows/perf-issue.md`.
 - **Design decision.** Architecture, data model, or API choice with competing options. `workflows/design-decision.md`.
 - **Architecture change.** Code crossing a component, package, or API boundary, or a large cross-cutting change. `workflows/architecture-change.md`.
+- **Parallel execution (Split & Sync).** A long implementation after the architect step: split into small independent units, dispatch them in parallel, and join them through the task-log barrier — each unit appends its status to `.codebuddy/task-log.md`, reads the entire log, and waits for all sibling units before reporting back. `workflows/parallel-execution.md`.
 - **Review handoff.** Invoked at the end of most other workflows. Stops at a verified diff with a handoff summary; the human reviews and opens the PR. `workflows/handoff.md`.

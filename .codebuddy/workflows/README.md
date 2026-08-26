@@ -12,14 +12,15 @@ Every workflow ends the same way: Step 1 verified work → Step 2 **Review Hando
 
 ## Specialist Workflows
 
-| Workflow                                        | Entry                 | Purpose                                                                                                               |
-| ----------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [bug-fix](./bug-fix.md)                         | Bug report            | Step 1 reproduce first → Step 2 fix root cause → Step 3 verify the failing repro passes on the same surface.          |
-| [refactoring](./refactoring.md)                 | Refactor request      | Change structure without changing behavior: Step 1 pin behavior first → Step 2 keep tests green.                      |
-| [perf-issue](./perf-issue.md)                   | Performance issue     | Step 1 baseline trace first → Step 2 targeted fix → Step 3 post-fix trace proves the improvement.                     |
-| [architecture-change](./architecture-change.md) | Architecture change   | Step 1 design decision with impact analysis → Step 2 ADR when needed → Step 3 migrate-callers-then-delete discipline. |
-| [design-decision](./design-decision.md)         | Design decision       | Step 1 enumerate options & trade-offs → Step 2 apply named principles → Step 3 record the outcome.                    |
-| [investigation](./investigation.md)             | "Why is X happening?" | Step 1 root-cause investigation → Step 2 fix (after the cause is proven).                                             |
+| Workflow                                        | Entry                 | Purpose                                                                                                                                                                |
+| ----------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [bug-fix](./bug-fix.md)                         | Bug report            | Step 1 reproduce first → Step 2 fix root cause → Step 3 verify the failing repro passes on the same surface.                                                           |
+| [refactoring](./refactoring.md)                 | Refactor request      | Change structure without changing behavior: Step 1 pin behavior first → Step 2 keep tests green.                                                                       |
+| [perf-issue](./perf-issue.md)                   | Performance issue     | Step 1 baseline trace first → Step 2 targeted fix → Step 3 post-fix trace proves the improvement.                                                                      |
+| [architecture-change](./architecture-change.md) | Architecture change   | Step 1 design decision with impact analysis → Step 2 ADR when needed → Step 3 migrate-callers-then-delete discipline.                                                  |
+| [design-decision](./design-decision.md)         | Design decision       | Step 1 enumerate options & trade-offs → Step 2 apply named principles → Step 3 record the outcome.                                                                     |
+| [investigation](./investigation.md)             | "Why is X happening?" | Step 1 root-cause investigation → Step 2 fix (after the cause is proven).                                                                                              |
+| [parallel-execution](./parallel-execution.md)   | Long implementation   | Step 1 split into small units → Step 2 write Split Plan to log → Step 3 dispatch in parallel → Step 4 sync via log barrier → Step 5 join + integrate → Step 6 advance. |
 
 ## Terminal Workflow
 

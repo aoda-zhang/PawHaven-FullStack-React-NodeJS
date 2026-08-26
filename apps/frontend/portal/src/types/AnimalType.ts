@@ -1,16 +1,11 @@
+import type { AnimalStatus } from '@pawhaven/shared/types';
+
 import type {
   RescueParticipantType,
   RescueUpdate,
 } from '@/features/RescueDetail/types';
 
-export type AnimalRescueStatus =
-  | 'pending'
-  | 'inProgress'
-  | 'treated'
-  | 'recovering'
-  | 'awaitingAdoption'
-  | 'adopted'
-  | 'failed';
+export type AnimalRescueStatus = AnimalStatus;
 
 export interface Comment {
   id: string;

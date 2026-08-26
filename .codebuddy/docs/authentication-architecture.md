@@ -195,11 +195,11 @@ sequenceDiagram
             AuthService-->>Gateway: 200 OK + Set-Cookie
             Gateway-->>Portal: Success
         else No match
-            AuthService-->>Gateway: 400 Bad Request
+            AuthService-->>Gateway: 401 Unauthorized (invalidToken)
             Gateway-->>Portal: Error
         end
     else Missing token
-        AuthService-->>Gateway: 400 Bad Request
+        AuthService-->>Gateway: 401 Unauthorized (invalidToken)
         Gateway-->>Portal: Error
     end
 ```
@@ -209,14 +209,20 @@ sequenceDiagram
 - Refresh rotates both access and refresh tokens.
 - A refresh token is valid only if it matches the stored hash for that user.
 - Refresh can be triggered explicitly (client call) or implicitly (JwtRefreshGuard).
+- **Token type separation**: every token carries a `type` claim (`access`/`refresh`). Auth service and both gateway guards reject tokens whose `type` does not match the expected kind.
+- **Absolute session cap**: tokens carry `sessionStartedAt` + `sessionExpiresAt` (default: session start + 30 days). Refresh is rejected with `401 sessionExpired` once `now > sessionExpiresAt` — the user MUST log in again. Access tokens past `sessionExpiresAt` are rejected by the verification guard (with a 30s clock tolerance).
+- **Refresh cookie Max-Age** = `min(7 days, remaining session time)`, so the refresh cookie never outlives the session.
+- Responses from login/register/refresh include `session_expires_at` so clients can display session state.
+- **Migration note**: tokens issued before this model lack the `type` claim and will be rejected — a one-time forced re-login on deploy is expected.
 
 **JwtRefreshGuard behavior**
 
 - Runs before JwtVerificationGuard on all protected requests
 - Checks if access token is missing, invalid, or expiring soon (configurable window)
 - Automatically calls auth-service `/refresh` endpoint with refresh token
+- **Single-flight dedupe**: concurrent requests carrying the same refresh token share one upstream refresh call; each request then applies the returned Set-Cookie to its own response
 - On success: updates both response Set-Cookie headers and request cookies for current request
-- On failure: clears cookies only when no valid access token exists; otherwise preserves current token
+- On failure (refresh rejected with 4xx): clears auth cookies and propagates the 401 — prevents an invalid refresh token from causing a repeat-refresh loop
 - Skips refresh logic entirely for routes marked with `@Public()` decorator
 
 ## Component Details
@@ -229,7 +235,7 @@ sequenceDiagram
   - `POST /auth/login`
   - `POST /auth/register`
   - `POST /auth/refresh`
-  - `GET /core/app/bootstrap`
+  - `GET /core/home`
 - Protected routes handled by `ProtectedProxyController` with catch-all pattern
 - Forwards requests to microservices with user info in custom headers (`X-Auth-User-Id`, `X-Auth-User-Email`)
 - Automatically refreshes tokens before expiry via `JwtRefreshGuard`
@@ -264,14 +270,19 @@ sequenceDiagram
 - Proactively refreshes access tokens before expiry
 - Configurable refresh window (default: 20% of token lifetime)
 - Calls auth-service refresh endpoint internally
+- Single-flight dedupe for concurrent requests sharing the same refresh token
+- Clears auth cookies when the refresh is rejected with 4xx (broken/invalid refresh token)
 - Updates cookies on both response and request objects
+- Rejects access tokens past the absolute session deadline (`sessionExpiresAt`, +30s tolerance)
 
 **JwtVerificationGuard** (runs second):
 
 - Validates access token JWT signature
+- Enforces `type: 'access'` claim and absolute session deadline (`sessionExpiresAt`, +30s tolerance)
+- Maintains a jti denylist: access tokens are revoked (denylisted) when the user logs out via `/auth/logout`; any request presenting a denylisted `jti` is denied with 401
 - Extracts user payload (userId, email)
 - Attaches `req.user` object for downstream proxy service
-- Throws 401 Unauthorized if token is missing or invalid
+- Throws 401 Unauthorized if token is missing, invalid, revoked, or past the session deadline
 
 ## Logout
 
@@ -284,3 +295,7 @@ sequenceDiagram
 - Store refresh tokens as hashes and rotate on each refresh.
 - Hash passwords using a strong one-way algorithm.
 - Avoid leaking sensitive details in error responses and logs.
+- Separate token types (`access` vs `refresh` claims) so a stolen access token cannot be replayed as a refresh token.
+- Bound the refresh window with an **absolute session cap** (30 days by default): refresh tokens slide for at most 7 days, but the session ends unconditionally at `sessionExpiresAt`.
+- Revoke access tokens on logout via the gateway jti denylist (in-memory; volatile across gateway restarts, bounded by the 15-minute token lifetime — use a shared cache such as Redis when scaling to multiple gateway instances).
+- Apply a small clock tolerance (30s) when verifying token expiry to absorb clock drift.

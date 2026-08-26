@@ -14,6 +14,9 @@ swagger:
 
 auth:
   jwtSecret: ${JWT_SECRET}
+  jwtClockTolerance: 30
+  jwtRefreshFallbackSeconds: 300
+  jwtRefreshWindowPercentage: 0.2
 
 DBConnections:
   - enable: true

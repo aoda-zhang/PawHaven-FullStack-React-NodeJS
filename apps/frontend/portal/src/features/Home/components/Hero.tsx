@@ -3,25 +3,29 @@ import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useFetchHeroStats } from '../api/home.queries';
+import { useLandingContext } from '@/features/Landing/landingContext';
 
 preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
 export const Hero = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { data: heroStatValues } = useFetchHeroStats();
+  const { heroStats } = useLandingContext();
 
-  const stats = heroStatValues
-    ? ([
-        { value: heroStatValues.rescues, labelKey: 'home.hero_stat_rescues' },
-        { value: heroStatValues.adopted, labelKey: 'home.hero_stat_adopted' },
-        {
-          value: heroStatValues.volunteers,
-          labelKey: 'home.hero_stat_volunteers',
-        },
-      ] as const)
-    : null;
+  const stats = [
+    {
+      value: heroStats.totalRescues.toLocaleString(),
+      labelKey: 'home.hero_stat_rescues',
+    },
+    {
+      value: heroStats.totalAdopted.toLocaleString(),
+      labelKey: 'home.hero_stat_adopted',
+    },
+    {
+      value: heroStats.totalVolunteers.toLocaleString(),
+      labelKey: 'home.hero_stat_volunteers',
+    },
+  ] as const;
 
   return (
     <section
@@ -48,7 +52,7 @@ export const Hero = () => {
             type="button"
             className="text-text-inverse bg-dark-text text-body cursor-pointer rounded-xl px-4 py-2 font-semibold transition-colors hover:opacity-90"
             onClick={() => {
-              navigate('/report-stray');
+              navigate('/report-animal');
             }}
           >
             <span className="flex items-center gap-1">

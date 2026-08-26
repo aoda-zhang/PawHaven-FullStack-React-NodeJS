@@ -6,8 +6,9 @@
 
 ## 1. Code Comments
 
-- Comments are a limited resource. Default is NOT to add a comment.
+- Comments are a limited resource. **DON'T write comments for unnecessary code.** Default is NOT to add a comment.
 - Every comment must explain **why**, not **what**.
+- Never comment self-evident code: structure markers (section separators), control flow, or obvious steps (`// update state`, `// loop through items`).
 - Prefer self-explanatory code through naming, structure, and clarity.
 - See workspace global rules for detailed comment guidelines.
 

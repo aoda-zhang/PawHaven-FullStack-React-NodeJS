@@ -1,15 +1,11 @@
-import dayjs from 'dayjs';
+import { formatDateTime } from '@pawhaven/frontend-core';
 import { MapPin, Calendar, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import type { AnimalDetail } from '@/types/AnimalType';
 
-const formatDate = (dateString: string) => {
-  return dayjs(dateString).format('YYYY-MM-DD');
-};
-
 export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <div className="bg-surface rounded-card shadow-card w-full">
@@ -24,23 +20,26 @@ export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
 
           <div className="text-text flex items-center gap-2">
             <Calendar size={16} className="text-primary" />
-            <span>{formatDate(animal?.foundTime)}</span>
+            <span>
+              {animal?.foundTime &&
+                formatDateTime(animal.foundTime, i18n.language)}
+            </span>
           </div>
 
           <div className="text-text flex items-center gap-2">
             <Info size={16} className="text-primary" />
-            <span>{t(`reportStray.${animal?.animalType}`)}</span>
+            <span>{t(`reportAnimal.${animal?.animalType}`)}</span>
           </div>
 
           <div className="text-text flex items-center gap-2">
             <Info size={16} className="text-primary" />
-            <span>{t(`reportStray.${animal?.age}`)}</span>
+            <span>{t(`reportAnimal.${animal?.age}`)}</span>
           </div>
         </div>
 
         <div className="mt-6">
           <h3 className="text-text mb-2 text-lg font-semibold">
-            {t('reportStray.appearance')}
+            {t('reportAnimal.appearance')}
           </h3>
           <p className="text-text-secondary mb-4">
             {animal?.statusDescription}
@@ -48,7 +47,7 @@ export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
 
           {animal?.appearance.hasInjury && (
             <div className="bg-error-light border-border-error rounded-card text-error border p-3">
-              <span className="text-error">{t('reportStray.has_injury')}</span>
+              <span className="text-error">{t('reportAnimal.has_injury')}</span>
               <p>{animal?.appearance.injuryDescription}</p>
             </div>
           )}

@@ -23,15 +23,6 @@ export const CredentialsSchema = z.object({
 export type CredentialsDto = z.infer<typeof CredentialsSchema>;
 
 /**
- * Refresh Token Request Schema
- */
-export const RefreshSchema = z.object({
-  refresh_token: z.string(),
-});
-
-export type RefreshDto = z.infer<typeof RefreshSchema>;
-
-/**
  * Auth Response Schema
  */
 export const AuthResponseSchema = z.object({
@@ -63,9 +54,21 @@ export const AuthUserSchema = UserSchema.extend({
 export type AuthUser = z.infer<typeof AuthUserSchema>;
 
 /**
+ * JWT token type claim — access tokens and refresh tokens are distinct
+ */
+export const TokenTypeSchema = z.enum(['access', 'refresh']);
+
+export type TokenType = z.infer<typeof TokenTypeSchema>;
+
+/**
  * JWT Verify Info Schema
+ * Claims carried by both access and refresh tokens:
+ * - type: token kind ('access' | 'refresh') — enforced at every verification point
+ * - jti: unique token id, used for revocation (logout denylist)
  */
 export const JwtVerifyInfoSchema = UserSchema.extend({
+  type: TokenTypeSchema.optional(),
+  jti: z.string().optional(),
   iat: z.number().optional(),
   exp: z.number().optional(),
 });

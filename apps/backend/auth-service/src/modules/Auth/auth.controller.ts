@@ -3,12 +3,12 @@ import {
   Post,
   Get,
   Body,
-  BadRequestException,
   UnauthorizedException,
   Res,
   Req,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
+import type { SessionDto } from '@pawhaven/shared/types';
 import { httpBusinessMappingCodes } from '@pawhaven/backend-core/constants';
 
 import { LoginDTO } from './dtos/login.dto';
@@ -23,7 +23,7 @@ export class AuthController {
   async login(
     @Body() loginDto: LoginDTO,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<SessionDto> {
     const result = await this.authService.login(
       loginDto.email,
       loginDto.password,
@@ -42,7 +42,7 @@ export class AuthController {
   async register(
     @Body() registerDto: RegisterDTO,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<SessionDto> {
     const result = await this.authService.register(
       registerDto.email,
       registerDto.password,
@@ -61,11 +61,11 @@ export class AuthController {
   async refresh(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<SessionDto> {
     const refreshToken = this.authService.getTokenFromRequest(req, 'refresh');
 
     if (!refreshToken) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+      throw new UnauthorizedException(httpBusinessMappingCodes.invalidToken);
     }
 
     const result = await this.authService.refresh(refreshToken);
@@ -99,12 +99,12 @@ export class AuthController {
   }
 
   @Get('/me')
-  async me(@Req() req: Request) {
+  async me(@Req() req: Request): Promise<{ userId: string; email: string }> {
     const accessToken = this.authService.getTokenFromRequest(req, 'access');
     if (!accessToken) {
       throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
     }
-    const payload = await this.authService.verifyToken(accessToken);
+    const payload = await this.authService.verifyToken(accessToken, 'access');
     return { userId: payload.userId, email: payload.email };
   }
 }

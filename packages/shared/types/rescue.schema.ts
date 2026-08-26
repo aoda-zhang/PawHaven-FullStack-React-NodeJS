@@ -1,92 +1,46 @@
 import { z } from 'zod';
 
-/**
- * Rescue schemas shared by frontend & backend
- */
+import { AnimalStatusSchema, AnimalStatus } from './animal-status';
 
-const RescueStatusValues = [
-  'pending',
-  'inProgress',
-  'treated',
-  'recovering',
-  'awaitingAdoption',
-  'adopted',
-  'failed',
-] as const;
+const RescueAgeValues = ['baby', 'young', 'adult', 'senior'] as const;
 
-export const RescueStatusSchema = z.enum(RescueStatusValues);
+export const RescueAgeSchema = z.enum(RescueAgeValues);
 
-export type RescueStatus = z.infer<typeof RescueStatusSchema>;
+export type RescueAge = z.infer<typeof RescueAgeSchema>;
 
 /**
- * Rescue item for list display (Home page)
+ * Animal appearance, shared by the report form and the rescue detail contract.
  */
-export const RescueItemSchema = z.object({
-  animalID: z.string(),
-  name: z.string(),
-  img: z.string().url(),
-  description: z.string(),
-  location: z.string(),
-  time: z.string(),
-  status: RescueStatusSchema,
+const MaxColorLength = 50;
+
+export const AnimalAppearanceSchema = z.object({
+  color: z.string().min(1, 'Color is required').max(MaxColorLength),
+  hasInjury: z.boolean(),
+  injuryDescription: z.string().optional(),
+  otherFeatures: z.string().optional(),
 });
 
-export type RescueItem = z.infer<typeof RescueItemSchema>;
-
 /**
- * Create rescue request DTO
+ * Create rescue request DTO (POST /core/rescues). Field names map 1:1 to
+ * the Prisma model (data is passed straight through).
  */
-export const CreateRescueDtoSchema = RescueItemSchema.pick({
-  animalID: true,
-  name: true,
-  img: true,
-  description: true,
-  location: true,
-}).extend({
-  rescueStatus: RescueStatusSchema.optional().default('pending'),
+export const CreateRescueDtoSchema = z.object({
+  name: z.string(),
+  animalType: z.string(),
+  age: RescueAgeSchema.optional(),
+  // Structured location stored on the rescue record (Prisma field `locationObj`).
+  locationObj: z
+    .object({
+      address: z.string(),
+      latitude: z.number(),
+      longitude: z.number(),
+    })
+    .optional(),
+  foundTime: z.string().optional(),
+  animalStatus: AnimalStatusSchema.optional().default(AnimalStatus.PENDING),
+  statusDescription: z.string().optional(),
+  reporterPhotos: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
 });
 
 export type CreateRescueDto = z.infer<typeof CreateRescueDtoSchema>;
-
-/**
- * Full rescue detail (RescueDetail page)
- */
-export const RescueDetailSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  animalType: z.string(),
-  age: z.enum(['baby', 'young', 'adult', 'senior']),
-  appearance: z.object({
-    color: z.string(),
-    hasInjury: z.boolean(),
-    injuryDescription: z.string().optional(),
-    otherFeatures: z.string().optional(),
-  }),
-  location: z.object({
-    address: z.string(),
-    latitude: z.number(),
-    longitude: z.number(),
-  }),
-  foundTime: z.string(),
-  status: RescueStatusSchema,
-  statusDescription: z.string(),
-  reporterPhotos: z.array(z.string()),
-  videos: z.array(z.string()).optional(),
-  reporter: z.object({
-    id: z.string(),
-    name: z.string(),
-    contactInfo: z.object({
-      phone: z.string(),
-      email: z.string().optional(),
-    }),
-  }),
-  stats: z.object({
-    viewCount: z.number(),
-    likeCount: z.number(),
-    shareCount: z.number(),
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type RescueDetail = z.infer<typeof RescueDetailSchema>;

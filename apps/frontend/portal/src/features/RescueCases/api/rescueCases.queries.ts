@@ -6,7 +6,7 @@ import { rescueCasesQueryKeys } from './rescueCases.queryKeys';
 export const useFetchRescueCases = () => {
   return useQuery({
     queryKey: rescueCasesQueryKeys.all,
-    queryFn: fetchRescueCases,
+    queryFn: () => fetchRescueCases(),
   });
 };
 

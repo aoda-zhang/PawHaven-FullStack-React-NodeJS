@@ -11,6 +11,7 @@
     "start": "node dist/main.js",
     "prisma:generate-mongodb": "prisma generate --schema=./src/prisma/mongodb/schema.prisma",
     "prisma:db-push": "prisma db push --schema=./src/prisma/mongodb/schema.prisma",
+    "prisma:seed-mongodb": "ts-node --project tsconfig.json -r tsconfig-paths/register src/prisma/mongodb/seed.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

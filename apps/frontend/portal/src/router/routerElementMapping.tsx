@@ -12,9 +12,9 @@ import { useIsStableEnv } from '@/hooks/useIsStableEnv';
 import { RootLayout } from '@/layout';
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 
-const ReportStray = lazyImport(
-  () => import('@/features/ReportStray'),
-  'ReportStray',
+const ReportAnimal = lazyImport(
+  () => import('@/features/ReportAnimal'),
+  'ReportAnimal',
 );
 const ReportDetail = lazyImport(
   () => import('@/features/RescueDetail'),
@@ -49,7 +49,7 @@ export const routerElementMapping: Record<string, ReactElement> = {
   home: <Home />,
   auth_login: <Login />,
   auth_register: <Register />,
-  report_stray: <ReportStray />,
+  report_animal: <ReportAnimal />,
   rescue_guides: <RescueGuide />,
   rescue_cases: <RescueCases />,
   rescue_detail: <ReportDetail />,

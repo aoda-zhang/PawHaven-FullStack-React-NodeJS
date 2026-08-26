@@ -1,21 +1,20 @@
 import { cn } from '@pawhaven/frontend-core';
+import type { AnimalStatus } from '@pawhaven/shared/types';
 import { CheckCircle2, Circle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import type { RescueStatus } from '../types';
-
 interface TimelineStep {
-  status: RescueStatus;
+  status: AnimalStatus;
   labelKey: string;
   completed: boolean;
   active: boolean;
 }
 
 interface RescueTimelineProps {
-  currentStatus: RescueStatus;
+  currentStatus: AnimalStatus;
 }
 
-const STATUS_ORDER: RescueStatus[] = [
+const STATUS_ORDER: AnimalStatus[] = [
   'pending',
   'inProgress',
   'treated',
@@ -24,7 +23,7 @@ const STATUS_ORDER: RescueStatus[] = [
   'adopted',
 ];
 
-const STATUS_LABEL_KEYS: Record<RescueStatus, string> = {
+const STATUS_LABEL_KEYS: Record<AnimalStatus, string> = {
   pending: 'common.rescue_status_pending',
   inProgress: 'common.rescue_status_inProgress',
   treated: 'common.rescue_status_treated',

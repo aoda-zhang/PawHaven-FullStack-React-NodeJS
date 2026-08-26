@@ -90,8 +90,8 @@
     "hero_subtitle": "From the first sighting to a forever home — PawHaven turns scattered cries for help into one transparent rescue pipeline.",
     "hero_report_cta": "Report a stray now",
     "hero_adopt_cta": "Meet adoptable pets",
-    "hero_stat_rescues": "Rescues completed",
-    "hero_stat_adopted": "Adopted homes",
+    "hero_stat_rescues": "Reported animals",
+    "hero_stat_adopted": "Rescues completed",
     "hero_stat_volunteers": "Active volunteers",
     "hero_image_alt": "A volunteer holding a rescued cat and dog",
     "forever_home_title": "Ready for a Forever Home",
@@ -102,7 +102,7 @@
     "adoptable_badge": "Adoptable",
     "waiting_days": "Waiting {{days}} days"
   },
-  "reportStray": {
+  "reportAnimal": {
     "report_animal": "Report Stray Animal",
     "animal_basic_info": "Basic Animal Information",
     "animal_type": "Animal Type",
@@ -162,6 +162,10 @@
     "wizard": {
       "title": "Report a Stray Animal",
       "subtitle": "Your 60-second report helps us get volunteers into action. Every detail counts.",
+      "sign_in_required_title": "Sign in to Report",
+      "sign_in_required_desc": "Please sign in so volunteers can reach you about your report.",
+      "sign_in_button": "Sign in",
+      "loading": "Loading...",
       "step1_label": "Location",
       "step1_title": "Where is the animal?",
       "step1_subtitle": "Share the exact location so volunteers can find it quickly.",
@@ -287,7 +291,7 @@
       "platform": {
         "heading": "Platform",
         "browse_rescues": "Browse Rescues",
-        "report_stray": "Report a Stray",
+        "report_animal": "Report a Stray",
         "adopt_animal": "Adopt an Animal",
         "volunteer": "Volunteer"
       },
