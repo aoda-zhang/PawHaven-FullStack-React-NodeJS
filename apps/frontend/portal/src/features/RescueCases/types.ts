@@ -1,19 +1,7 @@
-import type { RescueStatus } from '@pawhaven/shared/types';
+import type { RescueListItem, AnimalStatus } from '@pawhaven/shared/types';
 
-export type { RescueStatus };
+export type { AnimalStatus as RescueStatus };
 
-export interface RescueCase {
-  id: string;
-  title: string;
-  image: string;
-  status: RescueStatus;
-  urgency: 'high' | 'normal';
-  animalType: string;
-  location: string;
-  description: string;
-  reporter: string;
-  reportedAt: string;
-  distance: string;
-}
+export type RescueCase = RescueListItem;
 
-export type FilterStatus = 'all' | RescueStatus;
+export type FilterStatus = 'all' | AnimalStatus;

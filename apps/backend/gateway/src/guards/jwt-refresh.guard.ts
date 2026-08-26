@@ -1,4 +1,5 @@
 import {
+  HttpException,
   Injectable,
   CanActivate,
   ExecutionContext,
@@ -19,9 +20,20 @@ import { IS_OPTIONAL_AUTH } from '../decorators/optional-auth.decorator';
 
 type RequestWithUser = Request & { user?: User };
 
+const MS_PER_SECOND = 1000;
+const DEFAULT_REFRESH_WINDOW_SECONDS = 300;
+const DEFAULT_REFRESH_WINDOW_PERCENTAGE = 0.2;
+const CLIENT_ERROR_STATUS_MIN = 400;
+const CLIENT_ERROR_STATUS_MAX = 500;
+
 @Injectable()
 export class JwtRefreshGuard implements CanActivate {
   private readonly logger = new Logger(JwtRefreshGuard.name);
+
+  private readonly refreshInflight = new Map<
+    string,
+    Promise<string[] | null>
+  >();
 
   constructor(
     private readonly reflector: Reflector,
@@ -78,10 +90,9 @@ export class JwtRefreshGuard implements CanActivate {
   private verifyAccessToken(token: string): JwtVerifyInfo | null {
     try {
       const payload = this.jwtService.verify<JwtVerifyInfo>(token);
-      if (!payload?.userId) {
+      if (!payload?.userId || payload.type !== 'access') {
         return null;
       }
-
       return payload;
     } catch {
       return null;
@@ -93,7 +104,7 @@ export class JwtRefreshGuard implements CanActivate {
       return false;
     }
 
-    const nowInSeconds = Math.floor(Date.now() / 1000);
+    const nowInSeconds = Math.floor(Date.now() / MS_PER_SECOND);
     const remainingSeconds = payload.exp - nowInSeconds;
     const refreshWindowSeconds = this.getRefreshWindowSeconds(payload);
 
@@ -103,10 +114,11 @@ export class JwtRefreshGuard implements CanActivate {
   private getRefreshWindowSeconds(payload: JwtVerifyInfo): number {
     const fallbackSeconds = Math.floor(
       this.configService.get<number>('auth.jwtRefreshFallbackSeconds') ??
-        5 * 60,
+        DEFAULT_REFRESH_WINDOW_SECONDS,
     );
     const windowPercentage =
-      this.configService.get<number>('auth.jwtRefreshWindowPercentage') ?? 0.2;
+      this.configService.get<number>('auth.jwtRefreshWindowPercentage') ??
+      DEFAULT_REFRESH_WINDOW_PERCENTAGE;
 
     if (!payload.iat || !payload.exp) {
       return fallbackSeconds;
@@ -138,20 +150,17 @@ export class JwtRefreshGuard implements CanActivate {
       return;
     }
 
-    try {
-      const authClient = this.httpClientService.create('auth-service');
-      const response = await authClient.post<unknown>(
-        '/auth-service/refresh',
-        {},
-        {
-          returnResponse: true,
-          headers: {
-            Cookie: `${cookieKeys.refresh_token}=${refreshToken}`,
-          },
-        },
-      );
+    let inflight = this.refreshInflight.get(refreshToken);
+    if (!inflight) {
+      inflight = this.performRefresh(refreshToken);
+      this.refreshInflight.set(refreshToken, inflight);
+      inflight
+        .catch(() => undefined)
+        .finally(() => this.refreshInflight.delete(refreshToken));
+    }
 
-      const setCookieHeaders = response.headers['set-cookie'];
+    try {
+      const setCookieHeaders = await inflight;
       if (Array.isArray(setCookieHeaders) && setCookieHeaders.length > 0) {
         this.updateAuthCookies(req, res, setCookieHeaders);
       } else {
@@ -159,7 +168,7 @@ export class JwtRefreshGuard implements CanActivate {
       }
     } catch (error) {
       this.logger.error('Token refresh failed', error as Error);
-      if (options.clearCookiesOnFailure) {
+      if (options.clearCookiesOnFailure || this.isRefreshRejected(error)) {
         this.clearAuthCookies(res);
       }
       if (!options.isOptionalAuth) {
@@ -168,14 +177,45 @@ export class JwtRefreshGuard implements CanActivate {
     }
   }
 
+  private async performRefresh(refreshToken: string): Promise<string[] | null> {
+    const authClient = this.httpClientService.create('auth-service');
+    const response = await authClient.post<unknown>(
+      '/auth-service/refresh',
+      {},
+      {
+        returnResponse: true,
+        headers: {
+          Cookie: `${cookieKeys.refresh_token}=${refreshToken}`,
+        },
+      },
+    );
+
+    const setCookieHeaders = response.headers['set-cookie'];
+    return Array.isArray(setCookieHeaders) ? setCookieHeaders : null;
+  }
+
+  private isRefreshRejected(error: unknown): boolean {
+    if (error instanceof HttpException) {
+      const status = error.getStatus();
+      return (
+        status >= CLIENT_ERROR_STATUS_MIN && status < CLIENT_ERROR_STATUS_MAX
+      );
+    }
+    const response = (error as { response?: { status?: number } })?.response;
+    return (
+      typeof response?.status === 'number' &&
+      response.status >= CLIENT_ERROR_STATUS_MIN &&
+      response.status < CLIENT_ERROR_STATUS_MAX
+    );
+  }
+
   private updateAuthCookies(
     req: Request,
     res: Response,
     setCookieHeaders: string[],
   ): void {
-    res.setHeader('Set-Cookie', setCookieHeaders);
-
     setCookieHeaders.forEach((cookie) => {
+      res.append('Set-Cookie', cookie);
       const match = cookie.match(/^([^=]+)=([^;]+)/);
       if (match) {
         const [, name, value] = match;
@@ -192,9 +232,13 @@ export class JwtRefreshGuard implements CanActivate {
     const env = this.configService.get<string>('http.env');
     const secureSuffix = isProd(env) ? '; Secure' : '';
 
-    res.setHeader('Set-Cookie', [
+    res.append(
+      'Set-Cookie',
       `${cookieKeys.access_token}=; ${cookieOptions}${secureSuffix}`,
+    );
+    res.append(
+      'Set-Cookie',
       `${cookieKeys.refresh_token}=; ${cookieOptions}${secureSuffix}`,
-    ]);
+    );
   }
 }

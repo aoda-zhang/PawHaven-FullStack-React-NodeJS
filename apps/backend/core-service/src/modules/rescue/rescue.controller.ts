@@ -18,13 +18,13 @@ export class RescueController {
   @Get()
   @ApiOperation({
     summary:
-      'Get all rescues, optionally filter by status. Returns user-relevant rescues if authenticated.',
+      'Get rescues, optionally filter by status or limit the result count. Returns user-relevant rescues if authenticated.',
   })
-  findAll(
-    @Query('status') status?: string,
-    // @Headers('x-auth-user-id') userId?: string,
-  ) {
-    return this.rescueService.findAll(status);
+  findAll(@Query('status') status?: string, @Query('limit') limit?: string) {
+    return this.rescueService.findAll(
+      status,
+      limit ? Number(limit) : undefined,
+    );
   }
 
   @Get(':id')

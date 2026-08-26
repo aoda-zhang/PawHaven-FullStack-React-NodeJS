@@ -131,7 +131,7 @@ model RoutePermission {
   @@index([permissionId])
 }
 
-model Rescue {
+model animalReports {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -139,13 +139,45 @@ model Rescue {
 
   status String @default("active")
 
-  animalID     String   @unique
-  name         String
-  img          String?
-  description  String
-  location     String
-  time         DateTime @default(now())
-  rescueStatus String   @default("pending")
+  name     String?
 
-  @@index([rescueStatus])
+  animalType       String?
+  animalTypeOther  String?
+  age              String?
+  appearance       Json?
+  locationObj      Json?
+  foundTime        String?
+  animalStatus     String?
+  statusDescription String?
+  reporter         Json?
+  reporterPhotos   String[]
+  videos           String[]
+
+  @@index([animalStatus])
+}
+
+model AdoptablePet {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // availability filter (available | pending | adopted)
+  adoptionStatus String @default("available")
+
+  name           String
+  animalType     String
+  age            String
+  sex            String
+  breed          String
+  location       String
+  waitingDays    Int
+  tags           String[]
+  photo          String
+  rescuedFrom    String
+  rescueDuration String
+  medicalRecords String[]
+  temperament    String
+
+  @@index([adoptionStatus])
 }

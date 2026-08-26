@@ -1,4 +1,4 @@
-import { RescueStatusSchema } from '@pawhaven/shared/types';
+import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,20 +10,22 @@ interface RescueCasesSectionProps {
   cases: RescueCase[];
   onCaseClick: (id: string) => void;
   onSeeAll?: () => void;
+  showStatusSummary?: boolean;
 }
 
 export const RescueCasesSection = ({
   cases,
   onCaseClick,
   onSeeAll,
+  showStatusSummary = true,
 }: RescueCasesSectionProps) => {
   const { t } = useTranslation();
 
   const pendingCount = cases.filter(
-    (c) => c.status === RescueStatusSchema.enum.pending,
+    (c) => c.status === AnimalStatusSchema.enum.pending,
   ).length;
   const inProgressCount = cases.filter(
-    (c) => c.status === RescueStatusSchema.enum.inProgress,
+    (c) => c.status === AnimalStatusSchema.enum.inProgress,
   ).length;
 
   return (
@@ -33,12 +35,14 @@ export const RescueCasesSection = ({
           <h2 className="text-foreground font-serif text-2xl font-bold">
             {t('rescue_cases.section_title')}
           </h2>
-          <p className="text-muted-foreground mt-0.5 text-sm">
-            {pendingCount}
-            {t('common.rescue_status_pending')}
-            {inProgressCount}
-            {t('common.rescue_status_inProgress')}
-          </p>
+          {showStatusSummary && (
+            <p className="text-muted-foreground mt-0.5 text-sm">
+              {pendingCount}
+              {t('common.rescue_status_pending')}
+              {inProgressCount}
+              {t('common.rescue_status_inProgress')}
+            </p>
+          )}
         </div>
         {onSeeAll && (
           <button

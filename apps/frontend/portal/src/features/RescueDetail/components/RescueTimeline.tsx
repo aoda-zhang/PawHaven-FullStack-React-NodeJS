@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/frontend-core';
+import { cn, formatDateTime } from '@pawhaven/frontend-core';
 import { Clock, CheckCircle, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -11,7 +11,7 @@ interface RescueTimelineProps {
 }
 
 export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sortedUpdates = updates
     .slice()
     .sort(
@@ -22,12 +22,12 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   return (
     <div className="bg-surface rounded-card shadow-card mt-6 w-full p-6">
       <h2 className="text-text mb-6 text-xl font-bold">
-        {t('reportStray.rescue_timeline')}
+        {t('reportAnimal.rescue_timeline')}
       </h2>
 
       {sortedUpdates.length === 0 ? (
         <p className="text-text-muted py-8 text-center">
-          {t('reportStray.no_updates_yet')}
+          {t('reportAnimal.no_updates_yet')}
         </p>
       ) : (
         <div className="relative pl-6">
@@ -69,7 +69,9 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
                   <div className="mt-2 flex gap-4 text-sm sm:mt-0">
                     <div className="text-text-muted flex items-center gap-1">
                       <Clock size={14} />
-                      <span>{new Date(update.timestamp).toLocaleString()}</span>
+                      <span>
+                        {formatDateTime(update.timestamp, i18n.language)}
+                      </span>
                     </div>
                     <div className="text-text-muted flex items-center gap-1">
                       <User size={14} />

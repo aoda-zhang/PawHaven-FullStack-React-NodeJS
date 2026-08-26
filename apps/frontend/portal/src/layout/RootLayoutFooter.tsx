@@ -1,11 +1,46 @@
 import { Brand } from '@pawhaven/frontend-core';
 import { Github, Home, Mail, PawPrint, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useInRouterContext, useNavigate } from 'react-router-dom';
+import type { NavigateFunction } from 'react-router-dom';
+
+const FooterLink = ({
+  to,
+  className,
+  label,
+}: {
+  to: string;
+  className: string;
+  label: string;
+}) => {
+  const inRouter = useInRouterContext();
+  return inRouter ? (
+    <Link to={to} className={className}>
+      {label}
+    </Link>
+  ) : (
+    <a href={to} className={className}>
+      {label}
+    </a>
+  );
+};
+
+const RouterBrand = () => <Brand navigate={useNavigate()} />;
+
+const StandaloneBrand = () => {
+  const goHome: NavigateFunction = () => {
+    window.location.assign('/');
+  };
+  return <Brand navigate={goHome} />;
+};
+
+const FooterBrand = () => {
+  const inRouter = useInRouterContext();
+  return inRouter ? <RouterBrand /> : <StandaloneBrand />;
+};
 
 export const RootLayoutFooter = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
   const footerColumns = [
@@ -14,8 +49,8 @@ export const RootLayoutFooter = () => {
       links: [
         { label: t('footer.columns.platform.browse_rescues'), to: '/rescues' },
         {
-          label: t('footer.columns.platform.report_stray'),
-          to: '/report-stray',
+          label: t('footer.columns.platform.report_animal'),
+          to: '/report-animal',
         },
         { label: t('footer.columns.platform.adopt_animal'), to: '/adopt' },
         { label: t('footer.columns.platform.volunteer'), to: '/volunteer' },
@@ -99,7 +134,7 @@ export const RootLayoutFooter = () => {
       <div className="mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6">
         <div className="mb-12 grid gap-10 lg:grid-cols-5">
           <div className="lg:col-span-1">
-            <Brand navigate={navigate} />
+            <FooterBrand />
             <p className="text-brown-7 mt-4 text-sm leading-relaxed">
               {t('footer.brand_description')}
             </p>
@@ -129,12 +164,11 @@ export const RootLayoutFooter = () => {
                 <ul className="flex flex-col gap-2.5">
                   {column.links.map((link) => (
                     <li key={link.label}>
-                      <Link
+                      <FooterLink
                         to={link.to}
                         className="text-footer-text block text-left text-sm transition-colors hover:text-white"
-                      >
-                        {link.label}
-                      </Link>
+                        label={link.label}
+                      />
                     </li>
                   ))}
                 </ul>

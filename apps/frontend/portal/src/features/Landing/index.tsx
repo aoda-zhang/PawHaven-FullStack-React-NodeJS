@@ -2,8 +2,8 @@ import { SystemError } from '@pawhaven/frontend-core';
 import { Loading } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 
-import { useGetAppBootstrap } from './api/landing.queries';
-import type { LandingDataType } from './landingContext';
+import { useGetHomeData } from './api/landing.queries';
+import { EMPTY_HERO_STATS, type LandingDataType } from './landingContext';
 import { LandingContext } from './landingContext';
 
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
@@ -14,16 +14,17 @@ interface LandingProps {
 }
 export const Landing = ({ children }: LandingProps) => {
   const { profile } = useGlobalState();
-  const bootstrapScope = {
+  const homeScope = {
     userID: profile?.baseUserInfo?.userID ?? '',
     menuUpdateAt: profile?.baseUserInfo?.globalMenuUpdateAt ?? '',
     routerUpdateAt: profile?.baseUserInfo?.globalRouterUpdateAt ?? '',
   };
-  const { data, isError, isLoading } = useGetAppBootstrap(bootstrapScope);
+  const { data, isError, isLoading } = useGetHomeData(homeScope);
 
   const contextValue: LandingDataType = data ?? {
     menus: [],
     routers: [],
+    heroStats: EMPTY_HERO_STATS,
   };
 
   return (

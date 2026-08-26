@@ -19,6 +19,9 @@ import { AuthService } from './auth.service';
           signOptions: {
             expiresIn,
           },
+          verifyOptions: {
+            clockTolerance: 30,
+          },
         };
       },
       inject: [ConfigService],

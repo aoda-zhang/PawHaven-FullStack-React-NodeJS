@@ -45,13 +45,11 @@ export const loadConfig = (): ConfigType => {
   try {
     const yamlContent = loadYamlContent();
 
-    // 1. interpolate env
     const interpolated = resolveAppConfig<ConfigType>(
       yamlContent as ConfigType,
       environmentVariables,
     );
 
-    // 2. validate
     const parsed = ConfigSchema.safeParse(interpolated);
 
     if (!parsed.success) {

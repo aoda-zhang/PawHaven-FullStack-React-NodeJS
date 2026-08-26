@@ -1,4 +1,6 @@
+import { formatDateTime } from '@pawhaven/frontend-core';
 import { Clock, MapPin } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 import type { RescueCase } from '../types';
 
@@ -11,6 +13,7 @@ interface CaseCardProps {
 }
 
 export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
+  const { i18n } = useTranslation();
   return (
     <div
       onClick={() => onClick(caseData.id)}
@@ -27,7 +30,7 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
     >
       <div className="bg-muted relative h-48 overflow-hidden">
         <img
-          src={caseData.image}
+          src={caseData.image ?? '/images/hero-rescue.jpg'}
           alt={caseData.title}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -57,12 +60,12 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
         <div className="border-border flex items-center justify-between border-t pt-3">
           <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
             <Clock className="h-3.5 w-3.5" />
-            {caseData.reportedAt}
+            {formatDateTime(caseData.reportedAt, i18n.language)}
           </div>
-          {caseData.distance && (
+          {caseData.distance > 0 && (
             <div className="text-primary bg-accent flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium">
               <MapPin className="h-3 w-3" />
-              {caseData.distance}
+              {caseData.distance} km
             </div>
           )}
         </div>

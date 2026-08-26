@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { deleteLogout, postLogin, postRegister } from './auth.api';
+import { postLogin, postLogout, postRegister } from './auth.api';
 import { authQueryKeys } from './auth.queryKeys';
 
 import { landingQueryKeys } from '@/features/Landing/api/landing.queryKeys';
@@ -25,7 +25,7 @@ export const useRegister = () => {
 export const useLogout = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: deleteLogout,
+    mutationFn: postLogout,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: authQueryKeys.all });
       queryClient.invalidateQueries({ queryKey: landingQueryKeys.all });

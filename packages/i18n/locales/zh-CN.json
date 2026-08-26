@@ -90,8 +90,8 @@
     "hero_subtitle": "从第一次发现到永远的归宿——PawHaven 把零散的求助声汇聚成一条透明可见的救助链路。",
     "hero_report_cta": "立即上报流浪动物",
     "hero_adopt_cta": "认识待领养的毛孩子",
-    "hero_stat_rescues": "已完成救助",
-    "hero_stat_adopted": "已找到家",
+    "hero_stat_rescues": "已上报动物",
+    "hero_stat_adopted": "已完成救助",
     "hero_stat_volunteers": "活跃志愿者",
     "hero_image_alt": "一名志愿者怀抱获救的猫和狗",
     "forever_home_title": "等待一个永远的家",
@@ -102,7 +102,7 @@
     "adoptable_badge": "可领养",
     "waiting_days": "已等待 {{days}} 天"
   },
-  "reportStray": {
+  "reportAnimal": {
     "report_animal": "上报流浪动物",
     "animal_basic_info": "动物基本信息",
     "animal_type": "动物类型",
@@ -162,6 +162,10 @@
     "wizard": {
       "title": "上报流浪动物",
       "subtitle": "60秒快速上报，让志愿者行动起来。每个细节都很重要。",
+      "sign_in_required_title": "登录后上报",
+      "sign_in_required_desc": "为了让志愿者能及时联系你，上报前请先登录。",
+      "sign_in_button": "去登录",
+      "loading": "加载中...",
       "step1_label": "位置",
       "step1_title": "动物在哪里？",
       "step1_subtitle": "分享准确位置，让志愿者能快速找到。",
@@ -286,7 +290,7 @@
       "platform": {
         "heading": "平台",
         "browse_rescues": "浏览救助",
-        "report_stray": "上报流浪动物",
+        "report_animal": "上报流浪动物",
         "adopt_animal": "领养动物",
         "volunteer": "成为志愿者"
       },

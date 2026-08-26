@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { getAppBootstrap } from './landing.api';
-import { landingQueryKeys, type BootstrapScope } from './landing.queryKeys';
+import { getHomeData } from './landing.api';
+import { landingQueryKeys, type HomeScope } from './landing.queryKeys';
 
-export const useGetAppBootstrap = (scope?: BootstrapScope) => {
+export const useGetHomeData = (scope?: HomeScope) => {
   return useQuery({
-    queryKey: landingQueryKeys.bootstrap(scope),
-    queryFn: getAppBootstrap,
+    queryKey: landingQueryKeys.home(scope),
+    queryFn: getHomeData,
     staleTime: Infinity,
   });
 };

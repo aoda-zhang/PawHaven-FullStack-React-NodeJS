@@ -1,11 +1,13 @@
-import type { MenuItem, RouterItem } from '@pawhaven/shared/types';
+import type { HeroStats, MenuItem, RouterItem } from '@pawhaven/shared/types';
 
 import { apiClient } from '@/utils/apiClient';
 
-// Fetch menu and router from server side
-export const getAppBootstrap = async (): Promise<{
+export interface HomeData {
   menus: MenuItem[];
   routers: RouterItem[];
-}> => {
-  return apiClient.get('core/app/bootstrap');
+  heroStats: HeroStats;
+}
+
+export const getHomeData = async (): Promise<HomeData> => {
+  return apiClient.get<HomeData>('core/home');
 };

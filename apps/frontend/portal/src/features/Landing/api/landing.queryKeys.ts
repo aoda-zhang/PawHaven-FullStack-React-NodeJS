@@ -1,4 +1,4 @@
-export interface BootstrapScope {
+export interface HomeScope {
   userID: string;
   menuUpdateAt: string;
   routerUpdateAt: string;
@@ -6,6 +6,6 @@ export interface BootstrapScope {
 
 export const landingQueryKeys = {
   all: ['landing'] as const,
-  bootstrap: (scope?: BootstrapScope) =>
-    [...landingQueryKeys.all, 'bootstrap', ...(scope ? [scope] : [])] as const,
+  home: (scope?: HomeScope) =>
+    [...landingQueryKeys.all, 'home', ...(scope ? [scope] : [])] as const,
 };

@@ -33,10 +33,15 @@ export const Register = () => {
             className="mt-5 space-y-3"
             noValidate
             onSubmit={formProps.handleSubmit((data) => {
-              mutate({
-                email: data.email,
-                password: data.password,
-              });
+              mutate(
+                {
+                  email: data.email,
+                  password: data.password,
+                },
+                {
+                  onSuccess: () => navigate(routePaths.home, { replace: true }),
+                },
+              );
             })}
           >
             <FormInput

@@ -3,9 +3,6 @@ logs
 *.log
 yarn-debug.log*
 lerna-debug.log*
-
-# Harness runtime task log (single-file, orchestrator-written, never committed)
-Harness/task-log.md
 react-app-env.d.ts
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -132,3 +129,10 @@ tsconfig.tsbuildinfo
 
 # prisma dev runtime
 **/prisma/**/client**
+
+# codebuddy
+.codebuddy/memory/*.md
+.codebuddy/teams
+.codebuddy/docs/ADR
+.codebuddy/task-log.md
+.codebuddy/docs/task-log.md

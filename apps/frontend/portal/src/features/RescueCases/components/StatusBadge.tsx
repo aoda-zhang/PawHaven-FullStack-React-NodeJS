@@ -1,15 +1,14 @@
 import { cn } from '@pawhaven/frontend-core';
+import type { AnimalStatus } from '@pawhaven/shared/types';
 import { useTranslation } from 'react-i18next';
-
-import type { RescueStatus } from '../types';
 
 import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
 
 interface StatusBadgeProps {
-  status: RescueStatus;
+  status: AnimalStatus;
 }
 
-const STATUS_LABEL_KEYS: Record<RescueStatus, string> = {
+const STATUS_LABEL_KEYS: Record<AnimalStatus, string> = {
   pending: 'common.rescue_status_pending',
   inProgress: 'common.rescue_status_inProgress',
   treated: 'common.rescue_status_treated',

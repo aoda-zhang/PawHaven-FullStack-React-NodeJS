@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import crypto from 'node:crypto';
+import type { IncomingMessage } from 'node:http';
 
 import { BadGatewayException, Injectable } from '@nestjs/common';
 import type { Request, Response, NextFunction } from 'express';
@@ -7,6 +8,7 @@ import {
   createProxyMiddleware,
   fixRequestBody,
   RequestHandler,
+  responseInterceptor,
 } from 'http-proxy-middleware';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@pawhaven/shared/types';
@@ -30,15 +32,58 @@ export class ProxyService {
         pathRewrite: this.rewritePath.bind(this),
         ignorePath: false,
         changeOrigin: true,
+        selfHandleResponse: true,
         logger: console,
         on: {
           proxyReq: this.handleProxyReq.bind(this),
-          proxyRes: this.handleProxyRes.bind(this),
+          proxyRes: responseInterceptor(this.wrapEnvelope.bind(this)),
         },
       });
     } catch (error) {
       throw new BadGatewayException(error);
     }
+  }
+
+  /**
+   * Wrap every successful JSON response into the global envelope
+   * { status, isSuccess, message, code, data } (ADR-002). Binary responses
+   * (pdf/image/octet-stream) and non-2xx errors pass through untouched so the
+   * frontend error handler can read code/message from the raw body.
+   */
+  private async wrapEnvelope(
+    buffer: Buffer,
+    proxyRes: IncomingMessage,
+    req: Request,
+    res: Response,
+  ): Promise<Buffer | string> {
+    const { 'x-trace-id': traceHeader } = req.headers;
+    const traceId =
+      typeof traceHeader === 'string' ? traceHeader : crypto.randomUUID();
+    res.setHeader('X-Trace-Id', traceId);
+    res.setHeader('Referrer-Policy', 'no-referrer');
+
+    const { 'content-type': contentType = '' } = proxyRes.headers;
+    const isJson = contentType.includes('application/json');
+    const { statusCode } = res;
+
+    if (!isJson || statusCode < 200 || statusCode >= 300) {
+      return buffer;
+    }
+
+    const body = JSON.parse(buffer.toString('utf8') || 'null');
+
+    // Avoid double-wrapping if an upstream service already enveloped.
+    if (body && typeof body === 'object' && 'isSuccess' in body) {
+      return buffer;
+    }
+
+    return JSON.stringify({
+      status: statusCode,
+      isSuccess: true,
+      message: 'ok',
+      code: '0',
+      data: body,
+    });
   }
 
   private resolveTarget(req: Request): string {
@@ -85,12 +130,6 @@ export class ProxyService {
     }
 
     fixRequestBody(proxyReq, req);
-  }
-
-  private handleProxyRes(_: any, req: Request, res: Response): void {
-    const traceId = req.headers['x-trace-id'] ?? crypto.randomUUID();
-    res.setHeader('X-Trace-Id', traceId);
-    res.setHeader('Referrer-Policy', 'no-referrer');
   }
 
   private rewritePath(path: string, req: Request): string {

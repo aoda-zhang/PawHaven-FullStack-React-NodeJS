@@ -90,8 +90,8 @@
     "hero_subtitle": "Von der ersten Sichtung bis zum sicheren Zuhause — PawHaven verwandelt verstreute Hilferufe in eine transparente Rettungskette.",
     "hero_report_cta": "Streuner jetzt melden",
     "hero_adopt_cta": "Adoptierbare Tiere treffen",
-    "hero_stat_rescues": "Abgeschlossene Rettungen",
-    "hero_stat_adopted": "Vermittelte Zuhause",
+    "hero_stat_rescues": "Gemeldete Tiere",
+    "hero_stat_adopted": "Abgeschlossene Rettungen",
     "hero_stat_volunteers": "Aktive Freiwillige",
     "hero_image_alt": "Eine Freiwillige hält eine gerettete Katze und einen geretteten Hund",
     "forever_home_title": "Bereit für ein Zuhause für immer",
@@ -102,7 +102,7 @@
     "adoptable_badge": "Adoptierbar",
     "waiting_days": "Wartet {{days}} Tage"
   },
-  "reportStray": {
+  "reportAnimal": {
     "report_animal": "Fundtier melden",
     "animal_basic_info": "Grundlegende Tierinformationen",
     "animal_type": "Tierart",
@@ -162,6 +162,10 @@
     "wizard": {
       "title": "Streunendes Tier melden",
       "subtitle": "Ihre 60-Sekunden-Meldung bringt Freiwillige in Aktion. Jedes Detail zählt.",
+      "sign_in_required_title": "Anmelden zum Melden",
+      "sign_in_required_desc": "Bitte melden Sie sich an, damit Freiwillige Sie zu Ihrer Meldung erreichen können.",
+      "sign_in_button": "Anmelden",
+      "loading": "Wird geladen...",
       "step1_label": "Standort",
       "step1_title": "Wo ist das Tier?",
       "step1_subtitle": "Teilen Sie den genauen Standort, damit Freiwillige ihn schnell finden.",
@@ -287,7 +291,7 @@
       "platform": {
         "heading": "Plattform",
         "browse_rescues": "Rettungen durchsuchen",
-        "report_stray": "Streuner melden",
+        "report_animal": "Streuner melden",
         "adopt_animal": "Tier adoptieren",
         "volunteer": "Freiwilliger werden"
       },

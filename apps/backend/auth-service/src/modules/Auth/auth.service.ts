@@ -1,10 +1,16 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   Injectable,
-  BadRequestException,
+  UnauthorizedException,
   ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtVerifyInfo, AuthResponseDto } from '@pawhaven/shared/types';
+import {
+  JwtVerifyInfo,
+  AuthResponseDto,
+  TokenType,
+} from '@pawhaven/shared/types';
 import { isProd } from '@pawhaven/shared/utils';
 import * as bcrypt from 'bcrypt';
 import {
@@ -51,16 +57,17 @@ export class AuthService {
     @InjectPrisma(databaseEngines.mongodb)
     private prisma: PrismaClient,
   ) {
+    const accessExpiresIn = this.config.get<number>('auth.jwtExpiresIn') || 900;
+    const refreshExpiresIn =
+      this.config.get<number>('auth.refreshTokenExpiresIn') || 604800;
+
     this.tokenConfig = {
       expiresIn: {
-        access: this.config.get<number>('auth.jwtExpiresIn') || 60,
-        refresh:
-          this.config.get<number>('auth.refreshTokenExpiresIn') || 604800,
+        access: accessExpiresIn,
+        refresh: refreshExpiresIn,
       },
       maxAge: {
-        refresh:
-          (this.config.get<number>('auth.refreshTokenExpiresIn') || 604800) *
-          1000,
+        refresh: refreshExpiresIn * 1000,
       },
     };
 
@@ -84,18 +91,28 @@ export class AuthService {
     };
   }
 
-  /**
-   * Sign and return JWT token
-   */
-  private signToken(payload: Omit<JwtVerifyInfo, 'iat' | 'exp'>): string {
-    return this.jwtService.sign(payload, {
-      expiresIn: this.tokenConfig.expiresIn.access,
-    });
+  private signToken(
+    payload: Pick<JwtVerifyInfo, 'userId' | 'email' | 'roles'>,
+  ): string {
+    return this.jwtService.sign(
+      {
+        ...payload,
+        type: 'access',
+        jti: randomUUID(),
+      },
+      { expiresIn: this.tokenConfig.expiresIn.access },
+    );
   }
 
-  private generateRefreshToken(userId: string): string {
+  private generateRefreshToken(
+    payload: Pick<JwtVerifyInfo, 'userId' | 'email' | 'roles'>,
+  ): string {
     return this.jwtService.sign(
-      { userId },
+      {
+        ...payload,
+        type: 'refresh',
+        jti: randomUUID(),
+      },
       { expiresIn: this.tokenConfig.expiresIn.refresh },
     );
   }
@@ -115,12 +132,18 @@ export class AuthService {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async verifyToken(token: string): Promise<JwtVerifyInfo> {
+  async verifyToken(
+    token: string,
+    expectedType?: TokenType,
+  ): Promise<JwtVerifyInfo> {
     try {
-      return await this.jwtService.verifyAsync<JwtVerifyInfo>(token);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (_error) {
-      throw new BadRequestException(httpBusinessMappingCodes.invalidToken);
+      const payload = await this.jwtService.verifyAsync<JwtVerifyInfo>(token);
+      if (expectedType && payload.type !== expectedType) {
+        throw new Error('Token type mismatch');
+      }
+      return payload;
+    } catch {
+      throw new UnauthorizedException(httpBusinessMappingCodes.invalidToken);
     }
   }
 
@@ -188,20 +211,23 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         httpBusinessMappingCodes.invalidCredentials,
       );
     }
 
     const isPasswordValid = await this.comparePassword(password, user.password);
     if (!isPasswordValid) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         httpBusinessMappingCodes.invalidCredentials,
       );
     }
 
     const token = this.signToken({ userId: user.id, email: user.email });
-    const refreshToken = this.generateRefreshToken(user.id);
+    const refreshToken = this.generateRefreshToken({
+      userId: user.id,
+      email: user.email,
+    });
     const hashedRefreshToken = await this.hashPassword(refreshToken);
 
     await this.prisma.user.update({
@@ -241,12 +267,11 @@ export class AuthService {
       },
     });
 
-    const token = this.signToken({
+    const token = this.signToken({ userId: newUser.id, email: newUser.email });
+    const refreshToken = this.generateRefreshToken({
       userId: newUser.id,
       email: newUser.email,
     });
-
-    const refreshToken = this.generateRefreshToken(newUser.id);
     const hashedRefreshToken = await this.hashPassword(refreshToken);
 
     await this.prisma.user.update({
@@ -269,14 +294,14 @@ export class AuthService {
    * Refresh access token using refresh token
    */
   async refresh(refreshToken: string): Promise<AuthResponseDto> {
-    const payload = await this.verifyToken(refreshToken);
+    const payload = await this.verifyToken(refreshToken, 'refresh');
 
     const user = await this.prisma.user.findUnique({
       where: { id: payload.userId },
     });
 
     if (!user || !user.refreshToken) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         httpBusinessMappingCodes.invalidRefreshToken,
       );
     }
@@ -287,7 +312,7 @@ export class AuthService {
     );
 
     if (!isRefreshTokenValid) {
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         httpBusinessMappingCodes.invalidRefreshToken,
       );
     }
@@ -296,8 +321,10 @@ export class AuthService {
       userId: user.id,
       email: user.email,
     });
-
-    const newRefreshToken = this.generateRefreshToken(user.id);
+    const newRefreshToken = this.generateRefreshToken({
+      userId: user.id,
+      email: user.email,
+    });
     const newHashedRefreshToken = await this.hashPassword(newRefreshToken);
 
     await this.prisma.user.update({
