@@ -24,7 +24,7 @@ export const StepLocation = ({
   onAddressChange,
   onCoordinatesChange,
 }: StepLocationProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [geoState, setGeoState] = useState<GeoState>('idle');
   const [geoError, setGeoError] = useState('');
   const [geocodingState, setGeocodingState] = useState<GeocodingState>('idle');
@@ -34,7 +34,7 @@ export const StepLocation = ({
   const resolveAddress = async (lat: number, lng: number) => {
     setGeocodingState('resolving');
     try {
-      const placeName = await reverseGeocode(lat, lng);
+      const placeName = await reverseGeocode(lat, lng, i18n.language);
       if (placeName) {
         onAddressChange(placeName);
         setGeocodingState('idle');

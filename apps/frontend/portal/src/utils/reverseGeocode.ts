@@ -27,6 +27,7 @@ const buildDisplayName = (address: NominatimResponse['address']): string => {
 export const reverseGeocode = async (
   latitude: number,
   longitude: number,
+  language = 'en',
 ): Promise<string> => {
   const url = new URL(NOMINATIM_URL);
   url.searchParams.set('format', 'json');
@@ -34,7 +35,7 @@ export const reverseGeocode = async (
   url.searchParams.set('lon', String(longitude));
 
   const response = await fetch(url, {
-    headers: { 'User-Agent': USER_AGENT },
+    headers: { 'User-Agent': USER_AGENT, 'Accept-Language': language },
   });
   if (!response.ok) {
     throw new Error(`Reverse geocoding failed with status ${response.status}`);
