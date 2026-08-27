@@ -4,9 +4,9 @@ The **execution layer** of the .codebuddy. Each agent is a named role that the o
 
 ## The Orchestrator
 
-| Agent                     | Role                                                                                                                                                                                        | Pipeline Position          |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| [pawhaven](./pawhaven.md) | **Main dispatcher.** Receives the request, classifies scope, plans the agent-level dispatch, spawns subagents, maintains the task log, triggers review, and reports back. Never implements. | Start · coordination · end |
+| Agent                     | Role                                                                                                                                                                                          | Pipeline Position          |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| [pawhaven](./pawhaven.md) | **Main dispatcher.** Receives the request, classifies scope, plans the agent-level dispatch, spawns subagents, maintains the memory log, triggers review, and reports back. Never implements. | Start · coordination · end |
 
 ## Implementation & Analysis Agents
 
@@ -23,4 +23,4 @@ The **execution layer** of the .codebuddy. Each agent is a named role that the o
 
 Each agent declares which workflow segment it runs and which principles it enforces in its `### 1a. Wiring` section. The orchestrator (`pawhaven.md`) holds the full dispatch table.
 
-**Related**: [Workflows](../workflows/README.md) · [Communication Protocol](../docs/agent-communication-protocol.md) · [Task Log](../docs/task-log.md)
+**Related**: [Workflows](../workflows/README.md) · [Communication Protocol](../docs/agent-communication-protocol.md)

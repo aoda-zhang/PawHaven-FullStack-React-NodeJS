@@ -10,6 +10,7 @@ The **always-on constraints** of the .codebuddy. Rules are repo facts — they d
 | [documentation](./documentation.md)         | Documentation constraints: what must be documented, where, and how it stays in sync.                    |
 | [git](./git.md)                             | Git constraints: commit discipline, branch rules, what is never pushed.                                 |
 | [orchestrator](./orchestrator.md)           | Orchestrator dispatch discipline: planning & approval, scope & ownership, verification & reporting.     |
+| [components](./components.md)               | Component building constraints: React 19 (no `forwardRef`), props, styling, a11y, types.                |
 | [harness-validator](./harness-validator.md) | CI integrity checks: broken links, stale references, agent name consistency, directory existence.       |
 
 ## How They Enforce

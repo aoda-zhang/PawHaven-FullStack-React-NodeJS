@@ -166,7 +166,45 @@ export class HomeService {
     }
   }
 
-  async getAppMenus(userRoles: string[] = [this.defaultRole]): Promise<Menu> {
+  private applyAuthMenuFilter(
+    menus: MenuItem[],
+    isAuthenticated: boolean,
+  ): MenuItem[] {
+    if (!isAuthenticated) {
+      return menus;
+    }
+
+    const loginMenus = menus.filter((menu) =>
+      (menu.classNames ?? []).includes('login'),
+    );
+
+    if (loginMenus?.length === 0) {
+      return menus;
+    }
+
+    const nonLoginMenus = menus.filter(
+      (menu) => !(menu.classNames ?? []).includes('login'),
+    );
+    const maxOrder = nonLoginMenus.reduce(
+      (max, menu) => Math.max(max, menu.order ?? 0),
+      0,
+    );
+
+    return [
+      ...nonLoginMenus,
+      {
+        label: 'auth.logout',
+        to: loginMenus[0].to,
+        classNames: ['logout'],
+        order: maxOrder + 1,
+      },
+    ];
+  }
+
+  async getAppMenus(
+    userRoles: string[] = [this.defaultRole],
+    isAuthenticated = false,
+  ): Promise<Menu> {
     try {
       const userPermissionSet = await this.getPermissionSetByRoles(userRoles);
       const menus = await this.prisma.menu.findMany({
@@ -191,7 +229,7 @@ export class HomeService {
         orderBy: { order: 'asc' },
       });
 
-      return menus
+      const visibleMenus = menus
         .filter((menu) =>
           this.hasAccessByPermissions(
             menu.menuPermissions.map((permission) => permission.permissionId),
@@ -204,6 +242,8 @@ export class HomeService {
           classNames: menu.classNames,
           order: menu.order,
         }));
+
+      return this.applyAuthMenuFilter(visibleMenus, isAuthenticated);
     } catch (error) {
       this.logger.error('Failed to get app menus', error);
       throw new BadRequestException('get menus failed');
@@ -388,10 +428,11 @@ export class HomeService {
   }
 
   async getHomeData(
+    isAuthenticated = false,
     userRoles: string[] = [this.defaultRole],
   ): Promise<{ menus: Menu; routers: Router; heroStats: HeroStats }> {
     const [menus, routers, heroStats] = await Promise.all([
-      this.getAppMenus(userRoles),
+      this.getAppMenus(userRoles, isAuthenticated),
       this.getAppRouters(userRoles),
       this.getStats(),
     ]);

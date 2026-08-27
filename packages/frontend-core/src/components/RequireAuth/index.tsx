@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom';
 
+import { Loading } from '../Loading';
+
 interface RequireAuthProps {
   children: React.ReactNode;
   isLoading: boolean;
@@ -16,7 +18,7 @@ export const RequireAuth = ({
   const location = useLocation();
 
   if (isLoading) {
-    return null;
+    return <Loading />;
   }
 
   if (isError) {

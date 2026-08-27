@@ -22,13 +22,13 @@ export interface AnimalDetail {
   name: string;
   animalType: string;
   age: 'baby' | 'young' | 'adult' | 'senior';
-  appearance: {
+  appearance?: {
     color: string;
     hasInjury: boolean;
     injuryDescription?: string;
     otherFeatures?: string;
   };
-  location: {
+  location?: {
     address: string;
     latitude: number;
     longitude: number;

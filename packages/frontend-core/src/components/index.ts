@@ -1,4 +1,6 @@
 export { Brand } from './Brand';
+export { Loading } from './Loading';
+export { SuspenseWrapper } from './SuspenseWrapper';
 export { RequireAuth } from './RequireAuth';
 export { NotFound } from './NotFound';
 export { SystemError } from './SystemError';

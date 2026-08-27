@@ -93,17 +93,17 @@ packages/
 
 ### 2.4 Workflow Templates (reference for pipeline decisions)
 
-| Workflow            | File                                          | When to Use                                                                       |
-| ------------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
-| Investigation       | `.codebuddy/workflows/investigation.md`       | Read-only questions: how/why/are-we-sure                                          |
-| Feature Development | `.codebuddy/workflows/feature-development.md` | New feature (default pipeline)                                                    |
-| Bug Fix             | `.codebuddy/workflows/bug-fix.md`             | Bug fixes and patches                                                             |
-| Refactoring         | `.codebuddy/workflows/refactoring.md`         | Behavior-preserving structure/shape changes                                       |
-| Perf Issue          | `.codebuddy/workflows/perf-issue.md`          | Measured slowness, trace and optimize                                             |
-| Design Decision     | `.codebuddy/workflows/design-decision.md`     | Architecture/data-model/API choice                                                |
-| Architecture Change | `.codebuddy/workflows/architecture-change.md` | Service split, module restructure, paradigm change                                |
-| Parallel Execution  | `.codebuddy/workflows/parallel-execution.md`  | Long implementation after architect: split into small units, sync via log barrier |
-| Review Handoff      | `.codebuddy/workflows/handoff.md`             | Terminal step of most other workflows: verified diff, stop for human review       |
+| Workflow            | File                                          | When to Use                                                                               |
+| ------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Investigation       | `.codebuddy/workflows/investigation.md`       | Read-only questions: how/why/are-we-sure                                                  |
+| Feature Development | `.codebuddy/workflows/feature-development.md` | New feature (default pipeline)                                                            |
+| Bug Fix             | `.codebuddy/workflows/bug-fix.md`             | Bug fixes and patches                                                                     |
+| Refactoring         | `.codebuddy/workflows/refactoring.md`         | Behavior-preserving structure/shape changes                                               |
+| Perf Issue          | `.codebuddy/workflows/perf-issue.md`          | Measured slowness, trace and optimize                                                     |
+| Design Decision     | `.codebuddy/workflows/design-decision.md`     | Architecture/data-model/API choice                                                        |
+| Architecture Change | `.codebuddy/workflows/architecture-change.md` | Service split, module restructure, paradigm change                                        |
+| Parallel Execution  | `.codebuddy/workflows/parallel-execution.md`  | Long implementation after architect: split into small units, sync via memory-file barrier |
+| Review Handoff      | `.codebuddy/workflows/handoff.md`             | Terminal step of most other workflows: verified diff, stop for human review               |
 
 ### 2.5 Engineering Methodology
 
@@ -227,14 +227,14 @@ Subagents have a **300-second timeout** when dispatched synchronously (standard 
 
 **Choose the right dispatch mode before spawning:**
 
-| Task Complexity       | Examples                                                                                | Mode                                  | Method                                                                                                                   |
-| --------------------- | --------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **Simple**            | "Fix typo", "Add one component", "Update i18n keys", "Modify one file"                  | **Sync subagent**                     | `task(subagent_name="frontend", prompt="...")`                                                                           |
-| **Complex**           | "Implement feature X", "Create new page", "Add module with API + UI", "Refactor layout" | **Async team mode**                   | `team_create()` → `task(name="...", team_name="...", mode="bypassPermissions")`                                          |
-| **Long / Multi-unit** | Implementation after architect that is multi-file + cross-module + likely > 300s        | **Split & Sync (Parallel Execution)** | `workflows/parallel-execution.md` → split into U1..UN → `team_create()` → dispatch each unit → sync via task log barrier |
+| Task Complexity       | Examples                                                                                | Mode                                  | Method                                                                                                                      |
+| --------------------- | --------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Simple**            | "Fix typo", "Add one component", "Update i18n keys", "Modify one file"                  | **Sync subagent**                     | `task(subagent_name="frontend", prompt="...")`                                                                              |
+| **Complex**           | "Implement feature X", "Create new page", "Add module with API + UI", "Refactor layout" | **Async team mode**                   | `team_create()` → `task(name="...", team_name="...", mode="bypassPermissions")`                                             |
+| **Long / Multi-unit** | Implementation after architect that is multi-file + cross-module + likely > 300s        | **Split & Sync (Parallel Execution)** | `workflows/parallel-execution.md` → split into U1..UN → `team_create()` → dispatch each unit → sync via memory-file barrier |
 
 **Decision rule**: If the task requires reading architecture docs + implementing 2+ files → use team mode.
-**Decision rule (Split & Sync)**: After the architect delivers an ADR/design for a Standard/Architectural task, if the implementation spans multiple modules/workstreams or will likely exceed the 300s sync timeout, DO NOT spawn one giant subagent. Use `workflows/parallel-execution.md`: split into small units, dispatch in parallel, and have each unit sync its status through the task log barrier (§3.9).
+**Decision rule (Split & Sync)**: After the architect delivers an ADR/design for a Standard/Architectural task, if the implementation spans multiple modules/workstreams or will likely exceed the 300s sync timeout, DO NOT spawn one giant subagent. Use `workflows/parallel-execution.md`: split into small units, dispatch in parallel, and have each unit sync its status through the memory-file barrier (§3.9).
 
 ### 3.6 Execution Workflow
 
@@ -257,7 +257,7 @@ STEP 0: CLASSIFY & PLAN
   5. Produce agent-level plan (Section 3.2 format)
   6. Present to user (include complexity classification)
   7. WAIT for explicit confirmation (Standard/Architectural); proceed directly (Trivial)
-  8. On approval (or immediately for Trivial), open the task log: .codebuddy/task-log.md, append
+  8. On approval (or immediately for Trivial), open today's memory file: .codebuddy/memory/YYYY-MM-DD.md, append
      a new "## Task: YYYY-MM-DD-{slug}" section (§3.9)
         │
 STEP 1: ARCHITECT (complex changes only)
@@ -274,15 +274,15 @@ STEP 1b: SPLIT & SYNC (MANDATORY for long implementations — see §3.5)
   Instead run `workflows/parallel-execution.md`:
   1. Split implementation into small units U1..UN (one concern each, independent,
      one owner agent each, each ending in a verifiable check)
-  2. Write the Split Plan (unit table with WAITING status) into the task log (§3.9)
+  2. Write the Split Plan (unit table with WAITING status) into today's memory file (§3.9)
   3. team_create() → dispatch every unit in parallel (bypassPermissions)
   4. Each unit implements, then:
-     a. appends its status + report to the task log (append-only, own section)
-     b. READS THE ENTIRE task log to check all sibling units
+     a. appends its status + report to today's memory file (append-only, own section)
+     b. READS THE ENTIRE memory file to check all sibling units
      c. if ALL units DONE → barrier released → unit reports back
-     d. if ANY sibling NOT DONE → keep waiting (re-read the log) until all DONE
+     d. if ANY sibling NOT DONE → keep waiting (re-read the memory file) until all DONE
      e. if its OWN unit FAILED → append FAILED + reason, report immediately
-  5. When the log shows ALL units DONE → join the barrier, run the combined
+  5. When the memory file shows ALL units DONE → join the barrier, run the combined
      integration check (typecheck + lint + build), fix integration issues
   6. Advance to STEP 4 (Testing) with the integrated diff
   Skip for: single-workstream implementations that fit in one subagent
@@ -320,7 +320,7 @@ STEP 5: CODE REVIEW — two passes (skills/code-review/SKILL.MD)
   4. Report per pass: Tech Review verdict + Pattern Review verdict,
      each with Blocking / Warning / Suggestion
   5. If any blocking issue: re-spawn the responsible agent to fix (Step 1) →
-     re-test (Step 2) → re-review (Step 3); record each loop pass in the task log (§3.9)
+     re-test (Step 2) → re-review (Step 3); record each loop pass in the memory log (§3.9)
         │
 STEP 5b: STEP-COMPLETION VERIFICATION (MANDATORY — NO SKIP)
   1. Every subagent (frontend/backend/testing/review) MUST return a
@@ -333,7 +333,7 @@ STEP 5b: STEP-COMPLETION VERIFICATION (MANDATORY — NO SKIP)
      run ALL steps in order and return the Step Completion Checklist."
   4. A pipeline stage may NOT be marked complete while its subagent's steps
      are unverified. Skipping this verification is itself a violation.
-  5. Append each verified stage digest + checklist status to the task log (§3.9)
+  5. Append each verified stage digest + checklist status to the memory log (§3.9)
         │
 STEP 6: KNOWLEDGE CHECK
   1. If architecture changed / new ADR: spawn `knowledge-update` agent
@@ -343,7 +343,7 @@ STEP 7: SUMMARIZE
   1. Collect reports from all subagents
   2. Send shutdown_request to all team members → team_delete()
   3. Verify final state: typecheck + lint + full build (§5 Validation Commands)
-  4. Append the final Handoff section to the task log (§3.9)
+  4. Append the final Handoff section to today's memory file (§3.9)
   5. **MANDATORY: Doc Impact Assessment** — classify the handoff into one of:
      - `none` — no docs need updating (pure bug fix, no API/behavior change)
      - `update` — existing docs need updating (API changed, behavior modified)
@@ -351,8 +351,7 @@ STEP 7: SUMMARIZE
      - Write this classification into the handoff summary (§3.9), AND into the permanent
        record if this is an Architectural or Standard change. If Doc Impact is `update`
        or `create`, route to `knowledge-update` agent for permanent documentation.
-  6. ASK the user: "是否需要清空运行log？" → Yes → clear the file, No → keep
-  7. Present summary to user: what was built, changes, any follow-ups
+  6. Present summary to user: what was built, changes, any follow-ups
 ```
 
 ### 3.7 Timeout Recovery
@@ -362,13 +361,13 @@ If a sync subagent times out (300s), do NOT give up. Instead:
 1. Note what the subagent may have partially completed
 2. Re-spawn the SAME task using **team mode** — the async execution has no timeout
 3. The subagent will pick up where it left off (git status shows changed files)
-4. Append the timeout + recovery to the task log's Stuck Log (§3.9)
+4. Append the timeout + recovery to today's memory file's Stuck Log (§3.9)
 
 **Prevention beats recovery**: long implementations should never reach this state.
 After the architect step, run **Split & Sync** (STEP 1b, §3.5) so each dispatched
 unit is small enough to finish well inside the timeout. If a split-sync unit times
 out anyway, re-dispatch ONLY that unit in team mode; its siblings keep waiting at
-the barrier until the log shows all units DONE.
+the barrier until the memory file shows all units DONE.
 
 ### 3.8 When to Run in Parallel
 
@@ -379,28 +378,28 @@ Features can run in parallel ONLY when:
 - Two completely independent features
 - **Split & Sync units** (STEP 1b, §3.5): after the architect step, units split from
   ONE implementation run in parallel when they are independent concerns with no
-  runtime dependency on each other. The task log is the barrier: each unit appends
-  its status and waits for siblings before the wave joins (§3.9).
+  runtime dependency on each other. Today's memory file is the barrier: each unit
+  appends its status and waits for siblings before the wave joins (§3.9).
 
-**Default: sequential (Step 1 frontend → Step 2 backend).** Only parallelize when confident there are no cross-dependencies — but for a long implementation after architect, **prefer Split & Sync** over a single sequential implementation: it parallelizes independent units AND keeps a coordination barrier via the log.
+**Default: sequential (Step 1 frontend → Step 2 backend).** Only parallelize when confident there are no cross-dependencies — but for a long implementation after architect, **prefer Split & Sync** over a single sequential implementation: it parallelizes independent units AND keeps a coordination barrier via the memory file.
 
-### 3.9 Task Log — The Progress Document
+### 3.9 Memory Log — The Progress Document
 
-All workflow progress goes to **one** temporary runtime file, `.codebuddy/task-log.md` (.codebuddy root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never commit it. You own it:
+All workflow progress goes to **today's memory file**, `.codebuddy/memory/YYYY-MM-DD.md` (git-ignored, append-only). You own it:
 
 - **Open** it when the plan is approved (STEP 0): append a new `## Task: {YYYY-MM-DD-{slug}}` section with the header + plan.
 - **Append** a `## Phase:` section after every subagent stage: what the agent produced, the validation result, and whether its Step Completion Checklist was present.
 - **Record every loop**: a blocking finding routes back to the responsible implementer (Step 1 Fix → Step 2 Retest → Step 3 Re-review); log each pass.
 - **Log every stuck point** in the Stuck Log: what timed out, what was partially done, how it was recovered (see 3.7).
-- **Split Plan + unit status table**: in Split & Sync (STEP 1b), append the Split Plan with a unit status table. Each unit appends its own row update + `### Unit U1 — DONE/FAILED` report. This table IS the fork-join barrier: a unit reads the ENTIRE log to check sibling statuses and waits until all are DONE before reporting back.
-- **When the task completes** (STEP 7, summary presented): append the final `## Handoff` section, then **ask the user "是否需要清空运行log？"** — **Yes** → clear the file contents (keep the header), **No** → keep; the next task appends below.
+- **Split Plan + unit status table**: in Split & Sync (STEP 1b), append the Split Plan with a unit status table. Each unit appends its own row update + `### Unit U1 — DONE/FAILED` report. This table IS the fork-join barrier: a unit reads the ENTIRE memory file to check sibling statuses and waits until all are DONE before reporting back.
+- **When the task completes** (STEP 7, summary presented): append the final `## Handoff` section. Memory files are append-only daily records — there is no clearing step; the next task appends below.
 
-Why: the next stage references prior results from the log; if the task stalls, the log is where you (and the human) read the latest progress.
+Why: the next stage references prior results from the memory file; if the task stalls, it is where you (and the human) read the latest progress.
 
 **Write rules**:
 
-- **Orchestrator**: owns the log; opens tasks, appends phases, records loops/stuck points, joins the Split & Sync barrier, writes the Handoff.
-- **Subagents**: normally report back via their final message and do NOT write to the log — EXCEPT in Split & Sync mode (§3.5 STEP 1b), where each unit subagent appends ONLY its own unit row update + unit report (append-only, never edit another unit's section), then reads the ENTIRE log to check sibling status and waits for the barrier.
+- **Orchestrator**: owns the memory log; opens tasks, appends phases, records loops/stuck points, joins the Split & Sync barrier, writes the Handoff.
+- **Subagents**: normally report back via their final message and do NOT write to the memory file — EXCEPT in Split & Sync mode (§3.5 STEP 1b), where each unit subagent appends ONLY its own unit row update + unit report (append-only, never edit another unit's section), then reads the ENTIRE memory file to check sibling status and waits for the barrier.
 - **Append-only discipline**: no section is ever edited by a different agent; new content is appended at the end or under the writer's own unit heading.
 
 ---

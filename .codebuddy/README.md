@@ -92,16 +92,16 @@ Two verdicts, either can block: **Tech Review** asks "is the code written well" 
 
 ### Folder map
 
-| Folder                                  | Holds                    | Role in the system                                                                                                                                                                  |
-| --------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`dispatcher.md`](./dispatcher.md)      | The router skill         | The router. Classifies tasks, holds the non-negotiables, the 13-principle index, autonomy policy, subagent defaults, reply rules, workflow registry.                                |
-| [`workflows/`](./workflows/README.md)   | 8 fixed step sequences   | The plans. Copied verbatim into the todo list, executed step by step.                                                                                                               |
-| [`principles/`](./principles/README.md) | 13 leaf skills           | Decision rules. Read in full when applied; a citation must trace to a choice it changed.                                                                                            |
-| [`agents/`](./agents/README.md)         | Role definitions         | Who does what (pawhaven, architect, frontend, backend, code-review, ...). Each has scope and escalation.                                                                            |
-| [`skills/`](./skills/README.md)         | Skill folders            | Domain knowledge (react, styling, i18n, code-review doctors). Triggered by `description` in frontmatter.                                                                            |
-| [`rules/`](./rules/README.md)           | Always-on constraints    | Repo facts: architecture, security, testing, documentation, git.                                                                                                                    |
-| [`docs/`](./docs/README.md)             | Shared reference         | Product strategy, system architecture, design spec, agent-communication protocol, task-log format, standards.                                                                       |
-| `task-log.md` (runtime, git-ignored)    | Single task progress log | One temporary runtime file at the .codebuddy root, appended per task and per stage. The next stage references it; a stalled task is traced through it; cleared on the user's "Yes". |
+| Folder                                  | Holds                  | Role in the system                                                                                                                                                                         |
+| --------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`dispatcher.md`](./dispatcher.md)      | The router skill       | The router. Classifies tasks, holds the non-negotiables, the 13-principle index, autonomy policy, subagent defaults, reply rules, workflow registry.                                       |
+| [`workflows/`](./workflows/README.md)   | 8 fixed step sequences | The plans. Copied verbatim into the todo list, executed step by step.                                                                                                                      |
+| [`principles/`](./principles/README.md) | 13 leaf skills         | Decision rules. Read in full when applied; a citation must trace to a choice it changed.                                                                                                   |
+| [`agents/`](./agents/README.md)         | Role definitions       | Who does what (pawhaven, architect, frontend, backend, code-review, ...). Each has scope and escalation.                                                                                   |
+| [`skills/`](./skills/README.md)         | Skill folders          | Domain knowledge (react, styling, i18n, code-review doctors). Triggered by `description` in frontmatter.                                                                                   |
+| [`rules/`](./rules/README.md)           | Always-on constraints  | Repo facts: architecture, security, testing, documentation, git.                                                                                                                           |
+| [`docs/`](./docs/README.md)             | Shared reference       | Product strategy, system architecture, design spec, agent-communication protocol, standards.                                                                                               |
+| `memory/` (runtime, git-ignored)        | Daily memory log       | Today's memory file `.codebuddy/memory/YYYY-MM-DD.md` records the task section, phase digests, loops, and stuck points. The next stage references it; a stalled task is traced through it. |
 
 Each folder ships a `README.md` — read the folder README before diving into the files inside.
 
@@ -131,7 +131,7 @@ Every task, regardless of entry point (user prompt, `/pawhaven-mode`, or a dispa
 
 - **Verbatim-todo discipline** — workflow steps land in the todo list word-for-word. Each workflow ends in an evidence-gated feedback loop: Step 1 failing repro → Step 2 pass (bug-fix), Step 1 pinned behavior → Step 2 still green (refactoring), Step 1 baseline trace → Step 2 post-fix trace (perf).
 - **Verification is the religion** — _prove-it-works_: verify against the real artifact (typecheck, tests, build, rendered surface), never against "it compiles".
-- **Task log (single runtime file)** — all progress goes to `.codebuddy/task-log.md` (git-ignored, format: `docs/task-log.md`). The orchestrator appends a `## Task:` section per task and a digest after every stage; the next stage references it, and a stalled task is traced through it (Step 1 Stuck Log → Step 2 last Phase → Step 3 Handoff). When a task completes, the orchestrator asks **"是否需要清空运行log？"** — Yes → clear, No → keep.
+- **Memory log (daily runtime file)** — all progress goes to today's memory file `.codebuddy/memory/YYYY-MM-DD.md` (git-ignored). The orchestrator appends a `## Task:` section per task and a digest after every stage; the next stage references it, and a stalled task is traced through it (Step 1 Stuck Log → Step 2 last Phase → Step 3 Handoff). Memory files are append-only daily records — no clearing step.
 - **Review is two passes** — Tech Review (best practices, anti-patterns) and Pattern Review (fits the project's patterns and architecture). Two verdicts, either can block; blocking findings loop back to the implementer.
 - **Subagent discipline** — every subagent routes through the shared agent type (`agents/pawhaven.md`) so it inherits the same methodology; the parent owns every subagent's work, reviews the diff itself, and writes its own summary.
 - **Principles are decision-forcing** — laziness protocol (bias to delete), subtract-before-you-add, model-the-domain, prove-it-works, never-block-on-the-human, migrate-callers-then-delete-legacy.
@@ -160,7 +160,7 @@ The catalog above is the one-line summary — for the full steps and evidence ga
 
 1. **This file** — orientation.
 2. **`docs/agent-communication-protocol.md`** — the structured output formats every agent uses to interoperate.
-3. **`docs/task-log.md`** — the single runtime progress file (`.codebuddy/task-log.md`): what each stage produced, and where to look when a task stalls.
+3. **`.codebuddy/memory/YYYY-MM-DD.md`** — the daily memory log: what each stage produced, and where to look when a task stalls.
 4. **`docs/README.md`** — the documentation index (product strategy, architecture, design spec) for domain context.
 5. **The folder READMEs** — `workflows/` · `principles/` · `agents/` · `skills/` · `rules/` (each directory ships one; read it before the files inside). The router (`dispatcher.md`) lives at the root, introduced in Section 2 and indexed in Section 7.
 6. **`rules/`** — the always-on constraints for the current task.

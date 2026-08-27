@@ -263,9 +263,9 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 - Statuses: ✅ Pass, ❌ Fail, ⚠️ Warning, 💡 Suggestion
 - Severity: ❌ Blocking, ⚠️ Warning, 💡 Suggestion
 
-### 3.5 Task Log — The Progress Document
+### 3.5 Memory Log — The Progress Document
 
-All workflow progress goes to **one** temporary runtime file, `.codebuddy/task-log.md` (.codebuddy root, same level as `README.md`; format and lifecycle: `docs/task-log.md`). It is **git-ignored** — never committed. The orchestrator alone writes it:
+All workflow progress goes to **today's memory file**, `.codebuddy/memory/YYYY-MM-DD.md` (git-ignored, append-only). The orchestrator writes the task section; in Split & Sync mode, each unit appends its own unit section and reads the whole file as the fork-join barrier:
 
 - **Per task**: append a new `## Task: {Task ID}` section when the plan is approved.
 - **Per stage**: append a `## Phase:` digest (what the agent produced, validation result, whether its Step Completion Checklist was present) plus a pointer to the full structured report above.
@@ -273,8 +273,8 @@ All workflow progress goes to **one** temporary runtime file, `.codebuddy/task-l
 - **Per stuck point**: append to the Stuck Log (what timed out, what was partially done, how it was recovered).
 - **At completion**: append the final `## Handoff` section, then ask the user **"是否需要清空运行log？"** — **Yes** → clear the file contents (keep the header), **No** → keep; the next task appends below.
 
-If a task stalls, the log is the single place to read the latest progress: the Stuck Log says where it stopped, the last `## Phase:` says what finished, the Handoff section says whether it is done on purpose.
+If a task stalls, the memory log is the single place to read the latest progress: the Stuck Log says where it stopped, the last `## Phase:` says what finished, the Handoff section says whether it is done on purpose.
 
 ## 4. Cross-Reference
 
-**Related Docs**: [Task Log](./task-log.md) | [System Architecture Overview](./PawHaven-System-Architecture-Overview.md) | [Frontend Architecture](./PawHaven-Frontend-Architecture.md) | [Backend Architecture](./PawHaven-Backend-Architecture.md)
+**Related Docs**: [System Architecture Overview](./PawHaven-System-Architecture-Overview.md) | [Frontend Architecture](./PawHaven-Frontend-Architecture.md) | [Backend Architecture](./PawHaven-Backend-Architecture.md)

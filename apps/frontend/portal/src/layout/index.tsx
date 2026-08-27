@@ -1,5 +1,5 @@
-import { ContentFallback } from '@pawhaven/frontend-core';
-import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
+import { ContentFallback, Loading } from '@pawhaven/frontend-core';
+import { NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
