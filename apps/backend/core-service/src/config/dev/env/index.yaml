@@ -4,7 +4,7 @@ http:
   prefix: core-service
   timeout: 5000
   retryCount: 3
-  retryDelay: 500
+  retryDelay: 501
 
 swagger:
   title: 管理后台
