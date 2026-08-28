@@ -18,7 +18,6 @@
     "not_found_info": "Die gesuchte Seite wurde möglicherweise entfernt, umbenannt oder ist vorübergehend nicht verfügbar.",
     "sys_error": "<1>Oops! Etwas ist schiefgelaufen.</1><2>Bitte versuchen Sie, die Seite zu aktualisieren oder später erneut zurückzukehren.</2><3>Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support.</3><4>Zurück zur <5>Startseite</5></4>",
     "no_data": "Keine Daten verfügbar",
-    "condition": "Zustand",
     "anonymous": "Anonym",
     "volunteer": "Freiwillige/r",
     "loading": "Wird geladen",
@@ -219,7 +218,8 @@
       "nav_continue": "Weiter",
       "nav_submit": "Meldung abschicken",
       "case_number_prefix": "Fall-Nr. #",
-      "unknown": "Unbekannt"
+      "unknown": "Unbekannt",
+      "step3_label": "Zustand"
     }
   },
   "rescueGuide": {

@@ -18,7 +18,6 @@
     "not_found_info": "你访问的页面可能已被删除、名称已更改或暂时不可用。",
     "sys_error": "<heading>哎呀！出了点问题。</heading><para>请尝试刷新页面或稍后再试。</para><para>如果问题仍然存在，请联系支持。</para><link>返回 <a href='/'>主页</a></link>",
     "no_data": "暂无数据",
-    "condition": "当前状况",
     "anonymous": "匿名",
     "volunteer": "志愿者",
     "loading": "加载中",
@@ -218,7 +217,8 @@
       "nav_continue": "继续",
       "nav_submit": "提交上报",
       "case_number_prefix": "案例编号 #",
-      "unknown": "未知"
+      "unknown": "未知",
+      "step3_label": "状况"
     }
   },
   "rescueGuide": {
