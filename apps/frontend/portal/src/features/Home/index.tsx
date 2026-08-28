@@ -15,8 +15,9 @@ const LATEST_RESCUE_LIMIT = 4;
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { data: cases = [] } = useFetchLatestRescues(LATEST_RESCUE_LIMIT);
-  const { data: pets = [] } = useFetchAdoptablePets();
+  const { data: cases = [], isLoading: casesLoading } =
+    useFetchLatestRescues(LATEST_RESCUE_LIMIT);
+  const { data: pets = [], isLoading: petsLoading } = useFetchAdoptablePets();
 
   const handleCaseClick = useCallback(
     (id: string) => {
@@ -48,11 +49,13 @@ export const Home = () => {
         onCaseClick={handleCaseClick}
         onSeeAll={handleSeeAll}
         showStatusSummary={false}
+        isLoading={casesLoading}
       />
       <AdoptablePetsSection
         pets={pets}
         onPetClick={handlePetClick}
         onSeeAll={handleSeeAllPets}
+        isLoading={petsLoading}
       />
 
       <StrayCTA />

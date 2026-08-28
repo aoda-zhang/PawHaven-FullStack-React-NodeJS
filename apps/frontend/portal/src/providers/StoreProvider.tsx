@@ -1,4 +1,4 @@
-import { Loading } from '@pawhaven/frontend-core';
+import { Loading } from '@pawhaven/ui';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 

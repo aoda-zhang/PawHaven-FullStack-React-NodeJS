@@ -8,6 +8,8 @@ export { FormSelect } from './components/Form/FormSelect';
 export { PhoneInput, isValidPhoneNumber } from './components/PhoneInput';
 export { Phase } from './components/Phase';
 export { NotificationBanner } from './components/NotificationBanner';
+export { Loading } from './components/Loading';
+export { Skeleton, type SkeletonProps } from './components/Skeleton';
 export {
   Toast,
   showToast,

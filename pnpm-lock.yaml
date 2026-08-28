@@ -1337,6 +1337,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      lottie-react:
+        specifier: ^3.1.0
+        version: 3.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       lucide-react:
         specifier: ^0.545.0
         version: 0.545.0(react@19.2.8)
@@ -7446,6 +7449,15 @@ packages:
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
     hasBin: true
+
+  lottie-react@3.1.0:
+    resolution: {integrity: sha512-1iEQnS0UlCIHk5ogctWOPmGagxnxGv+XmIDLlztHS8Eohcmm8Jw/vNKMYMo/CkKtKdeUotyjGyd4ue+wZ5rZqg==}
+    peerDependencies:
+      react: ^18.2.0 || ^19.0.0
+      react-dom: ^18.2.0 || ^19.0.0
+
+  lottie-web@5.13.0:
+    resolution: {integrity: sha512-+gfBXl6sxXMPe8tKQm7qzLnUy5DUPJPKIyRHwtpCpyUEYjHYRJC/5gjUvdkuO2c3JllrPtHXH5UJJK8LRYl5yQ==}
 
   lru-cache@10.2.0:
     resolution: {integrity: sha512-2bIM8x+VAf6JT4bKAljS1qUWgMsqZRPGJS6FSahIMPVvctcNhyVp7AJu7quxOW9jwkryBReKZY5tY5JYv2n/7Q==}
@@ -16194,6 +16206,14 @@ snapshots:
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 3.0.0
+
+  lottie-react@3.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      lottie-web: 5.13.0
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+
+  lottie-web@5.13.0: {}
 
   lru-cache@10.2.0:
     optional: true

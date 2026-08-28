@@ -1,6 +1,5 @@
+import { Loading } from '@pawhaven/ui';
 import { Navigate, useLocation } from 'react-router-dom';
-
-import { Loading } from '../Loading';
 
 interface RequireAuthProps {
   children: React.ReactNode;

@@ -1,4 +1,5 @@
-import { SystemError, Loading } from '@pawhaven/frontend-core';
+import { SystemError } from '@pawhaven/frontend-core';
+import { Loading } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 
 import { useGetHomeData } from './api/landing.queries';
