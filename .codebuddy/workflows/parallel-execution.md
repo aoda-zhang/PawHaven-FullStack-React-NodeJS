@@ -1,8 +1,8 @@
 # Parallel Execution (Split & Sync)
 
 Split a long implementation into small, independently executable units, run them in
-parallel, and synchronize them through the task log — a fork-join barrier on
-`.codebuddy/task-log.md`.
+parallel, and synchronize them through today's memory file — a fork-join barrier on
+`.codebuddy/memory/YYYY-MM-DD.md`.
 
 You own this task. Split, dispatch, join, verify. Stay in the lead.
 
@@ -23,8 +23,8 @@ pipeline (see `pawhaven.md` §3.7).
      Name them U1..UN in dependency order. Units with no dependency between them may
      run in the same wave.
 
-2. **Write the Split Plan to the task log.** Under the task section in
-   `.codebuddy/task-log.md`, append:
+2. **Write the Split Plan to today's memory file.** Under the task section in
+   `.codebuddy/memory/YYYY-MM-DD.md`, append:
 
    ```
    ## Split Plan
@@ -47,27 +47,27 @@ pipeline (see `pawhaven.md` §3.7).
    ```
    SYNC PROTOCOL (mandatory):
    1. Implement your unit. Validate it (typecheck/lint/build for your scope).
-   2. APPEND your completion to the task log (.codebuddy/task-log.md):
+   2. APPEND your completion to today's memory file (.codebuddy/memory/YYYY-MM-DD.md):
       - update your row: | U1 | ... | DONE |
       - append a unit report: ### Unit U1 — DONE (files changed, validation
         evidence, Step Completion Checklist)
       Append-only: never edit another unit's section.
-   3. READ THE ENTIRE task log.
+   3. READ THE ENTIRE memory file.
    4. Check every sibling unit's status in the Split Plan table.
    5. If ALL units are DONE → barrier released → return your final report now.
-   6. If ANY sibling is NOT DONE → keep waiting: re-read the log after a short
-      delay; repeat until ALL units are DONE, then return your final report.
+   6. If ANY sibling is NOT DONE → keep waiting: re-read the memory file after a
+      short delay; repeat until ALL units are DONE, then return your final report.
    7. If YOUR unit FAILED → append ### Unit U1 — FAILED with the reason, return
       immediately with FAILED status (do NOT wait for siblings).
    ```
 
-5. **Join the barrier.** When the log shows ALL units DONE, collect the unit
-   reports. Run the integration check on the COMBINED tree: `pnpm typecheck`,
+5. **Join the barrier.** When the memory file shows ALL units DONE, collect the
+   unit reports. Run the integration check on the COMBINED tree: `pnpm typecheck`,
    `pnpm lint`, `pnpm build`. If integration fails, route the fix back to the
    owning unit (or fix it directly if it is a merge conflict).
 
 6. **Advance.** Hand the verified, integrated diff to the next pipeline stage
-   (STEP 4 Testing). Record the join result in the task log.
+   (STEP 4 Testing). Record the join result in today's memory file.
 
 ## Reply
 

@@ -16,14 +16,18 @@ export class HomeController {
     summary:
       'Get combined home data: menus, routers and hero section statistics',
   })
-  getHomeData(@Headers('x-auth-user-roles') userRolesHeader?: string): Promise<{
+  getHomeData(
+    @Headers('x-auth-verified') verifiedHeader?: string,
+    @Headers('x-auth-user-roles') userRolesHeader?: string,
+  ): Promise<{
     menus: MenuItemDto[];
     routers: RouterItemDTO[];
     heroStats: HeroStats;
   }> {
     const userRoles = this.homeService.resolveRequestRoles(userRolesHeader);
+    const isAuthenticated = verifiedHeader === '1';
 
-    return this.homeService.getHomeData(userRoles);
+    return this.homeService.getHomeData(isAuthenticated, userRoles);
   }
 
   @Post('/menu')

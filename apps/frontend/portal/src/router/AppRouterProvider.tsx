@@ -1,5 +1,4 @@
-import { RequireAuth } from '@pawhaven/frontend-core';
-import { SuspenseWrapper } from '@pawhaven/ui';
+import { RequireAuth, SuspenseWrapper } from '@pawhaven/frontend-core';
 import { useMemo, type ReactNode } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -27,17 +26,15 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
 const createRouteElement = (route: RouterEle): ReactNode => {
   const handle = route.handle ?? {};
-  const page = handle.isLazyLoad ? (
-    <SuspenseWrapper>{routerElementMapping[route.element]}</SuspenseWrapper>
+  const page = routerElementMapping[route.element];
+
+  const element = handle?.isRequireUserLogin ? (
+    <ProtectedRoute>{page}</ProtectedRoute>
   ) : (
-    routerElementMapping[route.element]
+    page
   );
 
-  if (!handle?.isRequireUserLogin) {
-    return page;
-  }
-
-  return <ProtectedRoute>{page}</ProtectedRoute>;
+  return <SuspenseWrapper>{element}</SuspenseWrapper>;
 };
 
 const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {

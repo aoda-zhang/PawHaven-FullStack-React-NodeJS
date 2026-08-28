@@ -1,3 +1,4 @@
+import { Loading } from '@pawhaven/ui';
 import { Navigate, useLocation } from 'react-router-dom';
 
 interface RequireAuthProps {
@@ -16,7 +17,7 @@ export const RequireAuth = ({
   const location = useLocation();
 
   if (isLoading) {
-    return null;
+    return <Loading />;
   }
 
   if (isError) {

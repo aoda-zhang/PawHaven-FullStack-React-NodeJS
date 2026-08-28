@@ -1,5 +1,6 @@
 import { cn } from '@pawhaven/frontend-core';
 import type { AnimalReportDto } from '@pawhaven/shared/types';
+import { isValidPhoneNumber } from '@pawhaven/ui';
 import { ArrowLeft, CheckCircle, ChevronRight } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -135,10 +136,9 @@ export const ReportWizard: React.FC = () => {
     }
   };
 
-  const phoneRegex = /^[\d\s\-+()]{7,20}$/;
-
   const handleSubmit = () => {
-    if (!phoneRegex.test(draft.contactPhone)) {
+    const fullPhone = draft.contactPhone.trim();
+    if (!fullPhone || !isValidPhoneNumber(fullPhone)) {
       setContactError(true);
       return;
     }
@@ -183,7 +183,7 @@ export const ReportWizard: React.FC = () => {
         : '',
       contactInfo: {
         name: 'Anonymous',
-        phone: draft.contactPhone,
+        phone: fullPhone,
         email: '',
       },
     };

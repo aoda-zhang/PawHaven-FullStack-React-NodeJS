@@ -1,3 +1,4 @@
+import { PhoneInput } from '@pawhaven/ui';
 import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -70,13 +71,10 @@ export const StepConfirm: React.FC<StepConfirmProps> = ({
         <label className="text-foreground mb-1.5 block text-sm font-medium">
           {t('reportAnimal.wizard.step5_contact_label')}
         </label>
-        <input
-          type="text"
-          value={contactPhone}
-          onChange={(e) => onContactPhoneChange(e.target.value)}
-          placeholder={t('reportAnimal.wizard.step5_contact_placeholder')}
-          aria-invalid={contactError}
-          className="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+        <PhoneInput
+          phone={contactPhone}
+          hasError={contactError}
+          onPhoneChange={onContactPhoneChange}
         />
         {contactError && (
           <p className="text-error mt-1 text-xs">

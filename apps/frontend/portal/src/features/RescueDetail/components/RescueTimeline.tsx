@@ -75,7 +75,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
                     </div>
                     <div className="text-text-muted flex items-center gap-1">
                       <User size={14} />
-                      <span>{update.operator.name}</span>
+                      <span>{update?.operator?.name}</span>
                     </div>
                   </div>
                 </div>

@@ -56,10 +56,10 @@ Location: Project root `README.MD` and `READMECN.MD`
 
 ## 7. Permanent vs Temporary Documentation
 
-| Type          | Location                  | Persistence                 | Trigger                                              | Examples                                                       |
-| ------------- | ------------------------- | --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
-| **Permanent** | `.codebuddy/docs/`        | Git-tracked, long-lived     | Architecture changes, new ADRs, API contract changes | System architecture, ADRs, feature workflows, design specs     |
-| **Temporary** | `.codebuddy/task-log.md`  | Git-ignored, session-scoped | Every task execution                                 | Runtime logs, task execution traces                            |
-| **Handoff**   | Workflows handoff summary | Ephemeral, per-task         | End of every task                                    | What changed, verification evidence, Doc Impact classification |
+| Type          | Location                          | Persistence                 | Trigger                                              | Examples                                                       |
+| ------------- | --------------------------------- | --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------- |
+| **Permanent** | `.codebuddy/docs/`                | Git-tracked, long-lived     | Architecture changes, new ADRs, API contract changes | System architecture, ADRs, feature workflows, design specs     |
+| **Temporary** | `.codebuddy/memory/YYYY-MM-DD.md` | Git-ignored, session-scoped | Every task execution                                 | Runtime notes, task execution traces                           |
+| **Handoff**   | Workflows handoff summary         | Ephemeral, per-task         | End of every task                                    | What changed, verification evidence, Doc Impact classification |
 
-> **Rule**: Permanent docs live in `.codebuddy/docs/` and are maintained by the `knowledge-update` agent. Temporary logs live in `task-log.md` and are cleared per session. Never confuse the two — a task log is not documentation, and documentation is not a task log.
+> **Rule**: Permanent docs live in `.codebuddy/docs/` and are maintained by the `knowledge-update` agent. Temporary runtime notes live in the daily memory file (`.codebuddy/memory/YYYY-MM-DD.md`). Never confuse the two — runtime notes are not documentation, and documentation is not runtime notes.

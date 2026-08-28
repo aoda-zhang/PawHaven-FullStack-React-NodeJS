@@ -23,15 +23,14 @@ export const RootLayoutMenu = ({
   const onOpenSidebar = useCallback(() => setSidebarOpen(true), []);
   const onCloseSidebar = useCallback(() => setSidebarOpen(false), []);
 
-  // Memoize derived menu splits to avoid re-filtering on every render.
   const { navItems, loginItem } = useMemo(() => {
-    const nav = menuItems.filter(
-      (item) => !(item.classNames as string[]).includes('login'),
+    const authItems = menuItems.filter((item) =>
+      (item.classNames as string[]).some(
+        (className) => className === 'login' || className === 'logout',
+      ),
     );
-    const login = menuItems.filter((item) =>
-      (item.classNames as string[]).includes('login'),
-    );
-    return { navItems: nav, loginItem: login };
+    const nav = menuItems.filter((item) => !authItems.includes(item));
+    return { navItems: nav, loginItem: authItems };
   }, [menuItems]);
 
   return (

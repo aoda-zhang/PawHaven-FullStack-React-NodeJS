@@ -1,16 +1,19 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import { ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { RescueCase } from '../types';
 
 import { CaseCard } from './CaseCard';
+import { RescueCasesSectionSkeleton } from './RescueCasesSectionSkeleton';
 
 interface RescueCasesSectionProps {
   cases: RescueCase[];
   onCaseClick: (id: string) => void;
   onSeeAll?: () => void;
   showStatusSummary?: boolean;
+  isLoading?: boolean;
 }
 
 export const RescueCasesSection = ({
@@ -18,6 +21,7 @@ export const RescueCasesSection = ({
   onCaseClick,
   onSeeAll,
   showStatusSummary = true,
+  isLoading = false,
 }: RescueCasesSectionProps) => {
   const { t } = useTranslation();
 
@@ -28,8 +32,31 @@ export const RescueCasesSection = ({
     (c) => c.status === AnimalStatusSchema.enum.inProgress,
   ).length;
 
+  let content: ReactNode;
+  if (isLoading) {
+    content = <RescueCasesSectionSkeleton />;
+  } else if (cases?.length === 0) {
+    content = (
+      <p className="text-text-secondary py-16 text-center">
+        {t('rescue_cases.no_cases_found')}
+      </p>
+    );
+  } else {
+    content = (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+        {cases.map((caseData) => (
+          <CaseCard
+            key={caseData.id}
+            caseData={caseData}
+            onClick={onCaseClick}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <section className="max-w-6xl py-10">
+    <section className="max-w-6xl py-10" aria-busy={isLoading}>
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-foreground font-serif text-2xl font-bold">
@@ -56,21 +83,7 @@ export const RescueCasesSection = ({
         )}
       </div>
 
-      {cases?.length === 0 ? (
-        <p className="text-text-secondary py-16 text-center">
-          {t('rescue_cases.no_cases_found')}
-        </p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-          {cases.map((caseData) => (
-            <CaseCard
-              key={caseData.id}
-              caseData={caseData}
-              onClick={onCaseClick}
-            />
-          ))}
-        </div>
-      )}
+      {content}
     </section>
   );
 };

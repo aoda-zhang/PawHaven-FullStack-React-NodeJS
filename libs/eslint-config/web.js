@@ -92,5 +92,14 @@ module.exports = {
         'import/no-default-export': 'off',
       },
     },
+    {
+      files: ['**/*.setup.ts', '**/*.setup.tsx'],
+      rules: {
+        'import/no-extraneous-dependencies': [
+          'error',
+          { devDependencies: true },
+        ],
+      },
+    },
   ],
 };
