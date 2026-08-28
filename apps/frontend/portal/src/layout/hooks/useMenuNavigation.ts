@@ -7,8 +7,11 @@ import type { NavigateFunction } from 'react-router-dom';
 import { MENU_CLASSES, type MenuClassKey } from '../menuClasses';
 
 import { useLogout } from '@/features/Auth/api/auth.mutations';
-import { routePaths } from '@/router/routePaths';
-import { useGlobalState } from '@/store/globalReducer';
+
+const LOGOUT_MENU_CLASS = 'logout';
+
+const isLogoutItem = (item: MenuItem) =>
+  (item.classNames ?? []).includes(LOGOUT_MENU_CLASS);
 
 interface UseMenuNavigationOptions {
   menuItems: MenuItem[];
@@ -22,19 +25,21 @@ export const useMenuNavigation = ({
   navigate,
 }: UseMenuNavigationOptions) => {
   const { t } = useTranslation();
-  const { profile } = useGlobalState();
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
-  const isLoggedIn = !!profile?.baseUserInfo?.userID;
+
+  // The backend swaps the login item for a `logout` one based on the session
+  // cookie, so the menu itself is the only trustworthy auth signal.
+  const isLoggedIn = useMemo(() => menuItems.some(isLogoutItem), [menuItems]);
 
   const handleMenuClick = useCallback(
     (item: MenuItem) => {
-      if (item.to === routePaths.login && isLoggedIn && !isLogoutPending) {
+      if (isLogoutItem(item) && !isLogoutPending) {
         logout();
         return;
       }
       navigate(item.to || '/');
     },
-    [isLoggedIn, isLogoutPending, logout, navigate],
+    [isLogoutPending, logout, navigate],
   );
 
   const resolvedItems = useMemo(

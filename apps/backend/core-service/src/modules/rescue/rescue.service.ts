@@ -4,10 +4,15 @@ import { databaseEngines } from '@pawhaven/backend-core/constants';
 import { PrismaClient } from '@prismaClient';
 import {
   RescueListItemSchema,
+  RescueDetailSchema,
+  RescueDetailAppearanceSchema,
+  RescueDetailLocationSchema,
+  RescueDetailReporterSchema,
   AnimalStatusSchema,
+  RescueAgeSchema,
   AnimalStatus,
 } from '@pawhaven/shared/types';
-import type { RescueListItem } from '@pawhaven/shared/types';
+import type { RescueListItem, RescueDetail } from '@pawhaven/shared/types';
 
 import { CreateRescueDto } from './DTO/rescue.DTO';
 
@@ -54,7 +59,7 @@ export class RescueService {
     }
   }
 
-  async findOne(id: string): Promise<RescueListItem> {
+  async findOne(id: string): Promise<RescueDetail> {
     try {
       const rescue = await this.prisma.animalReports.findUnique({
         where: { id },
@@ -62,7 +67,7 @@ export class RescueService {
       if (!rescue || rescue.deletedAt) {
         throw new BadRequestException(`Rescue not found: ${id}`);
       }
-      return this.toListItem(rescue);
+      return this.toDetail(rescue);
     } catch (error) {
       if (error instanceof BadRequestException) throw error;
       this.logger.error(`Failed to fetch rescue: ${id}`, error);
@@ -84,28 +89,64 @@ export class RescueService {
     reporterPhotos: string[];
     createdAt: Date;
   }): RescueListItem {
-    const appearance = (r.appearance ?? {}) as Record<string, unknown>;
-    const locationObj = (r.locationObj ?? {}) as Record<string, unknown>;
-    const reporter = (r.reporter ?? {}) as Record<string, unknown>;
-    const reporterName = (reporter.name as string) ?? '';
-    const address = (locationObj.address as string) ?? '';
+    const appearance = RescueDetailAppearanceSchema.parse(r.appearance ?? {});
+    const location = RescueDetailLocationSchema.parse(r.locationObj ?? {});
+    const reporter = RescueDetailReporterSchema.parse(r.reporter ?? {});
 
-    const status = AnimalStatusSchema.safeParse(r.animalStatus).success
-      ? (r.animalStatus as RescueListItem['status'])
-      : AnimalStatus.PENDING;
+    const status = AnimalStatusSchema.safeParse(r.animalStatus);
 
     return RescueListItemSchema.parse({
       id: r.id,
       title: r.name ?? 'Unknown animal',
       image: r.reporterPhotos[0],
-      status,
+      status: status.success ? status.data : AnimalStatus.PENDING,
       urgency: appearance.hasInjury === true ? 'high' : 'normal',
       animalType: r.animalType ?? r.animalTypeOther ?? 'unknown',
-      location: address,
+      location: location.address ?? '',
       description: r.statusDescription ?? '',
-      reporter: reporterName,
+      reporter: reporter.name ?? '',
       reportedAt: r.foundTime ?? r.createdAt.toISOString(),
       distance: 0,
+    });
+  }
+
+  private toDetail(r: {
+    id: string;
+    name: string | null;
+    animalType: string | null;
+    animalTypeOther: string | null;
+    age: string | null;
+    appearance: unknown;
+    locationObj: unknown;
+    foundTime: string | null;
+    animalStatus: string | null;
+    statusDescription: string | null;
+    reporter: unknown;
+    reporterPhotos: string[];
+    videos: string[];
+    createdAt: Date;
+    updatedAt: Date;
+  }): RescueDetail {
+    const status = AnimalStatusSchema.safeParse(r.animalStatus);
+    const age = RescueAgeSchema.safeParse(r.age);
+
+    return RescueDetailSchema.parse({
+      id: r.id,
+      name: r.name ?? 'Unknown animal',
+      animalType: r.animalType ?? r.animalTypeOther ?? 'unknown',
+      age: age.success ? age.data : undefined,
+      foundTime: r.foundTime ?? undefined,
+      status: status.success ? status.data : AnimalStatus.PENDING,
+      statusDescription: r.statusDescription ?? undefined,
+      description: r.statusDescription ?? undefined,
+      appearance: RescueDetailAppearanceSchema.parse(r.appearance ?? {}),
+      location: RescueDetailLocationSchema.parse(r.locationObj ?? {}),
+      photos: r.reporterPhotos,
+      videos: r.videos,
+      reporter: RescueDetailReporterSchema.parse(r.reporter ?? {}),
+      reportedAt: r.foundTime ?? r.createdAt.toISOString(),
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
     });
   }
 }

@@ -11,6 +11,13 @@ export type {
 } from './auth.schema';
 export type { RescueAge, CreateRescueDto } from './rescue.schema';
 export type { RescueListItem } from './rescue-list.schema';
+export type {
+  RescueDetail,
+  RescueDetailAppearance,
+  RescueDetailLocation,
+  RescueDetailReporter,
+  RescueDetailContactInfo,
+} from './rescue-detail.schema';
 export type { HeroStats } from './hero-stats.schema';
 export type { AdoptablePet } from './adoptable-pet.schema';
 export type { ApiResponseEnvelope } from './envelope.schema';
@@ -39,6 +46,13 @@ export {
   CreateRescueDtoSchema,
 } from './rescue.schema';
 export { RescueListItemSchema } from './rescue-list.schema';
+export {
+  RescueDetailSchema,
+  RescueDetailAppearanceSchema,
+  RescueDetailLocationSchema,
+  RescueDetailReporterSchema,
+  RescueDetailContactInfoSchema,
+} from './rescue-detail.schema';
 export { HeroStatsSchema } from './hero-stats.schema';
 export { AdoptablePetSchema } from './adoptable-pet.schema';
 export { ApiResponseEnvelopeSchema } from './envelope.schema';

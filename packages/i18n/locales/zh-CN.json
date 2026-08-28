@@ -18,6 +18,8 @@
     "not_found_info": "你访问的页面可能已被删除、名称已更改或暂时不可用。",
     "sys_error": "<heading>哎呀！出了点问题。</heading><para>请尝试刷新页面或稍后再试。</para><para>如果问题仍然存在，请联系支持。</para><link>返回 <a href='/'>主页</a></link>",
     "no_data": "暂无数据",
+    "anonymous": "匿名",
+    "volunteer": "志愿者",
     "loading": "加载中",
     "quick_links": "快速链接",
     "contact_me": "联系我",
@@ -165,9 +167,6 @@
     "wizard": {
       "title": "上报流浪动物",
       "subtitle": "60秒快速上报，让志愿者行动起来。每个细节都很重要。",
-      "sign_in_required_title": "登录后上报",
-      "sign_in_required_desc": "为了让志愿者能及时联系你，上报前请先登录。",
-      "sign_in_button": "去登录",
       "loading": "加载中...",
       "step1_label": "位置",
       "step1_title": "动物在哪里？",
@@ -182,7 +181,6 @@
       "step2_count_label": "动物数量",
       "step2_other_label": "是什么动物？",
       "step2_other_placeholder": "例如：兔子、鸟、乌龟……",
-      "step3_label": "状况",
       "step3_title": "外观与状况",
       "step3_subtitle": "描述你看到的，让志愿者做好准备。",
       "step3_color_label": "毛色",
@@ -219,7 +217,8 @@
       "nav_continue": "继续",
       "nav_submit": "提交上报",
       "case_number_prefix": "案例编号 #",
-      "unknown": "未知"
+      "unknown": "未知",
+      "step3_label": "状况"
     }
   },
   "rescueGuide": {
@@ -286,6 +285,25 @@
     "timeline_status_rescue_assigned": "已分配救援",
     "timeline_status_rescue_started": "救援开始",
     "timeline_status_rescued": "已救出"
+  },
+  "rescueDetail": {
+    "not_found": "未找到该救助案例",
+    "has_injury": "受伤",
+    "case_id": "案例编号 #{{id}}",
+    "no_timeline": "暂无救助进展。",
+    "volunteer_rescues": "已完成 {{count}} 次救助",
+    "volunteer_handling": "该志愿者正在处理此次救助。你可以申请协助。",
+    "offer_assistance": "申请协助",
+    "follow_case": "关注此案例",
+    "share_case": "分享案例",
+    "relevant_guides": "相关指南",
+    "guide_injured": "发现受伤动物时该怎么做",
+    "guide_injured_read": "6 分钟阅读",
+    "guide_kitten": "新生小猫救助完整指南",
+    "guide_kitten_read": "9 分钟阅读",
+    "guide_vehicle": "被撞动物急救指南",
+    "guide_vehicle_read": "7 分钟阅读",
+    "no_volunteer": "暂无志愿者认领此案例。"
   },
   "footer": {
     "columns": {

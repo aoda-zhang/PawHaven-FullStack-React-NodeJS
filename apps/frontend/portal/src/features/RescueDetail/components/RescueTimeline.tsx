@@ -1,104 +1,71 @@
-import { cn, formatDateTime } from '@pawhaven/frontend-core';
-import { Clock, CheckCircle, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import type { RescueUpdate } from '../types';
-
-import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
-
 interface RescueTimelineProps {
-  updates: RescueUpdate[];
+  updates: Array<{
+    status: string;
+    time: string;
+    description: string;
+    author: string;
+    photo?: string;
+  }>;
 }
 
 export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
-  const { t, i18n } = useTranslation();
-  const sortedUpdates = updates
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-    );
+  const { t } = useTranslation();
 
   return (
-    <div className="bg-surface rounded-card shadow-card mt-6 w-full p-6">
-      <h2 className="text-text mb-6 text-xl font-bold">
+    <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+      <h2 className="text-foreground mb-5 font-serif text-lg font-semibold">
         {t('reportAnimal.rescue_timeline')}
       </h2>
 
-      {sortedUpdates.length === 0 ? (
-        <p className="text-text-muted py-8 text-center">
-          {t('reportAnimal.no_updates_yet')}
+      {updates.length === 0 ? (
+        <p className="text-text-secondary text-sm">
+          {t('rescueDetail.no_timeline')}
         </p>
       ) : (
-        <div className="relative pl-6">
-          {sortedUpdates.map((update, index) => (
-            <div key={update.id} className="relative mb-8">
-              <div className="absolute top-3.5 -left-6 flex flex-col items-center">
-                <div
-                  className={cn(
-                    'z-base flex h-7 w-7 items-center justify-center rounded-full',
-                    getStatusColorByPrefix({
-                      status: update?.status,
-                      prefix: 'text',
-                    }),
-                  )}
+        <ol className="relative space-y-6 pl-6">
+          {updates.map((update, index) => {
+            const isLatest = index === 0;
+            return (
+              <li key={index} className="relative">
+                <span
+                  className={`absolute top-1 -left-6 flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                    isLatest
+                      ? 'border-status-high bg-status-high'
+                      : 'border-border bg-background'
+                  }`}
+                  aria-hidden="true"
                 >
-                  <CheckCircle size={16} />
+                  {!isLatest && (
+                    <span className="bg-text-muted h-2 w-2 rounded-full" />
+                  )}
+                </span>
+
+                <div>
+                  <div className="mb-1 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
+                    <span className="text-status-high">{update.status}</span>
+                    <span className="text-text-muted">{update.time}</span>
+                  </div>
+                  <p className="text-text-secondary text-sm leading-relaxed">
+                    {update.description}
+                  </p>
+                  <p className="text-text-muted mt-1 text-xs">
+                    — {update.author}
+                  </p>
+                  {update.photo && (
+                    <img
+                      src={update.photo}
+                      alt=""
+                      className="mt-3 h-28 w-full rounded-xl object-cover"
+                    />
+                  )}
                 </div>
-                {index < sortedUpdates.length - 1 && (
-                  <div className="bg-muted mt-1 h-full w-0.5" />
-                )}
-              </div>
-
-              <div className="bg-muted rounded-card p-4">
-                <div className="mb-3 flex flex-col items-start justify-between sm:flex-row sm:items-center">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={cn([
-                        'font-medium',
-                        getStatusColorByPrefix({
-                          status: update?.status,
-                          prefix: 'text',
-                        }),
-                      ])}
-                    >
-                      {t(`common.rescue_status_${update.status}`)}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 flex gap-4 text-sm sm:mt-0">
-                    <div className="text-text-muted flex items-center gap-1">
-                      <Clock size={14} />
-                      <span>
-                        {formatDateTime(update.timestamp, i18n.language)}
-                      </span>
-                    </div>
-                    <div className="text-text-muted flex items-center gap-1">
-                      <User size={14} />
-                      <span>{update?.operator?.name}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-text mb-4">{update.content}</p>
-
-                {update.images && update.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {update.images.map((img, i) => (
-                      <img
-                        key={img}
-                        src={img}
-                        alt={`Update ${i + 1}`}
-                        className="rounded-card h-24 w-24 object-cover"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+              </li>
+            );
+          })}
+        </ol>
       )}
-    </div>
+    </section>
   );
 };

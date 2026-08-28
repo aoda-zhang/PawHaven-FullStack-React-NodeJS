@@ -3,7 +3,12 @@ import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import {
+  Outlet,
+  ScrollRestoration,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 
 import { useMenuVisibility } from './hooks/useMenuVisibility';
 import { RootLayoutFooter } from './RootLayoutFooter';
@@ -22,6 +27,7 @@ export const RootLayout = () => {
 
   return (
     <div className="overflow-x-hidden">
+      <ScrollRestoration />
       <header className="z-sticky border-border bg-background/88 sticky top-0 border-b backdrop-blur-md">
         <Toast />
         {isSysMaintain && (

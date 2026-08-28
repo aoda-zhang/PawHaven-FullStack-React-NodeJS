@@ -18,6 +18,8 @@
     "not_found_info": "The page you are looking for might have been removed had its name changed or is temporary unavailable.",
     "sys_error": "<1>Oops! Something went wrong.</1><2>Please try refreshing the page or come back later.</2><3>If the problem persists, contact support.</3><4>Go back to <5>home</5></4>",
     "no_data": "No data available",
+    "anonymous": "Anonymous",
+    "volunteer": "Volunteer",
     "loading": "Loading",
     "quick_links": "Quick Links",
     "contact_me": "Contact Me",
@@ -165,9 +167,6 @@
     "wizard": {
       "title": "Report a Stray Animal",
       "subtitle": "Your 60-second report helps us get volunteers into action. Every detail counts.",
-      "sign_in_required_title": "Sign in to Report",
-      "sign_in_required_desc": "Please sign in so volunteers can reach you about your report.",
-      "sign_in_button": "Sign in",
       "loading": "Loading...",
       "step1_label": "Location",
       "step1_title": "Where is the animal?",
@@ -182,7 +181,6 @@
       "step2_count_label": "Number of animals",
       "step2_other_label": "What kind of animal?",
       "step2_other_placeholder": "e.g. Rabbit, bird, turtle...",
-      "step3_label": "Condition",
       "step3_title": "Appearance & condition",
       "step3_subtitle": "Describe what you see so volunteers come prepared.",
       "step3_color_label": "Coat color",
@@ -220,7 +218,8 @@
       "nav_continue": "Continue",
       "nav_submit": "Submit Report",
       "case_number_prefix": "Case #",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "step3_label": "Condition"
     }
   },
   "rescueGuide": {
@@ -287,6 +286,25 @@
     "timeline_status_rescue_assigned": "Rescue Assigned",
     "timeline_status_rescue_started": "Rescue Started",
     "timeline_status_rescued": "Rescued"
+  },
+  "rescueDetail": {
+    "not_found": "Rescue case not found",
+    "has_injury": "Injured",
+    "case_id": "Case #{{id}}",
+    "no_timeline": "No rescue updates yet.",
+    "volunteer_rescues": "{{count}} rescues completed",
+    "volunteer_handling": "This volunteer is currently handling this rescue. You can offer to assist.",
+    "offer_assistance": "Offer Assistance",
+    "follow_case": "Follow this case",
+    "share_case": "Share case",
+    "relevant_guides": "RELEVANT GUIDES",
+    "guide_injured": "What to Do When You Find an Injured Animal",
+    "guide_injured_read": "6 min read",
+    "guide_kitten": "Complete Newborn Kitten Rescue Guide",
+    "guide_kitten_read": "9 min read",
+    "guide_vehicle": "First Aid for Animals Hit by Vehicles",
+    "guide_vehicle_read": "7 min read",
+    "no_volunteer": "No volunteer has claimed this case yet."
   },
   "footer": {
     "columns": {
