@@ -36,7 +36,7 @@ const ErrorState = ({ onBack }: { onBack: () => void }) => {
         onClick={onBack}
         className="text-primary hover:text-primary-hover mt-4 inline-flex items-center gap-1 text-sm font-medium"
       >
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        <ArrowLeft className="pointer" aria-hidden="true" />
         {t('rescue_cases.back_to_cases')}
       </button>
     </div>
@@ -52,7 +52,7 @@ const BackButton = ({ onClick }: { onClick: () => void }) => {
       onClick={onClick}
       className="text-text-secondary hover:text-foreground mb-6 inline-flex items-center gap-1 text-sm font-medium transition-colors"
     >
-      <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+      <ArrowLeft className="pointer h-4 w-4" aria-hidden="true" />
       {t('rescue_cases.back_to_cases')}
     </button>
   );

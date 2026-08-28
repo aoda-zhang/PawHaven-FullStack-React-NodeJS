@@ -20,7 +20,7 @@
     "build:shared": "turbo run build --filter=@pawhaven/shared...",
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
-    "doctor": "npx react-doctor@latest"
+    "doctor:react": "npx react-doctor@latest"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

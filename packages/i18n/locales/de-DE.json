@@ -18,6 +18,9 @@
     "not_found_info": "Die gesuchte Seite wurde möglicherweise entfernt, umbenannt oder ist vorübergehend nicht verfügbar.",
     "sys_error": "<1>Oops! Etwas ist schiefgelaufen.</1><2>Bitte versuchen Sie, die Seite zu aktualisieren oder später erneut zurückzukehren.</2><3>Wenn das Problem weiterhin besteht, wenden Sie sich bitte an den Support.</3><4>Zurück zur <5>Startseite</5></4>",
     "no_data": "Keine Daten verfügbar",
+    "condition": "Zustand",
+    "anonymous": "Anonym",
+    "volunteer": "Freiwillige/r",
     "loading": "Wird geladen",
     "quick_links": "Schnellzugriff",
     "contact_me": "Kontakt",
@@ -165,9 +168,6 @@
     "wizard": {
       "title": "Streunendes Tier melden",
       "subtitle": "Ihre 60-Sekunden-Meldung bringt Freiwillige in Aktion. Jedes Detail zählt.",
-      "sign_in_required_title": "Anmelden zum Melden",
-      "sign_in_required_desc": "Bitte melden Sie sich an, damit Freiwillige Sie zu Ihrer Meldung erreichen können.",
-      "sign_in_button": "Anmelden",
       "loading": "Wird geladen...",
       "step1_label": "Standort",
       "step1_title": "Wo ist das Tier?",
@@ -182,7 +182,6 @@
       "step2_count_label": "Anzahl der Tiere",
       "step2_other_label": "Welche Art von Tier?",
       "step2_other_placeholder": "z.B. Kaninchen, Vogel, Schildkröte...",
-      "step3_label": "Zustand",
       "step3_title": "Aussehen & Zustand",
       "step3_subtitle": "Beschreiben Sie, was Sie sehen, damit Freiwillige vorbereitet sind.",
       "step3_color_label": "Fellfarbe",
@@ -287,6 +286,25 @@
     "timeline_status_rescue_assigned": "Rettung zugewiesen",
     "timeline_status_rescue_started": "Rettung gestartet",
     "timeline_status_rescued": "Gerettet"
+  },
+  "rescueDetail": {
+    "not_found": "Rettungsfall nicht gefunden",
+    "has_injury": "Verletzt",
+    "case_id": "Fall #{{id}}",
+    "no_timeline": "Noch keine Updates.",
+    "volunteer_rescues": "{{count}} Rettungen abgeschlossen",
+    "volunteer_handling": "Diese Freiwillige kümmert sich um diesen Fall. Du kannst anbieten zu helfen.",
+    "offer_assistance": "Hilfe anbieten",
+    "follow_case": "Fall folgen",
+    "share_case": "Fall teilen",
+    "relevant_guides": "RELEVANTE LEITFÄDEN",
+    "guide_injured": "Was tun bei einem verletzten Tier?",
+    "guide_injured_read": "6 Min. Lesezeit",
+    "guide_kitten": "Komplette Leitfaden zur Rettung von Neugeborenen Kätzchen",
+    "guide_kitten_read": "9 Min. Lesezeit",
+    "guide_vehicle": "Erste Hilfe für von Fahrzeugen erfasste Tiere",
+    "guide_vehicle_read": "7 Min. Lesezeit",
+    "no_volunteer": "Noch kein Freiwilliger hat diesen Fall übernommen."
   },
   "footer": {
     "columns": {

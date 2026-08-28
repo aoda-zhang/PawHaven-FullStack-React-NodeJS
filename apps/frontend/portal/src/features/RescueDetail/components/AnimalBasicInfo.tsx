@@ -1,67 +1,115 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
-import { MapPin, Calendar, Info } from 'lucide-react';
+import type { RescueDetail } from '@pawhaven/shared/types';
+import { MapPin, PawPrint, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import type { AnimalDetail } from '@/types/AnimalType';
+import { StatusBadge } from '@/features/RescueCases/components/StatusBadge';
 
-export const AnimalBasicInfo = ({ animal }: { animal: AnimalDetail }) => {
+interface AnimalBasicInfoProps {
+  animal: RescueDetail;
+}
+
+const CASE_NUMBER_LENGTH = 6;
+
+const UrgencyBadge = () => {
+  const { t } = useTranslation();
+  return (
+    <span className="bg-status-high/10 text-status-high inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold">
+      <span
+        className="h-1.5 w-1.5 rounded-full bg-current"
+        aria-hidden="true"
+      />
+      {t('rescue_cases.urgency_high')}
+    </span>
+  );
+};
+
+const InfoTile = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode;
+}) => (
+  <div className="bg-background-soft rounded-xl px-3 py-2.5">
+    <p className="text-text-secondary mb-0.5 text-xs">{label}</p>
+    <p className="text-foreground text-sm font-medium">{value}</p>
+  </div>
+);
+
+export const AnimalBasicInfo = ({ animal }: AnimalBasicInfoProps) => {
   const { t, i18n } = useTranslation();
 
+  const photo = animal.photos?.[0];
+  const isUrgent = animal.appearance?.hasInjury === true;
+  const caseNumber = animal.id.slice(-CASE_NUMBER_LENGTH).toUpperCase();
+
+  const animalTypeLabel = t(`reportAnimal.${animal.animalType}`, {
+    defaultValue: animal.animalType,
+  });
+
   return (
-    <div className="bg-surface rounded-card shadow-card w-full">
-      <div className="p-6">
-        <h1 className="text-primary mb-4 text-2xl font-bold">{animal?.name}</h1>
-
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {animal?.location?.address && (
-            <div className="text-text flex items-center gap-2">
-              <MapPin size={16} className="text-primary" />
-              <span>{animal.location.address}</span>
-            </div>
-          )}
-
-          {animal?.foundTime && (
-            <div className="text-text flex items-center gap-2">
-              <Calendar size={16} className="text-primary" />
-              <span>{formatDateTime(animal.foundTime, i18n.language)}</span>
-            </div>
-          )}
-
-          {animal?.animalType && (
-            <div className="text-text flex items-center gap-2">
-              <Info size={16} className="text-primary" />
-              <span>{t(`reportAnimal.${animal.animalType}`)}</span>
-            </div>
-          )}
-
-          {animal?.age && (
-            <div className="text-text flex items-center gap-2">
-              <Info size={16} className="text-primary" />
-              <span>{t(`reportAnimal.${animal.age}`)}</span>
-            </div>
-          )}
+    <section className="bg-card border-border overflow-hidden rounded-2xl border shadow-sm">
+      <div className="relative h-72 w-full">
+        <img
+          src={photo ?? '/images/hero-rescue.jpg'}
+          alt={animal.name}
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+          <StatusBadge status={animal.status} />
+          {isUrgent && <UrgencyBadge />}
         </div>
-
-        <div className="mt-6">
-          <h3 className="text-text mb-2 text-lg font-semibold">
-            {t('reportAnimal.appearance')}
-          </h3>
-          {animal?.statusDescription && (
-            <p className="text-text-secondary mb-4">
-              {animal.statusDescription}
-            </p>
-          )}
-
-          {animal?.appearance?.hasInjury && (
-            <div className="bg-error-light border-border-error rounded-card text-error border p-3">
-              <span className="text-error">{t('reportAnimal.has_injury')}</span>
-              {animal.appearance.injuryDescription && (
-                <p>{animal.appearance.injuryDescription}</p>
-              )}
-            </div>
-          )}
+        <div className="absolute bottom-5 left-5 text-white">
+          <p className="mb-1 text-xs opacity-90">
+            {t('rescueDetail.case_id', { id: caseNumber })}
+          </p>
+          <h1 className="font-serif text-3xl font-bold">{animal.name}</h1>
+          <p className="mt-1 flex items-center gap-1 text-sm opacity-90">
+            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+            {animal.location?.address ?? t('rescueDetail.not_found')}
+          </p>
         </div>
       </div>
-    </div>
+
+      <div className="p-4 sm:p-5">
+        {animal.description && (
+          <>
+            <h2 className="text-foreground mb-1.5 font-serif text-base font-semibold">
+              {t('rescue_cases.what_reported')}
+            </h2>
+            <p className="text-text-secondary mb-4 text-sm leading-relaxed">
+              {animal.description}
+            </p>
+          </>
+        )}
+
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <InfoTile
+            label={t('reportAnimal.animal_type')}
+            value={
+              <span className="flex items-center gap-2">
+                <PawPrint className="text-primary h-4 w-4" aria-hidden="true" />
+                {animalTypeLabel}
+              </span>
+            }
+          />
+          <InfoTile
+            label={t('rescue_cases.info_reporter')}
+            value={
+              <span className="flex items-center gap-2">
+                <User className="text-primary h-4 w-4" aria-hidden="true" />
+                {animal.reporter?.name ?? t('common.anonymous')}
+              </span>
+            }
+          />
+          <InfoTile
+            label={t('rescue_cases.info_reported')}
+            value={formatDateTime(animal.reportedAt, i18n.language)}
+          />
+        </div>
+      </div>
+    </section>
   );
 };
