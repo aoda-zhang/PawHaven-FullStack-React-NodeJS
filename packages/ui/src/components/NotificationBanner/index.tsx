@@ -61,7 +61,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
         'flex items-start justify-start gap-3 border-b px-4 py-4 text-left text-sm lg:px-20',
         tone.container,
         outlined && 'border-l-4',
-        filled && 'bg-primary/90 text-primary-foreground',
+        filled && 'bg-primary/90 text-primary-fg',
         banner.bannerWrapClassNames,
       )}
     >
