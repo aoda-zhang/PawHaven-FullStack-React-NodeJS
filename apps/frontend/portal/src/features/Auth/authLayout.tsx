@@ -1,23 +1,36 @@
-import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
-import { useNavigate } from 'react-router-dom';
+import { X } from 'lucide-react';
+import { ScrollRestoration, useNavigate } from 'react-router-dom';
 
-export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
+import { routePaths } from '@/router/routePaths';
+
+const CloseButton = ({ iconClassName }: { iconClassName: string }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen overflow-hidden px-3 py-3 sm:px-6 sm:py-5">
-      <div className="mx-auto flex h-full w-full max-w-5xl flex-col">
-        <div className="flex w-full items-center gap-4">
-          <Brand navigate={navigate} />
-          <div className="ml-auto shrink-0 [&>div]:!mb-0 [&>div]:!min-w-fit [&>div]:px-3 [&>div]:py-1 [&>div]:text-sm">
-            <LanguageSelector />
-          </div>
-        </div>
+    <button
+      onClick={() => navigate(routePaths.home)}
+      className="text-text-secondary hover:text-text focus-ring cursor-pointer transition-colors"
+    >
+      <X className={iconClassName} />
+    </button>
+  );
+};
 
-        <div className="mt-3 flex min-h-0 flex-1 items-center justify-center">
-          <div className="rounded-dialog border-border bg-surface shadow-modal sm:shadow-toast w-full max-w-[30rem] border px-5 py-6 sm:px-8 sm:py-7">
-            {children}
-          </div>
+export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <div className="bg-surface flex h-dvh flex-col overflow-hidden sm:items-center sm:justify-center">
+      <ScrollRestoration />
+
+      <div className="flex h-14 shrink-0 items-center justify-end px-4 sm:hidden">
+        <CloseButton iconClassName="size-6" />
+      </div>
+
+      <div className="bg-surface sm:border-border sm:shadow-modal flex min-h-0 w-full flex-1 flex-col sm:max-h-[calc(100dvh-4rem)] sm:max-w-[28rem] sm:flex-none sm:rounded-lg sm:border">
+        <div className="hidden shrink-0 justify-end pt-4 pr-4 sm:flex">
+          <CloseButton iconClassName="size-5" />
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-10 sm:px-8 sm:pt-1 sm:pb-8">
+          {children}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { Brand } from '@pawhaven/frontend-core';
-import { Github, Home, Mail, PawPrint, Users } from 'lucide-react';
+import { Github, Mail } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useInRouterContext, useNavigate } from 'react-router-dom';
 import type { NavigateFunction } from 'react-router-dom';
@@ -98,24 +98,6 @@ export const RootLayoutFooter = () => {
     },
   ];
 
-  const stats = [
-    {
-      icon: <PawPrint className="mx-auto h-5 w-5" />,
-      number: '2,841',
-      label: t('footer.stats.animals_rescued'),
-    },
-    {
-      icon: <Users className="mx-auto h-5 w-5" />,
-      number: '384',
-      label: t('footer.stats.active_volunteers'),
-    },
-    {
-      icon: <Home className="mx-auto h-5 w-5" />,
-      number: '1,203',
-      label: t('footer.stats.adopted'),
-    },
-  ];
-
   const socialLinks = [
     {
       icon: Github,
@@ -175,18 +157,6 @@ export const RootLayoutFooter = () => {
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="mb-8 grid grid-cols-3 gap-4 border-t border-b border-white/10 py-6">
-          {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="mb-0.5">{stat.icon}</div>
-              <div className="font-heading text-primary mb-0.5 text-2xl leading-none font-bold">
-                {stat.number}
-              </div>
-              <div className="text-footer-muted text-xs">{stat.label}</div>
-            </div>
-          ))}
         </div>
 
         <div className="text-footer-muted flex flex-col items-center justify-between gap-3 text-xs sm:flex-row">

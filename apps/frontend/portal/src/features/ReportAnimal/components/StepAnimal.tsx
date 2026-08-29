@@ -59,6 +59,9 @@ export const StepAnimal: React.FC<StepAnimalProps> = ({
             className="text-foreground mb-1.5 block text-sm font-medium"
           >
             {t('reportAnimal.wizard.step2_other_label')}
+            <span className="text-error ml-0.5" aria-hidden="true">
+              *
+            </span>
           </label>
           <input
             id="other-animal-type"
