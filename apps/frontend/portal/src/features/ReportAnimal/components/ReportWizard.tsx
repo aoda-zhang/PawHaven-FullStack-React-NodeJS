@@ -50,12 +50,29 @@ export const ReportWizard: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const [caseId, setCaseId] = useState('');
   const [contactError, setContactError] = useState(false);
+  const [stepError, setStepError] = useState('');
   const [draft, setDraft] = useState<ReportDraft>(initialDraft);
 
-  const update = (patch: Partial<ReportDraft>) =>
+  const update = (patch: Partial<ReportDraft>) => {
+    setStepError('');
     setDraft((prev) => ({ ...prev, ...patch }));
+  };
 
   const isUrgent = Object.values(draft.urgencyChecks).some(Boolean);
+
+  const validateStep = (currentStep: number): string => {
+    if (currentStep === Step.LOCATION && !draft.address.trim()) {
+      return t('reportAnimal.wizard.step1_address_required');
+    }
+    if (
+      currentStep === Step.ANIMAL &&
+      draft.animalType === 'other' &&
+      !draft.otherAnimalType.trim()
+    ) {
+      return t('reportAnimal.wizard.step2_other_required');
+    }
+    return '';
+  };
 
   const getSubmitLabel = () => {
     if (step < TOTAL_STEPS) return t('reportAnimal.wizard.nav_continue');
@@ -277,10 +294,16 @@ export const ReportWizard: React.FC = () => {
       </div>
 
       <div className="flex flex-col gap-2">
+        {stepError && (
+          <p className="text-error mb-2 text-center text-sm">{stepError}</p>
+        )}
         {step > Step.LOCATION && (
           <button
             type="button"
-            onClick={() => setStep((s) => s - 1)}
+            onClick={() => {
+              setStepError('');
+              setStep((s) => s - 1);
+            }}
             className="border-border text-muted-foreground hover:bg-muted flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -290,8 +313,17 @@ export const ReportWizard: React.FC = () => {
         <button
           type="button"
           onClick={() => {
-            if (step < TOTAL_STEPS) setStep((s) => s + 1);
-            else handleSubmit();
+            if (step < TOTAL_STEPS) {
+              const error = validateStep(step);
+              if (error) {
+                setStepError(error);
+                return;
+              }
+              setStepError('');
+              setStep((s) => s + 1);
+            } else {
+              handleSubmit();
+            }
           }}
           disabled={isPending}
           className="bg-primary text-primary-fg flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"

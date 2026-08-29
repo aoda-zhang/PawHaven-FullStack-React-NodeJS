@@ -167,6 +167,9 @@ export const StepLocation = ({
       <div>
         <label className="text-foreground mb-1.5 block text-sm font-medium">
           {t('reportAnimal.wizard.step1_landmark_label')}
+          <span className="text-error ml-0.5" aria-hidden="true">
+            *
+          </span>
         </label>
         <input
           type="text"

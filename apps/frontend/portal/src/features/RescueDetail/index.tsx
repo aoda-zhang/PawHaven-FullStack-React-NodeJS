@@ -13,11 +13,10 @@ export const RescueDetail = () => {
   const { animalID = '' } = useParams<{ animalID: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { data: animal, isLoading, isError } = useFetchRescueDetail(animalID);
+  const { data: animal, isPending, isError } = useFetchRescueDetail(animalID);
 
   const handleBack = () => navigate(-1);
-
-  if (isLoading) return <RescueDetailSkeleton />;
+  if (animalID && isPending) return <RescueDetailSkeleton />;
 
   if (isError || !animal) {
     return (

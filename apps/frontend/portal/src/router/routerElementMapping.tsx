@@ -4,6 +4,7 @@ import {
   lazyImport,
 } from '@pawhaven/frontend-core';
 import type { ReactElement } from 'react';
+import { ScrollRestoration } from 'react-router-dom';
 
 import { Login } from '@/features/Auth/Login';
 import { Register } from '@/features/Auth/Register';
@@ -31,16 +32,24 @@ const RescueCases = lazyImport(
 
 const NotFoundRoute = () => {
   const isStableEnv = useIsStableEnv();
-  return <NotFound isStableEnv={isStableEnv} footer={<RootLayoutFooter />} />;
+  return (
+    <>
+      <ScrollRestoration />
+      <NotFound isStableEnv={isStableEnv} footer={<RootLayoutFooter />} />
+    </>
+  );
 };
 
 const ErrorFallbackRoute = () => {
   const isStableEnv = useIsStableEnv();
   return (
-    <RouterErrorFallback
-      isStableEnv={isStableEnv}
-      footer={<RootLayoutFooter />}
-    />
+    <>
+      <ScrollRestoration />
+      <RouterErrorFallback
+        isStableEnv={isStableEnv}
+        footer={<RootLayoutFooter />}
+      />
+    </>
   );
 };
 
