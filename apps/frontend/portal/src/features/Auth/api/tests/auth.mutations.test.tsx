@@ -56,7 +56,7 @@ describe('Auth mutations — bootstrap invalidation', () => {
     expect(landingState?.isInvalidated).toBe(true);
   });
 
-  it('logout onSuccess invalidates both auth and landing bootstrap queries', async () => {
+  it('logout mutation does not invalidate queries itself (call site invalidates after navigation)', async () => {
     const { result } = renderHook(() => useLogout(), {
       wrapper: createWrapper(queryClient),
     });
@@ -68,7 +68,7 @@ describe('Auth mutations — bootstrap invalidation', () => {
     const authState = queryClient.getQueryState(authQueryKeys.all);
     const landingState = queryClient.getQueryState(landingQueryKeys.all);
 
-    expect(authState?.isInvalidated).toBe(true);
-    expect(landingState?.isInvalidated).toBe(true);
+    expect(authState?.isInvalidated).toBe(false);
+    expect(landingState?.isInvalidated).toBe(false);
   });
 });

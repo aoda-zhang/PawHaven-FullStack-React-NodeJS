@@ -1,5 +1,7 @@
 import { cn } from '@pawhaven/frontend-core';
 import type { MenuItem } from '@pawhaven/shared/types';
+import { showToast } from '@pawhaven/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction } from 'react-router-dom';
@@ -7,6 +9,9 @@ import type { NavigateFunction } from 'react-router-dom';
 import { MENU_CLASSES, type MenuClassKey } from '../menuClasses';
 
 import { useLogout } from '@/features/Auth/api/auth.mutations';
+import { authQueryKeys } from '@/features/Auth/api/auth.queryKeys';
+import { landingQueryKeys } from '@/features/Landing/api/landing.queryKeys';
+import { routePaths } from '@/router/routePaths';
 
 const LOGOUT_MENU_CLASS = 'logout';
 
@@ -25,21 +30,29 @@ export const useMenuNavigation = ({
   navigate,
 }: UseMenuNavigationOptions) => {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const { mutate: logout, isPending: isLogoutPending } = useLogout();
 
-  // The backend swaps the login item for a `logout` one based on the session
-  // cookie, so the menu itself is the only trustworthy auth signal.
   const isLoggedIn = useMemo(() => menuItems.some(isLogoutItem), [menuItems]);
 
   const handleMenuClick = useCallback(
     (item: MenuItem) => {
       if (isLogoutItem(item) && !isLogoutPending) {
-        logout();
+        logout(undefined, {
+          onSuccess: () => {
+            navigate(routePaths.login, { replace: true });
+            queryClient.invalidateQueries({ queryKey: authQueryKeys.all });
+            queryClient.invalidateQueries({ queryKey: landingQueryKeys.all });
+          },
+          onError: () => {
+            showToast({ type: 'error', message: t('auth.logout_failed') });
+          },
+        });
         return;
       }
       navigate(item.to || '/');
     },
-    [isLogoutPending, logout, navigate],
+    [isLogoutPending, logout, navigate, queryClient, t],
   );
 
   const resolvedItems = useMemo(

@@ -78,6 +78,7 @@
     "email_required": "E-Mail ist erforderlich",
     "password_required": "Passwort ist erforderlich",
     "logout": "Abmelden",
+    "logout_failed": "Abmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "current_lan": "Deutsch",
     "no_account": "Noch kein Konto?",
     "register_now": "Jetzt registrieren",

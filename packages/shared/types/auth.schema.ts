@@ -29,6 +29,7 @@ export const AuthResponseSchema = z.object({
   access_token: z.string(),
   expires_in: z.number(),
   refresh_token: z.string().optional(),
+  session_expires_at: z.number().optional(),
   user: UserSchema,
 });
 
@@ -40,6 +41,7 @@ export type AuthResponseDto = z.infer<typeof AuthResponseSchema>;
 export const SessionSchema = z.object({
   user: UserSchema,
   expires_in: z.number(),
+  session_expires_at: z.number().optional(),
 });
 
 export type SessionDto = z.infer<typeof SessionSchema>;
@@ -71,6 +73,8 @@ export const JwtVerifyInfoSchema = UserSchema.extend({
   jti: z.string().optional(),
   iat: z.number().optional(),
   exp: z.number().optional(),
+  sessionStartedAt: z.number().optional(),
+  sessionExpiresAt: z.number().optional(),
 });
 
 export type JwtVerifyInfo = z.infer<typeof JwtVerifyInfoSchema>;

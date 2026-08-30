@@ -23,12 +23,7 @@ export const useRegister = () => {
 };
 
 export const useLogout = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: postLogout,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: authQueryKeys.all });
-      queryClient.invalidateQueries({ queryKey: landingQueryKeys.all });
-    },
   });
 };

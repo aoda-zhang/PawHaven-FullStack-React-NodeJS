@@ -42,3 +42,5 @@ auth:
   jwtSecret: ${JWT_SECRET}
   jwtExpiresIn: 900
   refreshTokenExpiresIn: 604800
+  sessionExpiresIn: 2592000
+  refreshTokenRotationWindowSeconds: 86400

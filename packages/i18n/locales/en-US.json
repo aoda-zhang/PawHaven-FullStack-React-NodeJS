@@ -78,6 +78,7 @@
     "email_required": "Email is required",
     "password_required": "Password is required",
     "logout": "Log out",
+    "logout_failed": "Logout failed. Please try again.",
     "current_lan": "English(USA)",
     "no_account": "Don’t have an account?",
     "register_now": "Sign up now",

@@ -206,7 +206,7 @@ sequenceDiagram
 
 **Details**
 
-- Refresh rotates both access and refresh tokens.
+- Refresh always issues a new access token. The refresh token is rotated **only when it is close to its own expiry** (default: ≤ 1 day remaining) — reusing it until then keeps the stored hash stable and avoids rotation races where in-flight requests carrying an already-rotated token get logged out prematurely.
 - A refresh token is valid only if it matches the stored hash for that user.
 - Refresh can be triggered explicitly (client call) or implicitly (JwtRefreshGuard).
 - **Token type separation**: every token carries a `type` claim (`access`/`refresh`). Auth service and both gateway guards reject tokens whose `type` does not match the expected kind.
@@ -221,7 +221,7 @@ sequenceDiagram
 - Checks if access token is missing, invalid, or expiring soon (configurable window)
 - Automatically calls auth-service `/refresh` endpoint with refresh token
 - **Single-flight dedupe**: concurrent requests carrying the same refresh token share one upstream refresh call; each request then applies the returned Set-Cookie to its own response
-- On success: updates both response Set-Cookie headers and request cookies for current request
+- On success: updates the response Set-Cookie headers, `req.cookies`, AND the raw forwarded `Cookie` header — so upstream services (e.g. auth-service `/me`) see the refreshed tokens instead of the stale/expired ones
 - On failure (refresh rejected with 4xx): clears auth cookies and propagates the 401 — prevents an invalid refresh token from causing a repeat-refresh loop
 - Skips refresh logic entirely for routes marked with `@Public()` decorator
 
@@ -292,7 +292,7 @@ sequenceDiagram
 ## Security Considerations
 
 - Use secure, HTTP-only cookies to prevent client-side access.
-- Store refresh tokens as hashes and rotate on each refresh.
+- Store refresh tokens as hashes and rotate them when close to expiry (not on every refresh).
 - Hash passwords using a strong one-way algorithm.
 - Avoid leaking sensitive details in error responses and logs.
 - Separate token types (`access` vs `refresh` claims) so a stolen access token cannot be replayed as a refresh token.

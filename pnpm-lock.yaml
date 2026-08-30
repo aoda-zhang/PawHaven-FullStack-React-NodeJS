@@ -247,6 +247,10 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/backend/auth-service/dist/prisma/mongodb/client/authsvc-client-bak2: {}
+
+  apps/backend/auth-service/src/prisma/mongodb/client/authsvc-client-bak2: {}
+
   apps/backend/core-service:
     dependencies:
       '@grpc/proto-loader':
@@ -376,6 +380,8 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+
+  apps/backend/core-service/src/prisma/mongodb/client/core-svc-client-bak2: {}
 
   apps/backend/document-service:
     dependencies:

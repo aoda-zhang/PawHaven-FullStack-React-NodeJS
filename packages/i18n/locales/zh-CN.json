@@ -78,6 +78,7 @@
     "email_required": "请输入你的邮箱",
     "password_required": "请输入你的密码",
     "logout": "退出登录!",
+    "logout_failed": "退出登录失败，请稍后重试",
     "current_lan": "简体中文",
     "no_account": "还没有账号？",
     "register_now": "立即注册",

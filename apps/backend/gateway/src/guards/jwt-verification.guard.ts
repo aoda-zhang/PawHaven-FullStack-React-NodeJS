@@ -7,8 +7,12 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { User, JwtVerifyInfo } from '@pawhaven/shared/types';
-import { cookieKeys } from '@pawhaven/backend-core/constants';
+import {
+  cookieKeys,
+  authRouteSuffixes,
+} from '@pawhaven/backend-core/constants';
 
 import { IS_PUBLIC_API } from '../decorators/public.decorator';
 import { IS_OPTIONAL_AUTH } from '../decorators/optional-auth.decorator';
@@ -16,16 +20,22 @@ import { IS_OPTIONAL_AUTH } from '../decorators/optional-auth.decorator';
 type RequestWithUser = Request & { user?: User };
 
 const MS_PER_SECOND = 1000;
-const LOGOUT_PATH_SUFFIX = '/auth/logout';
 
 @Injectable()
 export class JwtVerificationGuard implements CanActivate {
   private readonly denylist = new Map<string, number>();
 
+  private readonly clockToleranceSeconds: number;
+
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.clockToleranceSeconds = this.configService.getOrThrow<number>(
+      'auth.jwtClockTolerance',
+    );
+  }
 
   canActivate(context: ExecutionContext): boolean {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_API, [
@@ -66,6 +76,13 @@ export class JwtVerificationGuard implements CanActivate {
       throw new UnauthorizedException('Session revoked, please login again');
     }
 
+    if (this.isSessionExpired(payload)) {
+      if (isOptionalAuth) {
+        return true;
+      }
+      throw new UnauthorizedException('Session expired, please login again');
+    }
+
     if (payload.jti && payload.exp && this.isLogoutPath(req.path)) {
       this.deny(payload.jti, payload.exp);
     }
@@ -91,8 +108,18 @@ export class JwtVerificationGuard implements CanActivate {
     }
   }
 
+  private isSessionExpired(payload: JwtVerifyInfo): boolean {
+    if (typeof payload.sessionExpiresAt !== 'number') {
+      return false;
+    }
+    const nowInSeconds = Math.floor(Date.now() / MS_PER_SECOND);
+    return (
+      payload.sessionExpiresAt - this.clockToleranceSeconds <= nowInSeconds
+    );
+  }
+
   private isLogoutPath(path: string): boolean {
-    return path.endsWith(LOGOUT_PATH_SUFFIX);
+    return path.endsWith(authRouteSuffixes.logout);
   }
 
   private isDenied(jti: string): boolean {

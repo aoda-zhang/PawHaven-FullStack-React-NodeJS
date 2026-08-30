@@ -16,7 +16,7 @@ dbConnections:
   - enable: true
     options:
       name: DOCUMENT_SERVICE_DB
-      uri: ${DOCUMENT_SERVICE_DB}
+      uri: ${DOCUMENT_SERVICE_MONGODB}
 
 cors:
   allowedHeaders:
