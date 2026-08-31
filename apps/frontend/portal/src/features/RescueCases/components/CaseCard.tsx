@@ -1,4 +1,5 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
+import { PhotoPlaceholder } from '@pawhaven/ui';
 import { Clock, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,11 +30,15 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
       className="border-border bg-card group cursor-pointer overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="bg-muted relative h-48 overflow-hidden">
-        <img
-          src={caseData.image ?? '/images/hero-rescue.jpg'}
-          alt={caseData.title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {caseData.image ? (
+          <img
+            src={caseData.image}
+            alt={caseData.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <PhotoPlaceholder iconClassName="h-12 w-12" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute top-3 left-3 flex gap-2">
           <StatusBadge status={caseData.status} />

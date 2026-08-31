@@ -21,6 +21,7 @@ export type {
 export type { HeroStats } from './hero-stats.schema';
 export type { AdoptablePet } from './adoptable-pet.schema';
 export type { ApiResponseEnvelope } from './envelope.schema';
+export type { HomeData } from './home.schema';
 
 // schemas
 
@@ -56,9 +57,25 @@ export {
 export { HeroStatsSchema } from './hero-stats.schema';
 export { AdoptablePetSchema } from './adoptable-pet.schema';
 export { ApiResponseEnvelopeSchema } from './envelope.schema';
+export { HomeDataSchema } from './home.schema';
 
-export { AnimalReportSchema } from './report-animal.schema';
-export type { AnimalReportDto } from './report-animal.schema';
+export {
+  AnimalReportSchema,
+  REPORT_PHOTO_LIMITS,
+  reporterPhotosSchema,
+  ANIMAL_TYPES,
+  SIZES,
+  BEHAVIORS,
+  createReportAnimalFormSchema,
+} from './report-animal.schema';
+export type {
+  AnimalReportDto,
+  AnimalType,
+  Size,
+  Behavior,
+  ReportAnimalFormMessages,
+  ReportAnimalFormValues,
+} from './report-animal.schema';
 
 export {
   StoryTypeValues,

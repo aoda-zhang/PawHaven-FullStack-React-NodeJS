@@ -1,6 +1,7 @@
 http:
   env: prod
   port: 8083
+  maxJsonBodySize: 100mb
   prefix: document-service
   timeout: 5000
   retryCount: 3
@@ -16,7 +17,7 @@ DBConnections:
   - enable: true
     options:
       name: DOCUMENT_SERVICE_DB
-      uri: ${DOCUMENT_SERVICE_DB}
+      uri: ${DOCUMENT_SERVICE_MONGODB}
 
 cors:
   allowedHeaders:

@@ -1,6 +1,7 @@
 http:
   env: dev
   port: 8082
+  maxJsonBodySize: 100mb
   prefix: auth-service
   timeout: 5000
   retryCount: 3
@@ -42,3 +43,5 @@ auth:
   jwtSecret: ${JWT_SECRET}
   jwtExpiresIn: 900
   refreshTokenExpiresIn: 604800
+  sessionExpiresIn: 2592000
+  refreshTokenRotationWindowSeconds: 86400

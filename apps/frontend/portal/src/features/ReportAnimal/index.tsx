@@ -1,6 +1,7 @@
+import { Loading } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 
-import { ReportWizard } from './components/ReportWizard';
+import { ReportAnimalForm } from './components/ReportAnimalForm';
 
 import { useCurrentUser } from '@/features/Auth/api/auth.queries';
 
@@ -9,13 +10,7 @@ export const ReportAnimal = () => {
   const { isLoading } = useCurrentUser();
 
   if (isLoading) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
-        <p className="text-muted-foreground text-sm">
-          {t('reportAnimal.wizard.loading')}
-        </p>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -26,7 +21,7 @@ export const ReportAnimal = () => {
       <p className="text-muted-foreground mb-6 text-sm">
         {t('reportAnimal.wizard.subtitle')}
       </p>
-      <ReportWizard />
+      <ReportAnimalForm />
     </div>
   );
 };

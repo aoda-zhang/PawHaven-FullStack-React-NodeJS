@@ -52,3 +52,35 @@ shared ← backend services
 Create an ADR for: architecture paradigm change, cross-cutting concern (3+ modules), irreversible decision, non-obvious trade-off.
 
 ADR template: `knowledge/ADR/ADR-001-template.md`
+
+## 8. No Hardcoded Business Values
+
+Any value that expresses a **business or operational decision** must come from configuration — never from a literal in source code.
+
+```ts
+// ❌ WRONG — a business decision frozen in source
+const ADOPTABLE_PET_LIMIT = 6;
+const VOLUNTEER_BASELINE = 120;
+const MAX_ROUTE_DEPTH = 3;
+
+// ✅ CORRECT — read from config, fail fast when missing
+const limit = configService.getOrThrow<number>('home.adoptablePetLimit');
+```
+
+**Where config lives**: `apps/backend/<service>/src/config/<env>/env/index.yaml` (dev / test / uat / prod), read through `ConfigService` with `getOrThrow`.
+
+**Why**: these values are operational, not structural. Product owners tune them per environment — more carousel items in prod, a smaller page size in test — without a code change, PR, or release. A literal forces a deploy for a tuning decision and silently applies one environment's choice to all four.
+
+**Classification**
+
+| Value                                                                 | Belongs in       | Examples                                                                                            |
+| --------------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------- |
+| Business rule, threshold, limit, quota, baseline figure, page size    | **Config**       | `home.adoptablePetLimit`, `home.volunteerBaseline`, `http.maxJsonBodySize`, `auth.sessionExpiresIn` |
+| Protocol / structural constant that cannot vary without a code change | **Source const** | `BYTES_PER_MB`, HTTP status codes, Zod schema limits that _define_ the API contract                 |
+| Derived from another constant                                         | **Source const** | `BYTES_PER_KB * BYTES_PER_KB`                                                                       |
+
+**No fallbacks.** Missing config must fail loudly at startup via `getOrThrow` — never degrade to a default. A silent default hides a broken deployment until it is in front of users.
+
+> **Lint-clean is not the goal — configurability is.** Extracting a literal into a named const (`const MAX_ROUTE_DEPTH = 3`) satisfies `no-magic-numbers` but still violates this rule. When a business value is flagged as a magic number, the fix is to move it to config, not to name it.
+
+**Review enforcement**: a reviewer seeing a new/edited `const` whose name reads like a business quantity (LIMIT, BASELINE, MAX__, MIN__, *_COUNT, *_SIZE, *_THRESHOLD, *_DAYS) must flag it and require config. Existing violations are grandfathered but must not be copied into new code.

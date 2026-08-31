@@ -21,10 +21,12 @@ export const Landing = ({ children }: LandingProps) => {
   };
   const { data, isError, isLoading } = useGetHomeData(homeScope);
 
-  const contextValue: LandingDataType = data ?? {
-    menus: [],
-    routers: [],
-    heroStats: EMPTY_HERO_STATS,
+  const contextValue: LandingDataType = {
+    menus: data?.menus ?? [],
+    routers: data?.routers ?? [],
+    heroStats: data?.heroStats ?? EMPTY_HERO_STATS,
+    latestRescues: data?.latestRescues ?? [],
+    adoptablePets: data?.adoptablePets ?? [],
   };
 
   return (

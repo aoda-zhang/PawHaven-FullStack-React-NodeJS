@@ -247,6 +247,10 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/backend/auth-service/dist/prisma/mongodb/client/authsvc-client-bak2: {}
+
+  apps/backend/auth-service/src/prisma/mongodb/client/authsvc-client-bak2: {}
+
   apps/backend/core-service:
     dependencies:
       '@grpc/proto-loader':
@@ -306,6 +310,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
@@ -377,6 +384,10 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/backend/core-service/dist/prisma/mongodb/client/core-svc-client-bak2: {}
+
+  apps/backend/core-service/src/prisma/mongodb/client/core-svc-client-bak2: {}
+
   apps/backend/document-service:
     dependencies:
       '@nestjs-modules/mailer':
@@ -445,6 +456,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.4.2
+      helmet:
+        specifier: ^8.1.0
+        version: 8.3.0
       i18n:
         specifier: ^0.15.2
         version: 0.15.3(supports-color@8.0.0)
@@ -590,6 +604,9 @@ importers:
       dayjs:
         specifier: ^1.11.18
         version: 1.11.21
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
@@ -928,6 +945,9 @@ importers:
       dotenv:
         specifier: ^17.2.0
         version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.0.0
         version: 8.3.0
@@ -977,6 +997,9 @@ importers:
       '@types/bcrypt':
         specifier: ^6.0.0
         version: 6.0.0
+      '@types/cookie-parser':
+        specifier: ^1.4.9
+        version: 1.4.10(@types/express@5.0.6)
       '@types/crypto-js':
         specifier: ^4.2.2
         version: 4.2.2
@@ -1337,6 +1360,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      embla-carousel-autoplay:
+        specifier: ^8.6.0
+        version: 8.6.0(embla-carousel@8.6.0)
+      embla-carousel-react:
+        specifier: 8.6.0
+        version: 8.6.0(react@19.2.8)
       lottie-react:
         specifier: ^3.1.0
         version: 3.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1365,6 +1394,12 @@ importers:
       '@pawhaven/tsconfig':
         specifier: workspace:*
         version: link:../../libs/tsconfig
+      '@testing-library/jest-dom':
+        specifier: ^7.0.0
+        version: 7.0.1(@testing-library/dom@10.4.1)(vitest@4.1.10(@types/node@24.13.3)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(yaml@2.9.0)))
+      '@testing-library/react':
+        specifier: ^16.3.2
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@types/node':
         specifier: ^24.7.1
         version: 24.13.3
@@ -1374,12 +1409,18 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.1
         version: 19.2.4(@types/react@19.2.18)
+      jsdom:
+        specifier: ^29.1.1
+        version: 29.1.1
       tailwindcss:
         specifier: ^4.1.14
         version: 4.3.3
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@types/node@24.13.3)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(yaml@2.9.0))
 
 packages:
 
@@ -5895,6 +5936,11 @@ packages:
   electron-to-chromium@1.5.405:
     resolution: {integrity: sha512-bNglH7lPH5l+yHOes7Zr4VqxhOy4BQ9ZBUX4VdoFgxMpzJk7W1ZoO3Vgd9Pxa9PyjQ76sfm2aKH/nzEcCNRlew==}
 
+  embla-carousel-autoplay@8.6.0:
+    resolution: {integrity: sha512-OBu5G3nwaSXkZCo1A6LTaFMZ8EpkYbwIaH+bPqdBnDGQ2fh4+NbzjXjs2SktoPNKCtflfVMc75njaDHOYXcrsA==}
+    peerDependencies:
+      embla-carousel: 8.6.0
+
   embla-carousel-react@8.6.0:
     resolution: {integrity: sha512-0/PjqU7geVmo6F734pmPqpyHqiM99olvyecY7zdweCw+6tKEXnrE90pBiBbMMU8s5tICemzpQ3hi5EpxzGW+JA==}
     peerDependencies:
@@ -7568,20 +7614,12 @@ packages:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
 
-  mime-db@1.40.0:
-    resolution: {integrity: sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==}
-    engines: {node: '>= 0.6'}
-
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
 
   mime-db@1.54.0:
     resolution: {integrity: sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ==}
-    engines: {node: '>= 0.6'}
-
-  mime-types@2.1.24:
-    resolution: {integrity: sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==}
     engines: {node: '>= 0.6'}
 
   mime-types@2.1.35:
@@ -14366,11 +14404,21 @@ snapshots:
 
   electron-to-chromium@1.5.405: {}
 
+  embla-carousel-autoplay@8.6.0(embla-carousel@8.6.0):
+    dependencies:
+      embla-carousel: 8.6.0
+
   embla-carousel-react@8.6.0(react@18.3.1):
     dependencies:
       embla-carousel: 8.6.0
       embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
       react: 18.3.1
+
+  embla-carousel-react@8.6.0(react@19.2.8):
+    dependencies:
+      embla-carousel: 8.6.0
+      embla-carousel-reactive-utils: 8.6.0(embla-carousel@8.6.0)
+      react: 19.2.8
 
   embla-carousel-reactive-utils@8.6.0(embla-carousel@8.6.0):
     dependencies:
@@ -16306,15 +16354,9 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.2
 
-  mime-db@1.40.0: {}
-
   mime-db@1.52.0: {}
 
   mime-db@1.54.0: {}
-
-  mime-types@2.1.24:
-    dependencies:
-      mime-db: 1.40.0
 
   mime-types@2.1.35:
     dependencies:
@@ -18805,7 +18847,7 @@ snapshots:
   type-is@1.6.18:
     dependencies:
       media-typer: 0.3.0
-      mime-types: 2.1.24
+      mime-types: 2.1.35
 
   type-is@2.1.0:
     dependencies:

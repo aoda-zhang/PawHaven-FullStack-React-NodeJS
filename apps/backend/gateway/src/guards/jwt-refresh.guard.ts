@@ -21,8 +21,6 @@ import { IS_OPTIONAL_AUTH } from '../decorators/optional-auth.decorator';
 type RequestWithUser = Request & { user?: User };
 
 const MS_PER_SECOND = 1000;
-const DEFAULT_REFRESH_WINDOW_SECONDS = 300;
-const DEFAULT_REFRESH_WINDOW_PERCENTAGE = 0.2;
 const CLIENT_ERROR_STATUS_MIN = 400;
 const CLIENT_ERROR_STATUS_MAX = 500;
 
@@ -113,12 +111,11 @@ export class JwtRefreshGuard implements CanActivate {
 
   private getRefreshWindowSeconds(payload: JwtVerifyInfo): number {
     const fallbackSeconds = Math.floor(
-      this.configService.get<number>('auth.jwtRefreshFallbackSeconds') ??
-        DEFAULT_REFRESH_WINDOW_SECONDS,
+      this.configService.getOrThrow<number>('auth.jwtRefreshFallbackSeconds'),
     );
-    const windowPercentage =
-      this.configService.get<number>('auth.jwtRefreshWindowPercentage') ??
-      DEFAULT_REFRESH_WINDOW_PERCENTAGE;
+    const windowPercentage = this.configService.getOrThrow<number>(
+      'auth.jwtRefreshWindowPercentage',
+    );
 
     if (!payload.iat || !payload.exp) {
       return fallbackSeconds;
@@ -142,7 +139,7 @@ export class JwtRefreshGuard implements CanActivate {
     if (!refreshToken) {
       this.logger.warn('refresh token missing');
       if (options.clearCookiesOnFailure) {
-        this.clearAuthCookies(res);
+        this.clearAuthCookies(req, res);
       }
       if (!options.isOptionalAuth) {
         throw new UnauthorizedException('Authentication required');
@@ -169,7 +166,7 @@ export class JwtRefreshGuard implements CanActivate {
     } catch (error) {
       this.logger.error('Token refresh failed', error as Error);
       if (options.clearCookiesOnFailure || this.isRefreshRejected(error)) {
-        this.clearAuthCookies(res);
+        this.clearAuthCookies(req, res);
       }
       if (!options.isOptionalAuth) {
         throw new UnauthorizedException('Session expired, please login again');
@@ -223,11 +220,28 @@ export class JwtRefreshGuard implements CanActivate {
         req.cookies = req.cookies ?? {};
         // eslint-disable-next-line no-param-reassign
         req.cookies[name] = value;
+        this.upsertCookieHeader(req, name, value);
       }
     });
   }
 
-  private clearAuthCookies(res: Response): void {
+  private upsertCookieHeader(req: Request, name: string, value: string): void {
+    const parts = (req.headers.cookie ?? '')
+      .split(';')
+      .map((part) => part.trim())
+      .filter(Boolean);
+    const entry = `${name}=${value}`;
+    const index = parts.findIndex((part) => part.startsWith(`${name}=`));
+    if (index >= 0) {
+      parts[index] = entry;
+    } else {
+      parts.push(entry);
+    }
+    // eslint-disable-next-line no-param-reassign
+    req.headers.cookie = parts.join('; ');
+  }
+
+  private clearAuthCookies(req: Request, res: Response): void {
     const cookieOptions = 'Path=/; Max-Age=0; HttpOnly; SameSite=Strict';
     const env = this.configService.get<string>('http.env');
     const secureSuffix = isProd(env) ? '; Secure' : '';
@@ -240,5 +254,24 @@ export class JwtRefreshGuard implements CanActivate {
       'Set-Cookie',
       `${cookieKeys.refresh_token}=; ${cookieOptions}${secureSuffix}`,
     );
+
+    // eslint-disable-next-line no-param-reassign
+    req.cookies = req.cookies ?? {};
+    // eslint-disable-next-line no-param-reassign
+    delete req.cookies[cookieKeys.access_token];
+    // eslint-disable-next-line no-param-reassign
+    delete req.cookies[cookieKeys.refresh_token];
+    if (req.headers.cookie) {
+      const parts = (req.headers.cookie ?? '')
+        .split(';')
+        .map((part) => part.trim())
+        .filter(
+          (part) =>
+            !part.startsWith(`${cookieKeys.access_token}=`) &&
+            !part.startsWith(`${cookieKeys.refresh_token}=`),
+        );
+      // eslint-disable-next-line no-param-reassign
+      req.headers.cookie = parts.join('; ');
+    }
   }
 }

@@ -31,6 +31,7 @@ Loaded by the `code-review` agent as a two-pass review.
 | [style-doctor](./code-review/style-doctor/SKILL.MD)               | TECH    | Styling & design token compliance.                                                               |
 | [i18n-doctor](./code-review/i18n-doctor/SKILL.MD)                 | TECH    | Hardcoded string detection.                                                                      |
 | [backend-doctor](./code-review/backend-doctor/SKILL.MD)           | TECH    | Backend code quality.                                                                            |
+| [test-doctor](./code-review/test-doctor/SKILL.MD)                 | TECH    | Test completeness & quality (every review, every scope).                                         |
 | [boundary-doctor](./code-review/boundary-doctor/SKILL.MD)         | PATTERN | Import boundaries & package dependency direction.                                                |
 | [architecture-doctor](./code-review/architecture-doctor/SKILL.MD) | PATTERN | Project architecture & design rules.                                                             |
 

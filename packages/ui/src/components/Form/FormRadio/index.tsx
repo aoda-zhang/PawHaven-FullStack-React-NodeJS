@@ -26,7 +26,16 @@ export const FormRadio = ({
 
   return (
     <div className={cn('baseFormContainer', className)}>
-      {label && <p className="mb-2 text-sm font-medium">{label}</p>}
+      {label && (
+        <p className="mb-2 text-sm font-medium">
+          {label}
+          {required && (
+            <span className="text-error ml-0.5" aria-hidden="true">
+              *
+            </span>
+          )}
+        </p>
+      )}
       <div className="flex flex-col gap-2">
         {options.map((option) => (
           <label

@@ -29,6 +29,12 @@ interface ErrorHandleType {
   meta: RequestMeta;
 }
 
+/**
+ * Displays an error toast notification with the given message and options.
+ *
+ * @param errorMessage - The error message to display
+ * @param errorNotificationOptions - Optional toast configuration (type and duration)
+ */
 const showErrorToast = (
   errorMessage: string,
   errorNotificationOptions?: { type?: ToastType; duration?: number },
@@ -39,6 +45,15 @@ const showErrorToast = (
   });
 };
 
+/**
+ * Handles API errors by routing them to appropriate handlers or displaying toast notifications.
+ * Translates error codes to i18n messages and handles auth, permission, server, and network errors.
+ *
+ * @param params - Error handling configuration
+ * @param params.queryOptions - Query options containing error callbacks
+ * @param params.errorInfo - The API error information
+ * @param params.meta - Request metadata for error handling behavior
+ */
 const handleError = ({ queryOptions, errorInfo, meta }: ErrorHandleType) => {
   let errorMessage = t('errorMessage.UNKNOWN_ERROR');
   if (i18n.exists(`errorMessage.${errorInfo?.code}`)) {
@@ -90,6 +105,21 @@ const handleError = ({ queryOptions, errorInfo, meta }: ErrorHandleType) => {
       break;
   }
 };
+/**
+ * Creates React Query configuration with error handling, caching, and retry logic.
+ * Configures default query options, query cache, and mutation cache with centralized error handling.
+ *
+ * @param queryOptions - Configuration for query behavior and error callbacks
+ * @param queryOptions.refetchOnReconnect - Whether to refetch on network reconnection (default: true)
+ * @param queryOptions.refetchOnWindowFocus - Whether to refetch on window focus (default: false)
+ * @param queryOptions.staleTime - Time in ms before data is considered stale (default: 5 minutes)
+ * @param queryOptions.gcTime - Time in ms before query cache is garbage collected (default: 30 minutes)
+ * @param queryOptions.maxRetry - Maximum number of retry attempts (default: 2)
+ * @param queryOptions.onAuthError - Callback for authentication errors
+ * @param queryOptions.onPermissionError - Callback for permission errors
+ * @param queryOptions.onSysError - Callback for critical system errors
+ * @returns React Query configuration object with defaultOptions, queryCache, and mutationCache
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getRequestQueryOptions = (queryOptions: QueryOptionsType) => {
   const {

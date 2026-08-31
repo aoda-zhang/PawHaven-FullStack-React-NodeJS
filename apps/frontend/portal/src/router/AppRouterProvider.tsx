@@ -1,5 +1,5 @@
 import { RequireAuth, SuspenseWrapper } from '@pawhaven/frontend-core';
-import { useMemo, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
@@ -55,15 +55,8 @@ const generateRoutes = (routesConfig: RouterEle[]): RouteObject[] => {
 
 export const AppRouterProvider = () => {
   const { routers } = useLandingContext();
-  const routes = useMemo<RouteObject[] | null>(() => {
-    if (!routers || routers.length === 0) return null;
-    return generateRoutes(routers);
-  }, [routers]);
-
-  const router = useMemo(() => {
-    if (!routes) return null;
-    return createBrowserRouter(routes);
-  }, [routes]);
+  const routes = routers?.length ? generateRoutes(routers) : null;
+  const router = routes ? createBrowserRouter(routes) : null;
 
   if (!router) return null;
 

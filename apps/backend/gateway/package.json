@@ -33,6 +33,7 @@
     "crypto-js": "^4.2.0",
     "csurf": "^1.11.0",
     "dayjs": "^1.11.18",
+    "express": "5.2.1",
     "helmet": "^8.1.0",
     "http-proxy-middleware": "^3.0.5",
     "mongoose": "^8.19.1",

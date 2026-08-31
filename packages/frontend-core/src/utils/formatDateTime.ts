@@ -15,6 +15,15 @@ const DAYJS_LOCALES: Record<string, string> = {
 const FALLBACK_LOCALE = 'en';
 const DEFAULT_FORMAT = 'lll';
 
+/**
+ * Formats a date/time value into a localized string.
+ * Returns empty string if value is falsy, or the original value as string if invalid.
+ *
+ * @param value - The date value to format (string, number, Date, or null/undefined)
+ * @param locale - The locale code (e.g., 'en-US', 'zh-CN', 'de-DE'). Defaults to 'en-US'
+ * @param format - Optional dayjs format string. Defaults to 'lll' (localized long format)
+ * @returns The formatted date string, empty string if no value, or original value if invalid
+ */
 export const formatDateTime = (
   value?: string | number | Date | null,
   locale = 'en-US',

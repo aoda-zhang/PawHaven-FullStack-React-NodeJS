@@ -59,7 +59,16 @@ export const FormInput = ({
         <div
           className={cn('baseFormContainer', className, fullWidth && 'w-full')}
         >
-          {label && <div className="mb-2 text-sm font-medium">{label}</div>}
+          {label && (
+            <div className="mb-2 text-sm font-medium">
+              {label}
+              {required && (
+                <span className="text-error ml-0.5" aria-hidden="true">
+                  *
+                </span>
+              )}
+            </div>
+          )}
           <div className="relative">
             <input
               {...field}

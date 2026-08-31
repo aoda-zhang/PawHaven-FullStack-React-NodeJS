@@ -11,9 +11,6 @@ import { ProtectedProxyController } from './protected-proxy.controller';
 import { PublicProxyController } from './public-proxy.controller';
 import { ProxyService } from './proxy.service';
 
-// Fallback clock-skew tolerance (seconds) for JWT exp/nbf verification
-const DEFAULT_CLOCK_TOLERANCE_SECONDS = 30;
-
 @Module({
   imports: [
     HttpModule,
@@ -27,9 +24,8 @@ const DEFAULT_CLOCK_TOLERANCE_SECONDS = 30;
         return {
           secret,
           verifyOptions: {
-            clockTolerance: configService.get<number>(
+            clockTolerance: configService.getOrThrow<number>(
               'auth.jwtClockTolerance',
-              DEFAULT_CLOCK_TOLERANCE_SECONDS,
             ),
           },
         };

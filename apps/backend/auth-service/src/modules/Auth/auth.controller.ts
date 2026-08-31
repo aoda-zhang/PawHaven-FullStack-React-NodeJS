@@ -35,6 +35,7 @@ export class AuthController {
     return {
       user: result.user,
       expires_in: result.expires_in,
+      session_expires_at: result.session_expires_at,
     };
   }
 
@@ -54,6 +55,7 @@ export class AuthController {
     return {
       user: result.user,
       expires_in: result.expires_in,
+      session_expires_at: result.session_expires_at,
     };
   }
 
@@ -76,6 +78,7 @@ export class AuthController {
     return {
       user: result.user,
       expires_in: result.expires_in,
+      session_expires_at: result.session_expires_at,
     };
   }
 

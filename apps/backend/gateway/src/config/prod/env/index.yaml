@@ -1,6 +1,7 @@
 http:
   env: prod
   port: 8080
+  maxJsonBodySize: 100mb
   prefix: api
   timeout: 5000
   retryCount: 3

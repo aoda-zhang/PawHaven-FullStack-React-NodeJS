@@ -1,5 +1,4 @@
 import { ChevronRight } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { AdoptablePet } from '../types';
@@ -14,6 +13,23 @@ interface AdoptablePetsSectionProps {
   isLoading?: boolean;
 }
 
+const PetList = ({
+  pets,
+  onPetClick,
+}: {
+  pets: AdoptablePet[];
+  onPetClick: (id: string) => void;
+}) => (
+  <div
+    className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2"
+    style={{ scrollSnapType: 'x mandatory' }}
+  >
+    {pets.map((pet) => (
+      <PetCard key={pet.id} pet={pet} onClick={onPetClick} />
+    ))}
+  </div>
+);
+
 export const AdoptablePetsSection = ({
   pets,
   onPetClick,
@@ -22,27 +38,21 @@ export const AdoptablePetsSection = ({
 }: AdoptablePetsSectionProps) => {
   const { t } = useTranslation();
 
-  let content: ReactNode;
-  if (isLoading) {
-    content = <AdoptablePetsSectionSkeleton />;
-  } else if (pets.length === 0) {
-    content = (
-      <p className="text-muted-foreground py-16 text-center">
-        {t('home.forever_home_no_pets')}
-      </p>
-    );
-  } else {
-    content = (
-      <div
-        className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2"
-        style={{ scrollSnapType: 'x mandatory' }}
-      >
-        {pets.map((pet) => (
-          <PetCard key={pet.id} pet={pet} onClick={onPetClick} />
-        ))}
-      </div>
-    );
-  }
+  const safePets = pets ?? [];
+
+  const renderContent = () => {
+    if (isLoading) {
+      return <AdoptablePetsSectionSkeleton />;
+    }
+    if (safePets.length === 0) {
+      return (
+        <p className="text-muted-foreground py-16 text-center">
+          {t('home.forever_home_no_pets')}
+        </p>
+      );
+    }
+    return <PetList pets={safePets} onPetClick={onPetClick} />;
+  };
 
   return (
     <section
@@ -72,7 +82,7 @@ export const AdoptablePetsSection = ({
           )}
         </div>
 
-        {content}
+        {renderContent()}
       </div>
     </section>
   );

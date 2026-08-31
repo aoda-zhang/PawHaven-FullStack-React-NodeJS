@@ -1,3 +1,4 @@
+import { PhotoPlaceholder } from '@pawhaven/ui';
 import { ArrowLeft, Clock, MapPin, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -60,11 +61,15 @@ const BackButton = ({ onClick }: { onClick: () => void }) => {
 
 const HeroSection = ({ caseData }: { caseData: RescueCase }) => (
   <div className="relative h-64 w-full">
-    <img
-      src={caseData.image ?? '/images/hero-rescue.jpg'}
-      alt={caseData.title}
-      className="h-full w-full object-cover"
-    />
+    {caseData.image ? (
+      <img
+        src={caseData.image}
+        alt={caseData.title}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      <PhotoPlaceholder iconClassName="h-12 w-12" />
+    )}
     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
     <div className="absolute right-4 bottom-4 left-4 flex items-center gap-2">
       <StatusBadge status={caseData.status} />

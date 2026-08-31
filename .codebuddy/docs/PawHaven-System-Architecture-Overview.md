@@ -442,14 +442,14 @@ export const RescueStatusChangedEventSchema = z.object({
 
 ### 7.2 What Goes Where
 
-| Package                   | Contains                                                                                          | Must NOT Contain                                   |
-| ------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `@pawhaven/shared`        | Zod schemas, TypeScript types, constants, event definitions, pure utility functions               | React code, backend framework code, database logic |
-| `@pawhaven/backend-core`  | SharedModule, PrismaModule, HttpClientModule, decorators, guards, interceptors, Prisma extensions | Business logic, domain entities                    |
-| `@pawhaven/frontend-core` | React hooks, API client, storage utilities, lazy loading helpers                                  | Business-specific components                       |
-| `@pawhaven/design-system` | CSS tokens, Tailwind theme, theme configuration, CSS utilities                                    | React components                                   |
-| `@pawhaven/ui`            | Reusable React components (Form\*, Loading, Toast, etc.)                                          | Business logic, API calls                          |
-| `@pawhaven/i18n`          | Translation provider, locale files, language detection                                            | Business content                                   |
+| Package                   | Contains                                                                                                                                           | Must NOT Contain                                   |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `@pawhaven/shared`        | Zod schemas, TypeScript types, constants, event definitions, pure utility functions                                                                | React code, backend framework code, database logic |
+| `@pawhaven/backend-core`  | SharedModule, PrismaModule, HttpClientModule, shared app bootstrap (`setupApp` via `./setup`), decorators, guards, interceptors, Prisma extensions | Business logic, domain entities                    |
+| `@pawhaven/frontend-core` | React hooks, API client, storage utilities, lazy loading helpers                                                                                   | Business-specific components                       |
+| `@pawhaven/design-system` | CSS tokens, Tailwind theme, theme configuration, CSS utilities                                                                                     | React components                                   |
+| `@pawhaven/ui`            | Reusable React components (Form\*, Loading, Toast, etc.)                                                                                           | Business logic, API calls                          |
+| `@pawhaven/i18n`          | Translation provider, locale files, language detection                                                                                             | Business content                                   |
 
 ---
 
