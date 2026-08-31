@@ -50,6 +50,10 @@
     "partialMN": "部分功能正在维护中，请耐心等待。",
     "mockDataWarning": "本站正在快速开发中，旨在为流浪动物救助提供便利。目前展示内容均为 Mock 数据，谢谢理解与支持！"
   },
+  "carousel": {
+    "previous": "上一张",
+    "next": "下一张"
+  },
   "imageUpload": {
     "add": "添加照片",
     "remove": "移除照片",

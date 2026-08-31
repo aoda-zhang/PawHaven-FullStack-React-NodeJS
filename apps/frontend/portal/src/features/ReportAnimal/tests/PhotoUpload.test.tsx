@@ -5,7 +5,7 @@ import type { ReportAnimalFormValues } from '@pawhaven/shared/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PhotoUpload } from '../components/PhotoUpload';
 
@@ -33,16 +33,24 @@ vi.mock('@pawhaven/ui', () => ({
 }));
 
 const revokeObjectUrl = vi.fn();
+const createdUrls: string[] = [];
 let urlCounter = 0;
 
 const nextObjectUrl = (): string => {
   urlCounter += 1;
-  return `blob:mock-${urlCounter}`;
+  const url = `blob:mock-${urlCounter}`;
+  createdUrls.push(url);
+  return url;
 };
 
 beforeAll(() => {
   URL.createObjectURL = vi.fn(nextObjectUrl);
   URL.revokeObjectURL = revokeObjectUrl;
+});
+
+beforeEach(() => {
+  createdUrls.length = 0;
+  revokeObjectUrl.mockClear();
 });
 
 const imageFile = (name: string, type = 'image/jpeg') =>
@@ -140,13 +148,13 @@ describe('PhotoUpload (MultiImageUpload)', () => {
     fireEvent.change(input, {
       target: { files: [imageFile('a.jpg'), imageFile('b.png', 'image/png')] },
     });
-    revokeObjectUrl.mockClear();
+    const removedPhotoUrl = createdUrls[0];
 
     const removeButtons = screen.getAllByRole('button', {
       name: 'imageUpload.remove',
     });
     fireEvent.click(removeButtons[0]);
 
-    expect(revokeObjectUrl).toHaveBeenCalledTimes(1);
+    expect(revokeObjectUrl).toHaveBeenCalledWith(removedPhotoUrl);
   });
 });

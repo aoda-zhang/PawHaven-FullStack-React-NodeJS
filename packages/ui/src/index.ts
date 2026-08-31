@@ -1,4 +1,13 @@
 export { Button, buttonVariants } from './components/Button';
+export {
+  Carousel,
+  type CarouselImage,
+  type CarouselProps,
+} from './components/Carousel';
+export {
+  PhotoPlaceholder,
+  type PhotoPlaceholderProps,
+} from './components/PhotoPlaceholder';
 export { FormInput } from './components/Form/FormInput';
 export { FormCheckbox } from './components/Form/FormCheckBox';
 export { FormDateRanger } from './components/Form/FormDateRanger';

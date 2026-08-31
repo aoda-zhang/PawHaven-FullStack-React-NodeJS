@@ -1,5 +1,6 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
 import type { RescueDetail } from '@pawhaven/shared/types';
+import { Carousel, PhotoPlaceholder } from '@pawhaven/ui';
 import { MapPin, PawPrint, User } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -40,7 +41,8 @@ const InfoTile = ({
 export const AnimalBasicInfo = ({ animal }: AnimalBasicInfoProps) => {
   const { t, i18n } = useTranslation();
 
-  const photo = animal.photos?.[0];
+  const photos = animal.photos ?? [];
+  const slides = photos.map((src) => ({ src, alt: animal.name }));
   const isUrgent = animal.appearance?.hasInjury === true;
   const caseNumber = animal.id.slice(-CASE_NUMBER_LENGTH).toUpperCase();
 
@@ -51,12 +53,18 @@ export const AnimalBasicInfo = ({ animal }: AnimalBasicInfoProps) => {
   return (
     <section className="bg-card border-border overflow-hidden rounded-2xl border shadow-sm">
       <div className="relative h-72 w-full">
-        <img
-          src={photo ?? '/images/hero-rescue.jpg'}
-          alt={animal.name}
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
+        {slides.length > 0 ? (
+          <Carousel
+            images={slides}
+            autoplay
+            loop
+            previousLabel={t('carousel.previous')}
+            nextLabel={t('carousel.next')}
+          />
+        ) : (
+          <PhotoPlaceholder iconClassName="h-14 w-14" />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute top-4 left-4 flex flex-wrap gap-2">
           <StatusBadge status={animal.status} />
           {isUrgent && <UrgencyBadge />}

@@ -50,6 +50,10 @@
     "partialMN": "Some features are under maintenance. Thank you for your patience.",
     "mockDataWarning": "This site is under rapid development to support stray animal rescue. All displayed data is mock. Thank you for your understanding!"
   },
+  "carousel": {
+    "previous": "Previous slide",
+    "next": "Next slide"
+  },
   "imageUpload": {
     "add": "Add photos",
     "remove": "Remove photo",

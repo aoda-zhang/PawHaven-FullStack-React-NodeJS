@@ -50,6 +50,10 @@
     "partialMN": "Einige Funktionen werden derzeit gewartet. Vielen Dank für Ihre Geduld.",
     "mockDataWarning": "Diese Seite befindet sich in schneller Entwicklung, um die Rettung von Straßentieren zu unterstützen. Alle angezeigten Daten sind Mock-Daten. Danke für Ihr Verständnis!"
   },
+  "carousel": {
+    "previous": "Vorheriges Bild",
+    "next": "Nächstes Bild"
+  },
   "imageUpload": {
     "add": "Fotos hinzufügen",
     "remove": "Foto entfernen",

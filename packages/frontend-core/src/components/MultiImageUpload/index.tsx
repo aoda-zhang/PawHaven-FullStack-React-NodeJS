@@ -2,7 +2,7 @@ import { ImagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { cn } from '../../utils';
+import { cn } from '../../utils/cn';
 
 export interface MultiImageUploadProps {
   value: File[];
@@ -21,6 +21,7 @@ export interface MultiImageUploadProps {
 }
 
 interface PreviewItem {
+  id: number;
   file: File;
   url: string;
 }
@@ -33,14 +34,6 @@ const DEFAULT_MAX_SIZE_BYTES = DEFAULT_MAX_SIZE_MB * BYTES_PER_MB;
 const DEFAULT_ACCEPTED_TYPES = ['image/jpeg', 'image/png'];
 const DEFAULT_ACCEPT = 'image/jpeg,image/png,.jpg,.jpeg,.png';
 const EMPTY_FILES: File[] = [];
-
-const toObjectUrl = (file: File): string => {
-  try {
-    return URL.createObjectURL(file);
-  } catch {
-    return '';
-  }
-};
 
 export const MultiImageUpload = ({
   value,
@@ -64,43 +57,41 @@ export const MultiImageUpload = ({
 
   const [localError, setLocalError] = useState('');
   const [previews, setPreviews] = useState<PreviewItem[]>([]);
-  const previewsRef = useRef<PreviewItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const idByFileRef = useRef(new WeakMap<File, number>());
+  const nextIdRef = useRef(0);
 
   const files = value ?? EMPTY_FILES;
   const maxSizeMb = Math.floor(maxSizeBytes / BYTES_PER_MB);
 
   useEffect(() => {
-    const previous = previewsRef.current;
+    const idByFile = idByFileRef.current;
+    const revokeFns: Array<() => void> = [];
+
     const next = files.map((file) => {
-      const existing = previous.find((item) => item.file === file);
-      return existing ?? { file, url: toObjectUrl(file) };
-    });
-
-    previous.forEach((item) => {
-      const kept = next.some((candidate) => candidate.file === item.file);
-      if (!kept && item.url) {
-        URL.revokeObjectURL(item.url);
+      let id = idByFile.get(file);
+      if (id === undefined) {
+        nextIdRef.current += 1;
+        id = nextIdRef.current;
+        idByFile.set(file, id);
       }
+      let url = '';
+      try {
+        const objectUrl = URL.createObjectURL(file);
+        revokeFns.push(() => URL.revokeObjectURL(objectUrl));
+        url = objectUrl;
+      } catch {
+        url = '';
+      }
+      return { id, file, url };
     });
 
-    previewsRef.current = next;
-    setPreviews((current) => {
-      const unchanged =
-        current.length === next.length &&
-        current.every((item, index) => item === next[index]);
-      return unchanged ? current : next;
-    });
-  }, [files]);
+    setPreviews(() => next);
 
-  useEffect(() => {
     return () => {
-      previewsRef.current.forEach((item) => {
-        if (item.url) URL.revokeObjectURL(item.url);
-      });
-      previewsRef.current = [];
+      revokeFns.forEach((revoke) => revoke());
     };
-  }, []);
+  }, [files]);
 
   const addFiles = (incoming: File[]) => {
     setLocalError('');
@@ -109,8 +100,10 @@ export const MultiImageUpload = ({
       setLocalError(t('imageUpload.too_many', { max }));
       return;
     }
+
+    const acceptedTypeSet = new Set(acceptedTypes);
     const results = incoming.map((file) => {
-      if (!acceptedTypes.includes(file.type)) {
+      if (!acceptedTypeSet.has(file.type)) {
         return { file, problem: 'format' as const };
       }
       if (file.size > maxSizeBytes) {
@@ -126,17 +119,26 @@ export const MultiImageUpload = ({
       setLocalError(t('imageUpload.size', { maxSize: maxSizeMb }));
     }
 
-    const accepted = results
-      .filter((item) => item.problem === null)
-      .map((item) => item.file);
+    const accepted: File[] = [];
+    results.forEach((result) => {
+      if (result.problem === null) {
+        accepted.push(result.file);
+      }
+    });
     if (accepted.length > 0) {
       onChange([...files, ...accepted]);
     }
   };
 
-  const removeFile = (index: number) => {
+  const removeFile = (id: number) => {
     setLocalError('');
-    onChange(files.filter((_, i) => i !== index));
+    const remaining: File[] = [];
+    previews.forEach((item) => {
+      if (item.id !== id) {
+        remaining.push(item.file);
+      }
+    });
+    onChange(remaining);
   };
 
   const resolvedError = error ?? localError;
@@ -166,9 +168,9 @@ export const MultiImageUpload = ({
         </p>
       )}
       <div className="grid grid-cols-3 gap-3">
-        {previews.map((item, index) => (
+        {previews.map((item) => (
           <div
-            key={`${item.file.name}-${index}`}
+            key={item.id}
             className="group border-border relative aspect-square overflow-hidden rounded-xl border"
           >
             {item.url && (
@@ -181,7 +183,7 @@ export const MultiImageUpload = ({
             <button
               type="button"
               aria-label={removeLabel ?? t('imageUpload.remove')}
-              onClick={() => removeFile(index)}
+              onClick={() => removeFile(item.id)}
               className="bg-background/80 text-error hover:bg-background absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
             >
               <Trash2 className="h-4 w-4" />
