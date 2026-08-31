@@ -2,23 +2,24 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { setupApp } from '@pawhaven/backend-core/setup';
 
 import { AppModule } from './app.module';
-import { setupApp } from './app-setup';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     forceCloseConnections: true,
+    bodyParser: false,
   });
+
+  const configService = app.get(ConfigService) as ConfigService;
 
   const logger = new Logger('Bootstrap');
 
-  // Setup app (CORS, security, pipes, versioning)
-  await setupApp(app);
+  setupApp(app, { enableVersioning: true, enableValidationPipe: true });
 
-  const configService = app.get(ConfigService) as ConfigService;
-  const port = configService.get<number>('http.port', 8080);
+  const port = configService.getOrThrow<number>('http.port');
 
   try {
     await app.listen(port, '0.0.0.0');

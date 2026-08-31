@@ -1,6 +1,6 @@
 import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
 import { Menu } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { RootLayoutMenuRender } from './RootLayoutMenuRender';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
@@ -20,18 +20,12 @@ export const RootLayoutMenu = ({
 }: RootLayoutMenuProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const onOpenSidebar = useCallback(() => setSidebarOpen(true), []);
-  const onCloseSidebar = useCallback(() => setSidebarOpen(false), []);
-
-  const { navItems, loginItem } = useMemo(() => {
-    const authItems = menuItems.filter((item) =>
-      (item.classNames as string[]).some(
-        (className) => className === 'login' || className === 'logout',
-      ),
-    );
-    const nav = menuItems.filter((item) => !authItems.includes(item));
-    return { navItems: nav, loginItem: authItems };
-  }, [menuItems]);
+  const authItems = menuItems.filter((item) =>
+    (item.classNames as string[]).some(
+      (className) => className === 'login' || className === 'logout',
+    ),
+  );
+  const navItems = menuItems.filter((item) => !authItems.includes(item));
 
   return (
     <nav aria-label="Main navigation">
@@ -48,10 +42,10 @@ export const RootLayoutMenu = ({
         </div>
 
         <div className="flex items-center gap-2">
-          {loginItem.length > 0 && (
+          {authItems.length > 0 && (
             <RootLayoutMenuRender
               className="hidden md:flex"
-              menuItems={loginItem}
+              menuItems={authItems}
               activePath={activePath}
               navigate={navigate}
             />
@@ -63,7 +57,7 @@ export const RootLayoutMenu = ({
           <button
             type="button"
             className="cursor-pointer md:hidden"
-            onClick={onOpenSidebar}
+            onClick={() => setSidebarOpen(true)}
             aria-label="Open navigation menu"
             aria-expanded={isSidebarOpen}
           >
@@ -75,7 +69,7 @@ export const RootLayoutMenu = ({
       <RootLayoutSidebar
         menuItems={menuItems}
         isSidebarOpen={isSidebarOpen}
-        onCloseSidebar={onCloseSidebar}
+        onCloseSidebar={() => setSidebarOpen(false)}
         navigate={navigate}
       />
     </nav>

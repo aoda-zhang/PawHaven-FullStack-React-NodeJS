@@ -185,6 +185,7 @@ Contract location: `packages/shared/src/schemas/{name}.schema.ts`
 | style-doctor | X | Y | Z |
 | i18n-doctor | 0 | Y | 0 |
 | backend-doctor | X | 0 | 0 |
+| test-doctor (every review) | X/Y | Y | 0 |
 
 | Check | Status | Detail |
 |-------|--------|--------|

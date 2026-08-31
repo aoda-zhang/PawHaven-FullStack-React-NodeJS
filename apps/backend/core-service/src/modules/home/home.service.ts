@@ -6,15 +6,25 @@ import {
   AnimalStatus,
   HeroStats,
   HeroStatsSchema,
+  HomeData,
   Menu,
   MenuItem,
   Router,
   RouterItem,
 } from '@pawhaven/shared/types';
 
+import { AdoptionService } from '../adoption/adoption.service';
+import { RescueService } from '../rescue/rescue.service';
+
 import { CreatedRouteDTO } from './DTO/router.DTO';
 
 const VOLUNTEER_BASELINE = 120;
+
+const LATEST_RESCUE_LIMIT = 4;
+
+const ADOPTABLE_PET_LIMIT = 6;
+
+const MAX_ROUTE_DEPTH = 3;
 
 @Injectable()
 export class HomeService {
@@ -22,11 +32,13 @@ export class HomeService {
 
   private readonly defaultRole = 'guest';
 
-  private readonly maxRouteDepth = 3;
+  private readonly maxRouteDepth = MAX_ROUTE_DEPTH;
 
   constructor(
     @InjectPrisma(databaseEngines.mongodb)
     private readonly prisma: PrismaClient,
+    private readonly rescueService: RescueService,
+    private readonly adoptionService: AdoptionService,
   ) {}
 
   private normalizeRoles(roles: string[]): string[] {
@@ -430,17 +442,22 @@ export class HomeService {
   async getHomeData(
     isAuthenticated = false,
     userRoles: string[] = [this.defaultRole],
-  ): Promise<{ menus: Menu; routers: Router; heroStats: HeroStats }> {
-    const [menus, routers, heroStats] = await Promise.all([
-      this.getAppMenus(userRoles, isAuthenticated),
-      this.getAppRouters(userRoles),
-      this.getStats(),
-    ]);
+  ): Promise<HomeData> {
+    const [menus, routers, heroStats, latestRescues, adoptablePets] =
+      await Promise.all([
+        this.getAppMenus(userRoles, isAuthenticated),
+        this.getAppRouters(userRoles),
+        this.getStats(),
+        this.rescueService.findAll(undefined, LATEST_RESCUE_LIMIT),
+        this.adoptionService.findAll(undefined, ADOPTABLE_PET_LIMIT),
+      ]);
 
     return {
       menus,
       routers,
       heroStats,
+      latestRescues,
+      adoptablePets,
     };
   }
 }

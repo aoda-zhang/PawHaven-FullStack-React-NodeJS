@@ -1,10 +1,18 @@
-import type { HeroStats, MenuItem, RouterItem } from '@pawhaven/shared/types';
+import type {
+  AdoptablePet,
+  HeroStats,
+  MenuItem,
+  RescueListItem,
+  RouterItem,
+} from '@pawhaven/shared/types';
 import { createContext, useContext } from 'react';
 
 export interface LandingDataType {
   menus: MenuItem[];
   routers: RouterItem[];
   heroStats: HeroStats;
+  latestRescues: RescueListItem[];
+  adoptablePets: AdoptablePet[];
 }
 
 export const EMPTY_HERO_STATS: HeroStats = {
@@ -17,6 +25,8 @@ export const LandingContext = createContext<LandingDataType>({
   menus: [] as MenuItem[],
   routers: [] as RouterItem[],
   heroStats: EMPTY_HERO_STATS,
+  latestRescues: [] as RescueListItem[],
+  adoptablePets: [] as AdoptablePet[],
 });
 
 export const useLandingContext = (): LandingDataType => {

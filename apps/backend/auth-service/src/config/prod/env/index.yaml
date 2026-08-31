@@ -1,6 +1,7 @@
 http:
   env: prod
   port: 8082
+  maxJsonBodySize: 100mb
   prefix: auth-service
   timeout: 5000
   retryCount: 3

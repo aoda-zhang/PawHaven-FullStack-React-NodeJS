@@ -3,13 +3,14 @@ name: code-review
 description: >
   Code Review Orchestrator. Two passes:
   TECH REVIEW — is the code written well? (figma gate, typecheck/react/style/
-  i18n/backend doctors, feature & logic deep review).
+  i18n/backend/test doctors, feature & logic deep review).
   PATTERN REVIEW — does the change fit the project? (boundary/architecture
   doctors, architecture & design, type contracts).
   GATE: figma-doctor verifies design spec match first. Each sub-skill is
   independently composable and can be loaded via use_skill.
+  test-doctor runs on EVERY review, every scope.
   Trigger: code review PR feedback quality check automated scans anti-pattern detection.
-version: 5.0
+version: 5.2
 ---
 
 # Code Review Orchestrator
@@ -30,7 +31,8 @@ code-review (this skill)
   │     │     ├── react-doctor        — React/Redux/Query/Form anti-patterns
   │     │     ├── style-doctor        — Styling & design token compliance
   │     │     ├── i18n-doctor         — Hardcoded string detection
-  │     │     └── backend-doctor      — Backend code quality
+  │     │     ├── backend-doctor      — Backend code quality
+  │     │     └── test-doctor         — Test coverage & quality (EVERY review, all scopes)
   │     └── Deep review: Layer 3 — feature & logic
   │           (completeness, data flow, edge cases, adversarial pass)
   │
@@ -51,7 +53,7 @@ Every review produces **two verdicts**, because they answer different questions:
 
 | Pass | Question | Findings from |
 | ---- | -------- | ------------- |
-| **TECH REVIEW** | Is the code written well? Best practices, anti-patterns, code quality | figma gate + typecheck/react/style/i18n/backend doctors + Layer 3 feature & logic deep review |
+| **TECH REVIEW** | Is the code written well? Best practices, anti-patterns, code quality | figma gate + typecheck/react/style/i18n/backend/test doctors + Layer 3 feature & logic deep review |
 | **PATTERN REVIEW** | Does the change fit the project? Follows the project's overall development rules/patterns, fits the current architecture | boundary/architecture doctors + Layer 2 architecture & design + Layer 4 type contract deep review |
 
 Either pass can block independently. A change that is well-written but breaks the project's architecture is blocked by Pattern Review; a change that fits the architecture but is full of anti-patterns is blocked by Tech Review.
@@ -60,11 +62,12 @@ Either pass can block independently. A change that is well-written but breaks th
 
 | Scope | Gate (TECH) | TECH Review sub-skills | PATTERN Review sub-skills |
 |-------|-------------|------------------------|---------------------------|
-| `frontend` | figma-doctor | typecheck, react, style, i18n | boundary, architecture |
-| `backend` | (skip, no UI) | typecheck, backend | boundary, architecture |
-| `full-stack` | figma-doctor | typecheck, react, style, i18n, backend | boundary, architecture |
+| `frontend` | figma-doctor | typecheck, react, style, i18n, **test** | boundary, architecture |
+| `backend` | (skip, no UI) | typecheck, backend, **test** | boundary, architecture |
+| `full-stack` | figma-doctor | typecheck, react, style, i18n, backend, **test** | boundary, architecture |
 
 Figma gate only applies to UI tasks (frontend / full-stack). Pure backend reviews skip the gate.
+**test-doctor runs on EVERY review, every scope** — it is never skipped (unlike the figma gate).
 
 ## Workflow
 
@@ -81,6 +84,7 @@ If scope includes frontend, run figma-doctor FIRST (sequential). It reads the de
 
 ### Step 2: Parallel-load all applicable sub-skills
 Use `use_skill` to load each sub-skill for the determined scope. This MUST be done in parallel — all sub-skill loads in one batch.
+**test-doctor is always included** — load it for every scope (frontend / backend / full-stack).
 
 ### Step 3: Execute each sub-skill's rules
 Each sub-skill's SKILL.MD lists explicit check rules. Execute them using the tools specified:
@@ -107,6 +111,10 @@ Verify the implementation quality itself:
 2. **Data flow** end-to-end
 3. **Edge cases** — empty/null/error states, i18n 3-locale sync, a11y
 4. **Adversarial pass** — try to break the change before confirming it
+5. **Test completeness & quality** — delegated to **test-doctor** (loaded in
+   Step 2, every scope). Its four checks: existence, meaningful assertions,
+   execution, conventions. If test-doctor was not loaded, apply its rules
+   manually — the checks themselves are mandatory on every review.
 
 ### Step 6: PATTERN REVIEW deep pass — Layer 2 + Layer 4, Architecture & Contracts
 Verify the change fits the project's overall patterns and architecture:
@@ -126,6 +134,6 @@ Each sub-skill is a true CodeBuddy skill and can be:
 ## Related
 
 - Gate: [figma-doctor](./figma-doctor/SKILL.MD)
-- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [style-doctor](./style-doctor/SKILL.MD) · [boundary-doctor](./boundary-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD) · [backend-doctor](./backend-doctor/SKILL.MD)
+- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.MD) · [react-doctor](./react-doctor/SKILL.MD) · [style-doctor](./style-doctor/SKILL.MD) · [boundary-doctor](./boundary-doctor/SKILL.MD) · [i18n-doctor](./i18n-doctor/SKILL.MD) · [backend-doctor](./backend-doctor/SKILL.MD) · [test-doctor](./test-doctor/SKILL.MD) (every review)
 - Architecture deep review: [architecture-doctor](./architecture-doctor/SKILL.MD)
 - Frontend skills: [react](../frontend/react/SKILL.MD) · [styling](../frontend/style/SKILL.MD) · [i18n](../frontend/i18n/SKILL.MD)

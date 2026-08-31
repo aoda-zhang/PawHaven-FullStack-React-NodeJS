@@ -190,7 +190,7 @@ The router: `dispatcher.md` holds the non-negotiables, the 13-principle index, a
 
 Entry point: `SKILL.MD` (orchestrator). Two passes, two verdicts:
 
-- **TECH REVIEW** — is the code written well? `figma-doctor` gate + `typecheck-doctor` · `react-doctor` · `style-doctor` · `i18n-doctor` · `backend-doctor` + Layer 3 feature & logic deep review (best practices, anti-patterns, code quality).
+- **TECH REVIEW** — is the code written well? `figma-doctor` gate + `typecheck-doctor` · `react-doctor` · `style-doctor` · `i18n-doctor` · `backend-doctor` · `test-doctor` (every review) + Layer 3 feature & logic deep review (best practices, anti-patterns, code quality).
 - **PATTERN REVIEW** — does the change fit the project? `boundary-doctor` · `architecture-doctor` + Layer 2 architecture & design + Layer 4 type contract deep review (follows the project's overall development rules/patterns, fits the current architecture).
 
 The review is adversarial: attempt to break the change before confirming it, every `MUST FIX` backed by evidence, no silent polishing. Either pass can block the handoff independently; blocking findings loop back to the responsible implementer.

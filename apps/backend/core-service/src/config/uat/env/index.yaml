@@ -1,6 +1,7 @@
 http:
   env: uat
   port: 8081
+  maxJsonBodySize: 100mb
   prefix: core-service
   timeout: 5000
   retryCount: 3

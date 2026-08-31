@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import type { HeroStats } from '@pawhaven/shared/types';
+import type { HomeData } from '@pawhaven/shared/types';
 
 import { MenuItemDto } from './DTO/menu.DTO';
 import { CreatedRouteDTO, RouterItemDTO } from './DTO/router.DTO';
@@ -14,16 +14,12 @@ export class HomeController {
   @Get()
   @ApiOperation({
     summary:
-      'Get combined home data: menus, routers and hero section statistics',
+      'Get combined home data: menus, routers, hero statistics, latest rescues and adoptable pets',
   })
   getHomeData(
     @Headers('x-auth-verified') verifiedHeader?: string,
     @Headers('x-auth-user-roles') userRolesHeader?: string,
-  ): Promise<{
-    menus: MenuItemDto[];
-    routers: RouterItemDTO[];
-    heroStats: HeroStats;
-  }> {
+  ): Promise<HomeData> {
     const userRoles = this.homeService.resolveRequestRoles(userRolesHeader);
     const isAuthenticated = verifiedHeader === '1';
 

@@ -39,7 +39,7 @@ You are also an **adversarial reviewer**. Your stance: attempt to break the chan
 
 You review in **two passes**, answering two different questions:
 
-- **TECH REVIEW — is the code written well?** Best practices, anti-patterns, code quality. Uses: figma gate, typecheck/react/style/i18n/backend doctors, and the Layer 3 feature & logic deep review.
+- **TECH REVIEW — is the code written well?** Best practices, anti-patterns, code quality. Uses: figma gate, typecheck/react/style/i18n/backend/test doctors, and the Layer 3 feature & logic deep review.
 - **PATTERN REVIEW — does the change fit the project?** Whether the change follows the project's overall development rules/patterns and fits the current architecture. Uses: boundary-doctor, architecture-doctor, Layer 2 architecture & design, and Layer 4 type contracts.
 
 Your verdict is a **pair**: Tech Review verdict + Pattern Review verdict. Either can block the handoff independently — a change that is well-written but violates the architecture is blocked by Pattern Review; a change that fits the architecture but is full of anti-patterns is blocked by Tech Review.
@@ -65,6 +65,7 @@ All sub-skills live under `.codebuddy/skills/code-review/`. Each sub-skill's `SK
 | TECH    | parallel | style-doctor        | `.codebuddy/skills/code-review/style-doctor/SKILL.MD`        | frontend              |
 | TECH    | parallel | i18n-doctor         | `.codebuddy/skills/code-review/i18n-doctor/SKILL.MD`         | frontend              |
 | TECH    | parallel | backend-doctor      | `.codebuddy/skills/code-review/backend-doctor/SKILL.MD`      | backend               |
+| TECH    | parallel | test-doctor         | `.codebuddy/skills/code-review/test-doctor/SKILL.MD`         | all (EVERY review)    |
 | PATTERN | parallel | boundary-doctor     | `.codebuddy/skills/code-review/boundary-doctor/SKILL.MD`     | all                   |
 | PATTERN | parallel | architecture-doctor | `.codebuddy/skills/code-review/architecture-doctor/SKILL.MD` | all                   |
 
@@ -108,11 +109,12 @@ RECEIVE TASK from AGENT
 │                                                                  │
 │ Primary path: use use_skill() to load each applicable sub-skill. │
 │                                                                  │
-│ Frontend: typecheck-doctor, react-doctor, style-doctor,          │
-│           boundary-doctor, i18n-doctor, architecture-doctor       │
-│ Backend:  typecheck-doctor, boundary-doctor, backend-doctor,     │
-│           architecture-doctor                                     │
-│ Full-stack: ALL 7                                                 │
+│ test-doctor ALWAYS loads — every scope, every review.            │
+│                                                                  │
+│ Frontend: typecheck, react, style, i18n, test, boundary,         │
+│           architecture                                           │
+│ Backend:  typecheck, backend, test, boundary, architecture       │
+│ Full-stack: ALL 8 (incl. test)                                   │
 │                                                                  │
 │ Fallback path (if use_skill fails or is unavailable):            │
 │ 1. read_file the SKILL.MD of each applicable sub-skill           │
@@ -187,6 +189,8 @@ RECEIVE TASK from AGENT
 │   • Race: stale response overwrites newer one?                   │
 │   • Optimistic update fails to roll back cleanly?                │
 │   • Empty / null / partial data crashes a render?                │
+│ □ Test completeness & quality: covered by test-doctor (existence,│
+│   meaningful assertions, execution, conventions) — always runs.  │
 └──────────────────────────────────────────────────────────────────┘
         │
         ▼

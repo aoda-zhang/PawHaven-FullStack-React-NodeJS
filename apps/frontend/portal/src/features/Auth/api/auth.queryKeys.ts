@@ -1,4 +1,5 @@
 export const authQueryKeys = {
   all: ['auth'] as const,
-  currentUser: () => [...authQueryKeys.all, 'current'] as const,
+  currentUser: (userId: string) =>
+    [...authQueryKeys.all, 'current', userId] as const,
 };

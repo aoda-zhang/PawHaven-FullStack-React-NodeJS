@@ -1,61 +1,46 @@
-import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { RescueCasesSection } from '../RescueCases/components/RescueCasesSection';
 
-import {
-  useFetchAdoptablePets,
-  useFetchLatestRescues,
-} from './api/home.queries';
 import { AdoptablePetsSection } from './components/AdoptablePetsSection';
 import { Hero } from './components/Hero';
 import { StrayCTA } from './components/StrayCTA';
 
-const LATEST_RESCUE_LIMIT = 4;
+import { useLandingContext } from '@/features/Landing/landingContext';
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { data: cases = [], isLoading: casesLoading } =
-    useFetchLatestRescues(LATEST_RESCUE_LIMIT);
-  const { data: pets = [], isLoading: petsLoading } = useFetchAdoptablePets();
+  const { latestRescues, adoptablePets } = useLandingContext();
 
-  const handleCaseClick = useCallback(
-    (id: string) => {
-      navigate(`/rescue/detail/${id}`);
-    },
-    [navigate],
-  );
+  const handleCaseClick = (id: string) => {
+    navigate(`/rescue/detail/${id}`);
+  };
 
-  const handleSeeAll = useCallback(() => {
+  const handleSeeAll = () => {
     navigate('/rescue-cases');
-  }, [navigate]);
+  };
 
-  const handlePetClick = useCallback(
-    (id: string) => {
-      navigate(`/adopt/detail/${id}`);
-    },
-    [navigate],
-  );
+  const handlePetClick = (id: string) => {
+    navigate(`/adopt/detail/${id}`);
+  };
 
-  const handleSeeAllPets = useCallback(() => {
+  const handleSeeAllPets = () => {
     navigate('/adopt');
-  }, [navigate]);
+  };
 
   return (
     <div className="flex flex-col">
       <Hero />
       <RescueCasesSection
-        cases={cases}
+        cases={latestRescues}
         onCaseClick={handleCaseClick}
         onSeeAll={handleSeeAll}
         showStatusSummary={false}
-        isLoading={casesLoading}
       />
       <AdoptablePetsSection
-        pets={pets}
+        pets={adoptablePets}
         onPetClick={handlePetClick}
         onSeeAll={handleSeeAllPets}
-        isLoading={petsLoading}
       />
 
       <StrayCTA />

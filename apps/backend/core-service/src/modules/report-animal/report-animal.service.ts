@@ -3,7 +3,7 @@ import type { IncomingHttpHeaders } from 'http';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { PrismaClient } from '@prismaClient';
+import { PrismaClient, type animalReports } from '@prismaClient';
 import { AnimalStatus } from '@pawhaven/shared/types';
 
 import { CreateReportAnimalDto } from './DTO/report-animal.DTO';
@@ -17,7 +17,10 @@ export class ReportAnimalService {
     private readonly prisma: PrismaClient,
   ) {}
 
-  async create(dto: CreateReportAnimalDto, headers: IncomingHttpHeaders = {}) {
+  async create(
+    dto: CreateReportAnimalDto,
+    headers: IncomingHttpHeaders = {},
+  ): Promise<animalReports> {
     try {
       const name =
         dto.animalType === 'other'
@@ -41,7 +44,7 @@ export class ReportAnimalService {
           animalStatus: AnimalStatus.PENDING,
           statusDescription: dto.statusDescription,
           reporter,
-          reporterPhotos: [],
+          reporterPhotos: dto.reporterPhotos,
           videos: [],
         },
       });

@@ -310,6 +310,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
@@ -381,6 +384,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/backend/core-service/dist/prisma/mongodb/client/core-svc-client-bak2: {}
+
   apps/backend/core-service/src/prisma/mongodb/client/core-svc-client-bak2: {}
 
   apps/backend/document-service:
@@ -451,6 +456,9 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.4.2
+      helmet:
+        specifier: ^8.1.0
+        version: 8.3.0
       i18n:
         specifier: ^0.15.2
         version: 0.15.3(supports-color@8.0.0)
@@ -596,6 +604,9 @@ importers:
       dayjs:
         specifier: ^1.11.18
         version: 1.11.21
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.1.0
         version: 8.3.0
@@ -934,6 +945,9 @@ importers:
       dotenv:
         specifier: ^17.2.0
         version: 17.4.2
+      express:
+        specifier: 5.2.1
+        version: 5.2.1(supports-color@8.0.0)
       helmet:
         specifier: ^8.0.0
         version: 8.3.0
@@ -983,6 +997,9 @@ importers:
       '@types/bcrypt':
         specifier: ^6.0.0
         version: 6.0.0
+      '@types/cookie-parser':
+        specifier: ^1.4.9
+        version: 1.4.10(@types/express@5.0.6)
       '@types/crypto-js':
         specifier: ^4.2.2
         version: 4.2.2
@@ -7574,20 +7591,12 @@ packages:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
 
-  mime-db@1.40.0:
-    resolution: {integrity: sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==}
-    engines: {node: '>= 0.6'}
-
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
 
   mime-db@1.54.0:
     resolution: {integrity: sha512-aU5EJuIN2WDemCcAp2vFBfp/m4EAhWJnUNSSw0ixs7/kXbd6Pg64EmwJkNdFhB8aWt1sH2CTXrLxo/iAGV3oPQ==}
-    engines: {node: '>= 0.6'}
-
-  mime-types@2.1.24:
-    resolution: {integrity: sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==}
     engines: {node: '>= 0.6'}
 
   mime-types@2.1.35:
@@ -16312,15 +16321,9 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.2
 
-  mime-db@1.40.0: {}
-
   mime-db@1.52.0: {}
 
   mime-db@1.54.0: {}
-
-  mime-types@2.1.24:
-    dependencies:
-      mime-db: 1.40.0
 
   mime-types@2.1.35:
     dependencies:
@@ -18811,7 +18814,7 @@ snapshots:
   type-is@1.6.18:
     dependencies:
       media-typer: 0.3.0
-      mime-types: 2.1.24
+      mime-types: 2.1.35
 
   type-is@2.1.0:
     dependencies:

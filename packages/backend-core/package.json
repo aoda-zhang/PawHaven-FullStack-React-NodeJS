@@ -25,6 +25,10 @@
       "require": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"
     },
+    "./setup": {
+      "require": "./dist/setup/app-setup.js",
+      "types": "./dist/setup/app-setup.d.ts"
+    },
     "./guards": {
       "require": "./dist/guards/index.js",
       "types": "./dist/guards/index.d.ts"
@@ -49,6 +53,7 @@
     "crypto-js": "^4.2.0",
     "csurf": "^1.11.0",
     "dayjs": "^1.11.18",
+    "express": "5.2.1",
     "js-yaml": "^4.1.0",
     "uuid": "^8.3.2",
     "zod": "^4.3.6"
@@ -110,6 +115,7 @@
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
     "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",

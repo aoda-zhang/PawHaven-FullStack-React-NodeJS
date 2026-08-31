@@ -29,6 +29,10 @@ const validPayload: AnimalReportDto = {
   },
   foundTime: '2026-08-22T10:00:00.000Z',
   status: 'friendly',
+  reporterPhotos: [
+    'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD',
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg',
+  ],
   contactInfo: {
     name: 'Jane Doe',
     phone: '+49 170 1234567',

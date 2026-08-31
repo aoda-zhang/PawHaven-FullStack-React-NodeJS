@@ -454,11 +454,18 @@ echo "✅ Module boundaries clean"
 
 ### 5.4 Validation & Shared
 
-| Category          | Technology             | Notes                              |
-| ----------------- | ---------------------- | ---------------------------------- |
-| **Validation**    | Zod + nestjs-zod       | Schemas in @pawhaven/shared        |
-| **Shared Kernel** | @pawhaven/shared       | Types, constants, event schemas    |
-| **Backend Core**  | @pawhaven/backend-core | SharedModule, PrismaModule, guards |
+| Category          | Technology             | Notes                                                                 |
+| ----------------- | ---------------------- | --------------------------------------------------------------------- |
+| **Validation**    | Zod + nestjs-zod       | Schemas in @pawhaven/shared                                           |
+| **Shared Kernel** | @pawhaven/shared       | Types, constants, event schemas                                       |
+| **Backend Core**  | @pawhaven/backend-core | SharedModule, PrismaModule, guards, shared app bootstrap (`setupApp`) |
+
+All services share one bootstrap: `NestFactory.create(AppModule, { bodyParser: false })` then
+`setupApp(app)` from `@pawhaven/backend-core/setup`, which applies the body-size limit
+(`http.maxJsonBodySize`), `http.prefix`, helmet, CORS, cookie-parser and shutdown hooks.
+`bodyParser: false` is mandatory — otherwise Nest registers its own unlimited parser first and
+the configured limit is silently bypassed. URI versioning and the strict `ValidationPipe` are
+opt-in per service.
 
 ### 5.5 Security
 

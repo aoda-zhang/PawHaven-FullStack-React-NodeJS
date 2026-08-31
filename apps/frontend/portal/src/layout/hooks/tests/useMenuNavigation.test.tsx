@@ -6,9 +6,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useMenuNavigation } from '../useMenuNavigation';
 
-import { authQueryKeys } from '@/features/Auth/api/auth.queryKeys';
-import { landingQueryKeys } from '@/features/Landing/api/landing.queryKeys';
-
 const { mockLogout, mockNavigate, mockShowToast, mockInvalidateQueries } =
   vi.hoisted(() => ({
     mockLogout: vi.fn(),
@@ -68,7 +65,7 @@ describe('useMenuNavigation', () => {
     mockInvalidateQueries.mockReset();
   });
 
-  it('triggers logout, redirects to login, then invalidates auth and landing bootstrap queries', () => {
+  it('triggers logout and redirects to login on success (invalidation lives in the mutation)', () => {
     const { result } = renderHookWith([navItem, logoutItem]);
 
     act(() => {
@@ -83,12 +80,7 @@ describe('useMenuNavigation', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/auth/login', {
       replace: true,
     });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: authQueryKeys.all,
-    });
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: landingQueryKeys.all,
-    });
+    expect(mockInvalidateQueries).not.toHaveBeenCalled();
   });
 
   it('shows an error toast and does not navigate when logout fails', () => {

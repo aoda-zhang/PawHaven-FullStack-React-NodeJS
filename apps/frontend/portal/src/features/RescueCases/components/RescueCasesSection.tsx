@@ -1,6 +1,5 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import { ArrowRight } from 'lucide-react';
-import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { RescueCase } from '../types';
@@ -25,26 +24,28 @@ export const RescueCasesSection = ({
 }: RescueCasesSectionProps) => {
   const { t } = useTranslation();
 
-  const pendingCount = cases.filter(
+  const safeCases = cases ?? [];
+  const pendingCount = safeCases.filter(
     (c) => c.status === AnimalStatusSchema.enum.pending,
   ).length;
-  const inProgressCount = cases.filter(
+  const inProgressCount = safeCases.filter(
     (c) => c.status === AnimalStatusSchema.enum.inProgress,
   ).length;
 
-  let content: ReactNode;
-  if (isLoading) {
-    content = <RescueCasesSectionSkeleton />;
-  } else if (cases?.length === 0) {
-    content = (
-      <p className="text-text-secondary py-16 text-center">
-        {t('rescue_cases.no_cases_found')}
-      </p>
-    );
-  } else {
-    content = (
+  const renderContent = () => {
+    if (isLoading) {
+      return <RescueCasesSectionSkeleton />;
+    }
+    if (safeCases.length === 0) {
+      return (
+        <p className="text-text-secondary py-16 text-center">
+          {t('rescue_cases.no_cases_found')}
+        </p>
+      );
+    }
+    return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-        {cases.map((caseData) => (
+        {safeCases.map((caseData) => (
           <CaseCard
             key={caseData.id}
             caseData={caseData}
@@ -53,7 +54,7 @@ export const RescueCasesSection = ({
         ))}
       </div>
     );
-  }
+  };
 
   return (
     <section className="max-w-6xl py-10" aria-busy={isLoading}>
@@ -83,7 +84,7 @@ export const RescueCasesSection = ({
         )}
       </div>
 
-      {content}
+      {renderContent()}
     </section>
   );
 };

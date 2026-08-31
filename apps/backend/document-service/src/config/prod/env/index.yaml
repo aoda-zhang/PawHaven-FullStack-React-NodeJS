@@ -1,6 +1,7 @@
 http:
   env: prod
   port: 8083
+  maxJsonBodySize: 100mb
   prefix: document-service
   timeout: 5000
   retryCount: 3
