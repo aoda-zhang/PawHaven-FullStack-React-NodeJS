@@ -39,6 +39,16 @@ const borderStatusColors: Record<RescueStatusType, StatusColorType> = {
   failed: 'border-rescue-status-failed',
 };
 
+/**
+ * Returns the appropriate Tailwind CSS class for a rescue status based on the requested style prefix.
+ * Supports background, text, and border color variants for all rescue statuses.
+ *
+ * @param params - The status color parameters
+ * @param params.status - The rescue status type
+ * @param params.prefix - The CSS prefix type ('bg', 'text', or 'border')
+ * @returns The Tailwind CSS class string for the status color
+ * @throws Error if an unsupported prefix is provided
+ */
 export const getStatusColorByPrefix = ({
   status,
   prefix,

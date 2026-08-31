@@ -15,6 +15,12 @@ interface NominatimResponse {
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse';
 const USER_AGENT = 'PawHaven/1.0 (contact: pawhaven@example.com)';
 
+/**
+ * Builds a human-readable address string from Nominatim address components.
+ *
+ * @param address - The address object from Nominatim response
+ * @returns A comma-separated address string, or empty string if no address
+ */
 const buildDisplayName = (address: NominatimResponse['address']): string => {
   if (!address) return '';
   const { road, suburb, city, town, village, county, state, country } = address;
@@ -24,6 +30,15 @@ const buildDisplayName = (address: NominatimResponse['address']): string => {
     .join(', ');
 };
 
+/**
+ * Converts geographic coordinates to a human-readable address using OpenStreetMap's Nominatim API.
+ *
+ * @param latitude - The latitude coordinate
+ * @param longitude - The longitude coordinate
+ * @param language - The language code for the address (defaults to 'en')
+ * @returns A promise that resolves to the formatted address string
+ * @throws Error if the reverse geocoding API request fails
+ */
 export const reverseGeocode = async (
   latitude: number,
   longitude: number,

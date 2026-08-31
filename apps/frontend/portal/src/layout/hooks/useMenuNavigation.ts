@@ -11,6 +11,12 @@ import { routePaths } from '@/router/routePaths';
 
 const LOGOUT_MENU_CLASS = 'logout';
 
+/**
+ * Checks if a menu item is the logout action.
+ *
+ * @param item - The menu item to check
+ * @returns True if the item has the logout class, false otherwise
+ */
 const isLogoutItem = (item: MenuItem) =>
   (item.classNames ?? []).includes(LOGOUT_MENU_CLASS);
 
@@ -20,6 +26,16 @@ interface UseMenuNavigationOptions {
   navigate: NavigateFunction;
 }
 
+/**
+ * Manages menu navigation logic including logout handling, active states, and translations.
+ * Resolves menu item classes, translates labels, and handles navigation/logout actions.
+ *
+ * @param options - Menu navigation configuration
+ * @param options.menuItems - Array of menu items to process
+ * @param options.activePath - Current active path for highlighting
+ * @param options.navigate - React Router navigate function
+ * @returns Processed menu items, click handler, and login state
+ */
 export const useMenuNavigation = ({
   menuItems,
   activePath,
