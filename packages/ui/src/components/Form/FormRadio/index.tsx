@@ -47,6 +47,7 @@ export const FormRadio = ({
                 <input
                   id={`${name}-${option.value}`}
                   type="radio"
+                  name={name}
                   value={option.value}
                   checked={field.value === option.value}
                   onChange={(event) => field.onChange(event.target.value)}

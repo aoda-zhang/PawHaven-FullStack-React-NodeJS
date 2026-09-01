@@ -32,7 +32,7 @@ export const RescueContactInfoSchema = z.object({
 export type RescueContactInfo = z.infer<typeof RescueContactInfoSchema>;
 
 export const RescueReporterSchema = z.object({
-  reporterId: z.string().optional(),
+  reporterId: z.string(),
 });
 
 export type RescueReporter = z.infer<typeof RescueReporterSchema>;
@@ -47,7 +47,6 @@ export const CreateRescueDtoSchema = z.object({
   size: z.string().min(1, 'Size is required'),
   animalCount: z.number().int().min(1, 'Animal count is required'),
   appearance: AnimalAppearanceSchema,
-  reporterId: z.string().optional(),
   reporterPhotos: z.array(z.string()),
 });
 

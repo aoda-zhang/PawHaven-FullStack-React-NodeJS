@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { EmailService } from './email.service';
 
@@ -7,7 +7,7 @@ export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 
   @Post('/send')
-  sendEmail(@Req() req: any, @Body() emailInfo: any) {
+  sendEmail(@Body() emailInfo: any) {
     return this.emailService.sendMail(emailInfo);
   }
 

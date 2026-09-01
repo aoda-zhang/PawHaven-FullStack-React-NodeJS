@@ -1,6 +1,14 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import type { IncomingHttpHeaders } from 'http';
+
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
-import { databaseEngines } from '@pawhaven/backend-core/constants';
+import { databaseEngines, httpHeaders } from '@pawhaven/backend-core/constants';
+import { readHeader } from '@pawhaven/backend-core/utils';
 import { PrismaClient, type animalReports } from '@prismaClient';
 import {
   RescueListItemSchema,
@@ -24,10 +32,16 @@ export class RescueService {
     private readonly prisma: PrismaClient,
   ) {}
 
-  async create(dto: CreateRescueDto) {
+  async create(dto: CreateRescueDto, headers: IncomingHttpHeaders = {}) {
+    const reporterId = readHeader(headers, httpHeaders.authUserId);
+
+    if (!reporterId) {
+      throw new UnauthorizedException('Reporter identity is required');
+    }
+
     try {
       return await this.prisma.animalReports.create({
-        data: dto,
+        data: { ...dto, reporterId },
       });
     } catch (error) {
       this.logger.error(`Failed to create rescue: ${dto.animalType}`, error);
@@ -91,7 +105,7 @@ export class RescueService {
       animalType: record.animalType ?? 'unknown',
       location: location.address ?? '',
       description: record.description,
-      reporterId: record.reporterId ?? '',
+      reporterId: record.reporterId,
       reportedAt: record.createdAt.toISOString(),
       distance: 0,
     });
@@ -113,7 +127,7 @@ export class RescueService {
       appearance: RescueDetailAppearanceSchema.parse(record.appearance ?? {}),
       location: RescueDetailLocationSchema.parse(record.locationObj ?? {}),
       photos: record.reporterPhotos,
-      reporter: { reporterId: record.reporterId ?? undefined },
+      reporter: { reporterId: record.reporterId },
       reportedAt: record.createdAt.toISOString(),
       distance: 0,
     });

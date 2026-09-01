@@ -1,6 +1,11 @@
 import type { IncomingHttpHeaders } from 'http';
 
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines, httpHeaders } from '@pawhaven/backend-core/constants';
 import { readHeader } from '@pawhaven/backend-core/utils';
@@ -20,9 +25,13 @@ export class ReportAnimalService {
     dto: AnimalReportDto,
     headers: IncomingHttpHeaders = {},
   ): Promise<animalReports> {
-    try {
-      const reporterId = readHeader(headers, httpHeaders.authUserId);
+    const reporterId = readHeader(headers, httpHeaders.authUserId);
 
+    if (!reporterId) {
+      throw new UnauthorizedException('Reporter identity is required');
+    }
+
+    try {
       return await this.prisma.animalReports.create({
         data: {
           animalType: dto.animalType,
