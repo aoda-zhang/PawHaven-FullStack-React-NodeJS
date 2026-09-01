@@ -1,5 +1,4 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
-// import EmailPayloadDTO from '@shared/DTO/Document/send-email.DTO';
 
 import { EmailService } from './email.service';
 
@@ -9,8 +8,7 @@ export class EmailController {
 
   @Post('/send')
   sendEmail(@Req() req: any, @Body() emailInfo: any) {
-    const userID = req?.headers?.['x-auth-user-id'] || req?.user?.userId;
-    return this.emailService.sendMail(userID, emailInfo);
+    return this.emailService.sendMail(emailInfo);
   }
 
   @Post('/preview')

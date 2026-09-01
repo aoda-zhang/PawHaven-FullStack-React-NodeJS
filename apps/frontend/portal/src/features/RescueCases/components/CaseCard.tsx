@@ -54,8 +54,8 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
       </div>
       <div className="p-4">
         <div className="mb-2 flex items-start gap-2">
-          <MapPin className="text-muted-foreground mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
-          <span className="text-muted-foreground text-xs">
+          <MapPin className="text-text-secondary mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+          <span className="text-text-secondary text-xs">
             {caseData.location}
           </span>
         </div>
@@ -63,7 +63,7 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
           {caseData.description}
         </p>
         <div className="border-border flex items-center justify-between border-t pt-3">
-          <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
+          <div className="text-text-secondary flex items-center gap-1.5 text-xs">
             <Clock className="h-3.5 w-3.5" />
             {formatDateTime(caseData.reportedAt, i18n.language)}
           </div>

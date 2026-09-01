@@ -28,17 +28,20 @@ export const ReportAnimalForm = () => {
   const form = useForm<ReportAnimalFormValues>({
     resolver: zodResolver(
       createReportAnimalFormSchema({
-        colorRequired: t('reportAnimal.wizard.step3_color_required'),
-        addressRequired: t('reportAnimal.wizard.step1_address_required'),
-        photosInvalid: t('reportAnimal.wizard.step1_photos_invalid'),
-        photosFormat: t('reportAnimal.wizard.step1_photos_format'),
-        photosSize: t('reportAnimal.wizard.step1_photos_size'),
-        photosRequired: t('reportAnimal.wizard.step1_photos_required'),
-        photosMax: t('reportAnimal.wizard.step1_photos_max'),
-        otherRequired: t('reportAnimal.wizard.step2_other_required'),
-        sizeRequired: t('reportAnimal.wizard.step3_size_required'),
-        behaviorRequired: t('reportAnimal.wizard.step3_behavior_required'),
-        contactRequired: t('reportAnimal.wizard.step2_contact_required'),
+        colorRequired: t('reportAnimal.color_required'),
+        addressRequired: t('reportAnimal.address_required'),
+        photosInvalid: t('reportAnimal.photos_invalid'),
+        photosFormat: t('reportAnimal.photos_format'),
+        photosSize: t('reportAnimal.photos_size'),
+        photosRequired: t('reportAnimal.photos_required'),
+        photosMax: t('reportAnimal.photos_max'),
+        otherRequired: t('reportAnimal.other_required'),
+        sizeRequired: t('reportAnimal.size_required'),
+        ageRequired: t('reportAnimal.age_required'),
+        behaviorRequired: t('reportAnimal.behavior_required'),
+        contactRequired: t('reportAnimal.contact_required'),
+        descriptionRequired: t('reportAnimal.description_required'),
+        descriptionMax: t('reportAnimal.description_max'),
       }),
     ),
     mode: 'onBlur',
@@ -47,46 +50,35 @@ export const ReportAnimalForm = () => {
       animalCount: 1,
       otherAnimalType: '',
       coatColor: '',
+      age: null,
       size: null,
       behavior: null,
       address: '',
       latitude: null,
       longitude: null,
       photos: [],
-      urgencyChecks: {
-        bleeding: false,
-        cantMove: false,
-        dangerZone: false,
-        breathing: false,
-      },
+      urgent: false,
       contactPhone: '',
+      description: '',
     },
   });
 
   const onSubmit = async (values: ReportAnimalFormValues) => {
-    const isUrgent = Object.values(values.urgencyChecks).some(Boolean);
+    const description = values.description?.trim() ?? '';
+    const isUrgent = values.urgent;
     const reporterPhotos = await readFilesAsDataUrls(values.photos);
     const dto: AnimalReportDto = {
-      animalType: values.animalType,
-      animalTypeOther:
-        values.animalType === 'other' ? values.otherAnimalType : undefined,
-      age: 'adult',
+      animalType:
+        values.animalType === 'other'
+          ? values.otherAnimalType
+          : values.animalType,
+      age: values.age!,
+      size: values.size!,
+      animalCount: values.animalCount,
       appearance: {
         color: values.coatColor,
-        hasInjury: values.urgencyChecks.bleeding,
-        injuryDescription: values.urgencyChecks.bleeding
-          ? t('reportAnimal.wizard.step4_urgency_bleeding')
-          : '',
-        otherFeatures: [
-          values.size && t(`reportAnimal.wizard.step3_size_${values.size}`),
-          values.animalType === 'other' && values.otherAnimalType,
-          values.animalCount > 1 &&
-            `${values.animalCount} ${t('reportAnimal.wizard.animal_count', {
-              count: values.animalCount,
-            })}`,
-        ]
-          .filter(Boolean)
-          .join(', '),
+        hasInjury: isUrgent && description.length > 0,
+        injuryDescription: isUrgent ? description : '',
       },
       location: {
         address: values.address,
@@ -94,12 +86,12 @@ export const ReportAnimalForm = () => {
           ? { latitude: values.latitude, longitude: values.longitude }
           : {}),
       },
-      foundTime: new Date().toISOString(),
       status: isUrgent ? 'dangerous' : 'other',
       statusDescription: values.behavior
-        ? t(`reportAnimal.wizard.step3_behavior_${values.behavior}`)
+        ? t(`reportAnimal.behavior_${values.behavior}`)
         : '',
       reporterPhotos,
+      description,
       contactInfo: {
         name: 'Anonymous',
         phone: values.contactPhone.trim(),
@@ -126,21 +118,21 @@ export const ReportAnimalForm = () => {
           <CheckCircle className="text-success h-8 w-8" />
         </div>
         <h1 className="text-foreground mb-2 text-2xl font-bold">
-          {t('reportAnimal.wizard.success_title')}
+          {t('reportAnimal.success_title')}
         </h1>
-        <p className="text-muted-foreground mb-4 text-sm">
-          {t('reportAnimal.wizard.case_number_prefix')}
+        <p className="text-text-secondary mb-4 text-sm">
+          {t('reportAnimal.case_number_prefix')}
           {caseId}
         </p>
-        <p className="text-muted-foreground mb-6 text-sm">
-          {t('reportAnimal.wizard.success_volunteers')}
+        <p className="text-text-secondary mb-6 text-sm">
+          {t('reportAnimal.success_volunteers')}
         </p>
         <Button
           type="button"
           onClick={() => navigate('/')}
           className="w-full rounded-xl py-3"
         >
-          {t('reportAnimal.wizard.success_home')}
+          {t('reportAnimal.success_home')}
         </Button>
       </div>
     );
@@ -151,20 +143,20 @@ export const ReportAnimalForm = () => {
       <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
         <div className="bg-card border-border mb-6 rounded-2xl border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
-            {t('reportAnimal.wizard.step1_title')}
+            {t('reportAnimal.basics_title')}
           </h2>
-          <p className="text-muted-foreground mb-5 text-sm">
-            {t('reportAnimal.wizard.step1_subtitle')}
+          <p className="text-text-secondary mb-5 text-sm">
+            {t('reportAnimal.basics_subtitle')}
           </p>
           <AnimalBasicsSection />
         </div>
 
         <div className="bg-card border-border mb-6 rounded-2xl border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
-            {t('reportAnimal.wizard.step2_title')}
+            {t('reportAnimal.behavior_title')}
           </h2>
-          <p className="text-muted-foreground mb-5 text-sm">
-            {t('reportAnimal.wizard.step2_subtitle')}
+          <p className="text-text-secondary mb-5 text-sm">
+            {t('reportAnimal.behavior_subtitle')}
           </p>
           <BehaviorContactSection />
         </div>

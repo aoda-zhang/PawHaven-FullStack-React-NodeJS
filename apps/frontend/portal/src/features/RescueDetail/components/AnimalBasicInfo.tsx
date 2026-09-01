@@ -1,123 +1,94 @@
-import { formatDateTime } from '@pawhaven/frontend-core';
+import { cn } from '@pawhaven/frontend-core';
+import { formatDateTime } from '@pawhaven/frontend-core/utils';
 import type { RescueDetail } from '@pawhaven/shared/types';
-import { Carousel, PhotoPlaceholder } from '@pawhaven/ui';
-import { MapPin, PawPrint, User } from 'lucide-react';
+import { Clock, PawPrint } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { StatusBadge } from '@/features/RescueCases/components/StatusBadge';
+import { InfoTile } from './InfoTile';
 
 interface AnimalBasicInfoProps {
   animal: RescueDetail;
+  className?: string;
 }
 
-const CASE_NUMBER_LENGTH = 6;
-
-const UrgencyBadge = () => {
-  const { t } = useTranslation();
-  return (
-    <span className="bg-status-high/10 text-status-high inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold">
-      <span
-        className="h-1.5 w-1.5 rounded-full bg-current"
-        aria-hidden="true"
-      />
-      {t('rescue_cases.urgency_high')}
-    </span>
-  );
-};
-
-const InfoTile = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: React.ReactNode;
-}) => (
-  <div className="bg-background-soft rounded-xl px-3 py-2.5">
-    <p className="text-text-secondary mb-0.5 text-xs">{label}</p>
-    <p className="text-foreground text-sm font-medium">{value}</p>
-  </div>
-);
-
-export const AnimalBasicInfo = ({ animal }: AnimalBasicInfoProps) => {
+export const AnimalBasicInfo = ({
+  animal,
+  className,
+}: AnimalBasicInfoProps) => {
   const { t, i18n } = useTranslation();
-
-  const photos = animal.photos ?? [];
-  const slides = photos.map((src) => ({ src, alt: animal.name }));
-  const isUrgent = animal.appearance?.hasInjury === true;
-  const caseNumber = animal.id.slice(-CASE_NUMBER_LENGTH).toUpperCase();
 
   const animalTypeLabel = t(`reportAnimal.${animal.animalType}`, {
     defaultValue: animal.animalType,
   });
 
+  const infoItems: Array<{ label: string; value: ReactNode; show?: boolean }> =
+    [
+      {
+        label: t('rescue_cases.info_animal'),
+        value: (
+          <span className="flex items-center gap-2">
+            <PawPrint className="text-primary h-4 w-4" aria-hidden="true" />
+            {animalTypeLabel}
+          </span>
+        ),
+      },
+      {
+        label: t('rescueDetail.size'),
+        value: t(`reportAnimal.size_${animal.size}`, {
+          defaultValue: animal.size,
+        }),
+        show: !!animal.size,
+      },
+      {
+        label: t('rescueDetail.animal_count'),
+        value: `${animal.animalCount} ${t('reportAnimal.animal_count', {
+          count: animal.animalCount,
+        })}`,
+        show: animal?.animalCount > 0,
+      },
+      {
+        label: t('rescueDetail.coat_color'),
+        value: animal.appearance?.color,
+        show: !!animal.appearance?.color,
+      },
+      {
+        label: t('rescueDetail.age'),
+        value: t(`reportAnimal.${animal.age}`, { defaultValue: animal.age }),
+        show: !!animal.age,
+      },
+      {
+        label: t('reportAnimal.behavior_label'),
+        value: animal.statusDescription,
+        show: !!animal.statusDescription,
+      },
+      {
+        label: t('rescueDetail.injury'),
+        value: animal.appearance.hasInjury
+          ? t('rescueDetail.yes')
+          : t('rescueDetail.no'),
+        show: !!animal?.appearance?.hasInjury,
+      },
+      {
+        label: t('rescue_cases.info_reported'),
+        value: (
+          <span className="flex items-center gap-2">
+            <Clock className="text-primary h-4 w-4" aria-hidden="true" />
+            {formatDateTime(animal.reportedAt, i18n.language)}
+          </span>
+        ),
+      },
+    ];
+
   return (
-    <section className="bg-card border-border overflow-hidden rounded-2xl border shadow-sm">
-      <div className="relative h-72 w-full">
-        {slides.length > 0 ? (
-          <Carousel
-            images={slides}
-            autoplay
-            loop
-            previousLabel={t('carousel.previous')}
-            nextLabel={t('carousel.next')}
-          />
-        ) : (
-          <PhotoPlaceholder iconClassName="h-14 w-14" />
-        )}
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute top-4 left-4 flex flex-wrap gap-2">
-          <StatusBadge status={animal.status} />
-          {isUrgent && <UrgencyBadge />}
-        </div>
-        <div className="absolute bottom-5 left-5 text-white">
-          <p className="mb-1 text-xs opacity-90">
-            {t('rescueDetail.case_id', { id: caseNumber })}
-          </p>
-          <h1 className="font-serif text-3xl font-bold">{animal.name}</h1>
-          <p className="mt-1 flex items-center gap-1 text-sm opacity-90">
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            {animal.location?.address ?? t('rescueDetail.not_found')}
-          </p>
-        </div>
+    <div className={cn('flex flex-col gap-4', className)}>
+      <div className="grid grid-cols-1 gap-x-1.5 gap-y-0 sm:grid-cols-2">
+        {infoItems
+          .filter((item) => item.show !== false)
+          .map((item, index) => (
+            <InfoTile key={index} label={item.label} value={item.value} />
+          ))}
       </div>
-
-      <div className="p-4 sm:p-5">
-        {animal.description && (
-          <>
-            <h2 className="text-foreground mb-1.5 font-serif text-base font-semibold">
-              {t('rescue_cases.what_reported')}
-            </h2>
-            <p className="text-text-secondary mb-4 text-sm leading-relaxed">
-              {animal.description}
-            </p>
-          </>
-        )}
-
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <InfoTile
-            label={t('reportAnimal.animal_type')}
-            value={
-              <span className="flex items-center gap-2">
-                <PawPrint className="text-primary h-4 w-4" aria-hidden="true" />
-                {animalTypeLabel}
-              </span>
-            }
-          />
-          <InfoTile
-            label={t('rescue_cases.info_reporter')}
-            value={
-              <span className="flex items-center gap-2">
-                <User className="text-primary h-4 w-4" aria-hidden="true" />
-                {animal.reporter?.name ?? t('common.anonymous')}
-              </span>
-            }
-          />
-          <InfoTile
-            label={t('rescue_cases.info_reported')}
-            value={formatDateTime(animal.reportedAt, i18n.language)}
-          />
-        </div>
-      </div>
-    </section>
+    </div>
   );
 };

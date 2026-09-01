@@ -11,7 +11,7 @@ export const RescueListItemSchema = z.object({
   animalType: z.string(),
   location: z.string(),
   description: z.string(),
-  reporter: z.string(),
+  reporterId: z.string(),
   reportedAt: z.string(),
   distance: z.number(),
 });

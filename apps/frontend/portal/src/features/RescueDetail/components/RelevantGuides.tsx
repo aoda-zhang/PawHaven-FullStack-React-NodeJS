@@ -1,3 +1,4 @@
+import { cn } from '@pawhaven/frontend-core';
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -5,6 +6,7 @@ interface Guide {
   icon: string;
   title: string;
   readTime: string;
+  highlight: string;
 }
 
 const GUIDES: Guide[] = [
@@ -12,16 +14,19 @@ const GUIDES: Guide[] = [
     icon: '🚨',
     title: 'guide_injured',
     readTime: 'guide_injured_read',
+    highlight: 'bg-pink-50',
   },
   {
     icon: '🐱',
     title: 'guide_kitten',
     readTime: 'guide_kitten_read',
+    highlight: 'bg-background-soft',
   },
   {
     icon: '🚗',
     title: 'guide_vehicle',
     readTime: 'guide_vehicle_read',
+    highlight: 'bg-amber-50',
   },
 ];
 
@@ -40,7 +45,10 @@ export const RelevantGuides = () => {
           <button
             key={guide.title}
             type="button"
-            className="border-border bg-background-soft hover:border-primary flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors"
+            className={cn(
+              'border-border hover:border-primary flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors',
+              guide.highlight,
+            )}
           >
             <span className="text-lg" aria-hidden="true">
               {guide.icon}

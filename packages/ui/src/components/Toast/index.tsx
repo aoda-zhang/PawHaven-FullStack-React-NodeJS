@@ -124,7 +124,7 @@ export const Toast = () => {
                 clearTimer(toast.id);
                 dismissToast(toast.id);
               }}
-              className="text-text-muted hover:text-text shrink-0 rounded p-0.5 transition-colors"
+              className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors"
             >
               <X className="size-4" />
             </button>

@@ -12,7 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtVerifyInfo, User } from '@pawhaven/shared/types';
 import { HttpClientService } from '@pawhaven/backend-core';
-import { cookieKeys } from '@pawhaven/backend-core/constants';
+import { cookieKeys, httpHeaders } from '@pawhaven/backend-core/constants';
 import { isProd } from '@pawhaven/shared/utils';
 
 import { IS_PUBLIC_API } from '../decorators/public.decorator';
@@ -54,7 +54,7 @@ export class JwtRefreshGuard implements CanActivate {
     const res = context.switchToHttp().getResponse<Response>();
     const accessToken = req.cookies?.[cookieKeys.access_token];
 
-    if (isPublic || (isOptionalAuth && !accessToken)) {
+    if (isPublic) {
       return true;
     }
 
@@ -78,7 +78,7 @@ export class JwtRefreshGuard implements CanActivate {
     if (this.shouldRefreshSoon(accessPayload)) {
       await this.attemptTokenRefresh(req, res, {
         clearCookiesOnFailure: false,
-        isOptionalAuth,
+        isOptionalAuth: true, // Don't throw on proactive refresh failure - token is still valid
       });
     }
 
@@ -160,6 +160,7 @@ export class JwtRefreshGuard implements CanActivate {
       const setCookieHeaders = await inflight;
       if (Array.isArray(setCookieHeaders) && setCookieHeaders.length > 0) {
         this.updateAuthCookies(req, res, setCookieHeaders);
+        this.setUserFromRefreshedToken(req);
       } else {
         this.logger.warn('Token refresh succeeded but no Set-Cookie returned');
       }
@@ -182,13 +183,30 @@ export class JwtRefreshGuard implements CanActivate {
       {
         returnResponse: true,
         headers: {
-          Cookie: `${cookieKeys.refresh_token}=${refreshToken}`,
+          [httpHeaders.cookie]: `${cookieKeys.refresh_token}=${refreshToken}`,
         },
       },
     );
 
-    const setCookieHeaders = response.headers['set-cookie'];
+    const setCookieHeaders = response.headers[httpHeaders.setCookie];
     return Array.isArray(setCookieHeaders) ? setCookieHeaders : null;
+  }
+
+  private setUserFromRefreshedToken(req: RequestWithUser): void {
+    const refreshedToken = req.cookies?.[cookieKeys.access_token];
+    if (!refreshedToken) {
+      return;
+    }
+
+    const payload = this.jwtService.decode<JwtVerifyInfo>(refreshedToken);
+    if (payload?.userId) {
+      // eslint-disable-next-line no-param-reassign
+      req.user = {
+        userId: payload.userId,
+        email: payload.email,
+        roles: payload.roles,
+      };
+    }
   }
 
   private isRefreshRejected(error: unknown): boolean {
@@ -212,7 +230,7 @@ export class JwtRefreshGuard implements CanActivate {
     setCookieHeaders: string[],
   ): void {
     setCookieHeaders.forEach((cookie) => {
-      res.append('Set-Cookie', cookie);
+      res.append(httpHeaders.setCookie, cookie);
       const match = cookie.match(/^([^=]+)=([^;]+)/);
       if (match) {
         const [, name, value] = match;
@@ -226,7 +244,7 @@ export class JwtRefreshGuard implements CanActivate {
   }
 
   private upsertCookieHeader(req: Request, name: string, value: string): void {
-    const parts = (req.headers.cookie ?? '')
+    const parts = (req.headers[httpHeaders.cookie] ?? '')
       .split(';')
       .map((part) => part.trim())
       .filter(Boolean);
@@ -238,7 +256,7 @@ export class JwtRefreshGuard implements CanActivate {
       parts.push(entry);
     }
     // eslint-disable-next-line no-param-reassign
-    req.headers.cookie = parts.join('; ');
+    req.headers[httpHeaders.cookie] = parts.join('; ');
   }
 
   private clearAuthCookies(req: Request, res: Response): void {
@@ -247,11 +265,11 @@ export class JwtRefreshGuard implements CanActivate {
     const secureSuffix = isProd(env) ? '; Secure' : '';
 
     res.append(
-      'Set-Cookie',
+      httpHeaders.setCookie,
       `${cookieKeys.access_token}=; ${cookieOptions}${secureSuffix}`,
     );
     res.append(
-      'Set-Cookie',
+      httpHeaders.setCookie,
       `${cookieKeys.refresh_token}=; ${cookieOptions}${secureSuffix}`,
     );
 
@@ -261,8 +279,8 @@ export class JwtRefreshGuard implements CanActivate {
     delete req.cookies[cookieKeys.access_token];
     // eslint-disable-next-line no-param-reassign
     delete req.cookies[cookieKeys.refresh_token];
-    if (req.headers.cookie) {
-      const parts = (req.headers.cookie ?? '')
+    if (req.headers[httpHeaders.cookie]) {
+      const parts = (req.headers[httpHeaders.cookie] ?? '')
         .split(';')
         .map((part) => part.trim())
         .filter(
@@ -271,7 +289,7 @@ export class JwtRefreshGuard implements CanActivate {
             !part.startsWith(`${cookieKeys.refresh_token}=`),
         );
       // eslint-disable-next-line no-param-reassign
-      req.headers.cookie = parts.join('; ');
+      req.headers[httpHeaders.cookie] = parts.join('; ');
     }
   }
 }

@@ -127,7 +127,6 @@ export const color = {
   text: 'var(--color-text)',
   textSecondary: 'var(--color-text-secondary)',
   textTertiary: 'var(--color-text-tertiary)',
-  textMuted: 'var(--color-text-muted)',
   textPlaceholder: 'var(--color-text-placeholder)',
   textInverse: 'var(--color-text-inverse)',
   textLink: 'var(--color-text-link)',

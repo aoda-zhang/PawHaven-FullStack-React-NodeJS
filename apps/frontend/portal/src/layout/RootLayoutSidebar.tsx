@@ -39,7 +39,7 @@ export const RootLayoutSidebar = ({
             type="button"
             aria-label="Close menu"
             onClick={onCloseSidebar}
-            className="text-text-muted hover:text-text rounded p-1 transition-colors"
+            className="text-text-secondary hover:text-text rounded p-1 transition-colors"
           >
             <X className="size-5" />
           </button>

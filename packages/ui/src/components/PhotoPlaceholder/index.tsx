@@ -17,7 +17,7 @@ export const PhotoPlaceholder = ({
 }: PhotoPlaceholderProps) => (
   <div
     className={cn(
-      'bg-muted text-text-muted flex h-full w-full items-center justify-center',
+      'bg-muted text-text-secondary flex h-full w-full items-center justify-center',
       className,
     )}
     aria-hidden="true"

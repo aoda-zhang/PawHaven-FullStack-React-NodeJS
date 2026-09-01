@@ -163,7 +163,7 @@ export const MultiImageUpload = ({
         </label>
       )}
       {hint && (
-        <p id={hintId} className="text-muted-foreground mb-3 text-xs">
+        <p id={hintId} className="text-text-secondary mb-3 text-xs">
           {hint}
         </p>
       )}
@@ -195,14 +195,14 @@ export const MultiImageUpload = ({
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label={addLabel ?? t('imageUpload.add')}
-            className="border-border text-muted-foreground hover:border-primary/40 hover:bg-muted flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed transition-colors"
+            className="border-border text-text-secondary hover:border-primary/40 hover:bg-muted flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed transition-colors"
           >
             <ImagePlus className="h-6 w-6" />
             <span className="text-xs">{addLabel ?? t('imageUpload.add')}</span>
           </button>
         )}
       </div>
-      <p className="text-muted-foreground mt-2 text-xs">
+      <p className="text-text-secondary mt-2 text-xs">
         {t('imageUpload.count', { count: previews.length, max })}
       </p>
       {resolvedError && (
@@ -210,7 +210,7 @@ export const MultiImageUpload = ({
           id={errorId}
           className={cn(
             'mt-1 text-xs',
-            error ? 'text-error' : 'text-muted-foreground',
+            error ? 'text-error' : 'text-text-secondary',
           )}
         >
           {resolvedError}

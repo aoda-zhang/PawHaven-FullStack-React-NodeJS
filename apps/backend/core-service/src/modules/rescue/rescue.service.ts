@@ -1,13 +1,12 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { PrismaClient } from '@prismaClient';
+import { PrismaClient, type animalReports } from '@prismaClient';
 import {
   RescueListItemSchema,
   RescueDetailSchema,
   RescueDetailAppearanceSchema,
   RescueDetailLocationSchema,
-  RescueDetailReporterSchema,
   AnimalStatusSchema,
   RescueAgeSchema,
   AnimalStatus,
@@ -31,7 +30,7 @@ export class RescueService {
         data: dto,
       });
     } catch (error) {
-      this.logger.error(`Failed to create rescue: ${dto.name}`, error);
+      this.logger.error(`Failed to create rescue: ${dto.animalType}`, error);
       throw new BadRequestException('Failed to create rescue record');
     }
   }
@@ -52,7 +51,7 @@ export class RescueService {
         orderBy: { createdAt: 'desc' },
         take,
       });
-      return rescues.map((r) => this.toListItem(r));
+      return rescues.map((record) => this.toListItem(record));
     } catch (error) {
       this.logger.error('Failed to fetch rescues', error);
       throw new BadRequestException('Failed to fetch rescues');
@@ -75,78 +74,48 @@ export class RescueService {
     }
   }
 
-  private toListItem(r: {
-    id: string;
-    name: string | null;
-    animalType: string | null;
-    animalTypeOther: string | null;
-    appearance: unknown;
-    locationObj: unknown;
-    foundTime: string | null;
-    animalStatus: string | null;
-    statusDescription: string | null;
-    reporter: unknown;
-    reporterPhotos: string[];
-    createdAt: Date;
-  }): RescueListItem {
-    const appearance = RescueDetailAppearanceSchema.parse(r.appearance ?? {});
-    const location = RescueDetailLocationSchema.parse(r.locationObj ?? {});
-    const reporter = RescueDetailReporterSchema.parse(r.reporter ?? {});
+  private toListItem(record: animalReports): RescueListItem {
+    const appearance = RescueDetailAppearanceSchema.parse(
+      record.appearance ?? {},
+    );
+    const location = RescueDetailLocationSchema.parse(record.locationObj ?? {});
 
-    const status = AnimalStatusSchema.safeParse(r.animalStatus);
+    const status = AnimalStatusSchema.safeParse(record.animalStatus);
 
     return RescueListItemSchema.parse({
-      id: r.id,
-      title: r.name ?? 'Unknown animal',
-      image: r.reporterPhotos[0],
+      id: record.id,
+      title: record.animalType ?? 'unknown',
+      image: record.reporterPhotos?.[0],
       status: status.success ? status.data : AnimalStatus.PENDING,
       urgency: appearance.hasInjury === true ? 'high' : 'normal',
-      animalType: r.animalType ?? r.animalTypeOther ?? 'unknown',
+      animalType: record.animalType ?? 'unknown',
       location: location.address ?? '',
-      description: r.statusDescription ?? '',
-      reporter: reporter.name ?? '',
-      reportedAt: r.foundTime ?? r.createdAt.toISOString(),
+      description: record.description,
+      reporterId: record.reporterId ?? '',
+      reportedAt: record.createdAt.toISOString(),
       distance: 0,
     });
   }
 
-  private toDetail(r: {
-    id: string;
-    name: string | null;
-    animalType: string | null;
-    animalTypeOther: string | null;
-    age: string | null;
-    appearance: unknown;
-    locationObj: unknown;
-    foundTime: string | null;
-    animalStatus: string | null;
-    statusDescription: string | null;
-    reporter: unknown;
-    reporterPhotos: string[];
-    videos: string[];
-    createdAt: Date;
-    updatedAt: Date;
-  }): RescueDetail {
-    const status = AnimalStatusSchema.safeParse(r.animalStatus);
-    const age = RescueAgeSchema.safeParse(r.age);
+  private toDetail(record: animalReports): RescueDetail {
+    const status = AnimalStatusSchema.safeParse(record.animalStatus);
+    const age = RescueAgeSchema.safeParse(record.age);
 
     return RescueDetailSchema.parse({
-      id: r.id,
-      name: r.name ?? 'Unknown animal',
-      animalType: r.animalType ?? r.animalTypeOther ?? 'unknown',
-      age: age.success ? age.data : undefined,
-      foundTime: r.foundTime ?? undefined,
+      id: record.id,
+      animalType: record.animalType ?? 'unknown',
+      age: age.success ? age.data : null,
       status: status.success ? status.data : AnimalStatus.PENDING,
-      statusDescription: r.statusDescription ?? undefined,
-      description: r.statusDescription ?? undefined,
-      appearance: RescueDetailAppearanceSchema.parse(r.appearance ?? {}),
-      location: RescueDetailLocationSchema.parse(r.locationObj ?? {}),
-      photos: r.reporterPhotos,
-      videos: r.videos,
-      reporter: RescueDetailReporterSchema.parse(r.reporter ?? {}),
-      reportedAt: r.foundTime ?? r.createdAt.toISOString(),
-      createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt.toISOString(),
+      statusDescription: record.statusDescription,
+      description: record.description,
+      size: record.size,
+      animalCount: record.animalCount,
+      appearance: RescueDetailAppearanceSchema.parse(record.appearance ?? {}),
+      location: RescueDetailLocationSchema.parse(record.locationObj ?? {}),
+      photos: record.reporterPhotos,
+      reporter: { reporterId: record.reporterId ?? undefined },
+      reportedAt: record.createdAt.toISOString(),
+      distance: 0,
     });
   }
 }

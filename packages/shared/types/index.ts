@@ -43,6 +43,7 @@ export {
 } from './animal-status';
 export {
   RescueAgeSchema,
+  RescueAgeValues,
   AnimalAppearanceSchema,
   CreateRescueDtoSchema,
 } from './rescue.schema';

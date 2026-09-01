@@ -20,8 +20,8 @@ export const PhotoUpload = () => {
       required
       max={REPORT_PHOTO_LIMITS.max}
       maxSizeBytes={REPORT_PHOTO_LIMITS.maxSizeBytes}
-      label={t('reportAnimal.wizard.step1_photos_label')}
-      hint={t('reportAnimal.wizard.step1_photos_hint')}
+      label={t('reportAnimal.photos_label')}
+      hint={t('reportAnimal.photos_hint')}
     />
   );
 };

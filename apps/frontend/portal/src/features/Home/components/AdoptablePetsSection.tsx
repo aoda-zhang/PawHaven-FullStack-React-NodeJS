@@ -46,7 +46,7 @@ export const AdoptablePetsSection = ({
     }
     if (safePets.length === 0) {
       return (
-        <p className="text-muted-foreground py-16 text-center">
+        <p className="text-text-secondary py-16 text-center">
           {t('home.forever_home_no_pets')}
         </p>
       );
@@ -66,7 +66,7 @@ export const AdoptablePetsSection = ({
             <h2 className="text-foreground font-serif text-2xl font-bold">
               {t('home.forever_home_title')}
             </h2>
-            <p className="text-muted-foreground mt-1 text-sm">
+            <p className="text-text-secondary mt-1 text-sm">
               {t('home.forever_home_subtitle')}
             </p>
           </div>

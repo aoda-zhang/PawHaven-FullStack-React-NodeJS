@@ -24,9 +24,9 @@ export const AnimalCountStepper = ({ label }: AnimalCountStepperProps) => {
       <div className="flex items-center gap-3">
         <button
           type="button"
-          aria-label={t('reportAnimal.wizard.step2_count_decrease')}
+          aria-label={t('reportAnimal.count_decrease')}
           onClick={() => update(count - 1)}
-          className="border-border text-muted-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
+          className="border-border text-text-secondary hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
         >
           <Minus className="h-4 w-4" />
         </button>
@@ -35,9 +35,9 @@ export const AnimalCountStepper = ({ label }: AnimalCountStepperProps) => {
         </span>
         <button
           type="button"
-          aria-label={t('reportAnimal.wizard.step2_count_increase')}
+          aria-label={t('reportAnimal.count_increase')}
           onClick={() => update(count + 1)}
-          className="border-border text-muted-foreground hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
+          className="border-border text-text-secondary hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
         >
           <Plus className="h-4 w-4" />
         </button>

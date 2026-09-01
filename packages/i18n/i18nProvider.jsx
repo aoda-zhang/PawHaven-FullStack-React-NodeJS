@@ -14,7 +14,7 @@ function I18nLoadingFallback() {
         minHeight: '100dvh',
         opacity: 0.5,
         fontSize: '0.875rem',
-        color: 'var(--color-text-muted, #737373)',
+        color: 'var(--color-text-secondary, #737373)',
       }}
     >
       Loading...

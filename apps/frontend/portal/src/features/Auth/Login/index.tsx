@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
-import { Button, FormInput } from '@pawhaven/ui';
+import { Button } from '@pawhaven/ui';
+import { FormInput } from '@pawhaven/ui/form';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';

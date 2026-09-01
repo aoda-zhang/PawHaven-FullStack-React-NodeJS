@@ -2,6 +2,8 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { httpHeaders } from '../../constants/httpHeaders';
+
 import { HttpClientInstance } from './httpClientInstance';
 
 @Injectable()
@@ -17,8 +19,8 @@ export class HttpClientService {
 
   private getDefaultHeaders(): Record<string, string> {
     return {
-      'X-App-Source': 'nestjs-gateway',
-      'X-Env': this.config.get<string>('NODE_ENV') || 'dev',
+      [httpHeaders.appSource]: 'nestjs-gateway',
+      [httpHeaders.env]: this.config.get<string>('NODE_ENV') || 'dev',
     };
   }
 

@@ -36,7 +36,7 @@ const mockCase: RescueCase = {
   animalType: 'cat',
   location: 'Test Location',
   description: 'Test description',
-  reporter: 'Tester',
+  reporterId: 'Tester',
   reportedAt: '2026-08-22T10:00:00.000Z',
   distance: 1.2,
 };

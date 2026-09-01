@@ -1,5 +1,13 @@
 import { cn } from '@pawhaven/frontend-core';
 import type { AnimalStatus } from '@pawhaven/shared/types';
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+} from '@pawhaven/ui';
 import { CheckCircle2, Circle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -46,7 +54,7 @@ const renderStepIcon = (step: TimelineStep) => {
     );
   }
 
-  return <Circle className="text-text-muted h-5 w-5" aria-hidden="true" />;
+  return <Circle className="text-text-secondary h-5 w-5" aria-hidden="true" />;
 };
 
 export const RescueTimeline = ({ currentStatus }: RescueTimelineProps) => {
@@ -64,32 +72,34 @@ export const RescueTimeline = ({ currentStatus }: RescueTimelineProps) => {
   }));
 
   return (
-    <div className="space-y-4">
-      {steps.map((step, idx) => (
-        <div key={step.status} className="flex items-start gap-3">
-          <div className="flex flex-col items-center">
-            {renderStepIcon(step)}
-            {idx < steps.length - 1 && (
-              <div
+    <Timeline>
+      {steps.map((step, idx) => {
+        const isLast = idx === steps.length - 1;
+        return (
+          <TimelineItem key={step.status}>
+            <TimelineSeparator>
+              <TimelineDot icon={renderStepIcon(step)} />
+              {!isLast && (
+                <TimelineConnector
+                  className={step.completed ? 'bg-success' : 'bg-border'}
+                />
+              )}
+            </TimelineSeparator>
+            <TimelineContent>
+              <span
                 className={cn(
-                  'mt-1 h-6 w-0.5',
-                  step.completed ? 'bg-success' : 'bg-border',
+                  'text-sm',
+                  step.active
+                    ? 'text-foreground font-medium'
+                    : 'text-text-secondary',
                 )}
-              />
-            )}
-          </div>
-          <span
-            className={cn(
-              'text-sm',
-              step.active
-                ? 'text-foreground font-medium'
-                : 'text-text-secondary',
-            )}
-          >
-            {t(step.labelKey)}
-          </span>
-        </div>
-      ))}
-    </div>
+              >
+                {t(step.labelKey)}
+              </span>
+            </TimelineContent>
+          </TimelineItem>
+        );
+      })}
+    </Timeline>
   );
 };

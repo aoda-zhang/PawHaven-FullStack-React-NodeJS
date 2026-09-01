@@ -2,7 +2,7 @@ import { Skeleton } from '@pawhaven/ui';
 
 export const RescueDetailSkeleton = () => (
   <div
-    className="mx-auto max-w-3xl px-4 py-6"
+    className="mx-auto max-w-3xl py-6"
     aria-hidden="true"
     data-testid="rescue-detail-skeleton"
   >

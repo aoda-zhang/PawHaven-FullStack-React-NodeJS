@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { AnimalAppearanceSchema, RescueAgeSchema } from './rescue.schema';
+import {
+  AnimalAppearanceSchema,
+  RescueAgeSchema,
+  RescueLocationSchema,
+} from './rescue.schema';
 
 /**
  * Report Animal Schemas
@@ -87,31 +91,22 @@ const contactInfoSchema = z
 export const AnimalReportSchema = z
   .object({
     animalType: z.string().min(1, 'Animal type is required'),
-    animalTypeOther: z.string().optional(),
     age: RescueAgeSchema,
+    size: z.string().min(1, 'Size is required'),
+    animalCount: z.number().int().min(1, 'Animal count is required'),
     appearance: AnimalAppearanceSchema,
-    location: z.object({
-      address: z.string().optional(),
-      latitude: z.number().optional(),
-      longitude: z.number().optional(),
-    }),
-    foundTime: z.string().min(1, 'Found time is required'),
+    location: RescueLocationSchema,
     status: z.enum(['dangerous', 'friendly', 'scared', 'other']),
     statusDescription: z.string().optional(),
+    description: z
+      .string()
+      .trim()
+      .min(1, 'Description is required')
+      .max(200, 'Description too long (max 200 characters)'),
     reporterPhotos: reporterPhotosSchema,
     contactInfo: contactInfoSchema,
   })
   .superRefine((data, ctx) => {
-    if (
-      data.animalType === 'other' &&
-      (!data.animalTypeOther || !data.animalTypeOther.trim())
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Please specify the animal type',
-        path: ['animalTypeOther'],
-      });
-    }
     if (data.appearance.hasInjury) {
       if (
         !data.appearance.injuryDescription ||
@@ -163,8 +158,11 @@ export interface ReportAnimalFormMessages {
   photosMax: string;
   otherRequired: string;
   sizeRequired: string;
+  ageRequired: string;
   behaviorRequired: string;
   contactRequired: string;
+  descriptionRequired: string;
+  descriptionMax: string;
 }
 
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png'];
@@ -189,6 +187,7 @@ export const createReportAnimalFormSchema = (
       animalCount: z.number().int().min(1),
       otherAnimalType: z.string(),
       coatColor: z.string().trim().min(1, messages.colorRequired),
+      age: RescueAgeSchema.nullable(),
       size: sizeEnum.nullable(),
       behavior: behaviorEnum.nullable(),
       address: z.string().trim().min(1, messages.addressRequired),
@@ -209,12 +208,12 @@ export const createReportAnimalFormSchema = (
         )
         .min(REPORT_PHOTO_LIMITS.min, messages.photosRequired)
         .max(REPORT_PHOTO_LIMITS.max, messages.photosMax),
-      urgencyChecks: z.object({
-        bleeding: z.boolean(),
-        cantMove: z.boolean(),
-        dangerZone: z.boolean(),
-        breathing: z.boolean(),
-      }),
+      urgent: z.boolean(),
+      description: z
+        .string()
+        .trim()
+        .min(1, messages.descriptionRequired)
+        .max(200, messages.descriptionMax),
       contactPhone: z
         .string()
         .min(1, messages.contactRequired)
@@ -233,6 +232,13 @@ export const createReportAnimalFormSchema = (
           code: z.ZodIssueCode.custom,
           message: messages.sizeRequired,
           path: ['size'],
+        });
+      }
+      if (data.age === null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: messages.ageRequired,
+          path: ['age'],
         });
       }
       if (data.behavior === null) {

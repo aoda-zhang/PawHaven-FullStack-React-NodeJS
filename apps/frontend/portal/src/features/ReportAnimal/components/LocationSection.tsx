@@ -1,5 +1,6 @@
 import type { ReportAnimalFormValues } from '@pawhaven/shared/types';
-import { Button, FormInput } from '@pawhaven/ui';
+import { Button } from '@pawhaven/ui';
+import { FormInput } from '@pawhaven/ui/form';
 import { Loader2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -70,7 +71,7 @@ export const LocationSection = () => {
       return (
         <div className="flex flex-col items-center gap-2 text-center">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground text-sm">
+          <p className="text-text-secondary text-sm">
             {geocodingState === 'resolving'
               ? t('reportAnimal.geocoding_address')
               : t('reportAnimal.getting_location')}
@@ -89,14 +90,12 @@ export const LocationSection = () => {
     }
     if (hasCoordinates && address) {
       return (
-        <p className="text-muted-foreground px-4 text-center text-sm">
-          {address}
-        </p>
+        <p className="text-text-secondary px-4 text-center text-sm">{address}</p>
       );
     }
     if (hasCoordinates) {
       return (
-        <p className="text-muted-foreground px-4 text-center text-sm">
+        <p className="text-text-secondary px-4 text-center text-sm">
           {t('reportAnimal.map_preview', {
             lat: formatCoord(latitude),
             lng: formatCoord(longitude),
@@ -107,8 +106,8 @@ export const LocationSection = () => {
     return (
       <div className="text-center">
         <MapPin className="text-primary mx-auto mb-2 h-8 w-8" />
-        <p className="text-muted-foreground text-sm">
-          {t('reportAnimal.wizard.step1_map_placeholder')}
+        <p className="text-text-secondary text-sm">
+          {t('reportAnimal.map_placeholder')}
         </p>
       </div>
     );
@@ -131,14 +130,14 @@ export const LocationSection = () => {
         {t('reportAnimal.use_current_location')}
       </Button>
       {geocodingState === 'error' && (
-        <p className="text-muted-foreground mb-3 text-xs">
+        <p className="text-text-secondary mb-3 text-xs">
           {t('reportAnimal.geocoding_failed')}
         </p>
       )}
       <FormInput
         name="address"
-        label={t('reportAnimal.wizard.step1_landmark_label')}
-        placeholder={t('reportAnimal.wizard.step1_landmark_hint')}
+        label={t('reportAnimal.landmark_label')}
+        placeholder={t('reportAnimal.landmark_hint')}
         required
       />
     </div>

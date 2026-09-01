@@ -2,11 +2,10 @@ import type { IncomingHttpHeaders } from 'http';
 
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
-import { databaseEngines } from '@pawhaven/backend-core/constants';
+import { databaseEngines, httpHeaders } from '@pawhaven/backend-core/constants';
+import { readHeader } from '@pawhaven/backend-core/utils';
 import { PrismaClient, type animalReports } from '@prismaClient';
-import { AnimalStatus } from '@pawhaven/shared/types';
-
-import { CreateReportAnimalDto } from './DTO/report-animal.DTO';
+import { AnimalStatus, type AnimalReportDto } from '@pawhaven/shared/types';
 
 @Injectable()
 export class ReportAnimalService {
@@ -18,48 +17,30 @@ export class ReportAnimalService {
   ) {}
 
   async create(
-    dto: CreateReportAnimalDto,
+    dto: AnimalReportDto,
     headers: IncomingHttpHeaders = {},
   ): Promise<animalReports> {
     try {
-      const name =
-        dto.animalType === 'other'
-          ? (dto.animalTypeOther ?? 'Unknown')
-          : dto.animalType;
-      const reporter = {
-        userId: this.readHeader(headers, 'x-auth-user-id'),
-        email: this.readHeader(headers, 'x-auth-user-email'),
-        roles: this.readHeader(headers, 'x-auth-user-roles'),
-      };
+      const reporterId = readHeader(headers, httpHeaders.authUserId);
 
       return await this.prisma.animalReports.create({
         data: {
-          name,
           animalType: dto.animalType,
-          animalTypeOther: dto.animalTypeOther,
           age: dto.age,
           appearance: dto.appearance,
           locationObj: dto.location,
-          foundTime: dto.foundTime,
           animalStatus: AnimalStatus.PENDING,
           statusDescription: dto.statusDescription,
-          reporter,
+          description: dto.description,
+          size: dto.size,
+          animalCount: dto.animalCount,
+          reporterId,
           reporterPhotos: dto.reporterPhotos,
-          videos: [],
         },
       });
     } catch (error) {
       this.logger.error('Failed to create report animal', error);
       throw new BadRequestException('Failed to submit report');
     }
-  }
-
-  private readHeader(
-    headers: IncomingHttpHeaders,
-    key: string,
-  ): string | undefined {
-    const value = headers[key];
-    if (Array.isArray(value)) return value[0];
-    return value;
   }
 }

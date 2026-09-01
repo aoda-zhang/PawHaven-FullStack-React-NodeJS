@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { HttpReqHeader } from '../types/http.types';
+import { httpHeaders } from '../constants/httpHeaders';
 
 /**
  * Extracts the authentication token from an HTTP request.
@@ -10,9 +10,10 @@ import { HttpReqHeader } from '../types/http.types';
  * @returns The extracted token string, or undefined if no valid token is found
  */
 export const getTokenFromHeader = (request: Request) => {
-  if (request?.headers?.[HttpReqHeader.accessToken]) {
-    return request?.headers?.[HttpReqHeader.accessToken];
+  if (request?.headers?.[httpHeaders.accessToken]) {
+    return request?.headers?.[httpHeaders.accessToken];
   }
-  const [type, token] = request?.headers?.authorization?.split(' ') ?? [];
+  const [type, token] =
+    request?.headers?.[httpHeaders.authorization]?.split(' ') ?? [];
   return type === 'Bearer' ? token : undefined;
 };

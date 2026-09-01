@@ -93,7 +93,7 @@ const InfoGrid = ({ caseData }: { caseData: RescueCase }) => {
       </div>
       <div className="text-text-secondary flex items-center gap-2 text-sm">
         <User className="h-4 w-4" aria-hidden="true" />
-        <span>{caseData.reporter}</span>
+        <span>{caseData.reporterId}</span>
       </div>
       <div className="text-text-secondary flex items-center gap-2 text-sm">
         <span>{t('rescue_cases.info_distance')}</span>
