@@ -98,7 +98,6 @@ export class RescueService {
       title: record.animalType ?? 'unknown',
       image: record.reporterPhotos?.[0],
       status: status.success ? status.data : AnimalStatus.PENDING,
-      urgency: 'normal',
       animalType: record.animalType ?? 'unknown',
       location: location.address,
       description: record.description,
