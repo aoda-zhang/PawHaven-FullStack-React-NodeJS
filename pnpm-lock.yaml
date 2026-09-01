@@ -1286,6 +1286,9 @@ importers:
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
         version: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      tailwind-merge:
+        specifier: 3.2.0
+        version: 3.2.0
     devDependencies:
       '@pawhaven/eslint-config':
         specifier: workspace:*

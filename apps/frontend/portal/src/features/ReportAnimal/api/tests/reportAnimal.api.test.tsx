@@ -18,17 +18,18 @@ const mockedPost = vi.mocked(apiClient.post);
 const validPayload: AnimalReportDto = {
   animalType: 'dog',
   age: 'adult',
+  size: 'medium',
+  animalCount: 1,
   appearance: {
     color: 'brown',
-    hasInjury: false,
   },
   location: {
     address: 'PawHaven Street 1',
     latitude: 52.52,
     longitude: 13.405,
   },
-  foundTime: '2026-08-22T10:00:00.000Z',
   status: 'friendly',
+  description: 'Found a friendly brown dog near the park',
   reporterPhotos: [
     'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD',
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg',

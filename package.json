@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "lint-staged": "lint-staged",
     "dev:all": "pnpm run build:libs && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
+    "dev:restart": "bash scripts/restart-dev.sh",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
     "build": "turbo run build",

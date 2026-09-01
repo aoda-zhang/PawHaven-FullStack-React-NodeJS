@@ -11,6 +11,8 @@ import {
   responseInterceptor,
 } from 'http-proxy-middleware';
 import { ConfigService } from '@nestjs/config';
+import { httpHeaders } from '@pawhaven/backend-core/constants';
+import { readHeader } from '@pawhaven/backend-core/utils';
 import { User } from '@pawhaven/shared/types';
 
 @Injectable()
@@ -56,13 +58,13 @@ export class ProxyService {
     req: Request,
     res: Response,
   ): Promise<Buffer | string> {
-    const { 'x-trace-id': traceHeader } = req.headers;
     const traceId =
-      typeof traceHeader === 'string' ? traceHeader : crypto.randomUUID();
-    res.setHeader('X-Trace-Id', traceId);
+      readHeader(req.headers, httpHeaders.traceId) ?? crypto.randomUUID();
+    res.setHeader(httpHeaders.traceId, traceId);
     res.setHeader('Referrer-Policy', 'no-referrer');
 
-    const { 'content-type': contentType = '' } = proxyRes.headers;
+    const contentType =
+      readHeader(proxyRes.headers, httpHeaders.contentType) ?? '';
     const isJson = contentType.includes('application/json');
     const { statusCode } = res;
 
@@ -109,24 +111,24 @@ export class ProxyService {
   }
 
   private handleProxyReq(proxyReq: any, req: Request & { user?: User }): void {
-    delete req.headers['x-auth-user-id'];
-    delete req.headers['x-auth-user-email'];
-    delete req.headers['x-auth-verified'];
-    delete req.headers['x-auth-user-roles'];
+    delete req.headers[httpHeaders.authUserId];
+    delete req.headers[httpHeaders.authUserEmail];
+    delete req.headers[httpHeaders.authVerified];
+    delete req.headers[httpHeaders.authUserRoles];
 
     const { user } = req;
 
     if (user?.userId) {
-      proxyReq.setHeader('X-Auth-User-Id', user.userId);
-      proxyReq.setHeader('X-Auth-Verified', '1');
+      proxyReq.setHeader(httpHeaders.authUserId, user.userId);
+      proxyReq.setHeader(httpHeaders.authVerified, '1');
       if (user.email) {
-        proxyReq.setHeader('X-Auth-User-Email', user.email);
+        proxyReq.setHeader(httpHeaders.authUserEmail, user.email);
       }
       if (Array.isArray(user.roles) && user.roles.length > 0) {
-        proxyReq.setHeader('X-Auth-User-Roles', user.roles.join(','));
+        proxyReq.setHeader(httpHeaders.authUserRoles, user.roles.join(','));
       }
     } else {
-      proxyReq.setHeader('X-Auth-Verified', '0');
+      proxyReq.setHeader(httpHeaders.authVerified, '0');
     }
 
     fixRequestBody(proxyReq, req);

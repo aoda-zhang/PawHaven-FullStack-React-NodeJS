@@ -92,7 +92,7 @@ export const FormInput = ({
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 onClick={() => setShowPassword((s) => !s)}
-                className="text-text-muted hover:text-text absolute top-1/2 right-3 -translate-y-1/2"
+                className="text-text-secondary hover:text-text absolute top-1/2 right-3 -translate-y-1/2"
               >
                 {showPassword ? (
                   <EyeOff className="size-4" />

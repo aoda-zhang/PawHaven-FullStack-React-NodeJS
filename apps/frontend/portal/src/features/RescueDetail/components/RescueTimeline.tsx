@@ -1,3 +1,12 @@
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+} from '@pawhaven/ui';
+import { Check, Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface RescueTimelineProps {
@@ -24,47 +33,49 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
           {t('rescueDetail.no_timeline')}
         </p>
       ) : (
-        <ol className="relative space-y-6 pl-6">
+        <Timeline>
           {updates.map((update, index) => {
             const isLatest = index === 0;
+            const isLast = index === updates.length - 1;
             return (
-              <li key={index} className="relative">
-                <span
-                  className={`absolute top-1 -left-6 flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                    isLatest
-                      ? 'border-status-high bg-status-high'
-                      : 'border-border bg-background'
-                  }`}
-                  aria-hidden="true"
-                >
-                  {!isLatest && (
-                    <span className="bg-text-muted h-2 w-2 rounded-full" />
-                  )}
-                </span>
+              <TimelineItem key={index}>
+                <TimelineSeparator>
+                  <TimelineDot
+                    variant={isLatest ? 'primary' : 'default'}
+                    icon={
+                      isLatest ? (
+                        <Zap className="h-4 w-4" />
+                      ) : (
+                        <Check className="h-4 w-4" />
+                      )
+                    }
+                  />
+                  {!isLast && <TimelineConnector />}
+                </TimelineSeparator>
 
-                <div>
+                <TimelineContent>
                   <div className="mb-1 flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
-                    <span className="text-status-high">{update.status}</span>
-                    <span className="text-text-muted">{update.time}</span>
+                    <span className="text-text-secondary">{update.status}</span>
+                    <span className="text-text-secondary">{update.time}</span>
                   </div>
-                  <p className="text-text-secondary text-sm leading-relaxed">
+                  <p className="text-foreground mt-1 text-sm leading-relaxed">
                     {update.description}
                   </p>
-                  <p className="text-text-muted mt-1 text-xs">
+                  <p className="text-text-secondary mt-1 text-xs">
                     — {update.author}
                   </p>
                   {update.photo && (
                     <img
                       src={update.photo}
                       alt=""
-                      className="mt-3 h-28 w-full rounded-xl object-cover"
+                      className="bg-muted mt-3 h-28 w-full rounded-xl object-cover"
                     />
                   )}
-                </div>
-              </li>
+                </TimelineContent>
+              </TimelineItem>
             );
           })}
-        </ol>
+        </Timeline>
       )}
     </section>
   );

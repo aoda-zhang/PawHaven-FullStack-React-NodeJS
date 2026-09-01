@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import type { Request } from 'express';
 
 import { RescueService } from './rescue.service';
 import { CreateRescueDto } from './DTO/rescue.DTO';
@@ -11,8 +12,8 @@ export class RescueController {
 
   @Post()
   @ApiOperation({ summary: 'Create a rescue record' })
-  create(@Body() dto: CreateRescueDto) {
-    return this.rescueService.create(dto);
+  create(@Body() dto: CreateRescueDto, @Req() req: Request) {
+    return this.rescueService.create(dto, req.headers);
   }
 
   @Get()

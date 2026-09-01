@@ -48,7 +48,7 @@ model Route {
   element String  @unique
   handle  Json?
 
-  order        Int?
+  order Int?
 
   routePermissions RoutePermission[]
 
@@ -139,19 +139,17 @@ model animalReports {
 
   status String @default("active")
 
-  name     String?
-
-  animalType       String?
-  animalTypeOther  String?
-  age              String?
-  appearance       Json?
-  locationObj      Json?
-  foundTime        String?
-  animalStatus     String?
+  animalType        String
+  age               String
+  appearance        Json
+  locationObj       Json
+  animalStatus      String @default("pending")
   statusDescription String?
-  reporter         Json?
-  reporterPhotos   String[]
-  videos           String[]
+  description       String
+  size              String
+  animalCount       Int
+  reporterId        String
+  reporterPhotos    String[]
 
   @@index([animalStatus])
 }

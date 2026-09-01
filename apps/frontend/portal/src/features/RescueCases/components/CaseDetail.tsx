@@ -6,7 +6,6 @@ import type { RescueCase } from '../types';
 
 import { RescueTimeline } from './RescueTimeline';
 import { StatusBadge } from './StatusBadge';
-import { UrgencyBadge } from './UrgencyBadge';
 
 interface CaseDetailProps {
   caseData: RescueCase | undefined;
@@ -73,7 +72,6 @@ const HeroSection = ({ caseData }: { caseData: RescueCase }) => (
     <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
     <div className="absolute right-4 bottom-4 left-4 flex items-center gap-2">
       <StatusBadge status={caseData.status} />
-      <UrgencyBadge urgency={caseData.urgency} />
     </div>
   </div>
 );
@@ -93,7 +91,7 @@ const InfoGrid = ({ caseData }: { caseData: RescueCase }) => {
       </div>
       <div className="text-text-secondary flex items-center gap-2 text-sm">
         <User className="h-4 w-4" aria-hidden="true" />
-        <span>{caseData.reporter}</span>
+        <span>{caseData.reporterId}</span>
       </div>
       <div className="text-text-secondary flex items-center gap-2 text-sm">
         <span>{t('rescue_cases.info_distance')}</span>

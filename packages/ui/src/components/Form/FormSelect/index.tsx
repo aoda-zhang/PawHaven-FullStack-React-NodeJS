@@ -53,7 +53,7 @@ export const FormSelect = ({
                 </option>
               ))}
             </select>
-            <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+            <ChevronDown className="text-text-secondary pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
           </div>
           {error && <p className="text-error mt-1 text-xs">{error.message}</p>}
         </div>

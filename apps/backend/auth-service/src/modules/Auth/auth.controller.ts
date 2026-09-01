@@ -9,7 +9,11 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import type { SessionDto } from '@pawhaven/shared/types';
-import { httpBusinessMappingCodes } from '@pawhaven/backend-core/constants';
+import {
+  httpBusinessMappingCodes,
+  httpHeaders,
+} from '@pawhaven/backend-core/constants';
+import { readHeader } from '@pawhaven/backend-core/utils';
 
 import { LoginDTO } from './dtos/login.dto';
 import { RegisterDTO } from './dtos/register.dto';
@@ -87,8 +91,8 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
-    const userId = req.headers['x-auth-user-id'];
-    const verified = req.headers['x-auth-verified'];
+    const userId = readHeader(req.headers, httpHeaders.authUserId);
+    const verified = readHeader(req.headers, httpHeaders.authVerified);
 
     if (verified !== '1' || typeof userId !== 'string') {
       throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);

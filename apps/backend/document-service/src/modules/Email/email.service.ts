@@ -34,7 +34,7 @@ export class EmailService {
     }
   }
 
-  async sendMail(_userID: string, emailProps: any) {
+  async sendMail(emailProps: any) {
     try {
       const emailHtml = await this.getEmailHtml({
         template: emailProps?.template,

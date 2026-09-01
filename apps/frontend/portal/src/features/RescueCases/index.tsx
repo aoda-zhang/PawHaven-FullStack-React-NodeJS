@@ -50,7 +50,7 @@ const RescueCasesPage = () => {
               'flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
               activeFilter === option.value
                 ? 'bg-primary text-primary-fg shadow-sm'
-                : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-muted border',
+                : 'bg-card border-border text-text-secondary hover:text-foreground hover:bg-muted border',
             )}
           >
             {t(option.labelKey)}

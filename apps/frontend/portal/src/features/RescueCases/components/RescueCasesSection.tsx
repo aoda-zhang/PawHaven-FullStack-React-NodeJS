@@ -64,7 +64,7 @@ export const RescueCasesSection = ({
             {t('rescue_cases.section_title')}
           </h2>
           {showStatusSummary && (
-            <p className="text-muted-foreground mt-0.5 text-sm">
+            <p className="text-text-secondary mt-0.5 text-sm">
               {pendingCount}
               {t('common.rescue_status_pending')}
               {inProgressCount}

@@ -10,6 +10,11 @@
       "types": "./build/index.d.ts",
       "import": "./build/index.js",
       "default": "./build/index.js"
+    },
+    "./form": {
+      "types": "./build/components/Form/index.d.ts",
+      "import": "./build/components/Form/index.js",
+      "default": "./build/components/Form/index.js"
     }
   },
   "scripts": {

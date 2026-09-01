@@ -9,6 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { httpHeaders } from '@pawhaven/backend-core/constants';
 
 import { PdfService } from './PDF.service';
 
@@ -32,7 +33,7 @@ export class PdfController {
     }
     const PDFData = await this.pdfService.generatePDF(payload);
     res.set({
-      'Content-Type': 'application/pdf',
+      [httpHeaders.contentType]: 'application/pdf',
       'Content-Disposition': `attachment; filename=${PDFData?.fileName}`,
     });
     res.end(PDFData?.data);
@@ -40,7 +41,7 @@ export class PdfController {
 
   @Get('rescue/guide')
   async getRescueGuidePdf(
-    @Headers('accept-language') acceptLanguage: string,
+    @Headers(httpHeaders.acceptLanguage) acceptLanguage: string,
     @Res() res: Response,
   ) {
     const locale = acceptLanguage?.startsWith('zh') ? 'zh' : 'en';
@@ -50,7 +51,7 @@ export class PdfController {
     });
     const filename = `PawHaven-Rescue-Guide-${locale.toUpperCase()}.pdf`;
     res.set({
-      'Content-Type': 'application/pdf',
+      [httpHeaders.contentType]: 'application/pdf',
       'Content-Disposition': `attachment; filename="${filename}"`,
       'Cache-Control': 'public, max-age=86400',
       Vary: 'Accept-Language',

@@ -20,7 +20,7 @@ packages/design-system/
 ├── src/                # TypeScript + CSS source
 │   ├── index.ts        # JS/TS entry point
 │   ├── tokens.ts       # Typed token access (CSS var references + raw values)
-│   ├── theme.css       # Semantic mappings (bg-primary, text-muted, etc.) + --text-* font-size aliases
+│   ├── theme.css       # Semantic mappings (bg-primary, text-text-secondary, etc.) + --text-* font-size aliases
 │   ├── utilities.css   # Custom Tailwind @utility classes (btn-primary, card, text-hero, text-stat, etc.)
 │   └── tokens/         # Primitive design tokens (CSS @theme blocks)
 │       ├── index.css   # Barrel import
@@ -139,13 +139,69 @@ used directly in components — always reference a semantic token from the table
 | `--color-footer-muted` | `--color-brown-8` | Footer muted labels (Footer Muted `#8f7b69`) |
 | `--color-text` | `--color-gray-9` | Body text |
 | `--color-text-secondary` | `--color-gray-7` | Subtle text |
-| `--color-text-muted` | `--color-gray-5` | Disabled/muted text |
 | `--color-text-inverse` | `--color-gray-1` | Text on dark/primary surfaces |
 | `--color-text-link` | `--color-primary` | Links |
 | `--color-error` | `--color-red-6` | Error states |
 | `--color-success` | `--color-green-6` | Success states |
 | `--color-warning` | `--color-yellow-6` | Warning states |
 | `--color-info` | `--color-blue-6` | Info states |
+
+#### Text Color Tokens
+
+These are the **text-color** semantic tokens. Each maps to a Tailwind text-color
+utility of the same name, prefixed with `text-` by Tailwind v4 (so the token
+`--color-text-secondary` → utility `text-text-secondary`). They are the recommended way
+to color text and are safe to use directly in `className`.
+
+| Token (CSS var) | Utility class | Value | Usage |
+|-----------------|---------------|-------|-------|
+| `--color-text` | `text-text` | `--color-gray-9` | Body text |
+| `--color-text-secondary` | `text-text-secondary` | `--color-gray-7` | Subtle/secondary text |
+| `--color-text-tertiary` | `text-text-tertiary` | `--color-gray-6` | Tertiary captions |
+| `--color-text-placeholder` | `text-text-placeholder` | `--color-gray-5` | Input placeholders |
+| `--color-text-inverse` | `text-text-inverse` | `--color-gray-1` | Text on dark / primary surfaces |
+| `--color-text-link` | `text-text-link` | `--color-primary` | Links |
+
+> **Naming note:** the utility always carries a leading `text-` (Tailwind's
+> text-color prefix), so tokens whose names also start with `text` produce a
+> doubled `text-text-…` class (e.g. `text-text-secondary`). This is expected and
+> valid — the class is generated from the `--color-*` theme token, not hardcoded.
+> There is intentionally **no** dedicated "muted text" token; previously-muted
+> text now uses `text-text-secondary`. The remaining `text-*`-prefixed tokens
+> keep their names for backward compatibility.
+
+#### Rescue Status Color Tokens
+
+These semantic tokens define the color for **every animal / rescue status**. They
+are the **single source of truth** for status colors and **must not** be hard-coded
+as raw Tailwind colors (e.g. `bg-blue-500`, `bg-green-500`, `bg-slate-400`).
+
+| Token (CSS var) | Utility class | Value | Status |
+|-----------------|---------------|-------|--------|
+| `--color-rescue-status-pending` | `bg-rescue-status-pending` | `--color-yellow-6` | `pending` |
+| `--color-rescue-status-inProgress` | `bg-rescue-status-inProgress` | `--color-blue-6` | `inProgress` |
+| `--color-rescue-status-treated` | `bg-rescue-status-treated` | `--color-blue-10` | `treated` |
+| `--color-rescue-status-recovering` | `bg-rescue-status-recovering` | `--color-green-6` | `recovering` |
+| `--color-rescue-status-awaitingAdoption` | `bg-rescue-status-awaitingAdoption` | `--color-yellow-5` | `awaitingAdoption` |
+| `--color-rescue-status-adopted` | `bg-rescue-status-adopted` | `--color-green-8` | `adopted` |
+| `--color-rescue-status-failed` | `bg-rescue-status-failed` | `--color-gray-6` | `failed` |
+
+> **Use the `getStatusColorByPrefix` util — never hard-code status colors.**
+> Always resolve a status color through the shared helper instead of writing the
+> class directly. This keeps the status → color mapping in one place and in sync
+> with the tokens above. The `prefix` argument selects the variant:
+> `'bg'` → `bg-rescue-status-*`, `'text'` → `text-rescue-status-*`,
+> `'border'` → `border-rescue-status-*`.
+>
+> ```ts
+> // apps/frontend/portal/src/utils/getStatusColorByPrefix.ts
+> import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
+>
+> const dotClass = getStatusColorByPrefix({ status: animal.status, prefix: 'bg' });
+> ```
+>
+> Current consumers: `RescueCases/components/StatusBadge.tsx`,
+> `RescueDetail/index.tsx`.
 
 #### Typography Tokens
 

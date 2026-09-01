@@ -5,6 +5,8 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 
+import { httpHeaders } from '../../constants/httpHeaders';
+
 export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 
 interface RequestOptions {
@@ -97,7 +99,7 @@ export class HttpClientInstance {
     const headers = {
       ...this.defaultHeaders,
       ...options?.headers,
-      'x-trace-id': context.traceId,
+      [httpHeaders.traceId]: context.traceId,
     };
 
     return {

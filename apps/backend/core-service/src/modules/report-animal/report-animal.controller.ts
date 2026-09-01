@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import type { Request } from 'express';
+import type { AnimalReportDto } from '@pawhaven/shared/types';
 
 import { ReportAnimalService } from './report-animal.service';
 import { CreateReportAnimalDto } from './DTO/report-animal.DTO';
@@ -13,6 +14,9 @@ export class ReportAnimalController {
   @Post()
   @ApiOperation({ summary: 'Submit an animal report' })
   create(@Body() dto: CreateReportAnimalDto, @Req() req: Request) {
-    return this.reportAnimalService.create(dto, req.headers);
+    return this.reportAnimalService.create(
+      dto as unknown as AnimalReportDto,
+      req.headers,
+    );
   }
 }

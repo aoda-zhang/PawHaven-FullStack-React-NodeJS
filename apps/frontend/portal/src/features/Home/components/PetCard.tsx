@@ -50,7 +50,7 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
             {pet.animalType === 'cat' ? '🐱' : '🐕'}
           </span>
         </div>
-        <p className="text-muted-foreground mb-2 text-xs">
+        <p className="text-text-secondary mb-2 text-xs">
           {pet.age} · {pet.sex}
         </p>
         <div className="mb-3 flex flex-wrap gap-1">
@@ -63,7 +63,7 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
             </span>
           ))}
         </div>
-        <div className="text-muted-foreground flex items-center gap-1 text-xs">
+        <div className="text-text-secondary flex items-center gap-1 text-xs">
           <Clock className="h-3 w-3" aria-hidden="true" />
           {t('home.waiting_days', { days: pet.waitingDays })}
         </div>
