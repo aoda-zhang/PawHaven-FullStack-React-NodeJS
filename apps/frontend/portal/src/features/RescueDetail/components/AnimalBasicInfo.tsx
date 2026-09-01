@@ -63,13 +63,6 @@ export const AnimalBasicInfo = ({
         show: !!animal.statusDescription,
       },
       {
-        label: t('rescueDetail.injury'),
-        value: animal.appearance.hasInjury
-          ? t('rescueDetail.yes')
-          : t('rescueDetail.no'),
-        show: !!animal?.appearance?.hasInjury,
-      },
-      {
         label: t('rescue_cases.info_reported'),
         value: (
           <span className="flex items-center gap-2">

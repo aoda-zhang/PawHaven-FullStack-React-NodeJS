@@ -20,7 +20,7 @@ packages/design-system/
 ├── src/                # TypeScript + CSS source
 │   ├── index.ts        # JS/TS entry point
 │   ├── tokens.ts       # Typed token access (CSS var references + raw values)
-│   ├── theme.css       # Semantic mappings (bg-primary, text-muted, etc.) + --text-* font-size aliases
+│   ├── theme.css       # Semantic mappings (bg-primary, text-text-secondary, etc.) + --text-* font-size aliases
 │   ├── utilities.css   # Custom Tailwind @utility classes (btn-primary, card, text-hero, text-stat, etc.)
 │   └── tokens/         # Primitive design tokens (CSS @theme blocks)
 │       ├── index.css   # Barrel import

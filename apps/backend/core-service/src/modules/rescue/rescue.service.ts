@@ -89,9 +89,6 @@ export class RescueService {
   }
 
   private toListItem(record: animalReports): RescueListItem {
-    const appearance = RescueDetailAppearanceSchema.parse(
-      record.appearance ?? {},
-    );
     const location = RescueDetailLocationSchema.parse(record.locationObj ?? {});
 
     const status = AnimalStatusSchema.safeParse(record.animalStatus);
@@ -101,9 +98,9 @@ export class RescueService {
       title: record.animalType ?? 'unknown',
       image: record.reporterPhotos?.[0],
       status: status.success ? status.data : AnimalStatus.PENDING,
-      urgency: appearance.hasInjury === true ? 'high' : 'normal',
+      urgency: 'normal',
       animalType: record.animalType ?? 'unknown',
-      location: location.address ?? '',
+      location: location.address,
       description: record.description,
       reporterId: record.reporterId,
       reportedAt: record.createdAt.toISOString(),
@@ -118,7 +115,7 @@ export class RescueService {
     return RescueDetailSchema.parse({
       id: record.id,
       animalType: record.animalType ?? 'unknown',
-      age: age.success ? age.data : null,
+      age: age.success ? age.data : 'adult',
       status: status.success ? status.data : AnimalStatus.PENDING,
       statusDescription: record.statusDescription,
       description: record.description,

@@ -77,8 +77,6 @@ export const ReportAnimalForm = () => {
       animalCount: values.animalCount,
       appearance: {
         color: values.coatColor,
-        hasInjury: isUrgent && description.length > 0,
-        injuryDescription: isUrgent ? description : '',
       },
       location: {
         address: values.address,

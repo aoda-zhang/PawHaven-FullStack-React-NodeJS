@@ -12,12 +12,10 @@ const MaxColorLength = 50;
 
 export const AnimalAppearanceSchema = z.object({
   color: z.string().min(1, 'Color is required').max(MaxColorLength),
-  hasInjury: z.boolean(),
-  injuryDescription: z.string().optional(),
 });
 
 export const RescueLocationSchema = z.object({
-  address: z.string().optional(),
+  address: z.string().min(1, 'Address is required'),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
 });

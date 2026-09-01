@@ -22,7 +22,6 @@ const validPayload: AnimalReportDto = {
   animalCount: 1,
   appearance: {
     color: 'brown',
-    hasInjury: false,
   },
   location: {
     address: 'PawHaven Street 1',

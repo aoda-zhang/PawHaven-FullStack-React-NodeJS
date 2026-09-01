@@ -12,7 +12,6 @@ const mockCases = [
     title: 'Test Cat',
     image: '/test.jpg',
     status: 'pending' as const,
-    urgency: 'high' as const,
     animalType: 'cat',
     location: 'Test Location',
     description: 'Test description',

@@ -51,6 +51,7 @@ export const FormRadio = ({
                   value={option.value}
                   checked={field.value === option.value}
                   onChange={(event) => field.onChange(event.target.value)}
+                  onBlur={field.onBlur}
                   className="accent-primary size-4"
                 />
                 {option.label}

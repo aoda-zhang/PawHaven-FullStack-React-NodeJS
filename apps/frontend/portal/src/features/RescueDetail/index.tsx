@@ -1,6 +1,6 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
 import { Carousel } from '@pawhaven/ui';
-import { AlertTriangle, ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -80,12 +80,6 @@ export const RescueDetail = () => {
               />
               {t(`common.rescue_status_${animal.status}`)}
             </span>
-            {animal.appearance?.hasInjury && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
-                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
-                {t('rescueDetail.urgent')}
-              </span>
-            )}
           </div>
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/70 to-transparent p-4">

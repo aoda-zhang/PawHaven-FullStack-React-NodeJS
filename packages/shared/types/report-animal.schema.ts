@@ -88,38 +88,23 @@ const contactInfoSchema = z
     { path: ['email'], message: 'Invalid email address' },
   );
 
-export const AnimalReportSchema = z
-  .object({
-    animalType: z.string().min(1, 'Animal type is required'),
-    age: RescueAgeSchema,
-    size: z.string().min(1, 'Size is required'),
-    animalCount: z.number().int().min(1, 'Animal count is required'),
-    appearance: AnimalAppearanceSchema,
-    location: RescueLocationSchema,
-    status: z.enum(['dangerous', 'friendly', 'scared', 'other']),
-    statusDescription: z.string().optional(),
-    description: z
-      .string()
-      .trim()
-      .min(1, 'Description is required')
-      .max(200, 'Description too long (max 200 characters)'),
-    reporterPhotos: reporterPhotosSchema,
-    contactInfo: contactInfoSchema,
-  })
-  .superRefine((data, ctx) => {
-    if (data.appearance.hasInjury) {
-      if (
-        !data.appearance.injuryDescription ||
-        !data.appearance.injuryDescription.trim()
-      ) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Please describe the injury',
-          path: ['appearance', 'injuryDescription'],
-        });
-      }
-    }
-  });
+export const AnimalReportSchema = z.object({
+  animalType: z.string().min(1, 'Animal type is required'),
+  age: RescueAgeSchema,
+  size: z.string().min(1, 'Size is required'),
+  animalCount: z.number().int().min(1, 'Animal count is required'),
+  appearance: AnimalAppearanceSchema,
+  location: RescueLocationSchema,
+  status: z.enum(['dangerous', 'friendly', 'scared', 'other']),
+  statusDescription: z.string().optional(),
+  description: z
+    .string()
+    .trim()
+    .min(1, 'Description is required')
+    .max(200, 'Description too long (max 200 characters)'),
+  reporterPhotos: reporterPhotosSchema,
+  contactInfo: contactInfoSchema,
+});
 
 export type AnimalReportDto = z.infer<typeof AnimalReportSchema>;
 

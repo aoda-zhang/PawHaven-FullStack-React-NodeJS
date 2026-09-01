@@ -7,7 +7,6 @@ export const RescueListItemSchema = z.object({
   title: z.string(),
   image: z.string().optional(),
   status: AnimalStatusSchema,
-  urgency: z.enum(['high', 'normal']),
   animalType: z.string(),
   location: z.string(),
   description: z.string(),

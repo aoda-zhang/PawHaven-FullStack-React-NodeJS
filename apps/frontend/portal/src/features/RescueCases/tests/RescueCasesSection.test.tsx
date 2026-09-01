@@ -32,7 +32,6 @@ const mockCase: RescueCase = {
   title: 'Test Cat',
   image: '/test.jpg',
   status: 'pending',
-  urgency: 'high',
   animalType: 'cat',
   location: 'Test Location',
   description: 'Test description',
