@@ -28,8 +28,11 @@ export const AnimalBasicInfo = ({
         label: t('rescue_cases.info_animal'),
         value: (
           <span className="flex items-center gap-2">
-            <PawPrint className="text-primary h-4 w-4" aria-hidden="true" />
-            {animalTypeLabel}
+            <PawPrint
+              className="text-primary h-4 w-4 shrink-0"
+              aria-hidden="true"
+            />
+            <span className="min-w-0 break-words">{animalTypeLabel}</span>
           </span>
         ),
       },
@@ -66,16 +69,21 @@ export const AnimalBasicInfo = ({
         label: t('rescue_cases.info_reported'),
         value: (
           <span className="flex items-center gap-2">
-            <Clock className="text-primary h-4 w-4" aria-hidden="true" />
-            {formatDateTime(animal.reportedAt, i18n.language)}
+            <Clock
+              className="text-primary h-4 w-4 shrink-0"
+              aria-hidden="true"
+            />
+            <span className="min-w-0 break-words">
+              {formatDateTime(animal.reportedAt, i18n.language)}
+            </span>
           </span>
         ),
       },
     ];
 
   return (
-    <div className={cn('flex flex-col gap-4', className)}>
-      <div className="grid grid-cols-1 gap-x-1.5 gap-y-0 sm:grid-cols-2">
+    <div className={cn('flex flex-col', className)}>
+      <div className="grid grid-cols-2 gap-x-1 gap-y-0">
         {infoItems
           .filter((item) => item.show !== false)
           .map((item, index) => (

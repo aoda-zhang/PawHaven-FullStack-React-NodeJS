@@ -1,5 +1,5 @@
 import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
-import { Menu } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 import { RootLayoutMenuRender } from './RootLayoutMenuRender';
@@ -57,11 +57,17 @@ export const RootLayoutMenu = ({
           <button
             type="button"
             className="cursor-pointer md:hidden"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open navigation menu"
+            onClick={() => setSidebarOpen(!isSidebarOpen)}
+            aria-label={
+              isSidebarOpen ? 'Close navigation menu' : 'Open navigation menu'
+            }
             aria-expanded={isSidebarOpen}
           >
-            <Menu size={34} aria-hidden="true" />
+            {isSidebarOpen ? (
+              <X size={34} aria-hidden="true" />
+            ) : (
+              <Menu size={34} aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -71,6 +77,7 @@ export const RootLayoutMenu = ({
         isSidebarOpen={isSidebarOpen}
         onCloseSidebar={() => setSidebarOpen(false)}
         navigate={navigate}
+        activePath={activePath}
       />
     </nav>
   );

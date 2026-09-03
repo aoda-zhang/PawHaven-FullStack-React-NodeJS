@@ -1,8 +1,7 @@
-import { LanguageSelector } from '@pawhaven/frontend-core';
-import { X } from 'lucide-react';
 import type { NavigateFunction } from 'react-router-dom';
 
-import { RootLayoutMenuRender } from './RootLayoutMenuRender';
+import { useMenuNavigation } from './hooks/useMenuNavigation';
+import { SidebarMenuItem } from './SidebarMenuItem';
 
 import type { MenuItemType } from '@/types/LayoutType';
 
@@ -11,6 +10,7 @@ interface RootLayoutSidebarProps {
   navigate: NavigateFunction;
   isSidebarOpen: boolean;
   onCloseSidebar: () => void;
+  activePath: string;
 }
 
 export const RootLayoutSidebar = ({
@@ -18,6 +18,7 @@ export const RootLayoutSidebar = ({
   isSidebarOpen,
   onCloseSidebar,
   navigate,
+  activePath,
 }: RootLayoutSidebarProps) => {
   const navigateAndClose: NavigateFunction = (...args) => {
     onCloseSidebar();
@@ -25,33 +26,41 @@ export const RootLayoutSidebar = ({
     navigate(...args);
   };
 
+  const { resolvedItems } = useMenuNavigation({
+    menuItems,
+    activePath,
+    navigate,
+  });
+
   if (!isSidebarOpen) return null;
 
+  const authItems = resolvedItems.filter((item) =>
+    (item.classNames as string[]).some((c) => c === 'login' || c === 'logout'),
+  );
+  const navItems = resolvedItems.filter((item) => !authItems.includes(item));
+
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true">
-      <div
-        className="bg-background/40 absolute inset-0"
-        onClick={onCloseSidebar}
-      />
-      <aside className="bg-background text-text absolute top-0 right-0 flex h-full w-80 flex-col pt-7 shadow-lg">
-        <div className="flex items-center justify-end gap-2 px-4 pb-4">
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={onCloseSidebar}
-            className="text-text-secondary hover:text-text rounded p-1 transition-colors"
-          >
-            <X className="size-5" />
-          </button>
+    <div className="border-border bg-background border-t shadow-lg md:hidden">
+      <nav aria-label="Mobile navigation" className="px-3 py-2">
+        <ul className="flex flex-col gap-1">
+          {navItems.map((item) => (
+            <li key={item.label}>
+              <SidebarMenuItem item={item} onClick={navigateAndClose} />
+            </li>
+          ))}
+        </ul>
+      </nav>
+      {authItems.length > 0 && (
+        <div className="border-border border-t px-3 py-3">
+          {authItems.map((item) => (
+            <SidebarMenuItem
+              key={item.label}
+              item={item}
+              onClick={navigateAndClose}
+            />
+          ))}
         </div>
-        <div className="flex justify-end px-4 pb-4">
-          <LanguageSelector />
-        </div>
-        <RootLayoutMenuRender
-          menuItems={menuItems}
-          navigate={navigateAndClose}
-        />
-      </aside>
+      )}
     </div>
   );
 };
