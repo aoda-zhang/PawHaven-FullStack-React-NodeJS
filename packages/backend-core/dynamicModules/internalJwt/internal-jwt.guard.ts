@@ -26,18 +26,11 @@ export class InternalJwtGuard implements CanActivate {
     private readonly reflector: Reflector,
     configService: ConfigService,
   ) {
-    const secret = configService.get<string>('internalJwt.secret');
-    const trustedKeyIds = configService.get<string[]>(
-      'internalJwt.trustedKeyIds',
+    const publicKeyByKeyId = configService.get<Record<string, string>>(
+      'internalJwt.publicKeys',
     );
-    if (
-      !secret ||
-      !Array.isArray(trustedKeyIds) ||
-      trustedKeyIds.length === 0
-    ) {
-      throw new Error(
-        'internalJwt.secret and internalJwt.trustedKeyIds must be non-empty',
-      );
+    if (!publicKeyByKeyId || Object.keys(publicKeyByKeyId).length === 0) {
+      throw new Error('internalJwt.publicKeys must be a non-empty keyId map');
     }
     const audience =
       configService.get<string>('internalJwt.audience') ??
@@ -51,14 +44,9 @@ export class InternalJwtGuard implements CanActivate {
     const clockSkewSeconds =
       configService.get<number>('internalJwt.clockSkewSeconds') ??
       DEFAULT_CLOCK_SKEW_SECONDS;
-    const secretByKeyId: Record<string, string> = {};
-    trustedKeyIds.forEach((keyId) => {
-      secretByKeyId[keyId] = secret;
-    });
     this.verifyOptions = {
       audience,
-      trustedKeyIds,
-      secretByKeyId,
+      publicKeyByKeyId,
       ttlSeconds,
       clockSkewSeconds,
     };

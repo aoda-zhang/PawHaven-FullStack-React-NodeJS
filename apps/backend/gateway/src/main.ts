@@ -15,6 +15,11 @@ async function bootstrap(): Promise<void> {
 
   const configService = app.get(ConfigService) as ConfigService;
 
+  const trustProxy = configService.get<number>('http.trustProxy') ?? 0;
+  if (trustProxy > 0) {
+    app.set('trust proxy', trustProxy);
+  }
+
   const logger = new Logger('Bootstrap');
 
   setupApp(app, { enableVersioning: true, enableValidationPipe: true });

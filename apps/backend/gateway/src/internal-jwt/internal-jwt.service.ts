@@ -30,7 +30,7 @@ export class InternalJwtService {
   ): InternalJwtHeaders {
     return signInternalJwt(
       this.buildInternalJwt(identity, target, rid),
-      target.secret,
+      target.privateKey,
       target.keyId,
     );
   }

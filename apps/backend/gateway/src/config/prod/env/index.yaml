@@ -6,6 +6,7 @@ http:
   timeout: 5000
   retryCount: 3
   retryDelay: 500
+  trustProxy: 0
 
 swagger:
   title: 管理后台
@@ -24,6 +25,12 @@ internalJwt:
   ttlSeconds: 45
   clockSkewSeconds: 30
 
+throttle:
+  ttlMs: 60000
+  limit: 300
+  authTtlMs: 60000
+  authLimit: 10
+
 DBConnections:
   - enable: true
     options:
@@ -40,7 +47,7 @@ microServices:
       pathRewrite: /core-service
       internalJwt:
         keyId: core-v1
-        secret: ${INTERNAL_JWT_SECRET_CORE}
+        privateKey: ${INTERNAL_JWT_PRIVATE_KEY_CORE}
   - name: auth-service
     enable: true
     options:
@@ -50,7 +57,7 @@ microServices:
       pathRewrite: /auth-service
       internalJwt:
         keyId: auth-v1
-        secret: ${INTERNAL_JWT_SECRET_AUTH}
+        privateKey: ${INTERNAL_JWT_PRIVATE_KEY_AUTH}
   - name: document-service
     enable: true
     options:
@@ -60,7 +67,7 @@ microServices:
       pathRewrite: /document-service
       internalJwt:
         keyId: document-v1
-        secret: ${INTERNAL_JWT_SECRET_DOCUMENT}
+        privateKey: ${INTERNAL_JWT_PRIVATE_KEY_DOCUMENT}
 
 cors:
   allowedHeaders:

@@ -12,11 +12,15 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
-  email        String    @unique
-  password     String
-  refreshToken String?
+  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  deletedAt             DateTime?
+  email                 String    @unique
+  password              String
+  refreshToken          String?
+  refreshTokenExpiresAt Int?
+  sessionExpiresAt      Int?
+
+  @@index([refreshToken])
 }

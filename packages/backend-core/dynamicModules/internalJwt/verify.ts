@@ -16,14 +16,14 @@ import {
   InternalJwtVerificationError,
   InternalJwtVerificationErrorCode as Code,
 } from './errors';
+import { decodePem } from './pem';
 
 const MILLISECONDS_PER_SECOND = 1000;
-const SIGNING_ALGORITHM = 'HS256';
+const SIGNING_ALGORITHM = 'ES256';
 
 export interface VerifyInternalJwtOptions {
   audience: string;
-  trustedKeyIds: string[];
-  secretByKeyId: Record<string, string>;
+  publicKeyByKeyId: Record<string, string>;
   ttlSeconds: number;
   clockSkewSeconds: number;
 }
@@ -51,13 +51,7 @@ export const verifyInternalJwt = (
   headers: IncomingHttpHeaders,
   options: VerifyInternalJwtOptions,
 ): InternalJwt => {
-  const {
-    audience,
-    trustedKeyIds,
-    secretByKeyId,
-    ttlSeconds,
-    clockSkewSeconds,
-  } = options;
+  const { audience, publicKeyByKeyId, ttlSeconds, clockSkewSeconds } = options;
 
   const token = readHeader(headers, httpHeaders.gatewayJwt);
   if (token === undefined) {
@@ -70,13 +64,13 @@ export const verifyInternalJwt = (
   }
 
   const keyId = decoded.header?.kid;
-  if (!keyId || !trustedKeyIds.includes(keyId) || !secretByKeyId[keyId]) {
+  if (!keyId || !publicKeyByKeyId[keyId]) {
     throw new InternalJwtVerificationError(Code.UNKNOWN_KEY);
   }
 
   let verified: Jwt;
   try {
-    verified = verify(token, secretByKeyId[keyId], {
+    verified = verify(token, decodePem(publicKeyByKeyId[keyId]), {
       algorithms: [SIGNING_ALGORITHM],
       clockTolerance: clockSkewSeconds,
       complete: true,

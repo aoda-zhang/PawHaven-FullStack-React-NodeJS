@@ -2,7 +2,7 @@ import type { InternalJwtKind } from '@pawhaven/shared/types';
 
 export type InternalJwtTarget = {
   audience: string;
-  secret: string;
+  privateKey: string;
   keyId: string;
 };
 

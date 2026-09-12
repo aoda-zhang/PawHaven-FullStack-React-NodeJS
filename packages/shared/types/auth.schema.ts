@@ -62,16 +62,10 @@ export const TokenTypeSchema = z.enum(['access', 'refresh']);
 
 export type TokenType = z.infer<typeof TokenTypeSchema>;
 
-/**
- * JWT Verify Info Schema
- * Claims carried by both access and refresh tokens:
- * - type: token kind ('access' | 'refresh') — enforced at every verification point
- */
 export const JwtVerifyInfoSchema = UserSchema.extend({
   type: TokenTypeSchema.optional(),
   iat: z.number().optional(),
   exp: z.number().optional(),
-  sessionStartedAt: z.number().optional(),
   sessionExpiresAt: z.number().optional(),
 });
 
