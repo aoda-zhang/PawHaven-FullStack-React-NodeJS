@@ -1,7 +1,7 @@
 export {
   InternalJwtVerificationError,
   InternalJwtVerificationErrorCode,
-} from './errors';
-export { signInternalJwt, type InternalJwtHeaders } from './sign';
-export { verifyInternalJwt, type VerifyInternalJwtOptions } from './verify';
-export { InternalJwt } from './internal-jwt.decorator';
+} from './errors.js';
+export { signInternalJwt, type InternalJwtHeaders } from './sign.js';
+export { verifyInternalJwt, type VerifyInternalJwtOptions } from './verify.js';
+export { InternalJwt } from './internal-jwt.decorator.js';

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
-import { MicroServiceRegistry } from '../routing/micro-service.registry';
+import { MicroServiceRegistry } from '../routing/micro-service.registry.js';
 
-import type { InternalJwtTarget } from './internal-jwt.types';
+import type { InternalJwtTarget } from './internal-jwt.types.js';
 
 @Injectable()
 export class InternalJwtTargetResolver {

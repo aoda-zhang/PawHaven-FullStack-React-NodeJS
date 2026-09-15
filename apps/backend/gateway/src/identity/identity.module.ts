@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
-import { GatewayInternalJwtModule } from '../internal-jwt/internal-jwt.module';
+import { GatewayInternalJwtModule } from '../internal-jwt/internal-jwt.module.js';
 
-import { IdentityResolver } from './identity.resolver';
+import { IdentityResolver } from './identity.resolver.js';
 
 @Module({
   imports: [

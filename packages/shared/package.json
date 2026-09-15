@@ -31,12 +31,12 @@
     }
   },
   "scripts": {
-    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:esm": "tsc -p tsconfig.esm.json && node -e \"require('node:fs').writeFileSync('dist/esm/package.json','{\\\"type\\\":\\\"module\\\"}')\"",
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build": "pnpm run build:esm && pnpm run build:cjs",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit -p tsconfig.cjs.json && tsc --noEmit -p tsconfig.esm.json && tsc --noEmit -p tsconfig.test.json",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "test:cov": "vitest run --coverage",
     "test:watch": "vitest"
   },

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { AnimalStatusSchema } from './animal-status';
+import { AnimalStatusSchema } from './animal-status.js';
 
 export const RescueListItemSchema = z.object({
   id: z.string(),

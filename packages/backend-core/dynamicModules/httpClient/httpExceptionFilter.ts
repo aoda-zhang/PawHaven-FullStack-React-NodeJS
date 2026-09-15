@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
 
-import { HttpResType } from '../../types/http.types';
+import { HttpResType } from '../../types/http.types.js';
 
 const BUSINESS_CODES = new Set<string>(Object.values(httpBusinessMappingCodes));
 

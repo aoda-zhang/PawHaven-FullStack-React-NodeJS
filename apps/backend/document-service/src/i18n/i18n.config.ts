@@ -4,7 +4,7 @@ import i18n from 'i18n';
 
 i18n.configure({
   locales: ['en', 'zh'], // List of supported languages
-  directory: join(__dirname, '.'), // Path to translation files
+  directory: join(import.meta.dirname, '.'), // Path to translation files
   defaultLocale: 'en', // Default language
   autoReload: false, // Disabled: do not automatically reload translation files
   updateFiles: false, // Prevents automatic creation of missing translation files

@@ -1,6 +1,7 @@
 {
   "private": "true",
   "name": "@pawhaven/core-service",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "postinstall": "pnpm run prisma:generate-mongodb",
@@ -31,6 +32,7 @@
     "@pawhaven/backend-core": "workspace:*",
     "@pawhaven/shared": "workspace:*",
     "@prisma/client": "^6.19.1",
+    "@prismaClient/index.js": "link:./src/prisma/mongodb/client",
     "@types/express": "^5.0.3",
     "axios": "^1.12.2",
     "cookie-parser": "^1.4.7",
@@ -53,6 +55,8 @@
     "@nestjs/testing": "^12.0.0",
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
+    "@rspack/cli": "^2.2.3",
+    "@rspack/core": "^2.2.3",
     "@swc/core": "^1.16.2",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
@@ -63,8 +67,10 @@
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.9.3",
     "unplugin-swc": "^1.6.0",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "webpack-node-externals": "^3.0.0"
   }
 }

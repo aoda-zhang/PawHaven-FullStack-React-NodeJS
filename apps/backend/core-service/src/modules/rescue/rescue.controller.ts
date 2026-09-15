@@ -9,7 +9,7 @@ import {
 } from '@pawhaven/shared/types';
 import type { Response } from 'express';
 
-import { RescueService } from './rescue.service';
+import { RescueService } from './rescue.service.js';
 
 const SECONDS_PER_YEAR = 31536000;
 

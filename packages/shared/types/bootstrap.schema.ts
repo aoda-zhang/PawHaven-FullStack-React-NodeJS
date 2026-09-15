@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { MenuItemSchema } from './menu.schema';
+import { MenuItemSchema } from './menu.schema.js';
 
 export const BootstrapDataSchema = z.object({
   menus: MenuItemSchema.array(),

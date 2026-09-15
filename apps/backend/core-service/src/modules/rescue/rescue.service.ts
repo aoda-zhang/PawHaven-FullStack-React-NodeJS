@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { PrismaClient, type animalReports } from '@prismaClient';
 import {
   RescueListItemSchema,
   RescueDetailSchema,
@@ -22,6 +21,7 @@ import type {
   RescueListItem,
   RescueDetail,
 } from '@pawhaven/shared/types';
+import { PrismaClient, type animalReports } from '@prismaClient/index.js';
 
 const PUBLIC_RESCUE_ROUTE = '/api/core/rescues';
 

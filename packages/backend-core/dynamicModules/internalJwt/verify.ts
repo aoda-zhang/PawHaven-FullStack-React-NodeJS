@@ -1,22 +1,16 @@
 import type { IncomingHttpHeaders } from 'http';
 
-import {
-  decode,
-  TokenExpiredError,
-  verify,
-  type Jwt,
-  type JwtPayload,
-} from 'jsonwebtoken';
+import jwt, { type Jwt, type JwtPayload } from 'jsonwebtoken';
 
-import { InternalJwtSchema, type InternalJwt } from '../../types';
-import { httpHeaders } from '../../constants/httpHeaders';
-import { readHeader } from '../../utils/readHeader';
+import { InternalJwtSchema, type InternalJwt } from '../../types/index.js';
+import { httpHeaders } from '../../constants/httpHeaders.js';
+import { readHeader } from '../../utils/readHeader.js';
 
 import {
   InternalJwtVerificationError,
   InternalJwtVerificationErrorCode as Code,
-} from './errors';
-import { decodePem } from './pem';
+} from './errors.js';
+import { decodePem } from './pem.js';
 
 const MILLISECONDS_PER_SECOND = 1000;
 const SIGNING_ALGORITHM = 'ES256';
@@ -33,7 +27,7 @@ const nowSeconds = (): number =>
 
 const decodeJwt = (token: string): Jwt | null => {
   try {
-    return decode(token, { complete: true });
+    return jwt.decode(token, { complete: true });
   } catch {
     return null;
   }
@@ -70,13 +64,13 @@ export const verifyInternalJwt = (
 
   let verified: Jwt;
   try {
-    verified = verify(token, decodePem(publicKeyByKeyId[keyId]), {
+    verified = jwt.verify(token, decodePem(publicKeyByKeyId[keyId]), {
       algorithms: [SIGNING_ALGORITHM],
       clockTolerance: clockSkewSeconds,
       complete: true,
     }) as Jwt;
   } catch (error) {
-    if (error instanceof TokenExpiredError) {
+    if (error instanceof jwt.TokenExpiredError) {
       throw new InternalJwtVerificationError(Code.EXPIRED);
     }
     throw new InternalJwtVerificationError(Code.BAD_SIGNATURE);

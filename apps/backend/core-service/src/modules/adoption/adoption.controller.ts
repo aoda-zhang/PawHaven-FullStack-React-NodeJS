@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OptionalAuth } from '@pawhaven/backend-core/decorators';
 
-import { AdoptionService } from './adoption.service';
+import { AdoptionService } from './adoption.service.js';
 
 @ApiTags('adoption')
 @Controller('adoptable-pets')

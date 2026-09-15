@@ -7,7 +7,7 @@ import { httpHeaders } from '@pawhaven/backend-core/constants';
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ProxyService } from './proxy.service';
+import { ProxyService } from './proxy.service.js';
 
 const TIMEOUT_MS = 300;
 const HTTP_STATUS_BAD_GATEWAY = 502;

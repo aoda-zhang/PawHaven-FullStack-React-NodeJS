@@ -2,9 +2,9 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { httpHeaders } from '../../constants/httpHeaders';
+import { httpHeaders } from '../../constants/httpHeaders.js';
 
-import { HttpClientInstance } from './httpClientInstance';
+import { HttpClientInstance } from './httpClientInstance.js';
 
 @Injectable()
 export class HttpClientService {

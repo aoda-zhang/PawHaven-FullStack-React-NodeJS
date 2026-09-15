@@ -1,6 +1,7 @@
 {
   "private": "true",
   "name": "@pawhaven/document-service",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "dev": "nest start --watch",
@@ -11,15 +12,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@pawhaven/backend-core": "workspace:*",
-    "@pawhaven/shared": "workspace:*",
     "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^12.0.0",
     "@nestjs/common": "^12.0.0",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "^12.0.0",
     "@nestjs/platform-express": "^12.0.0",
-    "@nestjs/throttler": "^6.4.0",
+    "@pawhaven/backend-core": "workspace:*",
+    "@pawhaven/shared": "workspace:*",
     "@react-email/components": "^0.5.6",
     "@types/express": "^5.0.3",
     "@types/react": "^19.2.2",
@@ -46,10 +46,11 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@pawhaven/tsconfig": "workspace:*",
-    "@pawhaven/eslint-config": "workspace:*",
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
+    "@pawhaven/eslint-config": "workspace:*",
+    "@pawhaven/tsconfig": "workspace:*",
+    "@rspack/core": "^2.2.3",
     "@types/i18n": "^0.13.12",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.7.1",
@@ -61,6 +62,8 @@
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3"
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
+    "typescript": "^5.9.3",
+    "webpack-node-externals": "^3.0.0"
   }
 }

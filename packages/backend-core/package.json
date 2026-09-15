@@ -4,46 +4,46 @@
   "version": "1.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "type": "commonjs",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./internal-jwt": {
       "types": "./dist/dynamicModules/internalJwt/index.d.ts",
-      "require": "./dist/dynamicModules/internalJwt/index.js",
+      "import": "./dist/dynamicModules/internalJwt/index.js",
       "default": "./dist/dynamicModules/internalJwt/index.js"
     },
     "./constants": {
       "types": "./dist/constants/index.d.ts",
-      "require": "./dist/constants/index.js",
+      "import": "./dist/constants/index.js",
       "default": "./dist/constants/index.js"
     },
     "./decorators": {
       "types": "./dist/decorators/index.d.ts",
-      "require": "./dist/decorators/index.js",
+      "import": "./dist/decorators/index.js",
       "default": "./dist/decorators/index.js"
     },
     "./middlewares": {
       "types": "./dist/middlewares/index.d.ts",
-      "require": "./dist/middlewares/index.js",
+      "import": "./dist/middlewares/index.js",
       "default": "./dist/middlewares/index.js"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
-      "require": "./dist/types/index.js",
+      "import": "./dist/types/index.js",
       "default": "./dist/types/index.js"
     },
     "./setup": {
       "types": "./dist/setup/app-setup.d.ts",
-      "require": "./dist/setup/app-setup.js",
+      "import": "./dist/setup/app-setup.js",
       "default": "./dist/setup/app-setup.js"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
-      "require": "./dist/utils/index.js",
+      "import": "./dist/utils/index.js",
       "default": "./dist/utils/index.js"
     },
     "./package.json": "./package.json"
@@ -84,7 +84,6 @@
     "@nestjs/platform-express": "^12.0.0",
     "@nestjs/swagger": "^12.0.0",
     "@nestjs/terminus": "^12.0.0",
-    "@nestjs/throttler": "^6.0.0",
     "dotenv": "^17.2.0",
     "helmet": "^8.0.0",
     "passport": "^0.7.0",

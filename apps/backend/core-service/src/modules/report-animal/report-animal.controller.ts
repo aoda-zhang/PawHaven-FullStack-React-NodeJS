@@ -7,7 +7,7 @@ import {
   type AnimalReportDto,
 } from '@pawhaven/shared/types';
 
-import { ReportAnimalService } from './report-animal.service';
+import { ReportAnimalService } from './report-animal.service.js';
 
 @ApiTags('report-animal')
 @Controller('report-animal')

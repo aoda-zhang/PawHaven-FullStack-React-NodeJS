@@ -21,6 +21,7 @@ export class ConfigsModule {
 
     const yamlContent = this.loadYamlContent<Record<string, unknown>>(
       currentEnv,
+      serviceRoot,
       serviceName,
     );
     const appConfig = resolveAppConfig(yamlContent, process.env) ?? {};
@@ -50,17 +51,19 @@ export class ConfigsModule {
 
   private static loadYamlContent<T = unknown>(
     runtimeEnv: string,
+    serviceRoot: string,
     serviceName: string,
   ): T {
-    const PROJECT_ROOT = join(__dirname, '../../../../../');
     const conventionalConfigPath = join(
-      PROJECT_ROOT,
-      `apps/backend/${serviceName}/src/config/${runtimeEnv}/env/index.yaml`,
+      serviceRoot,
+      `src/config/${runtimeEnv}/env/index.yaml`,
     );
     try {
       return yaml.load(readFileSync(conventionalConfigPath, 'utf8')) as T;
     } catch (error) {
-      throw new Error(`Config file loading failed: ${error}`);
+      throw new Error(
+        `Config file loading failed for "${serviceName}" (${conventionalConfigPath}): ${error}`,
+      );
     }
   }
 }

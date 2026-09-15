@@ -8,12 +8,12 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
 
-import { InternalJwtKind, type InternalJwt } from '../../types';
-import { AuthMetadataKey } from '../../decorators/auth-mode.decorator';
+import { InternalJwtKind, type InternalJwt } from '../../types/index.js';
+import { AuthMetadataKey } from '../../decorators/auth-mode.decorator.js';
 
-import { InternalJwtVerificationError } from './errors';
-import type { InternalJwtRequest } from './internal-jwt.types';
-import { verifyInternalJwt, type VerifyInternalJwtOptions } from './verify';
+import { InternalJwtVerificationError } from './errors.js';
+import type { InternalJwtRequest } from './internal-jwt.types.js';
+import { verifyInternalJwt, type VerifyInternalJwtOptions } from './verify.js';
 
 const DEFAULT_TTL_SECONDS = 45;
 const DEFAULT_CLOCK_SKEW_SECONDS = 30;

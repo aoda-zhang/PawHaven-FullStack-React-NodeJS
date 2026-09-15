@@ -8,16 +8,16 @@ import {
 } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 
-import { MiddlewareModule } from '../middlewares/index.module';
+import { MiddlewareModule } from '../middlewares/index.module.js';
 
-import { InternalJwtModule } from './internalJwt/internal-jwt.module';
-import { HttpSuccessInterceptor } from './httpClient/httpInterceptor';
-import { HttpExceptionFilter } from './httpClient/httpExceptionFilter';
-import { SwaggerModule } from './swagger/swagger.module';
-import { ConfigsModule } from './configModule/configs.module';
-import { HttpClientModule } from './httpClient/httpClient.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type';
+import { InternalJwtModule } from './internalJwt/internal-jwt.module.js';
+import { HttpSuccessInterceptor } from './httpClient/httpInterceptor.js';
+import { HttpExceptionFilter } from './httpClient/httpExceptionFilter.js';
+import { SwaggerModule } from './swagger/swagger.module.js';
+import { ConfigsModule } from './configModule/configs.module.js';
+import { HttpClientModule } from './httpClient/httpClient.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type.js';
 
 /**
  * SharedModule configuration options
@@ -67,7 +67,7 @@ export class SharedModule {
     return [
       ConfigsModule.forRoot(serviceRoot, serviceName),
       HttpClientModule,
-      InternalJwtModule.forRoot(serviceName),
+      InternalJwtModule.forRoot(serviceName, serviceRoot),
     ];
   }
 

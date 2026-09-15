@@ -7,7 +7,7 @@ import * as yaml from 'js-yaml';
 import { getRuntimeEnv, resolveAppConfig } from '@pawhaven/shared/utils';
 import type { RuntimeEnvType } from '@pawhaven/shared';
 
-import { InternalJwtGuard } from './internal-jwt.guard';
+import { InternalJwtGuard } from './internal-jwt.guard.js';
 
 type InternalJwtConfigFile = {
   internalJwt?: { enabled?: boolean };
@@ -15,8 +15,8 @@ type InternalJwtConfigFile = {
 
 @Module({})
 export class InternalJwtModule {
-  static forRoot(serviceName: string): DynamicModule {
-    if (!this.isEnabled(serviceName)) {
+  static forRoot(serviceName: string, serviceRoot: string): DynamicModule {
+    if (!this.isEnabled(serviceName, serviceRoot)) {
       return { module: InternalJwtModule };
     }
 
@@ -30,15 +30,14 @@ export class InternalJwtModule {
     };
   }
 
-  private static isEnabled(serviceName: string): boolean {
+  private static isEnabled(serviceName: string, serviceRoot: string): boolean {
     const currentEnv = getRuntimeEnv(process.env.NODE_ENV as RuntimeEnvType);
 
     let parsedConfig: unknown;
     try {
-      const projectRoot = join(__dirname, '../../../../../');
       const configPath = join(
-        projectRoot,
-        `apps/backend/${serviceName}/src/config/${currentEnv}/env/index.yaml`,
+        serviceRoot,
+        `src/config/${currentEnv}/env/index.yaml`,
       );
       parsedConfig = yaml.load(readFileSync(configPath, 'utf8'));
       parsedConfig = resolveAppConfig(

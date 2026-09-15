@@ -1,9 +1,9 @@
-import { sign } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
-import type { InternalJwt } from '../../types';
-import { httpHeaders } from '../../constants/httpHeaders';
+import type { InternalJwt } from '../../types/index.js';
+import { httpHeaders } from '../../constants/httpHeaders.js';
 
-import { decodePem } from './pem';
+import { decodePem } from './pem.js';
 
 const SIGNING_ALGORITHM = 'ES256';
 
@@ -16,7 +16,7 @@ export const signInternalJwt = (
   privateKey: string,
   keyId: string,
 ): InternalJwtHeaders => ({
-  [httpHeaders.gatewayJwt]: sign(claims, decodePem(privateKey), {
+  [httpHeaders.gatewayJwt]: jwt.sign(claims, decodePem(privateKey), {
     algorithm: SIGNING_ALGORITHM,
     keyid: keyId,
   }),

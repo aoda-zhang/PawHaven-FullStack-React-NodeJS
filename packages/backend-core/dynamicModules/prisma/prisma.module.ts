@@ -1,9 +1,9 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
 
-import { DatabaseEngine } from '../../constants';
+import { DatabaseEngine } from '../../constants/index.js';
 
-import { getPrismaInjectionToken } from './getPrismaInjectionToken';
-import { defaultPrismaExtensions } from './extensions';
+import { getPrismaInjectionToken } from './getPrismaInjectionToken.js';
+import { defaultPrismaExtensions } from './extensions/index.js';
 
 export interface PrismaExtension {
   name?: string;

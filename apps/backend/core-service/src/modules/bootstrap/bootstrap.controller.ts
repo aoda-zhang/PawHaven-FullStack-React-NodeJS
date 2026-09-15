@@ -12,7 +12,7 @@ import {
   type MenuItem,
 } from '@pawhaven/shared/types';
 
-import { BootstrapService } from './bootstrap.service';
+import { BootstrapService } from './bootstrap.service.js';
 
 @ApiTags('bootstrap')
 @Controller('bootstrap')

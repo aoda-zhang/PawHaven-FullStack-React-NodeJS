@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 
-import { AdoptionModule } from '../adoption/adoption.module';
-import { RescueModule } from '../rescue/rescue.module';
+import { AdoptionModule } from '../adoption/adoption.module.js';
+import { RescueModule } from '../rescue/rescue.module.js';
 
-import { HomeController } from './home.controller';
-import { HomeService } from './home.service';
+import { HomeController } from './home.controller.js';
+import { HomeService } from './home.service.js';
 
 @Module({
   imports: [RescueModule, AdoptionModule],

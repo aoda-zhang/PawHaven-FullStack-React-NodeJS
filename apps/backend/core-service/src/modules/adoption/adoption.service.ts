@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { PrismaClient } from '@prismaClient';
 import { AdoptablePetSchema } from '@pawhaven/shared/types';
 import type { AdoptablePet } from '@pawhaven/shared/types';
+import { PrismaClient } from '@prismaClient/index.js';
 
 @Injectable()
 export class AdoptionService {

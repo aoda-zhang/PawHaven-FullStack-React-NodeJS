@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { MicroServiceConfig } from './micro-service.config';
+import type { MicroServiceConfig } from './micro-service.config.js';
 
 type InternalJwtConfig = {
   ttlSeconds?: unknown;

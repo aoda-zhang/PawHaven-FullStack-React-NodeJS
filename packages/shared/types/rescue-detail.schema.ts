@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
-import { AnimalStatusSchema, AnimalStatus } from './animal-status';
+import { AnimalStatusSchema, AnimalStatus } from './animal-status.js';
 import {
   RescueAgeSchema,
   AnimalAppearanceSchema,
   RescueLocationSchema,
   RescueReporterSchema,
   RescueContactInfoSchema,
-} from './rescue.schema';
+} from './rescue.schema.js';
 
 export const RescueDetailAppearanceSchema = AnimalAppearanceSchema;
 export const RescueDetailLocationSchema = RescueLocationSchema;

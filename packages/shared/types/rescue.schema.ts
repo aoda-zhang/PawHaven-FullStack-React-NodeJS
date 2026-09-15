@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { AnimalStatusSchema, AnimalStatus } from './animal-status';
+import { AnimalStatusSchema, AnimalStatus } from './animal-status.js';
 
 export const RescueAgeValues = ['baby', 'adult'] as const;
 

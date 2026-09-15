@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { setupApp } from '@pawhaven/backend-core/setup';
 
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');

@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { render } from '@react-email/components';
 import type { SendEmailBody } from '@pawhaven/backend-core/types';
 
-import i18n from '../../i18n/i18n.config';
+import i18n from '../../i18n/i18n.config.js';
 
 @Injectable()
 export class EmailService {

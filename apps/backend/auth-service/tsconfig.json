@@ -8,6 +8,7 @@
     "declarationMap": false,
     "paths": {
       "@modules/*": ["./src/modules/*"],
+      "@prismaClient/*": ["./src/prisma/mongodb/client/*"],
       "@prismaClient": ["src/prisma/mongodb/client"]
     }
   },

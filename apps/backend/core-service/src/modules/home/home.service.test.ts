@@ -1,7 +1,7 @@
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { HomeService } from './home.service';
+import { HomeService } from './home.service.js';
 
 const VOLUNTEER_BASELINE = 120;
 
