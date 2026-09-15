@@ -3,6 +3,9 @@
   "name": "@pawhaven/core-service",
   "type": "module",
   "version": "1.0.0",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "postinstall": "pnpm run prisma:generate-mongodb",
     "dev": "nest start --watch",
