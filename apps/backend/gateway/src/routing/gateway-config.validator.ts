@@ -48,9 +48,9 @@ export class GatewayConfigValidator {
       }
       const internalJwt = microService.options?.internalJwt;
       const name = String(microService.name ?? 'unknown');
-      if (!internalJwt?.keyId || !internalJwt?.secret) {
+      if (!internalJwt?.keyId || !internalJwt?.privateKey) {
         throw new Error(
-          `microService ${name}: internalJwt keyId and secret must be configured`,
+          `microService ${name}: internalJwt keyId and privateKey must be configured`,
         );
       }
     });

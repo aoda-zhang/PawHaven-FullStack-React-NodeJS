@@ -11,7 +11,10 @@ import {
   httpHeaders,
   microServiceNames,
 } from '@pawhaven/backend-core/constants';
-import { InternalJwtKind, type JwtVerifyInfo } from '@pawhaven/shared/types';
+import {
+  InternalJwtKind,
+  type JwtVerifyInfo,
+} from '@pawhaven/backend-core/types';
 import { isProd } from '@pawhaven/shared/utils';
 import type { Request, Response } from 'express';
 
@@ -78,11 +81,13 @@ export class IdentityResolver {
 
     const accessPayload = this.validPayload(accessToken);
 
-    if (accessPayload) {
-      if (this.isLogoutPath(path)) {
-        return this.identityFromPayload(accessPayload);
-      }
+    if (this.isLogoutPath(path)) {
+      return accessPayload
+        ? this.identityFromPayload(accessPayload)
+        : { kind: InternalJwtKind.ANONYMOUS };
+    }
 
+    if (accessPayload) {
       if (refreshToken && this.shouldRefreshSoon(accessPayload)) {
         const refreshedPayload = await this.refreshPayload(
           req,

@@ -11,6 +11,7 @@ allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
   '@scarf/scarf': true
+  '@swc/core': true
   '@tailwindcss/oxide': true
   bcrypt: true
   esbuild: true
@@ -19,9 +20,15 @@ allowBuilds:
   puppeteer: true
   unrs-resolver: true
 
+# vitest 4 requires a matching coverage provider major; without this pin the
+# resolver picks @vitest/coverage-v8@5 and vitest refuses to run coverage.
+overrides:
+  '@vitest/coverage-v8': 4.1.11
+
 onlyBuiltDependencies:
   - '@nestjs/core'
   - '@scarf/scarf'
+  - '@swc/core'
   - '@tailwindcss/oxide'
   - bcrypt
   - esbuild

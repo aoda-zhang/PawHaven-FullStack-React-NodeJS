@@ -1,0 +1,118 @@
+# Quality gate: lint, typecheck, automated tests and a production build.
+# React Doctor stays in its own workflow (react-doctor.yml) and deployment in
+# deploy.yml so this job can stay fast on every pull request.
+name: Test
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, typecheck, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Resolve Node.js version from package.json
+        id: node_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+          if [[ -z "${NODE_VERSION}" ]]; then
+            echo "Missing engines.node in package.json" >&2
+            exit 1
+          fi
+          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node_version.outputs.node_version }}
+
+      - name: Enable package manager from package.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack install
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma clients
+        shell: bash
+        run: pnpm --filter @pawhaven/core-service --filter @pawhaven/auth-service prisma:generate-mongodb
+
+      - name: Lint
+        shell: bash
+        run: pnpm lint
+
+      - name: Typecheck
+        shell: bash
+        run: pnpm typecheck
+
+      - name: Tests
+        shell: bash
+        run: pnpm test
+
+      - name: Build
+        shell: bash
+        run: pnpm build
+
+  e2e:
+    name: Critical journeys (chromium)
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Resolve Node.js version from package.json
+        id: node_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+          if [[ -z "${NODE_VERSION}" ]]; then
+            echo "Missing engines.node in package.json" >&2
+            exit 1
+          fi
+          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node_version.outputs.node_version }}
+
+      - name: Enable package manager from package.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack install
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        shell: bash
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: End to end tests
+        shell: bash
+        run: pnpm test:e2e

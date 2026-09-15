@@ -37,12 +37,14 @@
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit -p tsconfig.cjs.json && tsc --noEmit -p tsconfig.esm.json && tsc --noEmit -p tsconfig.test.json",
     "test": "vitest run",
+    "test:cov": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "devDependencies": {
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
     "@types/node": "^24.10.1",
+    "@vitest/coverage-v8": "^4.1.11",
     "vitest": "^4.1.10"
   },
   "dependencies": {

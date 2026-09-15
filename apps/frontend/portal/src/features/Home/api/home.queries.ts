@@ -7,5 +7,4 @@ export const homeQueryOptions = () =>
   queryOptions({
     queryKey: homeQueryKeys.content(),
     queryFn: getHomeData,
-    staleTime: Infinity,
   });

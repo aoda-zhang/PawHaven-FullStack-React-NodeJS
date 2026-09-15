@@ -4,8 +4,7 @@ import { useState } from 'react';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
-
-import type { MenuItemType } from '@/types/LayoutType';
+import type { MenuItemType } from './types';
 
 interface RootLayoutMenuProps {
   menuItems: MenuItemType[];

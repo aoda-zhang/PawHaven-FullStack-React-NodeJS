@@ -59,4 +59,17 @@ describe('AdoptablePetsSection', () => {
     expect(screen.queryByTestId('adoptable-pets-skeleton')).toBeNull();
     expect(screen.getByText('Milo')).toBeDefined();
   });
+
+  it('renders the name without an animal type icon', () => {
+    render(
+      <AdoptablePetsSection
+        pets={[{ ...mockPet, animalType: 'cat' }]}
+        onPetClick={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText('Milo')).toBeDefined();
+    expect(screen.queryByText('🐱')).toBeNull();
+    expect(screen.queryByText('🐾')).toBeNull();
+  });
 });

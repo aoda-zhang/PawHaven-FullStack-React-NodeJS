@@ -12,7 +12,7 @@ export class InternalJwtTargetResolver {
     const microService = this.microServiceRegistry.findByName(serviceName);
     return {
       audience: serviceName,
-      secret: microService?.options?.internalJwt?.secret ?? '',
+      privateKey: microService?.options?.internalJwt?.privateKey ?? '',
       keyId: microService?.options?.internalJwt?.keyId ?? '',
     };
   }

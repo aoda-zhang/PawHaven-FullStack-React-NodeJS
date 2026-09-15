@@ -1,5 +1,6 @@
 import { resolve } from 'node:path';
 
+import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 const backendCoreRoot = resolve(
@@ -10,6 +11,7 @@ const backendCoreRoot = resolve(
 const sharedRoot = resolve(process.cwd(), '../../../packages/shared');
 
 export default defineConfig({
+  plugins: [swc.vite()],
   resolve: {
     alias: [
       {

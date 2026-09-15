@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
-const AdoptableAnimalTypeValues = ['cat', 'dog'] as const;
-
 export const AdoptablePetSchema = z.object({
   id: z.string(),
   name: z.string(),
-  animalType: z.enum(AdoptableAnimalTypeValues),
+  animalType: z.string().min(1, 'Animal type is required'),
   age: z.string(),
   sex: z.string(),
   breed: z.string(),

@@ -48,8 +48,7 @@ auth:
 internalJwt:
   enabled: true
   audience: auth-service
-  trustedKeyIds:
-    - auth-v1
-  secret: ${INTERNAL_JWT_SECRET_AUTH}
+  publicKeys:
+    auth-v1: ${INTERNAL_JWT_PUBLIC_KEY_AUTH}
   ttlSeconds: 45
   clockSkewSeconds: 30

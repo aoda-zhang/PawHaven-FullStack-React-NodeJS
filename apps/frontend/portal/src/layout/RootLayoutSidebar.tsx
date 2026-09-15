@@ -2,8 +2,7 @@ import { cn } from '@pawhaven/frontend-core';
 import type { NavigateFunction } from 'react-router-dom';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';
-
-import type { MenuItemType } from '@/types/LayoutType';
+import type { MenuItemType } from './types';
 
 interface RootLayoutSidebarProps {
   menuItems: MenuItemType[];

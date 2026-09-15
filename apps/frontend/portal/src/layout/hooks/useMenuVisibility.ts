@@ -1,8 +1,8 @@
 import { useRouterInfo } from '@pawhaven/frontend-core';
 import { useLocation } from 'react-router-dom';
 
+import type { RouterInfoType } from '@/layout/types';
 import { routePaths } from '@/router/routePaths';
-import type { RouterInfoType } from '@/types/LayoutType';
 
 interface MenuVisibility {
   isMenuAvailable: boolean;

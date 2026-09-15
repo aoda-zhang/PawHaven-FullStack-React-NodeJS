@@ -1,10 +1,12 @@
 /* eslint-disable no-param-reassign */
 import crypto from 'node:crypto';
 import type { ClientRequest, IncomingMessage } from 'node:http';
+import type { Socket } from 'node:net';
 
 import {
   BadGatewayException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
@@ -31,10 +33,15 @@ type PendingInternalJwtHeaders = {
 
 const HTTP_STATUS_MIN_OK = 200;
 const HTTP_STATUS_MIN_REDIRECT = 300;
+const HTTP_STATUS_BAD_GATEWAY = 502;
+const HTTP_STATUS_GATEWAY_TIMEOUT = 504;
+const TIMEOUT_ERROR_CODE = 'ETIMEDOUT';
 const SERVICE_PREFIX_SEGMENTS = 2;
 
 @Injectable()
 export class ProxyService {
+  private readonly logger = new Logger(ProxyService.name);
+
   private readonly proxyClient: RequestHandler<Request, Response, NextFunction>;
 
   private readonly timeoutMs?: number;
@@ -43,6 +50,8 @@ export class ProxyService {
     Request,
     PendingInternalJwtHeaders
   >();
+
+  private readonly requestStartedAt = new WeakMap<Request, number>();
 
   constructor(
     private readonly configService: ConfigService,
@@ -60,6 +69,7 @@ export class ProxyService {
     res: Response,
     next: NextFunction,
   ): Promise<void> {
+    this.requestStartedAt.set(req, Date.now());
     const microService = this.resolveMicroService(req);
     this.assertSafePath(req, microService);
     this.stripInboundGatewayHeaders(req);
@@ -85,12 +95,12 @@ export class ProxyService {
         ignorePath: false,
         changeOrigin: true,
         selfHandleResponse: true,
-        timeout: this.timeoutMs,
         proxyTimeout: this.timeoutMs,
         logger: console,
         on: {
           proxyReq: this.handleProxyReq.bind(this),
           proxyRes: responseInterceptor(this.wrapEnvelope.bind(this)),
+          error: this.handleProxyError.bind(this),
         },
       });
     } catch (error) {
@@ -133,6 +143,62 @@ export class ProxyService {
       code: '0',
       data: body,
     });
+  }
+
+  /**
+   * `selfHandleResponse` disables http-proxy-middleware's own response handling,
+   * so without this handler a failed or timed-out upstream left the client with a
+   * destroyed connection and no reply at all — indistinguishable from a hung
+   * client, and impossible to diagnose from the caller side.
+   */
+  private handleProxyError(
+    error: Error,
+    req: Request,
+    res: Response | Socket,
+  ): void {
+    const traceId = this.ensureTraceId(req);
+    // A spent `proxyTimeout` surfaces as a plain socket error (`ECONNRESET` /
+    // "socket hang up"), so the elapsed time is the only reliable signal.
+    const budgetMs = this.timeoutMs ?? 0;
+    const startedAt = this.requestStartedAt.get(req) ?? Date.now();
+    const exhaustedBudget = budgetMs > 0 && Date.now() - startedAt >= budgetMs;
+    const timedOut =
+      exhaustedBudget ||
+      (error as NodeJS.ErrnoException).code === TIMEOUT_ERROR_CODE ||
+      error.message.toLowerCase().includes('timeout');
+    const status = timedOut
+      ? HTTP_STATUS_GATEWAY_TIMEOUT
+      : HTTP_STATUS_BAD_GATEWAY;
+    const message = timedOut
+      ? 'Upstream service timed out'
+      : 'Upstream service unavailable';
+
+    this.logger.error(
+      `${message} (trace ${traceId}, target ${this.resolveTarget(req)}): ${error.message}`,
+    );
+
+    if (!this.isWritable(res) || res.headersSent) {
+      res.destroy();
+      return;
+    }
+
+    res.writeHead(status, {
+      [httpHeaders.contentType]: 'application/json',
+      [httpHeaders.traceId]: traceId,
+    });
+    res.end(
+      JSON.stringify({
+        status,
+        isSuccess: false,
+        message,
+        code: '',
+        data: null,
+      }),
+    );
+  }
+
+  private isWritable(res: Response | Socket): res is Response {
+    return typeof (res as Response).writeHead === 'function';
   }
 
   private resolveTarget(req: Request): string {

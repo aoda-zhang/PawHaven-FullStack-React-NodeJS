@@ -1,13 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
 import { PrismaClient } from '@prismaClient';
-import {
-  AnimalStatus,
-  HeroStats,
-  HeroStatsSchema,
-  HomeData,
-} from '@pawhaven/shared/types';
+import { AnimalStatus, HeroStats, HomeData } from '@pawhaven/shared/types';
 
 import { AdoptionService } from '../adoption/adoption.service';
 import { RescueService } from '../rescue/rescue.service';
@@ -46,18 +41,14 @@ export class HomeService {
         }),
       ]);
 
-      return HeroStatsSchema.parse({
+      return {
         totalRescues,
         totalAdopted: adoptedRescues + adoptedPets,
         totalVolunteers: VOLUNTEER_BASELINE,
-      });
+      };
     } catch (error) {
       this.logger.error('Failed to compute hero stats', error);
-      return HeroStatsSchema.parse({
-        totalRescues: 0,
-        totalAdopted: 0,
-        totalVolunteers: VOLUNTEER_BASELINE,
-      });
+      throw new BadRequestException('Failed to compute hero stats');
     }
   }
 

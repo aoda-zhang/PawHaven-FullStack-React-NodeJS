@@ -5,6 +5,14 @@
 module.exports = {
   root: true, // Ensure this is the root ESLint config to avoid accidental inheritance
 
+  // Tool config files (vitest, postcss, ...) are required to use default exports.
+  ignorePatterns: [
+    '**/*.config.ts',
+    '**/*.config.js',
+    '**/*.config.cjs',
+    '**/*.config.mjs',
+  ],
+
   // Specify parser for TypeScript
   parser: '@typescript-eslint/parser',
 

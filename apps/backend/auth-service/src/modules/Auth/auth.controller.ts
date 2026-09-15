@@ -8,17 +8,17 @@ import {
   Req,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
-import type {
-  AuthUser,
-  AuthenticatedInternalJwt,
-  SessionDto,
+import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
+import {
+  CredentialsSchema,
+  type AuthUser,
+  type CredentialsDto,
+  type SessionDto,
 } from '@pawhaven/shared/types';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
 import { Public } from '@pawhaven/backend-core/decorators';
 import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
 
-import { LoginDTO } from './dtos/login.dto';
-import { RegisterDTO } from './dtos/register.dto';
 import { AuthService } from './auth.service';
 
 @Controller()
@@ -28,7 +28,7 @@ export class AuthController {
   @Public()
   @Post('/login')
   async login(
-    @Body() loginDto: LoginDTO,
+    @Body({ schema: CredentialsSchema }) loginDto: CredentialsDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<SessionDto> {
     const result = await this.authService.login(
@@ -48,7 +48,7 @@ export class AuthController {
   @Public()
   @Post('/register')
   async register(
-    @Body() registerDto: RegisterDTO,
+    @Body({ schema: CredentialsSchema }) registerDto: CredentialsDto,
     @Res({ passthrough: true }) res: Response,
   ): Promise<SessionDto> {
     const result = await this.authService.register(
@@ -88,12 +88,15 @@ export class AuthController {
     };
   }
 
+  @Public()
   @Post('/logout')
   async logout(
-    @InternalJwt() claims: AuthenticatedInternalJwt,
+    @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ message: string }> {
-    await this.authService.logout(claims.sub);
+    const refreshToken = this.authService.getTokenFromRequest(req, 'refresh');
+
+    await this.authService.logout(refreshToken);
 
     this.authService.clearAuthCookies(res);
 

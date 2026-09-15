@@ -1,6 +1,6 @@
 export type MicroServiceInternalJwtConfig = {
   keyId?: string;
-  secret?: string;
+  privateKey?: string;
 };
 
 export type MicroServiceOptions = {

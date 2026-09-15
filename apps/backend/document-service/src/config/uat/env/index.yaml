@@ -41,8 +41,7 @@ cors:
 internalJwt:
   enabled: true
   audience: document-service
-  trustedKeyIds:
-    - document-v1
-  secret: ${INTERNAL_JWT_SECRET_DOCUMENT}
+  publicKeys:
+    document-v1: ${INTERNAL_JWT_PUBLIC_KEY_DOCUMENT}
   ttlSeconds: 45
   clockSkewSeconds: 30

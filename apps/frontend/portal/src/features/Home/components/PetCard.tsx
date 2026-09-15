@@ -42,14 +42,9 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
         </div>
       </div>
       <div className="p-4">
-        <div className="mb-1 flex items-start justify-between">
-          <h3 className="text-foreground font-serif text-base font-semibold">
-            {pet.name}
-          </h3>
-          <span className="text-lg" aria-hidden="true">
-            {pet.animalType === 'cat' ? '🐱' : '🐕'}
-          </span>
-        </div>
+        <h3 className="text-foreground mb-1 font-serif text-base font-semibold">
+          {pet.name}
+        </h3>
         <p className="text-text-secondary mb-2 text-xs">
           {pet.age} · {pet.sex}
         </p>

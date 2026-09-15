@@ -1,7 +1,11 @@
 import { sign } from 'jsonwebtoken';
-import type { InternalJwt } from '@pawhaven/shared/types';
 
+import type { InternalJwt } from '../../types';
 import { httpHeaders } from '../../constants/httpHeaders';
+
+import { decodePem } from './pem';
+
+const SIGNING_ALGORITHM = 'ES256';
 
 export type InternalJwtHeaders = {
   [httpHeaders.gatewayJwt]: string;
@@ -9,11 +13,11 @@ export type InternalJwtHeaders = {
 
 export const signInternalJwt = (
   claims: InternalJwt,
-  secret: string,
+  privateKey: string,
   keyId: string,
 ): InternalJwtHeaders => ({
-  [httpHeaders.gatewayJwt]: sign(claims, secret, {
-    algorithm: 'HS256',
+  [httpHeaders.gatewayJwt]: sign(claims, decodePem(privateKey), {
+    algorithm: SIGNING_ALGORITHM,
     keyid: keyId,
   }),
 });

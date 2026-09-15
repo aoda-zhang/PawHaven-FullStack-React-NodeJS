@@ -4,5 +4,8 @@ export const cookieKeys = {
 } as const;
 
 export const authRouteSuffixes = {
+  login: '/auth/login',
   logout: '/auth/logout',
+  refresh: '/auth/refresh',
+  register: '/auth/register',
 } as const;

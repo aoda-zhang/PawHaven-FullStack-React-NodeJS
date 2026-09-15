@@ -4,7 +4,10 @@ import {
   signInternalJwt,
   type InternalJwtHeaders,
 } from '@pawhaven/backend-core/internal-jwt';
-import { InternalJwtKind, type InternalJwt } from '@pawhaven/shared/types';
+import {
+  InternalJwtKind,
+  type InternalJwt,
+} from '@pawhaven/backend-core/types';
 
 import type {
   InternalJwtIdentity,
@@ -30,7 +33,7 @@ export class InternalJwtService {
   ): InternalJwtHeaders {
     return signInternalJwt(
       this.buildInternalJwt(identity, target, rid),
-      target.secret,
+      target.privateKey,
       target.keyId,
     );
   }
