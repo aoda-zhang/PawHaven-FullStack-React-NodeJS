@@ -6,20 +6,22 @@ import { ConfigModule, ConfigFactory } from '@nestjs/config';
 import { getRuntimeEnv } from '@pawhaven/shared/utils';
 import type { RuntimeEnvType } from '@pawhaven/shared';
 
-import { resolveServiceConfig } from './serviceConfig.js';
+import {
+  resolveServiceConfig,
+  type ServiceConfigSource,
+} from './serviceConfig.js';
 
 @Global()
 @Module({})
 export class ConfigsModule {
   /**
    * dynamic configuration
-   * @param serviceRoot absolute path to service root directory - holds the `.env` files
-   * @param configRoot  directory holding the per-env config shipped with the build
+   * @param serviceRoot absolute path to service root directory
    */
   static forRoot(
     serviceRoot: string,
     serviceName: string,
-    configRoot: string,
+    configSources?: ServiceConfigSource,
   ): DynamicModule {
     const runtimeEnv = process.env.NODE_ENV as RuntimeEnvType;
     const currentEnv = getRuntimeEnv(runtimeEnv);
@@ -27,8 +29,8 @@ export class ConfigsModule {
     const appConfig =
       resolveServiceConfig<Record<string, unknown>>({
         serviceName,
-        configRoot,
         runtimeEnv: currentEnv,
+        configSources,
       }) ?? {};
     const configFactory: ConfigFactory = () => ({
       ...appConfig,

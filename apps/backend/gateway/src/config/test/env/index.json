@@ -1,0 +1,103 @@
+{
+  "http": {
+    "env": "test",
+    "port": 8080,
+    "maxJsonBodySize": "100mb",
+    "prefix": "api",
+    "timeout": 15000,
+    "retryCount": 3,
+    "retryDelay": 500,
+    "trustProxy": 0
+  },
+  "swagger": {
+    "title": "管理后台",
+    "version": 1,
+    "prefix": "api-docs",
+    "description": "管理后台接口文档"
+  },
+  "auth": {
+    "jwtSecret": "${JWT_SECRET}",
+    "jwtClockTolerance": 30,
+    "jwtRefreshFallbackSeconds": 60,
+    "jwtRefreshWindowPercentage": 0.2
+  },
+  "internalJwt": {
+    "enabled": false,
+    "ttlSeconds": 45,
+    "clockSkewSeconds": 30
+  },
+  "throttle": {
+    "ttlMs": 60000,
+    "limit": 300,
+    "authTtlMs": 60000,
+    "authLimit": 10
+  },
+  "DBConnections": [
+    {
+      "enable": true,
+      "options": {
+        "name": "CORE_SERVICE_DB",
+        "uri": "${CORE_SERVICE_DB}"
+      }
+    }
+  ],
+  "microServices": [
+    {
+      "name": "core-service",
+      "enable": true,
+      "options": {
+        "host": "${CORE_SERVICE_HOST}",
+        "port": 8081,
+        "gatewayPrefix": "/api/core",
+        "pathRewrite": "/core-service",
+        "internalJwt": {
+          "keyId": "core-v1",
+          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_CORE}"
+        }
+      }
+    },
+    {
+      "name": "auth-service",
+      "enable": true,
+      "options": {
+        "host": "${AUTH_SERVICE_HOST}",
+        "port": 8082,
+        "gatewayPrefix": "/api/auth",
+        "pathRewrite": "/auth-service",
+        "internalJwt": {
+          "keyId": "auth-v1",
+          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_AUTH}"
+        }
+      }
+    },
+    {
+      "name": "document-service",
+      "enable": true,
+      "options": {
+        "host": "${DOCUMENT_SERVICE_HOST}",
+        "port": 8083,
+        "gatewayPrefix": "/api/document",
+        "pathRewrite": "/document-service",
+        "internalJwt": {
+          "keyId": "document-v1",
+          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_DOCUMENT}"
+        }
+      }
+    }
+  ],
+  "cors": {
+    "allowedHeaders": [
+      "X-timestamp",
+      "Access-Token",
+      "Accept",
+      "Content-Type",
+      "X-Sign",
+      "x-locale",
+      "Locale"
+    ],
+    "origin": ["http://localhost:3001"],
+    "credentials": true,
+    "optionsSuccessStatus": 204,
+    "methods": ["GET", "POST", "PUT", "OPTIONS"]
+  }
+}

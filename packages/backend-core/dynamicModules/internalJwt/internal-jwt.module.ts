@@ -3,7 +3,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { getRuntimeEnv } from '@pawhaven/shared/utils';
 import type { RuntimeEnvType } from '@pawhaven/shared';
 
-import { resolveServiceConfig } from '../configModule/serviceConfig.js';
+import {
+  resolveServiceConfig,
+  type ServiceConfigSource,
+} from '../configModule/serviceConfig.js';
 
 import { InternalJwtGuard } from './internal-jwt.guard.js';
 
@@ -13,8 +16,11 @@ type InternalJwtConfigFile = {
 
 @Module({})
 export class InternalJwtModule {
-  static forRoot(serviceName: string, configRoot: string): DynamicModule {
-    if (!this.isEnabled(serviceName, configRoot)) {
+  static forRoot(
+    serviceName: string,
+    configSources?: ServiceConfigSource,
+  ): DynamicModule {
+    if (!this.isEnabled(serviceName, configSources)) {
       return { module: InternalJwtModule };
     }
 
@@ -28,15 +34,18 @@ export class InternalJwtModule {
     };
   }
 
-  private static isEnabled(serviceName: string, configRoot: string): boolean {
+  private static isEnabled(
+    serviceName: string,
+    configSources?: ServiceConfigSource,
+  ): boolean {
     const currentEnv = getRuntimeEnv(process.env.NODE_ENV as RuntimeEnvType);
 
     let parsedConfig: InternalJwtConfigFile | undefined;
     try {
       parsedConfig = resolveServiceConfig<InternalJwtConfigFile>({
         serviceName,
-        configRoot,
         runtimeEnv: currentEnv,
+        configSources,
       });
     } catch (error) {
       const cause = error instanceof Error ? error.message : String(error);

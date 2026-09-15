@@ -2,19 +2,27 @@ import { join } from 'path';
 
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { SharedModule } from '@pawhaven/backend-core';
+import {
+  collectServiceConfigSources,
+  SharedModule,
+} from '@pawhaven/backend-core';
 import { microServiceNames } from '@pawhaven/backend-core/constants';
 
 import { ProxyModule } from './proxy/proxy.module.js';
 import { GatewayThrottleGuard } from './throttle/gateway-throttle.guard.js';
 import { ThrottleConfigValidator } from './throttle/throttle-config.validator.js';
 
+const configContext = import.meta.webpackContext('./config', {
+  recursive: true,
+  regExp: /\/env\/index\.json$/,
+});
+
 @Module({
   imports: [
     SharedModule.forRoot({
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.GATEWAY,
-      configRoot: join(import.meta.dirname, 'config'),
+      configSources: collectServiceConfigSources(configContext),
       modules: [],
     }),
     ProxyModule,

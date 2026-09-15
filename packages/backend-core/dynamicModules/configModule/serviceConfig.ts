@@ -1,35 +1,61 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
-import * as yaml from 'js-yaml';
 import { resolveAppConfig } from '@pawhaven/shared/utils';
+
+export type ServiceConfigEnv = 'dev' | 'test' | 'uat' | 'prod';
+
+export type ServiceConfig = Record<string, unknown>;
+
+export type ServiceConfigSource = Partial<
+  Record<ServiceConfigEnv, ServiceConfig>
+>;
+
+export type ServiceConfigContext = {
+  keys(): string[];
+  (id: string): unknown;
+};
 
 type ServiceConfigLookup = {
   serviceName: string;
-  configRoot: string;
   runtimeEnv: string;
+  configSources?: ServiceConfigSource;
 };
 
-export const serviceConfigPath = (
-  configRoot: string,
-  runtimeEnv: string,
-): string => join(configRoot, runtimeEnv, 'env/index.yaml');
+const toServiceConfig = (entry: unknown): ServiceConfig =>
+  (typeof entry === 'object' && entry !== null && 'default' in entry
+    ? (entry as { default: ServiceConfig }).default
+    : entry) as ServiceConfig;
+
+export const collectServiceConfigSources = (
+  context: ServiceConfigContext,
+): ServiceConfigSource => {
+  const sources: ServiceConfigSource = {};
+
+  context.keys().forEach((key) => {
+    sources[key.split('/')[1] as ServiceConfigEnv] = toServiceConfig(
+      context(key),
+    );
+  });
+
+  return sources;
+};
 
 export const resolveServiceConfig = <T = unknown>({
   serviceName,
-  configRoot,
   runtimeEnv,
+  configSources,
 }: ServiceConfigLookup): T => {
-  const configPath = serviceConfigPath(configRoot, runtimeEnv);
+  const config = configSources?.[runtimeEnv as ServiceConfigEnv];
 
   try {
-    return resolveAppConfig(
-      yaml.load(readFileSync(configPath, 'utf8')) as T,
-      process.env,
-    );
+    if (typeof config !== 'object' || config === null) {
+      throw new Error(
+        `no configuration was bundled for env "${runtimeEnv}"; a service must pass every env it supports via SharedModule.forRoot({ configSources })`,
+      );
+    }
+
+    return resolveAppConfig(config as T, process.env);
   } catch (error) {
     throw new Error(
-      `Config file loading failed for "${serviceName}" (${configPath}): ${error}`,
+      `Config file loading failed for "${serviceName}" (env: ${runtimeEnv}): ${error}`,
     );
   }
 };
