@@ -14,6 +14,7 @@ import { ThrottleConfigValidator } from './throttle/throttle-config.validator.js
     SharedModule.forRoot({
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.GATEWAY,
+      configRoot: join(import.meta.dirname, 'config'),
       modules: [],
     }),
     ProxyModule,

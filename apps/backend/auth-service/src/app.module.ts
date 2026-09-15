@@ -14,6 +14,7 @@ import { PrismaClient } from '@prismaClient/index.js';
     SharedModule.forRoot({
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.AUTH,
+      configRoot: join(import.meta.dirname, 'config'),
       modules: [
         {
           module: SharedModuleFeatures.PrismaModule,

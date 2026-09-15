@@ -27,6 +27,11 @@ interface SharedModuleForRootOptions {
   serviceRoot: string;
   serviceName: string;
   /**
+   * Directory holding the per-env config that ships with the build - `src` when running
+   * from sources, `dist` from the built bundle.
+   */
+  configRoot: string;
+  /**
    * Optional predefined shared modules to load
    * Only accepts modules from SharedModuleFeatures enum
    */
@@ -41,9 +46,13 @@ export class SharedModule {
    * For service-specific modules or providers, import them directly in your AppModule
    */
   static forRoot(options: SharedModuleForRootOptions): DynamicModule {
-    const { serviceRoot, serviceName, modules = [] } = options;
+    const { serviceRoot, serviceName, configRoot, modules = [] } = options;
 
-    const defaultModules = this.getDefaultModules(serviceRoot, serviceName);
+    const defaultModules = this.getDefaultModules(
+      serviceRoot,
+      serviceName,
+      configRoot,
+    );
     const optionalModules = this.loadOptionalModules(modules);
     const sharedProviders = this.getSharedProviders();
 
@@ -63,11 +72,12 @@ export class SharedModule {
   private static getDefaultModules(
     serviceRoot: string,
     serviceName: string,
+    configRoot: string,
   ): Array<Type<any> | DynamicModule> {
     return [
-      ConfigsModule.forRoot(serviceRoot, serviceName),
+      ConfigsModule.forRoot(serviceRoot, serviceName, configRoot),
       HttpClientModule,
-      InternalJwtModule.forRoot(serviceName, serviceRoot),
+      InternalJwtModule.forRoot(serviceName, configRoot),
     ];
   }
 
