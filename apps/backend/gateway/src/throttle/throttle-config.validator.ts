@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { ThrottleConfig } from './gateway-throttle';
+import type { ThrottleConfig } from './gateway-throttle.js';
 
 const MINIMUM_THROTTLE_VALUE = 1;
 const THROTTLE_KEYS: Array<keyof ThrottleConfig> = [

@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
-import { RoutingModule } from '../routing/routing.module';
+import { RoutingModule } from '../routing/routing.module.js';
 
-import { InternalJwtService } from './internal-jwt.service';
-import { InternalJwtTargetResolver } from './internal-jwt-target.resolver';
+import { InternalJwtService } from './internal-jwt.service.js';
+import { InternalJwtTargetResolver } from './internal-jwt-target.resolver.js';
 
 @Module({
   imports: [RoutingModule],

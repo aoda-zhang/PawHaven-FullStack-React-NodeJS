@@ -15,7 +15,7 @@ import { databaseEngines, cookieKeys } from '@pawhaven/backend-core/constants';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import { PrismaClient } from '@prismaClient';
+import { PrismaClient } from '@prismaClient/index.js';
 
 type SessionClaims = {
   sessionExpiresAt: number;

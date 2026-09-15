@@ -20,11 +20,11 @@ import {
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { readHeader } from '@pawhaven/backend-core/utils';
 
-import { IdentityResolver } from '../identity/identity.resolver';
-import { InternalJwtService } from '../internal-jwt/internal-jwt.service';
-import { InternalJwtTargetResolver } from '../internal-jwt/internal-jwt-target.resolver';
-import type { MicroServiceConfig } from '../routing/micro-service.config';
-import { MicroServiceRegistry } from '../routing/micro-service.registry';
+import { IdentityResolver } from '../identity/identity.resolver.js';
+import { InternalJwtService } from '../internal-jwt/internal-jwt.service.js';
+import { InternalJwtTargetResolver } from '../internal-jwt/internal-jwt-target.resolver.js';
+import type { MicroServiceConfig } from '../routing/micro-service.config.js';
+import { MicroServiceRegistry } from '../routing/micro-service.registry.js';
 
 type PendingInternalJwtHeaders = {
   [httpHeaders.gatewayJwt]: string;

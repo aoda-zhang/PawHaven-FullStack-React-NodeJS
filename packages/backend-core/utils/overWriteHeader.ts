@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { httpHeaders } from '../constants/httpHeaders';
+import { httpHeaders } from '../constants/httpHeaders.js';
 
 /**
  * Extracts the authentication token from an HTTP request.

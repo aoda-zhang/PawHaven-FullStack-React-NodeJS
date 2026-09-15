@@ -10,14 +10,17 @@ import { APP_FILTER } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
-import { InternalJwtKind, type InternalJwt } from '@pawhaven/shared/types';
+import {
+  InternalJwtKind,
+  type InternalJwt,
+} from '@pawhaven/backend-core/types';
 import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { HttpExceptionFilter } from '../httpClient/httpExceptionFilter';
+import { HttpExceptionFilter } from '../httpClient/httpExceptionFilter.js';
 
-import { InternalJwt as InternalJwtParam } from './internal-jwt.decorator';
-import type { InternalJwtRequest } from './internal-jwt.types';
+import { InternalJwt as InternalJwtParam } from './internal-jwt.decorator.js';
+import type { InternalJwtRequest } from './internal-jwt.types.js';
 
 const HTTP_STATUS_OK = 200;
 const HTTP_STATUS_UNAUTHORIZED = 401;

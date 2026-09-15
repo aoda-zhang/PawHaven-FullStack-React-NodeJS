@@ -1,4 +1,4 @@
-import { PrismaModuleOptions } from './prisma/prisma.module';
+import { PrismaModuleOptions } from './prisma/prisma.module.js';
 
 /**
  * =========================

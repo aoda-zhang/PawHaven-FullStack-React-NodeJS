@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { PrismaClient } from '@prismaClient';
 import { AnimalStatus, HeroStats, HomeData } from '@pawhaven/shared/types';
+import { PrismaClient } from '@prismaClient/index.js';
 
-import { AdoptionService } from '../adoption/adoption.service';
-import { RescueService } from '../rescue/rescue.service';
+import { AdoptionService } from '../adoption/adoption.service.js';
+import { RescueService } from '../rescue/rescue.service.js';
 
 const VOLUNTEER_BASELINE = 120;
 

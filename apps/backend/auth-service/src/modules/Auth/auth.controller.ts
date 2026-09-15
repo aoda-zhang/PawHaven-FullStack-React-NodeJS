@@ -19,7 +19,7 @@ import { httpBusinessMappingCodes } from '@pawhaven/shared';
 import { Public } from '@pawhaven/backend-core/decorators';
 import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
 
-import { AuthService } from './auth.service';
+import { AuthService } from './auth.service.js';
 
 @Controller()
 export class AuthController {

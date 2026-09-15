@@ -1,7 +1,7 @@
 import { All, Controller, Next, Req, Res } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
 
-import { ProxyService } from './proxy.service';
+import { ProxyService } from './proxy.service.js';
 
 @Controller()
 export class ProxyController {

@@ -1,1 +1,1 @@
-export { MiddlewareModule } from './index.module';
+export { MiddlewareModule } from './index.module.js';

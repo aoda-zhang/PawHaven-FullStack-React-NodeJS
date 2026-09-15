@@ -10,8 +10,8 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@prismaClient$/,
-        replacement: resolve(root, 'src/prisma/mongodb/client'),
+        find: /^@prismaClient\//,
+        replacement: `${resolve(root, 'src/prisma/mongodb/client')}/`,
       },
       {
         find: /^@modules\//,

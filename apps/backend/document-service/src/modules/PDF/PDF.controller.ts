@@ -15,7 +15,7 @@ import {
   type GeneratePdfBody,
 } from '@pawhaven/backend-core/types';
 
-import { PdfService } from './PDF.service';
+import { PdfService } from './PDF.service.js';
 
 @Controller('document')
 export class PdfController {

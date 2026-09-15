@@ -2,6 +2,7 @@
   "$schema": "http://json.schemastore.org/package",
   "private": true,
   "name": "@pawhaven/auth-service",
+  "type": "module",
   "main": "build/main.js",
   "version": "1.0.0",
   "scripts": {
@@ -27,12 +28,12 @@
     "@nestjs/passport": "^12.0.0",
     "@nestjs/platform-express": "^12.0.0",
     "@nestjs/terminus": "^12.0.0",
-    "@nestjs/throttler": "^6.4.0",
     "@pawhaven/backend-core": "workspace:*",
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/shared": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
     "@prisma/client": "^6.19.1",
+    "@prismaClient/index.js": "link:./src/prisma/mongodb/client",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.3",
     "@types/passport-jwt": "^4.0.1",
@@ -59,6 +60,7 @@
     "@nestjs/cli": "^12.0.0",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.0",
+    "@rspack/core": "^2.2.3",
     "@swc/core": "^1.16.2",
     "@types/cookie-parser": "^1.4.10",
     "@types/crypto-js": "^4.2.2",
@@ -73,7 +75,9 @@
     "ts-loader": "^9.5.4",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.9.3",
-    "unplugin-swc": "^1.6.0"
+    "unplugin-swc": "^1.6.0",
+    "webpack-node-externals": "^3.0.0"
   }
 }

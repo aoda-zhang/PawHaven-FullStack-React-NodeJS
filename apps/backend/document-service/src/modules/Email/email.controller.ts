@@ -6,7 +6,7 @@ import {
   type SendEmailBody,
 } from '@pawhaven/backend-core/types';
 
-import { EmailService } from './email.service';
+import { EmailService } from './email.service.js';
 
 @Controller('email')
 export class EmailController {

@@ -4,7 +4,7 @@ import {
   AnimalAppearanceSchema,
   RescueAgeSchema,
   RescueLocationSchema,
-} from './rescue.schema';
+} from './rescue.schema.js';
 
 /**
  * Report Animal Schemas

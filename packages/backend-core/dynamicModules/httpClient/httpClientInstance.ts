@@ -5,7 +5,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 
-import { httpHeaders } from '../../constants/httpHeaders';
+import { httpHeaders } from '../../constants/httpHeaders.js';
 
 export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 

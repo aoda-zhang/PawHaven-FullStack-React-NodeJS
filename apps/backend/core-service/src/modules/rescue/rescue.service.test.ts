@@ -2,7 +2,7 @@ import { Logger, NotFoundException } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { RescueService } from './rescue.service';
+import { RescueService } from './rescue.service.js';
 
 const RECORD_ID = 'PAW-0001';
 const REPORTED_AT = new Date('2026-08-22T10:00:00.000Z');

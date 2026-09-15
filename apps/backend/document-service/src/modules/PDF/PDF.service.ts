@@ -7,7 +7,7 @@ import * as ReactDOMServer from 'react-dom/server';
 import puppeteer, { Browser, PDFOptions } from 'puppeteer';
 import type { GeneratePdfBody } from '@pawhaven/backend-core/types';
 
-import i18n from '../../i18n/i18n.config';
+import i18n from '../../i18n/i18n.config.js';
 
 interface GetHTMLContentParams {
   template: string;

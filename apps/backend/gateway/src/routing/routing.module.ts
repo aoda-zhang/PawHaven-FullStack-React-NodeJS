@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { MicroServiceRegistry } from './micro-service.registry';
-import { GatewayConfigValidator } from './gateway-config.validator';
+import { MicroServiceRegistry } from './micro-service.registry.js';
+import { GatewayConfigValidator } from './gateway-config.validator.js';
 
 @Module({
   providers: [MicroServiceRegistry, GatewayConfigValidator],

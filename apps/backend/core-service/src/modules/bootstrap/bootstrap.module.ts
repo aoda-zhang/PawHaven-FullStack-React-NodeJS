@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { BootstrapController } from './bootstrap.controller';
-import { BootstrapService } from './bootstrap.service';
+import { BootstrapController } from './bootstrap.controller.js';
+import { BootstrapService } from './bootstrap.service.js';
 
 @Module({
   controllers: [BootstrapController],

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { RescueController } from './rescue.controller';
-import { RescueService } from './rescue.service';
+import { RescueController } from './rescue.controller.js';
+import { RescueService } from './rescue.service.js';
 
 @Module({
   controllers: [RescueController],

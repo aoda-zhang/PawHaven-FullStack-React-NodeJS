@@ -12,7 +12,7 @@ import {
 import type {
   InternalJwtIdentity,
   InternalJwtTarget,
-} from './internal-jwt.types';
+} from './internal-jwt.types.js';
 
 const MS_PER_SECOND = 1000;
 

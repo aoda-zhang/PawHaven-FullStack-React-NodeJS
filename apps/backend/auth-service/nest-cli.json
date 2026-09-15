@@ -3,6 +3,10 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
+    "builder": {
+      "type": "rspack",
+      "options": { "configPath": "rspack.config.mjs" }
+    },
     "assets": [
       {
         "include": "config/**",

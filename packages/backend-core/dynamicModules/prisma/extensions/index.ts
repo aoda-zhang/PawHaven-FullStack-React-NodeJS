@@ -1,4 +1,4 @@
-import { versionExtension } from './version.extension';
-import { softDeleteExtension } from './soft-delete.extension';
+import { versionExtension } from './version.extension.js';
+import { softDeleteExtension } from './soft-delete.extension.js';
 
 export const defaultPrismaExtensions = [versionExtension, softDeleteExtension];

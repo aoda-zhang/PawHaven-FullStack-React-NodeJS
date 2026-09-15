@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { AdoptionService } from './adoption.service';
+import { AdoptionService } from './adoption.service.js';
 
 const PET_ID = 'PET-0001';
 
