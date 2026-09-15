@@ -4,6 +4,9 @@
   "name": "@pawhaven/gateway",
   "type": "module",
   "version": "1.0.0",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
