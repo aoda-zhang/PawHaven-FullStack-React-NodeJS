@@ -19,7 +19,6 @@ export const ConfigSchema = z.object({
 
   query: z.object({
     refetchOnReconnect: z.boolean(),
-    refetchOnFocus: z.boolean(),
     refetchOnWindowFocus: z.boolean(),
     staleTime: z.number(),
     gcTime: z.number(),

@@ -2,8 +2,8 @@ import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { render } from '@react-email/components';
+import type { SendEmailBody } from '@pawhaven/backend-core/types';
 
-// import EmailPayloadDTO from '@shared/DTO/Document/send-email.DTO'
 import i18n from '../../i18n/i18n.config';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class EmailService {
     locale,
   }: {
     template: string;
-    payload: Record<string, any>;
+    payload?: Record<string, unknown>;
     locale: string;
   }) {
     try {
@@ -34,7 +34,7 @@ export class EmailService {
     }
   }
 
-  async sendMail(emailProps: any) {
+  async sendMail(emailProps: SendEmailBody) {
     try {
       const emailHtml = await this.getEmailHtml({
         template: emailProps?.template,

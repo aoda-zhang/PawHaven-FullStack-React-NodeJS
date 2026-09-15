@@ -1,5 +1,6 @@
 import type { Request } from 'express';
-import type { InternalJwt } from '@pawhaven/shared/types';
+
+import type { InternalJwt } from '../../types';
 
 export type InternalJwtRequest = Request & {
   internalJwt?: InternalJwt;

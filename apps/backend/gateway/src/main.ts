@@ -22,7 +22,7 @@ async function bootstrap(): Promise<void> {
 
   const logger = new Logger('Bootstrap');
 
-  setupApp(app, { enableVersioning: true, enableValidationPipe: true });
+  setupApp(app, { enableVersioning: true });
 
   const port = configService.getOrThrow<number>('http.port');
 

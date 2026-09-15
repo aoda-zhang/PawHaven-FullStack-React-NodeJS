@@ -4,7 +4,10 @@ import {
   signInternalJwt,
   type InternalJwtHeaders,
 } from '@pawhaven/backend-core/internal-jwt';
-import { InternalJwtKind, type InternalJwt } from '@pawhaven/shared/types';
+import {
+  InternalJwtKind,
+  type InternalJwt,
+} from '@pawhaven/backend-core/types';
 
 import type {
   InternalJwtIdentity,

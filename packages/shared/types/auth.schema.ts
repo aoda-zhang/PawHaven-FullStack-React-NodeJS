@@ -23,19 +23,6 @@ export const CredentialsSchema = z.object({
 export type CredentialsDto = z.infer<typeof CredentialsSchema>;
 
 /**
- * Auth Response Schema
- */
-export const AuthResponseSchema = z.object({
-  access_token: z.string(),
-  expires_in: z.number(),
-  refresh_token: z.string().optional(),
-  session_expires_at: z.number().optional(),
-  user: UserSchema,
-});
-
-export type AuthResponseDto = z.infer<typeof AuthResponseSchema>;
-
-/**
  * Session Schema (common response for login/register/verify)
  */
 export const SessionSchema = z.object({
@@ -54,19 +41,3 @@ export const AuthUserSchema = UserSchema.extend({
 });
 
 export type AuthUser = z.infer<typeof AuthUserSchema>;
-
-/**
- * JWT token type claim — access tokens and refresh tokens are distinct
- */
-export const TokenTypeSchema = z.enum(['access', 'refresh']);
-
-export type TokenType = z.infer<typeof TokenTypeSchema>;
-
-export const JwtVerifyInfoSchema = UserSchema.extend({
-  type: TokenTypeSchema.optional(),
-  iat: z.number().optional(),
-  exp: z.number().optional(),
-  sessionExpiresAt: z.number().optional(),
-});
-
-export type JwtVerifyInfo = z.infer<typeof JwtVerifyInfoSchema>;

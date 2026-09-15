@@ -7,8 +7,8 @@ import {
   type Jwt,
   type JwtPayload,
 } from 'jsonwebtoken';
-import { InternalJwtSchema, type InternalJwt } from '@pawhaven/shared/types';
 
+import { InternalJwtSchema, type InternalJwt } from '../../types';
 import { httpHeaders } from '../../constants/httpHeaders';
 import { readHeader } from '../../utils/readHeader';
 

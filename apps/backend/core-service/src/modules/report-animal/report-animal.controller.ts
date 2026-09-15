@@ -1,13 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
-import type {
-  AnimalReportDto,
-  AuthenticatedInternalJwt,
+import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
+import {
+  AnimalReportSchema,
+  type AnimalReportDto,
 } from '@pawhaven/shared/types';
 
 import { ReportAnimalService } from './report-animal.service';
-import { CreateReportAnimalDto } from './DTO/report-animal.DTO';
 
 @ApiTags('report-animal')
 @Controller('report-animal')
@@ -17,12 +17,9 @@ export class ReportAnimalController {
   @Post()
   @ApiOperation({ summary: 'Submit an animal report' })
   create(
-    @Body() dto: CreateReportAnimalDto,
+    @Body({ schema: AnimalReportSchema }) dto: AnimalReportDto,
     @InternalJwt() claims: AuthenticatedInternalJwt,
   ) {
-    return this.reportAnimalService.create(
-      dto as unknown as AnimalReportDto,
-      claims,
-    );
+    return this.reportAnimalService.create(dto, claims);
   }
 }

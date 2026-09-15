@@ -1,6 +1,6 @@
 import { sign } from 'jsonwebtoken';
-import type { InternalJwt } from '@pawhaven/shared/types';
 
+import type { InternalJwt } from '../../types';
 import { httpHeaders } from '../../constants/httpHeaders';
 
 import { decodePem } from './pem';

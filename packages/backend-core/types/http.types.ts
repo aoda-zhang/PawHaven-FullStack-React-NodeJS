@@ -5,8 +5,3 @@ export interface HttpResType {
   data: unknown;
   status: number;
 }
-export enum HttpBusinessCode {
-  jwtexpired = 'jwtexpired',
-  invalidToken = 'invalidtoken',
-  invalidSign = 'invalidsignature',
-}

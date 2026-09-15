@@ -2,11 +2,14 @@ import { Controller, Get, Post, Param, Query, Body, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OptionalAuth } from '@pawhaven/backend-core/decorators';
 import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
-import type { AuthenticatedInternalJwt } from '@pawhaven/shared/types';
+import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
+import {
+  CreateRescueDtoSchema,
+  type CreateRescueDto,
+} from '@pawhaven/shared/types';
 import type { Response } from 'express';
 
 import { RescueService } from './rescue.service';
-import { CreateRescueDto } from './DTO/rescue.DTO';
 
 const SECONDS_PER_YEAR = 31536000;
 
@@ -20,7 +23,7 @@ export class RescueController {
   @Post()
   @ApiOperation({ summary: 'Create a rescue record' })
   create(
-    @Body() dto: CreateRescueDto,
+    @Body({ schema: CreateRescueDtoSchema }) dto: CreateRescueDto,
     @InternalJwt() claims: AuthenticatedInternalJwt,
   ) {
     return this.rescueService.create(dto, claims);

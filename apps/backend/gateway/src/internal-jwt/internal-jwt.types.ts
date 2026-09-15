@@ -1,4 +1,4 @@
-import type { InternalJwtKind } from '@pawhaven/shared/types';
+import type { InternalJwtKind } from '@pawhaven/backend-core/types';
 
 export type InternalJwtTarget = {
   audience: string;

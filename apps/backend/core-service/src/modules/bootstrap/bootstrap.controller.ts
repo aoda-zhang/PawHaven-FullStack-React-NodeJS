@@ -4,11 +4,14 @@ import { OptionalAuth } from '@pawhaven/backend-core/decorators';
 import { InternalJwt as InternalJwtParam } from '@pawhaven/backend-core/internal-jwt';
 import {
   InternalJwtKind,
-  type BootstrapData,
   type InternalJwt,
+} from '@pawhaven/backend-core/types';
+import {
+  MenuItemSchema,
+  type BootstrapData,
+  type MenuItem,
 } from '@pawhaven/shared/types';
 
-import { MenuItemDto } from './DTO/menu.DTO';
 import { BootstrapService } from './bootstrap.service';
 
 @ApiTags('bootstrap')
@@ -33,7 +36,9 @@ export class BootstrapController {
   }
 
   @Post('/menu')
-  createMenu(@Body() menu: MenuItemDto): Promise<MenuItemDto> {
+  createMenu(
+    @Body({ schema: MenuItemSchema }) menu: MenuItem,
+  ): Promise<MenuItem> {
     return this.bootstrapService.addMenuItem(menu);
   }
 }

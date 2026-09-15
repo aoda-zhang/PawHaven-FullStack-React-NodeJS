@@ -5,21 +5,13 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import * as React from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import puppeteer, { Browser, PDFOptions } from 'puppeteer';
+import type { GeneratePdfBody } from '@pawhaven/backend-core/types';
 
 import i18n from '../../i18n/i18n.config';
 
 interface GetHTMLContentParams {
   template: string;
   PDFData?: Record<string, unknown>;
-}
-
-interface GeneratePDFPayload {
-  template: string;
-  locale: string;
-  PDFContentData?: Record<string, unknown>;
-  PDFHeaderData?: Record<string, unknown>;
-  PDFFooterData?: Record<string, unknown>;
-  PDFOptions?: PDFOptions;
 }
 
 interface HeaderFooterResult {
@@ -102,9 +94,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async getHeaderFooter(
-    payload: GeneratePDFPayload,
-  ): Promise<HeaderFooterResult> {
+  async getHeaderFooter(payload: GeneratePdfBody): Promise<HeaderFooterResult> {
     // const headerLogo = await convertImageToBase64(this.configService.get('PDF.headerLogo'))
     const headerTemplate = await this.getHTMLContent({
       template: 'common_header',
@@ -121,7 +111,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     };
   }
 
-  async getPDFSettings(payload: GeneratePDFPayload): Promise<PDFOptions> {
+  async getPDFSettings(payload: GeneratePdfBody): Promise<PDFOptions> {
     try {
       const headerFooter = await this.getHeaderFooter(payload);
       const defaultOptions: PDFOptions = {
@@ -155,7 +145,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
   }
 
   async generatePDF(
-    payload: GeneratePDFPayload,
+    payload: GeneratePdfBody,
   ): Promise<{ data: Buffer; fileName: string }> {
     try {
       // Set locale for PDF content to translate
@@ -194,7 +184,7 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  generatePDFFileName(payload: Pick<GeneratePDFPayload, 'template'>): string {
+  generatePDFFileName(payload: Pick<GeneratePdfBody, 'template'>): string {
     return `${payload?.template}-${Date.now()}.pdf`;
   }
 }

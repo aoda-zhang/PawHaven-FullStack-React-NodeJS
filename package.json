@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "25.x",
+    "node": "26.x",
     "pnpm": "11"
   },
   "scripts": {
@@ -15,6 +15,7 @@
     "dev:restart": "bash scripts/restart-dev.sh",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
+    "test:e2e": "playwright test",
     "lint": "turbo run lint",
     "build": "turbo run build",
     "build:backend-core": "turbo run build --filter=@pawhaven/backend-core...",
@@ -57,6 +58,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
+    "@playwright/test": "^1.63.0",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
@@ -79,5 +81,5 @@
     "turbo": "^2.8.14",
     "typescript": "^5.9.3"
   },
-  "packageManager": "pnpm@11.24.0"
+  "packageManager": "pnpm@12.4.1"
 }

@@ -7,11 +7,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
-import {
-  JwtVerifyInfo,
-  AuthResponseDto,
-  AuthUser,
-} from '@pawhaven/shared/types';
+import { AuthUser } from '@pawhaven/shared/types';
+import { AuthResponseDto, JwtVerifyInfo } from '@pawhaven/backend-core/types';
 import { isProd } from '@pawhaven/shared/utils';
 import * as bcrypt from 'bcrypt';
 import { databaseEngines, cookieKeys } from '@pawhaven/backend-core/constants';
@@ -140,25 +137,31 @@ export class AuthService {
   private resolveSessionClaims(user: {
     sessionExpiresAt: number | null;
   }): SessionClaims {
-    return {
-      sessionExpiresAt:
-        user.sessionExpiresAt ??
-        nowInSeconds() + this.tokenConfig.sessionExpiresIn,
-    };
+    if (typeof user.sessionExpiresAt !== 'number') {
+      throw new UnauthorizedException(SESSION_EXPIRED_MESSAGE);
+    }
+
+    return { sessionExpiresAt: user.sessionExpiresAt };
   }
 
   private isSessionExpired(sessionExpiresAt: number | null): boolean {
     if (typeof sessionExpiresAt !== 'number') {
-      return false;
+      return true;
     }
     return sessionExpiresAt <= nowInSeconds();
   }
 
-  private shouldRotateRefreshToken(refreshTokenExpiresAt: number): boolean {
-    return (
-      refreshTokenExpiresAt - nowInSeconds() <=
+  private shouldRotateRefreshToken(
+    refreshTokenExpiresAt: number,
+    session: SessionClaims,
+  ): boolean {
+    if (
+      refreshTokenExpiresAt - nowInSeconds() >
       this.tokenConfig.rotationWindowSeconds
-    );
+    ) {
+      return false;
+    }
+    return this.getRefreshTokenExpiresAt(session) > refreshTokenExpiresAt;
   }
 
   private getRefreshTokenExpiresAt(session: SessionClaims): number {
@@ -397,7 +400,7 @@ export class AuthService {
     );
 
     let refreshTokenToUse = refreshToken;
-    if (this.shouldRotateRefreshToken(user.refreshTokenExpiresAt)) {
+    if (this.shouldRotateRefreshToken(user.refreshTokenExpiresAt, session)) {
       refreshTokenToUse = this.generateRefreshToken();
 
       await this.prisma.user.update({
@@ -434,10 +437,18 @@ export class AuthService {
     return { userId: user.id, email: user.email };
   }
 
-  /**
-   * Logout user by clearing refresh token
-   */
-  async logout(userId: string): Promise<void> {
-    await this.revokeRefreshToken(userId);
+  async logout(refreshToken?: string): Promise<void> {
+    if (!refreshToken) {
+      return;
+    }
+
+    await this.prisma.user.updateMany({
+      where: { refreshToken: this.hashRefreshToken(refreshToken) },
+      data: {
+        refreshToken: null,
+        refreshTokenExpiresAt: null,
+        sessionExpiresAt: null,
+      },
+    });
   }
 }

@@ -115,9 +115,7 @@ const isServerError = (errorRes: ErrorResponse): boolean => {
   if (!errorRes) return false;
   const { status } = errorRes;
   return (
-    typeof status === 'number' &&
-    status >= HTTP_STATUS.INTERNAL_SERVER_ERROR &&
-    status !== HTTP_STATUS.SERVICE_UNAVAILABLE
+    typeof status === 'number' && status >= HTTP_STATUS.INTERNAL_SERVER_ERROR
   );
 };
 

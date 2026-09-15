@@ -16,13 +16,12 @@ import {
   RescueAgeSchema,
   AnimalStatus,
 } from '@pawhaven/shared/types';
+import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
 import type {
-  AuthenticatedInternalJwt,
+  CreateRescueDto,
   RescueListItem,
   RescueDetail,
 } from '@pawhaven/shared/types';
-
-import { CreateRescueDto } from './DTO/rescue.DTO';
 
 const PUBLIC_RESCUE_ROUTE = '/api/core/rescues';
 
@@ -33,6 +32,16 @@ const BASE64_MARKER = ';base64,';
 export type RescuePhoto = {
   mimeType: string;
   buffer: Buffer;
+};
+
+type RescueListRecord = {
+  id: string;
+  animalType: string | null;
+  animalStatus: string | null;
+  description: string | null;
+  locationObj: unknown;
+  reporterId: string;
+  createdAt: Date;
 };
 
 @Injectable()
@@ -70,8 +79,26 @@ export class RescueService {
         },
         orderBy: { createdAt: 'desc' },
         take,
+        select: {
+          id: true,
+          animalType: true,
+          animalStatus: true,
+          description: true,
+          locationObj: true,
+          reporterId: true,
+          createdAt: true,
+        },
       });
-      return rescues.map((record) => this.toListItem(record));
+
+      const photoBearingIds = await this.findPhotoBearingIds(
+        rescues.map((record) => record.id),
+      );
+
+      return rescues
+        .map((record) =>
+          this.toListItemOrSkip(record, photoBearingIds.has(record.id)),
+        )
+        .filter((item): item is RescueListItem => item !== undefined);
     } catch (error) {
       this.logger.error('Failed to fetch rescues', error);
       throw new BadRequestException('Failed to fetch rescues');
@@ -130,17 +157,41 @@ export class RescueService {
     return `${PUBLIC_RESCUE_ROUTE}/${rescueId}/photo/${index}`;
   }
 
-  private toListItem(record: animalReports): RescueListItem {
-    const location = RescueDetailLocationSchema.parse(record.locationObj ?? {});
+  private async findPhotoBearingIds(ids: string[]): Promise<Set<string>> {
+    if (ids.length === 0) {
+      return new Set();
+    }
+    const records = await this.prisma.animalReports.findMany({
+      where: { id: { in: ids }, reporterPhotos: { isEmpty: false } },
+      select: { id: true },
+    });
+    return new Set(records.map((record) => record.id));
+  }
+
+  private toListItemOrSkip(
+    record: RescueListRecord,
+    hasPhoto: boolean,
+  ): RescueListItem | undefined {
+    try {
+      return this.toListItem(record, hasPhoto);
+    } catch (error) {
+      this.logger.warn(`Skipping unmappable rescue: ${record.id}`, error);
+      return undefined;
+    }
+  }
+
+  private toListItem(
+    record: RescueListRecord,
+    hasPhoto: boolean,
+  ): RescueListItem {
+    const location = RescueDetailLocationSchema.parse(record.locationObj);
 
     const status = AnimalStatusSchema.safeParse(record.animalStatus);
 
     return RescueListItemSchema.parse({
       id: record.id,
       title: record.animalType ?? 'unknown',
-      image: record.reporterPhotos?.length
-        ? this.buildPhotoUrl(record.id, 0)
-        : undefined,
+      image: hasPhoto ? this.buildPhotoUrl(record.id, 0) : undefined,
       status: status.success ? status.data : AnimalStatus.PENDING,
       animalType: record.animalType ?? 'unknown',
       location: location.address,
@@ -164,8 +215,8 @@ export class RescueService {
       description: record.description,
       size: record.size,
       animalCount: record.animalCount,
-      appearance: RescueDetailAppearanceSchema.parse(record.appearance ?? {}),
-      location: RescueDetailLocationSchema.parse(record.locationObj ?? {}),
+      appearance: RescueDetailAppearanceSchema.parse(record.appearance),
+      location: RescueDetailLocationSchema.parse(record.locationObj),
       photos: record.reporterPhotos.map((_photo, index) =>
         this.buildPhotoUrl(record.id, index),
       ),

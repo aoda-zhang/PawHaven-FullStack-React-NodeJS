@@ -3,7 +3,7 @@ http:
   port: 8080
   maxJsonBodySize: 100mb
   prefix: api
-  timeout: 5000
+  timeout: 15000
   retryCount: 3
   retryDelay: 500
   trustProxy: 0

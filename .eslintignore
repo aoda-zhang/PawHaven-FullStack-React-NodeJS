@@ -41,3 +41,4 @@ packages/design-system/figma
 **/*.setup.ts
 **/*.setup.tsx
 vitest.config.ts
+playwright.config.ts

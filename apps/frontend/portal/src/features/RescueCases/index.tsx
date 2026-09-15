@@ -39,7 +39,7 @@ const RescueCasesPage = () => {
 
   return (
     <div className="max-w-6xl px-4">
-      <div className="bb- flex gap-1 overflow-x-auto pt-100">
+      <div className="flex gap-1 overflow-x-auto pt-10">
         {FILTER_OPTIONS.map((option) => (
           <button
             key={option.value}

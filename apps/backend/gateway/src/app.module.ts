@@ -26,6 +26,7 @@ import { ThrottleConfigValidator } from './throttle/throttle-config.validator';
       modules: [],
     }),
     ThrottlerModule.forRootAsync({
+      imports: [],
       inject: [ConfigService],
       useFactory: (configService: ConfigService): ThrottlerModuleOptions => {
         const throttle = configService.getOrThrow<ThrottleConfig>('throttle');

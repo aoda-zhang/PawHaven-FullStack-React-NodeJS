@@ -4,7 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
-import { InternalJwtKind } from '@pawhaven/shared/types';
+
+import { InternalJwtKind } from '../../types';
 
 import type { InternalJwtRequest } from './internal-jwt.types';
 

@@ -10,6 +10,10 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
+import {
+  GeneratePdfBodySchema,
+  type GeneratePdfBody,
+} from '@pawhaven/backend-core/types';
 
 import { PdfService } from './PDF.service';
 
@@ -21,13 +25,16 @@ export class PdfController {
   ) {}
 
   @Post('create')
-  generatePdf(@Body() body: any) {
+  generatePdf(@Body({ schema: GeneratePdfBodySchema }) body: GeneratePdfBody) {
     return this.pdfService.generatePDF(body);
   }
 
   // Only for develop test
   @Post('preview')
-  async previewPdf(@Body() payload: any, @Res() res: Response) {
+  async previewPdf(
+    @Body({ schema: GeneratePdfBodySchema }) payload: GeneratePdfBody,
+    @Res() res: Response,
+  ) {
     if (this.config.get('http.env') === 'prod') {
       throw new BadRequestException('Forbidden request!');
     }

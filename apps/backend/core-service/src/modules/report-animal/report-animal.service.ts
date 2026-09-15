@@ -2,11 +2,8 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
 import { PrismaClient, type animalReports } from '@prismaClient';
-import {
-  AnimalStatus,
-  type AnimalReportDto,
-  type AuthenticatedInternalJwt,
-} from '@pawhaven/shared/types';
+import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
+import { AnimalStatus, type AnimalReportDto } from '@pawhaven/shared/types';
 
 @Injectable()
 export class ReportAnimalService {

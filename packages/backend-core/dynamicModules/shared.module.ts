@@ -1,6 +1,12 @@
-import { DynamicModule, Global, Module, Provider, Type } from '@nestjs/common';
+import {
+  DynamicModule,
+  Global,
+  Module,
+  Provider,
+  StandardSchemaValidationPipe,
+  Type,
+} from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ZodValidationPipe } from 'nestjs-zod';
 
 import { MiddlewareModule } from '../middlewares/index.module';
 
@@ -97,13 +103,13 @@ export class SharedModule {
    * Global providers applied to all services
    * - HttpExceptionFilter: Standardizes error responses
    * - HttpSuccessInterceptor: Standardizes success responses
-   * - ZodValidationPipe: Validates request DTOs
+   * - StandardSchemaValidationPipe: Validates route params that declare a schema
    */
   private static getSharedProviders(): Provider[] {
     return [
       { provide: APP_FILTER, useClass: HttpExceptionFilter },
       { provide: APP_INTERCEPTOR, useClass: HttpSuccessInterceptor },
-      { provide: APP_PIPE, useClass: ZodValidationPipe },
+      { provide: APP_PIPE, useClass: StandardSchemaValidationPipe },
     ];
   }
 }

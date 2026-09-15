@@ -7,8 +7,8 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
-import { InternalJwtKind, type InternalJwt } from '@pawhaven/shared/types';
 
+import { InternalJwtKind, type InternalJwt } from '../../types';
 import { AuthMetadataKey } from '../../decorators/auth-mode.decorator';
 
 import { InternalJwtVerificationError } from './errors';

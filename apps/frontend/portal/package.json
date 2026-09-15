@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:cov": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -55,6 +56,7 @@
     "@types/node": "^24.7.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
+    "@vitest/coverage-v8": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "jsdom": "^29.1.1",
