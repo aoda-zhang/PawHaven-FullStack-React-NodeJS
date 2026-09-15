@@ -12,6 +12,7 @@ import { microServiceNames } from '@pawhaven/backend-core/constants';
     SharedModule.forRoot({
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.DOCUMENT,
+      configRoot: join(import.meta.dirname, 'config'),
       modules: [
         {
           module: SharedModuleFeatures.SwaggerModule,

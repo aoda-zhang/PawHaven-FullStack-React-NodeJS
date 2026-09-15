@@ -1,30 +1,35 @@
 import 'dotenv/config';
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigFactory } from '@nestjs/config';
-import * as yaml from 'js-yaml';
-import { getRuntimeEnv, resolveAppConfig } from '@pawhaven/shared/utils';
+import { getRuntimeEnv } from '@pawhaven/shared/utils';
 import type { RuntimeEnvType } from '@pawhaven/shared';
+
+import { resolveServiceConfig } from './serviceConfig.js';
 
 @Global()
 @Module({})
 export class ConfigsModule {
   /**
    * dynamic configuration
-   * @param serviceRoot absolute path to service root directory
+   * @param serviceRoot absolute path to service root directory - holds the `.env` files
+   * @param configRoot  directory holding the per-env config shipped with the build
    */
-  static forRoot(serviceRoot: string, serviceName: string): DynamicModule {
+  static forRoot(
+    serviceRoot: string,
+    serviceName: string,
+    configRoot: string,
+  ): DynamicModule {
     const runtimeEnv = process.env.NODE_ENV as RuntimeEnvType;
     const currentEnv = getRuntimeEnv(runtimeEnv);
 
-    const yamlContent = this.loadYamlContent<Record<string, unknown>>(
-      currentEnv,
-      serviceRoot,
-      serviceName,
-    );
-    const appConfig = resolveAppConfig(yamlContent, process.env) ?? {};
+    const appConfig =
+      resolveServiceConfig<Record<string, unknown>>({
+        serviceName,
+        configRoot,
+        runtimeEnv: currentEnv,
+      }) ?? {};
     const configFactory: ConfigFactory = () => ({
       ...appConfig,
     });
@@ -47,23 +52,5 @@ export class ConfigsModule {
       imports: [DynamicConfigModule],
       exports: [ConfigModule],
     };
-  }
-
-  private static loadYamlContent<T = unknown>(
-    runtimeEnv: string,
-    serviceRoot: string,
-    serviceName: string,
-  ): T {
-    const conventionalConfigPath = join(
-      serviceRoot,
-      `src/config/${runtimeEnv}/env/index.yaml`,
-    );
-    try {
-      return yaml.load(readFileSync(conventionalConfigPath, 'utf8')) as T;
-    } catch (error) {
-      throw new Error(
-        `Config file loading failed for "${serviceName}" (${conventionalConfigPath}): ${error}`,
-      );
-    }
   }
 }

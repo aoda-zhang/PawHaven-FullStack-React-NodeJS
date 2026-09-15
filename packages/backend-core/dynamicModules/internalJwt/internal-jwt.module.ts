@@ -1,11 +1,9 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-
 import { DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import * as yaml from 'js-yaml';
-import { getRuntimeEnv, resolveAppConfig } from '@pawhaven/shared/utils';
+import { getRuntimeEnv } from '@pawhaven/shared/utils';
 import type { RuntimeEnvType } from '@pawhaven/shared';
+
+import { resolveServiceConfig } from '../configModule/serviceConfig.js';
 
 import { InternalJwtGuard } from './internal-jwt.guard.js';
 
@@ -15,8 +13,8 @@ type InternalJwtConfigFile = {
 
 @Module({})
 export class InternalJwtModule {
-  static forRoot(serviceName: string, serviceRoot: string): DynamicModule {
-    if (!this.isEnabled(serviceName, serviceRoot)) {
+  static forRoot(serviceName: string, configRoot: string): DynamicModule {
+    if (!this.isEnabled(serviceName, configRoot)) {
       return { module: InternalJwtModule };
     }
 
@@ -30,20 +28,16 @@ export class InternalJwtModule {
     };
   }
 
-  private static isEnabled(serviceName: string, serviceRoot: string): boolean {
+  private static isEnabled(serviceName: string, configRoot: string): boolean {
     const currentEnv = getRuntimeEnv(process.env.NODE_ENV as RuntimeEnvType);
 
-    let parsedConfig: unknown;
+    let parsedConfig: InternalJwtConfigFile | undefined;
     try {
-      const configPath = join(
-        serviceRoot,
-        `src/config/${currentEnv}/env/index.yaml`,
-      );
-      parsedConfig = yaml.load(readFileSync(configPath, 'utf8'));
-      parsedConfig = resolveAppConfig(
-        parsedConfig as InternalJwtConfigFile,
-        process.env,
-      );
+      parsedConfig = resolveServiceConfig<InternalJwtConfigFile>({
+        serviceName,
+        configRoot,
+        runtimeEnv: currentEnv,
+      });
     } catch (error) {
       const cause = error instanceof Error ? error.message : String(error);
       throw new Error(
@@ -51,8 +45,7 @@ export class InternalJwtModule {
       );
     }
 
-    const enabled = (parsedConfig as InternalJwtConfigFile | undefined)
-      ?.internalJwt?.enabled;
+    const enabled = parsedConfig?.internalJwt?.enabled;
 
     if (enabled === undefined) {
       throw new Error(

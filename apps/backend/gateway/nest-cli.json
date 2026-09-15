@@ -10,7 +10,7 @@
     "watchAssets": true,
     "assets": [
       {
-        "include": "./src/config/**",
+        "include": "config/**",
         "watchAssets": true
       },
       {
