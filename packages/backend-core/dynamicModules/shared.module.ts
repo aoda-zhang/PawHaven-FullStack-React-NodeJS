@@ -15,6 +15,7 @@ import { HttpSuccessInterceptor } from './httpClient/httpInterceptor.js';
 import { HttpExceptionFilter } from './httpClient/httpExceptionFilter.js';
 import { SwaggerModule } from './swagger/swagger.module.js';
 import { ConfigsModule } from './configModule/configs.module.js';
+import type { ServiceConfigSource } from './configModule/serviceConfig.js';
 import { HttpClientModule } from './httpClient/httpClient.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type.js';
@@ -26,11 +27,7 @@ import { SharedModuleFeatures, SharedModuleItem } from './sharedModule.type.js';
 interface SharedModuleForRootOptions {
   serviceRoot: string;
   serviceName: string;
-  /**
-   * Directory holding the per-env config that ships with the build - `src` when running
-   * from sources, `dist` from the built bundle.
-   */
-  configRoot: string;
+  configSources?: ServiceConfigSource;
   /**
    * Optional predefined shared modules to load
    * Only accepts modules from SharedModuleFeatures enum
@@ -46,12 +43,12 @@ export class SharedModule {
    * For service-specific modules or providers, import them directly in your AppModule
    */
   static forRoot(options: SharedModuleForRootOptions): DynamicModule {
-    const { serviceRoot, serviceName, configRoot, modules = [] } = options;
+    const { serviceRoot, serviceName, modules = [], configSources } = options;
 
     const defaultModules = this.getDefaultModules(
       serviceRoot,
       serviceName,
-      configRoot,
+      configSources,
     );
     const optionalModules = this.loadOptionalModules(modules);
     const sharedProviders = this.getSharedProviders();
@@ -72,12 +69,12 @@ export class SharedModule {
   private static getDefaultModules(
     serviceRoot: string,
     serviceName: string,
-    configRoot: string,
+    configSources?: ServiceConfigSource,
   ): Array<Type<any> | DynamicModule> {
     return [
-      ConfigsModule.forRoot(serviceRoot, serviceName, configRoot),
+      ConfigsModule.forRoot(serviceRoot, serviceName, configSources),
       HttpClientModule,
-      InternalJwtModule.forRoot(serviceName, configRoot),
+      InternalJwtModule.forRoot(serviceName, configSources),
     ];
   }
 

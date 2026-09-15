@@ -1,0 +1,50 @@
+{
+  "http": {
+    "env": "test",
+    "port": 8081,
+    "maxJsonBodySize": "100mb",
+    "prefix": "core-service",
+    "timeout": 5000,
+    "retryCount": 3,
+    "retryDelay": 500
+  },
+  "swagger": {
+    "title": "管理后台",
+    "version": 1,
+    "prefix": "api-docs",
+    "description": "管理后台接口文档"
+  },
+  "DBConnections": [
+    {
+      "enable": true,
+      "options": {
+        "name": "CORE_SERVICE_MONGODB",
+        "uri": "${CORE_SERVICE_MONGODB}"
+      }
+    }
+  ],
+  "cors": {
+    "allowedHeaders": [
+      "X-timestamp",
+      "Access-Token",
+      "Accept",
+      "Content-Type",
+      "X-Sign",
+      "x-locale",
+      "Locale"
+    ],
+    "origin": ["http://localhost:3001"],
+    "credentials": true,
+    "optionsSuccessStatus": 204,
+    "methods": ["GET", "POST", "PUT", "OPTIONS"]
+  },
+  "internalJwt": {
+    "enabled": true,
+    "audience": "core-service",
+    "publicKeys": {
+      "core-v1": "${INTERNAL_JWT_PUBLIC_KEY_CORE}"
+    },
+    "ttlSeconds": 45,
+    "clockSkewSeconds": 30
+  }
+}

@@ -6,4 +6,5 @@ export { InternalJwtModule } from './dynamicModules/internalJwt/internal-jwt.mod
 export { InjectPrisma } from './dynamicModules/prisma/prisma.decorators.js';
 export { SwaggerService } from './dynamicModules/swagger/swagger.service.js';
 export { HttpClientService } from './dynamicModules/httpClient/HttpClient.service.js';
+export { collectServiceConfigSources } from './dynamicModules/configModule/serviceConfig.js';
 export * from './dynamicModules/sharedModule.type.js';

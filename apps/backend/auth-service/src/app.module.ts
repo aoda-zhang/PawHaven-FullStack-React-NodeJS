@@ -2,19 +2,28 @@ import { join } from 'path';
 
 import { AuthModule } from '@modules/Auth/auth.module.js';
 import { Module } from '@nestjs/common';
-import { SharedModule, SharedModuleFeatures } from '@pawhaven/backend-core';
+import {
+  collectServiceConfigSources,
+  SharedModule,
+  SharedModuleFeatures,
+} from '@pawhaven/backend-core';
 import {
   databaseEngines,
   microServiceNames,
 } from '@pawhaven/backend-core/constants';
 import { PrismaClient } from '@prismaClient/index.js';
 
+const configContext = import.meta.webpackContext('./config', {
+  recursive: true,
+  regExp: /\/env\/index\.json$/,
+});
+
 @Module({
   imports: [
     SharedModule.forRoot({
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.AUTH,
-      configRoot: join(import.meta.dirname, 'config'),
+      configSources: collectServiceConfigSources(configContext),
       modules: [
         {
           module: SharedModuleFeatures.PrismaModule,
