@@ -322,6 +322,7 @@ export class AuthService {
         userId: user.id,
         email: user.email,
         username: user.username ?? undefined,
+        status: user.status,
       },
     };
   }
@@ -377,6 +378,7 @@ export class AuthService {
         userId: newUser.id,
         email: newUser.email,
         username: newUser.username ?? undefined,
+        status: newUser.status,
       },
     };
   }
@@ -442,6 +444,7 @@ export class AuthService {
         userId: user.id,
         email: user.email,
         username: user.username ?? undefined,
+        status: user.status,
       },
     };
   }
@@ -449,7 +452,13 @@ export class AuthService {
   async getCurrentUser(userId: string): Promise<AuthUser> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, username: true, deletedAt: true },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        status: true,
+        deletedAt: true,
+      },
     });
 
     if (!user || user.deletedAt) {
@@ -460,6 +469,7 @@ export class AuthService {
       userId: user.id,
       email: user.email,
       username: user.username ?? undefined,
+      status: user.status,
     };
   }
 

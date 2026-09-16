@@ -11,15 +11,21 @@ datasource db {
   url      = env("AUTH_SERVICE_MONGODB")
 }
 
+enum UserStatus {
+  pending
+  active
+}
+
 model User {
-  id                    String    @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
+  id                    String     @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
   deletedAt             DateTime?
-  email                 String    @unique
-  roles                 String[] @default([])
+  email                 String     @unique
+  roles                 String[]   @default([])
   password              String
   username              String?
+  status                UserStatus @default(pending)
   refreshToken          String?
   refreshTokenExpiresAt Int?
   sessionExpiresAt      Int?

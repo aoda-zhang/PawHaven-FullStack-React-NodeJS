@@ -15,7 +15,7 @@ export const TokenTypeSchema = z.enum(['access', 'refresh']);
 
 export type TokenType = z.infer<typeof TokenTypeSchema>;
 
-export const JwtVerifyInfoSchema = UserSchema.extend({
+export const JwtVerifyInfoSchema = UserSchema.omit({ status: true }).extend({
   type: TokenTypeSchema.optional(),
   iat: z.number().optional(),
   exp: z.number().optional(),

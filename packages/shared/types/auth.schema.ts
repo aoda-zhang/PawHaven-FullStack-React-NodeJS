@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { UserStatusSchema } from './user-status.js';
+
 /**
  * Auth schemas used by frontend & backend
  */
@@ -9,6 +11,7 @@ export const UserSchema = z.object({
   email: z.email(),
   username: z.string().optional(),
   roles: z.array(z.string()).optional(),
+  status: UserStatusSchema,
 });
 
 export type User = z.infer<typeof UserSchema>;
