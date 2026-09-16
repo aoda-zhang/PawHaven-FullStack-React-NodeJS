@@ -48,7 +48,7 @@
     "globalMN": "系统正在维护中，请稍后再试。",
     "scheduledMN": "我们将在 {{time}} 进行系统维护，期间部分功能可能不可用。",
     "partialMN": "部分功能正在维护中，请耐心等待。",
-    "mockDataWarning": "本站正在快速开发中，旨在为流浪动物救助提供便利。目前展示内容均为 Mock 数据，谢谢理解与支持！"
+    "mockDataWarning": "本网站正在快速开发中，旨在为流浪动物救助提供便利。目前功能暂不完善，感谢关注与支持！"
   },
   "carousel": {
     "previous": "上一张",
@@ -384,7 +384,6 @@
     },
     "bottom_bar": {
       "license": "开源项目——MIT 许可证。",
-      "systems_operational": "所有系统正常运行",
       "built_with": "用 ❤️ 为每一个流浪生命而建"
     }
   },

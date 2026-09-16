@@ -30,7 +30,10 @@ export class ReportAnimalService {
           description: dto.description,
           size: dto.size,
           animalCount: dto.animalCount,
-          reporterId: claims.sub,
+          reporter: {
+            reporterID: claims.sub,
+            reporterName: claims.username?.trim() || null,
+          },
           reporterPhotos: dto.reporterPhotos,
         },
       });

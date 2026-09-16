@@ -31,6 +31,7 @@ export type RescueContactInfo = z.infer<typeof RescueContactInfoSchema>;
 
 export const RescueReporterSchema = z.object({
   reporterId: z.string(),
+  reporterName: z.string().nullable(),
 });
 
 export type RescueReporter = z.infer<typeof RescueReporterSchema>;

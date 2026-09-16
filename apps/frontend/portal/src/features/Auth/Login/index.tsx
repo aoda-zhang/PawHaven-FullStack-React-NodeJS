@@ -83,7 +83,7 @@ export const Login = () => {
           <span>{t('auth.no_account')} </span>
           <button
             type="button"
-            className="text-primary font-semibold"
+            className="text-primary cursor-pointer font-semibold"
             onClick={() => {
               navigate(routePaths.register);
             }}

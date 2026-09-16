@@ -66,6 +66,9 @@ export class InternalJwtService {
     if (identity.roles !== undefined) {
       claims.roles = identity.roles;
     }
+    if (identity.username) {
+      claims.username = identity.username;
+    }
     return claims;
   }
 }

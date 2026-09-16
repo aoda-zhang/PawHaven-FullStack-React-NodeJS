@@ -80,7 +80,7 @@ export const Register = () => {
           <span>{t('auth.with_account')} </span>
           <button
             type="button"
-            className="text-primary font-semibold"
+            className="text-primary cursor-pointer font-semibold"
             onClick={() => {
               navigate(routePaths.login);
             }}

@@ -14,7 +14,7 @@ const GUIDES: Guide[] = [
     icon: '🚨',
     title: 'guide_injured',
     readTime: 'guide_injured_read',
-    highlight: 'bg-pink-50',
+    highlight: 'bg-background-soft',
   },
   {
     icon: '🐱',
@@ -26,7 +26,7 @@ const GUIDES: Guide[] = [
     icon: '🚗',
     title: 'guide_vehicle',
     readTime: 'guide_vehicle_read',
-    highlight: 'bg-amber-50',
+    highlight: 'bg-background-soft',
   },
 ];
 

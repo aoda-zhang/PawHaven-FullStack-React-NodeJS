@@ -148,10 +148,15 @@ model animalReports {
   description       String
   size              String
   animalCount       Int
-  reporterId        String
+  reporter          Reporter?
   reporterPhotos    String[]
 
   @@index([animalStatus])
+}
+
+type Reporter {
+  reporterID   String
+  reporterName String?
 }
 
 model AdoptablePet {

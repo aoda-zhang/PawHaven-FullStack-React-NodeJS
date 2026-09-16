@@ -18,7 +18,6 @@ const MAX_PHOTO_SIZE_MB = 10;
 const MAX_PHOTO_SIZE_BYTES = MAX_PHOTO_SIZE_MB * BYTES_PER_MB;
 const BASE64_CHARS_PER_GROUP = 4;
 const BASE64_BYTES_PER_GROUP = 3;
-const CONTACT_NAME_MAX_LENGTH = 50;
 const CONTACT_EMAIL_MAX_LENGTH = 100;
 
 /**
@@ -59,13 +58,6 @@ export const reporterPhotosSchema = z
 
 const contactInfoSchema = z
   .object({
-    name: z
-      .string()
-      .min(1, 'Name is required')
-      .max(
-        CONTACT_NAME_MAX_LENGTH,
-        `Name too long (max ${CONTACT_NAME_MAX_LENGTH} characters)`,
-      ),
     phone: z
       .string()
       .min(1, 'Phone is required')

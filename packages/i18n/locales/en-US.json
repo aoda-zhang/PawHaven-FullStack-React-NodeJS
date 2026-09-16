@@ -48,7 +48,7 @@
     "globalMN": "The system is currently under maintenance. Please try again later.",
     "scheduledMN": "Scheduled maintenance will take place at {{time}}. Some features may be temporarily unavailable.",
     "partialMN": "Some features are under maintenance. Thank you for your patience.",
-    "mockDataWarning": "This site is under rapid development to support stray animal rescue. All displayed data is mock. Thank you for your understanding!"
+    "mockDataWarning": "This website is under rapid development to support stray animal rescue. Features are not yet complete. Thank you for your interest and support!"
   },
   "carousel": {
     "previous": "Previous slide",
@@ -386,7 +386,6 @@
     },
     "bottom_bar": {
       "license": "Open source — MIT License.",
-      "systems_operational": "All systems operational",
       "built_with": "Built with ❤️ for every stray life"
     }
   },

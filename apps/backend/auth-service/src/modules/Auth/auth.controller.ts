@@ -107,4 +107,18 @@ export class AuthController {
   async me(@InternalJwt() claims: AuthenticatedInternalJwt): Promise<AuthUser> {
     return this.authService.getCurrentUser(claims.sub);
   }
+
+  @Public()
+  @Get('/volunteer-count')
+  async getVolunteerCount(): Promise<{ count: number }> {
+    return { count: await this.authService.getVolunteerCount() };
+  }
+
+  @Post('/volunteer/opt-in')
+  async optInVolunteer(
+    @InternalJwt() claims: AuthenticatedInternalJwt,
+  ): Promise<{ success: boolean }> {
+    await this.authService.optInVolunteer(claims.sub);
+    return { success: true };
+  }
 }

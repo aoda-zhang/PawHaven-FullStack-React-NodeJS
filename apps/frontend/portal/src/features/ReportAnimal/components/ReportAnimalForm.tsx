@@ -91,7 +91,6 @@ export const ReportAnimalForm = () => {
       reporterPhotos,
       description,
       contactInfo: {
-        name: 'Anonymous',
         phone: values.contactPhone.trim(),
         email: '',
       },

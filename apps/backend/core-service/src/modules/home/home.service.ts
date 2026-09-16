@@ -1,13 +1,19 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { InjectPrisma } from '@pawhaven/backend-core';
-import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { AnimalStatus, HeroStats, HomeData } from '@pawhaven/shared/types';
+import { HttpClientService, InjectPrisma } from '@pawhaven/backend-core';
+import {
+  databaseEngines,
+  microServiceNames,
+} from '@pawhaven/backend-core/constants';
+import {
+  AnimalStatus,
+  ApiResponseEnvelope,
+  HeroStats,
+  HomeData,
+} from '@pawhaven/shared/types';
 import { PrismaClient } from '@prismaClient/index.js';
 
 import { AdoptionService } from '../adoption/adoption.service.js';
 import { RescueService } from '../rescue/rescue.service.js';
-
-const VOLUNTEER_BASELINE = 120;
 
 const LATEST_RESCUE_LIMIT = 4;
 
@@ -17,11 +23,16 @@ const ADOPTABLE_PET_LIMIT = 6;
 export class HomeService {
   private readonly logger = new Logger(HomeService.name);
 
+  private readonly authClient = this.httpClientService.create(
+    microServiceNames.AUTH,
+  );
+
   constructor(
     @InjectPrisma(databaseEngines.mongodb)
     private readonly prisma: PrismaClient,
     private readonly rescueService: RescueService,
     private readonly adoptionService: AdoptionService,
+    private readonly httpClientService: HttpClientService,
   ) {}
 
   async getStats(): Promise<HeroStats> {
@@ -41,10 +52,13 @@ export class HomeService {
         }),
       ]);
 
+      const { data } =
+        await this.authClient.get<ApiResponseEnvelope>('/volunteer-count');
+      const { count } = data as { count: number };
       return {
         totalRescues,
         totalAdopted: adoptedRescues + adoptedPets,
-        totalVolunteers: VOLUNTEER_BASELINE,
+        totalVolunteers: count,
       };
     } catch (error) {
       this.logger.error('Failed to compute hero stats', error);

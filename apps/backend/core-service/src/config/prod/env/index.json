@@ -46,5 +46,15 @@
     },
     "ttlSeconds": 45,
     "clockSkewSeconds": 30
-  }
+  },
+  "microServices": [
+    {
+      "name": "auth-service",
+      "enable": true,
+      "options": {
+        "host": "${AUTH_SERVICE_HOST}",
+        "port": 8082
+      }
+    }
+  ]
 }

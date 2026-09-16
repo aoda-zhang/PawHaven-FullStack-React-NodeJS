@@ -82,9 +82,12 @@ export class HttpClientInstance {
   private getFullURL(path: string): string {
     const currentMicroserviceOption = this.getCurrentMicroserviceOption();
     const cleanedBase = this.resolveServiceOrigin(currentMicroserviceOption);
+    const routePrefix = `/${this.serviceName}`.replace(/\/+$/, '');
     const cleanedPath = path?.trim()?.replace(/^\/+/, '');
 
-    const fullUrl = cleanedPath ? `${cleanedBase}/${cleanedPath}` : cleanedBase;
+    const fullUrl = cleanedPath
+      ? `${cleanedBase}${routePrefix}/${cleanedPath}`
+      : `${cleanedBase}${routePrefix}`;
     if (!fullUrl) {
       throw new Error(`Invalid composed URL: "${fullUrl}"`);
     }

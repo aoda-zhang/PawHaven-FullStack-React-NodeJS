@@ -47,7 +47,7 @@ export const VolunteerInfo = ({ volunteer }: VolunteerInfoProps) => {
 
             <button
               type="button"
-              className="border-border hover:bg-background-soft w-full rounded-xl border py-2.5 text-sm font-semibold transition-colors"
+              className="border-border hover:bg-background-soft w-full cursor-pointer rounded-xl border py-2.5 text-sm font-semibold transition-colors"
             >
               {t('rescueDetail.offer_assistance')}
             </button>
@@ -62,7 +62,7 @@ export const VolunteerInfo = ({ volunteer }: VolunteerInfoProps) => {
       <div className="border-border bg-card hover:bg-background-soft rounded-2xl border p-3 shadow-sm transition-colors">
         <button
           type="button"
-          className="text-text-secondary hover:text-foreground flex w-full items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"
+          className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"
         >
           <Bookmark className="h-4 w-4" aria-hidden="true" />
           {t('rescueDetail.follow_case')}
@@ -72,7 +72,7 @@ export const VolunteerInfo = ({ volunteer }: VolunteerInfoProps) => {
       <div className="border-border bg-card hover:bg-background-soft rounded-2xl border p-3 shadow-sm transition-colors">
         <button
           type="button"
-          className="text-text-secondary hover:text-foreground flex w-full items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"
+          className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"
         >
           <Share2 className="h-4 w-4" aria-hidden="true" />
           {t('rescueDetail.share_case')}

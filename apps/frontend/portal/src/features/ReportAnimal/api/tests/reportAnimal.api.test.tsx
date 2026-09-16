@@ -35,7 +35,6 @@ const validPayload: AnimalReportDto = {
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg',
   ],
   contactInfo: {
-    name: 'Jane Doe',
     phone: '+49 170 1234567',
   },
 };

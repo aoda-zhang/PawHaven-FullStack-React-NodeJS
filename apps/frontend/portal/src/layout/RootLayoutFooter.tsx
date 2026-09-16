@@ -164,9 +164,6 @@ export const RootLayoutFooter = () => {
             &copy; {currentYear} PawHaven. {t('footer.bottom_bar.license')}
           </p>
           <div className="flex items-center gap-1.5">
-            <span className="bg-success h-2 w-2 animate-pulse rounded-full" />
-            <span>{t('footer.bottom_bar.systems_operational')}</span>
-            <span className="mx-2 text-white/10">|</span>
             <span>{t('footer.bottom_bar.built_with')}</span>
           </div>
         </div>

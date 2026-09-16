@@ -28,6 +28,7 @@ const AuthenticatedInternalJwtSchema = InternalJwtBaseSchema.extend({
   sub: z.string().min(1),
   email: z.email().optional(),
   roles: z.array(z.string()).optional(),
+  username: z.string().optional(),
 });
 
 export const InternalJwtSchema = z.discriminatedUnion('kind', [

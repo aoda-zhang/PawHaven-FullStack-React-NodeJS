@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { HomeService } from './home.service.js';
 
-const VOLUNTEER_BASELINE = 120;
+const VOLUNTEER_COUNT = 7;
 
 type CountResult = number | Error;
 
@@ -17,6 +17,7 @@ const buildService = (
     adoptedPets?: CountResult;
   },
   lists: { rescues?: unknown[]; pets?: unknown[] } = {},
+  volunteerCount: CountResult = VOLUNTEER_COUNT,
 ) => {
   const { totalRescues = 0, adoptedRescues = 0, adoptedPets = 0 } = counts;
 
@@ -39,13 +40,26 @@ const buildService = (
     findAll: vi.fn(() => Promise.resolve(lists.pets ?? [])),
   };
 
+  const httpClientService = {
+    create: vi.fn().mockReturnValue({
+      get: vi
+        .fn()
+        .mockImplementation(() =>
+          volunteerCount instanceof Error
+            ? Promise.reject(volunteerCount)
+            : Promise.resolve({ data: { count: volunteerCount } }),
+        ),
+    }),
+  };
+
   const service = new HomeService(
     prisma as never,
     rescueService as never,
     adoptionService as never,
+    httpClientService as never,
   );
 
-  return { service, animalReportsCount, adoptablePetCount };
+  return { service, animalReportsCount, adoptablePetCount, httpClientService };
 };
 
 describe('HomeService.getStats', () => {
@@ -59,17 +73,17 @@ describe('HomeService.getStats', () => {
     await expect(service.getStats()).resolves.toEqual({
       totalRescues: 10,
       totalAdopted: 5,
-      totalVolunteers: VOLUNTEER_BASELINE,
+      totalVolunteers: VOLUNTEER_COUNT,
     });
   });
 
-  it('reports the volunteer baseline even when there is no activity', async () => {
+  it('reports the volunteer count even when there is no activity', async () => {
     const { service } = buildService({});
 
     await expect(service.getStats()).resolves.toEqual({
       totalRescues: 0,
       totalAdopted: 0,
-      totalVolunteers: VOLUNTEER_BASELINE,
+      totalVolunteers: VOLUNTEER_COUNT,
     });
   });
 
@@ -105,6 +119,18 @@ describe('HomeService.getStats', () => {
       'Failed to compute hero stats',
     );
   });
+
+  it('fails when the auth volunteer-count call rejects', async () => {
+    const { service } = buildService(
+      {},
+      {},
+      new Error('auth service unavailable'),
+    );
+
+    await expect(service.getStats()).rejects.toThrow(
+      'Failed to compute hero stats',
+    );
+  });
 });
 
 describe('HomeService.getHomeData', () => {
@@ -118,7 +144,7 @@ describe('HomeService.getHomeData', () => {
       heroStats: {
         totalRescues: 2,
         totalAdopted: 2,
-        totalVolunteers: VOLUNTEER_BASELINE,
+        totalVolunteers: VOLUNTEER_COUNT,
       },
       latestRescues: [{ id: 'PAW-0001' }],
       adoptablePets: [{ id: 'PET-0001' }],

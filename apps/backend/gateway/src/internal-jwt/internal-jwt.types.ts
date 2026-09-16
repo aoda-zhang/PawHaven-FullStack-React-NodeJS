@@ -13,4 +13,5 @@ export type InternalJwtIdentity =
       sub: string;
       email?: string;
       roles?: string[];
+      username?: string;
     };

@@ -17,7 +17,9 @@ model User {
   updatedAt             DateTime  @updatedAt
   deletedAt             DateTime?
   email                 String    @unique
+  roles                 String[] @default([])
   password              String
+  username              String?
   refreshToken          String?
   refreshTokenExpiresAt Int?
   sessionExpiresAt      Int?

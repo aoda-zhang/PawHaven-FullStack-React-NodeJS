@@ -25,7 +25,7 @@ const validReport = () => ({
   status: 'friendly',
   description: 'Found a stray kitten',
   reporterPhotos: [PHOTO, PHOTO],
-  contactInfo: { name: 'Reporter', phone: '12345678' },
+  contactInfo: { phone: '12345678' },
 });
 
 type ErrorBody = { message?: string[] };
@@ -92,7 +92,7 @@ describe('ReportAnimalController validation', () => {
       ...validReport(),
       animalCount: 0,
       status: 'nope',
-      contactInfo: { name: 'Reporter', phone: 'abc' },
+      contactInfo: { phone: 'abc' },
     });
     const body = (await response.json()) as ErrorBody;
 

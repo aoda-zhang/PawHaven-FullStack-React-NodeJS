@@ -11,7 +11,11 @@ import { AuthUser } from '@pawhaven/shared/types';
 import { AuthResponseDto, JwtVerifyInfo } from '@pawhaven/backend-core/types';
 import { isProd } from '@pawhaven/shared/utils';
 import * as bcrypt from 'bcrypt';
-import { databaseEngines, cookieKeys } from '@pawhaven/backend-core/constants';
+import {
+  databaseEngines,
+  cookieKeys,
+  userRoles,
+} from '@pawhaven/backend-core/constants';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
@@ -107,7 +111,7 @@ export class AuthService {
   }
 
   private signToken(
-    payload: Pick<JwtVerifyInfo, 'userId' | 'email' | 'roles'>,
+    payload: Pick<JwtVerifyInfo, 'userId' | 'email' | 'roles' | 'username'>,
     session: SessionClaims,
   ): string {
     return this.jwtService.sign(
@@ -180,6 +184,11 @@ export class AuthService {
         sessionExpiresAt: null,
       },
     });
+  }
+
+  private deriveUsernameFromEmail(email: string): string {
+    const at = email.indexOf('@');
+    return at > 0 ? email.slice(0, at) : email;
   }
 
   /**
@@ -286,7 +295,11 @@ export class AuthService {
 
     const session = this.getSessionClaims();
     const token = this.signToken(
-      { userId: user.id, email: user.email },
+      {
+        userId: user.id,
+        email: user.email,
+        username: user.username ?? undefined,
+      },
       session,
     );
     const refreshToken = this.generateRefreshToken();
@@ -308,6 +321,7 @@ export class AuthService {
       user: {
         userId: user.id,
         email: user.email,
+        username: user.username ?? undefined,
       },
     };
   }
@@ -330,12 +344,17 @@ export class AuthService {
       data: {
         email,
         password: hashedPassword,
+        username: this.deriveUsernameFromEmail(email),
       },
     });
 
     const session = this.getSessionClaims();
     const token = this.signToken(
-      { userId: newUser.id, email: newUser.email },
+      {
+        userId: newUser.id,
+        email: newUser.email,
+        username: newUser.username ?? undefined,
+      },
       session,
     );
     const refreshToken = this.generateRefreshToken();
@@ -357,6 +376,7 @@ export class AuthService {
       user: {
         userId: newUser.id,
         email: newUser.email,
+        username: newUser.username ?? undefined,
       },
     };
   }
@@ -395,6 +415,7 @@ export class AuthService {
       {
         userId: user.id,
         email: user.email,
+        username: user.username ?? undefined,
       },
       session,
     );
@@ -420,6 +441,7 @@ export class AuthService {
       user: {
         userId: user.id,
         email: user.email,
+        username: user.username ?? undefined,
       },
     };
   }
@@ -427,14 +449,18 @@ export class AuthService {
   async getCurrentUser(userId: string): Promise<AuthUser> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, deletedAt: true },
+      select: { id: true, email: true, username: true, deletedAt: true },
     });
 
     if (!user || user.deletedAt) {
       throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
     }
 
-    return { userId: user.id, email: user.email };
+    return {
+      userId: user.id,
+      email: user.email,
+      username: user.username ?? undefined,
+    };
   }
 
   async logout(refreshToken?: string): Promise<void> {
@@ -449,6 +475,39 @@ export class AuthService {
         refreshTokenExpiresAt: null,
         sessionExpiresAt: null,
       },
+    });
+  }
+
+  async getVolunteerCount(): Promise<number> {
+    return this.prisma.user.count({
+      where: {
+        deletedAt: { isSet: false },
+        roles: { has: userRoles.volunteer },
+      },
+    });
+  }
+
+  async optInVolunteer(userId: string): Promise<void> {
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { roles: true },
+    });
+
+    if (!current) {
+      return;
+    }
+
+    const nextRoles = Array.from(
+      new Set([...(current.roles ?? []), userRoles.volunteer]),
+    );
+
+    if (nextRoles.length === current.roles?.length) {
+      return;
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { roles: { set: nextRoles } },
     });
   }
 }

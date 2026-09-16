@@ -56,17 +56,6 @@ export class InternalJwtGuard implements CanActivate {
     const metadataTargets = [context.getHandler(), context.getClass()];
     const request = context.switchToHttp().getRequest<InternalJwtRequest>();
 
-    let claims: InternalJwt;
-    try {
-      claims = verifyInternalJwt(request.headers, this.verifyOptions);
-    } catch (error) {
-      if (error instanceof InternalJwtVerificationError) {
-        throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
-      }
-      throw error;
-    }
-    request.internalJwt = claims;
-
     const isPublic = this.reflector.getAllAndOverride<boolean>(
       AuthMetadataKey.PUBLIC,
       metadataTargets,
@@ -77,8 +66,27 @@ export class InternalJwtGuard implements CanActivate {
     );
 
     if (isPublic || isOptionalAuth) {
+      try {
+        request.internalJwt = verifyInternalJwt(
+          request.headers,
+          this.verifyOptions,
+        );
+      } catch {
+        // anonymous access — claims stay unset
+      }
       return true;
     }
+
+    let claims: InternalJwt;
+    try {
+      claims = verifyInternalJwt(request.headers, this.verifyOptions);
+    } catch (error) {
+      if (error instanceof InternalJwtVerificationError) {
+        throw new UnauthorizedException(httpBusinessMappingCodes.unauthorized);
+      }
+      throw error;
+    }
+    request.internalJwt = claims;
 
     if (claims.kind === InternalJwtKind.AUTHENTICATED) {
       return true;

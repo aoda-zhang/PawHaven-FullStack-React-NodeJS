@@ -31,7 +31,7 @@ export const RescueDetailContent = ({
       status: t('rescueDetail.timeline_reported'),
       time: formatDateTime(animal.reportedAt, i18n.language),
       description: animal.description ?? animal.statusDescription ?? '',
-      author: t('common.anonymous'),
+      author: animal.reporter.reporterName ?? t('common.anonymous'),
     },
   ];
 
