@@ -30,6 +30,7 @@ export const HTTP_STATUS = {
   CONFLICT: 409,
   // The request method is not supported by the server for the requested resource.
   METHOD_NOT_ALLOWED: 405,
+  BAD_GATEWAY: 502,
   // The server timed out waiting for the request.
   GATEWAY_TIMEOUT: 504,
 } as const;

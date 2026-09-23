@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ReportAnimalService } from './report-animal.service.js';
+import { ReportAnimalService } from './reportAnimal.service.js';
 
 const RECORD_ID = 'RPT-0001';
 const PHOTO = 'data:image/png;base64,AAAA';

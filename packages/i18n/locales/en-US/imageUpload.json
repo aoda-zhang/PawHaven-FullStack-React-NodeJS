@@ -1,0 +1,10 @@
+{
+  "imageUpload": {
+    "add": "Add photos",
+    "remove": "Remove photo",
+    "count": "{{count}}/{{max}}",
+    "too_many": "You can upload up to {{max}} photos",
+    "format": "Only JPG, JPEG or PNG images are allowed",
+    "size": "Each photo must be under {{maxSize}}MB"
+  }
+}

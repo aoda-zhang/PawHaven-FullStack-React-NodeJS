@@ -1,6 +1,6 @@
 # Authentication and Authorization Architecture
 
-> **Version**: v1.5 | **Date**: 2026-09-10
+> **Version**: v1.8 | **Date**: 2026-09-17
 > **Related Docs**: [Route Authentication](./route_authentication.md)
 
 ## Overview
@@ -67,7 +67,6 @@ graph TB
     subgraph "Service Databases"
         AuthDB[(Auth Service DB)]
         CoreDB[(Core Service DB)]
-        DocumentDB[(Document Service DB)]
     end
 
     Portal --> Gateway
@@ -80,7 +79,6 @@ graph TB
 
     AuthService --> AuthDB
     CoreService --> CoreDB
-    DocumentService --> DocumentDB
 ```
 
 > The gateway runs with `internalJwt.enabled: false` (it is the signer, never the enforcer). Downstream services set `enabled: true`, which registers the global `InternalJwtGuard` via `SharedModule.forRoot` defaults.
@@ -254,11 +252,11 @@ Guard behavior:
 
 ## Endpoint Policy (Downstream-Only)
 
-| Service              | `@Public()`                            | `@OptionalAuth()`                                                           | Default (authenticated)                            |
-| -------------------- | -------------------------------------- | --------------------------------------------------------------------------- | -------------------------------------------------- |
-| **auth-service**     | POST `/login`, `/register`, `/refresh` | —                                                                           | POST `/logout`, GET `/me` (DB-backed)              |
-| **core-service**     | —                                      | GET `/bootstrap`, `/home`, rescue list + `:id`, adoptable-pets list + `:id` | all write routes (report-animal, rescue create, …) |
-| **document-service** | —                                      | —                                                                           | all routes                                         |
+| Service              | `@Public()`                            | `@OptionalAuth()`                                                                                                  | Default (authenticated)                                                                                              |
+| -------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **auth-service**     | POST `/login`, `/register`, `/refresh` | —                                                                                                                  | POST `/logout`, GET `/me` (DB-backed)                                                                                |
+| **core-service**     | —                                      | GET `/bootstrap`, `/home`, rescue list + `:id`, adoptable-pets list + `:id`, animal-follow status + follower count | all write routes (report-animal, rescue create, …), animal-follow follow/unfollow                                    |
+| **document-service** | —                                      | —                                                                                                                  | `POST /pdf/render` only — internal, requires `kind:'authenticated'` JWT signed by core-v1 (`aud:'document-service'`) |
 
 ## Config Reference
 
@@ -292,13 +290,15 @@ internalJwt:
 
 Env placeholders (gateway + one per downstream service): `INTERNAL_JWT_SECRET_CORE`, `INTERNAL_JWT_SECRET_AUTH`, `INTERNAL_JWT_SECRET_DOCUMENT`. Key ids: `core-v1`, `auth-v1`, `document-v1` (carried in the JOSE `kid` header; the per-service secrets are unchanged by the JWT switch — no rotation).
 
+For the core→document internal JWT, core-service signs with `INTERNAL_JWT_PRIVATE_KEY_CORE` (`kid:'core-v1'`) and document-service verifies with `INTERNAL_JWT_PUBLIC_KEY_CORE`, trusting `core-v1` — asymmetric, so document-service holds only the public key. `INTERNAL_JWT_SECRET_DOCUMENT` is no longer used for this hop.
+
 ## Component Details
 
 ### API Gateway
 
 - Single entry point for all client requests.
 - Runs no Nest guard pipeline for auth: `InternalJwtService` resolves identity (F1-F4) before signing.
-- Single allowlisted `ProxyController` (`@All('*path')`) proxies only configured prefix→service pairs: `/api/core → core-service`, `/api/auth → auth-service`, `/api/document → document-service`. Unknown prefixes → 404.
+- Single allowlisted `ProxyController` (`@All('*path')`) proxies only configured prefix→service pairs: `/api/core → core-service`, `/api/auth → auth-service`. `document-service` is NOT proxied — it is core-only (see DD-10 in the System Architecture Overview). Unknown prefixes → 404.
 - Proxy safety: strips all inbound `x-auth-*`/`x-gateway-*` headers, rejects `/internal`-after-rewrite and `..` paths, and envelope-wraps 2xx JSON responses only.
 - Signs one `x-gateway-jwt` for every request (anonymous included) with the per-service secret/keyId from `microServices[].options.internalJwt` (`keyId` goes into the JOSE header).
 - The prefix→service map and the internal-JWT keyId/secret are read from `microServices[]` in the gateway YAML. At runtime `MicroServiceRegistry` (`apps/backend/gateway/src/routing/micro-service.registry.ts`) resolves the target by gateway prefix; at boot `GatewayConfigValidator` (`src/routing/gateway-config.validator.ts`) fails closed if any enabled service is missing its `internalJwt` keyId/secret or `internalJwt.ttlSeconds` is outside 30–60s. Routing lives in `src/routing/` (`RoutingModule`), while `src/config/` keeps only the per-environment YAML files.
@@ -317,6 +317,16 @@ Env placeholders (gateway + one per downstream service): `INTERNAL_JWT_SECRET_CO
 - Handlers receive the verified identity (`sub`/`email`/`roles`) through the `@InternalJwt()` param decorator, never from request headers. `@OptionalAuth()` reads use `@InternalJwt({ allowAnonymous: true })` and get the full `InternalJwt` union; authenticated handlers annotate `AuthenticatedInternalJwt` when they need `claims.sub`.
 - GET read endpoints use `@OptionalAuth()` (guest browsing); write endpoints are default-authenticated.
 - **Do not verify browser JWTs** — they verify the gateway-signed internal JWT and trust the gateway for browser sessions.
+
+### Service-to-Service Internal JWT (core-service → document-service)
+
+document-service's one route (`POST /pdf/render`) is reached only by core-service over internal HTTP — the gateway does not proxy it, so there is no gateway-signed JWT in this hop. The trust model differs from the browser flows:
+
+- core-service acts as the **signer** for this hop: it builds a complete `kind:'authenticated'` internal JWT with `aud:'document-service'`, `iat`/`exp`/`rid`/`sub`, signed with `INTERNAL_JWT_PRIVATE_KEY_CORE` and `kid:'core-v1'`.
+- document-service trusts the `core-v1` **public** key (it holds only the public key, never core-service's signing secret). Its global `InternalJwtGuard` (registered via `SharedModule.forRoot`, `internalJwt.enabled: true`, `trustedKeyIds` including `core-v1`) verifies the token fail closed, applying the same `aud` + lifetime + zod checks as any downstream guard.
+- The claims set is the same `AuthenticatedInternalJwt` union (`packages/shared/types/internal-jwt.schema.ts`); because `aud` is `document-service`, the exact-audience check passes only for this call.
+
+> Note: this is a core-signed internal JWT, not a gateway-signed one. document-service is never the audience of a gateway proxy because the gateway no longer exposes a `/api/document` prefix (see DD-10 in the System Architecture Overview).
 
 ### Decorators (`packages/backend-core/decorators` + `dynamicModules/internalJwt/`)
 

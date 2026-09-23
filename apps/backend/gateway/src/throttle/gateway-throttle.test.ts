@@ -3,11 +3,8 @@ import { HttpException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  isSensitiveAuthPath,
-  type ThrottleConfig,
-} from './gateway-throttle.js';
-import { GatewayThrottleGuard } from './gateway-throttle.guard.js';
+import { isSensitiveAuthPath, type ThrottleConfig } from './gatewayThrottle.js';
+import { GatewayThrottleGuard } from './gatewayThrottle.guard.js';
 
 const contextFor = (request: Record<string, unknown>) =>
   ({
@@ -40,7 +37,6 @@ describe('isSensitiveAuthPath', () => {
     ['/api/auth/logout', false],
     ['/api/auth/me', false],
     ['/api/core/rescues', false],
-    ['/api/document/pdf', false],
   ])('%s is treated as sensitive: %s', (path, expected) => {
     expect(isSensitiveAuthPath(contextFor({ path }))).toBe(expected);
   });

@@ -1,0 +1,12 @@
+{
+  "animalFollow": {
+    "follow": "Verlauf folgen",
+    "unfollow": "Nicht mehr folgen",
+    "following": "Verlauf gefolgt",
+    "followers_count": "{{count}} Personen folgen",
+    "followers_count_one": "{{count}} Person folgt",
+    "followers_count_other": "{{count}} Personen folgen",
+    "follow_error": "Folgen fehlgeschlagen. Bitte später erneut versuchen.",
+    "unfollow_error": "Folgen konnte nicht beendet werden. Bitte später erneut versuchen."
+  }
+}

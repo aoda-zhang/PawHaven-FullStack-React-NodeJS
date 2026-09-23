@@ -1,0 +1,26 @@
+{
+  "errorMessage": {
+    "TOKEN_EXPIRED": "登录已过期，请重新登录。",
+    "INVALID_TOKEN": "无效的访问令牌，请重新登录。",
+    "USER_NOT_FOUND": "用户不存在，请检查用户名。",
+    "INVALID_PASSWORD": "密码错误，请重新输入。",
+    "INVALID_CREDENTIALS": "邮箱或密码错误，请重试。",
+    "PERMISSION_DENIED": "您没有权限执行该操作。",
+    "EMAIL_ALREADY_EXISTS": "邮箱已被注册，请使用其他邮箱。",
+    "USERNAME_ALREADY_EXISTS": "用户名已存在，请更换用户名。",
+    "RESOURCE_CONFLICT": "资源冲突，请稍后再试。",
+    "DATA_VALIDATION_FAILED": "输入的数据不符合要求，请检查后重试。",
+    "OPERATION_TIMEOUT": "操作超时，请稍后重试。",
+    "SERVICE_UNAVAILABLE": "服务暂时不可用，请稍后再试。",
+    "EXCEEDED_RATE_LIMIT": "请求过于频繁，请稍后再试。",
+    "DUPLICATE_SUBMISSION": "重复提交，请勿重复操作。",
+    "SESSION_EXPIRED": "会话已过期，请重新登录。",
+    "ERR_NETWORK": "网络异常，请检查网络后重试",
+    "UNKNOWN_ERROR": "系统发生未知错误，请稍后重试或联系支持。",
+    "TOKEN_MISSING": "未提供访问令牌，请重新登录。",
+    "INVALID_SIGNATURE": "令牌签名无效，请重新登录。",
+    "UNAUTHORIZED": "您尚未登录，请先登录。",
+    "INVALID_REFRESH_TOKEN": "登录已过期，请重新登录。",
+    "SERVER_ERROR": "服务器发生异常，请稍后重试。"
+  }
+}

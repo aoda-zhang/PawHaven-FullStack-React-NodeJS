@@ -15,7 +15,8 @@
     "src/**"
   ],
   "scripts": {
-    "token-check": "node scripts/token-check.cjs"
+    "token-check": "node scripts/token-check.cjs",
+    "build:tokens": "node ./scripts/build-tokens.mjs"
   },
   "devDependencies": {
     "@pawhaven/eslint-config": "workspace:*",

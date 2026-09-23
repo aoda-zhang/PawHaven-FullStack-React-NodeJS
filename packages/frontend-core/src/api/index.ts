@@ -16,6 +16,13 @@ import { RequestMode } from './types';
  * Configuration options for creating an API client instance.
  */
 
+interface BinaryRequestConfig extends AxiosRequestConfig {
+  bypassEnvelope?: boolean;
+}
+
+const bypassesEnvelope = (config?: AxiosRequestConfig): boolean =>
+  Boolean((config as BinaryRequestConfig | undefined)?.bypassEnvelope);
+
 /**
  * Factory function to create a reusable API client with common interceptors and headers.
  */
@@ -63,7 +70,10 @@ export const createApiClient = (options: ApiClientOptions) => {
   // ✅ Response interceptor
   Http.interceptors.response.use(
     (response: AxiosResponse<ApiResponseType>) => {
-      if (requestMode === RequestMode.resource) {
+      if (
+        requestMode === RequestMode.resource ||
+        bypassesEnvelope(response.config)
+      ) {
         return response;
       }
 
@@ -112,11 +122,32 @@ export const createApiClient = (options: ApiClientOptions) => {
       return Http.put(url, data, { ...config }) as Promise<T>;
     },
     download(url: string, config?: AxiosRequestConfig): Promise<Blob> {
-      return Http.get(url, {
+      const binaryRequest: BinaryRequestConfig = {
         responseType: 'blob',
         transformResponse: (r) => r,
+        bypassEnvelope: true,
         ...config,
-      }).then((res: AxiosResponse<Blob>) => res.data);
+      };
+
+      return Http.get(url, binaryRequest).then(
+        (res: AxiosResponse<Blob>) => res.data,
+      );
+    },
+    postBlob<D = Record<string, unknown>>(
+      url: string,
+      data?: D,
+      config?: AxiosRequestConfig,
+    ): Promise<Blob> {
+      const binaryRequest: BinaryRequestConfig = {
+        responseType: 'blob',
+        transformResponse: (r) => r,
+        bypassEnvelope: true,
+        ...config,
+      };
+
+      return Http.post(url, data, binaryRequest).then(
+        (res: AxiosResponse<Blob>) => res.data,
+      );
     },
   };
 };

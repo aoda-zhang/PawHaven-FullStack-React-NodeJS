@@ -1,0 +1,82 @@
+{
+  "injuryResponse": {
+    "brand": "PawHaven Ratgeber-Bibliothek",
+    "title": "Verletzte Tiere im Feld versorgen",
+    "subtitle": "Wie du ein verletztes Tier sichtest, stabilisierst und transportierst, ohne die Verletzung zu verschlimmern.",
+    "sections": [
+      {
+        "title": "Die Stelle sicher machen",
+        "text": "Ein zweiter Verletzter hilft niemandem. Verkehr, Feuer und Wasser kommen vor dem Tier.",
+        "bullets": [
+          "Sicher anhalten, Warnblinklicht an und nach Möglichkeit Warnkegel oder Markierung aufstellen.",
+          "Dich langsam von der Seite nähern, leise sprechen und plötzliche Bewegungen vermeiden.",
+          "Arme vor dem Kontakt mit Handtuch, Jacke oder Decke schützen."
+        ]
+      },
+      {
+        "title": "In sechzig Sekunden sichten",
+        "text": "Tritt einen Schritt zurück und lies das ganze Tier: Atemanstrengung, Zahnfleischfarbe, Blutung und ob alle vier Beine beweglich sind. Das auffälligste Problem ist selten das dringendste."
+      },
+      {
+        "title": "Zuerst die Blutung stoppen",
+        "text": "Starke Blutungen töten lange vor einem Knochenbruch. Fester direkter Druck reicht fast immer.",
+        "bullets": [
+          "Eine saubere Kompresse drei Minuten lang fest auf die Wunde drücken.",
+          "Eine vollgesogene Kompresse nie abnehmen – eine neue darüber legen.",
+          "Einen Abbindeverband nur für eine Gliedmaße reservieren, die sich anders nicht stoppen lässt."
+        ]
+      },
+      {
+        "title": "Vermutete Brüche schützen",
+        "text": "Bei jedem von einem Fahrzeug erfassten Tier ist eine Wirbelsäulenverletzung anzunehmen. Bewegung kann eine heilbare Verletzung in dauerhafte Lähmung verwandeln.",
+        "bullets": [
+          "Keine Gliedmaße richten und keine vermutete Wirbelsäule bandagieren.",
+          "Das Tier zum Transport auf ein Brett, einen Karton oder eine gefaltete Decke schieben.",
+          "Bewegung auf das absolute Minimum begrenzen und den Körper gegen Rollen abpolstern."
+        ]
+      },
+      {
+        "title": "An die richtige Stelle bringen",
+        "text": "Ruf vorher an, damit ein Team bereitsteht – unangekündigtes Eintreffen wird oft hinter geplante Operationen einsortiert.",
+        "bullets": [
+          "Die Box abdecken; Dunkelheit und Ruhe senken die Panik messbar.",
+          "Das Fahrzeug warm halten und Berührung auf notwendige Kontrollen beschränken.",
+          "Das Tier sofort hineintragen und nie im geparkten Auto lassen."
+        ]
+      },
+      {
+        "title": "Das ganze Bild übergeben",
+        "text": "Was du am Fundort gesehen hast, sind Befunde, die die Klinik nicht nachträglich erheben kann. Gib sie weiter, bevor du gehst – am besten schriftlich."
+      }
+    ],
+    "checklist": {
+      "title": "Was du der Klinik mitteilen musst",
+      "items": [
+        "Tierart, ungefähres Alter und geschätztes Gewicht.",
+        "Fundort und die wahrscheinliche Ursache der Verletzung.",
+        "Zeitpunkt des Geschehens und Verhalten am Fundort.",
+        "Alle sichtbaren Verletzungen, auch Blut aus Nase, Maul oder Ohren.",
+        "Jede Maßnahme von dir – Druckverband, Bandagen, Wasser, Medikamente.",
+        "Zeitpunkt der letzten Fütterung, Wasseraufnahme und des Urinierens."
+      ]
+    },
+    "contacts": {
+      "title": "Wen du anrufst",
+      "items": [
+        {
+          "label": "Notfallpraxis",
+          "value": "Vorher anrufen und Verletzungen beschreiben"
+        },
+        {
+          "label": "PawHaven-Rettungsteam",
+          "value": "pawhaven.work"
+        },
+        {
+          "label": "Notfalldienste",
+          "value": "112 / 911"
+        }
+      ]
+    },
+    "disclaimer": "Feldversorgung stabilisiert, sie behandelt nicht. Jedes Tier mit Atemnot, unstillbarer Blutung oder vermuteter Wirbelsäulenverletzung gehört sofort zum Tierarzt."
+  }
+}

@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+@import './pdfRunTime/tokens/index.css';
+@import './pdfRunTime/theme.css';
+
+@source '../templates/**/*.tsx';
+@source '../components/**/*.tsx';
+
+@utility text-label {
+  font-size: var(--font-size-sm);
+  line-height: var(--leading-tight);
+}
+
+@utility text-fineprint {
+  font-size: var(--font-size-xs);
+  line-height: var(--leading-normal);
+}
+
+@utility tracking-label {
+  letter-spacing: var(--tracking-wide);
+}
+
+@utility tracking-fineprint {
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility tracking-print {
+  letter-spacing: var(--tracking-wide);
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    color: #1b1b19;
+    font-family:
+      -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+      Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',
+      'Noto Sans SC', 'Noto Sans CJK SC', sans-serif;
+    font-size: 12px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

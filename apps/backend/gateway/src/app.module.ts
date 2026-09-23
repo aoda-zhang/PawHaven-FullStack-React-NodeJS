@@ -7,10 +7,11 @@ import {
   SharedModule,
 } from '@pawhaven/backend-core';
 import { microServiceNames } from '@pawhaven/backend-core/constants';
+import { MiddlewareModule } from '@pawhaven/backend-core/middlewares';
 
 import { ProxyModule } from './proxy/proxy.module.js';
-import { GatewayThrottleGuard } from './throttle/gateway-throttle.guard.js';
-import { ThrottleConfigValidator } from './throttle/throttle-config.validator.js';
+import { GatewayThrottleGuard } from './throttle/gatewayThrottle.guard.js';
+import { ThrottleConfigValidator } from './throttle/throttleConfig.validator.js';
 
 const configContext = import.meta.webpackContext('./config', {
   recursive: true,
@@ -25,6 +26,7 @@ const configContext = import.meta.webpackContext('./config', {
       configSources: collectServiceConfigSources(configContext),
       modules: [],
     }),
+    MiddlewareModule,
     ProxyModule,
   ],
   providers: [

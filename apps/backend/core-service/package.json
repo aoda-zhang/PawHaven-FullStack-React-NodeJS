@@ -33,6 +33,7 @@
     "@nestjs/swagger": "^12.0.0",
     "@nestjs/terminus": "^12.0.0",
     "@pawhaven/backend-core": "workspace:*",
+    "@pawhaven/i18n": "workspace:*",
     "@pawhaven/shared": "workspace:*",
     "@prisma/client": "^6.19.1",
     "@prismaClient/index.js": "link:./src/prisma/mongodb/client",

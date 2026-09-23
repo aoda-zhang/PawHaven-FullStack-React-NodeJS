@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-import { AuthModule } from '@modules/Auth/auth.module.js';
+import { AuthModule } from '@modules/auth/auth.module.js';
 import { Module } from '@nestjs/common';
 import {
   collectServiceConfigSources,

@@ -1,0 +1,79 @@
+{
+  "firstAid": {
+    "brand": "PawHaven Rescue Library",
+    "title": "Pet First Aid Reference",
+    "subtitle": "What you can safely do in the first minutes after an accident — and the warning signs that mean stop and drive to a clinic.",
+    "sections": [
+      {
+        "title": "Check Airway, Breathing, Circulation",
+        "text": "Nothing else matters until you know air is moving. Work from the head downwards, and only move the animal if staying put is more dangerous.",
+        "bullets": [
+          "Airway: open the mouth gently and check for vomit, blood or a foreign object.",
+          "Breathing: watch the chest for ten seconds — 15 to 35 breaths per minute is normal for dogs and cats.",
+          "Circulation: press the gum line; colour should return within two seconds."
+        ]
+      },
+      {
+        "title": "Control Bleeding",
+        "text": "Firm direct pressure beats every clever technique. Do not remove clots that have already formed, and avoid tourniquets unless a limb is bleeding uncontrollably.",
+        "bullets": [
+          "Press a clean cloth firmly onto the wound for three minutes without peeking.",
+          "Stack more padding on top instead of swapping a soaked dressing.",
+          "Elevate the limb only if doing so causes no obvious pain."
+        ]
+      },
+      {
+        "title": "Support Breathing and CPR",
+        "text": "Start CPR only when the animal is not breathing and you cannot feel a heartbeat. Work to a rhythm of roughly 30 compressions followed by two rescue breaths.",
+        "bullets": [
+          "Lay the animal on its right side on a firm surface.",
+          "Compress the chest 2 to 3 cm deep, around 100 to 120 times per minute.",
+          "For rescue breathing, close the mouth and breathe gently until the chest rises."
+        ]
+      },
+      {
+        "title": "Clear a Choking Airway",
+        "text": "A choking animal may paw at its mouth, gag or make a high-pitched noise. Only reach inside if you can actually see the object — blind sweeps push it deeper.",
+        "bullets": [
+          "Use a hooked finger only when the item is visible and loose.",
+          "Small animals: support the body head-down and give two sharp blows between the shoulder blades.",
+          "If it loses consciousness, begin rescue breathing and drive to the clinic."
+        ]
+      },
+      {
+        "title": "Cool Down Heatstroke",
+        "text": "Heatstroke kills quickly, but cooling too aggressively is also dangerous. Aim for steady reduction rather than ice.",
+        "bullets": [
+          "Move into shade and wet the body with cool — never ice-cold — water.",
+          "Point a fan at the damp fur; the evaporation is what removes heat.",
+          "Offer small sips of water and stop active cooling once panting settles."
+        ]
+      },
+      {
+        "title": "Handle Suspected Poisoning",
+        "text": "Bring the packaging with you. Treatment depends on the exact substance, and guessing wastes time the animal does not have.",
+        "bullets": [
+          "Never induce vomiting unless a veterinarian tells you to.",
+          "Rinse contaminated fur with warm water and mild soap, keeping the animal warm.",
+          "Write down the product name, the estimated amount and the time it happened."
+        ]
+      },
+      {
+        "title": "Prepare for Shock",
+        "text": "Shock can follow any serious injury. Keep the animal warm, quiet and still, leave the head slightly above the body, and get help — this is not something to treat at home."
+      }
+    ],
+    "checklist": {
+      "title": "Stop treating and drive to a clinic if:",
+      "items": [
+        "Breathing is laboured, noisy, or has stopped.",
+        "Bleeding continues after five minutes of firm pressure.",
+        "The gums are white, blue or bright red.",
+        "The animal has collapsed, is seizing, or cannot stand.",
+        "You suspect poisoning, a snake bite or a fall from height.",
+        "There is a suspected fracture, or it cannot feel its legs."
+      ]
+    },
+    "disclaimer": "This reference supports professional veterinary care; it never replaces it. Always call a clinic and describe exactly what you did."
+  }
+}

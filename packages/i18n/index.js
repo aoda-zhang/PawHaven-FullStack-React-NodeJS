@@ -1,28 +1,51 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import resourcesToBackend from 'i18next-resources-to-backend';
+import { initReactI18next } from 'react-i18next';
+
 import { supportedLngs } from './supportedLngs';
+
+const cookieExpirationDays = 365;
+const hoursPerDay = 24;
+const minutesPerHour = 60;
+const cookieMinutes = cookieExpirationDays * hoursPerDay * minutesPerHour;
+
+const localeFilePattern = /^\.\/locales\/([^/]+)\//;
+
+const localeLoaders = Object.entries(
+  import.meta.glob('./locales/*/*.json'),
+).reduce((loadersByLocale, [modulePath, loadModule]) => {
+  const locale = modulePath.match(localeFilePattern)?.[1];
+
+  if (!locale) {
+    return loadersByLocale;
+  }
+
+  return {
+    ...loadersByLocale,
+    [locale]: [...(loadersByLocale[locale] ?? []), loadModule],
+  };
+}, {});
+
+const loadLocaleResources = async (locale) => {
+  const loaders = localeLoaders[locale] ?? [];
+  const loadedFiles = await Promise.all(
+    loaders.map((loadModule) => loadModule()),
+  );
+
+  return Object.assign({}, ...loadedFiles.map((module) => module.default));
+};
 
 i18n
   .use(LanguageDetector)
-  .use(
-    resourcesToBackend((locale, namespace) => {
-      if (namespace && namespace !== 'translation') {
-        return import(`./locales/${namespace}/${locale}.json`);
-      }
-      return import(`./locales/${locale}.json`);
-    }),
-  )
+  .use(resourcesToBackend((locale) => loadLocaleResources(locale)))
   .use(initReactI18next)
   .init({
     supportedLngs,
     fallbackLng: {
       default: ['en-US'],
       'zh-CN': ['zh-CN'],
-      zh: ['zh-CN'],
       'de-DE': ['de-DE'],
-      de: ['de-DE'],
     },
     preload: ['en-US'],
 
@@ -37,7 +60,7 @@ i18n
       order: ['localStorage', 'navigator', 'htmlTag'],
       lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage'],
-      cookieMinutes: 365 * 24 * 60,
+      cookieMinutes,
     },
 
     debug: false,
@@ -48,4 +71,4 @@ i18n
     },
   });
 
-export default i18n;
+export { i18n };

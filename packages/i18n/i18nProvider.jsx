@@ -1,8 +1,9 @@
-import { I18nextProvider } from 'react-i18next';
-import i18n from '.';
 import { Suspense } from 'react';
+import { I18nextProvider } from 'react-i18next';
 
-function I18nLoadingFallback() {
+import { i18n } from '.';
+
+const I18nLoadingFallback = () => {
   return (
     <div
       role="status"
@@ -20,7 +21,7 @@ function I18nLoadingFallback() {
       Loading...
     </div>
   );
-}
+};
 
 export const I18nProvider = ({ children }) => {
   return (

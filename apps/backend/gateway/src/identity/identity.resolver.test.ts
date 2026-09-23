@@ -9,17 +9,17 @@ import {
 import type { Request, Response } from 'express';
 import { describe, expect, it, vi } from 'vitest';
 
-import { InternalJwtService } from '../internal-jwt/internal-jwt.service.js';
+import { InternalJwtService } from '../internal-jwt/internalJwt.service.js';
 import type {
   InternalJwtIdentity,
   InternalJwtTarget,
-} from '../internal-jwt/internal-jwt.types.js';
+} from '../internal-jwt/InternalJwt.types.js';
 
 import { IdentityResolver } from './identity.resolver.js';
 
 const SECRET = 'identity-resolver-test-secret';
 const AUDIENCE = 'core-service';
-const KEY_ID = 'core-v1';
+const KEY_ID = 'internal-v1';
 const MS_PER_SECOND = 1000;
 const FAR_FUTURE_SECONDS = 60 * 60 * 24;
 const TRACE_ID = 'trace-1';

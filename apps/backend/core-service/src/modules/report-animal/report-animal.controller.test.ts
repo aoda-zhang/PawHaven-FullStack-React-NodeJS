@@ -6,8 +6,8 @@ import { InternalJwtKind } from '@pawhaven/backend-core/types';
 import type { RequestHandler } from 'express';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ReportAnimalController } from './report-animal.controller.js';
-import { ReportAnimalService } from './report-animal.service.js';
+import { ReportAnimalController } from './reportAnimal.controller.js';
+import { ReportAnimalService } from './reportAnimal.service.js';
 
 const HTTP_STATUS_CREATED = 201;
 const HTTP_STATUS_BAD_REQUEST = 400;

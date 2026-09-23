@@ -1,0 +1,26 @@
+{
+  "errorMessage": {
+    "TOKEN_EXPIRED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "INVALID_TOKEN": "Ungültiges Zugriffstoken. Bitte melden Sie sich erneut an.",
+    "USER_NOT_FOUND": "Benutzer nicht gefunden. Bitte überprüfen Sie den Benutzernamen.",
+    "INVALID_PASSWORD": "Falsches Passwort. Bitte versuchen Sie es erneut.",
+    "INVALID_CREDENTIALS": "Ungültige E-Mail-Adresse oder ungültiges Passwort. Bitte versuchen Sie es erneut.",
+    "PERMISSION_DENIED": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
+    "EMAIL_ALREADY_EXISTS": "Die E-Mail ist bereits registriert. Bitte verwenden Sie eine andere E-Mail.",
+    "USERNAME_ALREADY_EXISTS": "Der Benutzername existiert bereits. Bitte wählen Sie einen anderen Namen.",
+    "RESOURCE_CONFLICT": "Ressourcenkonflikt. Bitte versuchen Sie es später erneut.",
+    "DATA_VALIDATION_FAILED": "Die eingegebenen Daten sind ungültig. Bitte überprüfen Sie sie und versuchen Sie es erneut.",
+    "OPERATION_TIMEOUT": "Die Aktion ist abgelaufen. Bitte versuchen Sie es später erneut.",
+    "SERVICE_UNAVAILABLE": "Der Dienst ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
+    "EXCEEDED_RATE_LIMIT": "Zu viele Anfragen. Bitte versuchen Sie es später erneut.",
+    "DUPLICATE_SUBMISSION": "Doppelte Übermittlung. Bitte führen Sie die Aktion nicht erneut aus.",
+    "SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "ERR_NETWORK": "Netzwerkfehler, bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "UNKNOWN_ERROR": "Ein unbekannter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.",
+    "TOKEN_MISSING": "Kein Zugriffstoken übermittelt. Bitte melden Sie sich erneut an.",
+    "INVALID_SIGNATURE": "Ungültige Token-Signatur. Bitte melden Sie sich erneut an.",
+    "UNAUTHORIZED": "Sie sind nicht angemeldet. Bitte melden Sie sich an.",
+    "INVALID_REFRESH_TOKEN": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
+    "SERVER_ERROR": "Ein unerwarteter Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut."
+  }
+}

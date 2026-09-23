@@ -4,7 +4,7 @@ import { showToast } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction } from 'react-router-dom';
 
-import { useLogout } from '@/features/Auth/api/auth.mutations';
+import { useLogout } from '@/features/auth/api/auth.mutations';
 import { routePaths } from '@/router/routePaths';
 
 const LOGOUT_MENU_CLASS = 'logout';

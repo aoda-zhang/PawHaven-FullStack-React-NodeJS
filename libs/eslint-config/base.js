@@ -11,6 +11,7 @@ module.exports = {
     '**/*.config.js',
     '**/*.config.cjs',
     '**/*.config.mjs',
+    '**/*.config.json',
   ],
 
   // Specify parser for TypeScript
@@ -27,6 +28,7 @@ module.exports = {
     '@typescript-eslint', // TypeScript-specific rules
     'prettier', // Integrate Prettier formatting rules
     'import', // Validate imports
+    'check-file', // Enforce file/folder naming conventions
   ],
 
   // Extend shared configurations
@@ -103,6 +105,32 @@ module.exports = {
     // Other best practices
     // ----------------------------
     'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
+
+    // ----------------------------
+    // File naming convention
+    // ----------------------------
+    // Enforce camelCase for source + config files (no snake_case, no kebab-case).
+    // React components (.tsx) use PascalCase. JSON files (e.g. i18n locale
+    // resources, tsconfig) must be camelCase too. ignoreMiddleExtensions lets
+    // "config.schema.ts" / "*.client.ts" validate only the first segment.
+    // NOTE: nest-cli.json is exempted in .eslintignore (NestJS tool config).
+    'check-file/filename-naming-convention': [
+      'error',
+      {
+        '**/!(main|route|router).tsx': 'PASCAL_CASE',
+        '**/!(*.schema|*.types|*.type|*.dto).ts': 'CAMEL_CASE',
+        '**/*.{js,jsx,cjs,mjs}': 'CAMEL_CASE',
+        '**/*.json': 'CAMEL_CASE',
+      },
+      { ignoreMiddleExtensions: true },
+    ],
+
+    'check-file/folder-naming-convention': [
+      'error',
+      { '**/': 'KEBAB_CASE' },
+      { ignoreWords: ['de-DE', 'en-US', 'zh-CN'] },
+    ],
+
     'no-void': 'error',
     'no-magic-numbers': [
       'warn',
@@ -116,4 +144,41 @@ module.exports = {
       },
     ],
   },
+
+  // ----------------------------
+  // JSON data files
+  // ----------------------------
+  // JSON files carry no executable code, so only the filename naming rule
+  // (check-file/filename-naming-convention) should apply. The JS/TS rule set
+  // otherwise misfires on JSON literals — e.g. @typescript-eslint/no-unused-
+  // expressions flags the root object, no-magic-numbers flags numeric values,
+  // and prettier reports formatting. Disable those for *.json.
+  overrides: [
+    {
+      files: ['**/*.json'],
+      rules: {
+        '@typescript-eslint/no-unused-expressions': 'off',
+        'no-unused-expressions': 'off',
+        'no-magic-numbers': 'off',
+        'prettier/prettier': 'off',
+      },
+    },
+    {
+      files: [
+        '**/types/**/!(index).ts',
+        '**/dto/**/!(index).ts',
+        '**/*.schema.ts',
+        '**/*.types.ts',
+        '**/*.type.ts',
+        '**/*.dto.ts',
+      ],
+      rules: {
+        'check-file/filename-naming-convention': [
+          'error',
+          { '**/*.ts': 'PASCAL_CASE' },
+          { ignoreMiddleExtensions: true },
+        ],
+      },
+    },
+  ],
 };

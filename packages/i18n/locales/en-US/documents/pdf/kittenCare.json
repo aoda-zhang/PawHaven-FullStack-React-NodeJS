@@ -1,0 +1,63 @@
+{
+  "kittenCare": {
+    "brand": "PawHaven Rescue Library",
+    "title": "Orphaned Kitten & Puppy Care",
+    "subtitle": "How to keep newborn kittens and puppies alive through the first critical hours, until a rescue or veterinarian takes over.",
+    "sections": [
+      {
+        "title": "Confirm It Is Really Orphaned",
+        "text": "A mother often leaves for hours to hunt. Separating a healthy litter from its mother is the most common and most harmful mistake — wait and watch first.",
+        "bullets": [
+          "Observe from a distance for two to four hours before intervening.",
+          "Warm, quiet babies with round bellies are being fed; cold crying ones are not.",
+          "Call a rescue before removing a litter — they often have a nursing mother available."
+        ]
+      },
+      {
+        "title": "Warm It Before You Feed It",
+        "text": "A cold baby cannot digest milk, and feeding it in that state can be fatal. Warmth always comes first.",
+        "bullets": [
+          "Use a hot water bottle or heat pad, well wrapped, at one end of a box.",
+          "Leave half the box unheated so the baby can move away if it gets too warm.",
+          "Aim for 30 to 32 °C in the first week, and keep water away from the heat source."
+        ]
+      },
+      {
+        "title": "Feed on a Schedule, Upright",
+        "text": "Use only kitten or puppy milk replacer from a pet shop or pharmacy — cow’s milk causes diarrhoea and dehydration. Feed the baby lying on its stomach, never on its back like a human infant, and let it suck rather than squeezing the bottle."
+      },
+      {
+        "title": "Help It Toilet",
+        "text": "Newborns cannot urinate or defecate by themselves; their mother would normally lick them. You replace that stimulation after every single feed.",
+        "bullets": [
+          "Rub the genital area gently with a warm damp cotton pad for about a minute.",
+          "Expect urine after every feed and at least one stool a day.",
+          "No output, a hard belly, or crying while toileting needs veterinary help today."
+        ]
+      },
+      {
+        "title": "Keep Everything Clean",
+        "text": "Very young babies have almost no immune defence, so hygiene protects them more than any medicine you can buy.",
+        "bullets": [
+          "Wash your hands before handling and keep the bedding dry.",
+          "Prepare only what one feed needs and never store leftover formula.",
+          "Wash bottles and teats in hot soapy water and rinse thoroughly after use."
+        ]
+      },
+      {
+        "title": "Escalate Early",
+        "text": "Fading happens fast — a quiet, cold baby may have only a couple of hours. Contact a rescue or clinic the same day rather than waiting for it to deteriorate."
+      }
+    ],
+    "checklist": {
+      "title": "Feeding reference",
+      "items": [
+        "Week 1: every 2 to 3 hours around the clock, roughly 2 to 4 ml per feed.",
+        "Week 2: every 3 to 4 hours, roughly 5 to 7 ml per feed.",
+        "Weeks 3 to 4: every 4 to 5 hours, following the replacer packaging by weight.",
+        "From week 4: start weaning onto a gruel of replacer and wet food — ask a rescue for a plan."
+      ]
+    },
+    "disclaimer": "Amounts are a starting point for healthy newborns. Weigh the baby daily and follow your veterinarian’s advice if it stops gaining weight."
+  }
+}

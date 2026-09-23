@@ -1,0 +1,51 @@
+{
+  "footer": {
+    "columns": {
+      "platform": {
+        "heading": "Plattform",
+        "browse_rescues": "Rettungen durchsuchen",
+        "report_animal": "Streuner melden",
+        "adopt_animal": "Tier adoptieren",
+        "volunteer": "Freiwilliger werden"
+      },
+      "resources": {
+        "heading": "Ressourcen",
+        "knowledge_base": "Wissensdatenbank",
+        "rescue_stories": "Rettungsgeschichten",
+        "emergency_guide": "Notfallleitfaden"
+      },
+      "community": {
+        "heading": "Community",
+        "volunteer_network": "Freiwilligen-Netzwerk",
+        "partner_shelters": "Partner-Tierheime",
+        "share_story": "Geschichte teilen"
+      },
+      "company": {
+        "heading": "Unternehmen",
+        "about_pawhaven": "Über PawHaven",
+        "open_source": "Open Source",
+        "privacy_policy": "Datenschutz",
+        "terms_of_service": "Nutzungsbedingungen"
+      }
+    },
+    "brand_description": "Eine Plattform, die Melder, Retter und Adoptierende verbindet — von der ersten Sichtung bis zum sicheren Zuhause.",
+    "cta_title": "Streunendes Tier gesehen? Du kannst helfen.",
+    "cta_description": "Eine 60-sekündige Meldung auf PawHaven setzt ausgebildete Freiwillige in Bewegung. Du brauchst keine besonderen Fähigkeiten — nur ein Handy.",
+    "cta_button": "Streuner melden",
+    "cta_button_secondary": "Freiwillig werden",
+    "stats": {
+      "animals_rescued": "Gerettete Tiere",
+      "active_volunteers": "Aktive Freiwillige",
+      "adopted": "Adoptiert"
+    },
+    "social": {
+      "github": "GitHub",
+      "email": "E-Mail",
+      "instagram": "Instagram"
+    },
+    "bottom_bar": {
+      "license": "Open Source — MIT-Lizenz.",
+      "built_with": "Mit ❤️ für jedes streunende Leben gebaut"
+    }
+  }
+}

@@ -1,18 +1,21 @@
-export { Button, buttonVariants } from './components/Button';
+export { Button, buttonVariants } from './components/button/Button';
 export {
   Carousel,
   type CarouselImage,
   type CarouselProps,
-} from './components/Carousel';
+} from './components/Carousel/Carousel';
 export {
   PhotoPlaceholder,
   type PhotoPlaceholderProps,
-} from './components/PhotoPlaceholder';
-export { PhoneInput, isValidPhoneNumber } from './components/PhoneInput';
-export { Phase } from './components/Phase';
-export { NotificationBanner } from './components/NotificationBanner';
-export { Loading } from './components/Loading';
-export { Skeleton, type SkeletonProps } from './components/Skeleton';
+} from './components/photo-placeholder/PhotoPlaceholder';
+export {
+  PhoneInput,
+  isValidPhoneNumber,
+} from './components/phone-input/PhoneInput';
+export { Phase } from './components/phase/Phase';
+export { NotificationBanner } from './components/notification-banner/NotificationBanner';
+export { Loading } from './components/Loading/Loading';
+export { Skeleton, type SkeletonProps } from './components/skeleton/Skeleton';
 export {
   Timeline,
   TimelineItem,
@@ -20,7 +23,7 @@ export {
   TimelineDot,
   TimelineConnector,
   TimelineContent,
-} from './components/Timeline';
+} from './components/Timeline/Timeline';
 export {
   Toast,
   showToast,
@@ -28,4 +31,4 @@ export {
   type ToastType,
   type ToastItem,
   type ShowToastInput,
-} from './components/Toast';
+} from './components/toast/Toast';

@@ -18,9 +18,9 @@ import {
 import { isProd } from '@pawhaven/shared/utils';
 import type { Request, Response } from 'express';
 
-import { InternalJwtService } from '../internal-jwt/internal-jwt.service.js';
-import { InternalJwtTargetResolver } from '../internal-jwt/internal-jwt-target.resolver.js';
-import type { InternalJwtIdentity } from '../internal-jwt/internal-jwt.types.js';
+import { InternalJwtService } from '../internal-jwt/internalJwt.service.js';
+import { InternalJwtTargetResolver } from '../internal-jwt/internalJwtTarget.resolver.js';
+import type { InternalJwtIdentity } from '../internal-jwt/InternalJwt.types.js';
 
 const SESSION_EXPIRED_MESSAGE = 'Session expired, please login again';
 const ACCESS_TOKEN_TYPE = 'access';

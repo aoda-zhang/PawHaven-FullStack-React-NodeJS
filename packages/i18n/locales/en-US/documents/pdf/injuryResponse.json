@@ -1,0 +1,82 @@
+{
+  "injuryResponse": {
+    "brand": "PawHaven Rescue Library",
+    "title": "Injured Animal Field Response",
+    "subtitle": "How to triage, stabilise and move an injured animal without making the injury worse.",
+    "sections": [
+      {
+        "title": "Make the Scene Safe",
+        "text": "A second casualty helps nobody. Traffic, fire and water are dealt with before the animal.",
+        "bullets": [
+          "Stop somewhere safe, hazard lights on, and cone or flag the area if you can.",
+          "Approach slowly, from the side, speaking softly and avoiding sudden movement.",
+          "Protect your arms with a towel, jacket or blanket before touching it."
+        ]
+      },
+      {
+        "title": "Triage in Sixty Seconds",
+        "text": "Stand back and read the whole animal: breathing effort, gum colour, bleeding, and whether all four legs move. The loudest problem is rarely the most urgent one."
+      },
+      {
+        "title": "Stop Bleeding First",
+        "text": "Severe bleeding kills long before a broken bone matters. Firm direct pressure is almost always enough.",
+        "bullets": [
+          "Press a clean pad firmly onto the wound and hold it for three minutes.",
+          "Never remove a soaked pad — stack another one on top of it.",
+          "Reserve a tourniquet for a limb you genuinely cannot stop any other way."
+        ]
+      },
+      {
+        "title": "Protect Suspected Fractures",
+        "text": "Assume a spinal injury in any animal hit by a vehicle. Movement can turn a survivable injury into permanent paralysis.",
+        "bullets": [
+          "Do not straighten a limb and do not bandage a suspected spine.",
+          "Slide the animal onto a board, cardboard sheet or folded blanket to move it.",
+          "Keep movement to the absolute minimum and pad around the body so it cannot roll."
+        ]
+      },
+      {
+        "title": "Transport to the Right Place",
+        "text": "Phone ahead so a team is waiting — arriving unannounced often means being triaged behind scheduled surgery.",
+        "bullets": [
+          "Cover the carrier; darkness and quiet measurably reduce panic.",
+          "Keep the vehicle warm and limit handling to essential checks.",
+          "Carry the animal straight indoors; never leave it in a parked car."
+        ]
+      },
+      {
+        "title": "Hand Over the Full Picture",
+        "text": "What you saw at the scene is diagnostic information the clinic cannot recreate. Give it before you leave, in writing if you can."
+      }
+    ],
+    "checklist": {
+      "title": "What to tell the clinic",
+      "items": [
+        "Species, approximate age and estimated weight.",
+        "Where it was found and what most likely caused the injury.",
+        "When it happened and how it behaved at the scene.",
+        "Every injury you can see, including bleeding from nose, mouth or ears.",
+        "Any treatment you gave — pressure, bandaging, water or medication.",
+        "Time of last food, water and urination."
+      ]
+    },
+    "contacts": {
+      "title": "Who to call",
+      "items": [
+        {
+          "label": "Emergency clinic",
+          "value": "Phone ahead and describe the injuries"
+        },
+        {
+          "label": "PawHaven rescue team",
+          "value": "pawhaven.work"
+        },
+        {
+          "label": "Emergency services",
+          "value": "112 / 911"
+        }
+      ]
+    },
+    "disclaimer": "Field care stabilises; it does not treat. Any animal with breathing difficulty, uncontrolled bleeding or a suspected spinal injury needs a veterinarian immediately."
+  }
+}

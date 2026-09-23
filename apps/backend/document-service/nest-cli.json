@@ -11,8 +11,7 @@
       {
         "include": "config",
         "watchAssets": true
-      },
-      { "include": "i18n/*", "watchAssets": true }
+      }
     ]
   },
   "generateOptions": {

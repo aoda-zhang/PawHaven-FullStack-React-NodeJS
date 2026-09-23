@@ -1,6 +1,6 @@
 # PawHaven — Frontend Architecture
 
-> **Version**: v3.5 | **Date**: 2026-09-10
+> **Version**: v3.10 | **Date**: 2026-09-19
 > **Related**: [System Overview](./PawHaven-System-Architecture-Overview.md) | [Backend](./PawHaven-Backend-Architecture.md)
 
 ---
@@ -82,6 +82,7 @@ features/
 ├── Content/          # Stories & knowledge base
 ├── Volunteer/        # Volunteer profiles, case claiming, availability
 ├── Profile/          # User profile — aggregated view across domains
+├── AnimalFollow/     # Follow animal — follow control + follower count
 └── Discovery/        # Browse & search across all content
 ```
 
@@ -129,6 +130,19 @@ Enforcement: ESLint import/no-restricted-paths
 | **Volunteer** | Volunteer coordination   | Profiles, availability, case claims      |
 | **Profile**   | User aggregation         | Cross-domain user activity view          |
 | **Discovery** | Browse & search          | Unified search across content types      |
+
+### 2.5 AnimalFollow Feature (Supporting)
+
+Following an animal is a supporting feature with no product domain of its own. It sits at `apps/frontend/portal/src/features/AnimalFollow/` and follows the standard layout from §2.2 (`api/animalFollow.{api,queries,queryKeys,mutations}.ts`, `components/FollowButton.tsx`, `components/FollowerCount.tsx`, `tests/`) with one exception: it is a component + data set with no route of its own, so there is no `index.tsx` / `route.tsx`, and it adds no app-layer code.
+
+| Concern          | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Contract**     | `AnimalFollowResultSchema` from `@pawhaven/shared` (`packages/shared/types/animal-follow.schema.ts`, re-exported from the types index). API responses are parsed with the same schema the backend validates against (P5).                                                                                                                                                                                                                                                                        |
+| **Server state** | `animalFollowQueryKeys` provides `status(animalId)`. `useFollowStatus` returns the combined `{ isFollowing, followedAt, followerCount }` payload, so both the follow control and the follower count read from one query and one request. Follow and unfollow share one mutation factory whose response carries the same combined shape, so `onSuccess` writes the single `status` key with `setQueryData` and nothing is invalidated — neither the control nor the count triggers a refetch.     |
+| **i18n**         | A dedicated `animalFollow` namespace in `packages/i18n/locales/{en-US,zh-CN,de-DE}.json` (follow / unfollow / following / followers count with plural forms / follow and unfollow errors).                                                                                                                                                                                                                                                                                                       |
+| **Anonymous**    | Both controls render for every visitor — neither is gated on the client-side profile. The status query therefore always fires, which is safe because `/status` is `@OptionalAuth()` and answers `{ isFollowing: false }` to anonymous callers, and because a persisted profile is not a reliable proxy for a live session anyway (localStorage, cleared only on explicit logout). Follow and unfollow remain the only authenticated calls, so an anonymous click gets the standard 401 handling. |
+
+**Boundary note.** The rescue-detail page mounts both components from `features/RescueDetail/components/VolunteerInfo.tsx`, which imports `features/AnimalFollow/components/*` directly. That is a feature-to-feature import, a deviation from the isolation rule in §2.3, and is recorded here because it is the wiring the code currently ships.
 
 ---
 

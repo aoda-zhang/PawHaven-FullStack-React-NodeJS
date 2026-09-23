@@ -1,0 +1,79 @@
+{
+  "firstAid": {
+    "brand": "PawHaven Ratgeber-Bibliothek",
+    "title": "Erste Hilfe für Tiere",
+    "subtitle": "Was du in den ersten Minuten nach einem Unfall sicher tun kannst – und welche Warnzeichen bedeuten: abbrechen und sofort in die Klinik fahren.",
+    "sections": [
+      {
+        "title": "Atemwege, Atmung, Kreislauf prüfen",
+        "text": "Nichts anderes zählt, bevor du weißt, ob Luft fließt. Arbeite von Kopf nach hinten und bewege das Tier nur, wenn Bleiben gefährlicher ist.",
+        "bullets": [
+          "Atemwege: Maul vorsichtig öffnen und auf Erbrochenes, Blut oder Fremdkörper prüfen.",
+          "Atmung: Brustkorb zehn Sekunden beobachten – 15 bis 35 Atemzüge pro Minute sind bei Hund und Katze normal.",
+          "Kreislauf: Zahnfleisch drücken; die Farbe sollte in zwei Sekunden zurückkehren."
+        ]
+      },
+      {
+        "title": "Blutungen stoppen",
+        "text": "Fester direkter Druck schlägt jede Technik. Entferne keine bereits gebildeten Gerinnsel und verwende einen Druckverband am Stauverband für Gliedmaßen nur, wenn eine Blutung nicht anders zu stoppen ist.",
+        "bullets": [
+          "Drücke ein sauberes Tuch drei Minuten lang fest auf die Wunde, ohne nachzusehen.",
+          "Lege bei Durchnässung weitere Schichten darauf, statt die getränkte Auflage zu wechseln.",
+          "Lagere die Gliedmaße nur hoch, wenn das keine erkennbaren Schmerzen auslöst."
+        ]
+      },
+      {
+        "title": "Atmung und Wiederbelebung unterstützen",
+        "text": "Beginne die Herzdruckmassage nur, wenn das Tier nicht atmet und kein Herzschlag fühlbar ist. Arbeite im Rhythmus von etwa 30 Kompressionen auf zwei Beatmungen.",
+        "bullets": [
+          "Lege das Tier auf die rechte Seite auf eine feste Unterlage.",
+          "Drücke den Brustkorb 2 bis 3 cm tief, etwa 100- bis 120-mal pro Minute.",
+          "Zur Beatmung Maul schließen und sanft hineinatmen, bis sich der Brustkorb hebt."
+        ]
+      },
+      {
+        "title": "Blockierte Atemwege lösen",
+        "text": "Ein Tier mit Fremdkörper im Hals kratzt am Maul, würgt oder gibt hohe Töne von sich. Greife nur in das Maul, wenn du den Gegenstand wirklich siehst – blindes Wühlen schiebt ihn tiefer.",
+        "bullets": [
+          "Nur mit einem Fingerhaken arbeiten, wenn das Teil sichtbar und locker ist.",
+          "Kleine Tiere: Körper mit dem Kopf nach unten halten und zwei kräftige Schläge zwischen die Schulterblätter geben.",
+          "Bei Bewusstlosigkeit sofort beatmen und in die Klinik fahren."
+        ]
+      },
+      {
+        "title": "Hitzschlag abkühlen",
+        "text": "Ein Hitzschlag tötet schnell, aber zu aggressives Kühlen ist ebenfalls gefährlich. Setze auf stetige Senkung statt auf Eis.",
+        "bullets": [
+          "In den Schatten bringen und das Fell mit kühlem – niemals eiskaltem – Wasser befeuchten.",
+          "Einen Ventilator auf das nasse Fell richten; die Verdunstung entzieht die Wärme.",
+          "Kleine Schlucke Wasser anbieten und die aktive Kühlung beenden, sobald das Hecheln sich beruhigt."
+        ]
+      },
+      {
+        "title": "Verdacht auf Vergiftung",
+        "text": "Bring die Verpackung mit. Die Behandlung hängt vom genauen Stoff ab, und Raten kostet Zeit, die das Tier nicht hat.",
+        "bullets": [
+          "Löse nie Erbrechen aus, wenn kein Tierarzt es anweist.",
+          "Belastetes Fell mit warmem Wasser und milder Seife waschen und das Tier warmhalten.",
+          "Produktname, geschätzte Menge und Uhrzeit notieren."
+        ]
+      },
+      {
+        "title": "Auf einen Schock vorbereitet sein",
+        "text": "Ein Schock kann jeder schweren Verletzung folgen. Halte das Tier warm, ruhig und ruhig gestellt, lagere den Kopf etwas höher und hole Hilfe – das gehört nicht in die Eigenbehandlung."
+      }
+    ],
+    "checklist": {
+      "title": "Behandlung abbrechen und sofort in die Klinik, wenn:",
+      "items": [
+        "Die Atmung erschwert, geräuschvoll oder ausgefallen ist.",
+        "Die Blutung nach fünf Minuten festem Druck weitergeht.",
+        "Das Zahnfleisch weiß, blau oder leuchtend rot ist.",
+        "Das Tier zusammengebrochen ist, krampft oder nicht stehen kann.",
+        "Eine Vergiftung, ein Schlangenbiss oder ein Sturz aus Höhe vermutet wird.",
+        "Ein Bruch vermutet wird oder das Tier seine Beine nicht spürt."
+      ]
+    },
+    "disclaimer": "Diese Übersicht ergänzt die tierärztliche Versorgung und ersetzt sie niemals. Ruf immer eine Praxis an und beschreibe genau, was du getan hast."
+  }
+}
