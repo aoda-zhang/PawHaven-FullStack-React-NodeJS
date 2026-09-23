@@ -39,7 +39,7 @@ export default defineConfig({
       },
       {
         find: /^@pawhaven\/backend-core\/setup$/,
-        replacement: resolve(backendCoreRoot, 'setup/app-setup.ts'),
+        replacement: resolve(backendCoreRoot, 'setup/appSetup.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/types$/,
