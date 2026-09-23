@@ -3,7 +3,7 @@ export {
   Carousel,
   type CarouselImage,
   type CarouselProps,
-} from './components/Carousel/Carousel';
+} from './components/carousel/Carousel';
 export {
   PhotoPlaceholder,
   type PhotoPlaceholderProps,
@@ -14,7 +14,7 @@ export {
 } from './components/phone-input/PhoneInput';
 export { Phase } from './components/phase/Phase';
 export { NotificationBanner } from './components/notification-banner/NotificationBanner';
-export { Loading } from './components/Loading/Loading';
+export { Loading } from './components/loading/Loading';
 export { Skeleton, type SkeletonProps } from './components/skeleton/Skeleton';
 export {
   Timeline,
@@ -23,7 +23,7 @@ export {
   TimelineDot,
   TimelineConnector,
   TimelineContent,
-} from './components/Timeline/Timeline';
+} from './components/timeline/Timeline';
 export {
   Toast,
   showToast,
