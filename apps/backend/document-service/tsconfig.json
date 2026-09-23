@@ -3,8 +3,10 @@
   "compilerOptions": {
     "outDir": "dist",
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
     "paths": {
-      "@modules/*": ["./src/modules/*"]
+      "@PDF/*": ["./src/modules/pdf/*"],
+      "@Email/*": ["./src/modules/email/*"]
     }
   },
   "include": ["src"]

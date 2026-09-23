@@ -30,8 +30,7 @@
       "Accept",
       "Content-Type",
       "X-Sign",
-      "x-locale",
-      "Locale"
+      "x-locale"
     ],
     "origin": ["https://pawhaven.work"],
     "credentials": true,
@@ -41,10 +40,29 @@
   "internalJwt": {
     "enabled": true,
     "audience": "core-service",
+    "keyId": "internal-v1",
     "publicKeys": {
-      "core-v1": "${INTERNAL_JWT_PUBLIC_KEY_CORE}"
+      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
     },
     "ttlSeconds": 45,
     "clockSkewSeconds": 30
-  }
+  },
+  "microServices": [
+    {
+      "name": "auth-service",
+      "enable": true,
+      "options": {
+        "host": "${AUTH_SERVICE_HOST}",
+        "port": 8082
+      }
+    },
+    {
+      "name": "document-service",
+      "enable": true,
+      "options": {
+        "host": "${DOCUMENT_SERVICE_HOST}",
+        "port": 8083
+      }
+    }
+  ]
 }

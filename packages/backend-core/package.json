@@ -12,9 +12,9 @@
       "default": "./dist/index.js"
     },
     "./internal-jwt": {
-      "types": "./dist/dynamicModules/internalJwt/index.d.ts",
-      "import": "./dist/dynamicModules/internalJwt/index.js",
-      "default": "./dist/dynamicModules/internalJwt/index.js"
+      "types": "./dist/dynamic-modules/internal-jwt/index.d.ts",
+      "import": "./dist/dynamic-modules/internal-jwt/index.js",
+      "default": "./dist/dynamic-modules/internal-jwt/index.js"
     },
     "./constants": {
       "types": "./dist/constants/index.d.ts",

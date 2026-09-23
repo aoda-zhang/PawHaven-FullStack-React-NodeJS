@@ -12,6 +12,8 @@ out/
 *.config.mjs
 *.min.js
 *.d.ts
+# NestJS tool config — kebab-case, must not be renamed
+**/nest-cli.json
 
 # Ignore environment and tooling folders
 .husky/
@@ -21,7 +23,6 @@ scripts/
 logs/
 
 # Ignore specific monorepo folders that don't require linting
-packages/i18n
 libs/tsconfig
 libs/eslint-config
 **/config/**

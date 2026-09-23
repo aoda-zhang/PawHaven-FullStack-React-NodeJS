@@ -1,0 +1,63 @@
+{
+  "kittenCare": {
+    "brand": "PawHaven Ratgeber-Bibliothek",
+    "title": "Verwaiste Kitten & Welpen pflegen",
+    "subtitle": "Wie neugeborene Katzen und Hunde die entscheidenden ersten Stunden überleben, bis eine Rettungsstelle oder ein Tierarzt übernimmt.",
+    "sections": [
+      {
+        "title": "Zuerst klären, ob es wirklich verwaist ist",
+        "text": "Eine Mutter ist oft stundenlang zur Jagd unterwegs. Einen gesunden Wurf von der Mutter zu trennen ist der häufigste und schädlichste Fehler – warte und beobachte zuerst.",
+        "bullets": [
+          "Zwei bis vier Stunden aus der Entfernung beobachten, bevor du eingreifst.",
+          "Warme, ruhige Junge mit runden Bäuchen werden gefüttert; kalte, schreiende nicht.",
+          "Vor dem Mitnehmen eine Rettungsstelle anrufen – oft gibt es eine säugende Mutter."
+        ]
+      },
+      {
+        "title": "Erst wärmen, dann füttern",
+        "text": "Ein ausgekühltes Jungtier kann Milch nicht verdauen; es in diesem Zustand zu füttern kann tödlich sein. Wärme geht immer vor.",
+        "bullets": [
+          "Eine gut eingewickelte Wärmflasche oder ein Heizkissen an das eine Ende der Box legen.",
+          "Die Hälfte der Box unbeheizt lassen, damit das Junge bei Hitze wegkriechen kann.",
+          "In der ersten Woche 30 bis 32 °C anstreben und Wasser fern der Wärmequelle halten."
+        ]
+      },
+      {
+        "title": "Nach Plan und in Bauchlage füttern",
+        "text": "Verwende ausschließlich Aufzuchtmilch für Katzen oder Hunde aus Zoofachhandel oder Apotheke – Kuhmilch verursacht Durchfall und Austrocknung. Füttere das Jungtier in Bauchlage, niemals auf dem Rücken wie ein Menschenbaby, und lass es selbst saugen statt in die Flasche zu drücken."
+      },
+      {
+        "title": "Beim Ausscheiden helfen",
+        "text": "Neugeborene können nicht selbst urinieren oder kotieren; normalerweise leckt die Mutter sie. Du übernimmst diese Stimulation nach jeder einzelnen Mahlzeit.",
+        "bullets": [
+          "Den Genitalbereich etwa eine Minute mit einem warmen, feuchten Wattepad sanft reiben.",
+          "Nach jeder Mahlzeit Urin erwarten, mindestens einmal täglich Kot.",
+          "Keine Ausscheidung, harter Bauch oder Schreien dabei braucht noch am selben Tag tierärztliche Hilfe."
+        ]
+      },
+      {
+        "title": "Alles sauber halten",
+        "text": "Neugeborene haben kaum Immunabwehr; Hygiene schützt sie mehr als jedes frei käufliche Mittel.",
+        "bullets": [
+          "Vor jedem Kontakt Hände waschen und die Einstreu trocken halten.",
+          "Bereite nur eine Portion pro Mahlzeit zu und bewahre Reste niemals auf.",
+          "Flaschen und Sauger nach jeder Nutzung mit heißem Spülwasser reinigen und gründlich ausspülen."
+        ]
+      },
+      {
+        "title": "Früh Hilfe holen",
+        "text": "Ein Verfall geht schnell – ein stilles, kaltes Jungtier hat oft nur noch ein paar Stunden. Melde dich noch am selben Tag bei einer Rettungsstelle oder einer Praxis, statt auf eine Verschlechterung zu warten."
+      }
+    ],
+    "checklist": {
+      "title": "Fütterungsrichtwerte",
+      "items": [
+        "Woche 1: rund um die Uhr alle 2 bis 3 Stunden, etwa 2 bis 4 ml pro Mahlzeit.",
+        "Woche 2: alle 3 bis 4 Stunden, etwa 5 bis 7 ml pro Mahlzeit.",
+        "Woche 3 bis 4: alle 4 bis 5 Stunden, Mengen nach Packungsangabe je Gewicht.",
+        "Ab Woche 4: ans Absetzen mit Brei aus Aufzuchtmilch und Feuchtfutter gewöhnen – Planeinkleidung bei einer Rettungsstelle erfragen."
+      ]
+    },
+    "disclaimer": "Die Mengen sind Richtwerte für gesunde Neugeborene. Wiege das Tier täglich und folge dem Rat der Praxis, wenn es nicht mehr zunimmt."
+  }
+}

@@ -148,10 +148,28 @@ model animalReports {
   description       String
   size              String
   animalCount       Int
-  reporterId        String
+  reporter          Reporter?
   reporterPhotos    String[]
 
   @@index([animalStatus])
+}
+
+type Reporter {
+  reporterID   String
+  reporterName String?
+}
+
+model AnimalFollow {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId   String
+  animalId String
+
+  @@unique([userId, animalId])
+  @@index([animalId])
+  @@map("animal_follows")
 }
 
 model AdoptablePet {

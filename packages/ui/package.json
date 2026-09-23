@@ -12,9 +12,9 @@
       "default": "./build/index.js"
     },
     "./form": {
-      "types": "./build/components/Form/index.d.ts",
-      "import": "./build/components/Form/index.js",
-      "default": "./build/components/Form/index.js"
+      "types": "./build/components/form/index.d.ts",
+      "import": "./build/components/form/index.js",
+      "default": "./build/components/form/index.js"
     },
     "./index.css": "./index.css"
   },

@@ -1,6 +1,6 @@
 # PawHaven — System Architecture Design
 
-> **Version**: v3.5 | **Date**: 2026-09-10
+> **Version**: v3.10 | **Date**: 2026-09-19
 > **Design Philosophy**: Pragmatic service decomposition. Modular monolith inside core-service. Extract only when necessary.
 >
 > **This document has been split into 3 focused docs for easier navigation.**
@@ -9,11 +9,11 @@
 
 ## Architecture Docs
 
-| Document                                                                       | Content                                                                                                                                                                                                        |
-| ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [**System Architecture Overview**](./PawHaven-System-Architecture-Overview.md) | Philosophy, service decomposition, C4 model, data architecture, API gateway, event-driven communication, shared kernel, security, observability, deployment, design decisions, boundary enforcement, rationale |
-| [**Frontend Architecture**](./PawHaven-Frontend-Architecture.md)               | Feature-based module architecture, package ecosystem, component boundaries, server-driven routing, state management, design token architecture, i18n architecture, boundary enforcement                        |
-| [**Backend Architecture**](./PawHaven-Backend-Architecture.md)                 | Core-service modular monolith, bounded contexts as NestJS modules, event-driven communication, module boundary enforcement                                                                                     |
+| Document                                                                       | Content                                                                                                                                                                                                                   |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [**System Architecture Overview**](./PawHaven-System-Architecture-Overview.md) | Philosophy, service decomposition, C4 model, data architecture, API gateway, event-driven communication, shared kernel, security, observability, deployment, design decisions, boundary enforcement, rationale            |
+| [**Frontend Architecture**](./PawHaven-Frontend-Architecture.md)               | Feature-based module architecture, package ecosystem, component boundaries, server-driven routing, state management, design token architecture, i18n architecture, boundary enforcement                                   |
+| [**Backend Architecture**](./PawHaven-Backend-Architecture.md)                 | Core-service modular monolith, bounded contexts as NestJS modules, event-driven communication, module boundary enforcement, document-service PDF engine (single-template render contract, i18n copy / inbound data split) |
 
 ---
 

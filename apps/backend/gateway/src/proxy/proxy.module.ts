@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { IdentityModule } from '../identity/identity.module.js';
-import { GatewayInternalJwtModule } from '../internal-jwt/internal-jwt.module.js';
+import { GatewayInternalJwtModule } from '../internal-jwt/internalJwt.module.js';
 import { RoutingModule } from '../routing/routing.module.js';
 
 import { ProxyService } from './proxy.service.js';

@@ -1,0 +1,11 @@
+{
+  "animalFollow": {
+    "follow": "关注救助进展",
+    "unfollow": "取消关注",
+    "following": "已关注救助进展",
+    "followers_count": "已有 {{count}} 人关注",
+    "followers_count_other": "已有 {{count}} 人关注",
+    "follow_error": "关注失败，请稍后重试。",
+    "unfollow_error": "取消关注失败，请稍后重试。"
+  }
+}

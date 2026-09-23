@@ -7,25 +7,30 @@
   ],
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./dist/esm/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
+      "types": "./dist/esm/types/index.d.ts",
       "import": "./dist/esm/types/index.js",
       "require": "./dist/cjs/types/index.js"
     },
+    "./types/*": {
+      "types": "./dist/esm/types/*.d.ts",
+      "import": "./dist/esm/types/*.js",
+      "require": "./dist/cjs/types/*.js"
+    },
     "./constants": {
-      "types": "./dist/constants/index.d.ts",
+      "types": "./dist/esm/constants/index.d.ts",
       "import": "./dist/esm/constants/index.js",
       "require": "./dist/cjs/constants/index.js"
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
+      "types": "./dist/esm/utils/index.d.ts",
       "import": "./dist/esm/utils/index.js",
       "require": "./dist/cjs/utils/index.js"
     }

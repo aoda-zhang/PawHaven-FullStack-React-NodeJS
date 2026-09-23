@@ -1,0 +1,164 @@
+import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+import type { NestExpressApplication } from '@nestjs/platform-express';
+import { Test } from '@nestjs/testing';
+import { httpBusinessMappingCodes } from '@pawhaven/shared';
+import request from 'supertest';
+import { afterEach, describe, expect, it } from 'vitest';
+
+import { HttpExceptionFilter } from './httpExceptionFilter.js';
+
+const RAW_ERROR_ROUTE = '/raw-error';
+const HTTP_EXCEPTION_ROUTE = '/http-exception';
+const BUSINESS_ERROR_ROUTE = '/business-error';
+const PRISMA_UNIQUE_ROUTE = '/prisma-unique';
+const PRISMA_NOT_FOUND_ROUTE = '/prisma-not-found';
+const PRISMA_INIT_ROUTE = '/prisma-init';
+const GENERIC_MESSAGE = 'Internal server error';
+const PRISMA_LEAK =
+  'Invalid `prisma.user.findUnique()` invocation: empty database name not allowed';
+
+const throwPrisma = (code?: string): never => {
+  throw Object.assign(new Error(PRISMA_LEAK), {
+    code,
+    clientVersion: '6.0.0',
+  });
+};
+
+@Controller()
+class ProbeController {
+  @Get(RAW_ERROR_ROUTE)
+  rawError(): void {
+    throw new Error(PRISMA_LEAK);
+  }
+
+  @Get(HTTP_EXCEPTION_ROUTE)
+  httpError(): void {
+    throw new HttpException(
+      'Client supplied bad input',
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+
+  @Get(BUSINESS_ERROR_ROUTE)
+  businessError(): void {
+    throw new HttpException(
+      httpBusinessMappingCodes.unauthorized,
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+
+  @Get(PRISMA_UNIQUE_ROUTE)
+  prismaUnique(): void {
+    throwPrisma('P2002');
+  }
+
+  @Get(PRISMA_NOT_FOUND_ROUTE)
+  prismaNotFound(): void {
+    throwPrisma('P2025');
+  }
+
+  @Get(PRISMA_INIT_ROUTE)
+  prismaInit(): void {
+    throwPrisma();
+  }
+}
+
+const boot = async (): Promise<NestExpressApplication> => {
+  const moduleRef = await Test.createTestingModule({
+    controllers: [ProbeController],
+    providers: [{ provide: APP_FILTER, useClass: HttpExceptionFilter }],
+  }).compile();
+
+  const app = moduleRef.createNestApplication<NestExpressApplication>();
+  app.useLogger(false);
+  await app.init();
+
+  return app;
+};
+
+describe('HttpExceptionFilter', () => {
+  let app: NestExpressApplication | undefined;
+
+  afterEach(async () => {
+    if (app) {
+      await app.close();
+      app = undefined;
+    }
+  });
+
+  it('never leaks raw internal error messages for non-HttpException errors', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(RAW_ERROR_ROUTE);
+
+    expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(response.body).toEqual({
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      isSuccess: false,
+      message: GENERIC_MESSAGE,
+      code: '',
+      data: null,
+    });
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+    expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+
+  it('returns the intended message for HttpException errors', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      HTTP_EXCEPTION_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    expect(response.body.message).toBe('Client supplied bad input');
+  });
+
+  it('maps business codes into the code field for HttpException errors', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      BUSINESS_ERROR_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    expect(response.body.code).toBe(httpBusinessMappingCodes.unauthorized);
+  });
+
+  it('maps Prisma unique-constraint (P2002) to a safe 409 without leaking', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      PRISMA_UNIQUE_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.CONFLICT);
+    expect(response.body).toEqual({
+      status: HttpStatus.CONFLICT,
+      isSuccess: false,
+      message: 'Resource already exists',
+      code: '',
+      data: null,
+    });
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+    expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+
+  it('maps Prisma record-not-found (P2025) to a safe 404 without leaking', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      PRISMA_NOT_FOUND_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    expect(response.body.message).toBe('Resource not found');
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+  });
+
+  it('keeps other Prisma errors (e.g. init failure) generic and non-leaking', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(PRISMA_INIT_ROUTE);
+
+    expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(response.body.message).toBe(GENERIC_MESSAGE);
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+    expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+});

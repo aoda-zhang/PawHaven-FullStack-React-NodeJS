@@ -1,10 +1,11 @@
 import { join } from 'path';
 
 import { AdoptionModule } from '@modules/adoption/adoption.module.js';
+import { AnimalFollowModule } from '@modules/animal-follow/animalFollow.module.js';
 import { BootstrapModule } from '@modules/bootstrap/bootstrap.module.js';
 import { HomeModule } from '@modules/home/home.module.js';
 import { RescueModule } from '@modules/rescue/rescue.module.js';
-import { ReportAnimalModule } from '@modules/report-animal/report-animal.module.js';
+import { ReportAnimalModule } from '@modules/report-animal/reportAnimal.module.js';
 import { Module } from '@nestjs/common';
 import {
   collectServiceConfigSources,
@@ -46,6 +47,7 @@ const configContext = import.meta.webpackContext('./config', {
     RescueModule,
     ReportAnimalModule,
     AdoptionModule,
+    AnimalFollowModule,
   ],
 })
 export class AppModule {}

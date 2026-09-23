@@ -1,32 +1,32 @@
-export type { HttpResType } from './http.types.js';
-export { InternalJwtSchema } from './internal-jwt.schema.js';
+export type { HttpResType } from './Http.types.js';
+export { InternalJwtSchema } from './InternalJwt.schema.js';
 export {
   InternalJwtKindValues,
   InternalJwtKindSchema,
   InternalJwtKind,
-} from './internal-jwt.schema.js';
+} from './InternalJwt.schema.js';
 export type {
   InternalJwt,
   AuthenticatedInternalJwt,
-} from './internal-jwt.schema.js';
+} from './InternalJwt.schema.js';
 export {
   AuthResponseSchema,
   TokenTypeSchema,
   JwtVerifyInfoSchema,
-} from './auth.schema.js';
+} from './Auth.schema.js';
 export type {
   AuthResponseDto,
   TokenType,
   JwtVerifyInfo,
-} from './auth.schema.js';
+} from './Auth.schema.js';
 export {
-  DocumentTemplateSchema,
-  GeneratePdfBodySchema,
+  EmailTemplateSchema,
+  RenderPdfBodySchema,
   SendEmailBodySchema,
   PreviewEmailBodySchema,
-} from './document.schema.js';
+} from './Document.schema.js';
 export type {
-  GeneratePdfBody,
+  RenderPdfBody,
   SendEmailBody,
   PreviewEmailBody,
-} from './document.schema.js';
+} from './Document.schema.js';

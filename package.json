@@ -17,10 +17,8 @@
     "test": "turbo run test",
     "test:e2e": "playwright test",
     "lint": "turbo run lint",
+    "build:all": "pnpm run build:libs && pnpm run build",
     "build": "turbo run build",
-    "build:backend-core": "turbo run build --filter=@pawhaven/backend-core...",
-    "build:frontend-core": "turbo run build --filter=@pawhaven/frontend-core...",
-    "build:shared": "turbo run build --filter=@pawhaven/shared...",
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
     "doctor:react": "npx react-doctor@latest"
@@ -31,6 +29,7 @@
       "prettier --write"
     ],
     "*.json": [
+      "eslint --fix",
       "prettier --write"
     ],
     "*.md": [
@@ -78,7 +77,7 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
-    "turbo": "^2.8.14",
+    "turbo": "^2.11.3",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@12.4.1"

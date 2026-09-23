@@ -1,0 +1,85 @@
+{
+  "rescueGuide": {
+    "brand": "PawHaven Rescue Library",
+    "title": "Animal Rescue Basics",
+    "subtitle": "Six calm steps for helping a stray animal — from the moment you notice it until it is safely in professional hands.",
+    "sections": [
+      {
+        "title": "Put Safety First",
+        "text": "Your own safety is what makes the rest of the rescue possible. Even a gentle animal can bite or scratch when it is hurt, and a roadside rescue puts you in traffic too.",
+        "bullets": [
+          "Stop where the animal cannot reach you, and assess before touching anything.",
+          "Park legally, switch on hazard lights and use a torch at night.",
+          "Never put your face near the mouth, and never step into live traffic for it."
+        ]
+      },
+      {
+        "title": "Assess Before You Act",
+        "text": "Most stray animals are healthy and simply watchful. A few minutes of quiet observation tells you whether this is a real emergency.",
+        "bullets": [
+          "Look for bleeding, limping, dragging limbs, or a body that never changes position.",
+          "Check for a collar, an ear tip or a well-fed body — it may already have a home.",
+          "Note the exact location, the time and how far it can move; you will be asked later."
+        ]
+      },
+      {
+        "title": "Approach Slowly and Quietly",
+        "text": "Trust is built by being boring and predictable. Crouch down, avoid direct eye contact and speak in a low, steady voice. Let the animal close the last of the distance itself — food convinces far better than reaching hands."
+      },
+      {
+        "title": "Contain Without a Fight",
+        "text": "Containment should end the risk, not start one. Use equipment and barriers instead of your hands whenever the animal is unknown to you.",
+        "bullets": [
+          "Reach for a carrier, crate or towel-lined box first — your hands come last.",
+          "Slip a lead on only if the animal tolerates it; otherwise use a towel or blanket.",
+          "Wear gloves and long sleeves; even a small cat can inflict deep damage."
+        ]
+      },
+      {
+        "title": "Transport Calmly",
+        "text": "Keep the carrier covered and the car quiet. Do not open the carrier indoors, and never leave an animal in a parked vehicle — not briefly, not even with the window open."
+      },
+      {
+        "title": "Hand Over to Professionals",
+        "text": "Contact the nearest rescue or clinic the same day and say you are on the way, so the animal is not triaged behind scheduled cases.",
+        "bullets": [
+          "Report what you found through PawHaven so volunteers nearby can follow up.",
+          "Share photos and the exact location — accuracy saves time at intake.",
+          "Keep receipts if you paid for emergency care; many rescues reimburse them."
+        ]
+      }
+    ],
+    "contacts": {
+      "title": "Emergency Contacts",
+      "items": [
+        {
+          "label": "Local veterinarian",
+          "value": "Phone before you travel"
+        },
+        {
+          "label": "Animal shelter",
+          "value": "Book an intake slot first"
+        },
+        {
+          "label": "PawHaven hotline",
+          "value": "pawhaven.work"
+        },
+        {
+          "label": "Emergency services",
+          "value": "112 / 911"
+        }
+      ]
+    },
+    "checklist": {
+      "title": "The five basics before you act",
+      "items": [
+        "Assess if Rescue Is Needed",
+        "Ensure Your Safety",
+        "Provide Basic Help",
+        "Seek Professional Help",
+        "Submit a Rescue Report"
+      ]
+    },
+    "disclaimer": "This guide is general information, not veterinary advice. If an animal’s life is at risk, contact a veterinarian or the emergency services immediately."
+  }
+}

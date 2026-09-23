@@ -7,8 +7,8 @@ import { useReduxSelector } from '../hooks/reduxHooks';
 import { reducerNames } from './reducerNames';
 import type { ReduxState } from './reduxStore';
 
-import { StorageKeys } from '@/constants/StorageKeys';
-import type { ProfileType } from '@/features/Auth/types';
+import { StorageKeys } from '@/constants/storageKeys';
+import type { ProfileType } from '@/features/auth/types';
 
 export interface GlobalStateType {
   profile: ProfileType;

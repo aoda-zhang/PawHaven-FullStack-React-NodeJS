@@ -1,0 +1,51 @@
+{
+  "rescueGuide": {
+    "eyebrow": "Ratgeber-Bibliothek",
+    "title": "Rettungsratgeber",
+    "intro": "Druckfähige Ratgeber für Situationen, die Retter am häufigsten antreffen. Einmal herunterladen und auf dem Handy behalten — alle Inhalte funktionieren ohne Netz.",
+    "documents_title": "Ratgeber zum Download",
+    "documents": {
+      "rescueGuide": {
+        "title": "Tierrettung – Grundlagen",
+        "description": "Sechs Schritte, um ein streunendes Tier sicher zu retten – vom ersten Hinsehen bis zur Übergabe, mit Notfallkontakten."
+      },
+      "firstAid": {
+        "title": "Erste Hilfe für Tiere",
+        "description": "Was du in den ersten Minuten nach einem Unfall tun kannst – und welche Zeichen bedeuten, dass du abbrechen und fahren musst."
+      },
+      "kittenCare": {
+        "title": "Verwaiste Kitten & Welpen pflegen",
+        "description": "Wärme, Fütterung und Hygiene für Neugeborene, dazu Wochenwerte für die Fütterung."
+      },
+      "injuryResponse": {
+        "title": "Verletzte Tiere im Feld versorgen",
+        "description": "Wie du ein verletztes Tier sichtest, stabilisierst und transportierst, ohne es zu verschlimmern."
+      }
+    },
+    "download": "PDF herunterladen",
+    "download_failed": "Download fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "steps_title": "Fünf Grundlagen vor dem Handeln",
+    "steps": [
+      {
+        "title": "Beobachten und Einschätzen",
+        "desc": "Prüfe, ob das Tier verletzt, schwach oder gefangen ist. Wenn es ein Halsband trägt oder ruht, halte Abstand."
+      },
+      {
+        "title": "Sicherheit zuerst",
+        "desc": "Bleibe ruhig, vermeide plötzliche Bewegungen und sprich mit sanfter Stimme. Versuche nicht, das Tier zu jagen."
+      },
+      {
+        "title": "Erste Hilfe leisten",
+        "desc": "Biete sauberes Wasser oder ein Handtuch an. Gib kein Futter oder Medikamente ohne Wissen."
+      },
+      {
+        "title": "Professionelle Hilfe suchen",
+        "desc": "Kontaktiere Tierärzte, Tierheime oder PawHaven-Freiwillige in deiner Nähe."
+      },
+      {
+        "title": "Rettung auf PawHaven teilen",
+        "desc": "Teile deine Rettungsgeschichte auf PawHaven, damit mehr Menschen helfen können."
+      }
+    ]
+  }
+}

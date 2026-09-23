@@ -1,0 +1,10 @@
+{
+  "imageUpload": {
+    "add": "添加照片",
+    "remove": "移除照片",
+    "count": "{{count}}/{{max}}",
+    "too_many": "最多上传 {{max}} 张照片",
+    "format": "仅支持 JPG、JPEG 或 PNG 格式的图片",
+    "size": "每张图片不能超过 {{maxSize}}MB"
+  }
+}

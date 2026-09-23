@@ -7,8 +7,6 @@ import nodeExternals from 'webpack-node-externals';
 const require = createRequire(import.meta.url);
 const SERVICE_ROOT = import.meta.dirname;
 
-const TSCONFIG_BASELINE = require.resolve('@pawhaven/tsconfig/node');
-
 const buildAliases = () => {
   const { paths = {} } = require(
     path.join(SERVICE_ROOT, 'tsconfig.json'),
@@ -27,13 +25,6 @@ const LAZY_OPTIONAL_IMPORTS = [
   '@nestjs/microservices/microservices-module',
   '@nestjs/websockets/socket-module',
   '@nestjs/websockets/socket-module.js',
-  'class-validator',
-  'class-transformer',
-  'class-transformer/storage',
-  'amqp-connection-manager',
-  'ioredis',
-  'kafkajs',
-  'mqtt',
   '@nats-io/transport-node',
 ];
 
@@ -73,8 +64,50 @@ export const plugins = [
 
 export const resolve = {
   extensions: ['.tsx', '.ts', '.js'],
-  tsConfig: { configFile: TSCONFIG_BASELINE },
+  tsConfig: { configFile: path.join(SERVICE_ROOT, 'tsconfig.json') },
   plugins: [],
   alias: buildAliases(),
-  extensionAlias: { '.js': ['.ts', '.js'], '.mjs': ['.mts', '.mjs'] },
+  extensionAlias: {
+    '.js': ['.ts', '.tsx', '.js'],
+    '.mjs': ['.mts', '.mjs'],
+  },
+};
+
+export const module = {
+  rules: [
+    {
+      test: /\.tsx?$/,
+      exclude: /node_modules/,
+      type: 'javascript/esm',
+      use: [
+        {
+          loader: 'builtin:swc-loader',
+          options: {
+            jsc: {
+              parser: {
+                syntax: 'typescript',
+                decorators: true,
+              },
+              transform: {
+                legacyDecorator: true,
+                decoratorMetadata: true,
+                react: {
+                  runtime: 'automatic',
+                },
+              },
+              target: 'es2021',
+            },
+          },
+        },
+      ],
+    },
+    {
+      test: /pdf\.generated\.css$/,
+      type: 'asset/source',
+    },
+    {
+      test: /\.(png|jpe?g|gif|svg|webp|avif)$/,
+      type: 'asset/inline',
+    },
+  ],
 };

@@ -1,0 +1,51 @@
+{
+  "rescueGuide": {
+    "eyebrow": "Rescue library",
+    "title": "Rescue Guides",
+    "intro": "Printable guides for the situations rescuers meet most often. Download them once and keep them on your phone — every page works without a signal.",
+    "documents_title": "Downloadable guides",
+    "documents": {
+      "rescueGuide": {
+        "title": "Animal Rescue Basics",
+        "description": "The six steps for helping a stray animal safely, from first sighting to handover, with emergency contacts."
+      },
+      "firstAid": {
+        "title": "Pet First Aid Reference",
+        "description": "What you can do in the first minutes after an accident — and the signs that mean you must stop and drive to a clinic."
+      },
+      "kittenCare": {
+        "title": "Orphaned Kitten & Puppy Care",
+        "description": "Warmth, feeding and hygiene for newborns, plus a week-by-week feeding reference."
+      },
+      "injuryResponse": {
+        "title": "Injured Animal Field Response",
+        "description": "How to triage, stabilise and transport an injured animal without making the injury worse."
+      }
+    },
+    "download": "Download PDF",
+    "download_failed": "Download failed. Please try again.",
+    "steps_title": "The five basics before you act",
+    "steps": [
+      {
+        "title": "Assess if Rescue Is Needed",
+        "desc": "Observe if the animal is injured, weak, or trapped. If it’s resting or has a collar, keep your distance."
+      },
+      {
+        "title": "Ensure Your Safety",
+        "desc": "Keep a safe distance and avoid sudden movements. Speak softly and do not chase or grab the animal."
+      },
+      {
+        "title": "Provide Basic Help",
+        "desc": "Offer clean water or a towel if needed. Do not feed or medicate without proper knowledge."
+      },
+      {
+        "title": "Seek Professional Help",
+        "desc": "Contact local rescue stations, veterinarians, or PawHaven volunteers for assistance."
+      },
+      {
+        "title": "Submit a Rescue Report",
+        "desc": "Record and share your rescue story on PawHaven to help connect more volunteers."
+      }
+    ]
+  }
+}

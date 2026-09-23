@@ -1,4 +1,4 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +22,7 @@ const buildRecord = (overrides: RecordOverrides = {}) => ({
   appearance: { color: 'black' },
   locationObj: { address: 'Central Park' },
   reporterPhotos: [],
-  reporterId: 'user-1',
+  reporter: { reporterID: 'user-1', reporterName: null },
   createdAt: REPORTED_AT,
   deletedAt: null,
   ...overrides,
@@ -54,7 +54,7 @@ const buildService = (records: RecordOverrides[] | Error = []) => {
         animalStatus: record.animalStatus,
         description: record.description,
         locationObj: record.locationObj,
-        reporterId: record.reporterId,
+        reporter: record.reporter,
         createdAt: record.createdAt,
       })),
     );
@@ -239,8 +239,21 @@ describe('RescueService.findOne', () => {
       appearance: { color: 'black' },
       location: { address: 'Central Park' },
       photos: [FIRST_PHOTO_URL, `/api/core/rescues/${RECORD_ID}/photo/1`],
-      reporter: { reporterId: 'user-1' },
+      reporter: { reporterId: 'user-1', reporterName: null },
       reportedAt: REPORTED_AT.toISOString(),
+    });
+  });
+
+  it('surfaces the stored reporter name on the detail contract', async () => {
+    const { service } = buildService([
+      { reporter: { reporterID: 'user-1', reporterName: 'reporter-one' } },
+    ]);
+
+    const detail = await service.findOne(RECORD_ID);
+
+    expect(detail.reporter).toEqual({
+      reporterId: 'user-1',
+      reporterName: 'reporter-one',
     });
   });
 
@@ -312,5 +325,99 @@ describe('RescueService.findPhoto', () => {
     await expect(service.findPhoto(RECORD_ID, 0)).rejects.toThrow(
       `Rescue not found: ${RECORD_ID}`,
     );
+  });
+});
+
+describe('RescueService.create', () => {
+  const dto = {
+    animalType: 'cat',
+    age: 'baby' as const,
+    locationObj: { address: 'Central Park' },
+    animalStatus: AnimalStatus.PENDING,
+    description: 'Found a stray kitten',
+    size: 'small',
+    animalCount: 1,
+    appearance: { color: 'black' },
+    reporterPhotos: [],
+  };
+
+  const buildCreateService = () => {
+    const create = vi.fn(
+      ({
+        data,
+      }: {
+        data: { reporter: { reporterID: string; reporterName: string | null } };
+      }) => Promise.resolve({ id: RECORD_ID, ...data }),
+    );
+    const service = new RescueService({
+      animalReports: { create },
+    } as never);
+    return { service, create };
+  };
+
+  it('persists the reporter username from the internal jwt', async () => {
+    const { service, create } = buildCreateService();
+
+    await service.create(dto, {
+      kind: 'authenticated',
+      sub: 'user-1',
+      username: 'reporter-one',
+    } as never);
+
+    expect(create).toHaveBeenCalledWith({
+      data: {
+        ...dto,
+        reporter: { reporterID: 'user-1', reporterName: 'reporter-one' },
+      },
+    });
+  });
+
+  it('normalises a whitespace-only username to null', async () => {
+    const { service, create } = buildCreateService();
+
+    await service.create(dto, {
+      kind: 'authenticated',
+      sub: 'user-1',
+      username: '   ',
+    } as never);
+
+    expect(create.mock.calls[0][0].data.reporter.reporterName).toBeNull();
+  });
+
+  it('stores null when the jwt carries no username', async () => {
+    const { service, create } = buildCreateService();
+
+    await service.create(dto, {
+      kind: 'authenticated',
+      sub: 'user-1',
+    } as never);
+
+    expect(create.mock.calls[0][0].data.reporter.reporterName).toBeNull();
+  });
+
+  it('trims surrounding whitespace from a real username', async () => {
+    const { service, create } = buildCreateService();
+
+    await service.create(dto, {
+      kind: 'authenticated',
+      sub: 'user-1',
+      username: '  reporter-one  ',
+    } as never);
+
+    expect(create.mock.calls[0][0].data.reporter.reporterName).toBe(
+      'reporter-one',
+    );
+  });
+
+  it('maps a create failure to a bad request', async () => {
+    const service = new RescueService({
+      animalReports: {
+        create: vi.fn(() => Promise.reject(new Error('write failed'))),
+      },
+    } as never);
+
+    await expect(
+      service.create(dto, { kind: 'authenticated', sub: 'user-1' } as never),
+    ).rejects.toThrow(BadRequestException);
   });
 });

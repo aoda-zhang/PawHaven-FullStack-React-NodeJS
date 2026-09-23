@@ -2,7 +2,7 @@ import type {
   ColorPrefix,
   RescueStatusType,
   StatusColorType,
-} from '@/features/Home/types';
+} from '@/features/home/types';
 
 interface GetStatusColorParams {
   status: RescueStatusType;

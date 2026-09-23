@@ -19,22 +19,20 @@ import {
 } from 'http-proxy-middleware';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { readHeader } from '@pawhaven/backend-core/utils';
+import { HTTP_STATUS } from '@pawhaven/shared/constants';
 
 import { IdentityResolver } from '../identity/identity.resolver.js';
-import { InternalJwtService } from '../internal-jwt/internal-jwt.service.js';
-import { InternalJwtTargetResolver } from '../internal-jwt/internal-jwt-target.resolver.js';
+import { InternalJwtService } from '../internal-jwt/internalJwt.service.js';
+import { InternalJwtTargetResolver } from '../internal-jwt/internalJwtTarget.resolver.js';
 import type { MicroServiceConfig } from '../routing/micro-service.config.js';
-import { MicroServiceRegistry } from '../routing/micro-service.registry.js';
+import { MicroServiceRegistry } from '../routing/microService.registry.js';
 
 type PendingInternalJwtHeaders = {
   [httpHeaders.gatewayJwt]: string;
   [httpHeaders.traceId]: string;
 };
 
-const HTTP_STATUS_MIN_OK = 200;
-const HTTP_STATUS_MIN_REDIRECT = 300;
-const HTTP_STATUS_BAD_GATEWAY = 502;
-const HTTP_STATUS_GATEWAY_TIMEOUT = 504;
+const HTTP_REDIRECT_RANGE_MIN = 300;
 const TIMEOUT_ERROR_CODE = 'ETIMEDOUT';
 const SERVICE_PREFIX_SEGMENTS = 2;
 
@@ -125,8 +123,8 @@ export class ProxyService {
 
     if (
       !isJson ||
-      statusCode < HTTP_STATUS_MIN_OK ||
-      statusCode >= HTTP_STATUS_MIN_REDIRECT
+      statusCode < HTTP_STATUS.OK ||
+      statusCode >= HTTP_REDIRECT_RANGE_MIN
     ) {
       return buffer;
     }
@@ -167,8 +165,8 @@ export class ProxyService {
       (error as NodeJS.ErrnoException).code === TIMEOUT_ERROR_CODE ||
       error.message.toLowerCase().includes('timeout');
     const status = timedOut
-      ? HTTP_STATUS_GATEWAY_TIMEOUT
-      : HTTP_STATUS_BAD_GATEWAY;
+      ? HTTP_STATUS.GATEWAY_TIMEOUT
+      : HTTP_STATUS.BAD_GATEWAY;
     const message = timedOut
       ? 'Upstream service timed out'
       : 'Upstream service unavailable';
@@ -277,6 +275,11 @@ export class ProxyService {
         pending[httpHeaders.gatewayJwt],
       );
       proxyReq.setHeader(httpHeaders.traceId, pending[httpHeaders.traceId]);
+    }
+
+    const locale = readHeader(req.headers, httpHeaders.appLocale);
+    if (locale) {
+      proxyReq.setHeader(httpHeaders.appLocale, locale);
     }
 
     fixRequestBody(proxyReq, req);

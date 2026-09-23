@@ -6,7 +6,7 @@ export const httpHeaders = {
   appSource: 'x-app-source',
   env: 'x-env',
   accessToken: 'access-token',
-  locale: 'locale',
+  appLocale: 'x-locale',
   acceptLanguage: 'accept-language',
   contentType: 'content-type',
   authorization: 'authorization',

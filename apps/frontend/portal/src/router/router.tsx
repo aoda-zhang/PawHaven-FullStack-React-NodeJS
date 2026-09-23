@@ -7,18 +7,18 @@ import {
   loginRoute,
   registerRoute,
   requireUser,
-} from '@/features/Auth/route';
-import { homeRoute } from '@/features/Home/route';
-import { reportAnimalRoute } from '@/features/ReportAnimal/route';
-import { rescueCasesRoute } from '@/features/RescueCases/route';
-import { rescueDetailRoute } from '@/features/RescueDetail/route';
-import { rescueGuideRoute } from '@/features/RescueGuide/route';
+} from '@/features/auth/route';
+import { homeRoute } from '@/features/home/route';
+import { reportAnimalRoute } from '@/features/report-animal/route';
+import { rescueCasesRoute } from '@/features/rescue-cases/route';
+import { rescueDetailRoute } from '@/features/rescue-detail/route';
+import { rescueGuideRoute } from '@/features/rescue-guide/route';
 import { useIsStableEnv } from '@/hooks/useIsStableEnv';
-import { RootLayout } from '@/layout';
 import {
   rootLoader,
   rootShouldRevalidate,
 } from '@/layout/api/rootLayout.loader';
+import { RootLayout } from '@/layout/RootLayout';
 import { RootLayoutFooter } from '@/layout/RootLayoutFooter';
 import { routePaths } from '@/router/routePaths';
 

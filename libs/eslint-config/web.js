@@ -72,6 +72,7 @@ module.exports = {
   },
 
   overrides: [
+    ...(baseEslintConfig.overrides || []),
     {
       files: ['**/tests/**/*.{ts,tsx,js,jsx}'],
       rules: {

@@ -1,0 +1,26 @@
+{
+  "errorMessage": {
+    "TOKEN_EXPIRED": "Your session has expired. Please log in again.",
+    "INVALID_TOKEN": "Invalid access token. Please log in again.",
+    "USER_NOT_FOUND": "User not found. Please check the username.",
+    "INVALID_PASSWORD": "Incorrect password. Please try again.",
+    "INVALID_CREDENTIALS": "Invalid email or password. Please try again.",
+    "PERMISSION_DENIED": "You do not have permission to perform this action.",
+    "EMAIL_ALREADY_EXISTS": "The email is already registered. Please use another email.",
+    "USERNAME_ALREADY_EXISTS": "The username already exists. Please choose another username.",
+    "RESOURCE_CONFLICT": "Resource conflict. Please try again later.",
+    "DATA_VALIDATION_FAILED": "The input data is invalid. Please check and try again.",
+    "OPERATION_TIMEOUT": "The operation timed out. Please try again later.",
+    "SERVICE_UNAVAILABLE": "The service is temporarily unavailable. Please try again later.",
+    "EXCEEDED_RATE_LIMIT": "Too many requests. Please try again later.",
+    "DUPLICATE_SUBMISSION": "Duplicate submission. Please do not repeat the operation.",
+    "SESSION_EXPIRED": "Your session has expired. Please log in again.",
+    "ERR_NETWORK": "Network error, please check your connection and try again.",
+    "UNKNOWN_ERROR": "An unknown error occurred. Please try again later or contact support.",
+    "TOKEN_MISSING": "No access token was provided. Please log in again.",
+    "INVALID_SIGNATURE": "Invalid token signature. Please log in again.",
+    "UNAUTHORIZED": "You are not authenticated. Please log in.",
+    "INVALID_REFRESH_TOKEN": "Your session has expired. Please log in again.",
+    "SERVER_ERROR": "An unexpected server error occurred. Please try again later."
+  }
+}

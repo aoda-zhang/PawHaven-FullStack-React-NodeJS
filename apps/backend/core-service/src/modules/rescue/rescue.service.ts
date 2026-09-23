@@ -40,7 +40,7 @@ type RescueListRecord = {
   animalStatus: string | null;
   description: string | null;
   locationObj: unknown;
-  reporterId: string;
+  reporter: { reporterID: string; reporterName: string | null } | null;
   createdAt: Date;
 };
 
@@ -56,7 +56,13 @@ export class RescueService {
   async create(dto: CreateRescueDto, claims: AuthenticatedInternalJwt) {
     try {
       return await this.prisma.animalReports.create({
-        data: { ...dto, reporterId: claims.sub },
+        data: {
+          ...dto,
+          reporter: {
+            reporterID: claims.sub,
+            reporterName: claims.username?.trim() || null,
+          },
+        },
       });
     } catch (error) {
       this.logger.error(`Failed to create rescue: ${dto.animalType}`, error);
@@ -85,7 +91,7 @@ export class RescueService {
           animalStatus: true,
           description: true,
           locationObj: true,
-          reporterId: true,
+          reporter: true,
           createdAt: true,
         },
       });
@@ -196,7 +202,7 @@ export class RescueService {
       animalType: record.animalType ?? 'unknown',
       location: location.address,
       description: record.description,
-      reporterId: record.reporterId,
+      reporterId: record.reporter?.reporterID ?? '',
       reportedAt: record.createdAt.toISOString(),
       distance: 0,
     });
@@ -220,7 +226,10 @@ export class RescueService {
       photos: record.reporterPhotos.map((_photo, index) =>
         this.buildPhotoUrl(record.id, index),
       ),
-      reporter: { reporterId: record.reporterId },
+      reporter: {
+        reporterId: record.reporter?.reporterID ?? '',
+        reporterName: record.reporter?.reporterName ?? null,
+      },
       reportedAt: record.createdAt.toISOString(),
       distance: 0,
     });

@@ -30,7 +30,7 @@ vi.mock('@pawhaven/ui', () => ({
   showToast: mockShowToast,
 }));
 
-vi.mock('@/features/Auth/api/auth.mutations', () => ({
+vi.mock('@/features/auth/api/auth.mutations', () => ({
   useLogout: () => ({ mutate: mockLogout, isPending: false }),
 }));
 

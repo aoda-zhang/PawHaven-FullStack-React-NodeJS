@@ -1,15 +1,14 @@
 import { join } from 'path';
 
 import { Module } from '@nestjs/common';
-import { FileModule } from '@modules/File/file.module.js';
 import {
   collectServiceConfigSources,
   SharedModule,
   SharedModuleFeatures,
 } from '@pawhaven/backend-core';
-import { EmailModule } from '@modules/Email/email.module.js';
+import { EmailModule } from '@Email/email.module.js';
+import { PDFModule } from '@PDF/pdf.module.js';
 import { microServiceNames } from '@pawhaven/backend-core/constants';
-// import { PDFModule } from '@modules/Pdf/pdf.module.js';
 
 const configContext = import.meta.webpackContext('./config', {
   recursive: true,
@@ -29,8 +28,7 @@ const configContext = import.meta.webpackContext('./config', {
       ],
     }),
     EmailModule,
-    // PDFModule,
-    FileModule,
+    PDFModule,
   ],
   providers: [],
 })

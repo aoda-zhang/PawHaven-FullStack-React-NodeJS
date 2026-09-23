@@ -24,7 +24,9 @@
   "internalJwt": {
     "enabled": false,
     "ttlSeconds": 45,
-    "clockSkewSeconds": 30
+    "clockSkewSeconds": 30,
+    "keyId": "internal-v1",
+    "privateKey": "${INTERNAL_JWT_PRIVATE_KEY}"
   },
   "throttle": {
     "ttlMs": 60000,
@@ -49,11 +51,7 @@
         "host": "${CORE_SERVICE_HOST}",
         "port": 8081,
         "gatewayPrefix": "/api/core",
-        "pathRewrite": "/core-service",
-        "internalJwt": {
-          "keyId": "core-v1",
-          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_CORE}"
-        }
+        "pathRewrite": "/core-service"
       }
     },
     {
@@ -63,11 +61,7 @@
         "host": "${AUTH_SERVICE_HOST}",
         "port": 8082,
         "gatewayPrefix": "/api/auth",
-        "pathRewrite": "/auth-service",
-        "internalJwt": {
-          "keyId": "auth-v1",
-          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_AUTH}"
-        }
+        "pathRewrite": "/auth-service"
       }
     },
     {
@@ -77,11 +71,7 @@
         "host": "${DOCUMENT_SERVICE_HOST}",
         "port": 8083,
         "gatewayPrefix": "/api/document",
-        "pathRewrite": "/document-service",
-        "internalJwt": {
-          "keyId": "document-v1",
-          "privateKey": "${INTERNAL_JWT_PRIVATE_KEY_DOCUMENT}"
-        }
+        "pathRewrite": "/document-service"
       }
     }
   ],
@@ -92,8 +82,7 @@
       "Accept",
       "Content-Type",
       "X-Sign",
-      "x-locale",
-      "Locale"
+      "x-locale"
     ],
     "origin": ["https://pawhaven.work"],
     "credentials": true,

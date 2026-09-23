@@ -1,0 +1,85 @@
+{
+  "rescueGuide": {
+    "brand": "PawHaven Ratgeber-Bibliothek",
+    "title": "Tierrettung – Grundlagen",
+    "subtitle": "Sechs ruhige Schritte für die Hilfe an einem Streuner – vom ersten Hinsehen bis zur Übergabe in professionelle Hände.",
+    "sections": [
+      {
+        "title": "Eigene Sicherheit zuerst",
+        "text": "Deine eigene Sicherheit macht die ganze Rettung erst möglich. Selbst ein sanftes Tier beißt oder kratzt, wenn es verletzt ist, und an der Straße bringst du dich selbst in Gefahr.",
+        "bullets": [
+          "Halte außer Reichweite an und beurteile die Lage, bevor du etwas anfasst.",
+          "Parke ordentlich, schalte das Warnblinklicht ein und nutze nachts eine Taschenlampe.",
+          "Bring dein Gesicht nie in Nähe des Mauls und laufe nie in den fließenden Verkehr."
+        ]
+      },
+      {
+        "title": "Beurteilen, bevor du handelst",
+        "text": "Die meisten Streuner sind gesund und nur wachsam. Ein paar Minuten ruhiges Beobachten zeigen dir, ob wirklich ein Notfall vorliegt.",
+        "bullets": [
+          "Achte auf Blutungen, Lahmheit, nachgezogene Gliedmaßen oder eine unveränderte Körperhaltung.",
+          "Prüfe auf Halsband, Ohrkuppe oder gut genährten Körper – es könnte ein Zuhause haben.",
+          "Notiere genauen Ort, Uhrzeit und Bewegungsradius; danach wird man dich fragen."
+        ]
+      },
+      {
+        "title": "Langsam und ruhig nähern",
+        "text": "Vertrauen entsteht durch Berechenbarkeit. Geh in die Hocke, meide direkten Blickkontakt und sprich leise und gleichmäßig. Lass das Tier den letzten Teil des Weges selbst kommen – Futter überzeugt viel mehr als greifende Hände."
+      },
+      {
+        "title": "Ohne Kampf sichern",
+        "text": "Das Sichern soll das Risiko beenden, nicht ein neues eröffnen. Nutze Hilfsmittel statt deiner Hände, solange das Tier fremd ist.",
+        "bullets": [
+          "Greif zuerst zu Box, Käfig oder einem mit Handtuch ausgelegten Karton – deine Hände zuletzt.",
+          "Eine Leine nur überstreifen, wenn das Tier es zulässt; sonst Handtuch oder Decke nutzen.",
+          "Trag Handschuhe und lange Ärmel; auch eine kleine Katze kann tiefe Wunden verursachen."
+        ]
+      },
+      {
+        "title": "Ruhig transportieren",
+        "text": "Decke die Box ab und halte es im Auto ruhig. Öffne die Box nie im Freien Innern und lass ein Tier niemals im geparkten Auto – auch nicht kurz, auch nicht bei offenem Fenster."
+      },
+      {
+        "title": "An Fachleute übergeben",
+        "text": "Kontaktiere noch am selben Tag eine Rettungsstelle oder eine Klinik und kündige dein Kommen an, damit das Tier nicht hinter geplante Eingriffe einsortiert wird.",
+        "bullets": [
+          "Melde deinen Fund über PawHaven, damit Ehrenamtliche in der Nähe weiterhelfen.",
+          "Teile Fotos und den genauen Ort – Genauigkeit spart bei der Aufnahme Zeit.",
+          "Bewahre Belege, wenn du Notfallkosten vorgestreckt hast; viele Organisationen erstatten sie."
+        ]
+      }
+    ],
+    "contacts": {
+      "title": "Notfallkontakte",
+      "items": [
+        {
+          "label": "Tierarzt vor Ort",
+          "value": "Vor der Fahrt anrufen"
+        },
+        {
+          "label": "Tierheim",
+          "value": "Aufnahmeplatz vorher reservieren"
+        },
+        {
+          "label": "PawHaven-Hotline",
+          "value": "pawhaven.work"
+        },
+        {
+          "label": "Notfalldienste",
+          "value": "112 / 911"
+        }
+      ]
+    },
+    "checklist": {
+      "title": "Fünf Grundlagen vor dem Handeln",
+      "items": [
+        "Beobachten und Einschätzen",
+        "Sicherheit zuerst",
+        "Erste Hilfe leisten",
+        "Professionelle Hilfe suchen",
+        "Rettung auf PawHaven teilen"
+      ]
+    },
+    "disclaimer": "Dieser Ratgeber ist allgemeine Information und kein tierärztlicher Rat. Ist das Leben eines Tieres in Gefahr, kontaktiere sofort eine Tierarztpraxis oder den Notdienst."
+  }
+}
