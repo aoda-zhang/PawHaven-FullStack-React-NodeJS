@@ -59,9 +59,3 @@ instance.init({
 });
 
 export const documentI18n = instance;
-
-export const translateDocument = (locale, key, options) =>
-  instance.t(`document.${key}`, { ...options, lng: locale });
-
-export const getDocumentObject = (locale, key) =>
-  instance.t(`document.${key}`, { lng: locale, returnObjects: true });

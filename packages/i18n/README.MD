@@ -65,8 +65,8 @@ Every file inside a kind folder is merged **flat** into that kind's object, so t
 special case for chrome versus guides — the filename *is* the key. Adding a second document kind (say email) is just
 adding `documents/email/`, which yields `document.email.*` with no change to `resources.js`.
 
-So a backend reads them as `translateDocument(locale, 'pdf.header.tagline')` and
-`getDocumentObject(locale, 'pdf.rescueGuide')`.
+So a backend resolves them as `document.pdf.header.tagline` and `document.pdf.rescueGuide`
+(via the `documentI18n` instance).
 
 Each file carries **only its bare top-level key** — `header.json` is `{ "header": { ... } }`, never
 `{ "document": { "header": ... } }`. `resources.js` merges file content into the `document` object itself, so a
@@ -146,20 +146,6 @@ locales / fr - BE / common.json;
 
 `@pawhaven/i18n/resources` is Node-safe: it never imports `react`, `react-dom`, `react-i18next`, `i18next-browser-languagedetector` or `i18next-resources-to-backend`.
 
-```ts
-import { getDocumentObject, translateDocument } from '@pawhaven/i18n/resources';
-
-translateDocument('zh-CN', 'pdf.header.tagline');
-translateDocument('de-DE', 'pdf.footer.copyright');
-getDocumentObject('en-US', 'pdf.rescueGuide');
-```
-
-The key is resolved under `document`, so the caller passes the path below that key. `translateDocument` returns a
-`string`; `getDocumentObject` returns `unknown` on purpose, because a whole guide body is an object and the shape is
-not guaranteed by this package. A key that does not resolve comes back as **the key string itself**, so callers must
-narrow before use (for example `Array.isArray(...)`, or the `pdf*Schema` exports from `@pawhaven/shared/types`) —
-never assume an object or array came back.
-
 This entry reads `locales/{locale}/documents/` from disk, so PDF copy does **not** go through the browser loader.
 See [`documents/` — Node-only](#documents--node-only-excluded-from-the-browser-bundle).
 
@@ -193,8 +179,6 @@ t('guide.rescueGuide.title', { lng: locale });
 
 `documentI18n.changeLanguage(locale)` mutates module state shared by every render in the process. Two PDFs
 rendering concurrently in different locales would each overwrite the other's language, so `lng` per `t()` call is
-the only race-free option. The same applies to `translateDocument` / `getDocumentObject`, which already pass `lng`
-per call.
+the only race-free option.
 
-`returnObjects` is `false` on the instance; pass `{ returnObjects: true }` per call (as `getDocumentObject` does)
-when a whole subtree is wanted.
+`returnObjects` is `false` on the instance; pass `{ returnObjects: true }` per call when a whole subtree is wanted.

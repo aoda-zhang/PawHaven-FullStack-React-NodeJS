@@ -12,20 +12,14 @@ const cookieMinutes = cookieExpirationDays * hoursPerDay * minutesPerHour;
 
 const localeFilePattern = /^\.\/locales\/([^/]+)\//;
 
-const localeLoaders = Object.entries(
-  import.meta.glob('./locales/*/*.json'),
-).reduce((loadersByLocale, [modulePath, loadModule]) => {
-  const locale = modulePath.match(localeFilePattern)?.[1];
-
-  if (!locale) {
-    return loadersByLocale;
-  }
-
-  return {
-    ...loadersByLocale,
-    [locale]: [...(loadersByLocale[locale] ?? []), loadModule],
-  };
-}, {});
+const localeLoaders = {};
+Object.entries(import.meta.glob('./locales/*/*.json')).forEach(
+  ([modulePath, loadModule]) => {
+    const locale = modulePath.match(localeFilePattern)?.[1];
+    if (!locale) return;
+    (localeLoaders[locale] ??= []).push(loadModule);
+  },
+);
 
 const loadLocaleResources = async (locale) => {
   const loaders = localeLoaders[locale] ?? [];
