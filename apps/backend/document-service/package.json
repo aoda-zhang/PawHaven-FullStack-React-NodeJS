@@ -17,7 +17,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^2.0.2",
     "@nestjs/axios": "^12.0.0",
     "@nestjs/common": "^12.0.0",
     "@nestjs/config": "^12.0.0",

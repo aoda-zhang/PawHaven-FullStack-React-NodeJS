@@ -1,13 +1,15 @@
-import { ISendMailOptions, MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { render } from '@react-email/components';
 import type { SendEmailBody } from '@pawhaven/backend-core/types';
+import type { SendMailOptions, Transporter } from 'nodemailer';
+
+import { MAIL_TRANSPORT } from './mailTransport.js';
 
 @Injectable()
 export class EmailService {
   constructor(
-    private readonly mailService: MailerService,
+    @Inject(MAIL_TRANSPORT) private readonly transport: Transporter,
     private readonly configs: ConfigService,
   ) {}
 
@@ -37,12 +39,13 @@ export class EmailService {
         payload: emailProps?.payload,
         locale: emailProps?.locale ?? 'en-US',
       });
-      const options: ISendMailOptions = {
-        ...(emailProps?.options ?? {}),
+      const options = (emailProps?.options ?? {}) as SendMailOptions;
+
+      await this.transport.sendMail({
+        ...options,
         from: this.configs.get('email')?.from,
         html: emailHtml,
-      };
-      await this.mailService.sendMail(options);
+      });
     } catch (error) {
       console.log(error);
       throw new Error(`Failed to send email with error: ${error}`);

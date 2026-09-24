@@ -45,13 +45,10 @@ export const SystemError = ({ footer }: SystemErrorProps) => {
 
         <div className="mx-auto mb-12 max-w-xl">
           <h1 className="text-text mb-4 text-4xl leading-tight font-bold">
-            {t('common.system_error', 'Oops Something went wrong')}
+            {t('common.system_error')}
           </h1>
           <p className="text-text-secondary text-lg leading-relaxed">
-            {t(
-              'common.system_error_info',
-              'An unexpected error occurred. Please try again or return to the homepage.',
-            )}
+            {t('common.system_error_info')}
           </p>
         </div>
 

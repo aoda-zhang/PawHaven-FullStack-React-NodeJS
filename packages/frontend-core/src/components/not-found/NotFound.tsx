@@ -1,5 +1,5 @@
 import { Button } from '@pawhaven/ui';
-import { Home } from 'lucide-react';
+import { ArrowLeft, Home } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +8,10 @@ import type { ErrorInfo } from '../router-error-fallback/RouterErrorFallback';
 
 const goToHome = () => {
   window.location.href = '/';
+};
+
+const goBack = () => {
+  window.history.back();
 };
 
 export interface NotFoundProps {
@@ -53,25 +57,35 @@ export const NotFound = ({
 
         <div className="mx-auto mb-12 max-w-xl">
           <h2 className="text-text mb-4 text-3xl leading-tight font-bold">
-            {t('common.not_found', 'Page Not Found')}
+            {t('common.not_found', "We can't find that page")}
           </h2>
           <p className="text-text-secondary text-lg leading-relaxed">
             {t(
               'common.not_found_info',
-              'The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.',
+              'The link might be wrong, or the page may have been moved or removed. Check the address for typos, or start again from the homepage.',
             )}
           </p>
         </div>
 
-        <Button
-          onClick={goToHome}
-          className={cn(
-            'bg-warning text-text-inverse hover:bg-warning-hover mx-auto rounded-xl px-8 py-3 text-base font-semibold',
-          )}
-        >
-          <Home size={18} />
-          {t('common.go_to_home', 'Go to Home')}
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Button
+            onClick={goToHome}
+            className={cn(
+              'bg-warning text-text-inverse hover:bg-warning-hover rounded-xl px-8 py-3 text-base font-semibold',
+            )}
+          >
+            <Home size={18} />
+            {t('common.go_to_home', 'Go to Home')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={goBack}
+            className={cn('rounded-xl px-8 py-3 text-base font-semibold')}
+          >
+            <ArrowLeft size={18} />
+            {t('common.go_back', 'Go Back')}
+          </Button>
+        </div>
 
         {!isStableEnv && error?.data && (
           <p className="text-text-tertiary mx-auto mt-10 max-w-xl text-xs break-all">
