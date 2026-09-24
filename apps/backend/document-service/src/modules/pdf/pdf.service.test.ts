@@ -16,7 +16,7 @@ vi.mock('puppeteer', () => ({
   default: { launch: launchMock },
 }));
 
-vi.mock('@sparticuz/chromium', () => ({
+vi.mock('@sparticuz/chromium-min', () => ({
   default: {
     executablePath: executablePathMock,
     args: ['--sparticuz-arg'],
@@ -59,7 +59,7 @@ afterEach(() => {
 });
 
 describe('PdfService Chromium executable path resolution', () => {
-  it('prefers PUPPETEER_EXECUTABLE_PATH over config and @sparticuz/chromium (env wins)', async () => {
+  it('prefers PUPPETEER_EXECUTABLE_PATH over config and @sparticuz/chromium-min (env wins)', async () => {
     process.env.PUPPETEER_EXECUTABLE_PATH = '/env/chromium';
     const service = buildService(() => '/config/chromium');
 
@@ -86,7 +86,7 @@ describe('PdfService Chromium executable path resolution', () => {
     expect(options.headless).toBe(true);
   });
 
-  it('uses @sparticuz/chromium on Vercel when neither env var nor config is set', async () => {
+  it('uses @sparticuz/chromium-min on Vercel when neither env var nor config is set', async () => {
     process.env.VERCEL = '1';
     await buildService().renderPdf(body, locale);
 

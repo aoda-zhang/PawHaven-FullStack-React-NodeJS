@@ -109,5 +109,9 @@ export const module = {
       test: /\.(png|jpe?g|gif|svg|webp|avif)$/,
       type: 'asset/inline',
     },
+    {
+      test: /\.(woff2?|ttf|otf|eot)$/,
+      type: 'asset/inline',
+    },
   ],
 };

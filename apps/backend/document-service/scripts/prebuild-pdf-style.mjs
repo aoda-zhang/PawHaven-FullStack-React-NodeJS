@@ -9,7 +9,7 @@
  * relying on the `tailwindcss` binary being on PATH.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -41,6 +41,31 @@ execFileSync(process.execPath, [syncScript], {
   cwd: docServiceRoot,
   stdio: 'inherit',
 });
+
+// Copy the simplified-Chinese font out of @fontsource so it is a project asset
+// (not a node_modules import). rspack externalizes node_modules assets, which
+// would leave an unresolved runtime require; a project asset is inlined as a
+// data URL, letting headless Chromium render Chinese glyphs.
+console.log('› Copying CJK font (Noto Sans SC) from @fontsource...');
+const cjkFontSrc = join(
+  docServiceRoot,
+  'node_modules',
+  '@fontsource',
+  'noto-sans-sc',
+  'files',
+  'noto-sans-sc-chinese-simplified-400-normal.woff2',
+);
+if (!existsSync(cjkFontSrc)) {
+  throw new Error(
+    `CJK font not found at ${cjkFontSrc} (is @fontsource/noto-sans-sc installed?)`,
+  );
+}
+const cjkFontDestDir = join(docServiceRoot, 'src', 'assets', 'fonts');
+mkdirSync(cjkFontDestDir, { recursive: true });
+copyFileSync(
+  cjkFontSrc,
+  join(cjkFontDestDir, 'noto-sans-sc-chinese-simplified-400-normal.woff2'),
+);
 
 if (!existsSync(tailwindBin)) {
   throw new Error(`Tailwind CLI not found at ${tailwindBin}`);

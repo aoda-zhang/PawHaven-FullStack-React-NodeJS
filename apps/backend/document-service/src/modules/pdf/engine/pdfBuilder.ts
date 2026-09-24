@@ -9,8 +9,8 @@ import { documentI18n } from '@pawhaven/i18n/resources';
 
 import { CommonHeader } from '../components/Header.js';
 import { CommonFooter } from '../components/Footer.js';
-import { getPdfTemplate, renderPdfElement } from '../templates/index.js';
 
+import { getPdfTemplate, renderPdfElement } from './templateRegistry.js';
 import { documentStyles } from './styles.js';
 import {
   defaultPdfOptions,

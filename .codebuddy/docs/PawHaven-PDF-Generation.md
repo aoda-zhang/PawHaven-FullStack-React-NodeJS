@@ -45,9 +45,9 @@ POST /pdf/download   (or POST /pdf/preview, non-prod only)
   +- PDF.service.ts          renderPdf(body, locale) -> buildPdf(this.browser, ...)
   |
   +- engine/pdfBuilder.ts
-       1. getPdfTemplate(body.template)          templates/index.ts: name -> descriptor
+       1. getPdfTemplate(body.template)          engine/templateRegistry.ts: name -> descriptor (registered by templates/index.ts)
        2. documentI18n.cloneInstance({ lng })    per-request clone, never mutates the shared instance
-       3. descriptor.element(instance)           templates/index.ts wraps it in I18nextProvider
+       3. descriptor.element(instance)           engine/definePdfTemplate wraps Component in I18nextProvider
        4. renderPdfElement(...)                  ReactDOMServer.renderToStaticMarkup
        5. buildHtml(content, locale)             injects <style>{documentStyles}</style> (engine/styles.ts)
        6. buildChromeTemplate(instance, Header|Footer)   same path, plus transparent background
@@ -132,7 +132,7 @@ A class used anywhere else — built at runtime, or living outside those two glo
 **Add a guide**
 
 1. Create `templates/<slug>/index.tsx` exporting a component that takes no props and reads copy via `useTranslation(undefined, { keyPrefix: 'document.pdf.<slug>' })`.
-2. Register it in `templates/index.ts`. `pdfTemplates` is a `satisfies Record<GuideSlug, ...>`, so a missing slug is a compile error.
+2. Register it in `templates/index.ts` by adding `<slug>: definePdfTemplate({ Component })` to `pdfTemplates`. `definePdfTemplate` (from `engine/templateRegistry.ts`) wraps the component in an `I18nextProvider`; `pdfTemplates` is a `satisfies Record<GuideSlug, ...>` and its trailing `registerTemplates(pdfTemplates)` call auto-registers every entry with the engine, so a missing slug is a compile error and the template is immediately resolvable via `getPdfTemplate`.
 3. Add `packages/i18n/locales/{en-US,zh-CN,de-DE}/documents/pdf/<slug>.json` nested under `document.pdf.<slug>`. All three locales are required.
 4. Build, then confirm every class you used is present in `engine/pdfRunTime/pdf.generated.css`.
 

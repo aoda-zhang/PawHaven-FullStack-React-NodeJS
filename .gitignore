@@ -132,6 +132,7 @@ tsconfig.tsbuildinfo
 
 # PDF engine derived artifacts (generated at build time, never hand-edited)
 apps/backend/document-service/src/modules/pdf/engine/pdfRunTime/
+apps/backend/document-service/src/assets/fonts/
 
 # codebuddy
 .codebuddy/memory/*.md

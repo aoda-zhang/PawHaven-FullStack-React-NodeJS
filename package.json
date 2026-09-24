@@ -10,8 +10,8 @@
   "scripts": {
     "prepare": "husky",
     "format": "prettier --write .",
-    "build:all": "pnpm run build:libs && pnpm run build",
-    "dev:restart": "bash scripts/restart-dev.sh",
+    "build:local": "pnpm run build:libs && pnpm run build",
+    "dev:local": "bash scripts/restart-dev.sh",
     "dev:all": "pnpm run build:libs && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",

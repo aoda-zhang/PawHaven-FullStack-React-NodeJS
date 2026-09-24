@@ -110,6 +110,12 @@ Browser JWT / cookies are owned by the **gateway** only. Per request it resolves
 
 ---
 
+# 🧑‍💻 Local Development
+
+See [DEVELOPMENT.MD](./DEVELOPMENT.MD).
+
+---
+
 # 🌟 Contributing
 
 Contributions are welcome.
