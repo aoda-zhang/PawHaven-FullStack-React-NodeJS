@@ -19,6 +19,7 @@ allowBuilds:
   prisma: true
   protobufjs: true
   puppeteer: true
+  '@sparticuz/chromium': true
   unrs-resolver: true
 
 # vitest 4 requires a matching coverage provider major; without this pin the
@@ -34,6 +35,8 @@ onlyBuiltDependencies:
   - bcrypt
   - esbuild
   - protobufjs
+  - '@sparticuz/chromium'
+  - 'puppeteer'
   - unrs-resolver
 
 minimumReleaseAgeExclude:

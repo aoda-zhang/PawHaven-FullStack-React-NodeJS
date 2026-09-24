@@ -14,7 +14,8 @@
     "install:document-service": "pnpm --filter=@pawhaven/document-service... install",
     "turbo:build": "turbo run build --filter=@pawhaven/document-service --env-mode=loose",
     "start": "node dist/main.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@nestjs/axios": "^12.0.0",
@@ -26,6 +27,8 @@
     "@pawhaven/design-system": "workspace:*",
     "@pawhaven/i18n": "workspace:*",
     "@pawhaven/shared": "workspace:*",
+    "@sparticuz/chromium": "^153.0.0",
+    "puppeteer": "^24.34.0",
     "@react-email/components": "^0.5.6",
     "@types/express": "^5.0.3",
     "@types/react": "^19.2.2",
@@ -35,7 +38,6 @@
     "helmet": "^8.1.0",
     "i18next": "^25.6.0",
     "nodemailer": "^7.0.11",
-    "puppeteer": "^24.34.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.0.0",
@@ -48,12 +50,15 @@
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
     "@rspack/core": "^2.2.3",
+    "@swc/core": "^1.16.2",
     "@tailwindcss/cli": "^4.1.14",
-    "tailwindcss": "^4.1.14",
     "@types/node": "^24.7.1",
     "@types/nodemailer": "^6.4.20",
+    "tailwindcss": "^4.1.14",
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.9.3",
+    "unplugin-swc": "^1.6.0",
+    "vitest": "^4.1.10",
     "webpack-node-externals": "^3.0.0"
   }
 }

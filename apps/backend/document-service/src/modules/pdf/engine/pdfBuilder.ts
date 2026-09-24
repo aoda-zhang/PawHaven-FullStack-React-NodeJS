@@ -80,6 +80,12 @@ export const buildPdf = async (
     });
 
     return Buffer.from(buffer);
+  } catch (error) {
+    throw new Error(
+      `${body.template} render PDF with error: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   } finally {
     await page.close();
   }

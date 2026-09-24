@@ -1,35 +1,61 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
-import puppeteer, { Browser } from 'puppeteer';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
+import type { Browser } from 'puppeteer';
 import type { RenderPdfBody } from '@pawhaven/backend-core/types';
 import type { GuideLocale } from '@pawhaven/shared/types';
 
 import { buildPdf } from './engine/pdfBuilder.js';
 
+const DEFAULT_CHROMIUM_ARGS = [
+  '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-dev-shm-usage',
+  '--disable-gpu',
+];
+
 @Injectable()
-export class PdfService implements OnModuleInit, OnModuleDestroy {
+export class PdfService implements OnModuleDestroy {
   private readonly logger = new Logger(PdfService.name);
 
   private browser: Browser | null = null;
 
-  async onModuleInit(): Promise<void> {
+  constructor(private readonly configService: ConfigService) {}
+
+  private resolveChromiumExecutablePath(): string | undefined {
+    const fromEnv = process.env.PUPPETEER_EXECUTABLE_PATH;
+    if (fromEnv) {
+      return fromEnv;
+    }
+    return this.configService.get<string>('pdf.chromiumExecutablePath');
+  }
+
+  private async ensureBrowser(): Promise<Browser> {
+    if (this.browser) {
+      return this.browser;
+    }
+
+    const envOrConfig = this.resolveChromiumExecutablePath();
+    const useServerlessChromium = !envOrConfig && !!process.env.VERCEL;
+
+    const args = useServerlessChromium ? chromium.args : DEFAULT_CHROMIUM_ARGS;
+
     try {
       this.browser = await puppeteer.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-        ],
+        headless: useServerlessChromium ? 'shell' : true,
+        executablePath:
+          envOrConfig ??
+          (useServerlessChromium ? await chromium.executablePath() : undefined),
+        args,
       });
+      return this.browser;
     } catch (error) {
-      this.logger.error('Puppeteer bootstrap failed', error);
-      throw new Error('Puppeteer failed to bootstrap Chromium');
+      this.browser = null;
+      this.logger.error('Failed to launch Chromium for PDF rendering', error);
+      throw new Error(
+        'Chromium is not available: set PUPPETEER_EXECUTABLE_PATH to a Chromium executable',
+      );
     }
   }
 
@@ -44,19 +70,13 @@ export class PdfService implements OnModuleInit, OnModuleDestroy {
     body: RenderPdfBody,
     headerLocale: GuideLocale,
   ): Promise<Buffer> {
-    if (!this.browser) {
-      throw new Error('Puppeteer browser is not initialized');
-    }
+    const browser = await this.ensureBrowser();
 
     try {
-      return await buildPdf(this.browser, body, headerLocale);
+      return await buildPdf(browser, body, headerLocale);
     } catch (error) {
       this.logger.error(`Failed to render "${body.template}" PDF`, error);
-      throw new Error(
-        `${body.template} render PDF with error: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
+      throw error;
     }
   }
 }

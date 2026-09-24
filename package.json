@@ -10,18 +10,18 @@
   "scripts": {
     "prepare": "husky",
     "format": "prettier --write .",
-    "lint-staged": "lint-staged",
-    "dev:all": "pnpm run build:libs && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
+    "build:all": "pnpm run build:libs && pnpm run build",
     "dev:restart": "bash scripts/restart-dev.sh",
+    "dev:all": "pnpm run build:libs && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "playwright test",
     "lint": "turbo run lint",
-    "build:all": "pnpm run build:libs && pnpm run build",
     "build": "turbo run build",
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
-    "doctor:react": "npx react-doctor@latest"
+    "doctor:react": "npx react-doctor@latest",
+    "lint-staged": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
