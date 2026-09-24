@@ -1,3 +1,4 @@
+import { HttpException, Logger } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -52,11 +53,16 @@ const buildService = (
     }),
   };
 
+  const configService = {
+    get: vi.fn((_key: string, defaultValue?: number) => defaultValue),
+  };
+
   const service = new HomeService(
     prisma as never,
     rescueService as never,
     adoptionService as never,
     httpClientService as never,
+    configService as never,
   );
 
   return { service, animalReportsCount, adoptablePetCount, httpClientService };
@@ -110,26 +116,63 @@ describe('HomeService.getStats', () => {
     });
   });
 
-  it('reports a failed data source instead of publishing zeroed stats', async () => {
+  it('reports a failed local data source instead of publishing zeroed stats', async () => {
     const { service } = buildService({
       totalRescues: new Error('mongo unavailable'),
     });
 
-    await expect(service.getStats()).rejects.toThrow(
-      'Failed to compute hero stats',
-    );
+    await expect(service.getStats()).rejects.toThrow('mongo unavailable');
   });
 
-  it('fails when the auth volunteer-count call rejects', async () => {
+  it('degrades gracefully when the auth volunteer-count call rejects', async () => {
     const { service } = buildService(
       {},
       {},
       new Error('auth service unavailable'),
     );
 
-    await expect(service.getStats()).rejects.toThrow(
-      'Failed to compute hero stats',
+    await expect(service.getStats()).resolves.toEqual({
+      totalRescues: 0,
+      totalAdopted: 0,
+      totalVolunteers: 0,
+    });
+  });
+
+  it('logs a warning when the auth volunteer-count call rejects', async () => {
+    const { service } = buildService(
+      {},
+      {},
+      new Error('auth service unavailable'),
     );
+
+    const warnSpy = vi.spyOn(Logger.prototype, 'warn');
+    await service.getStats();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('auth-service'),
+    );
+    warnSpy.mockRestore();
+  });
+
+  it('surfaces the downstream status and traceId in the warning', async () => {
+    const authError = new HttpException(
+      {
+        traceId: 'trace-abc-123',
+        status: 503,
+        message: 'Service unavailable',
+        duration: 12,
+        data: null,
+      },
+      503,
+    );
+    const { service } = buildService({}, {}, authError);
+
+    const warnSpy = vi.spyOn(Logger.prototype, 'warn');
+    await service.getStats();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('status=503'));
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('traceId=trace-abc-123'),
+    );
+    warnSpy.mockRestore();
   });
 });
 
@@ -151,13 +194,11 @@ describe('HomeService.getHomeData', () => {
     });
   });
 
-  it('fails the page rather than rendering half-true stats', async () => {
+  it('fails the page when the local data source is unavailable', async () => {
     const { service } = buildService({
       adoptedRescues: new Error('mongo unavailable'),
     });
 
-    await expect(service.getHomeData()).rejects.toThrow(
-      'Failed to compute hero stats',
-    );
+    await expect(service.getHomeData()).rejects.toThrow('mongo unavailable');
   });
 });

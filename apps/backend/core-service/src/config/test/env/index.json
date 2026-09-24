@@ -14,6 +14,10 @@
     "prefix": "api-docs",
     "description": "管理后台接口文档"
   },
+  "featureFlag": {
+    "latestRescueLimit": 4,
+    "adoptablePetLimit": 6
+  },
   "DBConnections": [
     {
       "enable": true,

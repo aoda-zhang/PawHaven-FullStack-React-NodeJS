@@ -49,12 +49,6 @@ export const NotFound = ({
           </div>
         </div>
 
-        <div className="mb-8">
-          <span className="text-warning text-9xl leading-none font-black tracking-tighter">
-            404
-          </span>
-        </div>
-
         <div className="mx-auto mb-12 max-w-xl">
           <h2 className="text-text mb-4 text-3xl leading-tight font-bold">
             {t('common.not_found', "We can't find that page")}
