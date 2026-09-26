@@ -36,11 +36,7 @@ interface RequestContext {
   requestData: unknown;
 }
 
-const DEFAULT_REQUEST_TIMEOUT_MS = 8000;
-
 export class HttpClientInstance {
-  private readonly fallbackTimeout = DEFAULT_REQUEST_TIMEOUT_MS;
-
   private readonly internalJwtTtlSeconds: number;
 
   constructor(
@@ -57,7 +53,7 @@ export class HttpClientInstance {
 
   private getCurrentMicroserviceOption(): MicroserviceOption {
     const allMicroservices =
-      this.configService.get<MicroserviceConfigItem[]>('microServices') ?? [];
+      this.configService.getOrThrow<MicroserviceConfigItem[]>('microServices');
     const currentMicroserviceOption = allMicroservices?.find(
       (mic) => mic?.name === this.serviceName && mic?.enable,
     );
@@ -115,8 +111,7 @@ export class HttpClientInstance {
     };
 
     return {
-      timeout:
-        this.configService.get<number>('http.timeout') ?? this.fallbackTimeout,
+      timeout: this.configService.getOrThrow<number>('http.timeout'),
       ...options?.config,
       method: context.method,
       url: context.url,

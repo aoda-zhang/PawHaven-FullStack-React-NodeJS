@@ -15,8 +15,6 @@ import { InternalJwtVerificationError } from './errors.js';
 import type { InternalJwtRequest } from './InternalJwt.types.js';
 import { verifyInternalJwt, type VerifyInternalJwtOptions } from './verify.js';
 
-const DEFAULT_CLOCK_SKEW_SECONDS = 30;
-
 @Injectable()
 export class InternalJwtGuard implements CanActivate {
   private readonly verifyOptions: VerifyInternalJwtOptions;
@@ -31,18 +29,13 @@ export class InternalJwtGuard implements CanActivate {
     if (!publicKeyByKeyId || Object.keys(publicKeyByKeyId).length === 0) {
       throw new Error('internalJwt.publicKeys must be a non-empty keyId map');
     }
-    const audience =
-      configService.get<string>('internalJwt.audience') ??
-      configService.get<string>('http.prefix');
-    if (!audience) {
-      throw new Error('internalJwt.audience must be configured');
-    }
+    const audience = configService.getOrThrow<string>('internalJwt.audience');
     const ttlSeconds = configService.getOrThrow<number>(
       'internalJwt.ttlSeconds',
     );
-    const clockSkewSeconds =
-      configService.get<number>('internalJwt.clockSkewSeconds') ??
-      DEFAULT_CLOCK_SKEW_SECONDS;
+    const clockSkewSeconds = configService.getOrThrow<number>(
+      'internalJwt.clockSkewSeconds',
+    );
     this.verifyOptions = {
       audience,
       publicKeyByKeyId,

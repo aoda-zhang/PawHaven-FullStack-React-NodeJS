@@ -78,13 +78,11 @@ export class HomeService {
   }
 
   async getHomeData(): Promise<HomeData> {
-    const latestRescueLimit = this.configService.get<number>(
+    const latestRescueLimit = this.configService.getOrThrow<number>(
       'featureFlag.latestRescueLimit',
-      4,
     );
-    const adoptablePetLimit = this.configService.get<number>(
+    const adoptablePetLimit = this.configService.getOrThrow<number>(
       'featureFlag.adoptablePetLimit',
-      6,
     );
 
     const [heroStats, latestRescues, adoptablePets] = await Promise.all([

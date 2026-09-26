@@ -43,7 +43,7 @@ export class EmailService {
 
       await this.transport.sendMail({
         ...options,
-        from: this.configs.get('email')?.from,
+        from: this.configs.getOrThrow<string>('email.from'),
         html: emailHtml,
       });
     } catch (error) {

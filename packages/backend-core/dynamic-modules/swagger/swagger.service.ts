@@ -15,15 +15,15 @@ export class SwaggerService {
     if (isProd) return;
 
     const options = new DocumentBuilder()
-      .setTitle(this.config.get<string>('swagger.title') ?? '')
+      .setTitle(this.config.getOrThrow<string>('swagger.title'))
       .setDescription(this.config.get<string>('swagger.description') ?? '')
-      .setVersion(this.config.get<string>('swagger.version') ?? '')
+      .setVersion(this.config.getOrThrow<string>('swagger.version'))
       .addBearerAuth()
       .build();
 
     const document = NestSwaggerModule.createDocument(app, options);
     NestSwaggerModule.setup(
-      this.config.get('swagger.prefix') ?? 'api-docs',
+      this.config.getOrThrow('swagger.prefix'),
       app,
       document,
     );
