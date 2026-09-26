@@ -13,6 +13,8 @@ import {
 } from '@pawhaven/backend-core/constants';
 import { PrismaClient } from '@prismaClient/index.js';
 
+import { authServiceConfigSchema } from './config/Config.schema.js';
+
 const configContext = import.meta.webpackContext('./config', {
   recursive: true,
   regExp: /\/env\/index\.json$/,
@@ -24,6 +26,7 @@ const configContext = import.meta.webpackContext('./config', {
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.AUTH,
       configSources: collectServiceConfigSources(configContext),
+      configSchema: authServiceConfigSchema,
       modules: [
         {
           module: SharedModuleFeatures.PrismaModule,

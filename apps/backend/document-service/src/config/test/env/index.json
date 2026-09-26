@@ -14,15 +14,6 @@
     "prefix": "api-docs",
     "description": "管理后台接口文档"
   },
-  "DBConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "DOCUMENT_SERVICE_DB",
-        "uri": "${DOCUMENT_SERVICE_MONGODB}"
-      }
-    }
-  ],
   "cors": {
     "allowedHeaders": [
       "X-timestamp",
@@ -45,5 +36,24 @@
     },
     "ttlSeconds": 45,
     "clockSkewSeconds": 30
+  },
+  "dbConnections": [
+    {
+      "enable": true,
+      "options": {
+        "name": "DOCUMENT_SERVICE_DB",
+        "uri": "${DOCUMENT_SERVICE_MONGODB}"
+      }
+    }
+  ],
+  "email": {
+    "from": "no-reply@pawhaven.work",
+    "host": "${EMAIL_SMTP_HOST}",
+    "port": 587,
+    "user": "${EMAIL_SMTP_USER}",
+    "password": "${EMAIL_SMTP_PASSWORD}",
+    "tls": {
+      "ciphers": "HIGH"
+    }
   }
 }

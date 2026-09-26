@@ -14,15 +14,6 @@
     "prefix": "api-docs",
     "description": "管理后台接口文档"
   },
-  "DBConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "AUTH_SERVICE_MONGODB",
-        "uri": "${AUTH_SERVICE_MONGODB}"
-      }
-    }
-  ],
   "cors": {
     "allowedHeaders": [
       "X-timestamp",
@@ -40,9 +31,12 @@
   "auth": {
     "jwtSecret": "${JWT_SECRET}",
     "jwtExpiresIn": 300,
+    "jwtClockTolerance": 30,
+    "jwtRefreshFallbackSeconds": 60,
+    "jwtRefreshWindowPercentage": 0.2,
     "refreshTokenExpiresIn": 604800,
-    "sessionExpiresIn": 2592000,
-    "refreshTokenRotationWindowSeconds": 86400
+    "refreshTokenRotationWindowSeconds": 86400,
+    "sessionExpiresIn": 2592000
   },
   "internalJwt": {
     "enabled": true,
@@ -52,5 +46,14 @@
     },
     "ttlSeconds": 45,
     "clockSkewSeconds": 30
-  }
+  },
+  "dbConnections": [
+    {
+      "enable": true,
+      "options": {
+        "name": "AUTH_SERVICE_MONGODB",
+        "uri": "${AUTH_SERVICE_MONGODB}"
+      }
+    }
+  ]
 }

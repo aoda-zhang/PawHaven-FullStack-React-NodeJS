@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { MicroServiceRegistry } from './microService.registry.js';
-import { GatewayConfigValidator } from './gatewayConfig.validator.js';
 
 @Module({
-  providers: [MicroServiceRegistry, GatewayConfigValidator],
+  providers: [MicroServiceRegistry],
   exports: [MicroServiceRegistry],
 })
 export class RoutingModule {}

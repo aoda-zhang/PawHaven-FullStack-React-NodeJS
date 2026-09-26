@@ -21,6 +21,11 @@
       "import": "./dist/constants/index.js",
       "default": "./dist/constants/index.js"
     },
+    "./config-module": {
+      "types": "./dist/dynamic-modules/config-module/index.d.ts",
+      "import": "./dist/dynamic-modules/config-module/index.js",
+      "default": "./dist/dynamic-modules/config-module/index.js"
+    },
     "./decorators": {
       "types": "./dist/decorators/index.d.ts",
       "import": "./dist/decorators/index.js",

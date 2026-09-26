@@ -15,6 +15,7 @@ import { HttpSuccessInterceptor } from './http-client/httpInterceptor.js';
 import { HttpExceptionFilter } from './http-client/httpExceptionFilter.js';
 import { SwaggerModule } from './swagger/swagger.module.js';
 import { ConfigsModule } from './config-module/configs.module.js';
+import type { ServiceConfigSchema } from './config-module/configSchema.js';
 import type { ServiceConfigSource } from './config-module/serviceConfig.js';
 import { HttpClientModule } from './http-client/httpClient.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -28,6 +29,10 @@ interface SharedModuleForRootOptions {
   serviceRoot: string;
   serviceName: string;
   configSources?: ServiceConfigSource;
+  /**
+   * Zod schema every resolved config value must satisfy before the app boots
+   */
+  configSchema?: ServiceConfigSchema;
   /**
    * Optional predefined shared modules to load
    * Only accepts modules from SharedModuleFeatures enum
@@ -43,13 +48,20 @@ export class SharedModule {
    * For service-specific modules or providers, import them directly in your AppModule
    */
   static forRoot(options: SharedModuleForRootOptions): DynamicModule {
-    const { serviceRoot, serviceName, modules = [], configSources } = options;
+    const {
+      serviceRoot,
+      serviceName,
+      modules = [],
+      configSources,
+      configSchema,
+    } = options;
 
-    const defaultModules = this.getDefaultModules(
+    const defaultModules = this.getDefaultModules({
       serviceRoot,
       serviceName,
       configSources,
-    );
+      configSchema,
+    });
     const optionalModules = this.loadOptionalModules(modules);
     const sharedProviders = this.getSharedProviders();
 
@@ -66,13 +78,21 @@ export class SharedModule {
    * - ConfigsModule: Environment configuration
    * - HttpClientModule: HTTP client utilities
    */
-  private static getDefaultModules(
-    serviceRoot: string,
-    serviceName: string,
-    configSources?: ServiceConfigSource,
-  ): Array<Type<any> | DynamicModule> {
+  private static getDefaultModules(options: {
+    serviceRoot: string;
+    serviceName: string;
+    configSources?: ServiceConfigSource;
+    configSchema?: ServiceConfigSchema;
+  }): Array<Type<any> | DynamicModule> {
+    const { serviceRoot, serviceName, configSources, configSchema } = options;
+
     return [
-      ConfigsModule.forRoot(serviceRoot, serviceName, configSources),
+      ConfigsModule.forRoot({
+        serviceRoot,
+        serviceName,
+        configSources,
+        configSchema,
+      }),
       HttpClientModule,
       InternalJwtModule.forRoot(serviceName, configSources),
     ];

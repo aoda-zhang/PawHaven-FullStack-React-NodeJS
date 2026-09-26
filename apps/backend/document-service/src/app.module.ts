@@ -10,6 +10,8 @@ import { EmailModule } from '@Email/email.module.js';
 import { PDFModule } from '@PDF/pdf.module.js';
 import { microServiceNames } from '@pawhaven/backend-core/constants';
 
+import { documentServiceConfigSchema } from './config/Config.schema.js';
+
 const configContext = import.meta.webpackContext('./config', {
   recursive: true,
   regExp: /\/env\/index\.json$/,
@@ -21,6 +23,7 @@ const configContext = import.meta.webpackContext('./config', {
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.DOCUMENT,
       configSources: collectServiceConfigSources(configContext),
+      configSchema: documentServiceConfigSchema,
       modules: [
         {
           module: SharedModuleFeatures.SwaggerModule,

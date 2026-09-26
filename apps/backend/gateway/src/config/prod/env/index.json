@@ -17,12 +17,17 @@
   },
   "auth": {
     "jwtSecret": "${JWT_SECRET}",
+    "jwtExpiresIn": 300,
     "jwtClockTolerance": 30,
     "jwtRefreshFallbackSeconds": 60,
-    "jwtRefreshWindowPercentage": 0.2
+    "jwtRefreshWindowPercentage": 0.2,
+    "refreshTokenExpiresIn": 604800,
+    "refreshTokenRotationWindowSeconds": 86400,
+    "sessionExpiresIn": 2592000
   },
   "internalJwt": {
     "enabled": false,
+    "audience": "gateway",
     "ttlSeconds": 45,
     "clockSkewSeconds": 30,
     "keyId": "internal-v1",
@@ -34,15 +39,6 @@
     "authTtlMs": 60000,
     "authLimit": 10
   },
-  "DBConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "CORE_SERVICE_DB",
-        "uri": "${CORE_SERVICE_DB}"
-      }
-    }
-  ],
   "microServices": [
     {
       "name": "core-service",
@@ -88,5 +84,14 @@
     "credentials": true,
     "optionsSuccessStatus": 204,
     "methods": ["GET", "POST", "PUT", "OPTIONS"]
-  }
+  },
+  "dbConnections": [
+    {
+      "enable": true,
+      "options": {
+        "name": "CORE_SERVICE_DB",
+        "uri": "${CORE_SERVICE_DB}"
+      }
+    }
+  ]
 }

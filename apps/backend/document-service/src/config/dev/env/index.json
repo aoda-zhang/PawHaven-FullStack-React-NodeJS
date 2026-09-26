@@ -45,5 +45,15 @@
     },
     "ttlSeconds": 45,
     "clockSkewSeconds": 30
+  },
+  "email": {
+    "from": "no-reply@pawhaven.work",
+    "host": "${EMAIL_SMTP_HOST}",
+    "port": 587,
+    "user": "${EMAIL_SMTP_USER}",
+    "password": "${EMAIL_SMTP_PASSWORD}",
+    "tls": {
+      "ciphers": "HIGH"
+    }
   }
 }

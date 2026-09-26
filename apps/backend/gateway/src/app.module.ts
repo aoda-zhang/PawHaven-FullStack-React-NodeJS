@@ -9,6 +9,7 @@ import {
 import { microServiceNames } from '@pawhaven/backend-core/constants';
 import { MiddlewareModule } from '@pawhaven/backend-core/middlewares';
 
+import { gatewayConfigSchema } from './config/Config.schema.js';
 import { ProxyModule } from './proxy/proxy.module.js';
 import { GatewayThrottleGuard } from './throttle/gatewayThrottle.guard.js';
 import { ThrottleConfigValidator } from './throttle/throttleConfig.validator.js';
@@ -24,6 +25,7 @@ const configContext = import.meta.webpackContext('./config', {
       serviceRoot: join(import.meta.dirname, '..'),
       serviceName: microServiceNames.GATEWAY,
       configSources: collectServiceConfigSources(configContext),
+      configSchema: gatewayConfigSchema,
       modules: [],
     }),
     MiddlewareModule,
