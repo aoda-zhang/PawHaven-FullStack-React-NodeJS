@@ -4,8 +4,8 @@
 
 ## 环境准备
 
-- **Node.js**: `25.x`
-- **pnpm**: `11.x`
+- **Node.js**: `24.x`
+- **pnpm**: `12.x`
 
 详见 [`READMECN.MD`](./READMECN.MD)。先安装依赖：
 

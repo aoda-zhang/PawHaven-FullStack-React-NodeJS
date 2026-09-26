@@ -22,8 +22,8 @@ In addition to the application itself, PawHaven also serves as a **practice of m
 
 # 🛠 Prerequisites
 
-- **Node.js**: `25.x`
-- **pnpm**: `11.x`
+- **Node.js**: `24.x`
+- **pnpm**: `12.x`
 
 Ensure you meet these version requirements before installing dependencies or running the project.
 

@@ -4,8 +4,8 @@ How to build and run PawHaven on your machine.
 
 ## Prerequisites
 
-- **Node.js**: `25.x`
-- **pnpm**: `11.x`
+- **Node.js**: `24.x`
+- **pnpm**: `12.x`
 
 See [`README.MD`](./README.MD) for details. Install dependencies once:
 

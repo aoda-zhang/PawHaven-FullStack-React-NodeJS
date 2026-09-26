@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": "24.x",
-    "pnpm": "11"
+    "pnpm": "12"
   },
   "scripts": {
     "prepare": "husky",
