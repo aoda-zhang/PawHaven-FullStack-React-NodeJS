@@ -22,7 +22,7 @@ export default defineConfig({
         find: /^@pawhaven\/backend-core\/internal-jwt$/,
         replacement: resolve(
           backendCoreRoot,
-          'dynamicModules/internalJwt/index.ts',
+          'dynamic-modules/internal-jwt/index.ts',
         ),
       },
       {
@@ -39,7 +39,7 @@ export default defineConfig({
       },
       {
         find: /^@pawhaven\/backend-core\/setup$/,
-        replacement: resolve(backendCoreRoot, 'setup/appSetup.ts'),
+        replacement: resolve(backendCoreRoot, 'setup/configureApp.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/types$/,

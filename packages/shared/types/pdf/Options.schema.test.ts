@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { pdfMarginSchema, pdfOptionsSchema } from './options.schema.js';
+import { pdfMarginSchema, pdfOptionsSchema } from './Options.schema.js';
 
 const validLengths = ['110px', '80px', '0', '20mm', '1in', '1.5cm', '12'];
 const invalidLengths = ['10pt', '-5px', 'abc', '', 'px', '1.2.3px', '50 %'];

@@ -53,8 +53,25 @@ const buildService = (
     }),
   };
 
+  // Mirrors the real `featureFlag` block in src/config/*/env/index.json, which
+  // declares both limits in every environment. `getOrThrow` reproduces Nest's
+  // behaviour of failing fast when a required key is absent.
+  const featureFlags: Record<string, number> = {
+    'featureFlag.latestRescueLimit': 4,
+    'featureFlag.adoptablePetLimit': 6,
+  };
+
   const configService = {
     get: vi.fn((_key: string, defaultValue?: number) => defaultValue),
+    getOrThrow: vi.fn((key: string) => {
+      const value = featureFlags[key];
+
+      if (value === undefined) {
+        throw new Error(`Configuration key "${key}" does not exist`);
+      }
+
+      return value;
+    }),
   };
 
   const service = new HomeService(
