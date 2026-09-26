@@ -37,9 +37,9 @@
       "default": "./dist/types/index.js"
     },
     "./setup": {
-      "types": "./dist/setup/appSetup.d.ts",
-      "import": "./dist/setup/appSetup.js",
-      "default": "./dist/setup/appSetup.js"
+      "types": "./dist/setup/index.d.ts",
+      "import": "./dist/setup/index.js",
+      "default": "./dist/setup/index.js"
     },
     "./utils": {
       "types": "./dist/utils/index.d.ts",

@@ -1,11 +1,24 @@
 import { VersioningType } from '@nestjs/common';
+import type { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface.js';
 import { ConfigService } from '@nestjs/config';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import * as express from 'express';
 import helmet from 'helmet';
 
-export interface SetupAppOptions {
+import { httpHeaders } from '../constants/httpHeaders.js';
+
+const toHeaderList = (value: string | string[] | undefined): string[] => {
+  if (!value) {
+    return [];
+  }
+
+  return (Array.isArray(value) ? value : value.split(','))
+    .map((header) => header.trim())
+    .filter(Boolean);
+};
+
+export interface ConfigureAppOptions {
   enableVersioning?: boolean;
   enableCors?: boolean;
   enableCookieParser?: boolean;
@@ -19,9 +32,9 @@ export interface SetupAppOptions {
  * its own unlimited parser first and `http.maxJsonBodySize` is silently
  * bypassed.
  */
-export function setupApp(
+export function configureApp(
   app: NestExpressApplication,
-  options: SetupAppOptions = {},
+  options: ConfigureAppOptions = {},
 ): void {
   const {
     enableVersioning = false,
@@ -60,7 +73,20 @@ export function setupApp(
   }
 
   if (enableCors) {
-    app.enableCors(configService.get('cors'));
+    const corsOptions = configService.getOrThrow<CorsOptions>('cors');
+    const allowedHeaders = Array.from(
+      new Set([
+        ...toHeaderList(corsOptions.allowedHeaders),
+        httpHeaders.traceId,
+      ]),
+    );
+    const exposedHeaders = Array.from(
+      new Set([
+        ...toHeaderList(corsOptions.exposedHeaders),
+        httpHeaders.traceId,
+      ]),
+    );
+    app.enableCors({ ...corsOptions, allowedHeaders, exposedHeaders });
   }
 
   if (enableCookieParser) {

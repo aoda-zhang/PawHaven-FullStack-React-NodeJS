@@ -1,31 +1,9 @@
-import type { NestExpressApplication } from '@nestjs/platform-express';
-import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
-import { setupApp } from '@pawhaven/backend-core/setup';
+import { bootstrapApp } from '@pawhaven/backend-core/setup';
 
 import { AppModule } from './app.module.js';
 
-async function bootstrap(): Promise<void> {
-  const logger = new Logger('Bootstrap');
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bodyParser: false,
-  });
-  const configService = app.get(ConfigService) as ConfigService;
-
-  setupApp(app);
-
-  const port = configService.getOrThrow<number>('http.port');
-
-  try {
-    await app.listen(port, '0.0.0.0');
-    logger.log(`core-service running at http://localhost:${port}`);
-  } catch (error) {
-    logger.error('Failed to start core-service', error);
-    throw new Error(
-      `Bootstrap failed: ${error instanceof Error ? error.message : error}`,
-    );
-  }
-}
-
-bootstrap();
+// bootstrapApp already logs the failure; setting exitCode (rather than calling
+// process.exit) lets the buffered Nest logger flush before the process ends.
+bootstrapApp(AppModule).catch(() => {
+  process.exitCode = 1;
+});
