@@ -1,6 +1,6 @@
 # PawHaven — System Architecture Design
 
-> **Version**: v3.10 | **Date**: 2026-09-19
+> **Version**: v3.11 | **Date**: 2026-09-25
 > **Design Philosophy**: Pragmatic service decomposition. Modular monolith inside core-service. Extract only when necessary.
 >
 > **This document has been split into 3 focused docs for easier navigation.**

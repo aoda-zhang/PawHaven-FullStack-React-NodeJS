@@ -1,6 +1,6 @@
 # PawHaven — System Architecture Overview
 
-> **Version**: v3.10 | **Date**: 2026-09-19
+> **Version**: v3.11 | **Date**: 2026-09-25
 > **Design Philosophy**: Pragmatic service decomposition. Modular monolith inside core-service. Extract only when necessary.
 >
 > **Related Docs**: [Frontend Architecture](./PawHaven-Frontend-Architecture.md) | [Backend Architecture](./PawHaven-Backend-Architecture.md) | [Authentication Architecture](./authentication-architecture.md)
@@ -336,13 +336,17 @@ brain" lives in a dedicated `routing/` module rather than a generic `config/` fo
   - `micro-service.registry.ts` (`MicroServiceRegistry`) — the runtime prefix→service map.
     `ProxyService` and `InternalJwtTargetResolver` inject it to resolve a request's target host
     (`findByGatewayPrefix`) and the internal-JWT audience/secret (`findByName`).
-  - `gateway-config.validator.ts` (`GatewayConfigValidator`) — a bootstrap **fail-fast** guard
-    (constructor side-effect). It throws if `internalJwt.ttlSeconds` is outside 30–60s or any
-    enabled microservice lacks `internalJwt.keyId`/`secret`, so the gateway refuses to boot with
-    bad routing config.
-  - `routing.module.ts` (`RoutingModule`) — provides `MicroServiceRegistry` + `GatewayConfigValidator`
-    and exports `MicroServiceRegistry`; both `proxy/` and `internal-jwt/` import it (neither feature
-    imports the other, avoiding an `internal-jwt → proxy` coupling).
+  - `routing.module.ts` (`RoutingModule`) — provides `MicroServiceRegistry` and exports it;
+    both `proxy/` and `internal-jwt/` import it (neither feature imports the other, avoiding an
+    `internal-jwt → proxy` coupling).
+- **Gateway config validation is now the single Zod gate.** The dead
+  `routing/gateway-config.validator.ts` (`GatewayConfigValidator`, a constructor side-effect guard)
+  has been deleted. Its rules — `internalJwt.ttlSeconds` must be within 30–60s and every enabled
+  microservice must carry `internalJwt.keyId`/`secret` — were folded into the gateway's
+  `src/config/Config.schema.ts`, which composes the shared Zod building blocks and is passed to
+  `SharedModule.forRoot`. Validation runs inside the `load` factory and is enforced at bootstrap by
+  `bootstrapApp()` (see Backend Architecture §6.5): on a bad config the gateway prints the report and
+  `process.exit(1)` fires before `app.listen()`.
 
 ### 5.2 Endpoint Policy Decorators (Downstream)
 
@@ -560,6 +564,10 @@ this.logger.log({
   data: { caseId, fromStatus: 'pending', toStatus: 'inProgress', operatorId },
 });
 ```
+
+### 9.4 Request Correlation (`x-trace-id`)
+
+The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.randomUUID()` when absent, then echoes it on the proxied response so callers can correlate requests with gateway logs. The header name is defined once in `packages/backend-core/constants/httpHeaders.ts`. See Backend Architecture §6.8 for the full contract.
 
 ---
 

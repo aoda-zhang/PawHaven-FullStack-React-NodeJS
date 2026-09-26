@@ -1,6 +1,6 @@
 # PawHaven — Frontend Architecture
 
-> **Version**: v3.10 | **Date**: 2026-09-19
+> **Version**: v3.11 | **Date**: 2026-09-25
 > **Related**: [System Overview](./PawHaven-System-Architecture-Overview.md) | [Backend](./PawHaven-Backend-Architecture.md)
 
 ---

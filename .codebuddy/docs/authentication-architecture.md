@@ -1,6 +1,6 @@
 # Authentication and Authorization Architecture
 
-> **Version**: v1.8 | **Date**: 2026-09-17
+> **Version**: v1.9 | **Date**: 2026-09-25
 > **Related Docs**: [Route Authentication](./route_authentication.md)
 
 ## Overview
@@ -301,7 +301,7 @@ For the core→document internal JWT, core-service signs with `INTERNAL_JWT_PRIV
 - Single allowlisted `ProxyController` (`@All('*path')`) proxies only configured prefix→service pairs: `/api/core → core-service`, `/api/auth → auth-service`. `document-service` is NOT proxied — it is core-only (see DD-10 in the System Architecture Overview). Unknown prefixes → 404.
 - Proxy safety: strips all inbound `x-auth-*`/`x-gateway-*` headers, rejects `/internal`-after-rewrite and `..` paths, and envelope-wraps 2xx JSON responses only.
 - Signs one `x-gateway-jwt` for every request (anonymous included) with the per-service secret/keyId from `microServices[].options.internalJwt` (`keyId` goes into the JOSE header).
-- The prefix→service map and the internal-JWT keyId/secret are read from `microServices[]` in the gateway YAML. At runtime `MicroServiceRegistry` (`apps/backend/gateway/src/routing/micro-service.registry.ts`) resolves the target by gateway prefix; at boot `GatewayConfigValidator` (`src/routing/gateway-config.validator.ts`) fails closed if any enabled service is missing its `internalJwt` keyId/secret or `internalJwt.ttlSeconds` is outside 30–60s. Routing lives in `src/routing/` (`RoutingModule`), while `src/config/` keeps only the per-environment YAML files.
+- The prefix→service map and the internal-JWT keyId/secret are read from `microServices[]` in the gateway YAML. At runtime `MicroServiceRegistry` (`apps/backend/gateway/src/routing/micro-service.registry.ts`) resolves the target by gateway prefix. The gateway's config is validated by its Zod `Config.schema.ts` (composed from the shared building blocks, passed to `SharedModule.forRoot`); `bootstrapApp()` fails closed if any enabled service is missing its `internalJwt` keyId/secret or `internalJwt.ttlSeconds` is outside 30–60s. Routing lives in `src/routing/` (`RoutingModule`), while `src/config/` keeps only the per-environment YAML files. (The old `routing/gateway-config.validator.ts` was deleted — its rules were folded into `Config.schema.ts`.)
 - CORS `methods`: `GET, POST, PUT, OPTIONS` (DELETE/PATCH removed).
 
 ### Auth Service

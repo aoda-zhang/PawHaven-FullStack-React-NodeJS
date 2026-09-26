@@ -1,6 +1,6 @@
 # PawHaven — Backend Architecture
 
-> **Version**: v3.10 | **Date**: 2026-09-19
+> **Version**: v3.11 | **Date**: 2026-09-25
 > **Related Docs**: [System Architecture Overview](./PawHaven-System-Architecture-Overview.md) | [Frontend Architecture](./PawHaven-Frontend-Architecture.md)
 
 ---
@@ -655,7 +655,27 @@ All services share one bootstrap: `NestFactory.create(AppModule, { bodyParser: f
 the configured limit is silently bypassed. URI versioning and the strict `ValidationPipe` are
 opt-in per service.
 
-### 6.5 Security
+### 6.5 Bootstrap & Config Validation
+
+Startup is **fail-fast**. `setup/bootstrap.ts` exposes `bootstrapApp()`, which wraps `NestFactory.create` in a try/catch. If a service's environment config is invalid, validation throws `ServiceConfigValidationError`; the catch prints the multiline report and rethrows so `process.exit(1)` fires **before** `app.listen()` — no HTTP listener is ever opened.
+
+Each service composes its schema from shared Zod building blocks:
+
+- `packages/backend-core/dynamic-modules/config-module/configValidation.ts` — `validateServiceConfig`, `formatConfigIssues`, `ServiceConfigValidationError`.
+- `packages/backend-core/dynamic-modules/config-module/configSchema.ts` — reusable schema fragments.
+- `apps/backend/<svc>/src/config/Config.schema.ts` (gateway / auth / core / document) — the per-service schema, passed to `SharedModule.forRoot`.
+- `configs.module.ts` — validation runs **inside** the `load` factory so it sees the fully-resolved env (including `ConfigModule` interpolations).
+
+The `validate` / `validationSchema` hooks were **rejected** because they execute _before_ the `load` factories run, so they never see the resolved env and cannot validate the real config. Required leaves use `.min(1)`, so a missing `${VAR}` (which resolves to `''`) is caught rather than silently defaulting.
+
+On failure the process prints, e.g.:
+
+```
+configuration is invalid — refusing to start
+  DBConnections: required, received ""
+```
+
+### 6.6 Security
 
 | Category               | Technology                                                    | Notes                                                                 |
 | ---------------------- | ------------------------------------------------------------- | --------------------------------------------------------------------- |
@@ -665,7 +685,7 @@ opt-in per service.
 | **Rate Limiting**      | Token bucket                                                  | Per IP + per user at gateway                                          |
 | **Transport**          | HTTPS (TLS 1.3)                                               |                                                                       |
 
-### 6.6 Deployment & Infrastructure
+### 6.7 Deployment & Infrastructure
 
 | Category           | Technology       | Notes                         |
 | ------------------ | ---------------- | ----------------------------- |
@@ -674,14 +694,13 @@ opt-in per service.
 | **Managed DB**     | MongoDB Atlas    | Production                    |
 | **Cache**          | Redis            | Rate limiting, optional cache |
 
-### 6.7 Observability
+### 6.8 Observability
 
-| Category    | Technology      | Notes                          |
-| ----------- | --------------- | ------------------------------ |
-| **Tracing** | OpenTelemetry   | X-Trace-Id across all services |
-| **Logging** | Structured JSON | Service + module tags          |
+The gateway correlates proxied requests with a single header, **`x-trace-id`**, whose name is the single source in `packages/backend-core/constants/httpHeaders.ts`:
 
-### 6.8 Code Quality
+- **Header contract** — `ProxyService.ensureTraceId()` forwards an inbound `x-trace-id` when present, otherwise mints one with `crypto.randomUUID()`. The value is attached to the outgoing request and echoed on the proxied response via `res.setHeader`, so the caller can correlate its own logs with the gateway's.
+
+### 6.9 Code Quality
 
 | Category            | Technology                        | Notes                       |
 | ------------------- | --------------------------------- | --------------------------- |

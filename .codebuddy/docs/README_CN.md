@@ -18,8 +18,8 @@
 
 | 文档                                                                                   | 说明                                                                         |
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| [PawHaven-System-Architecture.md](./PawHaven-System-Architecture.md)                   | 系统架构设计 v3.10 — 服务拆分、模块化单体、部署拓扑、数据流                  |
-| [PawHaven-System-Architecture-Overview.md](./PawHaven-System-Architecture-Overview.md) | 系统架构 v3.10 — 5 个服务、API 网关路由（内部 JWT 认证）、事件目录、数据架构 |
+| [PawHaven-System-Architecture.md](./PawHaven-System-Architecture.md)                   | 系统架构设计 v3.11 — 服务拆分、模块化单体、部署拓扑、数据流                  |
+| [PawHaven-System-Architecture-Overview.md](./PawHaven-System-Architecture-Overview.md) | 系统架构 v3.11 — 5 个服务、API 网关路由（内部 JWT 认证）、事件目录、数据架构 |
 
 **核心内容**：Monorepo 结构（`apps/backend/*` + `apps/frontend/*` + `packages/*` + `libs/*`），务实的服务拆分理念，core-service 内的模块化单体设计，API 网关路由规则，服务间通信模式。
 
