@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigValidationError } from '@pawhaven/shared/utils';
 
+import { TraceLogger } from '../logging/traceLogger.js';
+
 import { type ConfigureAppOptions, configureApp } from './configureApp.js';
 
 export interface BootstrapAppOptions extends ConfigureAppOptions {
@@ -34,6 +36,7 @@ export async function bootstrapApp(
       bufferLogs: true,
       forceCloseConnections: true,
       bodyParser: false,
+      logger: new TraceLogger(),
     });
   } catch (error) {
     Logger.flush();
