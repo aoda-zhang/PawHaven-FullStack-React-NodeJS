@@ -696,9 +696,46 @@ configuration is invalid — refusing to start
 
 ### 6.8 Observability
 
-The gateway correlates proxied requests with a single header, **`x-trace-id`**, whose name is the single source in `packages/backend-core/constants/httpHeaders.ts`:
+Every request carries a single correlation id, **`x-trace-id`**, whose name is the single source in `packages/backend-core/constants/httpHeaders.ts`. The id is minted once, survives every hop, and is visible to the user in the response header of every browser request.
 
-- **Header contract** — `ProxyService.ensureTraceId()` forwards an inbound `x-trace-id` when present, otherwise mints one with `crypto.randomUUID()`. The value is attached to the outgoing request and echoed on the proxied response via `res.setHeader`, so the caller can correlate its own logs with the gateway's.
+#### Where it comes from
+
+`packages/backend-core/trace/traceContext.ts` owns the whole contract:
+
+- `resolveInboundTraceId(headers)` reuses a caller's `x-trace-id` when it is safe, otherwise mints a UUID. This is the **only** place inbound resolution happens — `traceMiddleware` and the gateway proxy both defer to it, so a request can never end up with two ids.
+- Inbound values are **sanitized, not trusted**. A reflected value must be non-empty, ≤ 64 chars, and match `^[A-Za-z0-9._:-]+$`. The value is echoed straight into a response header, and `res.setHeader` throws on CR/LF, so a caller-supplied `x-trace-id: bad\r\nx-injected: 1` is discarded in favour of a fresh id rather than reflected.
+
+#### Ambient propagation (`AsyncLocalStorage`)
+
+`runWithTrace(traceId, fn)` opens an `AsyncLocalStorage` scope; `getTraceId()` reads it back. In-house rather than a dependency, and scoped to a single concern.
+
+`traceMiddleware` (registered as the **first** `app.use()` in `configureApp`, so it runs before body parsing and applies to all four services without per-app wiring):
+
+1. resolves the id and writes it to `req.headers` **and** `res.setHeader` — the latter is why gateway-originated responses that never touch `ProxyService` (401 from the identity resolver, 429 from the throttle guard, 404/400 from proxy path validation, `/health`) are still traceable;
+2. wraps `next()` in `runWithTrace`, so handlers and every async continuation inherit the id;
+3. emits an access log on `res.on('finish')` — `METHOD path status durationMs trace=<id>`, escalating to `warn` at 4xx and `error` at 5xx. The id is read from the closure, not the ambient store, so the log does not depend on how the response happened to be written.
+
+#### Service-to-service hops
+
+`HttpClientInstance` takes `traceId: options?.traceId ?? getTraceId() ?? generateTraceId()` and applies it **last** in the header spread, so the outbound `x-trace-id` always equals `context.traceId` and cannot be clobbered by a raw header. Overriding goes through the dedicated `traceId` option precisely so there is only one authoritative value for a call.
+
+The same value is set as the internal JWT's **`rid`** claim, so the token a callee verifies and the header it receives describe the same request. `InternalJwtGuard.reportTraceIdMismatch()` cross-checks the two: a disagreement is logged as a warning and the header wins, because `rid` carries no authorization meaning — failing closed there would risk breaking live flows for a diagnosability-only signal.
+
+#### Log correlation
+
+`TraceLogger` (`packages/backend-core/logging/`) is a `ConsoleLogger` that stamps `[trace=<id>]` onto every line and is installed as the Nest logger in `bootstrapApp`. Routing the whole application through one logger is what makes the id useful — there is no call site to remember to annotate, so every existing `new Logger(X).warn(...)` in every service is correlated for free. Lines outside a request scope render `[trace=-]`.
+
+The id is resolved **at log-call time, not at write time**. Nest buffers startup logs (`bufferLogs: true`) and flushes them from `app.listen()`, which runs outside any request; reading the store lazily at write time would attribute those lines to whichever request happened to be in flight.
+
+#### Error responses
+
+`HttpExceptionFilter` sets the header and adds `traceId` to the response envelope, preferring a trace id carried on the exception payload over the ambient one — `HttpClientInstance` attaches the id of the hop that actually broke, so the caller is pointed at the failing hop rather than the hop that noticed. Only the object payload form is read: `HttpException` returns its response verbatim, so `new HttpException('some message', 400)` yields a bare string that would otherwise be copied into the `traceId` field.
+
+#### A real three-hop chain
+
+`POST /core/guide/pdf` (core-service `GuideController`) → `GuideService` → `POST /internal/pdf/render` (document-service `InternalPdfController`) exercises the full path: gateway → core-service → document-service, with one id throughout.
+
+`internal/pdf/render` carries no `@Public()`, so `InternalJwtGuard` protects it; the gateway refusing to proxy any path that rewrites to `/internal` is a second line of defence. The response is written with `@Res()` rather than returned, because the global success interceptor would otherwise wrap the PDF buffer in the JSON envelope and corrupt the download. `core-service` validates the guide slug against `GuideSlugSchema` before spending a document-service call, and forwards `x-locale` explicitly because `PdfService` resolves the rendering locale from that **header**, not the body.
 
 ### 6.9 Code Quality
 

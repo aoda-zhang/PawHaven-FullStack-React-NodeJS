@@ -339,6 +339,12 @@ Router instance is created **once at module scope** — never inside a React com
 | Deferred route data     | `<Suspense>` + `<Await>` with a feature-owned skeleton                     |
 | Route errors            | Route `ErrorBoundary` → `RouterErrorFallback` → `NotFound` / `SystemError` |
 
+#### Trace IDs in error surfaces
+
+The backend returns `x-trace-id` on every response, but the API client's response interceptor **unwraps the success envelope and returns bare payloads**, so a caller has no way to reach the header. `packages/frontend-core/src/api/trace.ts` keeps the latest value module-scoped and `index.ts` records it before the unwrap step. `SystemError` prefers the id carried by the error itself and falls back to that module-level value — a render error boundary is often several requests removed from the failure, so the last-seen id is frequently the better clue.
+
+`normalizeHttpError()` returns `traceId` on the error (header first, body field as fallback), and `ApiErrorInfo` carries it. The header name is duplicated as a literal in the frontend, which must not depend on a backend package.
+
 ### 5.6 Auth & Permissions
 
 - Auth gating is the **authenticated parent route**; children inherit it (no per-page guards, no repeated `/current-user` calls).
