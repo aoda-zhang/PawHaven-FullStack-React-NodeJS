@@ -35,6 +35,11 @@ export interface ApiErrorInfo {
   data?: Record<string, unknown>;
   raw?: unknown;
   code: string;
+  /**
+   * Server correlation id for the failed request, shown to the user so a bug
+   * report can be tied to specific backend logs.
+   */
+  traceId?: string | null;
 }
 
 export interface ApiResponseType {

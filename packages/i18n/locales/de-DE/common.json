@@ -36,6 +36,8 @@
     "owner_text_author_url": "https://aoda.vercel.app",
     "system_error": "Ups! Etwas ist schiefgelaufen",
     "system_error_info": "Der Dienst ist vorübergehend nicht verfügbar. Wir arbeiten daran — bitte versuchen Sie es in Kürze erneut.",
+    "error_trace_id": "Referenz-ID (bitte beim Melden des Problems angeben)",
+    "error_trace_id_copy": "Referenz-ID kopieren",
     "retry": "WIEDERHOLEN",
     "recent_rescue": "Neueste Rettungs-Updates",
     "rescue_status_pending": "Ausstehend",

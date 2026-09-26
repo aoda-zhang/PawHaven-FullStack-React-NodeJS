@@ -36,6 +36,8 @@
     "owner_text_author_url": "https://aoda.vercel.app",
     "system_error": "Oops! Something went wrong",
     "system_error_info": "The service is temporarily unavailable. We're working on it — please try again in a little while.",
+    "error_trace_id": "Reference ID (share this when reporting the problem)",
+    "error_trace_id_copy": "Copy reference ID",
     "retry": "RETRY",
     "recent_rescue": "Latest Rescue Updates",
     "rescue_status_pending": "Pending",
