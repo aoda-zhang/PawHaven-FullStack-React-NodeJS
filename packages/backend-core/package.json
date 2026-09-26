@@ -85,7 +85,6 @@
     "express": "5.2.1",
     "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.3",
-    "uuid": "^8.3.2",
     "zod": "^4.3.6"
   },
   "peerDependencies": {
@@ -151,7 +150,6 @@
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
-    "@types/uuid": "^8.3.4",
     "@vitest/coverage-v8": "^4.1.11",
     "prisma": "^6.19.1",
     "source-map-support": "^0.5.21",

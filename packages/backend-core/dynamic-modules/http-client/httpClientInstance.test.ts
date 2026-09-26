@@ -10,6 +10,7 @@ import { Logger } from '@nestjs/common';
 import { HttpClientInstance } from './httpClientInstance.js';
 import { httpHeaders } from '../../constants/httpHeaders.js';
 import { microServiceNames } from '../../constants/microServices.js';
+import { runWithTrace } from '../../trace/traceContext.js';
 
 const testPrivateKey = crypto.generateKeyPairSync('ec', {
   namedCurve: 'prime256v1',
@@ -128,5 +129,118 @@ describe('HttpClientInstance internal auth header', () => {
     const requestConfig = mockAxiosRequest.mock
       .calls[0][0] as AxiosRequestConfig;
     expect(requestConfig.headers?.[httpHeaders.gatewayJwt]).toBeUndefined();
+  });
+});
+
+const lastRequestConfig = (): AxiosRequestConfig =>
+  mockAxiosRequest.mock.calls.at(-1)?.[0] as AxiosRequestConfig;
+
+const lastRequestTraceId = (): unknown =>
+  lastRequestConfig().headers?.[httpHeaders.traceId];
+
+const lastRequestRid = (): unknown => {
+  const token = lastRequestConfig().headers?.[httpHeaders.gatewayJwt];
+  return typeof token === 'string' ? decodeJwtPayload(token).rid : undefined;
+};
+
+describe('HttpClientInstance trace propagation', () => {
+  beforeEach(() => {
+    mockAxiosRequest.mockClear();
+  });
+
+  const documentInstance = () =>
+    makeInstance(microServiceNames.DOCUMENT, makeConfig(baseConfig()));
+
+  it('forwards the ambient request trace id on a service-to-service call', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('ambient-trace', () => instance.get<string>('/pdf/x'));
+
+    expect(lastRequestTraceId()).toBe('ambient-trace');
+  });
+
+  it('sets the internal jwt rid to the same trace id as the header', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('shared-trace', () => instance.get<string>('/pdf/x'));
+
+    expect(lastRequestRid()).toBe('shared-trace');
+    expect(lastRequestRid()).toBe(lastRequestTraceId());
+  });
+
+  it('keeps the same trace id across a chained hop', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('chain-trace', async () => {
+      await instance.get<string>('/pdf/first');
+      await instance.get<string>('/pdf/second');
+    });
+
+    expect(lastRequestTraceId()).toBe('chain-trace');
+    expect(lastRequestRid()).toBe('chain-trace');
+  });
+
+  it('mints a fresh id outside a request scope instead of sending none', async () => {
+    const instance = documentInstance();
+
+    await instance.get<string>('/pdf/cron');
+
+    expect(lastRequestTraceId()).toEqual(expect.any(String));
+    expect(lastRequestTraceId()).not.toBe('');
+  });
+
+  it('honours an explicit traceId override', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('ambient-trace', () =>
+      instance.get<string>('/pdf/x', { traceId: 'explicit-trace' }),
+    );
+
+    expect(lastRequestTraceId()).toBe('explicit-trace');
+    expect(lastRequestRid()).toBe('explicit-trace');
+  });
+
+  it('does not let a raw header override the resolved trace id', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('ambient-trace', () =>
+      instance.get<string>('/pdf/x', {
+        headers: { [httpHeaders.traceId]: 'sneaky-override' },
+      }),
+    );
+
+    // A raw header would desync the header from the `rid` claim the callee
+    // cross-checks, so `context.traceId` stays authoritative.
+    expect(lastRequestTraceId()).toBe('ambient-trace');
+    expect(lastRequestRid()).toBe('ambient-trace');
+  });
+
+  it('keeps concurrent calls on their own trace', async () => {
+    const instance = documentInstance();
+
+    await Promise.all([
+      runWithTrace('trace-a', () => instance.get<string>('/pdf/a')),
+      runWithTrace('trace-b', () => instance.get<string>('/pdf/b')),
+    ]);
+
+    const traceIds = mockAxiosRequest.mock.calls.map(
+      (call) => (call[0] as AxiosRequestConfig).headers?.[httpHeaders.traceId],
+    );
+    expect(traceIds).toEqual(expect.arrayContaining(['trace-a', 'trace-b']));
+  });
+
+  it('propagates on every verb, not just GET', async () => {
+    const instance = documentInstance();
+
+    await runWithTrace('verb-trace', async () => {
+      await instance.post<string>('/pdf/x', { a: 1 });
+      await instance.put<string>('/pdf/x', { a: 1 });
+      await instance.delete<string>('/pdf/x');
+    });
+
+    const traceIds = mockAxiosRequest.mock.calls.map(
+      (call) => (call[0] as AxiosRequestConfig).headers?.[httpHeaders.traceId],
+    );
+    expect(traceIds).toEqual(['verb-trace', 'verb-trace', 'verb-trace']);
   });
 });
