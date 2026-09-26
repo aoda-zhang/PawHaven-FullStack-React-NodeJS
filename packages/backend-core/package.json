@@ -36,6 +36,16 @@
       "import": "./dist/middlewares/index.js",
       "default": "./dist/middlewares/index.js"
     },
+    "./trace": {
+      "types": "./dist/trace/index.d.ts",
+      "import": "./dist/trace/index.js",
+      "default": "./dist/trace/index.js"
+    },
+    "./logging": {
+      "types": "./dist/logging/index.d.ts",
+      "import": "./dist/logging/index.js",
+      "default": "./dist/logging/index.js"
+    },
     "./types": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/types/index.js",

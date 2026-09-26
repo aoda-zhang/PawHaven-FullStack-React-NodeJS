@@ -1,10 +1,12 @@
 import { createServer, type Server } from 'node:http';
+import { connect } from 'node:net';
 import type { AddressInfo } from 'node:net';
 
 import { Logger } from '@nestjs/common';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { localeMiddleware } from '@pawhaven/backend-core/middlewares';
+import { traceMiddleware } from '@pawhaven/backend-core/trace';
 import { HTTP_STATUS } from '@pawhaven/shared/constants';
 import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -48,7 +50,12 @@ const startCapturingUpstream = async (): Promise<Server> => {
   const server = createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.statusCode = 200;
-    res.end(JSON.stringify({ locale: req.headers['x-locale'] ?? null }));
+    res.end(
+      JSON.stringify({
+        locale: req.headers['x-locale'] ?? null,
+        traceId: req.headers[httpHeaders.traceId] ?? null,
+      }),
+    );
   });
   await new Promise<void>((resolve) => {
     server.listen(0, '127.0.0.1', () => {
@@ -57,6 +64,37 @@ const startCapturingUpstream = async (): Promise<Server> => {
   });
   return server;
 };
+
+// Kept unanchored so it can be composed into a larger pattern (e.g. matching a
+// uuid inside a raw HTTP response head) without dragging `^`/`$` along.
+const UUID_SOURCE =
+  '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+const UUID_PATTERN = new RegExp(`^${UUID_SOURCE}$`);
+
+/**
+ * Issues a request with a hand-written header block, bypassing the client
+ * libraries' own header validation.
+ */
+const rawRequest = (
+  port: number,
+  path: string,
+  rawHeaders: string,
+): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const socket = connect(port, '127.0.0.1', () => {
+      socket.write(
+        `GET ${path} HTTP/1.1\r\nHost: 127.0.0.1\r\n${rawHeaders}\r\nConnection: close\r\n\r\n`,
+      );
+    });
+
+    let received = '';
+    socket.setEncoding('utf8');
+    socket.on('data', (chunk: string) => {
+      received += chunk;
+    });
+    socket.on('end', () => resolve(received));
+    socket.on('error', reject);
+  });
 
 const buildGateway = (target: string) => {
   const configService = { get: vi.fn(() => TIMEOUT_MS) };
@@ -88,6 +126,9 @@ const buildGateway = (target: string) => {
 
   const app = new ExpressAdapter().getInstance();
   app.use(localeMiddleware);
+  // Mirrors `configureApp`, which installs the trace middleware for every
+  // service before routing.
+  app.use(traceMiddleware);
   app.use((req: never, res: never, next: never) => {
     proxy.proxyRequest(req, res, next).catch(() => undefined);
   });
@@ -199,5 +240,92 @@ describe('ProxyService: locale is normalized onto the proxied request', () => {
 
     expect(viaLocaleHeader.body.data.locale).toBe('en-US');
     expect(viaAcceptLanguage.body.data.locale).toBe('zh-CN');
+  });
+});
+
+describe('ProxyService: trace id is echoed and forwarded', () => {
+  let upstream: Server | undefined;
+
+  afterEach(async () => {
+    await close(upstream);
+    upstream = undefined;
+  });
+
+  it('puts a generated trace id on the response so the caller can quote it', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway).get(PROXY_PATH);
+
+    expect(response.headers[httpHeaders.traceId]).toMatch(UUID_PATTERN);
+  });
+
+  it('forwards the same trace id upstream that it returns to the caller', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway).get(PROXY_PATH);
+
+    // One id for the whole hop: what the browser sees is what the service logs.
+    expect(response.body.data.traceId).toBe(
+      response.headers[httpHeaders.traceId],
+    );
+  });
+
+  it('adopts a caller-supplied trace id so a trace can span services', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway)
+      .get(PROXY_PATH)
+      .set(httpHeaders.traceId, 'caller-owned-trace');
+
+    expect(response.headers[httpHeaders.traceId]).toBe('caller-owned-trace');
+    expect(response.body.data.traceId).toBe('caller-owned-trace');
+  });
+
+  it('replaces a legal-but-untrusted trace id rather than echoing it', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+    const address = gateway.address() as AddressInfo;
+
+    // A raw socket is required because supertest refuses to send a value with
+    // spaces. Spaces are legal in a header value but outside the trace-id
+    // charset, so this must be replaced with a generated id.
+    const raw = await rawRequest(
+      address.port,
+      PROXY_PATH,
+      `${httpHeaders.traceId}: not a safe id`,
+    );
+
+    expect(raw).not.toContain('not a safe id');
+    expect(raw).toMatch(new RegExp(`${httpHeaders.traceId}: ${UUID_SOURCE}`));
+  });
+
+  it('rejects a header-smuggling attempt before it can be reflected', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+    const address = gateway.address() as AddressInfo;
+
+    // The folded continuation line is refused by Node's HTTP parser, so the
+    // smuggled header never reaches the application at all.
+    const raw = await rawRequest(
+      address.port,
+      PROXY_PATH,
+      [`${httpHeaders.traceId}: bad`, ' x-injected: 1'].join('\r\n'),
+    );
+
+    expect(raw).toContain('400');
+    expect(raw).not.toMatch(/^x-injected:/im);
+  });
+
+  it('still returns a trace id when the upstream never responds', async () => {
+    upstream = await startStallingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway).get(PROXY_PATH);
+
+    expect(response.status).toBe(HTTP_STATUS.GATEWAY_TIMEOUT);
+    expect(response.headers[httpHeaders.traceId]).toMatch(UUID_PATTERN);
   });
 });
