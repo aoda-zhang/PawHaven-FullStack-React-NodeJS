@@ -1,0 +1,31 @@
+{
+  "env": "test",
+  "version": "${PAWHAVEN_USER_VERSION}",
+  "featureFlags": {
+    "enableBetaFeature": false,
+    "enableMaintenance": false
+  },
+  "api": {
+    "enableSign": false,
+    "baseURL": "${PAWHAVEN_USER_API_BASE_URL}",
+    "prefix": "api",
+    "timeout": 5000,
+    "privateKey": "${PAWHAVEN_USER_API_PRIVATE_KEY}"
+  },
+  "query": {
+    "refetchOnReconnect": true,
+    "refetchOnWindowFocus": false,
+    "staleTime": 30000,
+    "gcTime": 60000
+  },
+  "sentry": {
+    "dsn": "${PAWHAVEN_USER_SENTRY_DSN}"
+  },
+  "analytics": {
+    "id": "${PAWHAVEN_USER_GA_ID}"
+  },
+  "services": {
+    "user": "${PAWHAVEN_USER_SERVICE_URL}",
+    "notification": "${PAWHAVEN_USER_NOTIFICATION_SERVICE_URL}"
+  }
+}

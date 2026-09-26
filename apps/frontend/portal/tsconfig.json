@@ -1,9 +1,11 @@
 {
   "extends": "@pawhaven/tsconfig/web",
   "compilerOptions": {
-    "types": ["node", "vite/client", "@modyfi/vite-plugin-yaml/modules"],
+    "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
     "paths": {
       "@/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.json"]
 }

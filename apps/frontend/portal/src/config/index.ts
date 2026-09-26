@@ -1,10 +1,10 @@
-import { resolveAppConfig } from '@pawhaven/shared/utils';
+import { resolveAppConfig, validateConfig } from '@pawhaven/shared/utils';
 
 import { ConfigSchema, type ConfigType } from './config.schema';
-import devYaml from './dev/env/index.yaml';
-import prodYaml from './prod/env/index.yaml';
-import testYaml from './test/env/index.yaml';
-import uatYaml from './uat/env/index.yaml';
+import devConfig from './dev/env/index.json';
+import uatConfig from './uat/env/index.json';
+import testConfig from './test/env/index.json';
+import prodConfig from './prod/env/index.json';
 
 export const EnvVariables = {
   dev: 'dev',
@@ -13,28 +13,23 @@ export const EnvVariables = {
   test: 'test',
 } as const;
 
-const loadYamlContent = () => {
+const loadEnvContent = () => {
   const environmentVariables = import.meta.env;
   const currentEnv = environmentVariables.PAWHAVEN_USER_APP_ENV;
-  let yamlContent = {};
   switch (currentEnv) {
     case EnvVariables.dev:
-      yamlContent = devYaml;
-      break;
+      return devConfig;
     case EnvVariables.uat:
-      yamlContent = uatYaml;
-      break;
+      return uatConfig;
     case EnvVariables.test:
-      yamlContent = testYaml;
-      break;
+      return testConfig;
     case EnvVariables.prod:
-      yamlContent = prodYaml;
-      break;
+      return prodConfig;
     default:
-      yamlContent = devYaml;
+      return devConfig;
   }
-  return yamlContent;
 };
+
 export const loadConfig = (): ConfigType => {
   const environmentVariables = import.meta.env;
   const currentEnv = environmentVariables.PAWHAVEN_USER_APP_ENV;
@@ -43,26 +38,28 @@ export const loadConfig = (): ConfigType => {
     throw new Error(`Invalid or missing environment mode: ${currentEnv}`);
   }
   try {
-    const yamlContent = loadYamlContent();
+    const envContent = loadEnvContent();
 
     const interpolated = resolveAppConfig<ConfigType>(
-      yamlContent as ConfigType,
+      envContent as ConfigType,
       environmentVariables,
     );
 
-    const parsed = ConfigSchema.safeParse(interpolated);
+    validateConfig(
+      {
+        serviceName: 'portal',
+        runtimeEnv: currentEnv,
+        sources: `json(${currentEnv}) + import.meta.env`,
+        config: interpolated as Record<string, unknown>,
+      },
+      ConfigSchema,
+    );
 
-    if (!parsed.success) {
-      if (currentEnv !== EnvVariables.prod) {
-        console.error('❌ Invalid config:', parsed?.error);
-      }
-      throw new Error('Config validation failed');
-    }
-    return parsed.data;
+    return interpolated as ConfigType;
   } catch (error) {
     if (currentEnv !== EnvVariables.prod) {
       console.error('Error loading config:', error);
     }
-    throw new Error('Config validation failed');
+    throw error;
   }
 };

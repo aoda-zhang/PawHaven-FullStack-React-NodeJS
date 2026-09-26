@@ -23,6 +23,11 @@
       "import": "./build/utils/index.js",
       "default": "./build/utils/index.js"
     },
+    "./config": {
+      "types": "./build/config/index.d.ts",
+      "import": "./build/config/index.js",
+      "default": "./build/config/index.js"
+    },
     "./index.css": "./index.css"
   },
   "scripts": {
@@ -37,6 +42,7 @@
     "@pawhaven/shared": "workspace:*",
     "@pawhaven/ui": "workspace:*",
     "@tanstack/react-query": "^5.90.2",
+    "zod": "^4.3.6",
     "axios": "^1.12.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",

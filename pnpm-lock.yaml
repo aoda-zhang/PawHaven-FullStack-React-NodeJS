@@ -884,9 +884,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.7.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.14.4)(effect@3.21.0)(react-hook-form@7.85.0(react@19.2.8))(zod@4.4.3)
-      '@modyfi/vite-plugin-yaml':
-        specifier: ^1.1.1
-        version: 1.1.1(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(yaml@2.9.0))
       '@pawhaven/design-system':
         specifier: workspace:*
         version: link:../../../packages/design-system
@@ -1315,6 +1312,9 @@ importers:
       tailwind-merge:
         specifier: 3.2.0
         version: 3.2.0
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
     devDependencies:
       '@pawhaven/eslint-config':
         specifier: workspace:*
