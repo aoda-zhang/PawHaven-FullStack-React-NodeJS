@@ -1,0 +1,672 @@
+# PawHaven — Frontend Architecture
+
+> **Version**: v3.11 | **Date**: 2026-09-25
+> **Related**: [System Overview](PawHaven-System-Architecture-Overview.md) | [Backend](PawHaven-Backend-Architecture.md)
+
+---
+
+## Table of Contents
+
+1. [Architecture Philosophy](#1-architecture-philosophy)
+2. [Feature-Based Module Architecture](#2-feature-based-module-architecture)
+3. [Package Ecosystem](#3-package-ecosystem)
+4. [Component Architecture & Boundaries](#4-component-architecture--boundaries)
+5. [Routing Architecture](#5-routing-architecture)
+6. [State Management Architecture](#6-state-management-architecture)
+7. [Design Token Architecture](#7-design-token-architecture)
+8. [Internationalization Architecture](#8-internationalization-architecture)
+9. [Module Boundary Enforcement](#9-module-boundary-enforcement)
+
+---
+
+## 1. Architecture Philosophy
+
+> **"Each feature is a self-contained module that aligns 1:1 to a business domain. Features do not know about each other."**
+
+### Core Principles
+
+| #   | Principle                                               | What It Means                                                                                                                                                                                                                                                                                                             |
+| --- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1  | **Feature-based, not layer-based**                      | All code for a business capability (components, API calls, hooks, types) co-locates in one folder.                                                                                                                                                                                                                        |
+| P2  | **Features are isolated**                               | No cross-feature imports. Features communicate through the routing layer only.                                                                                                                                                                                                                                            |
+| P3  | **Packages are the shared foundation**                  | Reusable code graduates into versioned packages. Packages have strict dependency direction.                                                                                                                                                                                                                               |
+| P4  | **App layer orchestrates, not owns**                    | The app shell provides providers, routing, and layout. Business logic belongs in features.                                                                                                                                                                                                                                |
+| P5  | **One schema, two contexts**                            | Zod schemas in `@pawhaven/shared` validate frontend forms AND backend DTOs — single source of truth.                                                                                                                                                                                                                      |
+| P6  | **CSS token layers enable rebranding**                  | Design tokens flow primitives → semantics → utilities. Change one file to rebrand.                                                                                                                                                                                                                                        |
+| P7  | **Design tokens are the single source of truth for UI** | Every feature's visual design derives from the token source in `packages/design-system/src/tokens/` (12 CSS variable files) plus `src/theme.css`. Before implementing any feature UI, read the relevant token files. `pnpm token-check` enforces them. There is no Figma file in this repo and no Figma-to-code pipeline. |
+
+### The Graduation Rule
+
+> **A component starts in a feature. When a second feature needs it, it graduates to a shared layer.**
+>
+> - Pure UI component (no business logic) → `@pawhaven/ui`
+> - Business-common component (auth guards, error boundaries, domain widgets) → `@pawhaven/frontend-core`
+> - Cross-cutting logic & infrastructure → `@pawhaven/frontend-core`
+
+There is NO `apps/*/src/components/` layer — if a component is shared, it belongs in a package.
+
+When graduating a component that depends on app-level modules (e.g. `@/hooks/useIsStableEnv`, `@/layout/RootLayoutFooter`, `@/features/Auth/api/auth.queries`, `@/router/routePaths`), inject those dependencies via props before the move: pass resolved hook state, a `footer?: ReactNode` slot, and literal route-path strings. Packages MUST NOT import from `apps/*`.
+
+---
+
+## 2. Feature-Based Module Architecture
+
+### 2.1 Why Feature-Based
+
+Layer-based organization (`components/`, `hooks/`, `services/` at the top level) scatters related code across the project. When you work on "Rescue Cases", you touch 5+ directories. When you delete the feature, you hunt through the entire codebase.
+
+Feature-based organization flips this:
+
+| Layer-Based (BAD)                            | Feature-Based (GOOD)                      |
+| -------------------------------------------- | ----------------------------------------- |
+| Related code scattered across 5+ directories | All Rescue code in `features/Rescue/`     |
+| Unclear ownership                            | One folder = one team's domain            |
+| Easy to accidentally couple features         | Lint-enforced isolation                   |
+| Deleting a feature = find-and-hope           | Deleting a feature = `rm -rf features/X/` |
+
+### 2.2 Feature Structure
+
+```
+features/
+├── Landing/          # App bootstrap — runs first, fetches menus + routes
+│   ├── index.tsx
+│   ├── api/
+│   ├── components/
+│   └── types.ts
+│
+├── Auth/             # Authentication — login, register, password reset
+├── Home/             # Landing page — curated content, cross-domain aggregation
+├── Rescue/           # Rescue cases — case lifecycle, tracking, timeline
+├── Report/           # Stray reporting — submit reports, photos, GPS tagging
+├── Adoption/         # Adoption — listings, applications, matching
+├── Content/          # Stories & knowledge base
+├── Volunteer/        # Volunteer profiles, case claiming, availability
+├── Profile/          # User profile — aggregated view across domains
+├── AnimalFollow/     # Follow animal — follow control + follower count
+└── Discovery/        # Browse & search across all content
+```
+
+Each feature contains:
+
+```
+FeatureName/
+├── index.tsx          # Public entry — only this is importable by the router
+├── api/               # feature.api.ts + feature.queries.ts + feature.queryKeys.ts + feature.mutations.ts
+│   ├── <name>.api.ts
+│   ├── <name>.queries.ts
+│   ├── <name>.queryKeys.ts
+│   └── <name>.mutations.ts
+├── components/        # Feature-private components
+├── hooks/             # Feature-private hooks
+└── types.ts           # Feature-specific types
+```
+
+### 2.3 Feature Isolation Rules
+
+```
+✅ ALLOWED:
+  Feature → @pawhaven/ui, @pawhaven/design-system, @pawhaven/frontend-core, @pawhaven/i18n
+  Feature → @pawhaven/shared (types, schemas, constants)
+
+❌ FORBIDDEN:
+  Feature A → Feature B (any import)
+  Feature → Another feature's api/, components/, hooks/, types.ts
+
+Enforcement: ESLint import/no-restricted-paths
+  "features/*" → cannot import from "features/*" (except self)
+```
+
+### 2.4 How Features Align with Business Domains
+
+| Feature       | Business Domain          | Owns                                     |
+| ------------- | ------------------------ | ---------------------------------------- |
+| **Landing**   | App initialization       | Bootstrap flow, menu/route config fetch  |
+| **Auth**      | Identity & access        | Login, register, token management        |
+| **Home**      | Cross-domain aggregation | Curation, featured content               |
+| **Rescue**    | Rescue operations        | Case lifecycle, status machine, timeline |
+| **Report**    | Stray animal reporting   | Report form, photo upload, GPS           |
+| **Adoption**  | Pet adoption             | Listings, applications, agreements       |
+| **Content**   | Stories & education      | Articles, rescue stories, knowledge base |
+| **Volunteer** | Volunteer coordination   | Profiles, availability, case claims      |
+| **Profile**   | User aggregation         | Cross-domain user activity view          |
+| **Discovery** | Browse & search          | Unified search across content types      |
+
+### 2.5 AnimalFollow Feature (Supporting)
+
+Following an animal is a supporting feature with no product domain of its own. It sits at `apps/frontend/portal/src/features/AnimalFollow/` and follows the standard layout from §2.2 (`api/animalFollow.{api,queries,queryKeys,mutations}.ts`, `components/FollowButton.tsx`, `components/FollowerCount.tsx`, `tests/`) with one exception: it is a component + data set with no route of its own, so there is no `index.tsx` / `route.tsx`, and it adds no app-layer code.
+
+| Concern          | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Contract**     | `AnimalFollowResultSchema` from `@pawhaven/shared` (`packages/shared/types/animal-follow.schema.ts`, re-exported from the types index). API responses are parsed with the same schema the backend validates against (P5).                                                                                                                                                                                                                                                                        |
+| **Server state** | `animalFollowQueryKeys` provides `status(animalId)`. `useFollowStatus` returns the combined `{ isFollowing, followedAt, followerCount }` payload, so both the follow control and the follower count read from one query and one request. Follow and unfollow share one mutation factory whose response carries the same combined shape, so `onSuccess` writes the single `status` key with `setQueryData` and nothing is invalidated — neither the control nor the count triggers a refetch.     |
+| **i18n**         | A dedicated `animalFollow` namespace in `packages/i18n/locales/{en-US,zh-CN,de-DE}.json` (follow / unfollow / following / followers count with plural forms / follow and unfollow errors).                                                                                                                                                                                                                                                                                                       |
+| **Anonymous**    | Both controls render for every visitor — neither is gated on the client-side profile. The status query therefore always fires, which is safe because `/status` is `@OptionalAuth()` and answers `{ isFollowing: false }` to anonymous callers, and because a persisted profile is not a reliable proxy for a live session anyway (localStorage, cleared only on explicit logout). Follow and unfollow remain the only authenticated calls, so an anonymous click gets the standard 401 handling. |
+
+**Boundary note.** The rescue-detail page mounts both components from `features/RescueDetail/components/VolunteerInfo.tsx`, which imports `features/AnimalFollow/components/*` directly. That is a feature-to-feature import, a deviation from the isolation rule in §2.3, and is recorded here because it is the wiring the code currently ships.
+
+---
+
+## 3. Package Ecosystem
+
+### 3.1 Dependency Graph
+
+```
+                    ┌──────────────────┐
+                    │  @pawhaven/shared │  Zero runtime deps
+                    │  Types, schemas,  │
+                    │  constants, events│
+                    └────────┬─────────┘
+                             │
+         ┌───────────────────┼───────────────────┐
+         │                   │                   │
+         ▼                   ▼                   ▼
+┌─────────────────┐ ┌──────────────┐ ┌──────────────┐
+│ @pawhaven/       │ │ @pawhaven/   │ │ @pawhaven/   │
+│ frontend-core    │ │ i18n         │ │ design-system │
+│                  │ │              │ │              │
+│ Infra, hooks,    │ │ i18next +    │ │ CSS tokens,   │
+│ business-common  │ │ locale files │ │ theme, utils   │
+│ components       │ │              │ │              │
+└───┬───┬─────────┘ └──────────────┘ └──────────────┘
+    │   │
+    │   └──────────────────────┐
+    ▼                          ▼
+┌──────────────┐
+│ @pawhaven/ui │
+│ Form*, Toast  │
+│ Loading, etc. │
+└──────────────┘
+
+apps/frontend/portal  ──depends on──►  ALL packages above
+apps/frontend/admin   ──depends on──►  ALL packages above
+```
+
+### 3.2 Package Purpose & Boundaries
+
+| Package                   | Why It Exists                                                                                                        | Contains                                                                                                                                                                                      | Must NOT Contain                                        |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `@pawhaven/shared`        | Single source of truth for validation + types. One Zod schema = frontend form + backend DTO.                         | Zod schemas, TS types, enums, constants, event type definitions.                                                                                                                              | React, NestJS, Prisma, Node APIs. Must work in browser. |
+| `@pawhaven/design-system` | Design tokens + canonical Figma source of truth.                                                                     | CSS custom properties (tokens), theme.css, utilities.css, `figma/src/app/App.tsx` (canonical design — all feature UIs MUST reference this).                                                   | React components, JS runtime. CSS-only.                 |
+| `@pawhaven/i18n`          | Centralized i18n for all apps. One locale file per language, shared across portal + admin.                           | i18next instance, I18nProvider React component, locale JSON files.                                                                                                                            | Business logic, feature-specific translations.          |
+| `@pawhaven/frontend-core` | Shared infrastructure + business-common components. API client, auth, query config, shared guards, error boundaries. | Axios instance (auth + encrypt interceptors), queryClient config, storageTool, lazyImport, shared React hooks, RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback. | Feature-specific business logic.                        |
+| `@pawhaven/ui`            | Pure UI components — no API calls, no auth, no business logic. Form controls, loading states, notifications.         | FormInput, FormSelect, FormTextArea, FormDateRanger, Loading, Toast, NotificationBanner, SuspenseWrapper.                                                                                     | API calls, auth checks, business logic, domain types.   |
+
+### 3.3 Package Dependency Rules
+
+```
+@pawhaven/shared          → Nothing (zero dependencies)
+@pawhaven/design-system   → Nothing (CSS-only)
+@pawhaven/i18n            → @pawhaven/shared
+@pawhaven/frontend-core   → @pawhaven/shared, @pawhaven/ui, @pawhaven/i18n
+@pawhaven/ui              → @pawhaven/design-system, @pawhaven/i18n
+Apps (portal, admin)      → ALL packages
+
+❌ FORBIDDEN:
+  @pawhaven/ui            → @pawhaven/frontend-core (pure UI must not depend on API layer)
+  @pawhaven/design-system → @pawhaven/ui (tokens before components)
+  Any package             → Any app
+```
+
+---
+
+## 4. Component Architecture & Boundaries
+
+### 4.1 Component Layer Hierarchy
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  App Shell (apps/*/src/)                                 │
+│  ├── Providers (I18n → Store → Query → Router)           │
+│  ├── Layout (Header, Sidebar, Footer, Outlet)            │
+│  └── Router (React Router v7 static route tree)          │
+├─────────────────────────────────────────────────────────┤
+│  Features (features/*/)                                  │
+│  ├── Business-specific components, hooks, API calls      │
+│  ├── May import: @pawhaven/ui, @pawhaven/design-system   │
+│  ├── May NOT import: other features                      │
+├─────────────────────────────────────────────────────────┤
+│  Shared Packages (packages/*/)                           │
+│  ├── @pawhaven/ui — Pure UI components                   │
+│  ├── @pawhaven/frontend-core — Infra + business-common   │
+│  ├── @pawhaven/i18n — Internationalization               │
+│  ├── @pawhaven/design-system — Design tokens             │
+│  └── @pawhaven/shared — Types & validation               │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 4.2 Import Rules at Each Layer
+
+| Layer                       | Can Import From                                                                                            | Cannot Import From                        |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **Feature**                 | `@pawhaven/ui`, `@pawhaven/frontend-core`, `@pawhaven/i18n`, `@pawhaven/design-system`, `@pawhaven/shared` | Other features, Other apps                |
+| **@pawhaven/ui**            | `@pawhaven/design-system`, `@pawhaven/i18n`                                                                | `@pawhaven/frontend-core`, Features, Apps |
+| **@pawhaven/frontend-core** | `@pawhaven/shared`, `@pawhaven/ui`, `@pawhaven/i18n`                                                       | Features, Apps                            |
+
+### 4.3 Component Graduation Flow
+
+```
+Feature A needs Component X
+  │
+  ├── Only Feature A uses it
+  │     → lives in features/A/components/
+  │
+  └── Feature B also needs it
+        │
+        ├── Pure UI (Form control, Loading, Toast, Badge...)
+        │     → graduate to @pawhaven/ui
+        │
+        └── Business-common (RequireAuth, ErrorBoundary, Brand, NotFound, SystemError, RouterErrorFallback, domain widgets...)
+              → graduate to @pawhaven/frontend-core
+```
+
+---
+
+## 5. Routing Architecture
+
+### 5.1 Frontend-Owned Static Routing (React Router v7 Data Mode)
+
+The frontend owns the route tree. The backend never decides which React component renders for a URL.
+
+```
+src/router/router.tsx
+  │
+  ├── Shell route: RootLayout + rootLoader + ErrorBoundary + HydrateFallback
+  ├── Composes feature routes (only)
+  └── createBrowserRouter([rootRoute])  →  <RouterProvider router={router} />
+```
+
+Router instance is created **once at module scope** — never inside a React component.
+
+```
+/ (RootLayout, loader: rootLoader)
+├── /                        → Home                       features/Home/route.tsx
+├── /auth/login              → Login                      features/Auth/route.tsx
+├── /auth/register           → Register                   features/Auth/route.tsx
+├── /rescue/guides           → RescueGuide     (lazy)     features/RescueGuide/route.tsx
+├── /rescue-cases            → RescueCasesPage (lazy)     features/RescueCases/route.tsx
+├── /rescue/detail/:animalID → RescueDetail    (lazy)     features/RescueDetail/route.tsx
+├── authenticated (loader: requireUser)
+│   └── /report-animal       → ReportAnimal    (lazy)     features/ReportAnimal/route.tsx
+└── *                        → NotFound
+```
+
+### 5.2 File Layout
+
+| Location                   | Owns                                                         |
+| -------------------------- | ------------------------------------------------------------ |
+| `src/router/router.tsx`    | Shell route + `createBrowserRouter` singleton + composition  |
+| `src/router/routePaths.ts` | `routePaths` and `routeSearchParams` (URL vocabulary)        |
+| `src/layout/index.tsx`     | `RootLayout` + `rootLoader` (app-shell data)                 |
+| `features/<X>/route.tsx`   | That feature's route object(s), loader and `handle` metadata |
+
+### 5.3 Routing Rules
+
+```
+✅ The frontend owns the route tree — no backend `element` strings
+✅ `createBrowserRouter` is called once at module scope (stable router identity)
+✅ Each feature owns route.tsx — route, loader and page stay together
+✅ Components are referenced directly (no string → component registry)
+✅ Route-critical data is loaded by route loaders via queryClient.ensureQueryData(...)
+✅ Pages read initial data from useLoaderData() — not from React Query hooks
+✅ React Query owns caching/refetch/mutations; the router owns "when data must be ready"
+✅ Lazy routes use route-level `lazy:` for code splitting
+✅ Protected routes live under the authenticated parent route (loader: requireUser)
+
+❌ No generated route trees or component registries
+❌ No router creation inside a React component
+❌ Features do NOT import other features' route modules — only the shell composes them
+❌ Features do NOT use window.history / window.location for internal navigation
+```
+
+### 5.4 Data Loading Strategy
+
+| Route                      | Loader                   | Pattern                                                                                     |
+| -------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| Shell (`/`)                | `rootLoader`             | Blocking — home data (menus, hero stats, latest rescues, adoptable pets)                    |
+| `/rescue-cases`            | `rescueCasesLoader`      | Blocking — data ready before render                                                         |
+| `/rescue/detail/:animalID` | `rescueCaseDetailLoader` | **Deferred** — returns `{ animal: promise }`; page uses `<Suspense>` + `<Await>` + skeleton |
+| Authenticated parent       | `requireUser`            | Auth guard — primes current-user query, else `redirect('/auth/login?redirect=…')`           |
+
+> Deferred data paints the page shell immediately. Trade-off: the page reads a loader snapshot, so it does **not** re-render on React Query cache invalidation — use `router.invalidate()` or a subscription-only `useQuery` if live updates are needed.
+
+### 5.5 Loading & Error Boundaries
+
+| Phase                   | Mechanism                                                                  |
+| ----------------------- | -------------------------------------------------------------------------- |
+| Cold load (first paint) | Root `HydrateFallback` (`<Loading />`)                                     |
+| Lazy chunk loading      | `<Suspense fallback={<Loading />}>` in `RootLayout`                        |
+| In-app navigation       | `useNavigation()` in `RootLayout` → `aria-busy` on `<main>`                |
+| Deferred route data     | `<Suspense>` + `<Await>` with a feature-owned skeleton                     |
+| Route errors            | Route `ErrorBoundary` → `RouterErrorFallback` → `NotFound` / `SystemError` |
+
+#### Trace IDs in error surfaces
+
+The backend returns `x-trace-id` on every response, but the API client's response interceptor **unwraps the success envelope and returns bare payloads**, so a caller has no way to reach the header. `packages/frontend-core/src/api/trace.ts` keeps the latest value module-scoped and `index.ts` records it before the unwrap step. `SystemError` prefers the id carried by the error itself and falls back to that module-level value — a render error boundary is often several requests removed from the failure, so the last-seen id is frequently the better clue.
+
+`normalizeHttpError()` returns `traceId` on the error (header first, body field as fallback), and `ApiErrorInfo` carries it. The header name is duplicated as a literal in the frontend, which must not depend on a backend package.
+
+### 5.6 Auth & Permissions
+
+- Auth gating is the **authenticated parent route**; children inherit it (no per-page guards, no repeated `/current-user` calls).
+- The security boundary is the **backend** (JWT + role/permission checks per API). Frontend gating is UX only.
+- Backend remains the owner of **menus** and **route permissions**; route `handle.permission` metadata for UX gating is still pending.
+
+---
+
+## 6. State Management Architecture
+
+### 6.1 State Categories
+
+| State Type       | Scope           | Tool                       | Why                                                                        |
+| ---------------- | --------------- | -------------------------- | -------------------------------------------------------------------------- |
+| **Server state** | Global, cached  | TanStack Query v5          | API data with automatic cache invalidation, background refetch, pagination |
+| **Client state** | Global          | Redux Toolkit              | Auth tokens, locale preference, UI preferences — must survive page reloads |
+| **Form state**   | Local           | React Hook Form + Zod      | Form validation shares schemas with backend via @pawhaven/shared           |
+| **URL state**    | Global, encoded | React Router search params | Filters, pagination, sort order — shareable via URL                        |
+
+### 6.2 Why This Split
+
+```
+Server state (TanStack Query):
+  - "What's the list of rescue cases?" → Query
+  - Cache it, refetch when stale, invalidate on mutation
+  - We do NOT put this in Redux — Query is purpose-built for async server state
+
+Client state (Redux Toolkit):
+  - "Is the user logged in? What's their locale?"
+  - These are synchronous, long-lived, and needed by many components
+  - Persisted to encrypted localStorage
+
+Form state (React Hook Form):
+  - "What did the user type in this field?"
+  - Ephemeral, too frequent to put in Redux, should not pollute Query cache
+
+URL state (React Router):
+  - "Which page / what filters is the user looking at?"
+  - Should survive browser refresh and be shareable
+```
+
+### 6.3 Store Structure
+
+```
+Redux Store:
+  global:
+    ├── auth        (user, tokens, permissions)
+    ├── locale      (current language, fallback chain)
+    └── ui          (sidebar collapsed, theme mode)
+
+  Per-feature slices (dynamic registration):
+    ├── rescue      (selected case, filter state)
+    ├── volunteer   (current availability, selected region)
+    └── ...
+
+TanStack Query:
+  Query keys per feature:
+    ['rescue', 'cases', filters]
+    ['report', 'list', pagination]
+    ['adoption', 'listing', id]
+```
+
+### 6.4 Persistence Strategy
+
+```
+Redux Persist:
+  Auth tokens    → encrypted localStorage
+  Locale         → localStorage
+  UI preferences → localStorage
+
+TanStack Query Persister:
+  Query cache    → localStorage (hydration on app start)
+  gcTime: 30min  (keep in memory after inactive)
+  staleTime: 5min (before refetch)
+```
+
+---
+
+## 7. Design Token Architecture
+
+> The canonical Figma design source is `packages/design-system/figma/src/app/App.tsx`. All tokens, colors, layout dimensions, and component structures are derived from this file. When implementing any feature, start by reading the relevant sections of App.tsx.
+
+### 7.1 Three-Layer Token System
+
+```
+Layer 1: Primitives     (src/tokens/*.css)
+  Raw design values — independent of meaning
+  Example: --color-orange-6: #f7823a
+
+          ▼
+
+Layer 2: Semantics      (theme.css)
+  Map primitives to meaning — "what role, not what color"
+  Example: --color-primary: var(--color-orange-6)
+
+          ▼
+
+Layer 3: Utilities      (utilities.css)
+  Pre-built component patterns from semantic tokens
+  Example: .btn-primary { background: var(--color-primary); }
+```
+
+### 7.2 Why Three Layers
+
+```
+Without layers:
+  Components use --color-orange-6 directly
+  → To rebrand, you search-and-replace 200 files
+  → You miss one, the UI breaks
+
+With 3 layers:
+  Components use .btn-primary (Layer 3) or --color-primary (Layer 2)
+  → To rebrand, change ONE mapping in theme.css
+  → All components update automatically
+```
+
+### 7.3 Token File Structure
+
+```
+packages/design-system/
+└── src/tokens/           # Layer 1: Primitives
+│   ├── colors.css        # --color-orange-1 through --color-orange-12
+│   ├── spacing.css       # --space-1 through --space-12
+│   ├── typography.css    # --font-size-*, --font-weight-*, --line-height-*
+│   ├── radii.css         # --radius-1 through --radius-6
+│   ├── shadows.css       # --shadow-1 through --shadow-6
+│   └── ...
+│
+├── src/theme.css             # Layer 2: Semantics
+│   Maps primitives → semantic roles:
+│   --color-primary: var(--color-orange-6)
+│   --color-danger: var(--color-red-8)
+│   --spacing-section: var(--space-8)
+│   ...
+│
+├── src/utilities.css         # Layer 3: Component patterns
+│   .btn-primary, .card, .input, .badge, ...
+│
+└── (tokens consumed via Tailwind + CSS variables)
+```
+
+### 7.4 How Code Consumes Tokens
+
+```
+❌ BAD:    <div className="bg-[#f7823a]">         Hardcoded value
+❌ BAD:    <div style={{color: '#f7823a'}}>       No token, no rebrand
+
+✅ GOOD:   <div className="bg-primary">           Semantic utility
+✅ GOOD:   <Button className="btn-primary">        Component utility
+✅ GOOD:   <DatePicker className="bg-primary text-primary">   Token-driven styling
+```
+
+---
+
+## 8. Internationalization Architecture
+
+### 8.1 Design
+
+```
+@pawhaven/i18n
+  │
+  ├── i18next instance (shared by all frontend apps)
+  ├── I18nProvider (React context wrapper)
+  │
+  └── locales/
+      ├── zh-CN/     (Primary — product targets Chinese market)
+      │   ├── common.json
+      │   ├── auth.json
+      │   └── ...
+      ├── en-US/     (Secondary)
+      └── de-DE/     (Secondary)
+```
+
+### 8.2 Why a Separate Package
+
+```
+If i18n lives in each app:
+  - Duplicate i18next config across portal + admin
+  - Duplicate common translations (buttons, errors, dates)
+  - Locale switching inconsistent
+
+@pawhaven/i18n as a package:
+  - One i18next instance, shared by portal + admin
+  - Common translations in one place
+  - Apps add app-specific locale files to their own src/
+  - Adding a language = add one folder + register locale
+```
+
+### 8.3 Translation File Convention
+
+```
+@pawhaven/i18n/locales/{lang}/common.json  → Shared across all apps
+  "button.submit", "error.required", "date.format", ...
+
+app-specific locale files live in the app:
+  apps/frontend/portal/src/locales/{lang}/rescue.json
+  apps/frontend/portal/src/locales/{lang}/report.json
+```
+
+---
+
+## 9. Module Boundary Enforcement
+
+### 9.1 ESLint Rules
+
+```javascript
+// .eslintrc.cjs — custom rules for frontend
+
+{
+  rules: {
+    // No cross-feature imports
+    'import/no-restricted-paths': ['error', {
+      zones: [
+        {
+          target: './src/features',
+          from: './src/features',
+          except: ['./index.tsx'], // Only router imports feature entry
+        },
+      ],
+    }],
+
+    // @pawhaven/ui must not import from frontend-core
+    'import/no-restricted-paths': ['error', {
+      zones: [
+        {
+          target: './packages/ui/src',
+          from: './packages/frontend-core/src',
+        },
+      ],
+    }],
+  },
+}
+```
+
+### 9.2 CI Architecture Fitness Function
+
+```bash
+#!/bin/bash
+# scripts/check-frontend-boundaries.sh
+
+# 1. No cross-feature imports
+CROSS_FEATURE=$(grep -r "from.*features/" apps/frontend/portal/src/features/ \
+  --include="*.ts" --include="*.tsx" \
+  | grep -v "features/[^/]*/.*from.*features/[^/]*" 2>/dev/null || true)
+
+# 2. @pawhaven/ui has no React Query / axios imports
+UI_API_LEAK=$(grep -r "@tanstack/react-query\|axios" packages/ui/src/ \
+  --include="*.ts" --include="*.tsx" 2>/dev/null || true)
+
+# 3. No hardcoded color values in components
+HARDCODED_COLORS=$(grep -rP "#[0-9a-fA-F]{3,8}" apps/frontend/portal/src/features \
+  --include="*.tsx" 2>/dev/null || true)
+
+if [ -n "$CROSS_FEATURE" ]; then
+  echo "❌ Cross-feature import detected"
+  exit 1
+fi
+if [ -n "$UI_API_LEAK" ]; then
+  echo "❌ @pawhaven/ui imports API/db code"
+  exit 1
+fi
+if [ -n "$HARDCODED_COLORS" ]; then
+  echo "⚠️  Hardcoded color values detected — use design tokens"
+fi
+echo "✅ Frontend boundaries clean"
+```
+
+---
+
+## 10. Tech Stack
+
+### 10.1 Core
+
+| Category                  | Technology | Version / Notes    |
+| ------------------------- | ---------- | ------------------ |
+| **Framework**             | React      | v19                |
+| **Language**              | TypeScript | Strict mode        |
+| **Build Tool**            | Vite       |                    |
+| **Package Manager**       | pnpm       | Workspace monorepo |
+| **Monorepo Orchestrator** | Turbo      |                    |
+
+### 10.2 State Management
+
+| Category         | Technology            | Scope                                   |
+| ---------------- | --------------------- | --------------------------------------- |
+| **Server State** | TanStack Query        | v5 — API caching, refetch, invalidation |
+| **Client State** | Redux Toolkit         | Auth, locale, UI preferences            |
+| **Form State**   | React Hook Form + Zod | Form validation shared with backend     |
+| **URL State**    | React Router          | Search params, filters, pagination      |
+
+### 10.3 UI & Styling
+
+| Category              | Technology                   | Notes                                     |
+| --------------------- | ---------------------------- | ----------------------------------------- |
+| **CSS Framework**     | Tailwind CSS                 | Utility-first                             |
+| **Component Library** | shadcn/ui (Radix primitives) | Form controls, dialogs, date picker, etc. |
+| **Design Tokens**     | CSS Custom Properties        | 3-layer token system                      |
+| **Icons**             | Lucide                       |                                           |
+
+### 10.4 Routing & i18n
+
+| Category                 | Technology              | Notes                             |
+| ------------------------ | ----------------------- | --------------------------------- |
+| **Routing**              | React Router            | Server-driven routing             |
+| **Internationalization** | i18next + react-i18next | Shared via @pawhaven/i18n package |
+
+### 10.5 Validation & API
+
+| Category        | Technology | Notes                       |
+| --------------- | ---------- | --------------------------- |
+| **Validation**  | Zod        | Schemas in @pawhaven/shared |
+| **HTTP Client** | Axios      | Auth + encrypt interceptors |
+
+### 10.6 Code Quality
+
+| Category            | Technology                        | Notes                   |
+| ------------------- | --------------------------------- | ----------------------- |
+| **Linting**         | ESLint                            | Feature isolation rules |
+| **Formatting**      | Prettier                          | Centralized config      |
+| **Git Hooks**       | Husky + lint-staged               | Pre-commit checks       |
+| **Commit Standard** | Commitlint (Conventional Commits) |                         |
+
+---
+
+> **Related Docs**: [Backend Architecture](PawHaven-Backend-Architecture.md) | [System Overview](PawHaven-System-Architecture-Overview.md)

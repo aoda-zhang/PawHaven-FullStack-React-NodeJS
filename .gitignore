@@ -124,6 +124,17 @@ tsconfig.tsbuildinfo
 .env.*
 !.env.example
 
+# secrets — never commit private material
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+id_rsa
+id_rsa.pub
+secrets.yml
+credentials.json
+
 # turbo
 .turbo
 
