@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/oh-my-opencode-slim@latest/oh-my-opencode-slim.schema.json",
   "preset": "go",
-  "disabled_agents": ["observer"],
+  "disabled_agents": [],
   "multiplexer": {
     "type": "none"
   },
@@ -193,6 +193,22 @@
         ],
         "skills": [],
         "mcps": ["context7", "gh_grep"]
+      },
+      "observer": {
+        "model": [
+          {
+            "id": "opencode-go/deepseek-v4-flash-vision-exp",
+            "variant": "high"
+          },
+          {
+            "id": "opencode-go/grok-4.7"
+          },
+          {
+            "id": "opencode/space-bunny-free"
+          }
+        ],
+        "skills": [],
+        "mcps": []
       }
     },
     "free": {
@@ -270,6 +286,22 @@
           "project-rules",
           "principles"
         ],
+        "mcps": []
+      },
+      "observer": {
+        "model": [
+          {
+            "id": "opencode-go/deepseek-v4-flash-vision-exp",
+            "variant": "high"
+          },
+          {
+            "id": "opencode-go/space-bunny-free"
+          },
+          {
+            "id": "opencode-go/longcat-2.5-preview-free"
+          }
+        ],
+        "skills": [],
         "mcps": []
       }
     }
