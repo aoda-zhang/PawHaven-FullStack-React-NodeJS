@@ -20,6 +20,7 @@
     "build": "turbo run build",
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
+    "pi-check": "node scripts/check-pi-harness.mjs",
     "doctor:react": "npx react-doctor@latest",
     "lint-staged": "lint-staged"
   },

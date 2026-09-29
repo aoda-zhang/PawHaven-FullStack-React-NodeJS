@@ -1,0 +1,38 @@
+{
+  "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/schema/settings.schema.json",
+  "skills": [
+    ".pi/skills",
+    ".pi/skills/code-review/architecture-doctor",
+    ".pi/skills/code-review/backend-doctor",
+    ".pi/skills/code-review/boundary-doctor",
+    ".pi/skills/code-review/i18n-doctor",
+    ".pi/skills/code-review/react-doctor",
+    ".pi/skills/code-review/style-doctor",
+    ".pi/skills/code-review/test-doctor",
+    ".pi/skills/code-review/typecheck-doctor"
+  ],
+  "prompts": [".pi/prompts"],
+  "packages": ["npm:pi-subagents@0.73.1"],
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "thinking": "low"
+      },
+      "architect": {
+        "thinking": "high"
+      },
+      "frontend": {
+        "thinking": "medium"
+      },
+      "backend": {
+        "thinking": "medium"
+      },
+      "tester": {
+        "thinking": "low"
+      },
+      "reviewer": {
+        "thinking": "high"
+      }
+    }
+  }
+}

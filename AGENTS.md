@@ -117,26 +117,37 @@ Full detail: `docs/architecture/authentication-architecture.md`.
 
 ## The agent harness
 
-Agent config lives in `.opencode/`, driven by the `oh-my-opencode-slim` plugin. Committed
-project-locally, so behaviour is the same for everyone who clones the repo.
+Agent config lives in `.pi/`, committed project-locally, so behaviour is the same for everyone
+who clones the repo. **pi is the harness layer.** `.opencode/` is a legacy copy kept only until
+you are satisfied with pi; nothing in `.pi/` reads from it, and it can be deleted as-is.
 
-- `.opencode/skills/` — 22 skills, indexed by [`.opencode/skills/README.md`](.opencode/skills/README.md).
-  A skill's ID is its **directory name**. `project-rules` (9 constraint files) and `principles`
+- `.pi/skills/` — 22 skills, indexed by [`.pi/README.md`](.pi/README.md).
+  A skill's ID is its **directory name**, and `name:` in frontmatter must match it (lowercase
+  `a-z`, `0-9`, hyphens only) — pi uses `name` as the `/skill:<name>` command, so a name with a
+  slash in it silently breaks invocation. `project-rules` (9 constraint files) and `principles`
   (6 rules that need citing by name) are the two to load before non-trivial work.
-- `.opencode/command/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
+- `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
   `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`,
   `/perf-issue`, `/parallel-execution`, `/handoff`.
-- `.opencode/agent/knowledge-update.md` — the one custom agent; keeps docs matching reality.
-- `.opencode/oh-my-opencode-slim*.md` — prompt appends for orchestrator, oracle, fixer, designer.
+- `.pi/settings.json` — points pi at the two directories above. **The 8 `code-review/<doctor>`
+  skills are listed individually and must stay that way:** pi stops recursing at any directory
+  containing `SKILL.md`, so the doctors nested under the `code-review` parent are only found via
+  those explicit entries. Dropping them silently drops 8 skills.
+- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 22 skills and
+  9 commands load with zero diagnostics. Run it after touching anything in `.pi/`.
+
+`/trust` once so project config loads, then `/reload` after changing `.pi/`.
 
 Plan then dispatch for feature work: classify the request, present an agent-level plan, get
 approval, then dispatch. Ask before Standard and Architectural scope; do not re-ask for reversible
 sub-steps afterwards; always ask before a push or force-push.
 
-**A custom agent in `.opencode/agent/` cannot be granted project skills** — its own `skills:`
-frontmatter is ignored, and so is a config entry naming it, because the plugin's filter hook only
-iterates agents it knows. It gets the global skill set. So the orchestrator inlines the governing
-rule text into the dispatch prompt rather than naming a skill.
+**pi has no named sub-agents.** There is no orchestrator/fixer/oracle/designer to dispatch to
+today — the main session agent is the only agent, so every skill and command in `.pi/` loads
+into that one context. The lane rules under [Dispatch and verification](#dispatch-and-verification)
+state the intent; isolated sub-agent contexts require a `.pi/extensions/` subagent extension,
+which does not exist yet. Until it does, treat "dispatch" as "load the governing skill, then
+work" — and keep the verification discipline, which needs no second agent.
 
 ### Documentation
 
@@ -176,9 +187,9 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
 
 ### Git
 
-- **No agent commits anything unless the user explicitly asks.** Orchestrator and every subagent
-  alike, and source, scripts, tests, config, and docs. Being asked to _make a change_ is not
-  permission to commit. Leave changes in the working tree or staged.
+- **No agent commits anything unless the user explicitly asks.** Every agent alike — main
+  session or subagent — and source, scripts, tests, config, and docs. Being asked to _make a
+  change_ is not permission to commit. Leave changes in the working tree or staged.
 - Never push, open a PR, or babysit one. Never force-push, `reset --hard`, `clean`, or delete a
   branch without asking.
 
@@ -206,14 +217,15 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
 - Classify before planning (Trivial / Standard / Architectural) and name the principle that drove
   it. Approval is not per-step: once given, reversible sub-steps just get done.
 - **A lane with no named validator has not finished.** Every dispatch states who verifies it and
-  what counts as passing; `fixer` returns a `<verification>` block.
+  what counts as passing; a lane returns a `<verification>` block.
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. "It compiles" is not a pass. A bug's repro must pass on the same surface that
   failed.
 - Verify the **combined** tree, not just the units. `pnpm lint` already fails from 14 pre-existing
   errors — diff against baseline before calling anything a regression.
 - **Never hand-edit the harness or `docs/architecture/` as a side effect of a feature task**; those
-  changes deserve their own commit. Dispatch `knowledge-update` for architecture docs.
+  changes deserve their own commit. Keep `AGENTS.md` and `docs/architecture/` matching reality in
+  a separate change.
 - **Never ask the user for Figma files or screenshots** — Figma is not used here; the token source
   is `packages/design-system/src/tokens/`.
 
