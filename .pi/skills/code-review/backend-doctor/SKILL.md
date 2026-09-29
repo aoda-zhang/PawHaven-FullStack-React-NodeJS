@@ -70,4 +70,4 @@ Alternatively, search across the entire workspace and filter by backend-specific
 ## Related
 
 - Architecture: [architecture-doctor](../architecture-doctor/SKILL.md) · boundaries: [boundary-doctor](../boundary-doctor/SKILL.md)
-- Frontend pairing: [react-doctor](../react-doctor/SKILL.md)
+- Frontend pairing: [react-doctor](../../../agents/frontend/review/skills/react-doctor/SKILL.md)

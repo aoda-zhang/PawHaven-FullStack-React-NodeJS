@@ -100,7 +100,7 @@ MongoDB via Prisma, schema at `apps/backend/core-service/src/prisma/mongodb/sche
 - `npx prisma generate` after a schema change; `db push` against a shared environment is destructive
   — confirm first.
 
-→ Load the `backend-standards` skill for the full data and validation rules.
+→ Load the `backend` skill for the full data and validation rules.
 
 ### Frontend
 

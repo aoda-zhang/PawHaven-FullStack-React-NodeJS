@@ -77,7 +77,7 @@ frontmatter — zero duplication.
 | ------------- | ------------------------------------------------------------------ | ------------------------------------ |
 | project rules | project-rules, principles                                          | all agents                           |
 | frontend      | react, component, style, i18n, react-query, react-hook-form, redux | frontend                             |
-| backend       | backend-standards                                                  | backend                              |
+| backend       | backend                                                            | backend                              |
 | testing       | testing-standards                                                  | tester                               |
 | code review   | code-review (8 doctors)                                            | reviewer                             |
 | architecture  | architecture-design                                                | architect                            |

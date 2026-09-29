@@ -24,7 +24,8 @@ code-review (this skill)
   │
   ├── PASS A — TECH REVIEW (is the code written well?)
   │     ├── PARALLEL:
-  │     │     ├── typecheck-doctor    — TypeScript type check
+  │     │     ├── typecheck-doctor    — TypeScript compile check (mechanical)
+  │     │     ├── typescript-doctor  — Type discipline: any, casts, shared-type placement
   │     │     ├── react-doctor        — React/Redux/Query/Form anti-patterns
   │     │     ├── style-doctor        — Styling & design token compliance (DESIGN GATE)
   │     │     ├── i18n-doctor         — Hardcoded string detection
@@ -138,6 +139,6 @@ Each sub-skill is a true CodeBuddy skill and can be:
 
 ## Related
 
-- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.md) · [react-doctor](./react-doctor/SKILL.md) · [style-doctor](./style-doctor/SKILL.md) · [boundary-doctor](./boundary-doctor/SKILL.md) · [i18n-doctor](./i18n-doctor/SKILL.md) · [backend-doctor](./backend-doctor/SKILL.md) · [test-doctor](./test-doctor/SKILL.md) (every review)
+- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.md) · [react-doctor](../../agents/frontend/review/skills/react-doctor/SKILL.md) · [style-doctor](../../agents/frontend/review/skills/style-doctor/SKILL.md) · [boundary-doctor](./boundary-doctor/SKILL.md) · [i18n-doctor](../../agents/frontend/review/skills/i18n-doctor/SKILL.md) · [backend-doctor](./backend-doctor/SKILL.md) · [test-doctor](./test-doctor/SKILL.md) (every review)
 - Architecture deep review: [architecture-doctor](./architecture-doctor/SKILL.md)
-- Frontend skills: [react](../frontend/react/SKILL.md) · [styling](../frontend/style/SKILL.md) · [i18n](../frontend/i18n/SKILL.md)
+- Frontend skills: [react](../../agents/frontend/dev/skills/react/SKILL.md) · [styling](../../agents/frontend/dev/skills/style/SKILL.md) · [i18n](../../agents/frontend/dev/skills/i18n/SKILL.md)

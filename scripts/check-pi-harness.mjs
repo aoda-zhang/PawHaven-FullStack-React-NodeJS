@@ -2,7 +2,7 @@
 // Validates the pi harness in .pi/ using pi's own resource loaders, so the check
 // fails for the same reasons pi would fail at startup. Run via `pnpm pi-check`.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,15 +61,18 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-const EXPECTED_SKILLS = 22;
+const EXPECTED_SKILLS = 12;
 const EXPECTED_PROMPTS = 10;
 const EXPECTED_AGENTS = [
   'architect',
   'scout',
   'frontend',
+  'dev',
+  'review',
   'backend',
   'tester',
   'reviewer',
+  'oracle',
 ];
 
 const failures = [];
@@ -169,8 +172,14 @@ function scanAgents(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (entry.name === 'references' || entry.name === 'skills') continue;
       agents.push(...scanAgents(full));
-    } else if (entry.name.endsWith('.md') && !entry.name.startsWith('.')) {
+    } else if (
+      entry.name.endsWith('.md') &&
+      !entry.name.startsWith('.') &&
+      entry.name !== 'SKILL.md' &&
+      entry.name !== 'references'
+    ) {
       const raw = readFileSync(full, 'utf8');
       const match = raw.match(/^---\n([\s\S]*?)\n---/);
       if (!match) {
@@ -207,6 +216,45 @@ for (const expected of EXPECTED_AGENTS) {
 
 // Check agent frontmatter validity
 const knownSkillNames = new Set(projectSkills.skills.map((s) => s.name));
+
+// Agent-private skills (discovered via skillPath, not in settings.skills)
+// Finds any skills/ directory at any depth under .pi/agents/
+function scanAgentPrivateSkills() {
+  const found = [];
+  const agentsRoot = join(repoRoot, '.pi', 'agents');
+  if (!existsSync(agentsRoot)) return found;
+
+  function walk(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (!entry.isDirectory()) continue;
+      if (entry.name === 'skills') {
+        for (const skillEntry of readdirSync(full, { withFileTypes: true })) {
+          const skillFile = join(full, skillEntry.name, 'SKILL.md');
+          if (!skillEntry.isDirectory() || !existsSync(skillFile)) continue;
+          const raw = readFileSync(skillFile, 'utf8');
+          const nameMatch = raw.match(/^name:\s*(.+)/m);
+          const name = nameMatch?.[1]?.trim();
+          if (name) {
+            found.push({
+              name,
+              path: skillFile,
+              agent: relative(agentsRoot, dir),
+            });
+            knownSkillNames.add(name);
+          }
+        }
+      } else {
+        walk(full);
+      }
+    }
+  }
+  walk(agentsRoot);
+  return found;
+}
+
+const privateSkills = scanAgentPrivateSkills();
+
 for (const agent of discoveredAgents) {
   if (!agent.name) {
     failures.push(
@@ -227,6 +275,9 @@ for (const agent of discoveredAgents) {
 
 console.log(
   `agents:  ${discoveredNames.length} discovered (required: ${EXPECTED_AGENTS.join(', ')})`,
+);
+console.log(
+  `agent-private skills: ${privateSkills.length} (${privateSkills.map((s) => s.name).join(', ') || 'none'})`,
 );
 
 // Deduplicate agent names

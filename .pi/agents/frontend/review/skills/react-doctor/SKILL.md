@@ -178,7 +178,7 @@ This exists because the step is easy to skip: the scan is a prompt-level instruc
 
 ## Related
 
-- React standards: [react skill](../../frontend/react/SKILL.md)
-- Companion doctors: [style-doctor](../style-doctor/SKILL.md) · [i18n-doctor](../i18n-doctor/SKILL.md) · [typecheck-doctor](../typecheck-doctor/SKILL.md)
-- State rules: [redux](../../frontend/redux/SKILL.md) · [react-query](../../frontend/react-query/SKILL.md) · [react-hook-form](../../frontend/react-hook-form/SKILL.md)
+- React standards: [react skill](../../../dev/skills/react/SKILL.md)
+- Companion doctors: [style-doctor](../style-doctor/SKILL.md) · [i18n-doctor](../i18n-doctor/SKILL.md) · [typecheck-doctor](../../../../../skills/code-review/typecheck-doctor/SKILL.md)
+- State rules: [redux](../../../dev/skills/redux/SKILL.md) · [react-query](../../../dev/skills/react-query/SKILL.md) · [react-hook-form](../../../dev/skills/react-hook-form/SKILL.md)
 - CI counterpart: `.github/workflows/react-doctor.yml` (must stay on the same pinned version)

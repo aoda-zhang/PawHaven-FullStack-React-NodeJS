@@ -147,7 +147,7 @@ Skill IDs currently in the repo, all reachable as granted:
 | Group                   | IDs                                                                                                                                                                     |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | repo-wide               | `principles` · `project-rules` · `writing-standards`                                                                                                                    |
-| backend                 | `backend-standards` · `testing-standards`                                                                                                                               |
+| backend                 | `backend` · `testing-standards`                                                                                                                                         |
 | architecture            | `architecture-design`                                                                                                                                                   |
 | frontend (`/`)          | `react` · `component` · `style` · `i18n` · `react-query` · `redux` · `react-hook-form`                                                                                  |
 | review (`code-review/`) | the meta-skill plus `typecheck-doctor` · `react-doctor` · `style-doctor` · `i18n-doctor` · `backend-doctor` · `boundary-doctor` · `architecture-doctor` · `test-doctor` |

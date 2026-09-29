@@ -140,5 +140,5 @@ From results, determine the backend modules root (e.g., `apps/<project>/src/modu
 ## Related
 
 - Architecture & graduation: [architecture-doctor](../architecture-doctor/SKILL.md)
-- Component graduation: [component](../../frontend/component/SKILL.md)
+- Component graduation: [component](../../../agents/frontend/dev/skills/component/SKILL.md)
 - Backend modules: [backend-doctor](../backend-doctor/SKILL.md)

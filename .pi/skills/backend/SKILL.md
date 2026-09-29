@@ -1,5 +1,5 @@
 ---
-name: backend-standards
+name: backend
 description: >
   PawHaven backend implementation standards, verified against the real codebase. Covers the flat
   core-service module shape, the @pawhaven/backend-core export surface, MongoDB via @InjectPrisma,

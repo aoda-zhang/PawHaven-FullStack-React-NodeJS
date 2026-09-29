@@ -5,9 +5,6 @@
     ".pi/skills/code-review/architecture-doctor",
     ".pi/skills/code-review/backend-doctor",
     ".pi/skills/code-review/boundary-doctor",
-    ".pi/skills/code-review/i18n-doctor",
-    ".pi/skills/code-review/react-doctor",
-    ".pi/skills/code-review/style-doctor",
     ".pi/skills/code-review/test-doctor",
     ".pi/skills/code-review/typecheck-doctor"
   ],
@@ -22,7 +19,13 @@
         "thinking": "high"
       },
       "frontend": {
+        "thinking": "high"
+      },
+      "dev": {
         "thinking": "medium"
+      },
+      "review": {
+        "thinking": "high"
       },
       "backend": {
         "thinking": "medium"

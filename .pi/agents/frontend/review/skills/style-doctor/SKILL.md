@@ -230,5 +230,5 @@ Use the discovered paths throughout all search rules below.
 ## Related
 
 - Best practices: [references/best-practices.md](references/best-practices.md)
-- Design system tokens: [styling skill](../../frontend/style/SKILL.md)
+- Design system tokens: [styling skill](../../../dev/skills/style/SKILL.md)
 - Design gate: this skill IS the design gate (Figma is not used in this project)

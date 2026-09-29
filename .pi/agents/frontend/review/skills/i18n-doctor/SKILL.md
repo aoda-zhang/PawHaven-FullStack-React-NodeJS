@@ -154,5 +154,5 @@ Only flag content that is truly visible to the end user: button labels, headings
 
 ## Related
 
-- i18n standards: [i18n skill](../../frontend/i18n/SKILL.md)
+- i18n standards: [i18n skill](../../../dev/skills/i18n/SKILL.md)
 - styling: [style-doctor](../style-doctor/SKILL.md)

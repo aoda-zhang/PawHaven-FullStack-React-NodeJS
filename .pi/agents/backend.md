@@ -6,7 +6,7 @@ thinking: medium
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: true
-skills: project-rules, backend-standards, principles, writing-standards
+skills: project-rules, backend, typescript, principles, writing-standards
 tools: read, grep, find, ls, edit, write, bash
 defaultContext: fresh
 ---
