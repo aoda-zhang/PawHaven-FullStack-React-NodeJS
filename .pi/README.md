@@ -9,12 +9,16 @@ deleted once you are satisfied with pi — nothing in `.pi/` reads from it.
 ```
 .pi/
 ├── settings.json          # skills, prompts, packages, subagent model config
-├── skills/                # 22 skills (SKILL.md + references/)
+├── skills/                # 12 project skills (SKILL.md + references/)
 ├── prompts/               # 10 slash commands (/bug-fix, /new-feature, …)
-├── agents/                # 6 PawHaven-specific subagent definitions
+├── agents/                # 9 subagent definitions
 │   ├── architect.md       # read-only planning
 │   ├── scout.md           # read-only recon
-│   ├── frontend.md        # React/TS implementation
+│   ├── oracle.md          # read-only decision challenger
+│   ├── frontend/
+│   │   ├── frontend.md    # router: implementation → dev, review → review
+│   │   ├── dev/           # React/TS writer + 10 private skills (skillPath)
+│   │   └── review/        # findings-only review + 4 private doctors (skillPath)
 │   ├── backend.md         # NestJS implementation
 │   ├── tester.md          # test authoring
 │   └── reviewer.md        # read-only review
@@ -37,17 +41,15 @@ Main Pi Agent
       │
   subagent tool
       │
-  ┌───┼───┬───┐
-  ↓   ↓   ↓   ↓
-architect  scout  reviewer
-  │
-frontend + backend
-  │
-tester
+  ├── architect · scout · oracle    (read-only: plan, recon, challenge)
+  ├── reviewer                      (read-only review)
+  ├── frontend ── routes to ── dev (writer) · review (findings only)
+  ├── backend                       (writer)
+  └── tester                        (writer)
 ```
 
-Each agent gets only the skills it needs via `skills:` frontmatter. No agent inherits
-all 22 skills — context is minimized per agent.
+Each agent gets only the skills it needs via `skills:` frontmatter, plus `skillPath` for
+agent-private skills. No agent inherits all 12 project skills — context is minimized per agent.
 
 ## Model strategy
 
@@ -60,7 +62,9 @@ provider, so switching providers automatically switches all agents.
   "agentOverrides": {
     "scout":     { "thinking": "low" },
     "architect": { "thinking": "high" },
-    "frontend":  { "thinking": "medium" },
+    "frontend":  { "thinking": "high" },
+    "dev":       { "thinking": "medium" },
+    "review":    { "thinking": "high" },
     "backend":   { "thinking": "medium" },
     "tester":    { "thinking": "low" },
     "reviewer":  { "thinking": "high" }
@@ -70,18 +74,25 @@ provider, so switching providers automatically switches all agents.
 
 ## Skills
 
-22 skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
+12 project skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
 frontmatter — zero duplication.
 
-| Domain        | Skills                                                             | Used by                              |
-| ------------- | ------------------------------------------------------------------ | ------------------------------------ |
-| project rules | project-rules, principles                                          | all agents                           |
-| frontend      | react, component, style, i18n, react-query, react-hook-form, redux | frontend                             |
-| backend       | backend                                                            | backend                              |
-| testing       | testing-standards                                                  | tester                               |
-| code review   | code-review (8 doctors)                                            | reviewer                             |
-| architecture  | architecture-design                                                | architect                            |
-| standards     | writing-standards                                                  | architect, frontend, backend, tester |
+| Domain        | Skills                    | Used by                         |
+| ------------- | ------------------------- | ------------------------------- |
+| project rules | project-rules, principles | all agents                      |
+| backend       | backend                   | backend                         |
+| testing       | testing-standards         | tester                          |
+| code review   | code-review (5 doctors)   | reviewer, review                |
+| architecture  | architecture-design       | architect                       |
+| standards     | writing-standards         | architect, dev, backend, tester |
+
+14 agent-private skills sit outside `.pi/skills/` and load only into their owning agent via
+`skillPath` frontmatter:
+
+| Agent  | Private skills                                                                                                      |
+| ------ | ------------------------------------------------------------------------------------------------------------------- |
+| dev    | react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-context, frontend-patterns |
+| review | react-doctor, style-doctor, i18n-doctor, typescript-doctor                                                          |
 
 ## Slash commands (prompts)
 
@@ -89,6 +100,7 @@ frontmatter — zero duplication.
 
 | Command                | What it does                                                 |
 | ---------------------- | ------------------------------------------------------------ |
+| `/feature-development` | Plan, implement, validate a feature end to end               |
 | `/new-feature <name>`  | Full pipeline: scout → architect → implement → test → review |
 | `/bug-fix`             | Reproduce, root-cause, fix, verify                           |
 | `/architecture-change` | Structural change across boundaries                          |
@@ -105,5 +117,6 @@ frontmatter — zero duplication.
 pnpm pi-check
 ```
 
-Validates: 22 skills, 10 prompts, 6 agents, zero diagnostics. Catches missing files,
-invalid names, broken skill references, and missing package installs.
+Validates: 12 project skills, 14 agent-private skills, 10 prompts, 9 agents — zero
+diagnostics. Catches missing files, invalid names, broken skill references, and missing
+package installs.
