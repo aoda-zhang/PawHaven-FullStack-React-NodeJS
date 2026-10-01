@@ -50,4 +50,25 @@ This prompt defines your role. The **skill is the authority** for how to write c
 3. Check whether the component or feature already exists. Do not duplicate.
 4. Implement following the skill and the existing patterns in the codebase.
 5. Run typecheck if available: `pnpm typecheck` or a targeted `tsc --noEmit`.
-6. Return: files changed, what you verified, anything unresolved.
+6. Return the standard block below.
+
+## Result contract
+
+No vague statements such as "renders correctly" — a claim is backed by the command that ran, or it is
+marked unverified.
+
+```
+<result>
+  <status>complete|blocked|failed</status>
+  <scope>the component, hook, or feature you implemented</scope>
+  <changes>every file you added or edited, with what changed in it</changes>
+  <decisions>any pattern choice the skill did not already settle for you</decisions>
+  <verification>
+    <command>pnpm typecheck, the targeted tsc --noEmit, or the test you ran</command>
+    <result>the output that matters</result>
+    <status>pass|fail|not-run</status>
+  </verification>
+  <risks>what you did not verify — rendered output, a11y, or an integration you did not run</risks>
+  <next>what the caller should wire, hand to `review`, or follow up on</next>
+</result>
+```

@@ -44,7 +44,7 @@ the rule means.
 | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
 | [guard-the-context-window](./references/guard-the-context-window.md)                               | Delegation discipline — route bulk to specialists, keep summaries in the thread |
 | [never-block-on-the-human](./references/never-block-on-the-human.md)                               | Autonomy — proceed on reversible work, let the human course-correct             |
-| [prove-it-works](./references/prove-it-works.md)                                                   | The mandatory `<verification>` output block in `fixer`                          |
+| [prove-it-works](./references/prove-it-works.md)                                                   | The mandatory `<verification>` block in every lane's `<result>`                 |
 | [sequence-verifiable-units](./references/sequence-verifiable-units.md)                             | Every delegation names a validation owner and allowed scope                     |
 | [outcome-oriented-execution](./references/outcome-oriented-execution.md)                           | Convergence on the target architecture, not intermediate states                 |
 | [migrate-callers-then-delete-legacy-apis](./references/migrate-callers-then-delete-legacy-apis.md) | `laziness-protocol` plus the boundary rules above                               |

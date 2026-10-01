@@ -7,7 +7,7 @@
 - `develop` — Main development branch. All features merge here.
 - Feature branches: `feature/<short-description>` or `fix/<short-description>`.
 - Never commit directly to `develop` without a feature branch (except for harness configuration:
-  `.opencode/`).
+  `.pi/`).
 
 ## 2. Commit Conventions
 
@@ -35,7 +35,7 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update archi
 ## 4. Commit Hygiene
 
 - One commit per logical change. Avoid mega-commits.
-- `.opencode/` changes: committed as `docs(harness): ...` or `chore(harness): ...`.
+- `.pi/` changes: committed as `docs(harness): ...` or `chore(harness): ...`.
 - Code changes: committed as `feat|fix|refactor(scope): ...`.
 
 ## 5. Pushes and PRs
@@ -47,7 +47,7 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update archi
 ## 6. Agent's Git Scope
 
 - Agents NEVER commit code unless the user explicitly requests it.
-- Agents CAN stage and commit `.opencode/` configuration changes (their own domain) **when the user
+- Agents CAN stage and commit `.pi/` configuration changes (their own domain) **when the user
   asks for it.** "CAN" is permission, not instruction — do not read it as a standing licence to commit
   unprompted. The standing rule is: change the code, do not commit it, do not push it.
 - The orchestrator does NOT commit — only subagents may commit their own work.

@@ -42,10 +42,10 @@ files. Do not load all nine. The full set is ~780 lines and most tasks need two 
 
 ## Notes
 
-- `harness-validator` checks the integrity of the agent-control layer itself (`.codebuddy/` and
-  `.opencode/`). Its original form only scanned `.codebuddy/`, which is now incomplete — the skills,
-  commands, and rule references live under `.opencode/`. Treat it as a starting checklist, not a
-  complete one.
+- `harness-validator` checks the integrity of the agent-control layer itself (`.pi/`). It began as a
+  `.codebuddy/`-only checklist, then scanned the opencode copy, and now documents the checks that
+  `pnpm pi-check` does not cover — skill-id/dir agreement, relative links, and references to a retired
+  harness. Treat it as a starting checklist, not a complete one.
 - The most important invariant — the gateway owns browser auth, downstream services verify an
   internal ES256 JWT — is also stated in the root `AGENTS.md` and
   [`docs/architecture/authentication-architecture.md`](../../../docs/architecture/authentication-architecture.md).

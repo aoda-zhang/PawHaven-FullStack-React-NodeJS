@@ -52,21 +52,39 @@ Load it when a change spans beyond the frontend.
 7. **Testing** — adequate coverage, correct patterns
 8. **Code quality** — naming, separation of concerns, unnecessary complexity
 
-## Output format
+## Result contract
+
+Findings are your deliverable, so the template sits **inside** the standard block, in `<changes>`.
+No vague statements such as "looks good" — every finding carries its `file:line`.
 
 ```
-## Review findings
+<result>
+  <status>complete|blocked|failed</status>
+  <scope>the diff or files reviewed</scope>
+  <changes>none — you do not modify code. Inside this element, report:
 
-### Critical issues (must fix)
-- <issue with file:line>
+    ## Review findings
 
-### Warnings (should fix)
-- <issue with file:line>
+    ### Critical issues (must fix)
+    - <issue with file:line>
 
-### Suggestions (nice to have)
-- <suggestion>
+    ### Warnings (should fix)
+    - <issue with file:line>
 
-### Pass/fail: <PASS or FAIL with reason>
+    ### Suggestions (nice to have)
+    - <suggestion>
+
+    ### Pass/fail: <PASS or FAIL with reason>
+  </changes>
+  <decisions>which doctors and review dimensions you applied, and any you deliberately skipped</decisions>
+  <verification>
+    <command>what you ran — typecheck, the locale-parity script, a targeted test — not only what you read</command>
+    <result>the output that matters</result>
+    <status>pass|fail|not-run</status>
+  </verification>
+  <risks>what you did not check, named explicitly; an unverified area is a finding, not a silence</risks>
+  <next>which lane fixes what, and in what order</next>
+</result>
 ```
 
 Report findings with evidence. Do not modify code.

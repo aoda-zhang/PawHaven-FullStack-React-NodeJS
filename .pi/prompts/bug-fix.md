@@ -16,13 +16,19 @@ Be scientific. Every shipped line traces to runtime evidence. Reproduce first, t
 >
 > **Standard path**: Follow all steps below. If the bug touches API contracts, database entities, or requires a new module, it is Standard (not Trivial).
 
+> **Step 0 — Classify.** Run the [`task-classification`](../skills/task-classification/SKILL.md)
+> skill and show the user its JSON before this workflow starts. `taskType` must be `bug-fix`; a
+> slow-but-correct surface is `performance` and a "where does this live" question is
+> `investigation`, and both route elsewhere. A UI, routing, form, or auth surface puts
+> `browser-verifier` in `requiredVerification` — it re-runs the repro on the same surface.
+
 ## Steps
 
 1. **Reproduce it yourself** on the matching surface. Don't hand the repro to the user. Won't reproduce? Force it: synthesize the trigger, instrument until it fires. If the bug is truly environmental (device, account, backend), capture the closest repro you can and say exactly what is missing.
 2. **Binary-search the cause.** Form candidate hypotheses and rule them out with runtime evidence (logs, breakpoints, data inspection). Seed hypotheses by reading the relevant code path and, if useful, the regression history. Fan out parallel investigation subagents when the surface is wide; converge on the root cause.
 3. **Plan the fix.** If the fix crosses a component, package, or API boundary, run the `/architecture-change` command first. Otherwise design the smallest fix that addresses the root cause per **fix-root-causes** (via the `principles` skill) and **subtract-before-you-add** (via the `principles` skill). A belt-and-suspenders change that "might help" is a hypothesis, not a fix; it does not ship.
 4. **Implement.** Delegate to a subagent with a named data shape and explicit success criteria; review the diff yourself. Model the state per **model-the-domain** (via the `principles` skill); guard at boundaries per **boundary-discipline** (via the `principles` skill).
-5. **Verify on the same surface.** The original repro now passes, on the same surface that failed. Inconclusive or wrong-surface is not a pass. Run `pnpm typecheck` and the targeted tests; for UI bugs, confirm the rendered output. Paste failing-then-passing evidence verbatim in the reply.
+5. **Verify on the same surface.** The original repro now passes, on the same surface that failed. Inconclusive or wrong-surface is not a pass. Run `pnpm typecheck` and the targeted tests; for UI bugs, dispatch `browser-verifier` to confirm the rendered output and re-run the journey that failed. Paste failing-then-passing evidence verbatim in the reply.
 6. **Propose the commit split** so the failing repro would land before the fix, per **sequence-verifiable-units** (TDD cadence when there is a cheap test path). Leave the changes in the working tree — committing is the user's.
 7. **Run the review handoff** (`/handoff`). Include Doc Impact classification (`none` / `update` / `create`). Stop at the handoff: nothing is pushed, no PR is opened. The human reviews the diff and opens the PR.
 

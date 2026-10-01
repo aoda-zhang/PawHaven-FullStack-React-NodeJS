@@ -12,6 +12,9 @@
   "packages": ["npm:pi-subagents@0.73.1"],
   "subagents": {
     "agentOverrides": {
+      "oracle": {
+        "thinking": "high"
+      },
       "scout": {
         "thinking": "low"
       },
@@ -35,6 +38,9 @@
       },
       "reviewer": {
         "thinking": "high"
+      },
+      "browser-verifier": {
+        "thinking": "low"
       }
     }
   }

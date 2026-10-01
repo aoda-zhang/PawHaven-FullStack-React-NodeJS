@@ -7,7 +7,7 @@
  * builtins only, so it replaces the `jq` one-liners that assumed an undeclared
  * external binary.
  *
- *   node .opencode/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs
+ *   node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs
  *   node ... --locales packages/i18n/locales --reference en-US
  *
  * Exit codes: 0 all locales match, 1 drift found, 2 bad input.

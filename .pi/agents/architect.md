@@ -53,3 +53,27 @@ Return a structured implementation plan:
 ```
 
 Do not implement. Return the plan for the main agent to approve.
+
+## Result contract
+
+End every run with the standard block. No vague statements such as "looks good" — tie each claim to
+the file, line, or command output that backs it.
+
+```
+<result>
+  <status>complete|blocked|failed</status>
+  <scope>the feature or change you planned</scope>
+  <changes>none — you are read-only; the implementation plan above is the deliverable</changes>
+  <decisions>the design calls the plan rests on, and any you are leaving to the caller</decisions>
+  <verification>
+    <command>what you ran to ground the plan (grep/find/read targets, build or typecheck you checked)</command>
+    <result>what it produced</result>
+    <status>pass|fail|not-run</status>
+  </verification>
+  <risks>open questions, and the assumption each one rests on</risks>
+  <next>which lane to dispatch, in what order, and what each needs passed to it</next>
+</result>
+```
+
+`status` is `blocked` — not `complete` — when the plan cannot be settled without a decision you do
+not have; say whose decision it is.

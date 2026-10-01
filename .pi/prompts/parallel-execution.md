@@ -28,7 +28,8 @@ never waits on a sibling and never re-reads shared state — it does its work an
 1. **Split into units.** Name them U1..UN in dependency order. Each unit MUST be:
    - one concern (one module, one file group, one API path)
    - independently executable, with no runtime dependency on a sibling
-   - owned by exactly one lane (`fixer`, `designer`, or `oracle` depending on the work)
+   - owned by exactly one lane (`dev` or `backend` on implementation work, `oracle` on a design
+     or decision unit)
    - ending in a verifiable check (typecheck, lint, build, or a targeted test)
 
    Units with no dependency on each other go in the same wave. If a unit cannot be verified on its
@@ -37,11 +38,11 @@ never waits on a sibling and never re-reads shared state — it does its work an
 2. **Announce the split.** State the table in your reply before dispatching, so the human can see
    the decomposition and stop you cheaply if a unit is wrong.
 
-   | Unit | Lane       | Scope                  | Depends on | Verify with                                 |
-   | ---- | ---------- | ---------------------- | ---------- | ------------------------------------------- |
-   | U1   | `fixer`    | Prisma model + service | —          | `pnpm --filter @pawhaven/core-service test` |
-   | U2   | `fixer`    | report-animal service  | U1         | same                                        |
-   | U3   | `designer` | API paths + gate UI    | U2         | `pnpm --filter @pawhaven/portal test`       |
+   | Unit | Lane      | Scope                  | Depends on | Verify with                                 |
+   | ---- | --------- | ---------------------- | ---------- | ------------------------------------------- |
+   | U1   | `backend` | Prisma model + service | —          | `pnpm --filter @pawhaven/core-service test` |
+   | U2   | `backend` | report-animal service  | U1         | same                                        |
+   | U3   | `dev`     | API paths + gate UI    | U2         | `pnpm --filter @pawhaven/portal test`       |
 
 3. **Dispatch the wave in parallel.** Fire every unit with `task` and `background: true`, then
    return immediately — do not wait on any of them. Each prompt MUST carry:

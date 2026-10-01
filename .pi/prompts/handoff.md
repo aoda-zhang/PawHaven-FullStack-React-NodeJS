@@ -7,7 +7,7 @@ description: Produce a review handoff — proposed commit split, pasted evidence
 You own this task. Plan, review, verify. Delegate implementation to subagents, stay in the lead.
 
 The work stops here, ready for a human. You propose; the human commits, pushes, and opens the
-PR. Committing is not yours to do — see `.opencode/project-rules.md`.
+PR. Committing is not yours to do — see [`references/git.md`](../skills/project-rules/references/git.md).
 
 ## Steps
 
@@ -26,8 +26,11 @@ PR. Committing is not yours to do — see `.opencode/project-rules.md`.
      before/after numbers, the green pin).
    - What remains unverified or risky, named explicitly.
    - A suggested PR title and description, framing impact for the consumer and the maintainer.
-   - If Doc Impact is `update` or `create`, which documents need updating or creating, and route to
-     the `knowledge-update` agent for permanent documentation.
+   - If Doc Impact is `update` or `create`, which documents need updating or creating, and the exact
+     `docs/` edits the change invalidated. The main session owns those edits — it routes them to the
+     implementation lane that made the change, so the doc update ships in the same change
+     (`AGENTS.md`: "update the matching doc in the same change"). There is no separate
+     documentation agent.
 
 ## Reply
 

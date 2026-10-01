@@ -2,7 +2,7 @@
 
 > **Applies to**: All agents.
 > **Purpose**: Define documentation standards — what gets documented, where, and how.
-> **Doc Impact**: Every handoff (`/handoff`) MUST classify documentation impact as `none` / `update` / `create`. If `update` or `create`, route to `knowledge-update` agent for permanent documentation.
+> **Doc Impact**: Every handoff (`/handoff`) MUST classify documentation impact as `none` / `update` / `create`. If `update` or `create`, the main session routes the doc edits back to the lane that made the change, so the documentation ships in the same change. There is no separate documentation agent.
 
 ## 1. Code Comments
 
@@ -38,13 +38,14 @@ When a decision changes the architecture, reflect it directly in the living arch
 
 ## 4. Workflow Documentation
 
-Location: `.opencode/command/`
+Location: `.pi/prompts/`
 
 - One file per slash command — `/feature-development`, `/bug-fix`, `/architecture-change`,
   `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`, `/parallel-execution`,
   `/handoff`.
-- Each defines: numbered steps, decision points, failure recovery. Frontmatter `agent:` picks the
-  runner.
+- Each defines: numbered steps, decision points, failure recovery. Frontmatter `description:` is the
+  one-line text shown in the `/` menu; the prompt runs in the invoking session, it does not name a
+  runner agent.
 
 ## 5. ROOT READMEs
 
@@ -52,7 +53,8 @@ Location: Project root `README.md` and `README.cn.md`
 
 - Documentation tables reference all knowledge files.
 - Must stay in sync (EN ↔ CN translations).
-- Updated by `knowledge-update` agent on cascade.
+- Updated by the lane that changed the contract, on cascade, when the main session's `/handoff` step
+  classifies Doc Impact as `update`.
 
 ## 6. Inline API Documentation
 
@@ -68,4 +70,9 @@ Location: Project root `README.md` and `README.cn.md`
 | **Temporary** | _(none)_                  | Session-scoped, never written to disk | —                                          | Progress is reported in replies; there is no scratch file to drift out of sync |
 | **Handoff**   | Workflows handoff summary | Ephemeral, per-task                   | End of every task                          | What changed, verification evidence, Doc Impact classification                 |
 
-> **Rule**: permanent docs live in `docs/` and are maintained by the `knowledge-update` agent. There is no temporary-notes file — a previous version required a daily memory log at `.codebuddy/memory/YYYY-MM-DD.md` that never existed. Progress goes in replies. Do not reintroduce it, and do not mistake a chat reply for documentation: a reply that outlives the session must land in a doc.
+> **Rule**: permanent docs live in `docs/` and are updated in the same change as the code that
+> invalidated them — the main session classifies Doc Impact at `/handoff` and routes the edits to the
+> lane that made the change. There is no temporary-notes file — a previous version required a daily
+> memory log at `.codebuddy/memory/YYYY-MM-DD.md` that never existed. Progress goes in replies. Do not
+> reintroduce it, and do not mistake a chat reply for documentation: a reply that outlives the session
+> must land in a doc.

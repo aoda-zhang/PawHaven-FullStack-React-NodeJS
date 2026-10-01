@@ -39,7 +39,7 @@ There is no CI gate for this. Run the bundled script before claiming a change is
 read its stdout rather than reading the script's source, and do not reassemble the comparison by hand.
 
 ```bash
-node .opencode/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs \
+node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs \
   --locales packages/i18n/locales --reference en-US
 ```
 

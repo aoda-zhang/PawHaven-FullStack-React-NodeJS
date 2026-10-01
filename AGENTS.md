@@ -118,31 +118,37 @@ Full detail: `docs/architecture/authentication-architecture.md`.
 ## The agent harness
 
 Agent config lives in `.pi/`, committed project-locally, so behaviour is the same for everyone
-who clones the repo. **pi is the harness layer.** `.opencode/` is a legacy copy kept only until
-you are satisfied with pi; nothing in `.pi/` reads from it, and it can be deleted as-is.
+who clones the repo. **pi is the harness layer.** The `.opencode/` copy that preceded it was
+legacy, has been deleted, and nothing in `.pi/` ever read from it.
 
-- `.pi/skills/` — 12 project skills, indexed by [`.pi/README.md`](.pi/README.md). 14 more are
+- `.pi/skills/` — 13 project skills, indexed by [`.pi/README.md`](.pi/README.md); 14 more are
   agent-private under `.pi/agents/frontend/{dev,review}/skills/`, loaded via `skillPath`
   frontmatter only into those agents' contexts.
   A skill's ID is its **directory name**, and `name:` in frontmatter must match it (lowercase
   `a-z`, `0-9`, hyphens only) — pi uses `name` as the `/skill:<name>` command, so a name with a
-  slash in it silently breaks invocation. `project-rules` (9 constraint files) and `principles`
-  (6 rules that need citing by name) are the two to load before non-trivial work.
-- `.pi/prompts/` — 10 slash-command workflows: `/feature-development`, `/new-feature`,
-  `/bug-fix`, `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`,
-  `/perf-issue`, `/parallel-execution`, `/handoff`.
-- `.pi/agents/` — 9 subagent definitions run by pi-subagents (installed via `packages` in
+  slash in it silently breaks invocation. `project-rules` (9 constraint files), `principles`
+  (6 rules that need citing by name), and `task-classification` (routes a request to a
+  workflow) are the three to load before non-trivial work.
+- `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
+  `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`,
+  `/parallel-execution`, `/handoff`.
+- `.pi/agents/` — 10 subagent definitions run by pi-subagents (installed via `packages` in
   `.pi/settings.json`): `scout`, `architect`, `oracle` (read-only recon, planning, decision
   challenger), `frontend` (a router delegating to `dev` for implementation and `review` for
-  findings-only review), `backend`, `tester`, `reviewer`. `dev` and `review` live under
+  findings-only review), `backend`, `tester`, `reviewer`, `browser-verifier` (drives the running
+  portal in a real browser and edits no source). `dev` and `review` live under
   `.pi/agents/frontend/` with their private skills.
+- `.pi/handoffs/` — structured handoff artifacts for work that spans sessions or lanes, so a
+  fresh context reads one instead of re-deriving.
+- `.pi/evals/` — the harness's own eval corpus and metrics README; a harness change is
+  justified by a scored run that failed, not by theory.
 - `.pi/settings.json` — points pi at the directories above. **The 5 `code-review/<doctor>`
   skills are listed individually and must stay that way:** pi stops recursing at any directory
   containing `SKILL.md`, so the doctors nested under the `code-review` parent are only found via
   those explicit entries. Dropping them silently drops 5 skills. The 4 frontend doctors (react,
   style, i18n, typescript) are agent-private to `review` instead, via `skillPath`.
-- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 12 project
-  skills, 14 agent-private skills, 10 prompts, and 9 agents load with zero diagnostics. Run it
+- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 13 project
+  skills, 14 agent-private skills, 9 prompts, and 10 agents load with zero diagnostics. Run it
   after touching anything in `.pi/`.
 
 `/trust` once so project config loads, then `/reload` after changing `.pi/`.
@@ -151,7 +157,7 @@ Plan then dispatch for feature work: classify the request, present an agent-leve
 approval, then dispatch. Ask before Standard and Architectural scope; do not re-ask for reversible
 sub-steps afterwards; always ask before a push or force-push.
 
-**Dispatch is real: pi runs named sub-agents.** The 9 agents in `.pi/agents/` execute in
+**Dispatch is real: pi runs named sub-agents.** The 10 agents in `.pi/agents/` execute in
 isolated contexts via pi-subagents — `frontend` itself holds no edit tools and routes to `dev`
 (writer) and `review` (read-only). Dispatch through the subagent tool with a scope, a data
 shape, and observable success criteria — never a file list. The lane rules under

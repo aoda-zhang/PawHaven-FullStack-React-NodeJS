@@ -48,7 +48,7 @@ Identify the project's locale directory, then **execute** the bundled parity scr
 output:
 
 ```bash
-node .opencode/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs \
+node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs \
   --locales packages/i18n/locales --reference en-US
 ```
 
@@ -91,7 +91,7 @@ Use the discovered paths throughout all search rules below.
 - **Severity**: ❌ Blocking
 - **Tool**: `bash` — execute the bundled script, read its stdout
 - **Path**: `scripts/check-locale-parity.mjs`, run from the workspace root
-- **Script**: `node .opencode/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs` (accepts
+- **Script**: `node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs` (accepts
   `--locales <dir>`, default `packages/i18n/locales`, and `--reference <locale>`, default `en-US`).
   Zero dependencies — Node builtins only.
 - **Execution**: Run the script. Never read the file to work out what it does; the source stays out of

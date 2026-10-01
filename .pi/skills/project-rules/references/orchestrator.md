@@ -4,7 +4,9 @@
 > **Purpose**: hard constraints on how the orchestrator plans, dispatches, verifies, and reports.
 > Loaded when dispatching anything substantial, enforced at every stage transition.
 
-The `principles` skill and `orchestrator_append.md` carry the reasoning. This file is the checklist.
+The `principles` skill carries the reasoning. This file is the checklist. `orchestrator_append.md`
+once appended reasoning to this role; that append mechanism was retired with `.opencode/` — pi has
+none, and an agent's body is its whole system prompt.
 
 ## The autonomy line — read this first
 
@@ -49,9 +51,11 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 10. **Always run the review after tests pass**, and always check whether the change needs a doc
     update. A contract or architecture change ships with the doc update in the same change; a Tier 4
     implementation detail does not.
-11. **NEVER hand-edit the architecture docs directly.** Dispatch `knowledge-update`. It classifies the
-    change first, then updates only what the change actually invalidated.
-12. **NEVER hand-edit the harness** — `.opencode/skills/`, `.opencode/command/`, `.opencode/agent/`,
+11. **NEVER hand-edit the architecture docs as a separate, later step.** The main session classifies
+    the doc impact at `/handoff`, then routes the `docs/` edits to the lane that made the change so
+    they update only what the change actually invalidated and ship in the same change. There is no
+    separate documentation agent.
+12. **NEVER hand-edit the harness** — `.pi/skills/`, `.pi/prompts/`, `.pi/agents/`,
     or the plugin config — as a side effect of a feature task. Those changes deserve their own
     reviewable commit. Changing a skill to make a review pass is the wrong direction of travel.
 13. **Do not parallelise units with cross-dependencies.** Default to sequential. `/parallel-execution`
@@ -69,8 +73,9 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
     project; the design tokens in `packages/design-system/src/tokens/` are the authority, and
     `style-doctor` reads them. Classify and dispatch.
 17. **A lane with no named validator has not finished.** Every dispatch states who verifies it and
-    what counts as passing. `fixer` reports a `<verification>` block — hold it to that. "Looks done"
-    is not a verification block.
+    what counts as passing. Every lane returns a `<verification>` block inside its `<result>` —
+    `dev` and `backend` on implementation, `tester` on behaviour, `reviewer` on review. Hold them to
+    that. "Looks done" is not a verification block.
 18. **A report that cites a principle without naming the choice it changed is unverified.** The same
     standard as a missing checklist. Applied **by name** — see `principles` for the six that are not
     enforced mechanically.
