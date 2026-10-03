@@ -57,9 +57,9 @@ Ensure you meet these version requirements before installing dependencies or run
 
 # 🤖 AI Driver
 
-**`.opencode/`** is the **AI-driven development engine** behind PawHaven — an agent orchestrator that turns every coding request into a structured pipeline: `plan → dispatch agents → verify with tests → review against architecture & patterns → update knowledge`.
+**`.pi/`** is the **AI-driven development engine** behind PawHaven — an agent harness that turns every coding request into a structured pipeline: `classify → plan → dispatch lanes → verify → review against architecture & patterns → update docs`.
 
-👉 [Enter the harness](./.opencode/skills/README.md) — 22 skills, 9 slash-command workflows, the `knowledge-update` agent, and the project rules they enforce
+👉 [Enter the harness](./.pi/README.md) — 14 project skills, 9 slash-command workflows, 11 subagents, and the project rules they enforce. `pnpm pi-check` validates it.
 
 ---
 
@@ -89,6 +89,8 @@ frontend and backend detail), `product/` (the blueprint `features/` cite).
 > `docs/features/` is **as-built** — one document per portal feature folder, each verified against
 > the code. Gaps are recorded per feature, and
 > [known defects](./docs/features/README.md#known-defects-in-the-code) are tabulated in the index.
+> A feature doc is only as current as the last change that reconciled it, which is why the workflow
+> reads the architecture docs and the code first, and writes these last.
 
 ### Product & Architecture
 
@@ -108,7 +110,7 @@ Browser JWT / cookies are owned by the **gateway** only. Per request it resolves
 
 | Document                                                                                          | Description                                                                             |
 | ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Project Standards](./.opencode/skills/project-rules/SKILL.md)                                    | Coding conventions, tooling, workflows — enforced as a skill                            |
+| [Project Standards](./.pi/skills/project-rules/SKILL.md)                                          | Coding conventions, tooling, workflows — enforced as a skill                            |
 | [Authentication & Authorization Architecture](./docs/architecture/authentication-architecture.md) | Gateway-owned cookie JWT + internal ES256-JWT (InternalJwt) service auth, `roles` claim |
 | [Route-Level Authentication](./docs/architecture/route_authentication.md)                         | Frontend route guard implementation                                                     |
 

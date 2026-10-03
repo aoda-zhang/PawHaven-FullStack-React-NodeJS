@@ -8,7 +8,7 @@ description: >
   doctors, architecture & design, type contracts).
   style-doctor is the design gate: it is the only check against
   @pawhaven/design-system tokens. Each sub-skill is
-  independently composable and can be loaded via use_skill.
+  independently loadable by reading its SKILL.md path.
   test-doctor runs on EVERY review, every scope.
   Trigger: code review PR feedback quality check automated scans anti-pattern detection.
 ---
@@ -43,7 +43,13 @@ code-review (this skill)
               └── Layer 4 — type contract (full-stack only)
 ```
 
-Each sub-skill is a standalone SKILL.md containing explicit rules with exact tool invocations to use (search_content, execute_command, read_lints). No shell scripts. Each sub-skill can be loaded individually or composed.
+Each sub-skill is a standalone `SKILL.md` holding explicit rules with a runnable command or a file
+path to read. No shell scripts. Load one by reading its path — the paths are in the Related section at
+the bottom of this file — and they compose.
+
+**Every rule names a command you can run.** A rule you cannot execute produces no finding while still
+looking like a gate, so if a command in a sub-skill fails or is wrong, that is a finding about the
+harness, and it gets fixed in the same change.
 
 ## Two Passes
 
@@ -77,21 +83,16 @@ Ask the user or infer from changed files what is being built:
 
 - **Scope**: frontend / backend / full-stack
 
-### Step 1: Parallel-load all applicable sub-skills
+### Step 1: Load all applicable sub-skills
 
-Use `use_skill` to load each sub-skill for the determined scope. This MUST be done in parallel — all sub-skill loads in one batch.
-**test-doctor is always included** — load it for every scope (frontend / backend / full-stack).
-**style-doctor is the design gate** for frontend and full-stack scopes.
+Read each sub-skill's `SKILL.md` for the determined scope. The paths are in
+[Related](#related). **test-doctor is always included** — every scope, frontend / backend /
+full-stack. **style-doctor is the design gate** for frontend and full-stack scopes.
 
 ### Step 2: Execute each sub-skill's rules
 
-Each sub-skill's SKILL.md lists explicit check rules. Execute them using the tools specified:
-
-- `search_content` — for regex-based pattern detection
-- `execute_command` — for typecheck, format check, etc.
-- `read_lints` — for compiler/linter diagnostics
-
-All independent checks within and across sub-skills SHOULD run in parallel.
+Each sub-skill states a shell command or a file to read. Run them; independent checks SHOULD run
+together in one batch.
 
 ### Step 3: Aggregate results and assign each finding to a pass
 
@@ -131,11 +132,8 @@ Present findings organized by sub-skill, with file paths, line numbers, and seve
 
 ## Sub-Skill Composition
 
-Each sub-skill is a true CodeBuddy skill and can be:
-
-- Loaded individually via `use_skill("code-review/react-doctor")`
-- Combined on demand — load only the sub-skills needed
-- Parallel-loaded by pawhaven for full reviews
+Each sub-skill is loadable on its own — read its `SKILL.md` — so a narrow review reads only the
+doctors its scope needs, and a full review reads all of them.
 
 ## Related
 

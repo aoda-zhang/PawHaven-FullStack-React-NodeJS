@@ -44,29 +44,33 @@ never waits on a sibling and never re-reads shared state — it does its work an
    | U2   | `backend` | report-animal service  | U1         | same                                        |
    | U3   | `dev`     | API paths + gate UI    | U2         | `pnpm --filter @pawhaven/portal test`       |
 
-3. **Dispatch the wave in parallel.** Fire every unit with `task` and `background: true`, then
-   return immediately — do not wait on any of them. Each prompt MUST carry:
+3. **Dispatch the wave in parallel.** Fire every unit with one `subagent` call, `async: true`, then
+   return immediately — do not wait on any of them. Each dispatch MUST carry:
    - the unit ID, its exact scope, and what is explicitly **out** of scope
    - the absolute file paths to work in, not inlined file contents
    - the named data shape, if the unit introduces one
    - the exact verification command and the observable result that counts as passing
    - the relevant skills by name, and any principle text the lane cannot load itself
+   - an `output` path, so the unit's result survives past the run
 
-   Keep each prompt self-contained. A background agent cannot ask you a question, so anything you
-   leave implicit becomes a guess.
+   Keep each prompt self-contained. A background unit cannot ask you a question, so anything you
+   leave implicit becomes a guess. Use a workflow script when you want the wave joined automatically
+   rather than by hand.
 
-4. **Check status without disturbing the units.** Use `task_status` on each task ID. It is
-   read-only and does not re-wake the agent.
+4. **Check status without disturbing the units.** `bg_wait { nonBlocking: true }` subscribes to an
+   exact run's completion without polling, and an ordinary async run notifies this session natively
+   when it finishes. Either is a progress check.
 
-   **Never poll a unit by re-invoking `task` against its ID.** That re-wakes the child and burns
-   model work on a unit that was already progressing. `task_status` is the only progress check.
+   **Never re-dispatch a unit to ask for status.** That re-wakes the child and burns model work on a
+   unit that was already progressing. To nudge a running unit, use the supervisor channel
+   (`subagent_supervisor`, action `reply`).
 
-   If a unit is genuinely stuck rather than slow, send it a queued instruction with `task_message`
-   (non-interrupting) or cancel it with `task_cancel` and re-split. Do not spam it.
+   If a unit is genuinely stuck rather than slow, send it a follow-up message, or cancel it and
+   re-split. Do not spam it.
 
-5. **Collect results.** `task_result` returns the final text of a completed task, and a status
-   message while one is still running. Read every unit's report and **write your own summary** — do
-   not pass a subagent's words through as your own.
+5. **Collect results.** Each unit's `<result>` block carries its `<changes>`, `<verification>`, and
+   `<risks>`. Read every unit's report and **write your own summary** — do not pass a subagent's
+   words through as your own.
 
 6. **Verify the combined tree.** Individual unit checks do not prove the integration. Run the full
    set on the merged result:
@@ -77,8 +81,9 @@ never waits on a sibling and never re-reads shared state — it does its work an
    pnpm test
    ```
 
-   `pnpm lint` already fails from 14 pre-existing errors (3 in `gateway`, 11 in `backend-core`) —
-   diff against baseline before calling it a regression.
+   `pnpm lint` already fails from 13 pre-existing errors (3 in `gateway`, 10 in `backend-core`) —
+   diff against baseline before calling it a regression. An older number in this file said 14; the
+   measured baseline is 13.
 
    If integration fails, route the fix to the owning lane with `task`, naming the failing command
    and the output. A merge conflict between two units is yours to resolve directly.
@@ -95,6 +100,8 @@ never waits on a sibling and never re-reads shared state — it does its work an
   work blindly is how you clobber a correct change.
 - **The whole wave timed out or lost its result channel.** That is a sizing failure, not a bug in
   the unit. Split smaller. Do not retry the same size.
+- **A dispatch fails to launch at all** — extension, runner, or lane error. Stop. That is a harness
+  fault, not a unit that needs re-splitting, and silently retrying in a different mode hides it.
 
 ## Reply
 

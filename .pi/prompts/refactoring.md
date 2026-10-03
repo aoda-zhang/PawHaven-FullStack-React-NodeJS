@@ -14,6 +14,11 @@ Refactoring is a behavior-preserving change to structure or shape: rename, extra
 > user-visible UI, routing, or auth, put `browser-verifier` in `requiredVerification` — the rendered
 > output is the pin that proves nothing changed.
 
+> **Read order.** Architecture docs and code first; `docs/features/**` last. A refactor that only
+> moves files should describe the same system before and after, so usually the correct doc impact is
+> `none` — and a refactor that _does_ require a doc edit is a signal you moved something that was
+> load-bearing.
+
 ## Steps
 
 1. **Pin the behavior first.** Identify the executable checks that guard the code being moved: tests, typecheck, snapshots. If none exist and one is cheap, add it. Per **sequence-verifiable-units** (enforced by the orchestrator workflow), the pin lands before the refactor.
@@ -22,7 +27,8 @@ Refactoring is a behavior-preserving change to structure or shape: rename, extra
 4. **Refactor in verifiable units.** Move or rename in small slices; after each slice, the pin is still green. Delegate mechanical slices to subagents with explicit scope; review each diff yourself.
 5. **Verify the pin.** The pinned checks pass unchanged. Any change to behavior is a red flag; reconcile it deliberately or it does not ship. For user-visible code, dispatch `browser-verifier` so the rendered result is checked against the pin too.
 6. **Migrate callers in the same wave.** If a public API or export changed shape, migrate all consumers across `apps/` and `packages/` and delete the legacy export per **migrate-callers-then-delete-legacy-apis** (enforced by the orchestrator workflow).
-7. **Then `/handoff`**.
+7. **Reconcile the docs, last.** If a refactor changed a file path, endpoint, or module boundary that `docs/features/**` names, update it from the code that shipped, routed to the lane that did the move. If the document still describes the same system, Doc Impact is `none` and you touch nothing.
+8. **Then `/handoff`**.
 
 ## Reply
 

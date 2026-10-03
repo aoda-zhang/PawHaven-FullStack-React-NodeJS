@@ -149,8 +149,9 @@ pnpm --filter @pawhaven/core-service test
 cd apps/backend/core-service && npx prisma validate
 ```
 
-`pnpm lint` currently exits non-zero from **pre-existing** errors — 3 in `gateway`, 11 in
-`backend-core`. Diff against baseline before calling lint a regression you caused.
+`pnpm lint` currently exits non-zero from **pre-existing** errors — 3 in `gateway`, 10 in
+`backend-core`. Use `npx turbo run lint --continue` to see all of them; a plain `pnpm lint` stops at
+the first failing package. Diff against baseline before calling lint a regression you caused.
 
 There is no cross-module import linter. Run the grep yourself when it matters:
 

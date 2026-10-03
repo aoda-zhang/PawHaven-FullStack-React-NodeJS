@@ -23,21 +23,17 @@ a review's loaded sub-skills, the orchestrator must load it before completing St
 ## Step 0: Discover Changed Files and Their Test Files
 
 1. Get the set of changed source files for this review:
-   - PR / branch review: the diff between base and head, e.g.
-     ```
-     execute_command: git --no-pager diff --name-only <base>...<head>
-     ```
-   - Local working-tree review:
-     ```
-     execute_command: git --no-pager diff --name-only HEAD~1
-     execute_command: git status --short
-     ```
+   ```bash
+   git --no-pager diff --name-only <base>...<head>   # PR / branch review
+   git --no-pager diff --name-only HEAD~1            # local working-tree review
+   git status --short
+   ```
 2. From the changed files, derive each affected package (nearest `package.json`) and its
    test script.
 3. Locate existing test files for the affected packages:
-   ```
-   search_file: pattern="**/*.test.*" target_directory=<affected_package_src> recursive=true
-   search_file: pattern="**/*.spec.*" target_directory=<affected_package_src> recursive=true
+   ```bash
+   find <affected_package_src> -name '*.test.*' -o -name '*.spec.*' \
+     -not -path '*/node_modules/*' -not -path '*/dist/*'
    ```
 4. Build and **output the mapping**: `changed file → expected test file → existing test file (or MISSING)`.
    This prevents silent empty scans and documents coverage explicitly.
@@ -48,26 +44,27 @@ a review's loaded sub-skills, the orchestrator must load it before completing St
 
 - **Severity**: ⚠️ Warning; ❌ Blocking when the governing workflow mandates tests
   (feature-development, bug-fix, refactoring, perf-issue)
-- **Tool**: `search_file` / `read_file`
+- **Command**: the `find` in Step 0, filtered to the changed files' directories
 - **Explanation**: Every changed file that adds or modifies behavior must be covered by a
   test file. Pure config / type / design-token changes may be exempt — state why.
 - **Validation**: For each changed source file, check whether a sibling `*.test.*` /
   `*.spec.*` file exists. Missing coverage is a finding with the changed file's path.
+- **The project places tests in two places per feature**, so "sibling" is not the whole answer:
+  `features/<name>/tests/` for page and component tests, and `features/<name>/api/tests/` for
+  API-layer tests. Check both.
 
 ### Rule 2: Meaningful assertions
 
 - **Severity**: ⚠️ Warning; ❌ Blocking when tests are required by the workflow
-- **Tool**: `read_file`
-- **Path**: discovered test files
 - **Explanation**: Tests must assert the changed behavior — required-field blocking, DTO
   shape, error messages, i18n key resolution, API contract — not trivial/no-op assertions
   (e.g. `expect(true).toBe(true)`, or render-only smoke tests with no assertions on the
-  behavior under review).
+  behavior under review). Read the discovered test files and judge each assertion against
+  the diff.
 
 ### Rule 3: Test execution
 
 - **Severity**: ❌ Blocking
-- **Tool**: `execute_command`
 - **Command**: run the affected suites from the workspace root:
   ```bash
   pnpm --filter <packageName> test -- --run <test_file>
@@ -80,8 +77,6 @@ a review's loaded sub-skills, the orchestrator must load it before completing St
 ### Rule 4: Project test conventions
 
 - **Severity**: ⚠️ Warning; ❌ Blocking when the violation makes tests flaky/broken
-- **Tool**: `read_file` / `search_content`
-- **Path**: discovered test files
 - **Explanation**: Follow the project's test conventions (PawHaven):
   - Portal feature tests mock `@pawhaven/ui` — do NOT `importOriginal` the ui barrel (it
     pulls lottie-react into jsdom and crashes).
@@ -90,6 +85,7 @@ a review's loaded sub-skills, the orchestrator must load it before completing St
   - Import `@testing-library/jest-dom/vitest` for DOM matchers.
   - No hardcoded CJK user-visible strings that should be i18n keys.
   - Per-file `// @vitest-environment jsdom` pragma where the DOM is used.
+  - Vitest, never Jest — Jest is not installed in this workspace.
 
 ## Execution
 

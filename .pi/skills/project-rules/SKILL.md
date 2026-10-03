@@ -19,7 +19,7 @@ The hard constraints of this repo. Unlike [principles](../principles/SKILL.md), 
 decision-forcing _why_, rules are _what must always hold_. They do not change per task.
 
 **How to use this skill:** identify which domains the change touches, then read only those reference
-files. Do not load all nine. The full set is ~780 lines and most tasks need two or three.
+files. Do not load all ten. The full set is ~840 lines and most tasks need two or three.
 
 | Rule                                                   | Read it when the change touches                                     | Covers                                                                               |
 | ------------------------------------------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
@@ -28,7 +28,8 @@ files. Do not load all nine. The full set is ~780 lines and most tasks need two 
 | [components](./references/components.md)               | any React/TSX in `apps/` or `packages/`                             | React 19 (no `forwardRef`), props, styling, a11y, types.                             |
 | [security](./references/security.md)                   | auth, secrets, input handling, any backend endpoint                 | Auth & authorization, secrets, input validation, injection, exposure.                |
 | [testing](./references/testing.md)                     | writing or changing tests, or deciding what needs one               | What must be tested, coverage expectations, test placement.                          |
-| [documentation](./references/documentation.md)         | any behavior, contract, or architecture change                      | What must be documented, where, and how it stays in sync. Doc Impact classification. |
+| [documentation](./references/documentation.md)         | any behavior, contract, or architecture change                      | What must be documented, where, in what order, and how it stays in sync. Doc Impact. |
+| [skills](./references/skills.md)                       | writing or editing any skill, doctor, or agent-private skill        | What a skill may assert, and the bar for adding a best-practice rule.                |
 | [git](./references/git.md)                             | staging commits, branching, or anything touching git                | Commit discipline, branch rules, what is never pushed.                               |
 | [orchestrator](./references/orchestrator.md)           | planning, dispatching subagents, or reporting                       | Planning & approval, scope & ownership, verification & reporting.                    |
 | [harness-validator](./references/harness-validator.md) | before committing changes to agent config or docs                   | Broken links, stale references, name consistency, directory existence.               |
@@ -46,6 +47,10 @@ files. Do not load all nine. The full set is ~780 lines and most tasks need two 
   `.codebuddy/`-only checklist, then scanned the opencode copy, and now documents the checks that
   `pnpm pi-check` does not cover — skill-id/dir agreement, relative links, and references to a retired
   harness. Treat it as a starting checklist, not a complete one.
+- `skills` says what a skill is allowed to assert: it records what this repo does and cites the file
+  it was read from, and general best practice is a backlog added only when a real change shows the
+  gap. It also carries the harness's real tool vocabulary, which several doctors still violate, and
+  it states plainly that this repo has no way to score a run.
 - The most important invariant — the gateway owns browser auth, downstream services verify an
   internal ES256 JWT — is also stated in the root `AGENTS.md` and
   [`docs/architecture/authentication-architecture.md`](../../../docs/architecture/authentication-architecture.md).

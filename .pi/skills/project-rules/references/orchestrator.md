@@ -68,7 +68,8 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 
 15. **Verify the combined tree, not just the units.** `pnpm typecheck` and `pnpm build:local` on the
     merged result. A change that typechecks per-file but does not package is not done. `pnpm lint`
-    already fails from 14 pre-existing errors — diff against baseline before calling it a regression.
+    already fails from 13 pre-existing errors (3 in `gateway`, 10 in `backend-core`) — diff against
+    baseline before calling it a regression.
 16. **NEVER ask the user for design files, Figma JSON, or screenshots.** Figma is not used in this
     project; the design tokens in `packages/design-system/src/tokens/` are the authority, and
     `style-doctor` reads them. Classify and dispatch.

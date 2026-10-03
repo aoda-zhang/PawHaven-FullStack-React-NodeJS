@@ -23,15 +23,15 @@ Changed `.ts` / `.tsx` files. Skip `node_modules`, `dist`, `build`, generated cl
 ### Rule T1: `any`
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep`
-- **Pattern**: `\bany\b` in a type position — `: any`, `<any>`, `as any`, `Array<any>`, `any[]`
+- **Command**: `rg -n '(: any\b|<any>|as any\b|Array<any>|any\[\])' <changed files>`
 - **Pass**: `any` inside a string literal, a comment, or a third-party type name.
 - **Fix**: `unknown` + narrowing, or the real type.
 
 ### Rule T2: Unsafe cast
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep`
+- **Command**: `rg -n '\bas [A-Z]' <changed files>` — then judge each hit; this rule is not
+  mechanical, so the grep is the candidate list, not the finding
 - **Pattern**: `as <Type>` where the cast narrows away `null`/`undefined` or bridges unrelated types
 - **Pass**: `as const`, `as unknown as X` in a test fixture, narrowing after a real guard.
 - **Fix**: narrow with a type guard, or correct the declared type.
@@ -39,15 +39,18 @@ Changed `.ts` / `.tsx` files. Skip `node_modules`, `dist`, `build`, generated cl
 ### Rule T3: Non-null assertion
 
 - **Severity**: ⚠️ Warning
-- **Tool**: `grep`
-- **Pattern**: `\w+!\.` and `\w+!\[` and `!\s*;`
+- **Command**: `rg -n '\w+!\.|\w+!\[|!\s*;' <changed files>`
 - **Fix**: optional chaining, early return, or an explicit guard.
 - **Exception**: inside a `tests/` fixture where the value is constructed locally.
 
 ### Rule T4: Domain type outside `packages/shared/types`
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep` + reference count
+- **Command**: for each `type` / `interface` / `z.object` declared outside
+  `packages/shared/types` in the changed files, count its references with
+  `rg -l '<TypeName>' apps packages --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/build/**'`
+  and compare the count of distinct directories against 1. Mechanical count, manual judgement on
+  whether the declaration is a domain type or app infrastructure.
 - **Rule**: a type used in **more than one place** must be declared in
   `packages/shared/types/<Name>.schema.ts` and nowhere else. A type used exactly once stays with
   its single owner.
@@ -63,7 +66,8 @@ Changed `.ts` / `.tsx` files. Skip `node_modules`, `dist`, `build`, generated cl
 ### Rule T5: Duplicated literal union
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep`
+- **Command**: `rg -n "type \w+ =\s*'" <changed files>` — then check the literals against
+  `packages/shared/types/`
 - **Pattern**: `type X = 'a' | 'b'` where the same literals exist as a Zod enum in
   `packages/shared/types/`
 - **Pass**: `z.infer<typeof Schema>` or `typeof Schema.enum`.
@@ -72,39 +76,48 @@ Changed `.ts` / `.tsx` files. Skip `node_modules`, `dist`, `build`, generated cl
 ### Rule T6: `enum` keyword
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep`
-- **Pattern**: `\benum\s+\w+`
+- **Command**: `rg -n '\benum\s+\w+' <changed files>`
 - **Fix**: `as const` object + `z.infer` / `typeof Obj[keyof typeof Obj]`.
 
 ### Rule T7: Missing `import type`
 
 - **Severity**: ⚠️ Warning
-- **Tool**: `grep`
+- **Command**: `rg -n '^import \{' <changed .ts / .tsx files>`, then check whether each imported
+  name is used in type position only. Not mechanical; the grep is the candidate list.
 - **Pattern**: a named import used only in type position, not declared `import type`
 - **Fix**: `import type { X } from '...'`.
 
 ### Rule T8: Cross-boundary type import
 
 - **Severity**: ❌ Blocking
-- **Tool**: `grep`
+- **Command**:
+  `rg -n "@pawhaven/(frontend-core|ui|design-system)" apps/backend --glob '*.ts' --glob '!**/node_modules/**'`
 - **Pattern**: `apps/backend/**` importing `@pawhaven/frontend-core`, `@pawhaven/ui`, or
   `@pawhaven/design-system`
 - **Fix**: move the shared contract to `packages/shared/types`.
 
 ## Execution
 
-1. Resolve the changed-file list.
-2. Run T1–T8 in parallel over that list.
+1. Resolve the changed-file list with `git --no-pager diff --name-only <base>` and
+   `git status --short`.
+2. Run the T1–T8 commands over that list. They are independent — batch them.
 3. Report each hit as `file:line` + rule id + the fix.
 4. Any Blocking hit fails the review. Warnings are reported, not failed.
 
 ## Evidence requirement
 
-Paste the grep output for every Blocking rule. A rule with no output is a pass, and must be
-reported as `no matches` — never as a silent skip.
+Paste the command output for every Blocking rule. A rule with no output is a pass, and must be
+reported as `no matches` — never as a silent skip. T2, T4, T5 and T7 need judgement after the grep:
+paste the candidate list and the reasoning for each one you keep.
 
 ## Related
 
 - [typescript](../../../dev/skills/typescript/SKILL.md) — the rule source
 - [typecheck-doctor](../../../../../skills/code-review/typecheck-doctor/SKILL.md) — mechanical compiler check
 - [boundary-doctor](../../../../../skills/code-review/boundary-doctor/SKILL.md) — package dependency direction
+
+## Known hits — pre-existing, report as such
+
+- **T6** returns one hit: `packages/frontend-core/src/api/types.ts:54` declares
+  `export enum extraRequestHeader`. It is pre-existing. Report it as a finding about the codebase
+  once, not as a blocking finding on the change under review.

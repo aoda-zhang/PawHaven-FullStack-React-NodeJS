@@ -55,9 +55,9 @@
 
 # 🤖 AI Driver
 
-**`.opencode/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent 编排器，将每个开发请求转化为结构化流水线：`规划 → 分发 Agent → 测试验证 → 对照架构与模式审查 → 知识更新`。
+**`.pi/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent harness，将每个开发请求转化为结构化流水线：`分类 → 规划 → 分发执行通道 → 验证 → 对照架构与模式审查 → 更新文档`。
 
-👉 [进入 harness](./.opencode/skills/README.md) —— 22 个 skill、9 个斜杠命令工作流、`knowledge-update` agent,以及它们强制的项目规则
+👉 [进入 harness](./.pi/README.md) —— 13 个项目 skill、9 个斜杠命令工作流、11 个 subagent,以及它们强制的项目规则。由 `pnpm pi-check` 校验。
 
 ---
 
@@ -82,8 +82,11 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`architecture/`（某个技术点或某个问题
 在本项目里的设计）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）。
 
-> ⚠️ `docs/features/` 是**蓝图，不是现状** —— 11 个 feature 中有 7 个写到的后端模块并不存在，
-> 其中的领域事件在后端代码里一次都没出现。
+> `docs/features/` 是**现状**记录 —— 每个 portal feature 目录一份文档，均已对照代码核实。设计缺口
+> 就地记在各 feature 文档中，「实现了但与自身契约矛盾」的
+> [已知缺陷](./docs/features/README.md#known-defects-in-the-code) 汇总在索引表里。
+> feature 文档只准确到「上一次把它和代码对齐的那个 commit」为止，所以流程先读架构文档和代码，
+> 最后才回写它。
 
 ### 产品与架构
 
@@ -103,7 +106,7 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 | 文档                                                                     | 说明                                                                        |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| [项目规范](./.opencode/skills/project-rules/SKILL.md)                    | 编码规范、工具链、工作流 —— 以 skill 形式强制                               |
+| [项目规范](./.pi/skills/project-rules/SKILL.md)                          | 编码规范、工具链、工作流 —— 以 skill 形式强制                               |
 | [身份认证与授权架构](./docs/architecture/authentication-architecture.md) | 网关持有的 Cookie JWT + 内部 ES256 JWT（InternalJwt）服务认证,`roles` claim |
 | [路由级认证](./docs/architecture/route_authentication.md)                | 前端路由守卫实现                                                            |
 

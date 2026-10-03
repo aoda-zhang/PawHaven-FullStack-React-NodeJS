@@ -8,14 +8,17 @@ description: >
 
 # Frontend patterns
 
-Every example below is copied from the real codebase. Match the shape.
+Every example below is copied from the real codebase. Match the shape. Where a file is described as
+optional, it is because a real feature does not have it — not because the template is flexible.
 
 ## API layer
 
-Four files per feature, in `features/<name>/api/`.
+The files a feature needs depend on what it does. The `frontend` skill has the per-feature
+breakdown —
+[Feature layout](../../../../../skills/frontend/SKILL.md#feature-layout).
 
 ```ts
-// <name>.queryKeys.ts
+// <name>.queryKeys.ts — every feature with server data has this
 export const <name>QueryKeys = {
   all: ['<name>'] as const,
   current: (id: string) => [...<name>QueryKeys.all, 'current', id] as const,
@@ -31,7 +34,7 @@ export const getX = async (): Promise<X> => apiClient.get<X>('/x');
 ```
 
 ```ts
-// <name>.queries.ts — options factory
+// <name>.queries.ts — one options factory per read; absent when a feature has no read
 export const xQueryOptions = (id: string) => ({
   queryKey: <name>QueryKeys.current(id),
   queryFn: getX,
@@ -45,17 +48,30 @@ export const xQueryOptions = (id: string) => ({
 ## Route
 
 ```ts
-// features/<name>/route.tsx
+// features/rescue-cases/route.tsx — the loader form, for a feature that reads
+import { rescueCasesQueryOptions } from './api/rescueCases.queries';
+
+import { getQueryClient } from '@/providers/QueryProvider';
 import { routePaths } from '@/router/routePaths';
 
-export const <name>Route = {
-  path: routePaths.<name>,
+export const rescueCasesLoader = async () => {
+  const queryClient = getQueryClient();
+  return queryClient.ensureQueryData(rescueCasesQueryOptions());
+};
+
+export const rescueCasesRoute = {
+  path: routePaths.rescueCases,
+  loader: rescueCasesLoader,
   lazy: async () => {
-    const { <Name> } = await import('@/features/<name>/<Name>');
-    return { Component: <Name> };
+    const { RescueCasesPage } =
+      await import('@/features/rescue-cases/RescueCases');
+    return { Component: RescueCasesPage };
   },
 };
 ```
+
+A route with no loader of its own — `features/auth/route.tsx` — is `path` + `Component` + `handle`
+only. Do not add an empty loader.
 
 ## List page
 
@@ -101,15 +117,25 @@ const watched = useWatch({ control, name: 'field' });
 
 ## Loader / guard
 
+`features/auth/route.tsx` is the guard to copy — it reads the persisted profile off the store,
+prefetches through the same options the component reads, and redirects in the loader:
+
 ```ts
 export const requireUser = async ({ request }: LoaderFunctionArgs) => {
+  const { pathname, search } = new URL(request.url);
+  const redirectTo = `${routePaths.login}?${routeSearchParams.redirect}=${encodeURIComponent(`${pathname}${search}`)}`;
+
   try {
-    await getQueryClient().ensureQueryData(currentUserQueryOptions(userId));
+    await getQueryClient().ensureQueryData(
+      currentUserQueryOptions(getCurrentUserId()),
+    );
   } catch {
-    throw redirect(loginRoute.path);
+    throw redirect(redirectTo);
   }
+
   return null;
 };
 ```
 
-Redirect in the loader. Never a render-time `if (isLoading) return <Redirect />`.
+`getCurrentUserId()` reads `store.getState()` — valid in a loader, not in a component. Redirect in
+the loader. Never a render-time `if (isLoading) return <Redirect />`.

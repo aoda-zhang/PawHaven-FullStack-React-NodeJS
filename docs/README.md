@@ -8,7 +8,7 @@ authority, intent, or background.
 | Directory       | Holds                                                                       | Read it when                                             |
 | --------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- |
 | `architecture/` | A technical point, or the design of a specific problem, **in this project** | You are about to design or change something in that area |
-| `features/`     | One **portal feature**'s frontend **and** backend detail                    | You are building or changing that feature                |
+| `features/`     | One **portal feature**'s frontend **and** backend detail, as built          | After the change lands, to update the record from code   |
 | `product/`      | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap      |
 
 Design tokens are deliberately **not** documented here. They live in
@@ -17,7 +17,7 @@ Design tokens are deliberately **not** documented here. They live in
 
 ---
 
-## `features/` describes the running system
+## `features/` describes the running system — and is written after the code
 
 Each document in `features/` describes what exists. Where the product blueprint promised more, the
 gap is stated in that document's **What Does Not Exist** section rather than being left for a reader
@@ -27,6 +27,10 @@ every feature doc links back to the section it came from.
 Each document is keyed on one folder in `apps/frontend/portal/src/features/*`, and chapter 1 numbers
 that page's sections. A backend module with no feature folder of its own is documented as a section
 of the page that consumes it.
+
+**Read them after the code, not before.** A feature doc is accurate as of the last change that
+reconciled it with the code, so it is a record to update rather than a source to design from. When one
+disagrees with the code, the code is right and the document is the thing that is out of date.
 
 One structural fact worth knowing before reading any of them: **`animalReports` is both the report
 and the case.** There is no `rescue_cases` table and no event that creates one.
@@ -106,24 +110,31 @@ Operational docs for running the thing locally. Not design material — this is 
 
 ## 6. Agent harness
 
-The agent control layer lives in `.opencode/`, not here.
+The agent control layer lives in `.pi/`, not here.
 
-| Path                                                                              | Covers                                              |
-| --------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [skills/README.md](../.opencode/skills/README.md)                                 | Index of all 22 skills                              |
-| [orchestrator_append.md](../.opencode/oh-my-opencode-slim/orchestrator_append.md) | Complexity classification, dispatch lanes, autonomy |
-| [command/](../.opencode/command)                                                  | Slash-command workflows                             |
+| Path                                                              | Covers                                         |
+| ----------------------------------------------------------------- | ---------------------------------------------- |
+| [.pi/README.md](../.pi/README.md)                                 | Index of skills, prompts, and the 10 subagents |
+| [.pi/prompts/](../.pi/prompts)                                    | Slash-command workflows                        |
+| [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | Engineering standards, enforced as a skill     |
 
-Engineering standards are the `project-rules` skill; see
-[skills/README.md](../.opencode/skills/README.md).
+`pnpm pi-check` validates the harness. The retired `.opencode/` and `.codebuddy/` layers are gone;
+links into them are dead.
 
 ---
 
 ## Suggested reading order
 
-Product blueprint → `architecture/PawHaven-System-Architecture-Overview.md` → the specific
-architecture doc for your area → the `features/` doc for what you are building.
+The three architecture documents, then the code, then — after the change is verified — the feature
+doc.
 
-**Verify before you trust.** The architecture docs carry a `v3.11 / 2026-09-25` stamp and were
-checked against the code at that time. The `features/` docs were not, and diverge from it as
-described above.
+```
+PawHaven-System-Architecture-Overview.md
+  → PawHaven-Frontend-Architecture.md  |  PawHaven-Backend-Architecture.md
+    (+ authentication-architecture.md / route_authentication.md when auth is in scope)
+  → the code in apps/ and packages/
+  → update docs/features/<feature>.md from what shipped
+```
+
+**Verify before you trust.** The architecture docs carry a `v3.11 / 2026-09-25` stamp and were checked
+against the code at that time. A feature doc is as-built as of the last change that reconciled it.

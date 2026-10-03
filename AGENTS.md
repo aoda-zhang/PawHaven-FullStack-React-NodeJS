@@ -121,34 +121,38 @@ Agent config lives in `.pi/`, committed project-locally, so behaviour is the sam
 who clones the repo. **pi is the harness layer.** The `.opencode/` copy that preceded it was
 legacy, has been deleted, and nothing in `.pi/` ever read from it.
 
-- `.pi/skills/` — 13 project skills, indexed by [`.pi/README.md`](.pi/README.md); 14 more are
+- `.pi/skills/` — 14 project skills, indexed by [`.pi/README.md`](.pi/README.md); 13 more are
   agent-private under `.pi/agents/frontend/{dev,review}/skills/`, loaded via `skillPath`
   frontmatter only into those agents' contexts.
   A skill's ID is its **directory name**, and `name:` in frontmatter must match it (lowercase
   `a-z`, `0-9`, hyphens only) — pi uses `name` as the `/skill:<name>` command, so a name with a
-  slash in it silently breaks invocation. `project-rules` (9 constraint files), `principles`
+  slash in it silently breaks invocation. `project-rules` (10 constraint files), `frontend` (the shared portal facts a writer and a
+  reviewer must agree on), `principles`
   (6 rules that need citing by name), and `task-classification` (routes a request to a
-  workflow) are the three to load before non-trivial work.
+  workflow) are the three to load before non-trivial work. What a skill may assert — this repo's
+  patterns now, general best practice only once a real change shows the gap — is
+  [`project-rules`](.pi/skills/project-rules/references/skills.md).
 - `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
   `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`,
   `/parallel-execution`, `/handoff`.
-- `.pi/agents/` — 10 subagent definitions run by pi-subagents (installed via `packages` in
-  `.pi/settings.json`): `scout`, `architect`, `oracle` (read-only recon, planning, decision
-  challenger), `frontend` (a router delegating to `dev` for implementation and `review` for
-  findings-only review), `backend`, `tester`, `reviewer`, `browser-verifier` (drives the running
-  portal in a real browser and edits no source). `dev` and `review` live under
-  `.pi/agents/frontend/` with their private skills.
+- `.pi/agents/` — 11 subagent definitions run by pi-subagents (installed via `packages` in
+  `.pi/settings.json`): `orchestrator` (plans, dispatches, verifies, and hands off — holds **no**
+  `edit`/`write` tool, so it cannot implement), `scout`, `architect`, `oracle` (read-only recon,
+  planning, decision challenger), `frontend` (a router delegating to `dev` for implementation and
+  `review` for findings-only review), `backend`, `tester`, `reviewer`, `browser-verifier` (drives
+  the running portal in a real browser and edits no source). `dev` and `review` live under
+  `.pi/agents/frontend/` with their private skills. `orchestrator` is the entry point for a task
+  needing more than one lane; its `defaultContext: fresh` is what lets a task start from a clean
+  context and still dispatch the project's own lanes.
 - `.pi/handoffs/` — structured handoff artifacts for work that spans sessions or lanes, so a
   fresh context reads one instead of re-deriving.
-- `.pi/evals/` — the harness's own eval corpus and metrics README; a harness change is
-  justified by a scored run that failed, not by theory.
 - `.pi/settings.json` — points pi at the directories above. **The 5 `code-review/<doctor>`
   skills are listed individually and must stay that way:** pi stops recursing at any directory
   containing `SKILL.md`, so the doctors nested under the `code-review` parent are only found via
   those explicit entries. Dropping them silently drops 5 skills. The 4 frontend doctors (react,
   style, i18n, typescript) are agent-private to `review` instead, via `skillPath`.
-- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 13 project
-  skills, 14 agent-private skills, 9 prompts, and 10 agents load with zero diagnostics. Run it
+- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 14 project
+  skills, 13 agent-private skills, 9 prompts, and 11 agents load with zero diagnostics. Run it
   after touching anything in `.pi/`.
 
 `/trust` once so project config loads, then `/reload` after changing `.pi/`.
@@ -157,12 +161,16 @@ Plan then dispatch for feature work: classify the request, present an agent-leve
 approval, then dispatch. Ask before Standard and Architectural scope; do not re-ask for reversible
 sub-steps afterwards; always ask before a push or force-push.
 
-**Dispatch is real: pi runs named sub-agents.** The 10 agents in `.pi/agents/` execute in
-isolated contexts via pi-subagents — `frontend` itself holds no edit tools and routes to `dev`
-(writer) and `review` (read-only). Dispatch through the subagent tool with a scope, a data
-shape, and observable success criteria — never a file list. The lane rules under
-[Dispatch and verification](#dispatch-and-verification) govern what every lane must return, and
-the verification discipline is unchanged.
+**Dispatch is real: pi runs named sub-agents.** The 11 agents in `.pi/agents/` execute in
+isolated contexts via pi-subagents — `orchestrator` holds no edit tools and dispatches the other
+ten, and `frontend` likewise routes to `dev` (writer) and `review` (read-only). Dispatch through
+the subagent tool with a scope, a data shape, and observable success criteria — never a file list.
+The lane rules under [Dispatch and verification](#dispatch-and-verification) govern what every lane
+must return, and the verification discipline is unchanged.
+
+**Every mutating change gets an independent review.** A lane that reviews its own work cannot catch
+a self-consistent mistake. Dispatch `reviewer` (or `review` for a frontend diff) as a separate
+context; a change nobody independent has read has not been reviewed.
 
 ### Documentation
 
@@ -178,6 +186,22 @@ the verification discipline is unchanged.
 along. Chapter 1 of each document numbers the page's sections (1.1, 1.2, …); a backend module with
 no feature folder of its own is a section of the page that consumes it. Each document records what
 is missing, and the index tabulates where the implementation contradicts its own contract.
+
+### Read the code first, write the feature docs last
+
+This order is not a preference. It is the difference between a design that matches the system and
+one that matches a stale paragraph.
+
+1. **Entering a task**: read `PawHaven-System-Architecture-Overview.md`, then
+   `PawHaven-Backend-Architecture.md` or `PawHaven-Frontend-Architecture.md` for the area in scope
+   (`authentication-architecture.md` when auth is in play). Then read the **code**.
+2. **`docs/features/**` is not an input to a decision.** It is as-built _as of the last change that
+   reconciled it_. Read it to learn what is already known — the gaps, the tabulated defects — and
+   check any claim against the code before relying on it. Code and document disagree, the code is
+   right; say so in the reply and fix the document in step 4.
+3. **Before implementing**, nothing under `docs/` overrides what the code does.
+4. **After the change is verified**, update the feature doc from the code that shipped, and the
+   architecture doc if the architecture moved. Same change, same lane.
 
 Key architecture docs:
 
@@ -236,8 +260,9 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. "It compiles" is not a pass. A bug's repro must pass on the same surface that
   failed.
-- Verify the **combined** tree, not just the units. `pnpm lint` already fails from 14 pre-existing
-  errors — diff against baseline before calling anything a regression.
+- Verify the **combined** tree, not just the units. `pnpm lint` already fails from 13 pre-existing
+  errors (3 in `gateway`, 10 in `backend-core`) — diff against baseline before calling anything a
+  regression.
 - **Never hand-edit the harness or `docs/architecture/` as a side effect of a feature task**; those
   changes deserve their own commit. Keep `AGENTS.md` and `docs/architecture/` matching reality in
   a separate change.

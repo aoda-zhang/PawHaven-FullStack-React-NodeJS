@@ -4,11 +4,11 @@
 
 `docs/` 按文档的**用途**分类，因此从路径就能判断它是权威依据、设计意图，还是背景材料。
 
-| 目录            | 内容                                   | 何时读                                |
-| --------------- | -------------------------------------- | ------------------------------------- |
-| `architecture/` | 某个技术点、或某个问题在本项目里的设计 | 你要在该领域做设计或改动时            |
-| `features/`     | 单个 feature 的前端**与**后端功能细节  | 你要构建或改动该 feature 时           |
-| `product/`      | `features/` 所引用的上游产品蓝图       | 你需要某个 feature 的由来，或查路线图 |
+| 目录            | 内容                                      | 何时读                                |
+| --------------- | ----------------------------------------- | ------------------------------------- |
+| `architecture/` | 某个技术点、或某个问题在本项目里的设计    | 你要在该领域做设计或改动时            |
+| `features/`     | 单个 feature 的前端**与**后端细节（现状） | 改动落地后，从代码回写记录            |
+| `product/`      | `features/` 所引用的上游产品蓝图          | 你需要某个 feature 的由来，或查路线图 |
 
 设计 token **刻意不写进文档**。它们位于
 [`packages/design-system/src/tokens/`](../packages/design-system/src/tokens)，并由 `pnpm token-check`
@@ -16,7 +16,7 @@
 
 ---
 
-## `features/` 描述的是系统现状
+## `features/` 描述的是系统现状 —— 但它在代码之后写
 
 `features/` 下每份文档都是**现状**描述 —— 章节标题、端点、字段都以仓库里真实存在的东西为准。
 设计意图不混在里面：缺口就地记在每篇的 _What Does Not Exist_，而「实现了但与自身契约矛盾」的
@@ -26,6 +26,9 @@
 组件，以及背后的后端。没有独立 feature 目录的后端模块，作为消费它的页面的一节来记。
 
 产品意图在 [`product/`](./product/PawHaven-Product-Strategy-EN.md)，`features/` 引用它。
+
+**先读代码，再读它。** feature 文档只准确到「上一次把它和代码对齐的那个 commit」为止，所以它是
+**待更新的记录**，不是设计的输入。文档和代码冲突时以代码为准，并顺手把文档修掉。
 
 ---
 
@@ -88,25 +91,41 @@
 由 `pnpm token-check` 强制校验。项目使用基于这些 token 的 Tailwind 语义 utility；不要引入原始颜色值或
 魔法数字。
 
-## 5. Agent 控制层
+## 5. 开发
 
-Agent 控制层在 `.opencode/`，不在这里。
+本地跑起来所需的运维文档。不是设计材料 —— 它是搭建参考。
 
-| 路径                                                                              | 覆盖内容                         |
-| --------------------------------------------------------------------------------- | -------------------------------- |
-| [skills/README.md](../.opencode/skills/README.md)                                 | 全部 23 个 skill 的索引          |
-| [orchestrator_append.md](../.opencode/oh-my-opencode-slim/orchestrator_append.md) | 复杂度分类、调度通道、自主性边界 |
-| [command/](../.opencode/command)                                                  | 斜杠命令工作流                   |
+| 文档                                     | 覆盖内容                                      |
+| ---------------------------------------- | --------------------------------------------- |
+| [development.md](./development.md)       | 前置条件、构建顺序、dev 服务与端口、pnpm 脚本 |
+| [development.cn.md](./development.cn.md) | 同一份指南的中文版，与英文版保持同步          |
 
-原先放在本目录的 `project_standards.md` 现已成为 `project-rules` skill，见
-[skills/README.md](../.opencode/skills/README.md)。
+## 6. Agent 控制层
+
+Agent 控制层在 `.pi/`，不在这里。
+
+| 路径                                                              | 覆盖内容                           |
+| ----------------------------------------------------------------- | ---------------------------------- |
+| [.pi/README.md](../.pi/README.md)                                 | skill、prompt、10 个 subagent 索引 |
+| [.pi/prompts/](../.pi/prompts)                                    | 斜杠命令工作流                     |
+| [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | 工程规范，以 skill 形式强制        |
+
+harness 由 `pnpm pi-check` 校验。已退役的 `.opencode/` 与 `.codebuddy/` 目录均已删除，指向它们的
+链接都是死链。
 
 ---
 
 ## 建议阅读顺序
 
-产品蓝图 → `architecture/PawHaven-System-Architecture-Overview.md` → 你所在领域的具体架构文档 →
-你要构建的东西对应的 `features/` 文档。
+三份架构文档，然后是代码，最后 —— 改动验证通过之后 —— 才回写 feature 文档。
 
-**先核实，再信任。** 架构文档带有 `v3.11 / 2026-09-25` 标注，并在当时对照过代码。`features/` 文档没有
-做过这个核实，如上所述它们与代码存在明显偏差。
+```
+PawHaven-System-Architecture-Overview.md
+  → PawHaven-Frontend-Architecture.md  |  PawHaven-Backend-Architecture.md
+    （涉及认证时再加 authentication-architecture.md / route_authentication.md）
+  → apps/ 与 packages/ 里的代码
+  → 按落地的代码更新 docs/features/<feature>.md
+```
+
+**先核实，再信任。** 架构文档带有 `v3.11 / 2026-09-25` 标注，并在当时对照过代码；feature 文档则
+准确到「上一次把它和代码对齐的那个 commit」为止。

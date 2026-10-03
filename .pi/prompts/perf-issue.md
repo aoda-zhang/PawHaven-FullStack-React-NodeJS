@@ -21,7 +21,7 @@ Perf work is measurement-gated. Without a baseline, an optimization is a hypothe
 3. **Optimize the smallest change.** Target the measured bottleneck with the smallest change that fixes it, per **laziness-protocol** (via the `principles` skill). Model the domain if the fix touches state shape (**model-the-domain** (via the `principles` skill)): often a memo or effect fix is a symptom, and the real fix is moving state to the right home.
 4. **Re-measure on the same surface.** The post-fix trace shows the improvement against the baseline. If it does not improve, the change is a hypothesis, not a fix; it does not ship. A UI bottleneck is re-measured by `browser-verifier` on the same route, not on a different one.
 5. **Guard the win.** Add the cheapest check that would catch a regression (a perf assertion, a test, a re-measurement note) when one is practical.
-6. **Verify.** `pnpm typecheck`, targeted tests, the before/after numbers. Then `/handoff`.
+6. **Verify.** `pnpm typecheck`, targeted tests, the before/after numbers. Then reconcile `docs/features/<feature>.md` if the change altered what a document describes — including a _Known defects_ row that recorded the slowness and no longer holds. Then `/handoff`.
 
 ## Reply
 

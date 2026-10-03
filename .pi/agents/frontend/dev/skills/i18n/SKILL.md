@@ -16,25 +16,12 @@ description: >
 - Keys are semantic, not literal: `reportAnimal.animal_type`, never `"Animal Type"`.
 - Keys are `snake_case` inside a file, `camelCase` for cross-file access.
 
-## File layout
+## File layout and the locale contract
 
-One file per feature, plus the shared namespaces:
-
-```
-packages/i18n/locales/{en-US,zh-CN,de-DE}/
-├── common.json
-├── auth.json
-├── home.json
-├── reportAnimal.json
-├── rescueDetail.json
-├── errorMessage.json
-└── documents/
-```
-
-- Adding a key means adding it to **all three** locales in the same change.
-- `en-US`, `zh-CN`, `de-DE`. Never add a fourth without a stated need.
-- Never translate a file in isolation. A key present in one locale and missing in another is a
-  blocking finding.
+The locale set, the per-feature file layout, the naming split, and the all-three-locales
+rule are stated once in the `frontend` skill —
+[The i18n contract](../../../../../skills/frontend/SKILL.md#the-i18n-contract). Three
+locales, no fourth without a stated need.
 
 ## Usage
 

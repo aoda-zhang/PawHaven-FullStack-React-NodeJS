@@ -2,7 +2,8 @@
 name: redux
 description: >
   Redux Toolkit standards for the PawHaven portal. Client state only — cross-component and
-  session-scoped. Server data belongs to TanStack Query. Typed hooks are the only access path.
+  session-scoped. Server data belongs to TanStack Query. The typed hooks are the only access path,
+  and their exact names are in the `frontend` skill.
   Use when deciding whether a value belongs in Redux at all, and when touching a slice.
   触发场景 / Trigger: redux store slice dispatch selector state global client 状态管理.
 ---
@@ -24,61 +25,100 @@ Redux holds **client state only**. Walk the list and stop at the first that fits
 
 Two or three values that change together → `useReducer` in the component, not a slice.
 
+**Today the store holds one slice.** `store/globalReducer.ts` is the only `createSlice` in the
+portal, and it carries `profile`, `locale`, and `isSysMaintain` — session identity and a maintenance
+flag, nothing else. Before adding a second slice, check whether the value is genuinely cross-component
+and session-scoped; a second slice is not a default.
+
 ## Structure
 
-```ts
-// store/reducerNames.ts
-export const reducerNames = { global: 'global' } as const;
+Slices live in `apps/frontend/portal/src/store/`, not in the feature that uses them, and are
+registered centrally in `reducerRegister.ts`:
 
-// features/<feature>/<feature>.slice.ts
-export const globalSlice = createSlice({ name: reducerNames.global, initialState, reducers: { ... } });
+```ts
+// store/reducerNames.ts — the key, and the persistence key
+export const reducerNames = {
+  root: 'root',
+  global: 'global',
+  rescue: 'rescue',
+  bootstrap: 'bootstrap',
+} as const;
+
+// store/globalReducer.ts
+export const globalReducer = createSlice({
+  name: reducerNames.global,
+  initialState,
+  reducers: {
+    setProfile: (state, action) => {
+      state.profile = action.payload;
+    },
+  },
+});
+
+// store/reducerRegister.ts — the only place a reducer becomes part of the tree
+export const combinedReducers = {
+  [reducerNames.global]: globalReducer.reducer,
+};
 ```
 
-- One slice per domain concern. Do not grow a single `appSlice` with everything.
+- A slice is not wired in until `reducerRegister.ts` lists it. A slice that is not registered is dead
+  code that typechecks.
 - `name` comes from `reducerNames`, never a string literal.
-- `initialState` is typed from the slice state interface. No `any` state.
-- Actions are named for the event, not the setter: `profileLoaded`, not `setProfile`.
+- `initialState` is typed from the slice's state interface. No `any` state.
+- Actions are named for the event, not the setter: `setProfile` matches the one existing action — do
+  not invent a second naming convention for a single slice.
+
+`reducerNames` also carries `rescue` and `bootstrap`, and `persistReducers.ts` whitelists `rescue`,
+but only `global` is registered today. Treat the unused keys as a naming pool, not as existing state:
+check `reducerRegister.ts` before reading or writing `[reducerNames.rescue]`.
 
 ## Access
 
-```tsx
-const dispatch = useAppDispatch();
-const userId = useAppSelector(selectUserId);
-```
+The three typed paths and their **real names** are in the `frontend` skill —
+[State access](../../../../../skills/frontend/SKILL.md#state-access--the-real-names). Read them
+there; do not retype them, because this file once taught hook names that do not exist.
 
-- `useAppDispatch` / `useAppSelector` from the store hooks module. Raw `useDispatch` /
-  `useSelector` is a blocking finding — they lose the types.
-- Read with a selector from `reselect` or a plain function. Do not select an object literal
-  inline; it returns a new reference every render.
-- Write with `dispatch`. No direct state mutation, no `store.getState()` in a component.
+What is specific to **deciding** whether a value belongs in Redux at all:
+
+- Prefer the per-slice hook when one exists: it names the state space at the call site and keeps
+  `reducerNames` out of features.
+- Do not select an object literal inline; it returns a new reference every render. This repo uses no
+  `reselect` and no `createAsyncThunk` — do not cite either as the established pattern.
+- Write with `dispatch`. No direct state mutation, and no `store.getState()` in a component.
 
 ## Immutability
 
 - Reducers are pure. No `Date.now()`, no `Math.random()`, no fetch, no side effect.
-- Use `immer` through the toolkit, or a spread. Never mutate `state` by hand.
-- Async work lives in `createAsyncThunk` or TanStack Query, never inside a reducer.
+- Immer comes through the toolkit; never mutate `state` by hand.
+- Async work lives in TanStack Query. It does not go in a reducer.
 
 ## Outside React
 
-- `store.getState()` is allowed in a router loader or a non-React module.
-  Cast through the exported `ReduxState` type. It is not allowed in a component.
+`store.getState()` is used in exactly two places, both loaders: `layout/api/rootLayout.loader.ts`
+and `features/auth/route.tsx`. Both cast through `ReduxState`. It is not used in a component, and
+`useEffect` in a component reading it would be a finding.
 
 ## Persistence
 
-- Persist only what a reload needs: session, locale, consent.
-- Do not persist server data. It goes stale silently.
+`persistReducers.ts` whitelists what survives a reload — today `global` (and `rescue`, which is not
+registered). Persist only what a reload needs: session, locale, consent. Server data must never be
+persisted; it goes stale silently.
+
+`configureStore` sets `serializableCheck: false` because `redux-persist` needs it. That is a store
+config decision, not permission to put non-serializable values in state.
 
 ## Banned
 
-| Banned                            | Use                                 |
-| --------------------------------- | ----------------------------------- |
-| API data in a slice               | TanStack Query                      |
-| form values in a slice            | React Hook Form                     |
-| raw `useDispatch` / `useSelector` | `useAppDispatch` / `useAppSelector` |
-| inline object selector            | a memoized selector                 |
-| side effect in a reducer          | thunk or Query                      |
-| `store.getState()` in a component | `useAppSelector`                    |
-| string literal slice name         | `reducerNames`                      |
+| Banned                                  | Use                                |
+| --------------------------------------- | ---------------------------------- |
+| API data in a slice                     | TanStack Query                     |
+| form values in a slice                  | React Hook Form                    |
+| raw `useDispatch` / `useSelector`       | a typed hook — see `frontend`      |
+| inline object selector                  | a selector function over a scalar  |
+| side effect in a reducer                | TanStack Query                     |
+| `store.getState()` in a component       | a loader, or the typed hook        |
+| string literal slice name               | `reducerNames`                     |
+| a slice with no `reducerRegister` entry | dead code — register it or drop it |
 
 ## Doctor
 

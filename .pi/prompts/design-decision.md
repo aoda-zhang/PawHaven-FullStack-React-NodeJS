@@ -15,7 +15,7 @@ A design decision is an architecture, data model, or API choice with competing o
 3. **Settle empirical forks by observing.** If the choice is settled by behavior, layout, timing, or output, prototype it and let the result decide, per **never-block-on-the-human** (enforced by the orchestrator workflow). The ask is the slow path; a throwaway probe hands the human a result to react to.
 4. **Check the boundaries.** For each option, where are the guards, what is trusted, what breaks (API contract, i18n keys, storage, existing consumers across `apps/` and `packages/`)? Per **boundary-discipline** (via the `principles` skill) and **migrate-callers-then-delete-legacy-apis** (enforced by the orchestrator workflow), an option that strands legacy is worse than one that migrates it.
 5. **Decide, and name the tradeoff you accepted.** Every decision gives something up. State what the losing options were and why they lost. If the decision is contested or high-stakes, route it through adversarial review with the `code-review` skill before committing.
-6. **Write the decision.** If it changes the architecture or a shared contract, update the living architecture docs in `docs/` so future sessions inherit the reasoning, per the documentation rule. No ADR records.
+6. **Write the decision.** If it changes the architecture or a shared contract, update the living architecture docs in `docs/architecture/` so future sessions inherit the reasoning, per the documentation rule. No ADR records. If the decision contradicts what a `docs/features/**` document currently claims, that document is the thing that is wrong — reconcile it from the decision, not the other way round.
 
 ## Reply
 

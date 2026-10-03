@@ -9,22 +9,22 @@ and nothing in `.pi/` ever read from it.
 ```
 .pi/
 ├── settings.json          # skills, prompts, packages, subagent model config
-├── skills/                # 13 project skills (SKILL.md + references/)
+├── skills/                # 14 project skills (SKILL.md + references/)
 ├── prompts/               # 9 slash commands (/bug-fix, /feature-development, …)
-├── agents/                # 10 subagent definitions
+├── agents/                # 11 subagent definitions
+│   ├── orchestrator.md    # plans + dispatches, holds no edit tools
 │   ├── architect.md       # read-only planning
 │   ├── scout.md           # read-only recon
 │   ├── oracle.md          # read-only decision challenger
 │   ├── frontend/
 │   │   ├── frontend.md    # router: implementation → dev, review → review
-│   │   ├── dev/           # React/TS writer + 10 private skills (skillPath)
+│   │   ├── dev/           # React/TS writer + 9 private skills (skillPath)
 │   │   └── review/        # findings-only review + 4 private doctors (skillPath)
 │   ├── backend.md         # NestJS implementation
 │   ├── tester.md          # test authoring
 │   ├── reviewer.md        # read-only review
 │   └── browser-verifier.md # drives the running portal, read-only toward source
 ├── handoffs/              # structured handoff artifacts for long-running work
-├── evals/                 # harness eval corpus + metrics README
 └── npm/                   # pi-subagents + deps (gitignored by npm/.gitignore)
 ```
 
@@ -44,6 +44,11 @@ Main Pi Agent
       │
   subagent tool
       │
+  ├── orchestrator         (fresh context; plans, dispatches, verifies — no edit tools)
+  │     │
+  │     └── architect · scout · oracle · backend · dev · review
+  │                          · frontend · tester · reviewer · browser-verifier
+  │
   ├── architect · scout · oracle    (read-only: plan, recon, challenge)
   ├── reviewer                      (read-only review)
   ├── frontend ── routes to ── dev (writer) · review (findings only)
@@ -53,7 +58,20 @@ Main Pi Agent
 ```
 
 Each agent gets only the skills it needs via `skills:` frontmatter, plus `skillPath` for
-agent-private skills. No agent inherits all 13 project skills — context is minimized per agent.
+agent-private skills. No agent inherits all 14 project skills — context is minimized per agent.
+
+### Why `orchestrator` exists
+
+Every project agent used to be a leaf lane; the only agent holding `subagent` was `frontend`, pinned
+to `dev` and `review`. So a task that needed to start from a clean parent context had nowhere to go: a
+context outside this session has no dispatch rights and no project skill grants. Two agents working
+real tasks reported executing their required lanes inline as a result, and one reported that **no
+independent reviewer ever ran on its diff** — on a change that introduced the project's first
+role-gated endpoint.
+
+It holds **no `edit` or `write` tool**, so "never implement it yourself" is enforced by the toolset
+rather than by discipline. `defaultContext: fresh` is what makes it usable as a task parent, and
+`maxSubagentDepth: 1` keeps every lane it dispatches a leaf so recursion cannot grow.
 
 ## Model strategy
 
@@ -64,23 +82,24 @@ provider, so switching providers automatically switches all agents.
 ```json
 "subagents": {
   "agentOverrides": {
-    "oracle":           { "thinking": "high" },
-    "scout":            { "thinking": "low" },
-    "architect":        { "thinking": "high" },
-    "frontend":         { "thinking": "high" },
-    "dev":              { "thinking": "medium" },
-    "review":           { "thinking": "high" },
-    "backend":          { "thinking": "medium" },
-    "tester":           { "thinking": "low" },
-    "reviewer":         { "thinking": "high" },
-    "browser-verifier": { "thinking": "low" }
+    "orchestrator":      { "thinking": "high" },
+    "oracle":            { "thinking": "high" },
+    "scout":             { "thinking": "low" },
+    "architect":         { "thinking": "high" },
+    "frontend":          { "thinking": "high" },
+    "dev":               { "thinking": "medium" },
+    "review":            { "thinking": "high" },
+    "backend":           { "thinking": "medium" },
+    "tester":            { "thinking": "low" },
+    "reviewer":          { "thinking": "high" },
+    "browser-verifier":  { "thinking": "low" }
   }
 }
 ```
 
 ## Skills
 
-13 project skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
+14 project skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
 frontmatter — zero duplication.
 
 | Domain         | Skills                    | Used by                         |
@@ -93,13 +112,15 @@ frontmatter — zero duplication.
 | architecture   | architecture-design       | architect                       |
 | standards      | writing-standards         | architect, dev, backend, tester |
 
-14 agent-private skills sit outside `.pi/skills/` and load only into their owning agent via
-`skillPath` frontmatter:
+13 agent-private skills sit outside `.pi/skills/` and load only into their owning agent via
+`skillPath` frontmatter. They hold the **lens** — how to write, and what to flag. The **facts** both
+lenses need live once in the shared `frontend` project skill, so a rule and the fact it checks cannot
+drift apart:
 
-| Agent  | Private skills                                                                                                      |
-| ------ | ------------------------------------------------------------------------------------------------------------------- |
-| dev    | react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-context, frontend-patterns |
-| review | react-doctor, style-doctor, i18n-doctor, typescript-doctor                                                          |
+| Agent  | Private skills                                                                                    |
+| ------ | ------------------------------------------------------------------------------------------------- |
+| dev    | react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-patterns |
+| review | react-doctor, style-doctor, i18n-doctor, typescript-doctor                                        |
 
 ## Slash commands (prompts)
 
@@ -123,6 +144,6 @@ frontmatter — zero duplication.
 pnpm pi-check
 ```
 
-Validates: 13 project skills, 14 agent-private skills, 9 prompts, 10 agents — zero
+Validates: 14 project skills, 13 agent-private skills, 9 prompts, 11 agents — zero
 diagnostics. Catches missing files, invalid names, broken skill references, and missing
 package installs.

@@ -178,5 +178,7 @@ Never mark something verified because it compiles. See `prove-it-works` in the `
 
 ## Baseline
 
-`pnpm lint` exits non-zero from **pre-existing** errors — 3 in `gateway`, 11 in `backend-core`.
+`pnpm lint` exits non-zero from **pre-existing** errors — 3 in `gateway`, 10 in `backend-core`,
+13 in total. Measured with `npx turbo run lint --continue` on 2026-09-27; a plain `pnpm lint` stops at
+the first failing package and hides the rest.
 Diff against baseline before attributing a failure to your change.

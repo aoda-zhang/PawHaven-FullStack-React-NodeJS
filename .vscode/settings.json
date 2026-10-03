@@ -65,5 +65,7 @@
     "head": true,
     "grep": true
   },
-  "timezoneTheme.nightTheme": "Quiet Light"
+  "timezoneTheme.nightTheme": "Quiet Light",
+  "pendant.autoGenerateSessionNames": true,
+  "pendant.sessionNameGeneration": {}
 }

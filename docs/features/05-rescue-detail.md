@@ -227,7 +227,7 @@ mounts**. It is consumed only by `rescue-detail`:
 
 It is the one place two features share UI without it being promoted to `packages/ui`, even though
 the shared surface is a stable, self-contained button-plus-count pair. See
-[Component Rules](../../.opencode/skills/project-rules/references/components.md).
+[Component Rules](../../.pi/skills/project-rules/references/components.md).
 
 ## 6. What Does Not Exist
 

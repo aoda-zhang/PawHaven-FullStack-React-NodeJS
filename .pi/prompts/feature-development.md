@@ -19,6 +19,12 @@ A feature is built from a named data shape, through an explicit design pass, to 
 > form, or auth surface in scope puts `browser-verifier` in `requiredVerification` — for a complex
 > feature that is a hard completion gate, not a nice-to-have.
 
+> **Read order.** The architecture docs and the code first — `PawHaven-System-Architecture-Overview.md`,
+> then `PawHaven-Frontend-Architecture.md` / `PawHaven-Backend-Architecture.md` for the area in scope,
+> then the code. `docs/features/**` is read **last** and only to learn what is already known; it is a
+> record to update, not a design input. See the documentation rule in
+> [`project-rules`](../skills/project-rules/references/documentation.md).
+
 ## Steps
 
 1. **Name the data shape first.** What is the domain model? What types carry the feature end to end? Model the domain per **model-the-domain** (via the `principles` skill) before writing components or hooks. If the feature has an existing shape, align with it; do not invent a parallel one.
@@ -27,7 +33,8 @@ A feature is built from a named data shape, through an explicit design pass, to 
 4. **Delegate.** Fire a subagent per workstream with a named data shape and explicit success criteria. Review every diff yourself; write your own summary, don't pass through subagent words. **If the implementation is long** (multi-file, cross-module, two or more independent workstreams), run `/parallel-execution` instead: split into small verifiable units, dispatch them as background tasks, and join them yourself.
 5. **Cover the full state space.** Loading, empty, error, and offline states are part of the feature (**experience-first** (via the `principles` skill)). All user-visible text via `t()` in `zh-CN` / `en-US` / `de-DE`; all styles via design-system tokens. No hardcoded strings, no magic numbers.
 6. **Verify on the real surface.** `pnpm typecheck`, targeted tests, and a render check of the actual UI. The feature works when the real surface shows the intended behavior across states, not when it compiles. When the feature touches UI, routing, forms, or auth, dispatch `browser-verifier` for that check — a complex feature is not complete until it has run.
-7. **Then `/handoff`**. Include Doc Impact classification (`none` / `update` / `create`). The handoff stops the task: nothing is pushed, no PR is opened. You own the diff and answer review questions; the human reviews and opens the PR.
+7. **Update the feature doc, last.** Once the change is verified, write `docs/features/<feature>.md` from the code that shipped — new endpoints, new fields, the _What Does Not Exist_ entries that are now filled or newly found, and the _Known defects_ row in the index if the change closed one. Dispatch this to the lane that wrote the code, so the doc and the code land together. If the change did not alter what the document describes, say Doc Impact `none` and touch nothing.
+8. **Then `/handoff`**. Include Doc Impact classification (`none` / `update` / `create`). The handoff stops the task: nothing is pushed, no PR is opened. You own the diff and answer review questions; the human reviews and opens the PR.
 
 ## Reply
 

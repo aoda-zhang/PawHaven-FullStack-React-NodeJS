@@ -71,22 +71,12 @@ const { data: pets } = useQuery(petsQueryOptions());
 
 ## React 19 — HIGH
 
-**Incorrect (`forwardRef`):**
+`forwardRef` is obsolete: a function component accepts `ref` as a prop. The rule, the types, and the
+worked ❌/✅ pair are in `project-rules` —
+[React 19](../../../../../skills/project-rules/references/components.md) — which is the one place they are stated, and
+which every reviewer also reads. Do not retype the example here.
 
-```tsx
-const PetCard = forwardRef<HTMLDivElement, Props>(({ pet }, ref) => (
-  <div ref={ref} />
-));
-```
-
-**Correct (`ref` prop):**
-
-```tsx
-export const PetCard = ({
-  pet,
-  ref,
-}: Props & { ref?: Ref<HTMLDivElement> }) => <div ref={ref} />;
-```
+What is specific to writing:
 
 - No manual `memo` / `useMemo` / `useCallback` for ordinary re-render cost. The React Compiler handles it.
   Memoize only for a measured reason: an expensive third-party object identity, or a value passed

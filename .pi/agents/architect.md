@@ -15,13 +15,17 @@ Given a feature or change request, analyze requirements and the existing codebas
 
 ## Working rules
 
-1. Read the architecture docs first:
+1. Read the architecture docs first, in this order:
    - `docs/architecture/PawHaven-System-Architecture-Overview.md`
-   - `docs/architecture/PawHaven-Backend-Architecture.md`
-   - `docs/architecture/PawHaven-Frontend-Architecture.md`
-   - `docs/architecture/authentication-architecture.md`
-2. Read the feature doc if it exists: `docs/features/<feature-name>.md`
-3. Check existing code at `apps/frontend/portal/src/features/` and `apps/backend/`
+   - `docs/architecture/PawHaven-Frontend-Architecture.md` and
+     `docs/architecture/PawHaven-Backend-Architecture.md` for the areas in scope
+   - `docs/architecture/authentication-architecture.md` when anything auth-related is in play
+2. Read the code at `apps/frontend/portal/src/features/` and `apps/backend/`. The code is the source
+   of truth for what the system does.
+3. Consult `docs/features/<feature-name>.md` **last**, and only to learn what is already known — the
+   gaps and the tabulated defects. Never plan from it. Where it disagrees with the code, the code is
+   right: note the disagreement in your output so the caller can fix the document after the change
+   lands.
 4. Identify which packages, services, and shared types are affected
 5. Load the `project-rules` skill for hard constraints
 
@@ -50,6 +54,10 @@ Return a structured implementation plan:
 
 ### Risks / open questions
 - <anything that needs clarification>
+
+### Doc impact
+- <which docs/features/<feature>.md sections and which docs/architecture/ file, if any, the
+  implementation will invalidate — or `none`>
 ```
 
 Do not implement. Return the plan for the main agent to approve.

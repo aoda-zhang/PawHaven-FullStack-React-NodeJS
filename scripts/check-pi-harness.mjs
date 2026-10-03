@@ -61,9 +61,10 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-const EXPECTED_SKILLS = 13;
+const EXPECTED_SKILLS = 14;
 const EXPECTED_PROMPTS = 9;
 const EXPECTED_AGENTS = [
+  'orchestrator',
   'architect',
   'scout',
   'frontend',

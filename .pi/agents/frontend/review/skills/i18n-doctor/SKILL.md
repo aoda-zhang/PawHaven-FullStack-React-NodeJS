@@ -19,27 +19,25 @@ Dynamically locate frontend source directories using multiple strategies. i18n s
 
 ### Strategy 1: known frontend apps
 
-Find every `src/` directory under `apps/frontend/`:
+```bash
+find apps/frontend -type d -name src -not -path '*/node_modules/*'
+```
 
-```
-search_file: pattern="**/src/" target_directory=<workspace_root>/apps/frontend recursive=true
-```
+`apps/frontend/portal` is the only frontend app. Strategies 2 and 3 exist so that stays a finding
+rather than an assumption.
 
 ### Strategy 2: cross-validate with react-i18next usage
 
-Find every `.tsx` file that imports `react-i18next` to confirm active i18n usage:
-
-```
-search_content: pattern="from ['\"]react-i18next['\"]" path=<workspace_root>/apps/ type="tsx" outputMode="files_with_matches"
+```bash
+rg -l "from 'react-i18next'" apps/frontend --glob '*.tsx'
 ```
 
 ### Strategy 3: i18n entry files (fallback)
 
-If the first two strategies return nothing, search for i18n setup files:
+If the first two strategies return nothing:
 
-```
-search_file: pattern="**/i18n.ts" target_directory=<workspace_root> recursive=true
-search_file: pattern="**/i18n/index.*" target_directory=<workspace_root> recursive=true
+```bash
+find . \( -name 'i18n.ts' -o -name 'i18n' -type d \) -not -path '*/node_modules/*' -not -path './.pi/*'
 ```
 
 ### Locale completeness check
@@ -72,24 +70,19 @@ Use the discovered paths throughout all search rules below.
 ### Rule 1: Hardcoded English text in JSX
 
 - **Severity**: ⚠️ Warning
-- **Tool**: `search_content`
-- **Path**: Frontend source directories discovered in Step 0
-- **Exclude**: `node_modules/`, `dist/`, `*.test.tsx`, `*.spec.tsx`
-- **Pattern**: `>[A-Z][a-z]+( [a-z]+)*<`
-- **File Types**: `*.tsx`
+- **Command**:
+  ```bash
+  rg -n '>[A-Z][a-z]+( [a-z]+)*<' apps/frontend/portal/src --glob '*.tsx' \
+    --glob '!**/node_modules/**' --glob '!**/*.test.tsx' --glob '!**/*.spec.tsx'
+  ```
 - **Explanation**: Any text content between JSX tags that looks like English prose must use `{t('some.key')}` instead of being hardcoded. User-visible strings must go through i18next so they can be translated to all supported locales (zh-CN, en-US, de-DE).
-- **search_content invocation**:
-  ```
-  pattern: ">[A-Z][a-z]+( [a-z]+)*<"
-  path: <frontend_src_dirs_from_step0>
-  type: "tsx"
-  outputMode: "content"
-  ```
+- **The portal's own UI ships CJK strings directly** in places — see Known hits below — so this
+  command is a _starting point for review_, not a verdict. A match needs the manual pass in
+  [False Positive Handling](#false-positive-handling).
 
 ### Rule 2: Locale key parity
 
 - **Severity**: ❌ Blocking
-- **Tool**: `bash` — execute the bundled script, read its stdout
 - **Path**: `scripts/check-locale-parity.mjs`, run from the workspace root
 - **Script**: `node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs` (accepts
   `--locales <dir>`, default `packages/i18n/locales`, and `--reference <locale>`, default `en-US`).
@@ -111,19 +104,13 @@ Use the discovered paths throughout all search rules below.
 ### Rule 3: Non-snake_case translation keys
 
 - **Severity**: ⚠️ Warning
-- **Tool**: `search_content`
-- **Path**: Frontend source directories discovered in Step 0
-- **Exclude**: `node_modules/`, `dist/`, `*.test.tsx`, `*.spec.tsx`
-- **Pattern**: `t\(['"][\w]+\.[\w]*[a-z][A-Z][\w]*['"]`
-- **File Types**: `*.tsx`, `*.ts`
+- **Command**:
+  ```bash
+  rg -n "t\(['\"][\w]+\.[\w]*[a-z][A-Z][\w]*['\"]" apps/frontend/portal/src \
+    --glob '*.ts' --glob '*.tsx' \
+    --glob '!**/node_modules/**' --glob '!**/*.test.tsx' --glob '!**/*.spec.tsx'
+  ```
 - **Explanation**: Translation keys must be `snake_case` (lowercase words joined by underscores, e.g. `hero_headline_prefix`). The module prefix (before the first dot) may remain camelCase (`reportStray`, `rescueGuide`), but every key segment after the dot must use underscores. A `camelCase` segment after the dot is a violation. This rule scans `t()` call arguments for a lowercase-then-uppercase letter within the key segment.
-- **search_content invocation**:
-  ```
-  pattern: "t\(['\"][\w]+\.[\w]*[a-z][A-Z][\w]*['\"]"
-  path: <frontend_src_dirs_from_step0>
-  type: "tsx"
-  outputMode: "content"
-  ```
 - **False positive handling**: `errorMessage.TOKEN_EXPIRED`-style UPPER_SNAKE_CASE error-code maps are allowed and must NOT be flagged. Only flag keys where a lowercase letter is immediately followed by an uppercase letter (true `camelCase`).
 
 ## False Positive Handling
@@ -146,11 +133,25 @@ Only flag content that is truly visible to the end user: button labels, headings
 ## Execution
 
 1. Run Step 0 to discover frontend source directories and locale files. **Output the discovered directories and verified locale files explicitly.**
-2. Run Rule 1 (search_content) on the discovered source directories.
+2. Run Rule 1 on the discovered source directories.
 3. Run Rule 2 (execute `scripts/check-locale-parity.mjs`) and read its stdout.
-4. Run Rule 3 (search_content) on the discovered source directories to detect non-snake_case keys.
+4. Run Rule 3 on the discovered source directories to detect non-snake_case keys.
 5. Manually review each Rule 1 match: distinguish true hardcoded text from false positives (URLs, attributes, component names, etc.).
-6. Report: list discovered directories and locale files, then list each true violation with filePath, lineNumber, and the hardcoded text content or the offending key.
+6. Report: list discovered directories and locale files, then list each true violation with file path, line number, and the hardcoded text content or the offending key.
+
+## Known hits — pre-existing, report as such
+
+Two observations that are true of the codebase today, so a review does not re-derive them as a
+regression:
+
+- **Rule 2 currently passes.** All three locales are present (`de-DE`, `en-US`, `zh-CN`), with 396
+  keys each apart from one `zh-CN` plural variant marked `n/a`. The script also prints a warning that
+  `footer` and `rescueGuide` are each claimed by both `documents/pdf/<name>.json` and `<name>.json`
+  and share one namespace — a real collision risk, not a failure, and not something to fix in an
+  unrelated change.
+- **Rule 1 returns matches that are not all violations.** The portal ships CJK strings inline in
+  several components rather than through `t()`. Those are genuine i18n gaps worth reporting once,
+  marked pre-existing — not per review, and never as a blocking finding.
 
 ## Related
 

@@ -12,6 +12,9 @@
   "packages": ["npm:pi-subagents@0.73.1"],
   "subagents": {
     "agentOverrides": {
+      "orchestrator": {
+        "thinking": "high"
+      },
       "oracle": {
         "thinking": "high"
       },

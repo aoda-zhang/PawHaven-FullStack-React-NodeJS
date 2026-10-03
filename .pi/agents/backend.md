@@ -32,6 +32,9 @@ You are a backend implementation subagent for PawHaven.
 4. Read `docs/architecture/authentication-architecture.md` if auth is involved
 5. Implement the change within existing boundaries
 6. Run typecheck if available
+7. If your change altered what a `docs/features/<feature>.md` document describes — an endpoint, a
+   Prisma model, a recorded gap — update it now, from the code that shipped. Otherwise report Doc
+   Impact `none`.
 
 ## Result contract
 
@@ -42,13 +45,15 @@ the command that ran and the output it produced.
 <result>
   <status>complete|blocked|failed</status>
   <scope>the module, service, or endpoint you changed</scope>
-  <changes>every file you touched, with what changed in it — including migrations and module wiring</changes>
+  <changes>every file you touched, with what changed in it — including migrations, module wiring, and
+  the feature doc if your change invalidated one</changes>
   <decisions>any boundary, contract, or schema choice you made that the task did not already settle</decisions>
   <verification>
     <command>pnpm typecheck, the targeted test command, or the curl/route you exercised</command>
     <result>the output that matters</result>
     <status>pass|fail|not-run</status>
   </verification>
+  <docImpact>none | update | create — and for update, which document and which sections</docImpact>
   <risks>what you left unverified, and any constraint you bent</risks>
   <next>what the caller must wire, test, or review</next>
 </result>

@@ -19,9 +19,10 @@ An investigation is a read-only question: how does X work, why was Y built this 
 1. **Name the question and the evidence standard.** What exactly is being asked, and what counts as an answer (a file, a call path, a documented decision, a commit, runtime behavior)? If the question is about behavior, the evidence standard includes running it.
 2. **Read the real code, not the docs about the code.** Start from the actual implementation: the data shape, the call path, the boundary. Per **model-the-domain** (via the `principles` skill), understand the domain structure first; it explains most "why" questions.
 3. **Run what is runnable.** If the answer is observable (behavior, timing, output, state), observe it. Reproduce before concluding, per **fix-root-causes** (via the `principles` skill). When the observation is a UI, routing, or auth behavior, dispatch `browser-verifier` — it is read-only toward source and its findings are evidence, not changes.
-4. **Seed from history and docs.** Regression history and decision records explain why the code is the way it is. Use the docs/ tree and git history; cite what you actually read.
+4. **Seed from history and docs.** Regression history and decision records explain why the code is the way it is. Use `docs/architecture/` and git history; cite what you actually read. `docs/features/**` is a record of the last reconciliation, not a source of truth — where it disagrees with the code, the code is right.
 5. **Fan out when wide.** Large surfaces (many files, multiple packages) go to parallel subagents; converge on the synthesis yourself. Guard the context window: keep summaries, not raw dumps.
 6. **Write the cited answer.** Each claim maps to an artifact you read or observed this session. If the evidence is incomplete, say exactly what is missing rather than guessing.
+7. **Do not edit the docs.** This workflow is read-only, so a finding that a `docs/features/**` document is stale is a _result to report_, not an edit to make. Hand the caller the exact sections that are wrong and what the code says instead.
 
 ## Reply
 

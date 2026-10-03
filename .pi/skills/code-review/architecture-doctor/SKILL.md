@@ -291,8 +291,7 @@ grep -rn "interface.*Dto\|type.*Dto\|interface.*Type" \
 Verify significant architecture changes are reflected in the living architecture docs:
 
 ```bash
-# List the living architecture docs
-ls docs/
+ls docs/architecture/
 ```
 
 **What to look for:**
@@ -303,7 +302,7 @@ ls docs/
 
 ```
 💡 [Suggestion] Undocumented decision: The new notification module introduces a new event pattern.
-   Update `docs/PawHaven-System-Architecture-Overview.md` to record the decision.
+   Update `docs/architecture/PawHaven-System-Architecture-Overview.md` to record the decision.
 ```
 
 ---

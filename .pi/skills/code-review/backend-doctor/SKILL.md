@@ -10,64 +10,53 @@ description: >
 
 ## Responsibility
 
-Detect common quality issues in backend code, targeting NestJS projects.
-
-## Step 0: Discover Backend Source Directories
-
-Dynamically locate backend source directories so rules are project-agnostic:
-
-```
-search_file: pattern="**/main.ts" target_directory=<workspace_root> recursive=true
-```
-
-From results, extract the parent directories (e.g., `apps/backend/app-name/src/`). These are the backend source roots. Use them as search paths for Rules 1–2.
-
-Alternatively, search across the entire workspace and filter by backend-specific indicators (`@nestjs/*` imports, `@Module()` decorators).
+Detect common quality issues in backend code. The backend source roots are known, so they are named
+rather than discovered — `apps/backend/*/src`, which is `core-service`, `gateway`, `auth-service`,
+and `document-service`.
 
 ## Rules
 
 ### Rule 1: console.log in backend source
 
 - **Severity**: ❌ Blocking
-- **Tool**: `search_content`
-- **Path**: Backend source directories discovered in Step 0
-- **Exclude**: `node_modules/`, `dist/`, `*.spec.ts`, `*.test.ts`
-- **Pattern**: `console\.log`
-- **File Types**: `*.ts`
-- **Explanation**: `console.log` is forbidden in backend production code. Use the NestJS Logger service (`private readonly logger = new Logger(ClassName.name)`) or a structured logging solution instead. Console output is uncontrolled, cannot be filtered by log level, and bypasses the logging infrastructure.
-- **search_content invocation**:
+- **Command**:
+  ```bash
+  rg -n 'console\.log' apps/backend --glob '*.ts' \
+    --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/*.test.ts' --glob '!**/*.spec.ts'
   ```
-  pattern: "console\\.log"
-  path: <backend_src_dirs_from_step0>
-  type: "ts"
-  outputMode: "content"
-  ```
+- **Explanation**: `console.log` is forbidden in backend production code. Use the NestJS `Logger`
+  (`private readonly logger = new Logger(ClassName.name)`) or the logging service. Console output is
+  uncontrolled, cannot be filtered by level, and bypasses the logging infrastructure.
+- **This rule is not mechanically enforced.** `libs/eslint-config/node.js` sets `no-console: 'off'`
+  for backend, so a green `pnpm lint` says nothing about it. The command is the only check.
+- **Known hit**: `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught
+  error with `console.log`. It is pre-existing — report it as a finding about the codebase, not as a
+  regression from the change under review.
 
 ### Rule 2: TypeScript `any` type in backend
 
 - **Severity**: ❌ Blocking
-- **Tool**: `search_content`
-- **Path**: Backend source directories discovered in Step 0
-- **Exclude**: `node_modules/`, `dist/`, `*.spec.ts`, `*.test.ts`
-- **Pattern**: `: any`
-- **File Types**: `*.ts`
-- **Explanation**: The `any` type disables all type checking. In backend code, where data flows through multiple layers (controller → service → repository), untyped data causes runtime errors that are hard to trace. Use `unknown`, proper DTO interfaces, or generics instead.
-- **search_content invocation**:
+- **Command**:
+  ```bash
+  rg -n ': any\b|<any>' apps/backend --glob '*.ts' \
+    --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/*.test.ts' --glob '!**/*.spec.ts'
   ```
-  pattern: ": any"
-  path: <backend_src_dirs_from_step0>
-  type: "ts"
-  outputMode: "content"
-  ```
+- **Explanation**: `any` disables type checking. In backend code, where data crosses
+  controller → service → Prisma, untyped data produces runtime errors that are expensive to trace. Use
+  `unknown`, a proper DTO, or a generic.
+- **Also a warning, not an error, in ESLint** — `no-explicit-any` is configured as a warning in the
+  node config. So this is a warning in lint output and a blocking finding here; the two disagree by
+  design, and this doctor is the stricter of the two.
 
 ## Execution
 
-1. Run Step 0 first to discover backend source directories.
-2. Run both `search_content` calls in PARALLEL on the discovered paths.
-3. All violations are ❌ Blocking.
-4. Report: list each violation with filePath, lineNumber, matched content, and which rule it violates.
+1. Run both commands; they are independent and can run together.
+2. All violations are ❌ Blocking.
+3. Report: each violation with file path, line number, the matched text, and which rule it breaks.
+4. If a hit is pre-existing, report it as such and do not attribute it to the change under review.
 
 ## Related
 
 - Architecture: [architecture-doctor](../architecture-doctor/SKILL.md) · boundaries: [boundary-doctor](../boundary-doctor/SKILL.md)
 - Frontend pairing: [react-doctor](../../../agents/frontend/review/skills/react-doctor/SKILL.md)
+- Standards: [backend](../../../skills/backend/SKILL.md) — what the linter will and will not catch

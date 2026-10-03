@@ -14,15 +14,20 @@ Ensure zero TypeScript compile-time type errors across all projects.
 
 ## Step 0: Discover Projects with Type Checking
 
-Dynamically locate all projects that have TypeScript type checking configured:
-
-```
-search_file: pattern="**/tsconfig.json" target_directory=<workspace_root>/apps/ recursive=true
+```bash
+find apps packages libs -name tsconfig.json -not -path '*/node_modules/*' -not -path '*/dist/*' \
+  -not -path '*/build/*'
 ```
 
 For each `tsconfig.json` found, derive its package name from the nearest `package.json`. Build a list of `{packageName, projectPath}` entries.
 
 If a project's `package.json` includes a `"typecheck"` script, include it. Skip projects that have `tsconfig.json` but no `"typecheck"` script.
+
+Or run the whole tree in one command, which is the normal case at review time:
+
+```bash
+pnpm typecheck
+```
 
 ## Rules
 
@@ -32,13 +37,12 @@ For each project discovered in Step 0, generate a rule:
 
 - **Severity**: ❌ Blocking
 - **Scope**: frontend / backend / full-stack (auto-detected from project contents)
-- **Tool**: `execute_command`
-- **Pre-condition**: `tsconfig.json` exists and `package.json` has `"typecheck"` script
 - **Command**:
   ```bash
   pnpm --filter <packageName> typecheck 2>&1
   ```
-  Always run from the workspace root.
+  Always run from the workspace root. `pnpm --filter <packageName> typecheck` is the per-project
+  form; the root `pnpm typecheck` runs them all through turbo.
 - **Validation**: Exit code must be 0. Any non-zero exit or type error in output is a blocking failure.
 - **Report**: If failed, include the error output with file paths and line numbers.
 
@@ -56,10 +60,11 @@ Examples of how `<packageName>` is derived from `apps/<project>/package.json`:
 | tsconfig.json Location                    | package.json `name`      | Command                                          |
 | ----------------------------------------- | ------------------------ | ------------------------------------------------ |
 | `apps/frontend/portal/tsconfig.json`      | `@pawhaven/portal`       | `pnpm --filter @pawhaven/portal typecheck`       |
-| `apps/frontend/admin/tsconfig.json`       | `@pawhaven/admin`        | `pnpm --filter @pawhaven/admin typecheck`        |
 | `apps/backend/core-service/tsconfig.json` | `@pawhaven/core-service` | `pnpm --filter @pawhaven/core-service typecheck` |
 
-These are **illustrative examples** — actual projects and names are discovered at runtime.
+These are **illustrative examples** — actual projects and names are discovered at runtime. An earlier
+version of this table listed `apps/frontend/admin` / `@pawhaven/admin`, which is not a workspace
+package; do not add it back.
 
 ## Related
 

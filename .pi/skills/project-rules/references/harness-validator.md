@@ -103,9 +103,9 @@ here, so the package's own skills are not asserted against this repo's rule.
 ### 2. Relative links resolve
 
 ```bash
-# every relative .md link in the harness and in AGENTS.md
-grep -rhoE '\]\((\.{1,2}/[^)#]+)\)' .pi AGENTS.md --include="*.md" --exclude-dir=npm \
-  | sed -E 's/^\]\(//; s/\)$//' | sort -u
+# every relative .md link in the harness, in AGENTS.md, and in the docs tree
+grep -rhoE '\]\((\.{1,2}/[^)#]+)\)' .pi AGENTS.md docs README.md README.cn.md --include="*.md" \
+  --exclude-dir=npm | sed -E 's/^\]\(//; s/\)$//' | sort -u
 ```
 
 Resolve each against the file that contains it and confirm the target exists. A skill that links to a
@@ -118,8 +118,8 @@ in prose, and 1 was a real break that had been sitting there unnoticed.
 ### 3. No references to a retired harness
 
 ```bash
-grep -rn "\.codebuddy/\|\.opencode/" .pi AGENTS.md --include="*.md" \
-  --exclude-dir=handoffs --exclude-dir=npm
+grep -rn "\.codebuddy/\|\.opencode/" .pi AGENTS.md docs README.md README.cn.md \
+  --include="*.md" --exclude-dir=handoffs --exclude-dir=npm
 ```
 
 Two harnesses have been retired before this one: `.codebuddy/`, then `.opencode/`. Any hit is either a
@@ -127,6 +127,12 @@ Two harnesses have been retired before this one: `.codebuddy/`, then `.opencode/
 historical note. Fix the first; keep the second only where it reads in past tense and names what
 replaced it. `.pi/handoffs/` is excluded because those artifacts record the state of the tree at the
 time they were written.
+
+The scan covers `.pi/`, the root `AGENTS.md`, `docs/`, and both root READMEs. It used to cover only
+the first two, and 17 dead `.opencode/` links sat in `docs/README.md`, `docs/README.cn.md`,
+`README.md`, `README.cn.md`, and `docs/features/05-rescue-detail.md` for months — every one of them a
+path a reader could copy. A check scoped to the harness alone cannot see a link the harness does not
+contain.
 
 ## Running them
 
