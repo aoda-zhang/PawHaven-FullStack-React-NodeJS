@@ -98,13 +98,11 @@ separation (§16); frontend dev/review split with react-doctor on the review sid
   past tense); add §5 output contract block to all 9 agent definitions; add
   `oracle: { "thinking": "high" }` to settings.json. Does NOT touch: README.md (Lane D owns it),
   check-pi-harness.mjs, AGENTS.md, the 6 workflow prompts' classification wiring (Lane B).
-- **Lane C — Handoffs + Evals (P5/P6: gaps 7/8).** Create `.pi/handoffs/README.md` defining the
+- **Lane C — Handoffs (gap 7).** Create `.pi/handoffs/README.md` defining the
   §18 8-field artifact (Task / Current state / Completed work / Important decisions /
-  Verification performed / Known issues / Remaining work / Next action) + template. Create
-  `.pi/evals/{feature,bug-fix,refactor,architecture,investigation}/` with the §26 corpus:
-  5 feature + 5 bug-fix + 3 refactor + 2 architecture + 2 investigation task definitions, each
-  grounded in real PawHaven modules (Rescue, Reporting, Adoption, Community, gateway auth,
-  document-service PDF), plus a metrics README covering §26's eight measures.
+  Verification performed / Known issues / Remaining work / Next action) + template. The evals
+  half of this lane (gap 8) was deliberately dropped and is not to be recreated; the written
+  handoff is what replaced it.
 
 **Wave 2 (after A — overlaps settings.json and prompts):**
 

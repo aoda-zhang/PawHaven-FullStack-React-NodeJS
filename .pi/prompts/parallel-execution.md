@@ -28,26 +28,33 @@ never waits on a sibling and never re-reads shared state — it does its work an
 1. **Split into units.** Name them U1..UN in dependency order. Each unit MUST be:
    - one concern (one module, one file group, one API path)
    - independently executable, with no runtime dependency on a sibling
-   - owned by exactly one lane (`dev` or `backend` on implementation work, `oracle` on a design
-     or decision unit)
+   - owned by exactly one lane (`frontend-dev` or `backend-dev` on implementation work, `oracle` on a
+     design or decision unit)
    - ending in a verifiable check (typecheck, lint, build, or a targeted test)
 
    Units with no dependency on each other go in the same wave. If a unit cannot be verified on its
    own, it is not a unit — merge it into its dependent.
 
+   Every unit runs in its **own independent context**. A unit must not be handed another unit's
+   private reasoning, its intermediate notes, or a transcript of what a sibling found. It receives a
+   named scope, a named data shape, and observable success criteria, and nothing else. Passing one
+   unit's draft plan or half-written output to a second unit couples them and is what the split
+   exists to prevent.
+
 2. **Announce the split.** State the table in your reply before dispatching, so the human can see
    the decomposition and stop you cheaply if a unit is wrong.
 
-   | Unit | Lane      | Scope                  | Depends on | Verify with                                 |
-   | ---- | --------- | ---------------------- | ---------- | ------------------------------------------- |
-   | U1   | `backend` | Prisma model + service | —          | `pnpm --filter @pawhaven/core-service test` |
-   | U2   | `backend` | report-animal service  | U1         | same                                        |
-   | U3   | `dev`     | API paths + gate UI    | U2         | `pnpm --filter @pawhaven/portal test`       |
+   | Unit | Lane           | Scope                  | Depends on | Verify with                                 |
+   | ---- | -------------- | ---------------------- | ---------- | ------------------------------------------- |
+   | U1   | `backend-dev`  | Prisma model + service | —          | `pnpm --filter @pawhaven/core-service test` |
+   | U2   | `backend-dev`  | report-animal service  | U1         | same                                        |
+   | U3   | `frontend-dev` | API paths + gate UI    | U2         | `pnpm --filter @pawhaven/portal test`       |
 
 3. **Dispatch the wave in parallel.** Fire every unit with one `subagent` call, `async: true`, then
    return immediately — do not wait on any of them. Each dispatch MUST carry:
    - the unit ID, its exact scope, and what is explicitly **out** of scope
-   - the absolute file paths to work in, not inlined file contents
+   - the working directories and package boundaries the unit operates in, not a list of every file
+     it should touch. The unit plans its own edits inside the scope you named.
    - the named data shape, if the unit introduces one
    - the exact verification command and the observable result that counts as passing
    - the relevant skills by name, and any principle text the lane cannot load itself
@@ -69,8 +76,9 @@ never waits on a sibling and never re-reads shared state — it does its work an
    re-split. Do not spam it.
 
 5. **Collect results.** Each unit's `<result>` block carries its `<changes>`, `<verification>`, and
-   `<risks>`. Read every unit's report and **write your own summary** — do not pass a subagent's
-   words through as your own.
+   `<risks>`. Read every unit's report, relay each unit's verification exactly as it was reported, and
+   write your own reading across the units, per
+   [Evidence](../skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires).
 
 6. **Verify the combined tree.** Individual unit checks do not prove the integration. Run the full
    set on the merged result:
@@ -80,6 +88,9 @@ never waits on a sibling and never re-reads shared state — it does its work an
    pnpm build:local
    pnpm test
    ```
+
+   Add `pnpm pi-check` to that set when any unit touched `.pi/`. A harness change that typechecks and
+   packages can still fail to load, and `pi-check` is the check that proves it loads.
 
    `pnpm lint` already fails from 13 pre-existing errors (3 in `gateway`, 10 in `backend-core`) —
    diff against baseline before calling it a regression. An older number in this file said 14; the

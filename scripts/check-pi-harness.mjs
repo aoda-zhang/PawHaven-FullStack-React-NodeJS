@@ -61,20 +61,37 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-const EXPECTED_SKILLS = 14;
+const EXPECTED_SKILLS = 18;
+const EXPECTED_PRIVATE_SKILLS = 9;
 const EXPECTED_PROMPTS = 9;
 const EXPECTED_AGENTS = [
   'orchestrator',
   'architect',
   'scout',
-  'frontend',
-  'dev',
-  'review',
-  'backend',
+  'frontend-dev',
+  'backend-dev',
   'tester',
   'reviewer',
   'oracle',
   'browser-verifier',
+];
+
+// Escape hatch for a project skill that is reachable some way other than an agent's
+// `skills:` grant. The eight doctors `code-review` dispatches to by path at review time are
+// reached through that meta-skill's dispatch table, not through frontmatter, so requiring a
+// grant for them would only push someone to add a redundant one. `react-doctor` is deliberately
+// NOT in this list: `frontend-dev` runs it as a mandatory self-check and needs the pinned
+// version, so its grant is what keeps the pinned version in the skill instead of restated in a
+// prompt body. Add a name here ONLY with the indirection that reaches it written in the comment.
+const CATALOG_ONLY_SKILLS = [
+  'architecture-doctor',
+  'backend-doctor',
+  'boundary-doctor',
+  'i18n-doctor',
+  'style-doctor',
+  'test-doctor',
+  'typecheck-doctor',
+  'typescript-doctor',
 ];
 
 const failures = [];
@@ -192,14 +209,20 @@ function scanAgents(dir) {
       const nameMatch = fm.match(/^name:\s*(.+)/m);
       const descMatch = fm.match(/^description:\s*(.+)/m);
       const skillsMatch = fm.match(/^skills:\s*(.+)/m);
+      const allowedMatch = fm.match(/^allowedAgents:\s*(.+)/m);
+      const skillPathMatch = fm.match(/^skillPath:\s*(.+)/m);
+      const splitList = (value) =>
+        value
+          ?.split(/\s*,\s*/)
+          .map((s) => s.trim())
+          .filter(Boolean);
       agents.push({
         path: full,
         name: nameMatch?.[1]?.trim(),
         description: descMatch?.[1]?.trim(),
-        skills: skillsMatch?.[1]
-          ?.split(/\s*,\s*/)
-          .map((s) => s.trim())
-          .filter(Boolean),
+        skills: splitList(skillsMatch?.[1]),
+        allowedAgents: splitList(allowedMatch?.[1]),
+        skillPath: skillPathMatch?.[1]?.trim(),
       });
     }
   }
@@ -242,6 +265,7 @@ function scanAgentPrivateSkills() {
               name,
               path: skillFile,
               agent: relative(agentsRoot, dir),
+              agentSkillDir: full,
             });
             knownSkillNames.add(name);
           }
@@ -256,6 +280,12 @@ function scanAgentPrivateSkills() {
 }
 
 const privateSkills = scanAgentPrivateSkills();
+
+if (privateSkills.length !== EXPECTED_PRIVATE_SKILLS) {
+  failures.push(
+    `expected ${EXPECTED_PRIVATE_SKILLS} agent-private skills, found ${privateSkills.length}`,
+  );
+}
 
 for (const agent of discoveredAgents) {
   if (!agent.name) {
@@ -281,6 +311,104 @@ console.log(
 console.log(
   `agent-private skills: ${privateSkills.length} (${privateSkills.map((s) => s.name).join(', ') || 'none'})`,
 );
+
+// --- Reference resolution ---
+
+// An agent name that resolves to nothing is not an error anywhere in pi: the
+// dispatch silently falls back to a default agent, and the only thing lost is the
+// methodology the lane was supposed to carry. Rename one lane and every pointer to
+// it keeps working while pointing somewhere else, so the name must be checked against
+// the agents actually discovered on disk.
+for (const agent of discoveredAgents) {
+  for (const allowed of agent.allowedAgents ?? []) {
+    if (!discoveredNames.includes(allowed)) {
+      failures.push(
+        `agent ${agent.name} allows unknown agent: ${allowed} (allowedAgents)`,
+      );
+    }
+  }
+}
+
+// Same failure one layer out: an agentOverrides key left behind by a rename is inert,
+// so the renamed agent silently runs at pi's default thinking level.
+for (const key of Object.keys(settings.subagents?.agentOverrides ?? {})) {
+  if (!discoveredNames.includes(key)) {
+    failures.push(`settings.json agentOverrides has unknown agent: ${key}`);
+  }
+}
+
+// And one layer deeper still, in the skills themselves: a `requiredAgents` array naming an
+// agent that no longer exists. `task-classification` fixes that array as its contract and its
+// worked examples are copied verbatim by whoever runs them, so a name left behind by a rename
+// becomes a dispatch that resolves to nothing — and nothing else here reads a skill's body.
+// Only the array is parsed, never prose.
+function scanSkillMarkdown(dir, found = []) {
+  if (!existsSync(dir)) return found;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) scanSkillMarkdown(full, found);
+    else if (entry.name.endsWith('.md')) found.push(full);
+  }
+  return found;
+}
+
+for (const file of scanSkillMarkdown(join(repoRoot, '.pi', 'skills'))) {
+  const raw = readFileSync(file, 'utf8');
+  for (const match of raw.matchAll(/"requiredAgents"\s*:\s*\[([^\]]*)\]/g)) {
+    const bodyStart = match.index + match[0].length - match[1].length;
+    for (const entry of match[1].matchAll(/"([^"]+)"/g)) {
+      if (!discoveredNames.includes(entry[1])) {
+        const line = raw.slice(0, bodyStart + entry.index).split('\n').length;
+        failures.push(
+          `${relative(repoRoot, file)}:${line}: requiredAgents names unknown agent: ${entry[1]}`,
+        );
+      }
+    }
+  }
+}
+
+// skillPath is discovery-only. A typo'd or moved path resolves to nothing and the
+// agent loses its private skills with no diagnostic anywhere — it just runs with less
+// methodology than its own definition claims.
+const privateSkillDirs = new Set();
+for (const agent of discoveredAgents) {
+  if (!agent.skillPath) continue;
+  const resolved = resolve(dirname(agent.path), agent.skillPath);
+  privateSkillDirs.add(resolved);
+  if (!existsSync(resolved)) {
+    failures.push(
+      `agent ${agent.name}: skillPath does not exist: ${agent.skillPath} (${relative(repoRoot, resolved)})`,
+    );
+  }
+}
+
+// The inverse: a private skill no agent's skillPath reaches is dead weight. Nothing
+// loads it, and because it still parses as a valid skill it looks live on disk.
+for (const skill of privateSkills) {
+  if (
+    ![...privateSkillDirs].some(
+      (dir) => resolve(dir) === resolve(skill.agentSkillDir),
+    )
+  ) {
+    failures.push(
+      `agent-private skill unreachable from any skillPath: ${skill.name} (${relative(repoRoot, skill.path)})`,
+    );
+  }
+}
+
+// Every project skill must be granted somewhere. This is the check that keeps a
+// project skill from becoming invisible: a doctor promoted from agent-private to
+// project is only loaded by an agent if that agent still grants it, and dropping the
+// grant is invisible to every other check here.
+const grantedSkills = new Set();
+for (const agent of discoveredAgents) {
+  for (const skill of agent.skills ?? []) grantedSkills.add(skill);
+}
+for (const skill of projectSkills.skills) {
+  if (grantedSkills.has(skill.name) || CATALOG_ONLY_SKILLS.includes(skill.name))
+    continue;
+  failures.push(`project skill granted by no agent: ${skill.name}`);
+}
 
 // Deduplicate agent names
 const agentNameCounts = {};

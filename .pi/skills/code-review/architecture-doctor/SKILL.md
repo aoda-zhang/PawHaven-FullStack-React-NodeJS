@@ -337,6 +337,6 @@ ls docs/architecture/
 ## Related
 
 - Best practices: [references/best-practices.md](references/best-practices.md)
-- Boundaries: [boundary-doctor](../boundary-doctor/SKILL.md) · styling: [style-doctor](../../../agents/frontend/review/skills/style-doctor/SKILL.md)
-- Component graduation: [component](../../../agents/frontend/dev/skills/component/SKILL.md)
+- Boundaries: [boundary-doctor](../boundary-doctor/SKILL.md) · styling: [style-doctor](../style-doctor/SKILL.md)
+- Component graduation: [component](../../../agents/frontend-dev/skills/component/SKILL.md)
 ```

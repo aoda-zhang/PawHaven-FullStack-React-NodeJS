@@ -5,8 +5,12 @@
     ".pi/skills/code-review/architecture-doctor",
     ".pi/skills/code-review/backend-doctor",
     ".pi/skills/code-review/boundary-doctor",
+    ".pi/skills/code-review/i18n-doctor",
+    ".pi/skills/code-review/react-doctor",
+    ".pi/skills/code-review/style-doctor",
     ".pi/skills/code-review/test-doctor",
-    ".pi/skills/code-review/typecheck-doctor"
+    ".pi/skills/code-review/typecheck-doctor",
+    ".pi/skills/code-review/typescript-doctor"
   ],
   "prompts": [".pi/prompts"],
   "packages": ["npm:pi-subagents@0.73.1"],
@@ -24,20 +28,14 @@
       "architect": {
         "thinking": "high"
       },
-      "frontend": {
-        "thinking": "high"
-      },
-      "dev": {
+      "frontend-dev": {
         "thinking": "medium"
       },
-      "review": {
-        "thinking": "high"
-      },
-      "backend": {
+      "backend-dev": {
         "thinking": "medium"
       },
       "tester": {
-        "thinking": "low"
+        "thinking": "medium"
       },
       "reviewer": {
         "thinking": "high"

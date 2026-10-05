@@ -21,7 +21,8 @@
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
     "pi-check": "node scripts/check-pi-harness.mjs",
-    "doctor:react": "npx react-doctor@latest",
+    "check:links": "node scripts/check-md-links.mjs .",
+    "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged"
   },
   "lint-staged": {

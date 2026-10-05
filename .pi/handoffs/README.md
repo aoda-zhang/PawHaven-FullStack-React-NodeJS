@@ -137,5 +137,4 @@ waves with per-lane file sets and non-goals. Read it before writing your first h
 ## Related
 
 - `/handoff` — the workflow that produces a review handoff for a finished change.
-- `.pi/evals/` — the harness corpus; results are recorded per run, see its README.
 ```

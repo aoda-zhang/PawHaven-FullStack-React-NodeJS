@@ -2,7 +2,7 @@
 name: code-review
 description: >
   Code Review Orchestrator. Two passes:
-  TECH REVIEW — is the code written well? (typecheck/react/style/
+  TECH REVIEW — is the code written well? (typecheck/typescript/react/style/
   i18n/backend/test doctors, feature & logic deep review).
   PATTERN REVIEW — does the change fit the project? (boundary/architecture
   doctors, architecture & design, type contracts).
@@ -47,33 +47,45 @@ Each sub-skill is a standalone `SKILL.md` holding explicit rules with a runnable
 path to read. No shell scripts. Load one by reading its path — the paths are in the Related section at
 the bottom of this file — and they compose.
 
+There are **nine**. Seven run in the TECH pass, two in the PATTERN pass. `react-doctor`,
+`typescript-doctor`, `style-doctor`, and `i18n-doctor` were once agent-private skills nested under a
+`review` lane that no longer exists. They are project skills now and load through this meta-skill by
+path, exactly like the five that always lived here. Where a doctor sits in the tree is a fact about
+where it used to be, not a difference in how it loads or how binding it is.
+
 **Every rule names a command you can run.** A rule you cannot execute produces no finding while still
 looking like a gate, so if a command in a sub-skill fails or is wrong, that is a finding about the
 harness, and it gets fixed in the same change.
 
 ## Two Passes
 
-Every review produces **two verdicts**, because they answer different questions:
+Every review runs **two passes**, because they answer different questions:
 
 | Pass               | Question                                                                                                                 | Findings from                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| **TECH REVIEW**    | Is the code written well? Best practices, anti-patterns, code quality                                                    | typecheck/react/style/i18n/backend/test doctors + Layer 3 feature & logic deep review             |
+| **TECH REVIEW**    | Is the code written well? Best practices, anti-patterns, code quality                                                    | typecheck/typescript/react/style/i18n/backend/test doctors + Layer 3 feature & logic deep review  |
 | **PATTERN REVIEW** | Does the change fit the project? Follows the project's overall development rules/patterns, fits the current architecture | boundary/architecture doctors + Layer 2 architecture & design + Layer 4 type contract deep review |
+
+**Neither pass emits a verdict.** Each reports findings with a severity, and the `reviewer` lane turns
+the two groups into the single `VERDICT: PASS` or `VERDICT: FAIL` the workflow reads. A doctor that
+produced a verdict of its own would make two verdict producers, and the workflow would no longer know
+which one to obey.
 
 Either pass can block independently. A change that is well-written but breaks the project's architecture is blocked by Pattern Review; a change that fits the architecture but is full of anti-patterns is blocked by Tech Review.
 
 ## Scope → Skills Mapping
 
-| Scope        | TECH Review sub-skills                           | PATTERN Review sub-skills |
-| ------------ | ------------------------------------------------ | ------------------------- |
-| `frontend`   | typecheck, react, style, i18n, **test**          | boundary, architecture    |
-| `backend`    | typecheck, backend, **test**                     | boundary, architecture    |
-| `full-stack` | typecheck, react, style, i18n, backend, **test** | boundary, architecture    |
+| Scope        | TECH Review sub-skills                                       | PATTERN Review sub-skills |
+| ------------ | ------------------------------------------------------------ | ------------------------- |
+| `frontend`   | typecheck, typescript, react, style, i18n, **test**          | boundary, architecture    |
+| `backend`    | typecheck, typescript, backend, **test**                     | boundary, architecture    |
+| `full-stack` | typecheck, typescript, react, style, i18n, backend, **test** | boundary, architecture    |
 
-**test-doctor runs on EVERY review, every scope** — it is never skipped. `style-doctor` is the design
-gate: for UI scopes it is the only check against the `@pawhaven/design-system` tokens, so a token
-violation blocks the TECH pass. There is no separate Figma gate — Figma is not used in this project;
-the token CSS in `packages/design-system/src/tokens/` is the design authority.
+Across the three scopes the table names all nine. `test-doctor` runs on EVERY review, every scope, and
+is never skipped. `style-doctor` is the design gate: for UI scopes it is the only check against the
+`@pawhaven/design-system` tokens, so a token violation blocks the TECH pass. There is no separate
+Figma gate. Figma is not used in this project; the token CSS in
+`packages/design-system/src/tokens/` is the design authority.
 
 ## Workflow
 
@@ -104,7 +116,12 @@ Collect all sub-skill outputs and categorize:
 | ⚠️ Warning    | Should fix, does not block | Fix recommended; track as follow-up |
 | 💡 Suggestion | Optional improvement       | Informational only                  |
 
-Then tag every finding with its pass (see Two Passes above): findings from the typecheck/react/style/i18n/backend doctors belong to **TECH REVIEW**; findings from boundary/architecture doctors belong to **PATTERN REVIEW**.
+Then tag every finding with its pass (see Two Passes above): findings from the
+typecheck/typescript/react/style/i18n/backend doctors belong to **TECH REVIEW**; findings from
+boundary/architecture doctors belong to **PATTERN REVIEW**.
+
+Severity is the severity of the finding. It is not the review's verdict. A single `❌ Blocking` in
+either pass is what makes the reviewer emit `VERDICT: FAIL`, and nothing here emits a verdict at all.
 
 ### Step 4: TECH REVIEW deep pass — Layer 3, Feature & Logic
 
@@ -126,17 +143,27 @@ Verify the change fits the project's overall patterns and architecture:
 1. **Architecture & Design (Layer 2)** — module placement, package layering, dependency direction, component graduation rules, API/event consistency, design tokens, server-driven data, decision coverage
 2. **Type Contracts (Layer 4, full-stack only)** — frontend/backend type consistency, API route matching
 
-### Step 6: Output graded report with per-pass verdicts
+### Step 6: Aggregate findings per pass
 
-Present findings organized by sub-skill, with file paths, line numbers, and severity. Report **two verdicts** — Tech Review verdict and Pattern Review verdict — plus the overall verdict. Either pass can block independently.
+Present findings organized by sub-skill, with file paths, line numbers, and severity, grouped under
+**TECH REVIEW** and **PATTERN REVIEW**. Each pass carries its own blocking state. The `reviewer` lane
+reads the two groups and produces the one verdict the workflow consumes.
 
 ## Sub-Skill Composition
 
 Each sub-skill is loadable on its own — read its `SKILL.md` — so a narrow review reads only the
 doctors its scope needs, and a full review reads all of them.
 
+**Why load on demand by path rather than granting in frontmatter.** Granting a skill loads its whole
+body into the child's context up front, before the reviewer knows the scope. A backend-only review
+would then carry the React and styling rules it will never apply, and the cost of that context grows
+with every doctor added. This skill exists so a narrow review reads only the rules its scope needs.
+Granting all nine in an agent's frontmatter undoes progressive disclosure and is not a fix for
+anything; if a rule is being loaded and not applied, the finding is that the rule is unclear, not that
+it needs to be granted.
+
 ## Related
 
-- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.md) · [react-doctor](../../agents/frontend/review/skills/react-doctor/SKILL.md) · [style-doctor](../../agents/frontend/review/skills/style-doctor/SKILL.md) · [boundary-doctor](./boundary-doctor/SKILL.md) · [i18n-doctor](../../agents/frontend/review/skills/i18n-doctor/SKILL.md) · [backend-doctor](./backend-doctor/SKILL.md) · [test-doctor](./test-doctor/SKILL.md) (every review)
+- Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.md) · [typescript-doctor](./typescript-doctor/SKILL.md) · [react-doctor](./react-doctor/SKILL.md) · [style-doctor](./style-doctor/SKILL.md) · [boundary-doctor](./boundary-doctor/SKILL.md) · [i18n-doctor](./i18n-doctor/SKILL.md) · [backend-doctor](./backend-doctor/SKILL.md) · [test-doctor](./test-doctor/SKILL.md) (every review)
 - Architecture deep review: [architecture-doctor](./architecture-doctor/SKILL.md)
-- Frontend skills: [react](../../agents/frontend/dev/skills/react/SKILL.md) · [styling](../../agents/frontend/dev/skills/style/SKILL.md) · [i18n](../../agents/frontend/dev/skills/i18n/SKILL.md)
+- Frontend skills: [react](../../agents/frontend-dev/skills/react/SKILL.md) · [styling](../../agents/frontend-dev/skills/style/SKILL.md) · [i18n](../../agents/frontend-dev/skills/i18n/SKILL.md)

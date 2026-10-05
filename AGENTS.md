@@ -121,9 +121,10 @@ Agent config lives in `.pi/`, committed project-locally, so behaviour is the sam
 who clones the repo. **pi is the harness layer.** The `.opencode/` copy that preceded it was
 legacy, has been deleted, and nothing in `.pi/` ever read from it.
 
-- `.pi/skills/` — 14 project skills, indexed by [`.pi/README.md`](.pi/README.md); 13 more are
-  agent-private under `.pi/agents/frontend/{dev,review}/skills/`, loaded via `skillPath`
-  frontmatter only into those agents' contexts.
+- `.pi/skills/` — 18 project skills (9 top-level plus 9 doctors under `code-review/`), indexed by
+  [`.pi/README.md`](.pi/README.md); 9 more are agent-private under
+  `.pi/agents/frontend-dev/skills/`, loaded via `skillPath` frontmatter only into that agent's
+  context.
   A skill's ID is its **directory name**, and `name:` in frontmatter must match it (lowercase
   `a-z`, `0-9`, hyphens only) — pi uses `name` as the `/skill:<name>` command, so a name with a
   slash in it silently breaks invocation. `project-rules` (10 constraint files), `frontend` (the shared portal facts a writer and a
@@ -135,25 +136,37 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
 - `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
   `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`,
   `/parallel-execution`, `/handoff`.
-- `.pi/agents/` — 11 subagent definitions run by pi-subagents (installed via `packages` in
-  `.pi/settings.json`): `orchestrator` (plans, dispatches, verifies, and hands off — holds **no**
-  `edit`/`write` tool, so it cannot implement), `scout`, `architect`, `oracle` (read-only recon,
-  planning, decision challenger), `frontend` (a router delegating to `dev` for implementation and
-  `review` for findings-only review), `backend`, `tester`, `reviewer`, `browser-verifier` (drives
-  the running portal in a real browser and edits no source). `dev` and `review` live under
-  `.pi/agents/frontend/` with their private skills. `orchestrator` is the entry point for a task
+- `.pi/agents/` — 9 subagent definitions run by pi-subagents (installed via `packages` in
+  `.pi/settings.json`): `orchestrator` (plans, dispatches, verifies, and hands off — holds no
+  dedicated `edit`/`write` tool, though it does hold `bash`, which is a write channel, so staying
+  out of the source is discipline rather than a guarantee), `scout` (fast read-only recon),
+  `architect` (read-only plan author), `oracle` (independent read-only plan review), `frontend-dev`
+  (the React/TypeScript writer and its self-test), `backend-dev` (the NestJS writer and its self-test),
+  `tester` (acceptance verification, independent of the developer), `reviewer` (the only lane that
+  emits `VERDICT: PASS|FAIL`, read-only toward source), `browser-verifier` (drives the running
+  portal in a real browser and edits no source). `frontend-dev` lives under
+  `.pi/agents/frontend-dev/` with its private skills. `orchestrator` is the entry point for a task
   needing more than one lane; its `defaultContext: fresh` is what lets a task start from a clean
   context and still dispatch the project's own lanes.
 - `.pi/handoffs/` — structured handoff artifacts for work that spans sessions or lanes, so a
   fresh context reads one instead of re-deriving.
-- `.pi/settings.json` — points pi at the directories above. **The 5 `code-review/<doctor>`
+- `.pi/settings.json` — points pi at the directories above. **The 9 `code-review/<doctor>`
   skills are listed individually and must stay that way:** pi stops recursing at any directory
   containing `SKILL.md`, so the doctors nested under the `code-review` parent are only found via
-  those explicit entries. Dropping them silently drops 5 skills. The 4 frontend doctors (react,
-  style, i18n, typescript) are agent-private to `review` instead, via `skillPath`.
-- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 14 project
-  skills, 13 agent-private skills, 9 prompts, and 11 agents load with zero diagnostics. Run it
-  after touching anything in `.pi/`.
+  those explicit entries. Dropping one silently drops a skill. The four frontend doctors (react,
+  style, i18n, typescript) were promoted out of the retired `review` lane and are project skills
+  now. `frontend-dev` grants `react-doctor` by name because it runs it as a mandatory self-check;
+  the eight doctors it does not grant are reached through `code-review`'s dispatch table and named
+  in the validator's `CATALOG_ONLY_SKILLS` allowlist.
+- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 18 project skills,
+  9 agent-private skills, 9 prompts, and 9 agents load with zero diagnostics. It also resolves every
+  agent's `allowedAgents`, every `agentOverrides` key, every `skillPath`, and every
+  `requiredAgents` name in a skill body, and it flags any project skill that no agent grants. Run it after touching anything in `.pi/`.
+- `pnpm check:links` — resolves every relative markdown link **and anchor** across `.pi/`,
+  `AGENTS.md`, `docs/`, and both root READMEs. It skips any directory named `npm`, `handoffs`,
+  `node_modules`, `dist`, or `build`, at any depth rather than by path prefix — so `.pi/npm` and
+  `.pi/handoffs` go unscanned, and so would a `docs/build` created tomorrow. Run it alongside
+  `pi-check`: a harness change that breaks an anchor into another file passes every count.
 
 `/trust` once so project config loads, then `/reload` after changing `.pi/`.
 
@@ -161,16 +174,18 @@ Plan then dispatch for feature work: classify the request, present an agent-leve
 approval, then dispatch. Ask before Standard and Architectural scope; do not re-ask for reversible
 sub-steps afterwards; always ask before a push or force-push.
 
-**Dispatch is real: pi runs named sub-agents.** The 11 agents in `.pi/agents/` execute in
-isolated contexts via pi-subagents — `orchestrator` holds no edit tools and dispatches the other
-ten, and `frontend` likewise routes to `dev` (writer) and `review` (read-only). Dispatch through
-the subagent tool with a scope, a data shape, and observable success criteria — never a file list.
-The lane rules under [Dispatch and verification](#dispatch-and-verification) govern what every lane
-must return, and the verification discipline is unchanged.
+**Dispatch is real: pi runs named sub-agents.** The 9 agents in `.pi/agents/` execute in
+isolated contexts via pi-subagents — `orchestrator` is the only one holding `subagent`, and it
+dispatches the other eight. Dispatch through the subagent tool with a scope, a data shape, and
+observable success criteria — never a file list. The lane rules under
+[Dispatch and verification](#dispatch-and-verification) govern what every lane must return, and
+the verification discipline is unchanged.
 
 **Every mutating change gets an independent review.** A lane that reviews its own work cannot catch
-a self-consistent mistake. Dispatch `reviewer` (or `review` for a frontend diff) as a separate
-context; a change nobody independent has read has not been reviewed.
+a self-consistent mistake. Dispatch `reviewer` as a separate context; a change nobody independent
+has read has not been reviewed. `reviewer` is the only lane that emits a verdict **about code**
+(`oracle` emits one about a plan, which is not the same thing), so it is also the only verdict a
+report can end on.
 
 ### Documentation
 
@@ -256,7 +271,10 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
 - Classify before planning (Trivial / Standard / Architectural) and name the principle that drove
   it. Approval is not per-step: once given, reversible sub-steps just get done.
 - **A lane with no named validator has not finished.** Every dispatch states who verifies it and
-  what counts as passing; a lane returns a `<verification>` block.
+  what counts as passing; a lane returns a `<verification>` block in which each check reads
+  `PASS | FAIL | NOT RUN`, and anything unrun carries the reason it was not run. A failed check or a
+  `FAIL` review routes back to the **developer** lane, which fixes and re-runs its own self-test,
+  in a loop capped at 3 cycles. It does not route back to `reviewer`, which does not edit the diff.
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. "It compiles" is not a pass. A bug's repro must pass on the same surface that
   failed.

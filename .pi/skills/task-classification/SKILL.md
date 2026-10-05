@@ -52,7 +52,7 @@ task type; the outcome is.
   `.pi/agents/`; do not add an agent that has nothing to check.
 - `requiredVerification` — the checks that must pass, and who runs them. A lane with no named
   validator has not finished.
-- `requiresClarification` / `clarificationReason` — see [Clarification](#clarification).
+- `requiresClarification` / `clarificationReason` — see [Output rules](#output-rules).
 
 Worked examples for every type: [references/worked-examples.md](./references/worked-examples.md).
 
@@ -104,6 +104,8 @@ it as a bare category.
 hypothesis. Grep for the files, packages, and services the change lands in and confirm before
 emitting the JSON. An unverified `scope` sends the wrong agent to the wrong tree.
 
+Work on `.pi/` is `infrastructure`. It gets no scope category of its own.
+
 ## Complexity
 
 Complexity is **orchestration depth** — how much delegation and planning the task justifies. Line
@@ -125,6 +127,11 @@ Risk sets verification depth.
 Always at least **high**: authentication, authorization, permissions, credentials, tokens, sessions,
 PII, security boundaries. In this repo that also covers anything touching the gateway's cookie and
 internal-JWT boundary — see `docs/architecture/authentication-architecture.md`.
+
+A change to the harness itself is **high at minimum** and may not take a lightweight path:
+`.pi/agents`, `.pi/skills`, `.pi/prompts`, `.pi/settings.json`, workflow definitions, model
+configuration, orchestrator behaviour. A harness change affects every future development task, so a
+wrong one is paid for repeatedly and stays invisible until much later.
 
 **critical** is reserved for destructive operations: destructive database migrations, destructive data
 operations, production infrastructure changes.
@@ -158,3 +165,6 @@ the workflows above; reach them from the routed workflow, not instead of it.
    primary type was wrong, say which field changed and why.
 4. **Never classify from keywords alone.** If the type came from a word in the request rather than
    from the outcome, keep going until the outcome is known.
+5. **When the scope touches the harness, say which validation the change must pass.** A `.pi/` change
+   runs `pnpm pi-check`, and the reply names it. Leaving the validator implicit is how a change
+   renames a path, breaks a link, and reports itself verified.

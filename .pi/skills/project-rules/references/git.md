@@ -46,8 +46,22 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update archi
 
 ## 6. Agent's Git Scope
 
-- Agents NEVER commit code unless the user explicitly requests it.
-- Agents CAN stage and commit `.pi/` configuration changes (their own domain) **when the user
-  asks for it.** "CAN" is permission, not instruction — do not read it as a standing licence to commit
-  unprompted. The standing rule is: change the code, do not commit it, do not push it.
-- The orchestrator does NOT commit — only subagents may commit their own work.
+The root `AGENTS.md` is authoritative here, and it is stricter than what this file used to say.
+**No agent commits anything unless the user explicitly asks.** The rule covers every agent alike, the
+main session and every subagent, and it covers source, scripts, tests, config, and docs. Being asked
+to _make a change_ is not permission to commit it.
+
+Scope per lane:
+
+- **Developer lanes** (`frontend-dev`, `backend-dev`) leave their changes in the working tree. They commit
+  only on an explicit human request, never on their own initiative.
+- **Verification lanes** (`tester`, `reviewer`, `browser-verifier`) hold no write access to
+  application source, so a commit is not theirs to make. They report and the human decides.
+- **The orchestrator** writes no source, so it has nothing to commit. It proposes the commit split in
+  the handoff and stops there.
+
+No lane pushes, opens a PR, force-pushes, resets, cleans, or deletes a branch without asking. Those
+touch shared history and the old one is not always recoverable.
+
+"Can commit on request" is permission, not a standing licence. The permission is the request that
+carried it, and it does not extend to the next change.

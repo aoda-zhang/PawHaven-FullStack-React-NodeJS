@@ -79,7 +79,7 @@ When a skill is wrong, fix it in the same change and record what it used to say.
 skill teaches nothing, and the next reader re-derives the same wrong belief from a different skill.
 Sections named _Corrections_, or a dated note under the rule, are how a skill carries that history —
 see [`backend`](../../backend/SKILL.md) and the i18n
-[module inventory](../../../agents/frontend/dev/skills/i18n/references/module-inventory.md), which
+[module inventory](../../../agents/frontend-dev/skills/i18n/references/module-inventory.md), which
 dates its counts and says they are an indication, not a contract.
 
 ## What a skill must not name

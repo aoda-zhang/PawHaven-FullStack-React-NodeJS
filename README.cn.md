@@ -57,7 +57,7 @@
 
 **`.pi/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent harness，将每个开发请求转化为结构化流水线：`分类 → 规划 → 分发执行通道 → 验证 → 对照架构与模式审查 → 更新文档`。
 
-👉 [进入 harness](./.pi/README.md) —— 13 个项目 skill、9 个斜杠命令工作流、11 个 subagent,以及它们强制的项目规则。由 `pnpm pi-check` 校验。
+👉 [进入 harness](./.pi/README.md) —— 18 个项目 skill、9 个斜杠命令工作流、9 个 subagent,以及它们强制的项目规则。由 `pnpm pi-check` 校验。
 
 ---
 

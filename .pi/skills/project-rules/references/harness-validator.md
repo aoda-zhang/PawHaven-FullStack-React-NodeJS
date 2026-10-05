@@ -5,6 +5,7 @@
 - [Why this exists](#why-this-exists)
 - [What the harness is now](#what-the-harness-is-now)
 - [Automated: `pnpm pi-check`](#automated-pnpm-pi-check)
+- [Automated: `pnpm check:links`](#automated-pnpm-checklinks)
 - [Manual checks](#manual-checks)
 - [1. Skill id is the directory name](#1-skill-id-is-the-directory-name)
 - [2. Relative links resolve](#2-relative-links-resolve)
@@ -15,6 +16,12 @@
 > **Applies to**: manual validation before committing anything under `.pi/`, and CI if you wire it in.
 > **Purpose**: integrity checks that the agent harness is internally consistent — no dangling skill
 > grants, no dead agent targets, no broken relative links.
+
+**Run the automated pair first.** Every change under `.pi/` clears `pnpm pi-check` and
+`pnpm check:links` before it is committed; they are specified under
+[Automated: `pnpm pi-check`](#automated-pnpm-pi-check) and
+[Automated: `pnpm check:links`](#automated-pnpm-checklinks). The three [manual checks](#manual-checks)
+below are what those two scripts do not cover, which is why they are still written out here.
 
 ## Why this exists
 
@@ -40,12 +47,19 @@ None of that is visible in a diff. These checks make it visible.
 │   └── <name>.md                # slash command; frontmatter `description:` only
 ├── agents/
 │   ├── <name>.md                # subagent definition; body IS the system prompt
-│   └── frontend/
-│       ├── frontend.md          # router agent
-│       ├── dev/skills/          # agent-private skills, loaded via skillPath
-│       └── review/skills/       # agent-private doctors, loaded via skillPath
+│   └── frontend-dev/
+│       ├── dev.md               # the frontend implementation lane
+│       └── skills/              # agent-private skills, loaded via skillPath
 └── npm/                         # pi-subagents + deps (gitignored)
 ```
+
+The `skills/code-review/` directory holds 9 nested doctors — `architecture-doctor`,
+`backend-doctor`, `boundary-doctor`, `i18n-doctor`, `react-doctor`, `style-doctor`, `test-doctor`,
+`typecheck-doctor`, and `typescript-doctor`. The four frontend doctors were promoted out of the
+retired `frontend/review/skills/` tree in the merge, so they are project skills that no agent grants
+via `skillPath` any more. `reviewer` reaches all nine through this meta-skill's dispatch table, and
+the eight it does not grant in frontmatter are named in `CATALOG_ONLY_SKILLS` in the validator.
+`frontend-dev` grants `react-doctor` by name, because it runs it as a mandatory self-check.
 
 **The skill ID is the directory name, and the frontmatter `name` must agree with it** — pi resolves a
 skill's invocable name as frontmatter `name` falling back to the directory name, so `style-doctor/` with
@@ -55,7 +69,7 @@ and never on a name that merely disagrees with its directory — so this drift i
 `pnpm pi-check` and is manual check 1 below. A name containing a slash breaks `/skill:<name>`
 invocation silently, which is the case AGENTS.md calls out by name.
 
-`settings.json` lists the 5 `code-review/<doctor>` skills **individually** and must stay that way: pi
+`settings.json` lists the 9 `code-review/<doctor>` skills **individually** and must stay that way: pi
 stops recursing at any directory containing a `SKILL.md`, so the doctors nested under the `code-review`
 parent are only found via those explicit entries. Dropping one silently drops a skill.
 
@@ -74,13 +88,52 @@ would fail at startup. It already covers:
 - each `npm:` package in `settings.json` is **installed** under `.pi/npm`, and its manifest-declared
   skill, prompt, and extension paths exist.
 - every pi diagnostic (warning included) surfaced as a failure.
+- every name in an agent's `allowedAgents:` **resolves to a discovered agent** — an unknown name
+  falls back to a default agent at dispatch, so a retired lane silently loses its methodology.
+- every `subagents.agentOverrides` key in `settings.json` **resolves to a discovered agent** —
+  catches an override left behind by a rename.
+- every name in a skill body's `requiredAgents` array **resolves to a discovered agent** — the
+  array is the skill's dispatch contract and whoever runs it copies the names out verbatim, so a
+  name left behind by a rename becomes a dispatch that resolves to nothing, and nothing else here
+  reads a skill's body. Only the array is parsed, never prose.
+- every agent `skillPath:` **exists on disk**, resolved relative to the agent definition file —
+  `skillPath` is discovery-only, so a broken path drops an agent's private skills with no
+  diagnostic.
+- every discovered agent-private skill is **reachable from some agent's `skillPath:`** — an
+  orphaned private skill is dead weight nobody loads.
+- every project skill is **granted in at least one agent's `skills:` frontmatter**, or named in
+  the `CATALOG_ONLY_SKILLS` allowlist at the top of the script with a comment naming the
+  indirection that reaches it. This is the check that catches a doctor promoted to a project
+  skill whose only grant was dropped: the count check, the duplicate-name check, and the
+  agent-private `skillPath` reachability check would all still pass.
 
 Do not duplicate this in a shell one-liner, and do not loosen its expectations to make a red run green
 — update the counts deliberately, in the same change that adds or removes the resource.
 
+## Automated: `pnpm check:links`
+
+`scripts/check-md-links.mjs` resolves every relative markdown link **and every anchor** across `.pi/`,
+`AGENTS.md`, `docs/`, `README.md`, and `README.cn.md`. It skips any directory named `npm`, `handoffs`,
+`node_modules`, `dist`, or `build`, at any depth rather than by path prefix — so `.pi/npm` and
+`.pi/handoffs` go unscanned, and so would a `docs/build` created tomorrow — and it exits non-zero
+listing each break with the file it was found in.
+
+The anchor half is the part a hand-rolled grep cannot do. A path check confirms the file is there; it
+cannot tell you that `#the-gate-sequence` still names a heading that exists. That is what this check
+catches: every target file present, every link plausible, and a reader sent to a heading that had
+been renamed.
+
+**It resolves anchors the way GitHub does, and the rule matters.** GitHub lowercases the heading,
+drops every character that is not a word character, a space, or a hyphen, and turns each space into a
+hyphen **without collapsing runs**. So `State access — the real names` slugifies to
+`#state-access--the-real-names`, with a double hyphen where the em-dash was. A reader who slugifies
+differently will "fix" a link that is already correct. Do not hand-edit an anchor that
+`check:links` accepts, and when you do add one, write the double hyphen.
+
 ## Manual checks
 
-These three are not covered by `pnpm pi-check`.
+These three are not covered by `pnpm pi-check` or `pnpm check:links`. Check 2 now has an automated
+half, but the block below is still the way to see the whole link inventory at once.
 
 ### 1. Skill id is the directory name
 
@@ -95,9 +148,10 @@ for f in $(find .pi/skills .pi/agents -name SKILL.md); do
 done
 ```
 
-Empty output is the pass — currently 27 files scanned, zero mismatches. Recurse to every `SKILL.md`,
+Empty output is the pass — currently 27 files scanned (18 project + 9 agent-private), zero
+mismatches. Recurse to every `SKILL.md`,
 not one level: the doctors sit at depth two (`code-review/*-doctor`) and the agent-private skills at
-depth four (`frontend/dev/skills/*`), and they are the ones that drift. `.pi/npm` is not a scan root
+depth two (`frontend-dev/skills/*`), and they are the ones that drift. `.pi/npm` is not a scan root
 here, so the package's own skills are not asserted against this repo's rule.
 
 ### 2. Relative links resolve
@@ -111,6 +165,10 @@ grep -rhoE '\]\((\.{1,2}/[^)#]+)\)' .pi AGENTS.md docs README.md README.cn.md --
 Resolve each against the file that contains it and confirm the target exists. A skill that links to a
 deleted reference sends the reader nowhere, and it fails silently at exactly the moment someone needed
 it. Exclude `.pi/npm` — that tree is installed dependencies, not this repo's prose.
+
+`pnpm check:links` now runs this check, including the anchor half. The block is kept because it lists
+the whole link inventory in one view, which is what makes an unexpected target visible; the script
+tells you a link is broken, not which links it introduced.
 
 Do not eyeball this. Earlier passes over this repo found 387 links; 7 were illustrative placeholders
 in prose, and 1 was a real break that had been sitting there unnoticed.
@@ -136,12 +194,18 @@ contain.
 
 ## Running them
 
-There is no `scripts/harness-check.sh`. It was recommended by an earlier version of this file and
-never existed. Until someone writes it, run the blocks above by hand or fold them into a
-`package.json` script.
+```bash
+pnpm pi-check      # automated: harness structure
+pnpm check:links   # automated: relative markdown links and anchors
+```
 
-Prefer a real markdown-link checker (`lychee`, `markdown-link-check`) for check 2 once there are enough
-links for grep to be the wrong tool.
+Then run the three manual checks in [Manual checks](#manual-checks) by hand. They are not optional,
+and they are not scriptable today.
+
+The `scripts/harness-check.sh` an earlier version of this file recommended never existed and has not
+been replaced by a shell script. What replaced it is the pair above: `pi-check` uses pi's own loaders
+because nothing else can, and `check:links` is a Node script because anchors need a real Markdown
+parser rather than grep.
 
 ## Failure response
 

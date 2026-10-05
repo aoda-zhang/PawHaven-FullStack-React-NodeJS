@@ -6,8 +6,22 @@ description: Produce a review handoff — proposed commit split, pasted evidence
 
 You own this task. Plan, review, verify. Delegate implementation to subagents, stay in the lead.
 
-The work stops here, ready for a human. You propose; the human commits, pushes, and opens the
-PR. Committing is not yours to do — see [`references/git.md`](../skills/project-rules/references/git.md).
+The work stops here, at `READY FOR HUMAN FINAL REVIEW`. You propose; the human commits, pushes,
+and opens the PR. Committing is not yours to do — see
+[`references/git.md`](../skills/project-rules/references/git.md).
+
+**AI verification does not replace human approval.** Every automated gate before this one answers one
+question: does the change do what it was asked to do? None of them answers whether this is what was
+wanted. Four decisions are the human's alone, and they are the reason this workflow ends rather than
+continues:
+
+- Is this what was actually wanted? Scope, framing, and priority are product judgments a passing test
+  cannot make.
+- Is the behavior correct? `VERDICT: PASS` means no finding blocked it, not that every case is right.
+- Is the scope acceptable? The pin that turned green may have been narrower than the problem.
+- Should it be merged or released, and when?
+
+Answering any of those yourself is the failure this step exists to prevent.
 
 ## Steps
 
@@ -35,8 +49,17 @@ PR. Committing is not yours to do — see [`references/git.md`](../skills/projec
      drift is not new. The implementation lane owns those edits so the doc ships in the same change
      (`AGENTS.md`: "update the matching doc in the same change"). There is no separate
      documentation agent.
+5. **Say `READY FOR HUMAN FINAL REVIEW` and stop.** The release proposal is complete at this point,
+   and it consists of exactly four things: the proposed commit split, the message for each commit, a
+   PR title and description, and a summary of what was verified and what remains unverified. Propose
+   them, do not perform them.
+
+   A release step must not redesign application code, fix an unrelated bug found in passing, bypass
+   `reviewer` because the change looks small, or treat its own verification as the human's approval.
+   A defect you notice now is reported as a finding, not fixed here. An unfixed defect that blocks
+   the change sends it back to the workflow that shipped it, not into this summary.
 
 ## Reply
 
-The handoff summary above: what changed, the evidence, what is unverified, and the suggested PR
-description. Name the principles that changed a decision.
+`READY FOR HUMAN FINAL REVIEW`, then the handoff summary: what changed, the evidence, what is
+unverified, and the suggested PR description. Name the principles that changed a decision.

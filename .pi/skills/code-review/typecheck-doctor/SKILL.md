@@ -68,5 +68,5 @@ package; do not add it back.
 
 ## Related
 
-- Frontend/backend standards: [react](../../../agents/frontend/dev/skills/react/SKILL.md) · [redux](../../../agents/frontend/dev/skills/redux/SKILL.md)
-- Companion doctors: [react-doctor](../../../agents/frontend/review/skills/react-doctor/SKILL.md) · [style-doctor](../../../agents/frontend/review/skills/style-doctor/SKILL.md)
+- Frontend/backend standards: [react](../../../agents/frontend-dev/skills/react/SKILL.md) · [redux](../../../agents/frontend-dev/skills/redux/SKILL.md)
+- Companion doctors: [react-doctor](../react-doctor/SKILL.md) · [style-doctor](../style-doctor/SKILL.md)

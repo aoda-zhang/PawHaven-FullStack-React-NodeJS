@@ -1,6 +1,6 @@
 # Worked Examples
 
-One full classification per task type, plus two boundary cases. Each is a request in PawHaven's
+One full classification per task type, plus three boundary cases. Each is a request in PawHaven's
 domain, with the reasoning that fixes the primary type and the evidence that set scope.
 
 ---
@@ -28,8 +28,8 @@ New user-visible behavior: a reporting flow that does not exist today.
   "workflow": "feature",
   "requiredAgents": [
     "architect",
-    "frontend",
-    "backend",
+    "frontend-dev",
+    "backend-dev",
     "tester",
     "browser-verifier"
   ],
@@ -127,7 +127,13 @@ Changes service responsibilities and cross-service contracts.
   "risk": "high",
   "confidence": 0.9,
   "workflow": "architecture-change",
-  "requiredAgents": ["architect", "oracle", "backend", "reviewer", "tester"],
+  "requiredAgents": [
+    "architect",
+    "oracle",
+    "backend-dev",
+    "reviewer",
+    "tester"
+  ],
   "requiredVerification": [
     "callers migrated in one wave; no dual path left",
     "core-service no longer imports the PDF module",
@@ -185,7 +191,7 @@ becomes `bug-fix`.
   "risk": "low",
   "confidence": 0.75,
   "workflow": "performance",
-  "requiredAgents": ["scout", "backend", "tester"],
+  "requiredAgents": ["scout", "backend-dev", "tester"],
   "requiredVerification": [
     "baseline time recorded before any change",
     "post-fix time recorded on the same surface and compared to the baseline",
@@ -250,3 +256,40 @@ broken, that is a second classification, and the bug is reported as a `bug-fix`.
 
 Unknown fields stay empty rather than guessed. This is the honest outcome, and it is a successful
 classification — the alternative is building the wrong thing and calling it verified.
+
+---
+
+## 9. Harness change — "Make the review skill load its own doctors instead of nesting them"
+
+A `.pi/skills/` change. No task type names this, and a seventh type is not added, because
+`architecture-change` would route to service boundaries, competing designs, migration waves, and
+`docs/architecture/` edits, none of which apply to a skill file. The risk floor and the named
+validator carry it instead.
+
+```json
+{
+  "taskType": "refactor",
+  "secondaryTasks": ["documentation"],
+  "scope": ["infrastructure", "documentation"],
+  "complexity": "medium",
+  "risk": "high",
+  "confidence": 0.85,
+  "workflow": "refactor",
+  "requiredAgents": ["reviewer"],
+  "requiredVerification": [
+    "pnpm pi-check exits 0 — 18 project skills, 9 agent-private skills, 9 prompts, 9 agents load with zero diagnostics",
+    "node scripts/check-md-links.mjs . reports 0 broken",
+    "npx prettier --check clean on every changed file"
+  ],
+  "requiresClarification": false,
+  "clarificationReason": null
+}
+```
+
+Why `risk: high` rather than `low`. The diff is four moved files, but a harness change affects every
+future development task, so a wrong one is paid for repeatedly and stays invisible until much later.
+`scope` is `infrastructure` because `.pi/` has no scope category of its own. `reviewer` is required
+because the risk is high and no lane reviews its own change. `refactor` is the primary type because
+the harness's behaviour is unchanged and only its structure moves, and `documentation` is a
+secondary because the reference file that stated the old nesting has to change in the same pass.
+`pnpm pi-check` is named in the reply rather than left implicit, which is what a harness scope owes.

@@ -142,7 +142,7 @@ rg -n 'useSelector|useDispatch' apps/frontend/portal/src --glob '!**/reduxHooks.
 rg -n 'style=\{\{' apps/frontend/portal/src --glob '*.tsx'
 rg -n ': any\b' apps/frontend/portal/src --glob '!**/*.test.*'
 # locale key parity — a bundled script, not a hand-rolled jq
-node .pi/agents/frontend/review/skills/i18n-doctor/scripts/check-locale-parity.mjs \
+node .pi/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs \
   --locales packages/i18n/locales --reference en-US
 ```
 
@@ -151,9 +151,9 @@ a rule and the fact it checks cannot drift apart.
 
 ## Related
 
-- [Writing](../../agents/frontend/dev/skills/frontend-patterns/SKILL.md) — concrete shapes to copy
-- [React standards](../../agents/frontend/dev/skills/react/SKILL.md) · [styling](../../agents/frontend/dev/skills/style/SKILL.md) · [i18n](../../agents/frontend/dev/skills/i18n/SKILL.md) · [TypeScript](../../agents/frontend/dev/skills/typescript/SKILL.md) · [Redux](../../agents/frontend/dev/skills/redux/SKILL.md) · [component placement](../../agents/frontend/dev/skills/component/SKILL.md)
-- [Doctors](../../agents/frontend/review/skills/react-doctor/SKILL.md) · [style](../../agents/frontend/review/skills/style-doctor/SKILL.md) · [i18n](../../agents/frontend/review/skills/i18n-doctor/SKILL.md) · [TypeScript](../../agents/frontend/review/skills/typescript-doctor/SKILL.md)
+- [Writing](../../agents/frontend-dev/skills/frontend-patterns/SKILL.md) — concrete shapes to copy
+- [React standards](../../agents/frontend-dev/skills/react/SKILL.md) · [styling](../../agents/frontend-dev/skills/style/SKILL.md) · [i18n](../../agents/frontend-dev/skills/i18n/SKILL.md) · [TypeScript](../../agents/frontend-dev/skills/typescript/SKILL.md) · [Redux](../../agents/frontend-dev/skills/redux/SKILL.md) · [component placement](../../agents/frontend-dev/skills/component/SKILL.md)
+- [Doctors](../code-review/react-doctor/SKILL.md) · [style](../code-review/style-doctor/SKILL.md) · [i18n](../code-review/i18n-doctor/SKILL.md) · [TypeScript](../code-review/typescript-doctor/SKILL.md)
 - [Frontend architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md) — what the
   portal is _for_, and why the boundaries above exist. Read the relevant section before changing a
   boundary; this file records where things are, not whether they belong there.
