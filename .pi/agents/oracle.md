@@ -8,7 +8,7 @@ description: >
   触发场景 / Trigger: plan review challenge assumption architecture plan approval risk boundary data model.
 systemPromptMode: replace
 inheritProjectContext: true
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, principles, architecture-design
 tools: read, grep, find, ls, bash
 defaultContext: fresh

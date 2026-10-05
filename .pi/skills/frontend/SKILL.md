@@ -19,6 +19,21 @@ that is the bug this file exists to prevent.
 
 When a fact here is wrong, fix it here. Do not correct it in a lens skill.
 
+## What this file is
+
+This is PawHaven project knowledge, not generic React guidance. It is the operational index an agent
+reads instead of loading the 672-line
+[frontend architecture document](../../../docs/architecture/PawHaven-Frontend-Architecture.md),
+because that document holds none of the names and paths below: it has no `reduxHooks` path, no
+`useAppSelector` correction, no feature-directory layout, and no "where a type lives" table. Merging
+this file into `docs/` would either bloat the architecture document or invent a second file competing
+with it, so the split is deliberate and fixed.
+
+**`docs/` is why a rule exists. This file is where things are and what they are called.**
+
+Where a section below has a canonical counterpart in the architecture document, that section is the
+authority for the reasoning behind the rule. The operational fact stays here.
+
 ## The map
 
 | What                    | Path                                                       |
@@ -33,6 +48,11 @@ When a fact here is wrong, fix it here. Do not correct it in a lens skill.
 
 `apps/frontend/portal` is the **only** frontend app. There is no `apps/frontend/admin`; a skill or
 rule that scans it is scanning nothing.
+
+Why the portal owns its own routing rather than deferring it is
+[§5 Routing architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md#5-routing-architecture).
+The packages it consumes, and the dependency direction between them, are in
+[§3 Package ecosystem](../../../docs/architecture/PawHaven-Frontend-Architecture.md#3-package-ecosystem).
 
 `@/` aliases `apps/frontend/portal/src`. Relative imports inside a feature, `@pawhaven/*` for
 packages.
@@ -62,6 +82,11 @@ Features: `auth`, `home`, `report-animal`, `rescue-cases`, `rescue-detail`, `res
 
 Add a file because the feature needs it, not because a template lists it.
 
+The boundary these directories exist to hold is
+[§4 Component architecture and boundaries](../../../docs/architecture/PawHaven-Frontend-Architecture.md#4-component-architecture--boundaries),
+and the automated checks that catch a violation are
+[§9 Module boundary enforcement](../../../docs/architecture/PawHaven-Frontend-Architecture.md#9-module-boundary-enforcement).
+
 ## State access — the real names
 
 There are **three** typed paths, and no others:
@@ -84,6 +109,9 @@ The registered store is one slice: `store/globalReducer.ts` carrying `profile`, 
 
 Server data is never in Redux. It belongs to TanStack Query.
 
+The split between the two, and why it is drawn there rather than elsewhere, is
+[§6 State management architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md#6-state-management-architecture).
+
 ## The styling gate
 
 Tokens live in `packages/design-system/src/tokens/`, consumed as **semantic Tailwind utilities**.
@@ -99,6 +127,9 @@ at `packages/design-system/scripts/token-check.cjs`, which is not in the tree. U
 gate is `style-doctor`'s commands, not that script. Do not tell anyone a token violation is
 "enforced by `pnpm token-check`".
 
+The three-layer token system this gate exists to protect is
+[§7 Design token architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md#7-design-token-architecture).
+
 ## Where a type lives
 
 | Situation                       | Location                                 | Import                   |
@@ -112,6 +143,10 @@ never duplicate the literal union. A type in `packages/frontend-core` is app inf
 domain contract.
 
 Banned: `any`, an `as` cast that silences an error, `!`, the `enum` keyword.
+
+The package boundary that puts domain contracts in `packages/shared` and app infrastructure in
+`packages/frontend-core` is
+[§3 Package ecosystem](../../../docs/architecture/PawHaven-Frontend-Architecture.md#3-package-ecosystem).
 
 ## The i18n contract
 
@@ -128,6 +163,9 @@ rendered translation. A stored translation makes the stored value depend on the 
 
 Features must not import `@pawhaven/i18n` directly; that package is app-root infrastructure. Use
 `useTranslation` / `t()`.
+
+Why i18n is a separate package with its own loader is
+[§8 Internationalization architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md#8-internationalization-architecture).
 
 ## Verification commands
 
@@ -149,11 +187,16 @@ node .pi/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs \
 The four `*-doctor` skills own the full rule lists. This file owns the vocabulary those rules use, so
 a rule and the fact it checks cannot drift apart.
 
+The boundary rules these commands check are stated in
+[§9 Module boundary enforcement](../../../docs/architecture/PawHaven-Frontend-Architecture.md#9-module-boundary-enforcement).
+
 ## Related
 
 - [Writing](../../agents/frontend-dev/skills/frontend-patterns/SKILL.md) — concrete shapes to copy
 - [React standards](../../agents/frontend-dev/skills/react/SKILL.md) · [styling](../../agents/frontend-dev/skills/style/SKILL.md) · [i18n](../../agents/frontend-dev/skills/i18n/SKILL.md) · [TypeScript](../../agents/frontend-dev/skills/typescript/SKILL.md) · [Redux](../../agents/frontend-dev/skills/redux/SKILL.md) · [component placement](../../agents/frontend-dev/skills/component/SKILL.md)
 - [Doctors](../code-review/react-doctor/SKILL.md) · [style](../code-review/style-doctor/SKILL.md) · [i18n](../code-review/i18n-doctor/SKILL.md) · [TypeScript](../code-review/typescript-doctor/SKILL.md)
-- [Frontend architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md) — what the
-  portal is _for_, and why the boundaries above exist. Read the relevant section before changing a
-  boundary; this file records where things are, not whether they belong there.
+- [Frontend architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md) — the
+  canonical home for why each rule above exists. §3 package ecosystem, §4 component boundaries,
+  §5 routing, §6 state, §7 design tokens, §8 i18n, §9 module boundary enforcement. Read the section
+  before changing a boundary. This file records where things are and what they are called; that
+  document records whether they belong there, and why.

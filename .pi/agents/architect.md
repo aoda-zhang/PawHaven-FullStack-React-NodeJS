@@ -4,7 +4,7 @@ description: Reads requirements and architecture docs, produces an implementatio
 tools: read, grep, find, ls, bash
 systemPromptMode: replace
 inheritProjectContext: false
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, architecture-design, principles, writing-standards
 ---
 

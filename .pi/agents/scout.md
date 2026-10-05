@@ -2,7 +2,7 @@
 name: scout
 description: Fast codebase recon — finds relevant files, components, services, and patterns. Read-only.
 inheritProjectContext: true
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, principles
 tools: read, grep, find, ls, bash
 defaultProgress: true

@@ -23,12 +23,15 @@ drifts from its copy.
 | 5   | Developer self-test        | the writing lane              | Every implementation lane, before it reports |
 | 6   | Independent verification   | `tester`                      | Conditional, `medium` or `high` complexity   |
 | 7   | Independent review         | `reviewer`                    | Every mutating change                        |
-| 8   | Combined-tree verification | `frontend-dev`, `backend-dev` | After the units are joined                   |
+| 8   | Combined-tree verification | the orchestrator              | After the units are joined                   |
 | 9   | Human final review         | the human                     | Every change that survives to a handoff      |
 
-Four stages are conditional on task risk. **Plan review is skipped when the task classified as
-Trivial, and the classification is the entire trigger.** A plan that reads small is not a reason to
-skip it, and a plan that reads large does not promote a Trivial task into a reviewed one. Human plan
+Three of the nine numbered stages are conditional on task risk: plan review, human plan approval, and
+independent verification. A `browser-verifier` pass is a fourth conditional act and is described below,
+but it is not one of the nine numbered stages, so the count of conditional stages is three.
+**Plan review is skipped when the task classified as Trivial, and the classification is the entire
+trigger.** A plan that reads small is not a reason to skip it, and a plan that reads large does not
+promote a Trivial task into a reviewed one. Human plan
 approval is skipped for Trivial scope, because there is nothing to weigh. Independent verification
 runs when the task classified at `medium` or `high` complexity, and is skipped for a Trivial or
 `low`-complexity task. At that complexity the work is localized to one layer with a straight
@@ -45,8 +48,9 @@ are separate contexts for that reason. A lane reviewing its own diff cannot catc
 mistake, so self-test and review are not the same act at two intensities.
 
 Stage 8 verifies the joined tree, because a change that typechecks per file and does not package is
-not done. See [Evidence](#evidence-what-a-pass-requires) for what a stage must report before it
-counts as passed.
+not done. The orchestrator owns it. A developer owns its own unit, and stage 5 already covers that.
+See [Evidence](#evidence-what-a-pass-requires) for what a stage must report before it counts as
+passed.
 
 ## The autonomy line — read this first
 
@@ -103,7 +107,8 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 
 8. **Do not write test files unless the task asks for them.** A behaviour change without a test is a
    finding at review time; adding tests nobody requested is scope the user did not budget for. Say
-   which you are doing.
+   which you are doing. Which lane authors the test once one is called for is in
+   [When combined-tree verification fails](#when-combined-tree-verification-fails).
 9. **Figma mock data belongs in the feature that owns it** — `src/features/<FeatureName>/mockData.ts`.
    Never in the design-system package. This is temporary and goes away at real API integration.
 10. **Always run the review after tests pass**, and always check whether the change needs a doc
@@ -124,8 +129,10 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 
 ## Verification and reporting
 
-15. **Verify the combined tree, not just the units.** `pnpm typecheck` and `pnpm build:local` on the
-    merged result. A change that typechecks per-file but does not package is not done. `pnpm lint`
+15. **The orchestrator verifies the combined tree, not just the units.** `pnpm typecheck` and
+    `pnpm build:local` on the merged result, run by you rather than delegated. A developer
+    self-tests its own unit at stage 5 and nothing more, because a change that typechecks per-file
+    but does not package is only visible once the units are joined. `pnpm lint`
     already fails from 13 pre-existing errors (3 in `gateway`, 10 in `backend-core`) — diff against
     baseline before calling it a regression.
 16. **NEVER ask the user for design files, Figma JSON, or screenshots.** Figma is not used in this
@@ -232,6 +239,65 @@ applies again, because the thing being approved is a different thing.
 
 Reworking a wrong plan inside a fix loop produces more of the wrong thing. Each cycle looks bounded
 and none of them address the finding.
+
+## When combined-tree verification fails
+
+This section refines the router above rather than replacing it. Classify the failure before routing
+it, because the same failing check carries a different owner depending on which of these it is.
+
+| Category                                | What it means                                                   | Route                                                                                                                            |
+| --------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `IMPLEMENTATION_FAILURE`                | This domain's code is wrong                                     | Back to that domain's implementation worker, through [the bounded fix loop](#the-bounded-fix-loop).                              |
+| `TEST_FAILURE`                          | A test is wrong or stale                                        | The orchestrator decides first whether the test or the implementation is at fault, then routes to whichever one owns it.         |
+| `INTEGRATION_FAILURE`                   | The domains disagree at the boundary                            | Back to the orchestrator, re-routed through contract analysis to **every** affected domain. Never to a single developer.         |
+| `SCOPE_OR_REQUIREMENT_FAILURE`          | The implementation does not meet the agreed requirement         | That is the "the plan is wrong" branch, so back to [planning](#when-to-return-to-planning).                                      |
+| `ENVIRONMENT_OR_INFRASTRUCTURE_FAILURE` | The code may be correct and the environment blocks verification | Report it as-is. Do **not** route an application-code change to an implementation worker, because nothing in the diff is broken. |
+
+**When a failure could be classified either way, take the more specific category and say why.** A
+frontend/backend contract disagreement is also arguably a requirement failure, but
+`INTEGRATION_FAILURE` names the boundary that broke rather than the intent and carries the route that
+reaches **every** affected domain, so it is the one that governs; the report states the category it
+took and the reason.
+
+The fix loop stays bounded wherever a branch lands in it. Maximum 3 cycles, then
+`WORKFLOW BLOCKED`, as [the bounded fix loop](#the-bounded-fix-loop) states. An escalation carries
+the failure, its evidence, the attempts made so far, the affected domain, the suspected root cause,
+and what is still uncertain.
+
+**The writing lane authors the test.** When `TEST_FAILURE` lands on a test that is missing rather
+than wrong, `tester` has already reported that criterion as `unverifiable` and named the check that
+would settle it. That report is the authorisation that surfaces the need, not the authority to write
+it. The task prompt or the bounded fix loop decides whether a test gets written, and the
+implementation lane owning that domain authors it. `tester` is not a second developer, and a check
+its author wrote is not independent evidence.
+
+## The contract change gate
+
+An implementation worker must not silently redefine an agreed contract. When the contract it was
+handed turns out to be insufficient to build what was asked, it stops and emits:
+
+```
+CONTRACT_CHANGE_REQUIRED
+```
+
+carrying the current contract, the proposed change, the reason, the affected domains, the affected
+files, and the risk.
+
+The orchestrator routes that signal through the planning authority that already exists. `architect`
+for a design question. `oracle` to challenge the proposal before it is adopted. A material change
+triggers the human gate, the same way any other scope decision does. Every affected lane is
+re-synchronised on the new contract before work continues, so no unit keeps building against the one
+it was handed.
+
+The failure this prevents is a boundary that moves in two directions at once. A frontend lane quietly
+changes an API expectation, a backend lane quietly changes the response shape, and the mismatch
+surfaces only at final verification, by which point both lanes have reported a self-test pass.
+
+A contract here is a coordination artifact. It is not an agent, not a skill, and not a workflow
+subsystem. Where the boundary has a code-level expression, that is
+[`packages/shared/types`](../../../../packages/shared/types), the types and Zod schemas both sides
+import instead of re-declaring, and this gate governs the coordination above it. Reuse the artifact
+that already exists rather than introducing a second system for the same job.
 
 ## What was retired
 

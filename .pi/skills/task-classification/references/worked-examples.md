@@ -1,7 +1,11 @@
 # Worked Examples
 
-One full classification per task type, plus three boundary cases. Each is a request in PawHaven's
-domain, with the reasoning that fixes the primary type and the evidence that set scope.
+One full classification per task type, plus three boundary cases and the two routing shapes the
+skill's routing section keys on. Each is a request in PawHaven's domain, with the reasoning that
+fixes the primary type and the evidence that set scope and domains.
+
+Every example carries `scope` and `domains` together. Read the pair: `scope` says where the change
+lands, `domains` says which workers run.
 
 ---
 
@@ -24,6 +28,7 @@ New user-visible behavior: a reporting flow that does not exist today.
   ],
   "complexity": "medium",
   "risk": "low",
+  "domains": ["frontend", "backend"],
   "confidence": 0.85,
   "workflow": "feature",
   "requiredAgents": [
@@ -45,8 +50,9 @@ New user-visible behavior: a reporting flow that does not exist today.
 
 Why `feature` and not `refactor`: nothing exists to preserve. Complexity is medium, not high — one
 service owns reporting, and the contract lives in `packages/shared` without a boundary change.
-`browser-verifier` is in required verification because a form with a success state is only proven on
-the real surface.
+`domains` is `frontend` and `backend`, two workers and no schema work, so `database` stays out of it
+while remaining in `scope`. `browser-verifier` is in required verification because a form with a
+success state is only proven on the real surface.
 
 ---
 
@@ -61,6 +67,7 @@ Existing behavior is incorrect.
   "scope": ["frontend"],
   "complexity": "low",
   "risk": "low",
+  "domains": ["frontend"],
   "confidence": 0.9,
   "workflow": "bug-fix",
   "requiredAgents": ["browser-verifier"],
@@ -88,6 +95,7 @@ changes it back to what it should have been. `confidence` is high because the re
   "scope": ["frontend", "testing"],
   "complexity": "low",
   "risk": "low",
+  "domains": ["frontend"],
   "confidence": 0.8,
   "workflow": "refactor",
   "requiredAgents": ["tester"],
@@ -125,6 +133,7 @@ Changes service responsibilities and cross-service contracts.
   ],
   "complexity": "high",
   "risk": "high",
+  "domains": ["backend"],
   "confidence": 0.9,
   "workflow": "architecture-change",
   "requiredAgents": [
@@ -146,8 +155,10 @@ Changes service responsibilities and cross-service contracts.
 ```
 
 Why `risk: high`: the gateway proxies `/api` to the service that now owns the contract, so the
-request path and its auth boundary move. Complexity is high for the same reason. The
-`documentation` secondary is not optional — the boundary decision has to outlive the change.
+request path and its auth boundary move. Complexity is high for the same reason. `domains` is
+`backend` alone, because one worker does the whole move however many services it crosses. `gateway`
+and `cross-system` describe where the change lands and stay out of `domains`. The `documentation`
+secondary is not optional: the boundary decision has to outlive the change.
 
 ---
 
@@ -162,6 +173,7 @@ The user wants to know where the rule lives. No change is requested.
   "scope": ["backend", "core-service"],
   "complexity": "low",
   "risk": "low",
+  "domains": ["backend"],
   "confidence": 0.85,
   "workflow": "investigation",
   "requiredAgents": ["scout"],
@@ -189,6 +201,7 @@ becomes `bug-fix`.
   "scope": ["backend", "core-service", "database", "testing"],
   "complexity": "medium",
   "risk": "low",
+  "domains": ["backend", "database"],
   "confidence": 0.75,
   "workflow": "performance",
   "requiredAgents": ["scout", "backend-dev", "tester"],
@@ -204,7 +217,8 @@ becomes `bug-fix`.
 
 Why not `bug-fix`: a bug is wrong; this is slow. The discriminator is measurement — without a
 baseline number this cannot be `performance`, and if the slowness turns out to be a broken index
-causing errors, it is a `bug-fix` and the workflow changes.
+causing errors, it is a `bug-fix` and the workflow changes. `database` appears in both lists because
+the index is where the fix lands and the query layer is the worker that has to reason about it.
 
 ---
 
@@ -219,6 +233,7 @@ The trap case. The word "add" plus a feature-shaped noun reads as a feature; it 
   "scope": ["frontend", "testing"],
   "complexity": "low",
   "risk": "low",
+  "domains": ["frontend"],
   "confidence": 0.8,
   "workflow": "refactor",
   "requiredAgents": ["tester"],
@@ -245,6 +260,7 @@ broken, that is a second classification, and the bug is reported as a `bug-fix`.
   "scope": [],
   "complexity": "",
   "risk": "low",
+  "domains": [],
   "confidence": 0.2,
   "workflow": "",
   "requiredAgents": [],
@@ -273,6 +289,7 @@ validator carry it instead.
   "scope": ["infrastructure", "documentation"],
   "complexity": "medium",
   "risk": "high",
+  "domains": [],
   "confidence": 0.85,
   "workflow": "refactor",
   "requiredAgents": ["reviewer"],
@@ -288,8 +305,88 @@ validator carry it instead.
 
 Why `risk: high` rather than `low`. The diff is four moved files, but a harness change affects every
 future development task, so a wrong one is paid for repeatedly and stays invisible until much later.
-`scope` is `infrastructure` because `.pi/` has no scope category of its own. `reviewer` is required
-because the risk is high and no lane reviews its own change. `refactor` is the primary type because
-the harness's behaviour is unchanged and only its structure moves, and `documentation` is a
-secondary because the reference file that stated the old nesting has to change in the same pass.
-`pnpm pi-check` is named in the reply rather than left implicit, which is what a harness scope owes.
+`scope` is `infrastructure` because `.pi/` has no scope category of its own. `domains` is empty,
+because no current domain describes the work and the list stays open until one does; adding a
+`harness` value to cover this one example is not worth a term every other classification then has to
+consider. `reviewer` is required because the risk is high and no lane reviews its own change.
+`refactor` is the primary type because the harness's behaviour is unchanged and only its structure
+moves, and `documentation` is a secondary because the reference file that stated the old nesting has
+to change in the same pass. `pnpm pi-check` is named in the reply rather than left implicit, which is
+what a harness scope owes.
+
+---
+
+## 10. Full-stack feature — "Show a rescue case's progress as a public timeline"
+
+`medium` complexity, `medium` risk, `domains: [frontend, backend]`. The shape the routing section
+routes with two workers.
+
+```json
+{
+  "taskType": "feature",
+  "secondaryTasks": ["documentation"],
+  "scope": ["frontend", "backend", "api", "core-service", "shared", "testing"],
+  "complexity": "medium",
+  "risk": "medium",
+  "domains": ["frontend", "backend"],
+  "confidence": 0.85,
+  "workflow": "feature",
+  "requiredAgents": [
+    "architect",
+    "frontend-dev",
+    "backend-dev",
+    "tester",
+    "browser-verifier",
+    "reviewer"
+  ],
+  "requiredVerification": [
+    "shared Zod schema for the timeline entries, imported by both sides and not re-declared",
+    "frontend and backend units run in parallel only after the contract is settled",
+    "browser-verifier: the timeline renders, orders, and handles a case with no entries",
+    "pnpm typecheck and pnpm build:local green on the combined tree"
+  ],
+  "requiresClarification": false,
+  "clarificationReason": null
+}
+```
+
+Why `medium` risk: nothing here touches authentication, permissions, credentials, or PII, so the
+risk floor does not apply, and nothing in the change is destructive. Complexity is medium because
+two domains and a shared payload cross between them. No `fullstack-dev` worker is dispatched and
+none should be created for this shape. The work is composed from the two domains that already exist,
+with the contract settled first so neither worker guesses at the boundary.
+
+---
+
+## 11. Low complexity, high risk — "Shorten the gateway access-token lifetime to 5 minutes"
+
+`low` complexity, `high` risk, `domains: [backend]`. The shape that must not take the fast path.
+
+```json
+{
+  "taskType": "feature",
+  "secondaryTasks": ["testing"],
+  "scope": ["backend", "gateway", "api", "testing"],
+  "complexity": "low",
+  "risk": "high",
+  "domains": ["backend"],
+  "confidence": 0.8,
+  "workflow": "feature",
+  "requiredAgents": ["backend-dev", "tester", "reviewer"],
+  "requiredVerification": [
+    "the auth suite green against the new lifetime",
+    "no handler infers a session's age from a window of its own",
+    "reviewer and the human gate both run, because high risk forces them whatever the diff size"
+  ],
+  "requiresClarification": false,
+  "clarificationReason": null
+}
+```
+
+Why complexity is low: one constant, one service, an established pattern, and a verification the
+suite already knows how to run. Why risk is high: the value governs token lifetime, so the
+authentication floor applies however small the change is. That is what keeping `complexity` and
+`risk` separate buys. Low complexity buys nothing here, so the planner, the plan review, the named
+validator, the independent review, and the human gate all run over a one-line diff. `domains` is
+`backend` because the implementation worker is the backend lane, while `gateway` stays in `scope`
+alone, naming the service rather than a capability.

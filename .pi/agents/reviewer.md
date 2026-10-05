@@ -3,7 +3,7 @@ name: reviewer
 description: Reviews code changes for correctness, architecture consistency, security, testing, and project conventions. The only lane that emits a verdict — VERDICT: PASS or VERDICT: FAIL. Findings only, does not modify code.
 systemPromptMode: replace
 inheritProjectContext: true
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, code-review, principles, react-doctor
 tools: read, grep, find, ls, bash, watchdog_diff, contact_supervisor
 defaultContext: fork

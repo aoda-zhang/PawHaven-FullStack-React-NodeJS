@@ -211,6 +211,7 @@ function scanAgents(dir) {
       const skillsMatch = fm.match(/^skills:\s*(.+)/m);
       const allowedMatch = fm.match(/^allowedAgents:\s*(.+)/m);
       const skillPathMatch = fm.match(/^skillPath:\s*(.+)/m);
+      const inheritSkillsMatch = fm.match(/^inheritSkills:\s*(.+)/m);
       const splitList = (value) =>
         value
           ?.split(/\s*,\s*/)
@@ -223,6 +224,7 @@ function scanAgents(dir) {
         skills: splitList(skillsMatch?.[1]),
         allowedAgents: splitList(allowedMatch?.[1]),
         skillPath: skillPathMatch?.[1]?.trim(),
+        inheritSkills: inheritSkillsMatch?.[1]?.trim(),
       });
     }
   }
@@ -408,6 +410,18 @@ for (const skill of projectSkills.skills) {
   if (grantedSkills.has(skill.name) || CATALOG_ONLY_SKILLS.includes(skill.name))
     continue;
   failures.push(`project skill granted by no agent: ${skill.name}`);
+}
+
+// `inheritSkills: false` strips Pi's whole discovered skills catalog, and pi selects what
+// remains purely from `skills:`. An agent that declares it while granting nothing therefore
+// runs with zero skills — no diagnostic, and nothing in the body to say so, since prose
+// describing a rule is not a grant. Pair the two.
+for (const agent of discoveredAgents) {
+  if (agent.inheritSkills === 'false' && !(agent.skills?.length > 0)) {
+    failures.push(
+      `agent ${agent.name}: inheritSkills: false with no skills: grant — it would run with no skills at all`,
+    );
+  }
 }
 
 // Deduplicate agent names

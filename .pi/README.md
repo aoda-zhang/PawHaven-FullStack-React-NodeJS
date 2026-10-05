@@ -75,16 +75,56 @@ session, and the two sessions disagreed.
 | `oracle`           | Reads a proposed plan and answers one question: is it fit to implement? Read-only.                                   | The planner reading its own plan is not a review. Conditional: it runs when a plan crosses a boundary or carries an expensive trade-off.                                                                                                         |
 | `frontend-dev`     | Writes React/TypeScript, self-tests with React Doctor and the targeted checks.                                       | It is the context that holds the change, separate from the one that judges it. It carries the nine private React skills, so a component author gets the methodology loaded and a reviewer does not pay for it.                                   |
 | `backend-dev`      | Writes NestJS service code, self-tests with typecheck and the targeted tests.                                        | Same reason as `frontend-dev`, on the other side of the stack. Its constraints differ from the frontend's, so it needs its own system prompt rather than a branch in one.                                                                        |
-| `tester`           | Verifies the implementation against the acceptance criteria, criterion by criterion.                                 | Verification by the author of the change is not verification. It emits evidence, not a verdict, because the verdict has exactly one producer.                                                                                                    |
+| `tester`           | Verifies the implementation against the acceptance criteria, criterion by criterion. Holds no `edit` or `write`.     | Verification by the author of the change is not verification. It emits evidence, not a verdict, because the verdict has exactly one producer. A missing check is a report, not a test.                                                           |
 | `reviewer`         | Reviews the diff across the code-review dimensions. The **only** lane that emits `VERDICT: PASS` or `VERDICT: FAIL`. | Self-review cannot catch a self-consistent mistake. It is the single place a verdict is produced, so there is one standard for what counts as one. It has no edit tool, so findings go back to the developer lane.                               |
 | `browser-verifier` | Drives the running portal in a real browser and reports what the screen did.                                         | A rendered result and a passing unit test are different facts, and only one of them can be observed. It holds no edit tool, so it cannot "fix while verifying" and lose independence. Conditional: it runs on user-visible surfaces.             |
 
 Every lane holds only the skills it needs via `skills:` frontmatter, plus `skillPath` for
-agent-private skills. No agent inherits all 18 project skills, because context is the cost being
-managed.
+agent-private skills, and all nine set `inheritSkills: false`. No agent inherits all 18 project
+skills, because context is the cost being managed. The consequences of that are in
+[Roles, domains, and the knowledge boundary](#roles-domains-and-the-knowledge-boundary).
 
 `orchestrator` is the only agent holding `subagent`. `maxSubagentDepth: 1` keeps every lane it
 dispatches a leaf, so recursion cannot grow.
+
+## Roles, domains, and the knowledge boundary
+
+**Implementation is a role, not an agent name.** A role says what a worker does in the workflow: it
+implements a scoped unit inside its own domain and self-tests before it reports. A domain says which
+technical capability it operates in. `frontend-dev` is role `implementation`, domain `frontend`.
+`backend-dev` is role `implementation`, domain `backend`.
+
+**A new domain needs a new agent, not a new workflow.** A `devops-dev` would be role
+`implementation`, domain `devops`, and the gate sequence, the routing rules, and the verification
+chain are already domain-neutral, so nothing in the process moves. The one place the word registers
+is the `domains` field of the classification artifact, whose value list
+[`task-classification`](./skills/task-classification/SKILL.md#domains) is deliberately open. If that
+claim turned out to be false, the process would change in exactly the places
+[`orchestrator.md`](./skills/project-rules/references/orchestrator.md#the-gate-sequence) already
+names, and the only genuinely new artifact would be a grant set: which skills the lane holds, which
+tools it may use, and where its findings route. The harness does not ship `devops-dev` today,
+because a model that accommodates future domains does not have to contain them.
+
+**Multi-domain work is composition, not a new role.** The `frontend + backend` shape is
+`orchestrator` → planner (`architect`) → the shared contract → `frontend-dev` and `backend-dev`, in
+parallel only where the dependencies permit → `tester` → `browser-verifier` on a user-facing surface
+→ `reviewer` → combined-tree verification by the orchestrator. The shared contract is settled before
+either worker starts, and where it has a code-level expression it is
+[`packages/shared/types`](../packages/shared/types), the schemas both sides import instead of
+re-declaring. No `fullstack-dev` exists and none should be created. A role with nothing of its own to
+check is not a role: it would hold no contract either domain worker cannot hold, and the only work it
+performed would be two workers' work plus a join the orchestrator already does.
+
+**The knowledge boundary is the grant, not the label.** All nine agents set `inheritSkills: false`
+and declare their own `skills:`, so a worker receives exactly its grants and nothing else. A future
+domain worker does not inherit the whole catalog by arriving. The process that enforces it is in
+[`orchestrator.md`](./skills/project-rules/references/orchestrator.md), not restated here.
+
+**`docs/` is the canonical home for PawHaven-specific project knowledge.** `.pi/skills/` holds
+reusable technical capability, plus the operational index in
+[the `frontend` skill](./skills/frontend/SKILL.md#what-this-file-is), which is where an agent reads
+that the portal's files live and what they are called. No second project-knowledge hierarchy was
+created under `.pi/`, because a second one is a second place to look and a second copy to drift.
 
 ## What was removed and why
 
@@ -151,8 +191,9 @@ parent is only found through its explicit entry. Dropping one silently drops a s
 
 ## The gate sequence
 
-Nine stages from classification to the human's final review, with three of them conditional on
-scope and risk. It is defined once, in
+Nine stages from classification to the human's final review, three of them conditional on scope and
+risk. A `browser-verifier` pass is conditional too, but it is not a numbered stage, so it is not part
+of the count. The sequence, the conditions, and that count are defined once, in
 [`orchestrator.md`](./skills/project-rules/references/orchestrator.md#the-gate-sequence), along with
 the [evidence contract](./skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires)
 that says what a `PASS` is and

@@ -112,11 +112,11 @@ Operational docs for running the thing locally. Not design material — this is 
 
 The agent control layer lives in `.pi/`, not here.
 
-| Path                                                              | Covers                                         |
-| ----------------------------------------------------------------- | ---------------------------------------------- |
-| [.pi/README.md](../.pi/README.md)                                 | Index of skills, prompts, and the 10 subagents |
-| [.pi/prompts/](../.pi/prompts)                                    | Slash-command workflows                        |
-| [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | Engineering standards, enforced as a skill     |
+| Path                                                              | Covers                                        |
+| ----------------------------------------------------------------- | --------------------------------------------- |
+| [.pi/README.md](../.pi/README.md)                                 | Index of skills, prompts, and the 9 subagents |
+| [.pi/prompts/](../.pi/prompts)                                    | Slash-command workflows                       |
+| [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | Engineering standards, enforced as a skill    |
 
 `pnpm pi-check` validates the harness. The retired `.opencode/` and `.codebuddy/` layers are gone;
 links into them are dead.

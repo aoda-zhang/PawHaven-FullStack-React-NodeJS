@@ -12,7 +12,7 @@ description: >
   login auth cookie session 登录 鉴权 会话, frontend backend integration 前后端联调.
 systemPromptMode: replace
 inheritProjectContext: true
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, testing-standards, principles
 tools: read, grep, find, ls, bash
 defaultContext: fresh

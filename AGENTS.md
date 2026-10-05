@@ -130,7 +130,7 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
   slash in it silently breaks invocation. `project-rules` (10 constraint files), `frontend` (the shared portal facts a writer and a
   reviewer must agree on), `principles`
   (6 rules that need citing by name), and `task-classification` (routes a request to a
-  workflow) are the three to load before non-trivial work. What a skill may assert — this repo's
+  workflow and names the `domains` it needs) are the three to load before non-trivial work. What a skill may assert — this repo's
   patterns now, general best practice only once a real change shows the gap — is
   [`project-rules`](.pi/skills/project-rules/references/skills.md).
 - `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
@@ -142,12 +142,18 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
   out of the source is discipline rather than a guarantee), `scout` (fast read-only recon),
   `architect` (read-only plan author), `oracle` (independent read-only plan review), `frontend-dev`
   (the React/TypeScript writer and its self-test), `backend-dev` (the NestJS writer and its self-test),
-  `tester` (acceptance verification, independent of the developer), `reviewer` (the only lane that
+  `tester` (acceptance verification, read-only toward source: a criterion with no executable check
+  comes back as a report naming the missing test, and the writing lane authors it), `reviewer` (the only lane that
   emits `VERDICT: PASS|FAIL`, read-only toward source), `browser-verifier` (drives the running
   portal in a real browser and edits no source). `frontend-dev` lives under
   `.pi/agents/frontend-dev/` with its private skills. `orchestrator` is the entry point for a task
   needing more than one lane; its `defaultContext: fresh` is what lets a task start from a clean
-  context and still dispatch the project's own lanes.
+  context and still dispatch the project's own lanes. Every agent sets `inheritSkills: false` and
+  declares its own `skills:`, so a lane receives exactly its grants.
+  **Implementation is a role, not an agent name**, and `frontend-dev` / `backend-dev` are its first
+  two domain workers: role `implementation`, domains `frontend` and `backend`. A new domain such as
+  `devops` adds an agent and a grant set, not a new workflow — see
+  [.pi/README.md](.pi/README.md#roles-domains-and-the-knowledge-boundary).
 - `.pi/handoffs/` — structured handoff artifacts for work that spans sessions or lanes, so a
   fresh context reads one instead of re-deriving.
 - `.pi/settings.json` — points pi at the directories above. **The 9 `code-review/<doctor>`
@@ -275,12 +281,22 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
   `PASS | FAIL | NOT RUN`, and anything unrun carries the reason it was not run. A failed check or a
   `FAIL` review routes back to the **developer** lane, which fixes and re-runs its own self-test,
   in a loop capped at 3 cycles. It does not route back to `reviewer`, which does not edit the diff.
+  A finding that says the plan is wrong returns to planning instead, and a combined-tree failure is
+  classified before it is routed, so an environment block is reported rather than sent back to a
+  developer. The full router is in
+  [orchestrator.md](.pi/skills/project-rules/references/orchestrator.md#when-combined-tree-verification-fails).
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. "It compiles" is not a pass. A bug's repro must pass on the same surface that
   failed.
-- Verify the **combined** tree, not just the units. `pnpm lint` already fails from 13 pre-existing
+- Verify the **combined** tree, not just the units, and the orchestrator owns that stage. A developer
+  self-tests its own unit and nothing more. `pnpm lint` already fails from 13 pre-existing
   errors (3 in `gateway`, 10 in `backend-core`) — diff against baseline before calling anything a
   regression.
+- **A worker that cannot build what it was handed stops and signals.** It emits
+  `CONTRACT_CHANGE_REQUIRED` with the current contract, the proposed change, the reason, the
+  affected domains, the affected files, and the risk, rather than quietly redefining a boundary at
+  its own edge. See
+  [the contract change gate](.pi/skills/project-rules/references/orchestrator.md#the-contract-change-gate).
 - **Never hand-edit the harness or `docs/architecture/` as a side effect of a feature task**; those
   changes deserve their own commit. Keep `AGENTS.md` and `docs/architecture/` matching reality in
   a separate change.

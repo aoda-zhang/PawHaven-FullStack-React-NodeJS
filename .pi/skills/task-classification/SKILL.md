@@ -1,10 +1,10 @@
 ---
 name: task-classification
 description: >
-  Classify a request before a workflow is chosen — task type, secondary tasks, scope, complexity,
-  risk, confidence, clarification need — as one JSON artifact the user sees. Semantic intent, not
-  keywords. Routes to the six canonical workflow prompts. Load at routing time, at the start of
-  any non-trivial request, before planning or dispatching.
+  Classify a request before a workflow is chosen — task type, secondary tasks, scope, domains,
+  complexity, risk, confidence, clarification need — as one JSON artifact the user sees. Semantic
+  intent, not keywords. Routes to the six canonical workflow prompts. Load at routing time, at the
+  start of any non-trivial request, before planning or dispatching.
   触发场景 / Trigger: new request task routing workflow selection classify classification triage
   which workflow which process how to start where to start first step entry point, complexity scope
   risk size difficulty estimate 复杂度 难度 范围 风险 任务分类 路由, feature bug fix refactor
@@ -15,7 +15,6 @@ description: >
 # Task Classification
 
 Classify before selecting a workflow. The deliverable is one JSON block, and the user sees it.
-
 **Classify semantic intent, not keywords.** Read what must be true when the task is done, not which
 words the request contains. "Add a test for the adoption form" is not a feature — the behavior
 already exists and nothing user-visible changes; it is `testing` scope inside a `refactor` that
@@ -31,6 +30,7 @@ task type; the outcome is.
   "scope": [],
   "complexity": "low | medium | high",
   "risk": "low | medium | high | critical",
+  "domains": [],
   "confidence": 0.0,
   "workflow": "",
   "requiredAgents": [],
@@ -45,7 +45,8 @@ task type; the outcome is.
   depth, and verification. They do **not** change the workflow.
 - `scope` — from the twelve categories in [Scope](#scope). Only categories you actually touched.
 - `complexity` — orchestration depth, not diff size. See [Complexity](#complexity).
-- `risk` — verification depth. See [Risk](#risk).
+- `risk` — verification depth, and independent of `complexity`. See [Risk](#risk).
+- `domains` — the implementation capabilities the task needs. See [Domains](#domains).
 - `confidence` — 0.0–1.0. Below ~0.6 means the request is ambiguous; set `requiresClarification`.
 - `workflow` — the canonical prompt this routes to. See [Routing](#routing).
 - `requiredAgents` — agents whose involvement the risk and scope justify. Name them from
@@ -85,8 +86,7 @@ weight.
   `architecture-change`, `risk: high`. The reported failure is what the user wants gone.
 
 Never let a secondary task take over the routing. If the architecture change is the bulk of the
-work and the fix is incidental, say so plainly in the reply — the workflow may be
-`architecture-change` after all.
+work, say so plainly in the reply; the workflow may be `architecture-change` after all.
 
 ## Scope
 
@@ -106,14 +106,42 @@ emitting the JSON. An unverified `scope` sends the wrong agent to the wrong tree
 
 Work on `.pi/` is `infrastructure`. It gets no scope category of its own.
 
+## Domains
+
+`domains` answers which implementation capabilities the task needs, which is to say which workers
+must run:
+
+```json
+"domains": ["frontend", "backend", "database"]
+```
+
+`frontend` and `backend` are the two that dispatch today, and `database` joins them when the change
+is schema or persistence work. The list is deliberately open: `devops`, `mobile`, `data`, `security`
+and others may be added later without changing anything else in the harness.
+
+`scope` keeps its values unchanged. It says where in the repository the change lands, and `gateway`,
+`core-service`, `document-service`, and `cross-system` name services and boundaries in this repo
+rather than capabilities, so they have no home in `domains`.
+
+**A value may appear in both lists, and that is not duplication.** They answer different questions,
+and different parts of the workflow read them. `scope` says where, `domains` says which workers.
+`database` stays in `scope` and also appears in `domains` for exactly that reason.
+
 ## Complexity
 
 Complexity is **orchestration depth** — how much delegation and planning the task justifies. Line
 count is not complexity; a five-file change inside one service is not a high-complexity task, and a
 two-file change to an auth contract is.
 
+Complexity and risk are **separate and independent**. Complexity measures how much the task is to
+orchestrate, and risk measures how badly a wrong answer is paid for. Low complexity never buys a
+lighter path when risk is high: a two-file change to authentication behavior is technically small and
+operationally high-risk, so it takes the strong path in full.
+
 - **low** — localized, one layer, established pattern, low ambiguity, straightforward verification.
-  Do the work in the main session. Dispatching here costs more than it saves.
+  Bind it on complexity **and** risk together, because the fast path is `low` and `low` only. Do the
+  work in the main session when both are low. Dispatching on a small diff with a high risk costs more
+  than it saves.
 - **medium** — multiple files or layers, non-trivial state or data flow, several tests, moderate
   uncertainty. Dispatch per workstream, join the results yourself.
 - **high** — multiple services, architecture boundaries, database changes, security-sensitive flows,
@@ -153,6 +181,40 @@ running it is not. `critical` is never cleared by an agent's own confidence.
 
 `design-decision`, `parallel-execution`, and `handoff` are not task types. They are stages inside
 the workflows above; reach them from the routed workflow, not instead of it.
+
+### Routing the lanes
+
+`taskType` picks the workflow. The lane sequence comes from `complexity`, `risk`, and `domains` read
+together: `domains` decides which workers appear, and the other two decide how much surrounds them.
+
+**`low` complexity, `low` risk, `domains: [frontend]`.** `orchestrator` → `frontend-dev` → `tester` →
+`reviewer` → the human. No planner and no plan review, because the work sits in one layer with a
+straight verification. The developer self-test still runs, since a lane that has not checked its own
+work has no evidence to hand on.
+
+**`medium` complexity, `medium` risk, `domains: [frontend, backend]`.** `orchestrator` → `architect`
+as the planner → **the shared contract** → `frontend-dev` and `backend-dev`, in parallel only where
+the dependencies permit → `tester` → `browser-verifier` on a user-facing surface → `reviewer` →
+combined-tree verification. `oracle` plan review is conditional; the human plan approval is not,
+because a two-domain feature is Standard work at minimum. A full-stack task is **composed** from two
+domains, and no `fullstack-dev` worker exists or should be created for it. Composition is what the
+orchestrator already does, and a role for it would be a role with nothing of its own to check.
+
+**`low` complexity, `high` risk, `domains: [backend]`.** The strong path in full: planner, plan
+review, a named validator per unit, independent review, and the human gate, because high risk forces
+every one of them however small the diff is. This is the shape the routing has to get right.
+
+### The shared contract
+
+When `domains` interact, the shared contract is settled before the independent implementation starts,
+so neither worker is guessing at the boundary the other is about to land.
+
+A contract is a durable handoff artifact that describes a boundary. It is not an agent, not a skill,
+and not a subsystem. At the code level that boundary is
+[`packages/shared/types`](../../../packages/shared/types), the types and Zod schemas both sides
+import instead of re-declaring. When a contract turns out to be insufficient mid-flight, the worker's
+next move is in
+[the contract change gate](../project-rules/references/orchestrator.md#the-contract-change-gate).
 
 ## Output rules
 

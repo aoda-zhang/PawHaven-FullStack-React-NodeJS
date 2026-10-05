@@ -7,7 +7,7 @@ description: >
   mistake.
 systemPromptMode: replace
 inheritProjectContext: true
-inheritSkills: true
+inheritSkills: false
 skills: project-rules, principles, task-classification
 tools: subagent, read, grep, find, ls, bash
 defaultContext: fresh
