@@ -23,7 +23,7 @@ Format: `<type>(<scope>): <description>`
 | `test`     | Adding or updating tests                            |
 | `style`    | Formatting, whitespace (not CSS styling)            |
 
-Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update architect agent rules`
+Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update planner agent rules`
 
 ## 3. Pre-Commit Checks
 

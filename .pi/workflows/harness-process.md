@@ -40,8 +40,8 @@ Nine stages, in this order.
 
 | #   | Stage                      | Lane                          | When it runs                                 |
 | --- | -------------------------- | ----------------------------- | -------------------------------------------- |
-| 1   | Plan                       | `scout`, `architect`          | Always beyond Trivial                        |
-| 2   | Plan review                | `oracle`                      | Conditional, skipped for Trivial scope       |
+| 1   | Plan                       | `explorer`, `planner`         | Always beyond Trivial                        |
+| 2   | Plan review                | `critic`                      | Conditional, skipped for Trivial scope       |
 | 3   | Human plan approval        | the human                     | Standard and Architectural scope             |
 | 4   | Implementation             | `frontend-dev`, `backend-dev` | Always beyond Trivial                        |
 | 5   | Developer self-test        | the writing lane              | Every implementation lane, before it reports |
@@ -63,14 +63,14 @@ localized to one layer with a straight verification, so an independent acceptanc
 it returns; a task that classified higher gets it whatever its diff looks like. A `browser-verifier`
 pass runs when the change touches a surface a user touches and is skipped for a backend-only change.
 
-**Stage 2 answers an evidence question, not a design one.** `oracle` is the evidence advisor about the
+**Stage 2 answers an evidence question, not a design one.** `critic` is the evidence advisor about the
 existing system. The question it answers is **what does the existing system actually establish about
 this plan's premises** — does the abstraction already exist, where the behaviour lives today, which
 packages depend on the interface, whether this contract change reaches another domain. It cites a
 file, a line, or a command for every claim, and reports what it cannot ground as unverified with the
 check that would settle it. It **refuses to design**: asked how to build something, it answers with
 what the code establishes and hands the design question back to stage 1. It is therefore not a second
-`architect`, and dispatching it as one spends the lane on a design opinion instead of on evidence.
+`planner`, and dispatching it as one spends the lane on a design opinion instead of on evidence.
 `VERDICT: PASS` means no premise is contradicted by the evidence, not that the design is approved.
 
 The rest are unconditional. Stage 5 runs on every implementation, because a lane that has not run its
@@ -97,10 +97,10 @@ decide how much surrounds them.
 straight verification. The developer self-test still runs, since a lane that has not checked its own
 work has no evidence to hand on.
 
-**`medium` complexity, `medium` risk, `domains: [frontend, backend]`.** `orchestrator` → `architect` as
-the planner → **the shared contract** → `frontend-dev` and `backend-dev`, in parallel only where the
+**`medium` complexity, `medium` risk, `domains: [frontend, backend]`.** `orchestrator` → `planner` →
+**the shared contract** → `frontend-dev` and `backend-dev`, in parallel only where the
 dependencies permit → `tester` → `browser-verifier` on a user-facing surface → `reviewer` →
-combined-tree verification. `oracle` plan review is conditional; the human plan approval is not,
+combined-tree verification. `critic` plan review is conditional; the human plan approval is not,
 because a two-domain feature is Standard work at minimum. A full-stack task is **composed** from two
 domains, and no `fullstack-dev` worker exists or should be created for it. Composition is what the
 orchestrator already does, and a role for it would be a role with nothing of its own to check.
@@ -199,8 +199,8 @@ instead. This is the route the signal takes once it has been emitted.
 
 1. The orchestrator reads the signal and decides whether the proposed change is a design question, an
    evidence question, or both.
-2. **Design.** `architect` for a design question.
-3. **Evidence.** `oracle` establishes what the existing system actually supports in the proposal,
+2. **Design.** `planner` for a design question.
+3. **Evidence.** `critic` establishes what the existing system actually supports in the proposal,
    before it is adopted. It is asked for the evidence the proposal assumes, not for a second design,
    and it answers that question even when the proposal is sound.
 4. **Human gate.** A material change triggers it, the same way any other scope decision does.

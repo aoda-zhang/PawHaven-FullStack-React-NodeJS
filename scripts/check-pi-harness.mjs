@@ -71,13 +71,13 @@ const EXPECTED_PRIVATE_SKILLS = 0;
 const EXPECTED_PROMPTS = 10;
 const EXPECTED_AGENTS = [
   'orchestrator',
-  'architect',
-  'scout',
+  'planner',
+  'explorer',
   'frontend-dev',
   'backend-dev',
   'tester',
   'reviewer',
-  'oracle',
+  'critic',
   'browser-verifier',
 ];
 

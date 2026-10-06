@@ -46,10 +46,10 @@ None of that is visible in a diff. These checks make it visible.
 ├── workflows/
 │   └── <name>.md                # slash command; flat, because the loader does not recurse
 ├── agents/
-│   ├── orchestrator/orchestrator.md            # coordination
-│   ├── planning/<agent>/<agent>.md             # scout, architect, oracle
-│   ├── implementation/<agent>/<agent>.md       # frontend-dev, backend-dev
-│   └── verification/<agent>/<agent>.md         # tester, reviewer, browser-verifier
+│   ├── orchestrator/orchestrator.agent.md       # coordination
+│   ├── planning/<agent>/<agent>.agent.md        # explorer, planner, critic
+│   ├── implementation/<agent>/<agent>.agent.md  # frontend-dev, backend-dev
+│   └── verification/<agent>/<agent>.agent.md    # tester, reviewer, browser-verifier
 └── npm/                         # pi-subagents + deps (gitignored)
 ```
 

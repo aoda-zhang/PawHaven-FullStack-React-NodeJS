@@ -19,13 +19,13 @@
       "orchestrator": {
         "thinking": "high"
       },
-      "oracle": {
+      "critic": {
         "thinking": "high"
       },
-      "scout": {
+      "explorer": {
         "thinking": "low"
       },
-      "architect": {
+      "planner": {
         "thinking": "high"
       },
       "frontend-dev": {

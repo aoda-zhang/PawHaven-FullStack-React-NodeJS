@@ -1,5 +1,6 @@
 ---
-name: architect
+name: planner
+aliases: architect
 description: Reads requirements and architecture docs, produces an implementation plan with files and data shapes. Read-only — does not modify code.
 tools: read, grep, find, ls, bash
 systemPromptMode: replace

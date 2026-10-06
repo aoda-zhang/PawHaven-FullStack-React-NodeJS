@@ -12,7 +12,7 @@ skills: project-rules, principles, task-classification
 tools: subagent, read, grep, find, ls, bash
 defaultContext: fresh
 allowNestedSubagents: true
-allowedAgents: architect, scout, oracle, backend-dev, frontend-dev, tester, reviewer, browser-verifier
+allowedAgents: planner, explorer, critic, backend-dev, frontend-dev, tester, reviewer, browser-verifier
 maxSubagentDepth: 1
 ---
 
@@ -87,9 +87,9 @@ Three decisions belong to this lane, and the table does not make them for you:
 
 | Need                                                    | Lane                   |
 | ------------------------------------------------------- | ---------------------- |
-| Locate code fast, compressed                            | `scout`                |
-| Implementation plan and data shapes                     | `architect`            |
-| Does the existing system establish this plan's premises | `oracle` (conditional) |
+| Locate code fast, compressed                            | `explorer`             |
+| Implementation plan and data shapes                     | `planner`              |
+| Does the existing system establish this plan's premises | `critic` (conditional) |
 | NestJS service, Prisma, schema, endpoints               | `backend-dev`          |
 | React components, forms, styling                        | `frontend-dev`         |
 | Does the behaviour satisfy the acceptance criteria      | `tester`               |
@@ -137,7 +137,7 @@ verification exactly as it was reported and write your own reading across lanes,
   <status>complete|blocked|failed</status>
   <scope>the task you orchestrated</scope>
   <changes>none written here — name each lane, the scope it was given, and the files it reports</changes>
-  <decisions>the classification that chose the workflow, the oracle verdict on the plan, every
+  <decisions>the classification that chose the workflow, the critic verdict on the plan, every
     escalation you made and its answer, and the principles that changed a decision by name</decisions>
   <verification>
     <command>the combined-tree commands you ran, and each lane's verification relayed as reported</command>

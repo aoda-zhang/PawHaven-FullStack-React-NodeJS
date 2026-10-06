@@ -22,8 +22,8 @@ Both are linked rather than restated here, because a rule stated twice drifts fr
 │   └── code-review/       # meta-skill + 9 doctors nested underneath
 ├── workflows/             # 10 process definitions, flat (/bug-fix, /feature-development, /harness-process, …)
 ├── agents/                # 9 subagent definitions, grouped by role
-│   ├── orchestrator/      # orchestrator.md — plans, dispatches, verifies, hands off
-│   ├── planning/          # scout, architect, oracle — read-only
+│   ├── orchestrator/      # orchestrator.agent.md — plans, dispatches, verifies, hands off
+│   ├── planning/          # explorer, planner, critic — read-only
 │   ├── implementation/    # frontend-dev, backend-dev — the two writers
 │   └── verification/      # tester, reviewer, browser-verifier — read-only
 ├── handoffs/              # structured handoff artifacts for long-running work
@@ -35,15 +35,15 @@ with a `**Role:**` / `**Domain:**` line. `pnpm pi-check` fails when either line 
 pair is checked rather than conventional. `.pi/skills/` is the only skill registry, and an agent
 receives a skill by granting it by name. The full role/domain model
 lives in [Roles, domains, and the knowledge boundary](#roles-domains-and-the-knowledge-boundary),
-and [`orchestrator/orchestrator.md`](./agents/orchestrator/orchestrator.md) owns the statement of
-it.
+and [`orchestrator/orchestrator.agent.md`](./agents/orchestrator/orchestrator.agent.md) owns the
+statement of it.
 
 ## Using it
 
 1. `/trust` once. Project config only loads after trust.
 2. `/reload` after changing anything under `.pi/`.
 3. Commands appear in the `/` menu: `/bug-fix`, `/feature-development`, `/refactoring`, and the rest.
-4. Subagents are available via the `subagent` tool: `Use scout to scan the auth flow.`
+4. Subagents are available via the `subagent` tool: `Use explorer to scan the auth flow.`
 5. `/subagents-doctor` checks pi-subagents setup.
 6. `pnpm pi-check` and `pnpm check:links` validate the harness. Run both before committing anything
    in `.pi/`.
@@ -73,9 +73,9 @@ names that do not exist.
 | Agent              | What it does                                                                                                         | Why it is an agent and not a skill or a prompt step                                                                                                                                                                                              |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `orchestrator`     | Classifies, plans, dispatches, verifies the joined tree, hands off. Writes no code.                                  | It is the entry point for a task that needs more than one lane. It needs a context outside the caller's session that still holds `subagent` and the project's skill grants. `defaultContext: fresh` is what makes a clean-context task possible. |
-| `scout`            | Fast read-only recon. Returns compressed, checkable findings.                                                        | It keeps a codebase sweep out of the planner's context. A skill cannot compress a session; a lane can return findings instead. `thinking: low` because speed is the product.                                                                     |
-| `architect`        | Writes the implementation plan: files, data shapes, boundaries. Read-only.                                           | The plan must be written by a context that has not already decided how to implement. A plan written by the lane that will execute it encodes that lane's assumptions as given.                                                                   |
-| `oracle`           | Reads a proposed plan and answers one question: is it fit to implement? Read-only.                                   | The planner reading its own plan is not a review. Conditional: it runs when a plan crosses a boundary or carries an expensive trade-off.                                                                                                         |
+| `explorer`         | Fast read-only recon. Returns compressed, checkable findings.                                                        | It keeps a codebase sweep out of the planner's context. A skill cannot compress a session; a lane can return findings instead. `thinking: low` because speed is the product.                                                                     |
+| `planner`          | Writes the implementation plan: files, data shapes, boundaries. Read-only.                                           | The plan must be written by a context that has not already decided how to implement. A plan written by the lane that will execute it encodes that lane's assumptions as given.                                                                   |
+| `critic`           | Reads a proposed plan and answers one question: is it fit to implement? Read-only.                                   | The planner reading its own plan is not a review. Conditional: it runs when a plan crosses a boundary or carries an expensive trade-off.                                                                                                         |
 | `frontend-dev`     | Writes React/TypeScript, self-tests with React Doctor and the targeted checks.                                       | It is the context that holds the change, separate from the one that judges it. It grants the nine React skills by name, so a component author gets the methodology loaded and a reviewer does not pay for it.                                    |
 | `backend-dev`      | Writes NestJS service code, self-tests with typecheck and the targeted tests.                                        | Same reason as `frontend-dev`, on the other side of the stack. Its constraints differ from the frontend's, so it needs its own system prompt rather than a branch in one.                                                                        |
 | `tester`           | Verifies the implementation against the acceptance criteria, criterion by criterion. Holds no `edit` or `write`.     | Verification by the author of the change is not verification. It emits evidence, not a verdict, because the verdict has exactly one producer. A missing check is a report, not a test.                                                           |
@@ -109,7 +109,7 @@ tools it may use, and where its findings route. The harness does not ship `devop
 because a model that accommodates future domains does not have to contain them.
 
 **Multi-domain work is composition, not a new role.** The `frontend + backend` shape is
-`orchestrator` → planner (`architect`) → the shared contract → `frontend-dev` and `backend-dev`, in
+`orchestrator` → `planner` → the shared contract → `frontend-dev` and `backend-dev`, in
 parallel only where the dependencies permit → `tester` → `browser-verifier` on a user-facing surface
 → `reviewer` → combined-tree verification by the orchestrator. The shared contract is settled before
 either worker starts, and where it has a code-level expression it is
@@ -145,7 +145,7 @@ both the writer and the reader reach them.
 
 **`dev` is now `frontend-dev`.** With the router gone, a bare `dev` was ambiguous on its own. The
 agent moved from `.pi/agents/frontend/dev/dev.md` to
-`.pi/agents/implementation/frontend-dev/frontend-dev.md`, and the nine React skills that once
+`.pi/agents/implementation/frontend-dev/frontend-dev.agent.md`, and the nine React skills that once
 travelled with it now sit in `.pi/skills/` beside every other skill.
 
 ## Skills
@@ -162,8 +162,8 @@ frontmatter, so there is one copy of every rule and one registry that holds all 
 | code review    | code-review + 9 doctors (`architecture-`, `backend-`, `boundary-`, `i18n-`, `react-`, `style-`, `test-`, `typecheck-`, `typescript-doctor`) | reviewer (all nine, through the `code-review` dispatch table), frontend-dev (`react-doctor` only, for its self-check) |
 | frontend lens  | react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-patterns                                           | frontend-dev (typescript also granted by backend-dev)                                                                 |
 | frontend facts | frontend                                                                                                                                    | frontend-dev                                                                                                          |
-| architecture   | architecture-design                                                                                                                         | architect, oracle                                                                                                     |
-| standards      | writing-standards                                                                                                                           | architect, frontend-dev, backend-dev, tester                                                                          |
+| architecture   | architecture-design                                                                                                                         | planner, critic                                                                                                       |
+| standards      | writing-standards                                                                                                                           | planner, frontend-dev, backend-dev, tester                                                                            |
 
 The frontend **lens** skills hold how to write React here, and the **facts** that lens checks
 against live once in the shared `frontend` skill, so a rule and the fact it checks cannot drift
@@ -232,9 +232,9 @@ is inherited from the parent session.
 "subagents": {
   "agentOverrides": {
     "orchestrator":     { "thinking": "high" },
-    "oracle":           { "thinking": "high" },
-    "scout":            { "thinking": "low" },
-    "architect":        { "thinking": "high" },
+    "critic":           { "thinking": "high" },
+    "explorer":         { "thinking": "low" },
+    "planner":          { "thinking": "high" },
     "frontend-dev":     { "thinking": "medium" },
     "backend-dev":      { "thinking": "medium" },
     "tester":           { "thinking": "medium" },

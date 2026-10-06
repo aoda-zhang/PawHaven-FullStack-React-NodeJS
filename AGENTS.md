@@ -138,14 +138,14 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
   single copy of the gate sequence and is the file the rule files link to rather than restate it.
 - `.pi/agents/` — 9 subagent definitions run by pi-subagents (installed via `packages` in
   `.pi/settings.json`), grouped by the role each one plays:
-  `orchestrator/orchestrator.md`,
-  `planning/{scout,architect,oracle}/`,
+  `orchestrator/orchestrator.agent.md`,
+  `planning/{explorer,planner,critic}/`,
   `implementation/{frontend-dev,backend-dev}/`, and
   `verification/{tester,browser-verifier,reviewer}/`.
   `orchestrator` plans, dispatches, verifies, and hands off (it holds no dedicated
   `edit`/`write` tool, though it does hold `bash`, which is a write channel, so staying out of the
-  source is discipline rather than a guarantee), `scout` is fast read-only recon, `architect` the
-  read-only plan author, `oracle` the independent read-only plan reviewer, `frontend-dev` the
+  source is discipline rather than a guarantee), `explorer` is fast read-only recon, `planner` the
+  read-only plan author, `critic` the independent read-only plan reviewer, `frontend-dev` the
   React/TypeScript writer and its self-test, `backend-dev` the NestJS writer and its self-test,
   `tester` acceptance verification (read-only toward source: a criterion with no executable check
   comes back as a report naming the missing test, and the writing lane authors it), `reviewer` the
@@ -207,7 +207,7 @@ the verification discipline is unchanged.
 **Every mutating change gets an independent review.** A lane that reviews its own work cannot catch
 a self-consistent mistake. Dispatch `reviewer` as a separate context; a change nobody independent
 has read has not been reviewed. `reviewer` is the only lane that emits a verdict **about code**
-(`oracle` emits one about a plan, which is not the same thing), so it is also the only verdict a
+(`critic` emits one about a plan, which is not the same thing), so it is also the only verdict a
 report can end on.
 
 ### Documentation

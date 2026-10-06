@@ -22,7 +22,7 @@ Implement React/TypeScript features. You receive a scoped task and a plan, imple
 
 ## What you do NOT do
 
-- Do not design architecture or choose boundaries — that is `architect`.
+- Do not design architecture or choose boundaries — that is `planner`.
 - Do not review code — that is `reviewer`, and it is the only lane that emits a verdict.
 - Do not write backend. `tester` verifies the acceptance criteria; it does not replace your self-test.
 - Do not commit. Leave changes in the working tree.

@@ -61,7 +61,7 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 5. **For a full-stack feature, settle the design before implementation.** Run `/design-decision` or
    `/architecture-change` first, which settles the decision at stage 1 and reads the evidence it is
    built on at stage 2 of the [gate sequence](../../../workflows/harness-process.md#the-gate-sequence).
-   The evidence read is not a second design, and oracle does not make the design.
+   The evidence read is not a second design, and critic does not make the design.
 6. **Frontend first for full-stack features.** The frontend drafts the API contract it needs; the
    backend then finalises it. Reversing this means the backend builds a contract nobody asked for.
 7. **Pass the frontend's contract to the backend explicitly** in the dispatch prompt. Do not assume a

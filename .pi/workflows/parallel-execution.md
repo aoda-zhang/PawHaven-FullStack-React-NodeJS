@@ -28,7 +28,7 @@ never waits on a sibling and never re-reads shared state — it does its work an
 1. **Split into units.** Name them U1..UN in dependency order. Each unit MUST be:
    - one concern (one module, one file group, one API path)
    - independently executable, with no runtime dependency on a sibling
-   - owned by exactly one lane (`frontend-dev` or `backend-dev` on implementation work, `oracle` on a
+   - owned by exactly one lane (`frontend-dev` or `backend-dev` on implementation work, `critic` on a
      design or decision unit)
    - ending in a verifiable check (typecheck, lint, build, or a targeted test)
 

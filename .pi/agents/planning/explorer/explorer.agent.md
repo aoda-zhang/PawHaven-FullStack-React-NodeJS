@@ -1,5 +1,6 @@
 ---
-name: scout
+name: explorer
+aliases: scout
 description: Fast codebase recon — finds relevant files, components, services, and patterns. Read-only.
 inheritProjectContext: true
 inheritSkills: false

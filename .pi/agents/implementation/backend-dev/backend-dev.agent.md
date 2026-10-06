@@ -28,7 +28,7 @@ plan, implement it inside the domain's boundaries, and report what changed and h
 
 ## Workflow
 
-1. Read the task and any context from scout
+1. Read the task and any context from explorer
 2. Check existing service structure at `apps/backend/`
 3. Read `docs/architecture/PawHaven-Backend-Architecture.md`
 4. Read `docs/architecture/authentication-architecture.md` if auth is involved
