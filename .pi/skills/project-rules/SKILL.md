@@ -5,7 +5,7 @@ description: >
   Read this before planning or implementing any change that touches architecture, packages, API
   contracts, React components, security, tests, documentation, or commits. A change that violates a
   rule is a blocking finding in review, no matter how well it works otherwise.
-  触发场景 / Trigger: rules constraints hard rules repo facts conventions policy architecture boundary
+  Trigger: rules constraints hard rules repo facts conventions policy architecture boundary
   package dependency direction service map monorepo layout, security auth authorization secrets input
   validation injection exposure, testing coverage test placement test strategy, documentation docs sync
   doc impact, git commit conventional commits branch strategy, react component props styling a11y
@@ -29,7 +29,7 @@ files. Do not load all ten. The full set is ~840 lines and most tasks need two o
 | [security](./references/security.md)                   | auth, secrets, input handling, any backend endpoint                 | Auth & authorization, secrets, input validation, injection, exposure.                |
 | [testing](./references/testing.md)                     | writing or changing tests, or deciding what needs one               | What must be tested, coverage expectations, test placement.                          |
 | [documentation](./references/documentation.md)         | any behavior, contract, or architecture change                      | What must be documented, where, in what order, and how it stays in sync. Doc Impact. |
-| [skills](./references/skills.md)                       | writing or editing any skill, doctor, or agent-private skill        | What a skill may assert, and the bar for adding a best-practice rule.                |
+| [skills](./references/skills.md)                       | writing or editing any skill, doctor, or reference file             | What a skill may assert, and the bar for adding a best-practice rule.                |
 | [git](./references/git.md)                             | staging commits, branching, or anything touching git                | Commit discipline, branch rules, what is never pushed.                               |
 | [orchestrator](./references/orchestrator.md)           | planning, dispatching subagents, or reporting                       | Planning & approval, scope & ownership, verification & reporting.                    |
 | [harness-validator](./references/harness-validator.md) | before committing changes to agent config or docs                   | Broken links, stale references, name consistency, directory existence.               |

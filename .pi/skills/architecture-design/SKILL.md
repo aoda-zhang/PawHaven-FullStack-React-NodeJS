@@ -5,11 +5,11 @@ description: >
   service), how to assess API and database impact against the real service map, how to classify
   risk, and the decision-record format to hand back. Read before designing any change that crosses
   a module, package, service, or API boundary, and before approving someone else's design.
-  触发场景 / Trigger: architecture design technical design system design solution planning decision,
-  架构设计 技术方案评估 决策, module assignment new module extend existing service split bounded
-  context, API design contract endpoint contract change database schema migration impact analysis,
-  risk assessment impact dependency technical debt, cross-module cross-package boundary refactor
-  restructure, design review architecture approval 设计评审 影响评估 风险.
+  Trigger: architecture design technical design system design solution planning decision, module
+  assignment new module extend existing service split bounded context, API design contract endpoint
+  contract change database schema migration impact analysis, risk assessment impact dependency
+  technical debt, cross-module cross-package boundary refactor restructure, design review
+  architecture approval.
 ---
 
 # Architecture Design
@@ -122,54 +122,12 @@ design with no rollback story for a High-risk change is not finished.
 
 ## Hand back
 
-```markdown
-# Architecture Design: {feature}
+The output is a decision record. → [references/decision-record.md](./references/decision-record.md)
+holds the section-by-section template.
 
-## 1. Problem
-
-What this solves, in one paragraph.
-
-## 2. Current architecture
-
-What exists today that is in scope — modules, models, endpoints. Cite real paths.
-
-## 3. Decision
-
-### 3.1 Placement
-
-Which module or service owns it, and why (the Q1/Q2/Q3 answer).
-
-### 3.2 API
-
-| Method | Path | Purpose | Request | Response | Auth policy |
-
-### 3.3 Data
-
-Prisma diff, or "no schema change" with the reason.
-
-### 3.4 Shared types
-
-New or changed Zod schemas in packages/shared, and every consumer.
-
-### 3.5 Alternatives
-
-What else was considered and why it lost. A design with one option considered is not a decision.
-
-## 4. Impact
-
-Frontend · Backend · cross-module, each with the concrete files or contracts touched.
-
-## 5. Risk
-
-Level, what could go wrong, mitigation, rollback.
-
-## 6. Verification
-
-How this will be proven — the command, the surface, the observable result.
-```
-
-Section 3.1 and 3.5 are the ones that carry the decision. Do not pad the rest to make it look
-thorough.
+Two rules govern it. Section **3.1 Placement** and section **3.5 Alternatives** are the ones that
+carry the decision; a design with one option considered is not a decision. Do not pad the rest to make
+it look thorough.
 
 ## Non-negotiables
 
@@ -186,10 +144,9 @@ thorough.
 
 ## Corrections to the old docs
 
-Checked against the code; all false:
+`.codebuddy/agents/architect.md` is gone and three of its claims were false: the repo anatomy omitted
+`packages/backend-core`, the API impact table asked for event contracts on a bus that does not exist,
+and the risk table named a `content` module that is not there. Do not reintroduce them.
 
-- The repo anatomy omitted `packages/backend-core`, which exists and is central to backend work.
-- The API impact table asked for "event contracts (publisher module, event name, payload)". There is
-  no event bus.
-- The risk table's Low example was "adding a standalone content module". There is no `content`
-  module, and adding one is not automatically low-risk.
+→ [references/retired-harness-corrections.md](./references/retired-harness-corrections.md) — the
+claim-by-claim list, and where the corrected fact now lives.

@@ -6,11 +6,11 @@ description: >
   language selection, framing impact for the consumer and the maintainer, and candor over
   sycophancy. Read before writing any human-facing artifact, and whenever a draft reads like
   documentation of a process rather than an account of what happened.
-  触发场景 / Trigger: writing prose writing docs documentation reply response summary handoff report
-  commit message PR description changelog comment, 文案 写作 回复 汇报 总结 文档 提交信息,
-  hard to read run-on sentence jargon abbreviation jargon, hedging vague filler wordy padding,
-  sycophancy agreeing with user pushback honest disagreement candor, 浮夸 含糊 冗长 不诚实 迎合,
-  review writing finding severity statement tone, explanation framing for reader context missing.
+  Trigger: writing prose writing docs documentation reply response summary handoff report commit
+  message PR description changelog comment, hard to read run-on sentence jargon abbreviation
+  jargon, hedging vague filler wordy padding, sycophancy agreeing with user pushback honest
+  disagreement candor, review writing finding severity statement tone, explanation framing for
+  reader context missing.
 ---
 
 # Writing Standards

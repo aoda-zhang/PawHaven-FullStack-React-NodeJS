@@ -1,11 +1,13 @@
 # Worked Examples
 
 One full classification per task type, plus three boundary cases and the two routing shapes the
-skill's routing section keys on. Each is a request in PawHaven's domain, with the reasoning that
-fixes the primary type and the evidence that set scope and domains.
+process file's lane sequences key on
+([harness-process.md](../../../workflows/harness-process.md#lane-shapes)). Each is a request in
+PawHaven's domain, with the reasoning that fixes the primary type and the evidence that set scope and
+domains.
 
 Every example carries `scope` and `domains` together. Read the pair: `scope` says where the change
-lands, `domains` says which workers run.
+lands, `domains` says which implementation capabilities run.
 
 ---
 
@@ -31,13 +33,7 @@ New user-visible behavior: a reporting flow that does not exist today.
   "domains": ["frontend", "backend"],
   "confidence": 0.85,
   "workflow": "feature",
-  "requiredAgents": [
-    "architect",
-    "frontend-dev",
-    "backend-dev",
-    "tester",
-    "browser-verifier"
-  ],
+  "requiredAgents": ["planning", "implementation", "verification"],
   "requiredVerification": [
     "pnpm typecheck green",
     "shared Zod schema imported by both sides — not re-declared",
@@ -51,7 +47,7 @@ New user-visible behavior: a reporting flow that does not exist today.
 Why `feature` and not `refactor`: nothing exists to preserve. Complexity is medium, not high — one
 service owns reporting, and the contract lives in `packages/shared` without a boundary change.
 `domains` is `frontend` and `backend`, two workers and no schema work, so `database` stays out of it
-while remaining in `scope`. `browser-verifier` is in required verification because a form with a
+while remaining in `scope`. The `verification` role is in required verification because a form with a
 success state is only proven on the real surface.
 
 ---
@@ -70,7 +66,7 @@ Existing behavior is incorrect.
   "domains": ["frontend"],
   "confidence": 0.9,
   "workflow": "bug-fix",
-  "requiredAgents": ["browser-verifier"],
+  "requiredAgents": ["verification"],
   "requiredVerification": [
     "repro on the portal form before the fix",
     "same repro passes after the fix",
@@ -98,7 +94,7 @@ changes it back to what it should have been. `confidence` is high because the re
   "domains": ["frontend"],
   "confidence": 0.8,
   "workflow": "refactor",
-  "requiredAgents": ["tester"],
+  "requiredAgents": ["verification"],
   "requiredVerification": [
     "existing AnimalCard tests pass unchanged before and after the extraction",
     "all AnimalCard call sites migrated; no duplicate badge markup left"
@@ -136,13 +132,7 @@ Changes service responsibilities and cross-service contracts.
   "domains": ["backend"],
   "confidence": 0.9,
   "workflow": "architecture-change",
-  "requiredAgents": [
-    "architect",
-    "oracle",
-    "backend-dev",
-    "reviewer",
-    "tester"
-  ],
+  "requiredAgents": ["planning", "implementation", "verification"],
   "requiredVerification": [
     "callers migrated in one wave; no dual path left",
     "core-service no longer imports the PDF module",
@@ -176,7 +166,7 @@ The user wants to know where the rule lives. No change is requested.
   "domains": ["backend"],
   "confidence": 0.85,
   "workflow": "investigation",
-  "requiredAgents": ["scout"],
+  "requiredAgents": ["planning"],
   "requiredVerification": [
     "each claim cites a file or call path read this session",
     "stated explicitly if the answer is incomplete"
@@ -204,7 +194,7 @@ becomes `bug-fix`.
   "domains": ["backend", "database"],
   "confidence": 0.75,
   "workflow": "performance",
-  "requiredAgents": ["scout", "backend-dev", "tester"],
+  "requiredAgents": ["planning", "implementation", "verification"],
   "requiredVerification": [
     "baseline time recorded before any change",
     "post-fix time recorded on the same surface and compared to the baseline",
@@ -236,7 +226,7 @@ The trap case. The word "add" plus a feature-shaped noun reads as a feature; it 
   "domains": ["frontend"],
   "confidence": 0.8,
   "workflow": "refactor",
-  "requiredAgents": ["tester"],
+  "requiredAgents": ["verification"],
   "requiredVerification": [
     "the new tests fail when the form behavior is broken"
   ],
@@ -292,9 +282,9 @@ validator carry it instead.
   "domains": [],
   "confidence": 0.85,
   "workflow": "refactor",
-  "requiredAgents": ["reviewer"],
+  "requiredAgents": ["verification"],
   "requiredVerification": [
-    "pnpm pi-check exits 0 — 18 project skills, 9 agent-private skills, 9 prompts, 9 agents load with zero diagnostics",
+    "pnpm pi-check exits 0 — 27 project skills, 10 prompts, 9 agents load with zero diagnostics, and no skills/ directory under .pi/agents/",
     "node scripts/check-md-links.mjs . reports 0 broken",
     "npx prettier --check clean on every changed file"
   ],
@@ -308,7 +298,8 @@ future development task, so a wrong one is paid for repeatedly and stays invisib
 `scope` is `infrastructure` because `.pi/` has no scope category of its own. `domains` is empty,
 because no current domain describes the work and the list stays open until one does; adding a
 `harness` value to cover this one example is not worth a term every other classification then has to
-consider. `reviewer` is required because the risk is high and no lane reviews its own change.
+consider. The `verification` role is required because the risk is high and no lane reviews its own
+change.
 `refactor` is the primary type because the harness's behaviour is unchanged and only its structure
 moves, and `documentation` is a secondary because the reference file that stated the old nesting has
 to change in the same pass. `pnpm pi-check` is named in the reply rather than left implicit, which is
@@ -318,8 +309,8 @@ what a harness scope owes.
 
 ## 10. Full-stack feature — "Show a rescue case's progress as a public timeline"
 
-`medium` complexity, `medium` risk, `domains: [frontend, backend]`. The shape the routing section
-routes with two workers.
+`medium` complexity, `medium` risk, `domains: [frontend, backend]`. The shape the lane sequences
+route with two implementation roles.
 
 ```json
 {
@@ -331,14 +322,7 @@ routes with two workers.
   "domains": ["frontend", "backend"],
   "confidence": 0.85,
   "workflow": "feature",
-  "requiredAgents": [
-    "architect",
-    "frontend-dev",
-    "backend-dev",
-    "tester",
-    "browser-verifier",
-    "reviewer"
-  ],
+  "requiredAgents": ["planning", "implementation", "verification"],
   "requiredVerification": [
     "shared Zod schema for the timeline entries, imported by both sides and not re-declared",
     "frontend and backend units run in parallel only after the contract is settled",
@@ -372,7 +356,7 @@ with the contract settled first so neither worker guesses at the boundary.
   "domains": ["backend"],
   "confidence": 0.8,
   "workflow": "feature",
-  "requiredAgents": ["backend-dev", "tester", "reviewer"],
+  "requiredAgents": ["implementation", "verification"],
   "requiredVerification": [
     "the auth suite green against the new lifetime",
     "no handler infers a session's age from a window of its own",

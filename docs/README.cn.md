@@ -106,8 +106,8 @@ Agent 控制层在 `.pi/`，不在这里。
 
 | 路径                                                              | 覆盖内容                          |
 | ----------------------------------------------------------------- | --------------------------------- |
-| [.pi/README.md](../.pi/README.md)                                 | skill、prompt、9 个 subagent 索引 |
-| [.pi/prompts/](../.pi/prompts)                                    | 斜杠命令工作流                    |
+| [.pi/README.md](../.pi/README.md)                                 | skill、工作流、9 个 subagent 索引 |
+| [.pi/workflows/](../.pi/workflows)                                | 斜杠命令工作流                    |
 | [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | 工程规范，以 skill 形式强制       |
 
 harness 由 `pnpm pi-check` 校验。已退役的 `.opencode/` 与 `.codebuddy/` 目录均已删除，指向它们的

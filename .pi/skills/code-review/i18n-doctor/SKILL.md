@@ -156,5 +156,5 @@ regression:
 
 ## Related
 
-- i18n standards: [i18n skill](../../../agents/frontend-dev/skills/i18n/SKILL.md)
+- i18n standards: [i18n skill](../../i18n/SKILL.md)
 - styling: [style-doctor](../style-doctor/SKILL.md)

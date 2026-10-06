@@ -6,8 +6,8 @@ description: >
   contract, and the API-layer file shapes. Read before writing or reviewing any portal code, and
   cite it rather than restating it — a rule stated in two places is a rule that will disagree with
   itself.
-  触发场景 / Trigger: frontend portal react component where find layout structure token hook i18n
-  type api layer where does this live 文件位置 目录结构 约定.
+  Trigger: frontend portal react component where find layout structure token hook i18n type api
+  layer where does this live.
 ---
 
 # Frontend
@@ -36,56 +36,12 @@ authority for the reasoning behind the rule. The operational fact stays here.
 
 ## The map
 
-| What                    | Path                                                       |
-| ----------------------- | ---------------------------------------------------------- |
-| App entry               | `apps/frontend/portal/src/main.tsx`                        |
-| Router paths            | `apps/frontend/portal/src/router/routePaths.ts`            |
-| Root loader + bootstrap | `apps/frontend/portal/src/layout/api/rootLayout.loader.ts` |
-| Store                   | `apps/frontend/portal/src/store/reduxStore.ts`             |
-| Store hooks             | `apps/frontend/portal/src/hooks/reduxHooks.ts`             |
-| Query client            | `apps/frontend/portal/src/providers/QueryProvider.tsx`     |
-| API client              | `apps/frontend/portal/src/utils/apiClient.ts`              |
+→ [references/portal-layout.md](./references/portal-layout.md) — the entry points, the feature
+directory layout, and which `api/` files each feature actually has. Read it before adding a feature
+or hunting for where a path lives.
 
-`apps/frontend/portal` is the **only** frontend app. There is no `apps/frontend/admin`; a skill or
-rule that scans it is scanning nothing.
-
-Why the portal owns its own routing rather than deferring it is
-[§5 Routing architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md#5-routing-architecture).
-The packages it consumes, and the dependency direction between them, are in
-[§3 Package ecosystem](../../../docs/architecture/PawHaven-Frontend-Architecture.md#3-package-ecosystem).
-
-`@/` aliases `apps/frontend/portal/src`. Relative imports inside a feature, `@pawhaven/*` for
-packages.
-
-## Feature layout
-
-```
-features/<name>/
-├── route.tsx              ← lazy route definition, and the loader/guard
-├── <Name>.tsx             ← page component
-├── api/                   ← the four files below, plus api/tests/
-├── components/            ← feature-private components
-├── constants/  utils/  tests/
-```
-
-Features: `auth`, `home`, `report-animal`, `rescue-cases`, `rescue-detail`, `rescue-guide`,
-`animal-follow`, plus `layout/` (root loader + bootstrap, not a feature).
-
-**The api directory is not a fixed four files.** It follows what the feature does:
-
-| Files                                                    | Features                                |
-| -------------------------------------------------------- | --------------------------------------- |
-| `.api` `.queries` `.queryKeys` `.mutations` + `tests`    | `animal-follow`, `auth`                 |
-| `.api` `.queries` `.queryKeys`, no mutations (read-only) | `home`, `rescue-cases`, `rescue-detail` |
-| `.api` `.mutations` `.queryKeys`, no queries (writes)    | `report-animal`                         |
-| `.api` only, plus its test                               | `rescue-guide` (PDF download)           |
-
-Add a file because the feature needs it, not because a template lists it.
-
-The boundary these directories exist to hold is
-[§4 Component architecture and boundaries](../../../docs/architecture/PawHaven-Frontend-Architecture.md#4-component-architecture--boundaries),
-and the automated checks that catch a violation are
-[§9 Module boundary enforcement](../../../docs/architecture/PawHaven-Frontend-Architecture.md#9-module-boundary-enforcement).
+The rules below decide whether a change belongs at one of those paths. The reference is the index
+they point at.
 
 ## State access — the real names
 
@@ -192,8 +148,8 @@ The boundary rules these commands check are stated in
 
 ## Related
 
-- [Writing](../../agents/frontend-dev/skills/frontend-patterns/SKILL.md) — concrete shapes to copy
-- [React standards](../../agents/frontend-dev/skills/react/SKILL.md) · [styling](../../agents/frontend-dev/skills/style/SKILL.md) · [i18n](../../agents/frontend-dev/skills/i18n/SKILL.md) · [TypeScript](../../agents/frontend-dev/skills/typescript/SKILL.md) · [Redux](../../agents/frontend-dev/skills/redux/SKILL.md) · [component placement](../../agents/frontend-dev/skills/component/SKILL.md)
+- [Writing](../frontend-patterns/SKILL.md) — concrete shapes to copy
+- [React standards](../react/SKILL.md) · [styling](../style/SKILL.md) · [i18n](../i18n/SKILL.md) · [TypeScript](../typescript/SKILL.md) · [Redux](../redux/SKILL.md) · [component placement](../component/SKILL.md)
 - [Doctors](../code-review/react-doctor/SKILL.md) · [style](../code-review/style-doctor/SKILL.md) · [i18n](../code-review/i18n-doctor/SKILL.md) · [TypeScript](../code-review/typescript-doctor/SKILL.md)
 - [Frontend architecture](../../../docs/architecture/PawHaven-Frontend-Architecture.md) — the
   canonical home for why each rule above exists. §3 package ecosystem, §4 component boundaries,

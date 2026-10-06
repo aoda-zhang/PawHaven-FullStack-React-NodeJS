@@ -6,12 +6,12 @@ description: >
   Zod schemas from @pawhaven/shared/types with inbound @Body({ schema }) AND outbound .parse(),
   and the gateway-owned auth boundary. Read before writing or changing any NestJS module, controller,
   service, Prisma model, or backend endpoint.
-  触发场景 / Trigger: backend development NestJS module provider dependency injection decorator guard
+  Trigger: backend development NestJS module provider dependency injection decorator guard
   interceptor pipe filter middleware, controller endpoint route RESTful CRUD, service provider
   facade, prisma ORM schema model migration seed relation mongodb ObjectId, DTO validation zod schema
   parse request body response serialization, microservices event emitter inter-service communication,
-  微服务 后端开发 接口开发 数据库设计 事件处理, auth guard public optional internal jwt claims,
-  shared types package import, monorepo workspace package export subpath.
+  auth guard public optional internal jwt claims, shared types package import, monorepo workspace
+  package export subpath.
 ---
 
 # Backend Standards
@@ -162,15 +162,8 @@ grep -rE "from '.*modules/[a-z-]+/" apps/backend/core-service/src/modules/ --inc
 
 ## Corrections to the old docs
 
-`.codebuddy/agents/backend.md` asserted these. All were checked against the code and are **false**:
+`.codebuddy/agents/backend.md` is gone and several of its claims were false — a flat module tree, no
+event bus, MongoDB rather than a SQL Prisma client, no `ZodValidationPipe`. Do not reintroduce them.
 
-- Modules contain `entities/`, `use-cases/`, `events/`, `DTO/`, `index.ts` — none exist anywhere.
-- A `content` module with use-case and facade patterns — no such module exists.
-- `ZodValidationPipe` / `nestjs-zod` — zero references, not in any `package.json`.
-- `EventEmitterModule` / `@OnEvent` event bus — zero references, not installed.
-- Cross-module imports are "enforced by ESLint" — there is no such rule.
-- Prisma lives at `prisma/schema.prisma` and is reached as a `PrismaClient` constructor param —
-  it is MongoDB at `src/prisma/mongodb/`, injected via `@InjectPrisma`.
-
-Do not reintroduce them. If a future change adopts an event bus or use-case folders, this skill and
-the code should be updated together.
+→ [references/retired-harness-corrections.md](./references/retired-harness-corrections.md) — the
+claim-by-claim list, and what each one is contradicted by.

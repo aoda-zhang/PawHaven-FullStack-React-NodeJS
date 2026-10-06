@@ -4,7 +4,7 @@ description: >
   Type discipline checks. Catches `any`, unsafe casts, non-null assertions, duplicated
   domain types that belong in `packages/shared/types`, literal unions duplicating a Zod
   schema, and missing `import type`. Runs on changed files; zero tolerance for the banned list.
-  触发场景 / Trigger: type any cast assertion enum duplicate schema shared types typecheck review.
+  Trigger: type any cast assertion enum duplicate schema shared types typecheck review.
 ---
 
 # typescript-doctor
@@ -112,7 +112,7 @@ paste the candidate list and the reasoning for each one you keep.
 
 ## Related
 
-- [typescript](../../../agents/frontend-dev/skills/typescript/SKILL.md) — the rule source
+- [typescript](../../typescript/SKILL.md) — the rule source
 - [typecheck-doctor](../../code-review/typecheck-doctor/SKILL.md) — mechanical compiler check
 - [boundary-doctor](../../code-review/boundary-doctor/SKILL.md) — package dependency direction
 

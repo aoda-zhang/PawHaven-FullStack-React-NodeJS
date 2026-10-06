@@ -2,7 +2,7 @@
 // Validates the pi harness in .pi/ using pi's own resource loaders, so the check
 // fails for the same reasons pi would fail at startup. Run via `pnpm pi-check`.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve, relative } from 'node:path';
+import { dirname, join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,9 +61,14 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-const EXPECTED_SKILLS = 18;
-const EXPECTED_PRIVATE_SKILLS = 9;
-const EXPECTED_PROMPTS = 9;
+// 27 = 18 top-level skills + the 9 `code-review/<doctor>` skills, which pi-check reaches through
+// the explicit `settings.json` entries rather than by recursing into `code-review/`.
+const EXPECTED_SKILLS = 27;
+// `.pi/skills/` is the only skill registry. Zero is the value that keeps it that way: a `skills/`
+// directory reappearing under `.pi/agents/` is a second registry, and it turns red here rather than
+// becoming a third copy of a rule nobody notices drifting.
+const EXPECTED_PRIVATE_SKILLS = 0;
+const EXPECTED_PROMPTS = 10;
 const EXPECTED_AGENTS = [
   'orchestrator',
   'architect',
@@ -75,6 +80,60 @@ const EXPECTED_AGENTS = [
   'oracle',
   'browser-verifier',
 ];
+
+// --- Architecture boundary: Workflow -> Agent -> Skill -> Reference/Script ---
+//
+// The direction is one-way, and these checks exist because nothing else in the harness makes a
+// violation visible. A skill that routes work to a lane, an agent that dispatches, a second skill
+// registry, or a load-order loop between two skills all load cleanly in pi and change behaviour
+// silently. Every message below is prefixed ARCHITECTURE_VIOLATION: because a broken dependency
+// direction is a different error class from a missing file, and the reader needs to know which
+// one they hit.
+
+// The agent names that count as a lane for the skill -> agent check.
+const LANE_NAMES = EXPECTED_AGENTS;
+
+// A skill may name a lane where it is naming the role it constrains a rule about, or where the name
+// is an example of a value the harness stores rather than a route to take. Each exception is pinned
+// to the file AND to the exact text of the line, so editing that line retires the exception instead
+// of silently widening it. Keep this list short: every entry is a place the dependency direction
+// has to be argued for, and an entry nobody can justify is a rule that was given away.
+const SKILL_TO_AGENT_ALLOWLIST = [
+  {
+    // Example of a grant, not a route. This document describes what the harness registry looks
+    // like, and "which agent grants which doctor" is a fact about the grants, not work handed to
+    // that agent.
+    file: '.pi/skills/project-rules/references/harness-validator.md',
+    line: '`reviewer` reaches all nine through this meta-skill',
+  },
+  {
+    // Same, second grant example on the same paragraph.
+    file: '.pi/skills/project-rules/references/harness-validator.md',
+    line: '`frontend-dev` grants `react-doctor` by name',
+  },
+];
+
+// A cycle that survives the `## Related` filter is a load-order loop: A must be read before B and B
+// before A, so no ordering satisfies both. Nothing listed here today, because every symmetric
+// "see also" reference in the repo now lives inside a `## Related` section and is filtered by rule
+// rather than by an entry — 0 cycles survive the filter. The constant stays because the rule it
+// backs is "anything not justified here fails", and a justified pair is a decision someone has to
+// make in writing; if a real cycle ever appears that is genuinely symmetric, add its SORTED
+// NODE-SET below with the reason it carries no ordering. Entries are matched as a sorted node-set,
+// so a 2-node pair is a different key from the 3-node triangle that contains it.
+//
+// Do NOT extend the filter to the `## Doctor` sections, which look like a second see-also section
+// and are not. Ten of the surviving edges are a skill naming the doctor that reviews it, and the
+// doctor's own back-reference is the half that sits in `## Related`. Filtering both halves would
+// drop `react -> react-doctor -> react` silently, and that pair carries weight: `react-doctor`
+// exists to review `react`, so a future rule written from a skill into its own doctor is a real
+// ordering edge the check must keep hold of. Symmetry of the reference is the thing that decides it,
+// not the name of the section it sits in.
+const ALLOWED_SKILL_CYCLES = [];
+
+// Only the coordinating agent may dispatch. A second dispatcher is a second place the process
+// lives, and the process has exactly one owner.
+const DISPATCH_AGENT = 'orchestrator';
 
 // Escape hatch for a project skill that is reachable some way other than an agent's
 // `skills:` grant. The eight doctors `code-review` dispatches to by path at review time are
@@ -166,15 +225,44 @@ if (projectPrompts.templates.length !== EXPECTED_PROMPTS) {
 // skill name or unparseable frontmatter silently breaks a command even though the
 // resource still loads.
 for (const diagnostic of [...skills.diagnostics, ...prompts.diagnostics]) {
+  // A name collision is asserted on its own below, against the structured `collision` field, so
+  // the reader gets the message that says what the collision costs instead of pi's bare
+  // `name "..." collision`. Skipping it here rather than filtering it out of the array means a
+  // future pi that stops setting that type falls through this loop and still fails the run. The
+  // check below cannot become dormant while that is true.
+  if (diagnostic.type === 'collision') continue;
   const where = diagnostic.path.replace(`${repoRoot}/`, '');
   const message = diagnostic.message.split('\n')[0];
   failures.push(`${where}: ${message}`);
   if (diagnostic.type === 'warning') warnings.push(`${where}: ${message}`);
 }
 
-const duplicateNames = skills.skills
-  .map((s) => s.name)
-  .filter((name, index, all) => all.indexOf(name) !== index);
+// Duplicate skill name. This reads pi's `collision` diagnostic rather than `skills.skills`, which
+// pi has already deduplicated by name: the loser of a collision never reaches that array, so no
+// count taken from it can ever repeat, and an assertion written against it can never fire. The
+// condition is real and it is not a warning. Two resources answer to one invocable name,
+// `/skill:<name>` resolves to whichever pi loaded first, and the other becomes unreachable behind a
+// name that still looks live in the catalog.
+//
+// The match is on `type`, a structured field, not on the message text. `collision` is the literal
+// pi pushes in core/skills.js and nothing else in the resource pipeline emits it, so a
+// false positive is not reachable: a false *negative* is, if pi renames the type, and the loop
+// above is what catches that case.
+const collisions = [...skills.diagnostics, ...prompts.diagnostics].filter(
+  (diagnostic) => diagnostic.type === 'collision',
+);
+for (const diagnostic of collisions) {
+  const { name, winnerPath, loserPath } = diagnostic.collision ?? {};
+  if (!name) {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: duplicate skill name — ${diagnostic.path.replace(`${repoRoot}/`, '')}: ${diagnostic.message.split('\n')[0]}, with no collision details to report which resource lost.`,
+    );
+    continue;
+  }
+  failures.push(
+    `ARCHITECTURE_VIOLATION: duplicate skill name — ${relative(repoRoot, loserPath ?? diagnostic.path)} claims \`${name}\`, already loaded from ${relative(repoRoot, winnerPath ?? 'an earlier skill path')}. Two resources answer to one invocable name, so /skill:${name} resolves to whichever pi loaded first and the other is unreachable.`,
+  );
+}
 
 console.log(
   `skills:  ${projectSkills.skills.length}/${EXPECTED_SKILLS} project, ${skills.skills.length} total`,
@@ -210,6 +298,8 @@ function scanAgents(dir) {
       const descMatch = fm.match(/^description:\s*(.+)/m);
       const skillsMatch = fm.match(/^skills:\s*(.+)/m);
       const allowedMatch = fm.match(/^allowedAgents:\s*(.+)/m);
+      const toolsMatch = fm.match(/^tools:\s*(.+)/m);
+      const nestedMatch = fm.match(/^allowNestedSubagents:\s*(.+)/m);
       const skillPathMatch = fm.match(/^skillPath:\s*(.+)/m);
       const inheritSkillsMatch = fm.match(/^inheritSkills:\s*(.+)/m);
       const splitList = (value) =>
@@ -223,8 +313,11 @@ function scanAgents(dir) {
         description: descMatch?.[1]?.trim(),
         skills: splitList(skillsMatch?.[1]),
         allowedAgents: splitList(allowedMatch?.[1]),
+        tools: splitList(toolsMatch?.[1]),
+        allowNestedSubagents: nestedMatch?.[1]?.trim(),
         skillPath: skillPathMatch?.[1]?.trim(),
         inheritSkills: inheritSkillsMatch?.[1]?.trim(),
+        body: raw.slice(match[0].length),
       });
     }
   }
@@ -243,6 +336,30 @@ for (const expected of EXPECTED_AGENTS) {
 
 // Check agent frontmatter validity
 const knownSkillNames = new Set(projectSkills.skills.map((s) => s.name));
+
+// One definition of a `**Field:** value` declaration line in an agent body, shared by the two
+// readers below so they cannot disagree about what counts as declared. The separator is `[^\S\n]`
+// rather than `\s`, because `\s` spans newlines and a bare `**Domain:**` would borrow the first
+// character of the next line and pass.
+const DECLARED_FIELD_VALUE = {
+  // A role is a word, and `requiredAgents` is matched against the whole token.
+  Role: '[A-Za-z][A-Za-z-]*',
+  // A domain is any non-whitespace token: the lanes that are not domain workers declare `—`, and
+  // that is a declared value, not an absent one. What is forbidden is having no value on the line.
+  Domain: '\\S',
+};
+const declaredField = (field) =>
+  new RegExp(`\\*\\*${field}:\\*\\*[^\\S\\n]+(${DECLARED_FIELD_VALUE[field]})`);
+
+// Roles are declared in agent bodies, so the set is derived rather than listed here: a role an
+// agent stops declaring is a role nothing can claim. `task-classification` emits `requiredAgents`
+// by role, because a skill that named a lane would be routing work, and the orchestrator resolves
+// each role to the lane that fills it.
+const declaredRoles = new Set();
+for (const agent of discoveredAgents) {
+  const role = (agent.body ?? '').match(declaredField('Role'))?.[1];
+  if (role) declaredRoles.add(role);
+}
 
 // Agent-private skills (discovered via skillPath, not in settings.skills)
 // Finds any skills/ directory at any depth under .pi/agents/
@@ -343,7 +460,8 @@ for (const key of Object.keys(settings.subagents?.agentOverrides ?? {})) {
 // agent that no longer exists. `task-classification` fixes that array as its contract and its
 // worked examples are copied verbatim by whoever runs them, so a name left behind by a rename
 // becomes a dispatch that resolves to nothing — and nothing else here reads a skill's body.
-// Only the array is parsed, never prose.
+// Only the array is parsed, never prose. An entry may be an agent name or a role; either way it
+// must resolve to something real.
 function scanSkillMarkdown(dir, found = []) {
   if (!existsSync(dir)) return found;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -359,10 +477,10 @@ for (const file of scanSkillMarkdown(join(repoRoot, '.pi', 'skills'))) {
   for (const match of raw.matchAll(/"requiredAgents"\s*:\s*\[([^\]]*)\]/g)) {
     const bodyStart = match.index + match[0].length - match[1].length;
     for (const entry of match[1].matchAll(/"([^"]+)"/g)) {
-      if (!discoveredNames.includes(entry[1])) {
+      if (!discoveredNames.includes(entry[1]) && !declaredRoles.has(entry[1])) {
         const line = raw.slice(0, bodyStart + entry.index).split('\n').length;
         failures.push(
-          `${relative(repoRoot, file)}:${line}: requiredAgents names unknown agent: ${entry[1]}`,
+          `${relative(repoRoot, file)}:${line}: requiredAgents names unknown agent or role: ${entry[1]}`,
         );
       }
     }
@@ -424,6 +542,22 @@ for (const agent of discoveredAgents) {
   }
 }
 
+// pi has no `role`, `domain`, or `capabilities` frontmatter field, so an agent's body is the
+// only place either can be declared — and an agent's body *is* its system prompt, which is
+// where the pair is actually enforced. Nothing else in this script reads a body, so a lane
+// that silently lost its `Role:`/`Domain:` header would keep loading, keep being dispatched,
+// and keep reading as if the harness were organised by domain when nothing says which role it
+// holds. Declared in the body, it fails here instead.
+for (const agent of discoveredAgents) {
+  for (const field of Object.keys(DECLARED_FIELD_VALUE)) {
+    if (!declaredField(field).test(agent.body ?? '')) {
+      failures.push(
+        `${relative(repoRoot, agent.path)}: missing **${field}:** declaration in the agent body`,
+      );
+    }
+  }
+}
+
 // Deduplicate agent names
 const agentNameCounts = {};
 for (const name of discoveredNames)
@@ -433,9 +567,196 @@ for (const [name, count] of Object.entries(agentNameCounts)) {
     failures.push(`duplicate agent name: ${name} (${count} files)`);
 }
 
+// --- Architecture boundary checks ---
+// Workflow -> Agent -> Skill -> Reference/Script, one way. A violation of that direction loads
+// cleanly in pi and changes behaviour silently, which is why each of these is checked rather than
+// left to review.
+
+const skillsRoot = join(repoRoot, '.pi', 'skills');
+const skillFiles = scanSkillMarkdown(skillsRoot);
+
+// 1. skill -> agent. A skill teaches a capability. It does not route work to a lane, and it does
+// not own the process. Naming a lane is legitimate where a rule binds that role, or where the name
+// is an example of a value the harness stores; both live on the allowlist above with the reason.
+const lanePattern = new RegExp('`(' + LANE_NAMES.join('|') + ')`', 'g');
+for (const file of skillFiles) {
+  const relPath = relative(repoRoot, file);
+  readFileSync(file, 'utf8')
+    .split('\n')
+    .forEach((text, index) => {
+      for (const match of text.matchAll(lanePattern)) {
+        const lane = match[1];
+        const allowed = SKILL_TO_AGENT_ALLOWLIST.some(
+          (entry) => entry.file === relPath && text.includes(entry.line),
+        );
+        if (allowed) continue;
+        failures.push(
+          `ARCHITECTURE_VIOLATION: skill -> agent — ${relPath}:${index + 1}: names the lane \`${lane}\`. Name the role or the stage instead, or link the process file.`,
+        );
+      }
+    });
+}
+
+// 2. agent-local skill registry. The private-skill count above catches a `skills/` directory that
+// holds a loadable SKILL.md; this catches the directory itself, including an empty one or one whose
+// skill is malformed enough that the loader never sees it. Either way `.pi/skills/` is no longer
+// the only registry, and a skill granted from two places drifts.
+function scanAgentSkillDirs(dir = join(repoRoot, '.pi', 'agents'), found = []) {
+  if (!existsSync(dir)) return found;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const full = join(dir, entry.name);
+    if (entry.name === 'skills') found.push(relative(repoRoot, full));
+    else scanAgentSkillDirs(full, found);
+  }
+  return found;
+}
+for (const dir of scanAgentSkillDirs()) {
+  failures.push(
+    `ARCHITECTURE_VIOLATION: agent-local skill registry — ${dir}: .pi/skills/ is the only registry. An agent reaches a skill by granting its name in frontmatter, and a second registry is a second copy of every rule in it.`,
+  );
+}
+
+// 3. non-orchestrator agent holds dispatch. The process has exactly one owner. A second dispatcher
+// is a second place the sequence lives, and the two copies diverge without anything noticing.
+for (const agent of discoveredAgents) {
+  if (agent.name === DISPATCH_AGENT) continue;
+  if (agent.tools?.includes('subagent')) {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: non-orchestrator agent holds dispatch — ${relative(repoRoot, agent.path)}: \`${agent.name}\` holds the \`subagent\` tool. Only \`${DISPATCH_AGENT}\` may dispatch.`,
+    );
+  }
+  if (agent.allowNestedSubagents === 'true') {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: non-orchestrator agent holds dispatch — ${relative(repoRoot, agent.path)}: \`${agent.name}\` sets \`allowNestedSubagents: true\`. Only \`${DISPATCH_AGENT}\` may dispatch.`,
+    );
+  }
+}
+
+// 4. circular skill dependency. The graph is the relative `../<name>/SKILL.md` links between
+// skills, matched at ANY `../` depth and excluding the links inside a `## Related` section. A cycle
+// is a violation when it is a load-order loop: each member would have to be read before the next
+// and no ordering satisfies both. A `## Related` block is a "see also" list — it asserts that two
+// skills are neighbours, symmetrically, and carries no read order — so it is the reasoning the
+// hand-listed pairs below rest on, applied to a section rather than to a pair. What is left is an
+// ordering graph, and a cycle in it is a real load-order loop unless ALLOWED_SKILL_CYCLES says why
+// it is not.
+
+// The offsets a `## Related` section covers: its heading line through the line before the next
+// heading of level 1 or 2, or the end of the file. A level-2 heading whose entire title is `Related`,
+// case-insensitively, so `### Related` and `## Related work` do not match. A section is a property
+// of a link's position, not of its shape, so it is found by position.
+function relatedSections(raw) {
+  const lines = raw.split('\n');
+  const offsets = [];
+  let at = 0;
+  for (const line of lines) {
+    offsets.push(at);
+    at += line.length + 1;
+  }
+  const ranges = [];
+  let start = null;
+  lines.forEach((line, index) => {
+    const heading = line.match(/^(#{1,6})\s+(.*?)\s*$/);
+    if (!heading) return;
+    const level = heading[1].length;
+    if (start !== null && level <= 2) {
+      ranges.push([start, offsets[index]]);
+      start = null;
+    }
+    if (level === 2 && /^related$/i.test(heading[2])) start = offsets[index];
+  });
+  if (start !== null) ranges.push([start, raw.length]);
+  return ranges;
+}
+const isSeeAlso = (ranges, offset) =>
+  ranges.some(([from, to]) => offset >= from && offset < to);
+
+const skillIdByFile = new Map();
+for (const file of skillFiles) {
+  const id = relative(skillsRoot, dirname(file)).split(sep).join('/');
+  skillIdByFile.set(resolve(file), id);
+}
+const skillGraph = new Map();
+let seeAlsoLinks = 0;
+let seeAlsoSections = 0;
+for (const file of skillFiles) {
+  const from = skillIdByFile.get(resolve(file));
+  const raw = readFileSync(file, 'utf8');
+  const related = relatedSections(raw);
+  seeAlsoSections += related.length;
+  const targets = new Set();
+  for (const match of raw.matchAll(
+    /\]\(((?:\.\.\/)+)([a-z0-9-]+(?:\/[a-z0-9-]+)*)\/SKILL\.md(?:#[^)]*)?\)/g,
+  )) {
+    // The prefix is consumed as written and resolved with it, because the depth is what the link
+    // says. The nine doctors sit one level deeper than the top-level skills, so their links are
+    // written `../../redux/SKILL.md`; assuming a single level up and appending the sibling under
+    // the doctor's own directory resolves nothing, every lookup misses, and the graph comes out
+    // smaller than the repo — a cycle check that passes because it never saw an edge.
+    const to = skillIdByFile.get(
+      resolve(dirname(file), match[1], match[2], 'SKILL.md'),
+    );
+    if (!to) continue;
+    if (isSeeAlso(related, match.index)) {
+      seeAlsoLinks++;
+      continue;
+    }
+    targets.add(to);
+  }
+  skillGraph.set(from, [...targets].sort());
+}
+// Counted off the graph rather than accumulated per file: several `.md` files share a directory
+// (every `references/` directory holds more than one), and they collapse to one node id, so a
+// running total would count their edges more than once and print a graph that does not exist.
+const orderingEdges = [...skillGraph.values()].reduce(
+  (n, targets) => n + targets.length,
+  0,
+);
+
+function* elementaryCycles(graph) {
+  for (const start of [...graph.keys()].sort()) {
+    function* walk(current, path) {
+      for (const next of graph.get(current) ?? []) {
+        if (next === start) {
+          yield path;
+          continue;
+        }
+        // Never step back onto an earlier node than the start, so a cycle is generated once per
+        // starting rotation rather than once per node it contains.
+        if (next < start || path.includes(next)) continue;
+        yield* walk(next, [...path, next]);
+      }
+    }
+    yield* walk(start, [start]);
+  }
+}
+
+const allowedCycles = new Set(
+  ALLOWED_SKILL_CYCLES.map((cycle) => cycle.slice().sort().join('|')),
+);
+const seenCycles = new Map();
+for (const cycle of elementaryCycles(skillGraph)) {
+  const key = cycle.slice().sort().join('|');
+  if (seenCycles.has(key)) continue;
+  // Rotate to start at the lowest-sorting member so the message names one stable reading of the
+  // cycle rather than whichever rotation the walk happened to reach first.
+  const sorted = cycle.slice().sort();
+  const head = cycle.indexOf(sorted[0]);
+  seenCycles.set(key, [...cycle.slice(head), ...cycle.slice(0, head)]);
+}
+for (const [key, cycle] of seenCycles) {
+  if (allowedCycles.has(key)) continue;
+  failures.push(
+    `ARCHITECTURE_VIOLATION: circular skill dependency — ${cycle.join(' -> ')} -> ${cycle[0]}. Each must be read before the next, so no order satisfies both. If the references are a symmetric "see also", move them into the \`## Related\` section of the skills that cite them; only a cycle that is genuinely not a see-also belongs in ALLOWED_SKILL_CYCLES, with the reason it carries no ordering.`,
+  );
+}
+
+console.log(
+  `skill graph: ${skillGraph.size} nodes, ${orderingEdges} ordering edges, ${seeAlsoLinks} links inside ${seeAlsoSections} \`## Related\` sections filtered out`,
+);
+
 for (const warning of warnings) console.warn(`warn  ${warning}`);
-for (const duplicate of new Set(duplicateNames))
-  failures.push(`duplicate skill name: ${duplicate}`);
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`fail  ${failure}`);

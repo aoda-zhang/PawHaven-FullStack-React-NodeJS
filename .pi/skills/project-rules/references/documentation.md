@@ -62,11 +62,13 @@ When a decision changes the architecture, reflect it directly in the living arch
 
 ## 4. Workflow Documentation
 
-Location: `.pi/prompts/`
+Location: `.pi/workflows/`
 
 - One file per slash command — `/feature-development`, `/bug-fix`, `/architecture-change`,
   `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`, `/parallel-execution`,
-  `/handoff`.
+  `/handoff`. The files are flat in that directory: pi's prompt loader scans one directory for
+  `.md` files and does not descend, so a nested `feature/` or `bug-fix/` subdirectory would not be
+  found and the slash command would silently stop existing.
 - Each defines: numbered steps, decision points, failure recovery. Frontmatter `description:` is the
   one-line text shown in the `/` menu; the prompt runs in the invoking session, it does not name a
   runner agent.

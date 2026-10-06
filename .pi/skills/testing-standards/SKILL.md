@@ -6,11 +6,10 @@ description: >
   with browser-API polyfills, the unplugin-swc requirement in backend-core, co-location rules, and
   what the e2e harness actually covers today. Read before writing a test, deciding whether a change
   needs one, or reporting a test result.
-  触发场景 / Trigger: test testing unit test integration test e2e end-to-end API test regression,
-  单元测试 集成测试 接口测试 回归测试 端到端测试 覆盖率, vitest jest playwright test runner config
-  jsdom testing-library render hook mock stub spy assert coverage, prisma mock test double
-  fixture builder, nest testing module Test.createTestingModule dependency injection,
-  test placement co-located tests directory convention, 测试策略 测试报告 QA 验证.
+  Trigger: test testing unit test integration test e2e end-to-end API test regression, vitest jest
+  playwright test runner config jsdom testing-library render hook mock stub spy assert coverage,
+  prisma mock test double fixture builder, nest testing module Test.createTestingModule dependency
+  injection, test placement co-located tests directory convention.
 ---
 
 # Testing Standards
@@ -66,89 +65,33 @@ feature or component directory. Both conventions are established; match whicheve
 
 1. **Import `vi` from `vitest`** — not globals, even though `packages/ui` sets `globals: true`.
 2. **Build records through a factory with overridable defaults.** A literal fixture duplicated
-   across cases drifts the moment a field is added.
-
-```typescript
-import { describe, expect, it, vi } from 'vitest';
-import { AnimalStatus } from '@pawhaven/shared/types';
-import { RescueService } from './rescue.service.js';
-
-const RECORD_ID = 'PAW-0001';
-const REPORTED_AT = new Date('2026-08-22T10:00:00.000Z');
-
-type RecordOverrides = Record<string, unknown>;
-
-const buildRecord = (overrides: RecordOverrides = {}) => ({
-  id: RECORD_ID,
-  animalType: 'cat',
-  age: 'baby',
-  animalStatus: AnimalStatus.PENDING,
-  statusDescription: null,
-  description: 'Found near the park',
-  size: 'small',
-  animalCount: 1,
-  appearance: { color: 'black' },
-  locationObj: { address: 'Central Park' },
-  reporterPhotos: [],
-  reporter: { reporterID: 'user-1', reporterName: null },
-  createdAt: REPORTED_AT,
-  deletedAt: null,
-  ...overrides,
-});
-```
-
+   across cases drifts the moment a field is added, so the reference builds `buildRecord(overrides)`
+   once and spreads the overrides last.
 3. **Double Prisma by hand, not with a mocking library.** There is no `prisma-mock` dependency. The
-   double is a `vi.fn()` per model method, wired into a fake client, and it must distinguish call
-   shapes the service actually uses — note how it detects a narrow `select` lookup:
-
-```typescript
-const isPhotoLookup = (args?: { select?: Record<string, boolean> }) =>
-  args?.select !== undefined && Object.keys(args.select).length === 1;
-```
-
+   double is a `vi.fn()` per model method, wired into a fake client, and it must distinguish the call
+   shapes the service actually uses — a narrow `select` lookup is not the general case, and a double
+   that treats them as one passes a test the real client would fail.
 4. **Cover the error path explicitly.** The double accepts `Error` in place of records so the
-   rejection branch is reachable:
-
-```typescript
-const buildService = (records: RecordOverrides[] | Error = []) => { … };
-```
-
+   rejection branch is reachable.
 5. Assert on the **thrown `BadRequestException` / `NotFoundException`**, not on Prisma's error text —
    the service deliberately hides internals from clients.
 
-→ [references/backend-service-tests.md](./references/backend-service-tests.md)
+→ [references/backend-service-tests.md](./references/backend-service-tests.md) — the factory, the
+Prisma double, the error-path shape, HTTP tests, and what not to do, in full.
 
 ## Frontend component tests
 
-`packages/ui/src/components/carousel/tests/Carousel.test.tsx` is the reference.
-
-```typescript
-// @vitest-environment jsdom
-import '@testing-library/jest-dom/vitest';
-
-import { render, screen } from '@testing-library/react';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
-
-import { Carousel } from '../Carousel';
-```
+`packages/ui/src/components/carousel/tests/Carousel.test.tsx` is the reference. Three rules:
 
 - **The `// @vitest-environment jsdom` pragma is per-file.** Put it at the top of every DOM test.
 - **Import `@testing-library/jest-dom/vitest`** for the custom matchers.
 - **Polyfill browser APIs; do not mock the component's dependencies.** jsdom implements none of
-  `matchMedia`, `IntersectionObserver`, or `ResizeObserver`, so libraries like Embla fail at init:
+  `matchMedia`, `IntersectionObserver`, or `ResizeObserver`, so a library like Embla fails at init.
+  Stub the **environment**, not the thing under test: a test that mocks the component's own
+  collaborators proves nothing about the component.
 
-```typescript
-// Embla needs matchMedia + IntersectionObserver + ResizeObserver on init;
-// jsdom implements none of them. Browser-API polyfills, not component mocks.
-beforeAll(() => {
-  window.matchMedia = ((query: string) => createMediaQueryList(query)) as typeof window.matchMedia;
-  window.IntersectionObserver = function IntersectionObserverStub() { … };
-  window.ResizeObserver = function ResizeObserverStub() { … };
-});
-```
-
-That comment is the rule: stub the **environment**, not the thing under test. A test that mocks the
-component's own collaborators proves nothing about the component.
+→ [references/frontend-component-tests.md](./references/frontend-component-tests.md) — the working
+test file and the three polyfill stubs.
 
 ## backend-core needs SWC
 

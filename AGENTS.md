@@ -121,10 +121,9 @@ Agent config lives in `.pi/`, committed project-locally, so behaviour is the sam
 who clones the repo. **pi is the harness layer.** The `.opencode/` copy that preceded it was
 legacy, has been deleted, and nothing in `.pi/` ever read from it.
 
-- `.pi/skills/` — 18 project skills (9 top-level plus 9 doctors under `code-review/`), indexed by
-  [`.pi/README.md`](.pi/README.md); 9 more are agent-private under
-  `.pi/agents/frontend-dev/skills/`, loaded via `skillPath` frontmatter only into that agent's
-  context.
+- `.pi/skills/` — 27 project skills (18 top-level plus 9 doctors under `code-review/`), indexed by
+  [`.pi/README.md`](.pi/README.md). It is the single skill registry: nothing under `.pi/agents/`
+  holds a copy, and an agent receives a skill only by granting it by name.
   A skill's ID is its **directory name**, and `name:` in frontmatter must match it (lowercase
   `a-z`, `0-9`, hyphens only) — pi uses `name` as the `/skill:<name>` command, so a name with a
   slash in it silently breaks invocation. `project-rules` (10 constraint files), `frontend` (the shared portal facts a writer and a
@@ -133,23 +132,32 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
   workflow and names the `domains` it needs) are the three to load before non-trivial work. What a skill may assert — this repo's
   patterns now, general best practice only once a real change shows the gap — is
   [`project-rules`](.pi/skills/project-rules/references/skills.md).
-- `.pi/prompts/` — 9 slash-command workflows: `/feature-development`, `/bug-fix`,
-  `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`, `/perf-issue`,
-  `/parallel-execution`, `/handoff`.
+- `.pi/workflows/` — 10 process definitions, one per slash command: `/feature-development`,
+  `/bug-fix`, `/architecture-change`, `/design-decision`, `/investigation`, `/refactoring`,
+  `/perf-issue`, `/parallel-execution`, `/handoff`, and `/harness-process`, which is the harness's
+  single copy of the gate sequence and is the file the rule files link to rather than restate it.
 - `.pi/agents/` — 9 subagent definitions run by pi-subagents (installed via `packages` in
-  `.pi/settings.json`): `orchestrator` (plans, dispatches, verifies, and hands off — holds no
-  dedicated `edit`/`write` tool, though it does hold `bash`, which is a write channel, so staying
-  out of the source is discipline rather than a guarantee), `scout` (fast read-only recon),
-  `architect` (read-only plan author), `oracle` (independent read-only plan review), `frontend-dev`
-  (the React/TypeScript writer and its self-test), `backend-dev` (the NestJS writer and its self-test),
-  `tester` (acceptance verification, read-only toward source: a criterion with no executable check
-  comes back as a report naming the missing test, and the writing lane authors it), `reviewer` (the only lane that
-  emits `VERDICT: PASS|FAIL`, read-only toward source), `browser-verifier` (drives the running
-  portal in a real browser and edits no source). `frontend-dev` lives under
-  `.pi/agents/frontend-dev/` with its private skills. `orchestrator` is the entry point for a task
-  needing more than one lane; its `defaultContext: fresh` is what lets a task start from a clean
-  context and still dispatch the project's own lanes. Every agent sets `inheritSkills: false` and
-  declares its own `skills:`, so a lane receives exactly its grants.
+  `.pi/settings.json`), grouped by the role each one plays:
+  `orchestrator/orchestrator.md`,
+  `planning/{scout,architect,oracle}/`,
+  `implementation/{frontend-dev,backend-dev}/`, and
+  `verification/{tester,browser-verifier,reviewer}/`.
+  `orchestrator` plans, dispatches, verifies, and hands off (it holds no dedicated
+  `edit`/`write` tool, though it does hold `bash`, which is a write channel, so staying out of the
+  source is discipline rather than a guarantee), `scout` is fast read-only recon, `architect` the
+  read-only plan author, `oracle` the independent read-only plan reviewer, `frontend-dev` the
+  React/TypeScript writer and its self-test, `backend-dev` the NestJS writer and its self-test,
+  `tester` acceptance verification (read-only toward source: a criterion with no executable check
+  comes back as a report naming the missing test, and the writing lane authors it), `reviewer` the
+  only lane that emits `VERDICT: PASS|FAIL` (read-only toward source), and `browser-verifier` the
+  driver of the running portal in a real browser, which edits no source.
+  **Each agent body declares its `Role:` and its `Domain:`**, and `pnpm pi-check` fails when either
+  line is missing, so the pair is a checked convention rather than a comment: pi has no `role` or
+  `domain` frontmatter field, so the body is the only place either can be declared. `frontend-dev`
+  lives under `.pi/agents/implementation/frontend-dev/`. `orchestrator` is
+  the entry point for a task needing more than one lane; its `defaultContext: fresh` is what lets a
+  task start from a clean context and still dispatch the project's own lanes. Every agent sets
+  `inheritSkills: false` and declares its own `skills:`, so a lane receives exactly its grants.
   **Implementation is a role, not an agent name**, and `frontend-dev` / `backend-dev` are its first
   two domain workers: role `implementation`, domains `frontend` and `backend`. A new domain such as
   `devops` adds an agent and a grant set, not a new workflow — see
@@ -164,10 +172,19 @@ legacy, has been deleted, and nothing in `.pi/` ever read from it.
   now. `frontend-dev` grants `react-doctor` by name because it runs it as a mandatory self-check;
   the eight doctors it does not grant are reached through `code-review`'s dispatch table and named
   in the validator's `CATALOG_ONLY_SKILLS` allowlist.
-- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 18 project skills,
-  9 agent-private skills, 9 prompts, and 9 agents load with zero diagnostics. It also resolves every
-  agent's `allowedAgents`, every `agentOverrides` key, every `skillPath`, and every
-  `requiredAgents` name in a skill body, and it flags any project skill that no agent grants. Run it after touching anything in `.pi/`.
+- `pnpm pi-check` — the harness validator. Imports pi's own loaders and asserts 27 project skills,
+  10 prompt commands, and 9 agents load with zero diagnostics, and that no `skills/` directory has
+  reappeared under `.pi/agents/`. It also resolves every
+  agent's `allowedAgents`, every `agentOverrides` key, every `skillPath`, every
+  `requiredAgents` name in a skill body, and every agent's `Role:` / `Domain:` line, and it flags
+  any project skill that no agent grants. On top of that it holds the one-way direction between the
+  layers (`Workflow -> Agent -> Skill -> Reference/Script`) with four checks reported as
+  `ARCHITECTURE_VIOLATION:`: a skill that names a lane, a second skill registry under
+  `.pi/agents/`, dispatch held by an agent other than the coordinating one, and a circular skill
+  dependency. A duplicate skill name is a secondary assertion that is dormant today, because pi's
+  own loader already reports the collision. Each allowlist entry in that script is a place the
+  direction has to be argued for, so add a name only with the reason written next to it. Run it after
+  touching anything in `.pi/`.
 - `pnpm check:links` — resolves every relative markdown link **and anchor** across `.pi/`,
   `AGENTS.md`, `docs/`, and both root READMEs. It skips any directory named `npm`, `handoffs`,
   `node_modules`, `dist`, or `build`, at any depth rather than by path prefix — so `.pi/npm` and
@@ -284,7 +301,7 @@ and API contracts live in `docs/` and the `project-rules` skill; do not restate 
   A finding that says the plan is wrong returns to planning instead, and a combined-tree failure is
   classified before it is routed, so an environment block is reported rather than sent back to a
   developer. The full router is in
-  [orchestrator.md](.pi/skills/project-rules/references/orchestrator.md#when-combined-tree-verification-fails).
+  [orchestrator.md](.pi/workflows/harness-process.md#when-combined-tree-verification-fails).
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. "It compiles" is not a pass. A bug's repro must pass on the same surface that
   failed.

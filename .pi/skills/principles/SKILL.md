@@ -5,7 +5,7 @@ description: >
   the self-audit duty to name which one did. Load this before planning or implementing any
   non-trivial change, and while reviewing one. A principle cited with no decision behind it means
   the rule was skipped, not that it was satisfied.
-  触发场景 / Trigger: principle decision tradeoff judgement call judgement call architecture choice
+  Trigger: principle decision tradeoff judgement call judgement call architecture choice
   design choice naming abstraction adding abstraction new api new component refactor diff size,
   debugging root cause reproduce why symptom, state modelling domain model data shape type structure
   boundary validation parsing trust, ux tradeoff loading empty error state polish, self-audit cite

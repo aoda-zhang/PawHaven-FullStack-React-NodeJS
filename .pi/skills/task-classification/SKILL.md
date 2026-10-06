@@ -3,13 +3,12 @@ name: task-classification
 description: >
   Classify a request before a workflow is chosen — task type, secondary tasks, scope, domains,
   complexity, risk, confidence, clarification need — as one JSON artifact the user sees. Semantic
-  intent, not keywords. Routes to the six canonical workflow prompts. Load at routing time, at the
+  intent, not keywords. Routes to the six canonical workflows. Load at routing time, at the
   start of any non-trivial request, before planning or dispatching.
-  触发场景 / Trigger: new request task routing workflow selection classify classification triage
-  which workflow which process how to start where to start first step entry point, complexity scope
-  risk size difficulty estimate 复杂度 难度 范围 风险 任务分类 路由, feature bug fix refactor
-  architecture investigation performance 需求分类, ambiguous vague underspecified clarify needs
-  clarification 澄清 需求不明确.
+  Trigger: new request task routing workflow selection classify classification triage which workflow
+  which process how to start where to start first step entry point, complexity scope risk size
+  difficulty estimate, feature bug fix refactor architecture investigation performance, ambiguous
+  vague underspecified clarify needs clarification.
 ---
 
 # Task Classification
@@ -48,9 +47,12 @@ task type; the outcome is.
 - `risk` — verification depth, and independent of `complexity`. See [Risk](#risk).
 - `domains` — the implementation capabilities the task needs. See [Domains](#domains).
 - `confidence` — 0.0–1.0. Below ~0.6 means the request is ambiguous; set `requiresClarification`.
-- `workflow` — the canonical prompt this routes to. See [Routing](#routing).
-- `requiredAgents` — agents whose involvement the risk and scope justify. Name them from
-  `.pi/agents/`; do not add an agent that has nothing to check.
+- `workflow` — the canonical prompt this routes to. The mapping is in
+  [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow).
+- `requiredAgents` — the roles the risk and scope justify. `domains` decides which implementation
+  capabilities run, and this field names the roles those capabilities imply: `planning`,
+  `implementation`, and `verification`. Do not name a role that has nothing to check. Which lane
+  fills each role is not this skill's decision.
 - `requiredVerification` — the checks that must pass, and who runs them. A lane with no named
   validator has not finished.
 - `requiresClarification` / `clarificationReason` — see [Output rules](#output-rules).
@@ -157,8 +159,8 @@ PII, security boundaries. In this repo that also covers anything touching the ga
 internal-JWT boundary — see `docs/architecture/authentication-architecture.md`.
 
 A change to the harness itself is **high at minimum** and may not take a lightweight path:
-`.pi/agents`, `.pi/skills`, `.pi/prompts`, `.pi/settings.json`, workflow definitions, model
-configuration, orchestrator behaviour. A harness change affects every future development task, so a
+`.pi/agents`, `.pi/skills`, `.pi/workflows`, `.pi/settings.json`, model configuration, orchestrator
+behaviour. A harness change affects every future development task, so a
 wrong one is paid for repeatedly and stays invisible until much later.
 
 **critical** is reserved for destructive operations: destructive database migrations, destructive data
@@ -170,44 +172,21 @@ running it is not. `critical` is never cleared by an agent's own confidence.
 
 ## Routing
 
-| `taskType`            | `workflow`            | Prompt                                                      |
-| --------------------- | --------------------- | ----------------------------------------------------------- |
-| `feature`             | `feature`             | [feature-development](../../prompts/feature-development.md) |
-| `bug-fix`             | `bug-fix`             | [bug-fix](../../prompts/bug-fix.md)                         |
-| `refactor`            | `refactor`            | [refactoring](../../prompts/refactoring.md)                 |
-| `architecture-change` | `architecture-change` | [architecture-change](../../prompts/architecture-change.md) |
-| `investigation`       | `investigation`       | [investigation](../../prompts/investigation.md)             |
-| `performance`         | `performance`         | [perf-issue](../../prompts/perf-issue.md)                   |
-
+Each of the six task types routes to exactly one workflow, and `taskType` is what picks it.
 `design-decision`, `parallel-execution`, and `handoff` are not task types. They are stages inside
-the workflows above; reach them from the routed workflow, not instead of it.
+the workflows above, reached from the routed workflow rather than instead of it.
 
-### Routing the lanes
-
-`taskType` picks the workflow. The lane sequence comes from `complexity`, `risk`, and `domains` read
-together: `domains` decides which workers appear, and the other two decide how much surrounds them.
-
-**`low` complexity, `low` risk, `domains: [frontend]`.** `orchestrator` → `frontend-dev` → `tester` →
-`reviewer` → the human. No planner and no plan review, because the work sits in one layer with a
-straight verification. The developer self-test still runs, since a lane that has not checked its own
-work has no evidence to hand on.
-
-**`medium` complexity, `medium` risk, `domains: [frontend, backend]`.** `orchestrator` → `architect`
-as the planner → **the shared contract** → `frontend-dev` and `backend-dev`, in parallel only where
-the dependencies permit → `tester` → `browser-verifier` on a user-facing surface → `reviewer` →
-combined-tree verification. `oracle` plan review is conditional; the human plan approval is not,
-because a two-domain feature is Standard work at minimum. A full-stack task is **composed** from two
-domains, and no `fullstack-dev` worker exists or should be created for it. Composition is what the
-orchestrator already does, and a role for it would be a role with nothing of its own to check.
-
-**`low` complexity, `high` risk, `domains: [backend]`.** The strong path in full: planner, plan
-review, a named validator per unit, independent review, and the human gate, because high risk forces
-every one of them however small the diff is. This is the shape the routing has to get right.
+The mapping from type to prompt, and the lane shape that `complexity`, `risk`, and `domains` imply,
+are in [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow). This
+skill produces the artifact that selects a workflow; it does not own the sequence that follows.
 
 ### The shared contract
 
 When `domains` interact, the shared contract is settled before the independent implementation starts,
-so neither worker is guessing at the boundary the other is about to land.
+so neither worker is guessing at the boundary the other is about to land. A full-stack task is
+**composed** from the domains that exist, and no `fullstack-dev` worker exists or should be created
+for it. Composition is what the coordinating role already does, and a role for it would be a role with
+nothing of its own to check.
 
 A contract is a durable handoff artifact that describes a boundary. It is not an agent, not a skill,
 and not a subsystem. At the code level that boundary is

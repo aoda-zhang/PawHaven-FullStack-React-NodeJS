@@ -59,7 +59,7 @@ Ensure you meet these version requirements before installing dependencies or run
 
 **`.pi/`** is the **AI-driven development engine** behind PawHaven — an agent harness that turns every coding request into a structured pipeline: `classify → plan → dispatch lanes → verify → review against architecture & patterns → update docs`.
 
-👉 [Enter the harness](./.pi/README.md) — 18 project skills, 9 slash-command workflows, 9 subagents, and the project rules they enforce. `pnpm pi-check` validates it.
+👉 [Enter the harness](./.pi/README.md) — 27 project skills, 9 slash-command workflows, 9 subagents, and the project rules they enforce. `pnpm pi-check` validates it.
 
 ---
 

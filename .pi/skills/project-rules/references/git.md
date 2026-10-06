@@ -51,14 +51,15 @@ The root `AGENTS.md` is authoritative here, and it is stricter than what this fi
 main session and every subagent, and it covers source, scripts, tests, config, and docs. Being asked
 to _make a change_ is not permission to commit it.
 
-Scope per lane:
+Scope per role, with the lanes that fill each role named in
+[the gate sequence](../../../workflows/harness-process.md#the-gate-sequence):
 
-- **Developer lanes** (`frontend-dev`, `backend-dev`) leave their changes in the working tree. They commit
-  only on an explicit human request, never on their own initiative.
-- **Verification lanes** (`tester`, `reviewer`, `browser-verifier`) hold no write access to
-  application source, so a commit is not theirs to make. They report and the human decides.
-- **The orchestrator** writes no source, so it has nothing to commit. It proposes the commit split in
-  the handoff and stops there.
+- **Implementation roles** leave their changes in the working tree. They commit only on an explicit
+  human request, never on their own initiative.
+- **Verification roles** hold no write access to application source, so a commit is not theirs to
+  make. They report and the human decides.
+- **The coordination role** writes no source, so it has nothing to commit. It proposes the commit
+  split in the handoff and stops there.
 
 No lane pushes, opens a PR, force-pushes, resets, cleans, or deletes a branch without asking. Those
 touch shared history and the old one is not always recoverable.

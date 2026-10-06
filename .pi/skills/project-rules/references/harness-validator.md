@@ -43,23 +43,29 @@ None of that is visible in a diff. These checks make it visible.
 │   └── code-review/
 │       ├── SKILL.md             # meta-skill that dispatches to the doctors
 │       └── <doctor>/SKILL.md    # nested doctors
-├── prompts/
-│   └── <name>.md                # slash command; frontmatter `description:` only
+├── workflows/
+│   └── <name>.md                # slash command; flat, because the loader does not recurse
 ├── agents/
-│   ├── <name>.md                # subagent definition; body IS the system prompt
-│   └── frontend-dev/
-│       ├── dev.md               # the frontend implementation lane
-│       └── skills/              # agent-private skills, loaded via skillPath
+│   ├── orchestrator/orchestrator.md            # coordination
+│   ├── planning/<agent>/<agent>.md             # scout, architect, oracle
+│   ├── implementation/<agent>/<agent>.md       # frontend-dev, backend-dev
+│   └── verification/<agent>/<agent>.md         # tester, reviewer, browser-verifier
 └── npm/                         # pi-subagents + deps (gitignored)
 ```
 
+A file under `agents/` is an agent because pi discovers `.md` recursively there and excludes
+`*.chain.md` — the directory names are free, and the agent's identity is its frontmatter `name:`. The
+directory an agent lives in is its **role**, and the body declares that role and its **domain** with a
+`**Role:**` / `**Domain:**` line, because pi has no `role` or `domain` frontmatter field and an agent's
+body is its whole system prompt. No `skills/` directory lives under `agents/`: `.pi/skills/` is the
+only registry, and an agent reaches a skill by granting its name.
+
 The `skills/code-review/` directory holds 9 nested doctors — `architecture-doctor`,
 `backend-doctor`, `boundary-doctor`, `i18n-doctor`, `react-doctor`, `style-doctor`, `test-doctor`,
-`typecheck-doctor`, and `typescript-doctor`. The four frontend doctors were promoted out of the
-retired `frontend/review/skills/` tree in the merge, so they are project skills that no agent grants
-via `skillPath` any more. `reviewer` reaches all nine through this meta-skill's dispatch table, and
-the eight it does not grant in frontmatter are named in `CATALOG_ONLY_SKILLS` in the validator.
-`frontend-dev` grants `react-doctor` by name, because it runs it as a mandatory self-check.
+`typecheck-doctor`, and `typescript-doctor`. `reviewer` reaches all nine through this meta-skill's
+dispatch table, and the eight it does not grant in frontmatter are named in `CATALOG_ONLY_SKILLS` in
+the validator. `frontend-dev` grants `react-doctor` by name, because it runs it as a mandatory
+self-check.
 
 **The skill ID is the directory name, and the frontmatter `name` must agree with it** — pi resolves a
 skill's invocable name as frontmatter `name` falling back to the directory name, so `style-doctor/` with
@@ -79,11 +85,13 @@ parent are only found via those explicit entries. Dropping one silently drops a 
 would fail at startup. It already covers:
 
 - project skill, prompt, and agent **counts**, against the `EXPECTED_*` constants at the top of the
-  script — those constants are the thing to update when the harness changes size.
+  script — those constants are the thing to update when the harness changes size. The
+  agent-private count is **0**, which is what keeps `.pi/skills/` the single registry: a `skills/`
+  directory reappearing under `.pi/agents/` turns that check red.
 - every required agent **name** is discovered under `.pi/agents/` (the scan skips `references/`,
   `skills/`, and `SKILL.md`, so nested agent bodies are found).
-- every skill named in an agent's `skills:` frontmatter **resolves** — project skill or
-  agent-private skill discovered via `skillPath`.
+- every skill named in an agent's `skills:` frontmatter **resolves** — against the project skills
+  discovered under `.pi/skills/`.
 - duplicate skill names and duplicate agent names.
 - each `npm:` package in `settings.json` is **installed** under `.pi/npm`, and its manifest-declared
   skill, prompt, and extension paths exist.
@@ -96,16 +104,103 @@ would fail at startup. It already covers:
   array is the skill's dispatch contract and whoever runs it copies the names out verbatim, so a
   name left behind by a rename becomes a dispatch that resolves to nothing, and nothing else here
   reads a skill's body. Only the array is parsed, never prose.
-- every agent `skillPath:` **exists on disk**, resolved relative to the agent definition file —
-  `skillPath` is discovery-only, so a broken path drops an agent's private skills with no
-  diagnostic.
-- every discovered agent-private skill is **reachable from some agent's `skillPath:`** — an
-  orphaned private skill is dead weight nobody loads.
+- **the agent-local `skillPath:` registry, as a regression guard.** Two assertions, and with
+  `EXPECTED_PRIVATE_SKILLS = 0` and no agent-local `skills/` directory permitted, **neither can fire
+  today** — that is what eliminating the second registry bought. They stay because they are the
+  guard that makes its elimination enforced rather than merely intended:
+  - every agent `skillPath:` **exists on disk**, resolved relative to the agent definition file —
+    `skillPath` is discovery-only, so a broken path drops an agent's private skills with no
+    diagnostic. If a `skills/` directory reappears under `.pi/agents/` with a mistyped `skillPath:`,
+    this is what catches it: a path that resolves to nothing, so an agent that believes it has a
+    private skill loads with a silently smaller one.
+  - every discovered agent-private skill is **reachable from some agent's `skillPath:`** — an
+    orphaned private skill is dead weight nobody loads. If the directory comes back, this is what
+    catches a `SKILL.md` written under it that no `skillPath:` names: a skill nothing grants, so
+    nothing loads it and nothing reports it missing.
+
+  Neither is live coverage today. Read them as "what the first reappearance of an agent-local
+  registry is checked against", not as two checks that are currently watching. The check that is
+  live for the same regression is the agent-local `skills/` directory check below.
+
 - every project skill is **granted in at least one agent's `skills:` frontmatter**, or named in
   the `CATALOG_ONLY_SKILLS` allowlist at the top of the script with a comment naming the
   indirection that reaches it. This is the check that catches a doctor promoted to a project
   skill whose only grant was dropped: the count check, the duplicate-name check, and the
-  agent-private `skillPath` reachability check would all still pass.
+  agent-private `skillPath` reachability guard above would all still pass.
+- every discovered agent **declares a `Role:` and a `Domain:` in its body**, and the value is on the
+  same line as the field. pi has no `role`, `domain`, or `capabilities` frontmatter field, so the
+  body is the only place either can be declared —
+  and nothing else in this script reads a body, so an agent that lost the line would keep loading and
+  keep being dispatched while reading as if the harness were organised by role. The failure names the
+  file and the missing field. One pattern builds both fields and the `Role:` set that
+  `requiredAgents` resolves against, so the two readers cannot disagree about what counts as
+  declared; the separator is horizontal whitespace rather than `\s`, which spans newlines and would
+  let a bare `**Domain:**` borrow the first character of the next line.
+- **a skill that names a lane.** A skill teaches a capability, so it does not route work to a lane and
+  does not own the process. Any lane name in backticks anywhere under `.pi/skills/` is a failure.
+  `SKILL_TO_AGENT_ALLOWLIST` holds **two entries**, both in the structural description above, and both
+  earn their place the same way. They state which lane holds which grant, which is a value in the
+  registry being described rather than an instruction to route work. What earns an entry is that kind
+  of statement and nothing else. Each entry is pinned to the file **and** to the exact text of the
+  line, so a third lane name in this file still fails and editing an allowlisted line retires its
+  entry instead of widening it. Name the role or the stage instead, or link the process file.
+- **an agent-local skill registry.** A `skills/` directory at any depth under `.pi/agents/` is a
+  failure. The count check above catches a directory that holds a loadable `SKILL.md`, and this catches
+  the directory itself, including an empty one and one malformed enough that pi's loader never sees the
+  skill. A second registry is a second copy of every rule in it, and a rule granted from two places
+  drifts from its other copy.
+- **dispatch held by anyone but the coordinating agent.** Only the coordinating agent may list the
+  `subagent` tool or set `allowNestedSubagents: true`, and the two are separate branches, so either
+  one alone is a failure. The process has exactly one owner. A second dispatcher is a second place the
+  sequence lives, and the two copies diverge without anything noticing.
+- **a circular skill dependency.** The graph is the relative `../<name>/SKILL.md` links between
+  skills, matched at **any `../` depth**, resolved against the depth the link itself consumes, and
+  **excluding every link that sits inside a `## Related` section**. Three decisions, each
+  load-bearing:
+  - **any depth.** The nine doctors sit one level deeper than the top-level skills, so their links
+    to those skills are written `../../redux/SKILL.md`. Matching a single level and assuming one
+    level up resolves nothing, and a graph that misses half its edges reports no cycle while the
+    repo has one.
+  - **`## Related` is excluded.** That block is a "see also" list. It asserts two skills are
+    neighbours, symmetrically, and carries no read order — the same reasoning the hand-listed pairs
+    used to rest on, applied to a section rather than to a pair. The nine doctors each keep one for
+    exactly this reason, and the filter is what makes keeping one meaningful: a cross-reference with
+    no ordering belongs there, and moving it into the body turns it into an ordering edge the check
+    will hold you to.
+  - **what remains is a load-order loop.** Each member would have to be read before the next and no
+    ordering satisfies both, so it fails unless `ALLOWED_SKILL_CYCLES` says why it is not. Entries
+    are matched as a **sorted node-set**, so a 2-node pair is a different key from the triangle that
+    contains it. The constant holds **zero entries** today, because **zero cycles survive the
+    filter** — every symmetric reference in the repo is inside a `## Related` section. An entry is a
+    claim a person has to make in writing, so it is not something to add to make a run green.
+
+  One-sided is not symmetric, and the check does not need the pair to be mutual to be right: a
+  `## Doctor` section in a skill names the checker that reviews it and stays in the graph, because
+  the doctor's own back-reference is the half that lives in `## Related`. Dropping it would be the
+  shape-based rule this replaced.
+
+  The script prints the graph it actually built — 44 nodes, 17 ordering edges, 43 links inside 12
+  `## Related` sections filtered out. It prints it because a cycle check that passes over less than
+  it claims is the defect this exists to remove, and a section detector that silently matched
+  nothing would make the check vacuous in exactly the same way. Note that the node id is a skill's
+  **directory**, so the 84 markdown files under `.pi/skills/` collapse to 44 nodes — every
+  `references/` directory is one node. That can only add edges, never drop one, so it cannot hide a
+  cycle; it is stated here rather than left to be discovered.
+
+- **a duplicate skill name.** This one is a **secondary assertion, and it is currently dormant**. pi's loader drops the loser of a name collision and reports it as a diagnostic that is
+  already surfaced above, so the collision is caught without this line and the reader's actual failure
+  is pi's own collision message. What this assertion adds is the cost. Two resources answer to one
+  invocable name, `/skill:<name>` resolves to whichever pi loaded first, and the other skill becomes
+  unreachable behind that name rather than merely shadowed. It is kept because it costs nothing and it
+  is the only assertion that states the consequence. It stops being dormant if pi's loader ever keeps
+  both.
+
+The four architecture checks are the ones that hold the one-way direction between the layers,
+`Workflow -> Agent -> Skill -> Reference/Script`. Every one of them loads cleanly in pi and changes
+behaviour silently, which is why none is left to review. Each reports with an `ARCHITECTURE_VIOLATION:`
+prefix, because a reversed dependency is a different error class from a missing file and the reader
+needs to know which one they hit. Two of them carry an allowlist, and an entry in either is a place the
+direction has to be argued for. Add a name to one only with the reason written next to it.
 
 Do not duplicate this in a shell one-liner, and do not loosen its expectations to make a red run green
 — update the counts deliberately, in the same change that adds or removes the resource.
@@ -148,10 +243,10 @@ for f in $(find .pi/skills .pi/agents -name SKILL.md); do
 done
 ```
 
-Empty output is the pass — currently 27 files scanned (18 project + 9 agent-private), zero
-mismatches. Recurse to every `SKILL.md`,
-not one level: the doctors sit at depth two (`code-review/*-doctor`) and the agent-private skills at
-depth two (`frontend-dev/skills/*`), and they are the ones that drift. `.pi/npm` is not a scan root
+Empty output is the pass — currently 27 files scanned (18 top-level project skills + 9 doctors),
+zero mismatches. Recurse to every `SKILL.md`,
+not one level: the doctors sit at depth two (`code-review/*-doctor`) and they are the ones that
+drift. `.pi/npm` is not a scan root
 here, so the package's own skills are not asserted against this repo's rule.
 
 ### 2. Relative links resolve
@@ -225,7 +320,7 @@ finds them in an old document knows they no longer apply here:
   `pi-check` resolves them.
 - **`<agent>_append.md`** prompt appends resolved by slim's built-in agent name list. pi has no append
   mechanism; an agent's body is its system prompt.
-- **Frontmatter `agent:` in a command file** picking the runner. Nothing under `.pi/prompts/` declares
-  `agent:` — pi prompts run in the session that invokes them.
+- **Frontmatter `agent:` in a command file** picking the runner. Nothing under `.pi/workflows/`
+  declares `agent:` — pi prompts run in the session that invokes them.
 - **`opencode debug agents`** as the source of truth for which agents exist. The equivalent here is the
   agent list that `pi-check` discovers, or `find .pi/agents -name '*.md' -not -path '*/skills/*'`.

@@ -24,70 +24,18 @@ Bumping the version requires explicit approval **AND** a matching bump in the wo
 
 ## Layer 1: Official React Doctor CLI
 
-### Mandatory flags
-
-| Flag                  | Why                                                                                                                                                                                                                                                                                                   |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `-y`                  | Skips the interactive project prompt and scans **all** workspace projects. Without it the CLI prompts, and in an agent context it falls back to a subset — `apps/frontend/portal` and `apps/frontend/admin` get silently skipped. **This is the single most common cause of "doctor found nothing".** |
-| `--verbose`           | Shows affected files and line numbers per rule.                                                                                                                                                                                                                                                       |
-| `--scope changed`     | Only issues introduced vs the base branch — the same delta CI comments on.                                                                                                                                                                                                                            |
-| `--include-untracked` | With `--scope changed`, also covers new/uncommitted files (the normal state mid-review).                                                                                                                                                                                                              |
-
-### Regression check (default for code review)
+Run the regression check. If the score dropped vs the base branch, fix the regressions before
+committing.
 
 ```bash
 npx react-doctor@0.9.12 -y --verbose --scope changed --include-untracked
 ```
 
-If the score dropped vs the base branch, fix the regressions before committing.
+`-y` is not optional. Without it the CLI prompts for a project and an agent context silently
+scans a subset, which is the single most common cause of "doctor found nothing".
 
-### Full codebase scan (only when explicitly asked for)
-
-```bash
-npx react-doctor@0.9.12 -y --verbose
-```
-
-### Targeting specific apps
-
-```bash
-npx react-doctor@0.9.12 -y --verbose --scope changed --include-untracked --project apps/frontend/portal
-```
-
-`--project` accepts workspace names or directory paths (comma-separated) and overrides the `projects` config field. Use it to force coverage when the detected project list looks short.
-
-### /doctor — full local triage workflow
-
-When the user types `/doctor`, says "run react doctor", or asks for a full triage:
-
-```bash
-curl --fail --silent --show-error \
-  --header 'Cache-Control: no-cache' \
-  https://www.react.doctor/prompts/react-doctor-agent.md
-```
-
-The playbook is the single source of truth — a scan → filter → triage → fix → validate loop that edits the working tree directly (never commits, never opens PRs). Follow every step in the fetched playbook.
-
-Pair it with per-rule prompts at `https://www.react.doctor/prompts/rules/<plugin>/<rule>.md` (fetched on demand inside the playbook).
-
-### Configuring or explaining rules
-
-When the user wants to understand / disable / tune a rule:
-
-```bash
-npx react-doctor@0.9.12 rules explain <rule>
-npx react-doctor@0.9.12 rules disable|set|category|ignore-tag …
-```
-
-| Flag                  | Purpose                                                                 |
-| --------------------- | ----------------------------------------------------------------------- |
-| `-y`                  | Skip prompts, scan all workspace projects (required in agent context)   |
-| `--verbose`           | Show affected files and line numbers per rule                           |
-| `--scope changed`     | Only issues introduced vs base branch                                   |
-| `--scope lines`       | Only issues whose source spans touch changed lines                      |
-| `--include-untracked` | With files/changed/lines scope, also scan ordinary untracked files      |
-| `--project <name>`    | Select workspace names or directory paths (comma-separated)             |
-| `--base <ref>`        | Base git ref for files/changed/lines scope (auto-detected when omitted) |
-| `--score`             | Output only the numeric score                                           |
+→ [references/cli-reference.md](./references/cli-reference.md) — the full flag table, the
+full-scan and `--project` variants, the `/doctor` playbook fetch, and `rules explain`.
 
 ---
 
@@ -195,7 +143,7 @@ This exists because the step is easy to skip: the scan is a prompt-level instruc
 
 ## Related
 
-- React standards: [react skill](../../../agents/frontend-dev/skills/react/SKILL.md)
+- React standards: [react skill](../../react/SKILL.md)
 - Companion doctors: [style-doctor](../style-doctor/SKILL.md) · [i18n-doctor](../i18n-doctor/SKILL.md) · [typecheck-doctor](../../code-review/typecheck-doctor/SKILL.md)
-- State rules: [redux](../../../agents/frontend-dev/skills/redux/SKILL.md) · [react-query](../../../agents/frontend-dev/skills/react-query/SKILL.md) · [react-hook-form](../../../agents/frontend-dev/skills/react-hook-form/SKILL.md)
+- State rules: [redux](../../redux/SKILL.md) · [react-query](../../react-query/SKILL.md) · [react-hook-form](../../react-hook-form/SKILL.md)
 - CI counterpart: `.github/workflows/react-doctor.yml` (must stay on the same pinned version)

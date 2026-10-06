@@ -66,8 +66,8 @@ Every review runs **two passes**, because they answer different questions:
 | **TECH REVIEW**    | Is the code written well? Best practices, anti-patterns, code quality                                                    | typecheck/typescript/react/style/i18n/backend/test doctors + Layer 3 feature & logic deep review  |
 | **PATTERN REVIEW** | Does the change fit the project? Follows the project's overall development rules/patterns, fits the current architecture | boundary/architecture doctors + Layer 2 architecture & design + Layer 4 type contract deep review |
 
-**Neither pass emits a verdict.** Each reports findings with a severity, and the `reviewer` lane turns
-the two groups into the single `VERDICT: PASS` or `VERDICT: FAIL` the workflow reads. A doctor that
+**Neither pass emits a verdict.** Each reports findings with a severity, and the review role turns the
+two groups into the single `VERDICT: PASS` or `VERDICT: FAIL` the workflow reads. A doctor that
 produced a verdict of its own would make two verdict producers, and the workflow would no longer know
 which one to obey.
 
@@ -146,8 +146,8 @@ Verify the change fits the project's overall patterns and architecture:
 ### Step 6: Aggregate findings per pass
 
 Present findings organized by sub-skill, with file paths, line numbers, and severity, grouped under
-**TECH REVIEW** and **PATTERN REVIEW**. Each pass carries its own blocking state. The `reviewer` lane
-reads the two groups and produces the one verdict the workflow consumes.
+**TECH REVIEW** and **PATTERN REVIEW**. Each pass carries its own blocking state. The review role reads
+the two groups and produces the one verdict the workflow consumes.
 
 ## Sub-Skill Composition
 
@@ -166,4 +166,4 @@ it needs to be granted.
 
 - Parallel doctors: [typecheck-doctor](./typecheck-doctor/SKILL.md) · [typescript-doctor](./typescript-doctor/SKILL.md) · [react-doctor](./react-doctor/SKILL.md) · [style-doctor](./style-doctor/SKILL.md) · [boundary-doctor](./boundary-doctor/SKILL.md) · [i18n-doctor](./i18n-doctor/SKILL.md) · [backend-doctor](./backend-doctor/SKILL.md) · [test-doctor](./test-doctor/SKILL.md) (every review)
 - Architecture deep review: [architecture-doctor](./architecture-doctor/SKILL.md)
-- Frontend skills: [react](../../agents/frontend-dev/skills/react/SKILL.md) · [styling](../../agents/frontend-dev/skills/style/SKILL.md) · [i18n](../../agents/frontend-dev/skills/i18n/SKILL.md)
+- Frontend skills: [react](../react/SKILL.md) · [styling](../style/SKILL.md) · [i18n](../i18n/SKILL.md)

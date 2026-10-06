@@ -1,56 +1,18 @@
 # Orchestrator Rules
 
-> **Applies to**: the orchestrator lane.
-> **Purpose**: hard constraints on how the orchestrator plans, dispatches, verifies, and reports.
-> Loaded when dispatching anything substantial, enforced at every stage transition.
+> **Applies to**: the coordination role.
+> **Purpose**: hard constraints on how the coordinating agent plans, dispatches, verifies, and
+> reports. Loaded when dispatching anything substantial, enforced at every stage transition.
 
 The `principles` skill carries the reasoning. This file is the checklist. `orchestrator_append.md`
 once appended reasoning to this role; that append mechanism was retired with `.opencode/` — pi has
 none, and an agent's body is its whole system prompt.
 
-## The gate sequence
-
-Nine stages, in this order. The sequence is the harness's process and lives here alone, so an agent
-prompt or a workflow prompt points at this section instead of restating it. A rule stated twice
-drifts from its copy.
-
-| #   | Stage                      | Lane                          | When it runs                                 |
-| --- | -------------------------- | ----------------------------- | -------------------------------------------- |
-| 1   | Plan                       | `scout`, `architect`          | Always beyond Trivial                        |
-| 2   | Plan review                | `oracle`                      | Conditional, skipped for Trivial scope       |
-| 3   | Human plan approval        | the human                     | Standard and Architectural scope             |
-| 4   | Implementation             | `frontend-dev`, `backend-dev` | Always beyond Trivial                        |
-| 5   | Developer self-test        | the writing lane              | Every implementation lane, before it reports |
-| 6   | Independent verification   | `tester`                      | Conditional, `medium` or `high` complexity   |
-| 7   | Independent review         | `reviewer`                    | Every mutating change                        |
-| 8   | Combined-tree verification | the orchestrator              | After the units are joined                   |
-| 9   | Human final review         | the human                     | Every change that survives to a handoff      |
-
-Three of the nine numbered stages are conditional on task risk: plan review, human plan approval, and
-independent verification. A `browser-verifier` pass is a fourth conditional act and is described below,
-but it is not one of the nine numbered stages, so the count of conditional stages is three.
-**Plan review is skipped when the task classified as Trivial, and the classification is the entire
-trigger.** A plan that reads small is not a reason to skip it, and a plan that reads large does not
-promote a Trivial task into a reviewed one. Human plan
-approval is skipped for Trivial scope, because there is nothing to weigh. Independent verification
-runs when the task classified at `medium` or `high` complexity, and is skipped for a Trivial or
-`low`-complexity task. At that complexity the work is localized to one layer with a straight
-verification, so an independent acceptance lane costs more than it returns; a task that classified
-higher gets it whatever its diff looks like. A `browser-verifier` pass runs when the change touches a
-surface a user touches and is skipped for a backend-only change.
-
-The rest are unconditional. Stage 5 runs on every implementation, because a lane that has not run its
-own checks has no evidence to hand on. Stage 7 runs on every mutating change, no matter how small,
-because a change nobody independent has read has not been reviewed.
-
-**The agent that writes the code must not give the final verdict on that code.** Stages 5, 6, and 7
-are separate contexts for that reason. A lane reviewing its own diff cannot catch a self-consistent
-mistake, so self-test and review are not the same act at two intensities.
-
-Stage 8 verifies the joined tree, because a change that typechecks per file and does not package is
-not done. The orchestrator owns it. A developer owns its own unit, and stage 5 already covers that.
-See [Evidence](#evidence-what-a-pass-requires) for what a stage must report before it counts as
-passed.
+**The sequence is not here.** The nine-stage gate sequence, which lane holds each stage, the lane
+shapes keyed on complexity and risk, and every failure route live in
+[`harness-process.md`](../../../workflows/harness-process.md). This file holds the rules that constrain
+each role, and links there for order. A rule file that also carried the sequence would have two copies
+to drift.
 
 ## The autonomy line — read this first
 
@@ -97,7 +59,9 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
    observable success criteria — not a file list. The lane analyses and plans its own work. A file
    list is a plan you made for an agent that has more context than you gave it.
 5. **For a full-stack feature, settle the design before implementation.** Run `/design-decision` or
-   `/architecture-change` first. `oracle` with `architecture-design` produces the decision.
+   `/architecture-change` first, which settles the decision at stage 1 and reads the evidence it is
+   built on at stage 2 of the [gate sequence](../../../workflows/harness-process.md#the-gate-sequence).
+   The evidence read is not a second design, and oracle does not make the design.
 6. **Frontend first for full-stack features.** The frontend drafts the API contract it needs; the
    backend then finalises it. Reversing this means the backend builds a contract nobody asked for.
 7. **Pass the frontend's contract to the backend explicitly** in the dispatch prompt. Do not assume a
@@ -108,7 +72,7 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 8. **Do not write test files unless the task asks for them.** A behaviour change without a test is a
    finding at review time; adding tests nobody requested is scope the user did not budget for. Say
    which you are doing. Which lane authors the test once one is called for is in
-   [When combined-tree verification fails](#when-combined-tree-verification-fails).
+   [When combined-tree verification fails](../../../workflows/harness-process.md#when-combined-tree-verification-fails).
 9. **Figma mock data belongs in the feature that owns it** — `src/features/<FeatureName>/mockData.ts`.
    Never in the design-system package. This is temporary and goes away at real API integration.
 10. **Always run the review after tests pass**, and always check whether the change needs a doc
@@ -118,7 +82,7 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
     the doc impact at `/handoff`, then routes the `docs/` edits to the lane that made the change so
     they update only what the change actually invalidated and ship in the same change. There is no
     separate documentation agent.
-12. **NEVER hand-edit the harness** — `.pi/skills/`, `.pi/prompts/`, `.pi/agents/`,
+12. **NEVER hand-edit the harness** — `.pi/skills/`, `.pi/workflows/`, `.pi/agents/`,
     or the plugin config — as a side effect of a feature task. Those changes deserve their own
     reviewable commit. Changing a skill to make a review pass is the wrong direction of travel.
 13. **Do not parallelise units with cross-dependencies.** Default to sequential. `/parallel-execution`
@@ -129,10 +93,10 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
 
 ## Verification and reporting
 
-15. **The orchestrator verifies the combined tree, not just the units.** `pnpm typecheck` and
-    `pnpm build:local` on the merged result, run by you rather than delegated. A developer
-    self-tests its own unit at stage 5 and nothing more, because a change that typechecks per-file
-    but does not package is only visible once the units are joined. `pnpm lint`
+15. **The coordinating agent verifies the combined tree, not just the units.** `pnpm typecheck` and
+    `pnpm build:local` on the merged result, run by the coordinating agent rather than delegated. A
+    developer self-tests its own unit at stage 5 and nothing more, because a change that typechecks
+    per-file but does not package is only visible once the units are joined. `pnpm lint`
     already fails from 13 pre-existing errors (3 in `gateway`, 10 in `backend-core`) — diff against
     baseline before calling it a regression.
 16. **NEVER ask the user for design files, Figma JSON, or screenshots.** Figma is not used in this
@@ -151,6 +115,12 @@ Asking about every step is not rigour, it is friction. Asking before a force-pus
     [Evidence](#evidence-what-a-pass-requires), which holds this rule.
 22. **No fabricated references.** Link only artifacts produced or read this session. An invented
     filename is worse than an admitted gap, because it sends a reader to a dead end with confidence.
+23. **The agent that writes the code must not give the final verdict on that code.** A lane reviewing
+    its own diff cannot catch a self-consistent mistake, so self-test and review are not the same act
+    at two intensities. Self-testing a unit is required; a verdict on it is not available to the lane
+    that produced it. Stage 5 is the lane's own check and stage 7 is an independent context, and
+    neither is optional. Which stages those are, and which lane holds each, is in
+    [the gate sequence](../../../workflows/harness-process.md#the-gate-sequence).
 
 ## Evidence: what a PASS requires
 
@@ -170,18 +140,17 @@ command you cannot name has not been run. Every check reports one of three state
 are absence of evidence read as evidence.
 
 **An unrun check is `NOT RUN`, never an inferred pass.** A check that was skipped because it was slow,
-because the environment lacked a dependency, or because the lane judged it unnecessary is
-`NOT RUN` with that reason attached. The one exception is a check that does not apply, and an
-inapplicable check is named as inapplicable rather than left blank. Blank is how a skipped check
-becomes a claimed pass.
+because the environment lacked a dependency, or because the lane judged it unnecessary is `NOT RUN`
+with that reason attached. The one exception is a check that does not apply, and an inapplicable check
+is named as inapplicable rather than left blank. Blank is how a skipped check becomes a claimed pass.
 
-**A lane with no named validator has not finished.** The dispatch names who verifies the lane and
-what counts as passing, before the lane starts. If the lane cannot name the command it would use, the
+**A lane with no named validator has not finished.** The dispatch names who verifies the lane and what
+counts as passing, before the lane starts. If the lane cannot name the command it would use, the
 prompt is at fault. Fix the prompt and re-dispatch.
 
-Every lane returns a `<verification>` block inside its `<result>`. `frontend-dev` and `backend-dev` report
-on implementation, `tester` on behaviour, `reviewer` on review. Hold each to that shape and relay the
-block through rather than paraphrasing it into vagueness.
+Every lane returns a `<verification>` block inside its `<result>`. The implementation roles report on
+implementation, the acceptance role on behaviour, and the review role on review. Hold each to that
+shape and relay the block through rather than paraphrasing it into vagueness.
 
 **A lane's evidence is relayed exactly as reported. The narrative across lanes is yours.** Two rules
 that look opposed and are not. Relay every command a lane names, with the output it produced, at the
@@ -198,79 +167,6 @@ says about relaying evidence, points here rather than restating it.
 A bug's repro passes on the same surface that failed. A check that runs against a different surface
 proves something else, and reporting it as a pass is the failure this rule exists to prevent.
 
-## The bounded fix loop
-
-Verification or review fails. The finding goes back to the lane that wrote the code, which fixes it
-and re-runs its own self-test. Independent review runs again on the new code, and independent
-verification runs again if it ran the first time. That is one cycle.
-
-**Maximum 3 cycles.** On the third failure, stop. Report `WORKFLOW BLOCKED` with every unresolved
-finding, the command output behind each one, and what each remaining finding would need. Hand it to
-the human. Do not dispatch a fourth cycle. A loop that never terminates is not diligence, it is a
-task that has stopped reporting.
-
-**The reviewer does not fix. It reports, and the developer fixes.** A review lane that edits the diff
-is no longer independent, and it also leaves the fix unverified by the pass that followed it. The
-separation is what the loop depends on, so it holds even when the fix looks trivial.
-
-The loop handles a defect in the implementation. A finding that says the plan is wrong is not a
-defect, and running it through the loop produces more of the wrong thing. That is
-[When to return to planning](#when-to-return-to-planning).
-
-## When to return to planning
-
-Not every failure belongs in the fix loop. The discriminator is the finding's own claim.
-
-Route it to the fix loop when the finding says **the implementation is wrong**: a behaviour defect, a
-missing test, a broken build, a finding scoped to the files that were approved.
-
-Return to planning when the finding says **the plan is wrong**:
-
-- the architecture is wrong, or a boundary the plan assumed does not hold in the code
-- the approved scope is insufficient to finish the task
-- a new API is needed, public or shared, and it does not exist yet
-- the data model must change
-- the requirements changed while the work was in flight
-- the implementation needs a materially different approach from the approved one
-
-Return to planning means re-entering stage 1 with the finding as the new input, not patching around
-it inside the current approval. If the re-plan changes scope or risk, the human gate at stage 3
-applies again, because the thing being approved is a different thing.
-
-Reworking a wrong plan inside a fix loop produces more of the wrong thing. Each cycle looks bounded
-and none of them address the finding.
-
-## When combined-tree verification fails
-
-This section refines the router above rather than replacing it. Classify the failure before routing
-it, because the same failing check carries a different owner depending on which of these it is.
-
-| Category                                | What it means                                                   | Route                                                                                                                            |
-| --------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `IMPLEMENTATION_FAILURE`                | This domain's code is wrong                                     | Back to that domain's implementation worker, through [the bounded fix loop](#the-bounded-fix-loop).                              |
-| `TEST_FAILURE`                          | A test is wrong or stale                                        | The orchestrator decides first whether the test or the implementation is at fault, then routes to whichever one owns it.         |
-| `INTEGRATION_FAILURE`                   | The domains disagree at the boundary                            | Back to the orchestrator, re-routed through contract analysis to **every** affected domain. Never to a single developer.         |
-| `SCOPE_OR_REQUIREMENT_FAILURE`          | The implementation does not meet the agreed requirement         | That is the "the plan is wrong" branch, so back to [planning](#when-to-return-to-planning).                                      |
-| `ENVIRONMENT_OR_INFRASTRUCTURE_FAILURE` | The code may be correct and the environment blocks verification | Report it as-is. Do **not** route an application-code change to an implementation worker, because nothing in the diff is broken. |
-
-**When a failure could be classified either way, take the more specific category and say why.** A
-frontend/backend contract disagreement is also arguably a requirement failure, but
-`INTEGRATION_FAILURE` names the boundary that broke rather than the intent and carries the route that
-reaches **every** affected domain, so it is the one that governs; the report states the category it
-took and the reason.
-
-The fix loop stays bounded wherever a branch lands in it. Maximum 3 cycles, then
-`WORKFLOW BLOCKED`, as [the bounded fix loop](#the-bounded-fix-loop) states. An escalation carries
-the failure, its evidence, the attempts made so far, the affected domain, the suspected root cause,
-and what is still uncertain.
-
-**The writing lane authors the test.** When `TEST_FAILURE` lands on a test that is missing rather
-than wrong, `tester` has already reported that criterion as `unverifiable` and named the check that
-would settle it. That report is the authorisation that surfaces the need, not the authority to write
-it. The task prompt or the bounded fix loop decides whether a test gets written, and the
-implementation lane owning that domain authors it. `tester` is not a second developer, and a check
-its author wrote is not independent evidence.
-
 ## The contract change gate
 
 An implementation worker must not silently redefine an agreed contract. When the contract it was
@@ -283,11 +179,10 @@ CONTRACT_CHANGE_REQUIRED
 carrying the current contract, the proposed change, the reason, the affected domains, the affected
 files, and the risk.
 
-The orchestrator routes that signal through the planning authority that already exists. `architect`
-for a design question. `oracle` to challenge the proposal before it is adopted. A material change
-triggers the human gate, the same way any other scope decision does. Every affected lane is
-re-synchronised on the new contract before work continues, so no unit keeps building against the one
-it was handed.
+**The route that signal takes is in
+[the contract change route](../../../workflows/harness-process.md#the-contract-change-route).** The rule
+is here because it binds the worker that has to stop. The sequence is elsewhere because it describes
+who acts next, which is the process's job and not this file's.
 
 The failure this prevents is a boundary that moves in two directions at once. A frontend lane quietly
 changes an API expectation, a backend lane quietly changes the response shape, and the mismatch
@@ -307,4 +202,4 @@ directory never existed and the mechanism is gone. Progress is reported in repli
 context; there is no file to maintain and no barrier to honour.
 
 `style-doctor` is the design gate for UI scopes, sequenced by the `code-review` skill in the TECH
-pass. The orchestrator does not treat a token violation as separable from the rest of the TECH pass.
+pass. A token violation is not separable from the rest of the TECH pass.

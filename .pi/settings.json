@@ -12,7 +12,7 @@
     ".pi/skills/code-review/typecheck-doctor",
     ".pi/skills/code-review/typescript-doctor"
   ],
-  "prompts": [".pi/prompts"],
+  "prompts": [".pi/workflows"],
   "packages": ["npm:pi-subagents@0.73.1"],
   "subagents": {
     "agentOverrides": {
