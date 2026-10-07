@@ -62,9 +62,8 @@ Examples of how `<packageName>` is derived from `apps/<project>/package.json`:
 | `apps/frontend/portal/tsconfig.json`      | `@pawhaven/portal`       | `pnpm --filter @pawhaven/portal typecheck`       |
 | `apps/backend/core-service/tsconfig.json` | `@pawhaven/core-service` | `pnpm --filter @pawhaven/core-service typecheck` |
 
-These are **illustrative examples** — actual projects and names are discovered at runtime. An earlier
-version of this table listed `apps/frontend/admin` / `@pawhaven/admin`, which is not a workspace
-package; do not add it back.
+These are **illustrative examples** — actual projects and names are discovered at runtime. There is no
+`apps/frontend/admin` in this workspace; do not add it.
 
 ## Related
 

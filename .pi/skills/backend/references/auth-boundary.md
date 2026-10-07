@@ -2,31 +2,16 @@
 
 ## Contents
 
-- [The flow](#the-flow)
 - [Declaring endpoint policy](#declaring-endpoint-policy)
 - [Reading identity](#reading-identity)
 - [What the guard actually enforces](#what-the-guard-actually-enforces)
 - [Verifying this yourself](#verifying-this-yourself)
 - [Reviewing a change here](#reviewing-a-change-here)
 
-**The gateway alone owns browser cookies and browser JWTs.** Every other service sees only a
-short-lived internal JWT. This is the repo's most expensive invariant to violate.
-
-## The flow
-
-```
-browser ──cookie/JWT──► gateway :8080
-                           │  resolves caller identity (F1–F4), refreshes if needed
-                           │  signs ES256 internal JWT  ──►  x-gateway-jwt
-                           ▼
-                    core-service / auth-service / document-service
-                           │  InternalJwtGuard verifies, fails closed
-                           ▼
-                    handler reads claims via @InternalJwt()
-```
-
-Downstream services **never** see a browser token. The `x-trace-id` header and the internal JWT's
-`rid` claim are minted from the same value by the gateway.
+The trust model — who mints the internal JWT, how it is signed, and what the gateway resolves — is
+owned by [authentication-architecture.md](../../../../docs/architecture/authentication-architecture.md).
+This reference holds the implementation side: how to declare policy, how to read identity, and what
+counts as a blocking defect in a service.
 
 ## Declaring endpoint policy
 

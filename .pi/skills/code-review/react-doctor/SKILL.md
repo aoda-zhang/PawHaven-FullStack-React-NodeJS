@@ -16,11 +16,11 @@ Two-layer validation for React code:
 1. **Primary**: `npx react-doctor@0.9.12` — the canonical tool for security, performance, correctness, architecture, accessibility, and bundle size.
 2. **Supplementary**: manual `rg` rules for project-specific conventions the generic CLI cannot know (typed Redux hooks, TanStack Query key factories, RHF enforcement).
 
-**Version is pinned to `0.9.12`** — the SAME version CI runs (`.github/workflows/react-doctor.yml` sets `version: "0.9.12"` on `millionco/react-doctor@v2`).
+**Version is pinned to `0.9.12`** — the same version CI runs (`.github/workflows/react-doctor.yml` sets `version: "0.9.12"` on `millionco/react-doctor@v2`).
 
-Never use `@latest`: it drifts ahead of the pin and the local scan stops agreeing with CI. The gap is not theoretical — the skill previously claimed `0.7.6` while CI ran `0.9.12`, which is **17 releases of rules CI reported and the local review could not see** (this is why PR #70's findings were missed).
-
-Bumping the version requires explicit approval **AND** a matching bump in the workflow. Both sides move together or neither does.
+Never use `@latest`: it drifts ahead of the pin and the local scan stops agreeing with CI. Bumping the
+version requires explicit approval **and** a matching bump in the workflow. Both sides move together or
+neither does.
 
 ## Layer 1: Official React Doctor CLI
 
@@ -50,11 +50,9 @@ find apps/frontend -type d -name src -not -path '*/node_modules/*'
 find apps/frontend -name 'reduxHooks.ts' -not -path '*/node_modules/*'
 ```
 
-`apps/frontend/portal` is the only frontend app in this repo. An earlier version of this skill
-required the scan to cover `apps/frontend/admin` as well, and told the reviewer to re-run with
-`--project apps/frontend/portal,apps/frontend/admin` when it was missing from the list. **No admin app
-exists** — that directory is not in the workspace, and asking for it turns a clean scan into a
-false finding. If a second frontend app is ever added, discover it here rather than hardcoding it.
+`apps/frontend/portal` is the only frontend app in this repo, and there is no `apps/frontend/admin`.
+Do not ask any command for a project that does not exist; that turns a clean scan into a false
+finding. If a second frontend app is added, discover it here rather than hardcoding it.
 
 From the results, derive the frontend `src/` root and the Redux store directory.
 
@@ -136,9 +134,8 @@ From the results, derive the frontend `src/` root and the Redux store directory.
 
 Paste the **raw react-doctor output** — the exact command, the project list it scanned, and the findings — into the review report.
 
-A review that claims "react-doctor: clean" **without** that raw output is INVALID. The review's verification block must carry this evidence; a missing scan is a skipped step, not a passing one.
-
-This exists because the step is easy to skip: the scan is a prompt-level instruction, not automation. On PR #70 it was never executed, so CI's findings had no local counterpart.
+A review that claims "react-doctor: clean" **without** that raw output is invalid. The review's
+verification block must carry this evidence; a missing scan is a skipped step, not a passing one.
 
 ## Related
 

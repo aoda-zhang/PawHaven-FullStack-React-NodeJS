@@ -52,24 +52,19 @@ Those subdirectories are the module names for Rule 4.
 - **Explanation**: Feature A must not import from Feature B directly. If code is shared across
   features, it must graduate to `@pawhaven/ui` or `@pawhaven/frontend-core`.
 
-**The exclusions are load-bearing.** Without them this command returns ~15 hits that are all correct
-code, and a doctor that cries wolf gets skipped:
+**The exclusions are load-bearing.** Without them this command returns hits that are all correct code,
+and a doctor that cries wolf gets skipped:
 
-- `src/router/**` is the composition root — `router.tsx` imports every feature's `route.tsx` on
-  purpose. The search is scoped to `src/features/` to drop it.
-- `import type` is filtered out. `store/globalReducer.ts` and `features/auth/` share
-  `ProfileType`, and `utils/getStatusColorByPrefix.ts` reads a type out of `features/home/types` —
-  type-only sharing across the app shell is not the violation this rule is about.
-- A feature importing from **itself** (`features/home/route.tsx` → `features/home/Home`) is the
-  normal case. Only a source/target pair that differs is a finding.
+- `src/router/**` is the composition root — the router imports every feature's route on purpose. The
+  search is scoped to `src/features/` to drop it.
+- `import type` is filtered out. Type-only sharing across the app shell is not the violation this rule
+  is about.
+- A feature importing from **itself** is the normal case. Only a source/target pair that differs is a
+  finding.
 
-**Known hits — real, and worth reporting, not new:** `features/rescue-detail/components/VolunteerInfo.tsx`
-imports `FollowButton` and `FollowerCount` from `features/animal-follow/`;
-`features/report-animal/api/reportAnimal.mutations.ts` imports `homeQueryKeys` and
-`rescueCasesQueryKeys`; and `features/report-animal/ReportAnimal.tsx` imports `useCurrentUser` from
-`features/auth/`. The first is recorded as a defect in `docs/features/README.md`; the other two are
-not recorded anywhere. All are pre-existing, so flag them as findings about the codebase, not as
-regressions from the change under review.
+Pre-existing hits this rule returns are recorded in
+[docs/quality](../../../../docs/quality/README.md), marked with the command that produces them. Report
+those once as findings about the codebase, never as regressions from the change under review.
 
 ### Rule 2: Packages importing feature code
 
@@ -144,14 +139,9 @@ regressions from the change under review.
 - `apps/frontend/portal/src/providers/QueryProvider.tsx` — `window.location.replace(...)` on an auth
   failure. A forced full-page reload that clears broken session state is intentional.
 
-**One known hit that is a real deviation, reported as a warning:**
-
-- `apps/frontend/portal/src/layout/RootLayoutFooter.tsx` — `StandaloneBrand` calls
-  `window.location.assign('/')`. It only runs when `useInRouterContext()` is false, so
-  `useNavigate` is unavailable there, which is why the rule cannot be satisfied. A plain
-  `<a href="/">` would be the better form: it avoids a full reload and does not require JS. Report
-  it as ⚠️ Warning against the pre-existing code, not as a blocking finding on the change under
-  review.
+**One pre-existing hit is a real deviation, reported as a warning** — recorded in
+[docs/quality](../../../../docs/quality/README.md) with the reason the rule cannot be satisfied there
+and the better form. Report it as ⚠️ Warning against pre-existing code, not as blocking.
 
 ## Execution
 

@@ -194,21 +194,12 @@ Use the discovered paths throughout all search rules below.
 6. Report: list discovered directories, then list each violation with file path, line number, matched
    content, and which rule it breaks.
 
-## Known hits — pre-existing, report as such
+## Pre-existing hits
 
-Running the commands above today returns two groups, both of them in the codebase rather than in any
-change under review:
-
-- **Rule 4d**, two inline `style={{ }}`: `features/home/components/AdoptablePetsSection.tsx:25` and
-  `features/home/components/PetCard.tsx:27`, both `scrollSnap*` values. The first is recorded as a
-  defect in `docs/features/README.md`; the second is not recorded anywhere.
-- **Rule 2**, raw Tailwind colour utilities: `layout/RootLayoutFooter.tsx` (`text-brown-7`,
-  `bg-white/10`, `hover:text-white`) and `features/home/components/PetCard.tsx:40`
-  (`text-gray-400`, `hover:text-red-500`).
-
-A review must not attribute these to the diff it is reviewing. Report them once, marked
-pre-existing, and move on — otherwise every review of a frontend file re-reports the same four lines
-and the real finding gets lost.
+A review must not attribute a pre-existing hit to the diff it is reviewing. Report it once, marked
+pre-existing, and move on — otherwise every review of a frontend file re-reports the same lines and
+the real finding gets lost. Every pre-existing hit these rules return is recorded in
+[docs/quality](../../../../docs/quality/README.md), with the command that produces it.
 
 ## Related
 

@@ -118,9 +118,9 @@ Behavioural rules — the ones an agent gets wrong without being told.
   a loop capped at 3 cycles. A finding that says the plan is wrong returns to planning instead.
 - **No plausibility passes.** If you cannot name the command that ran and the output it produced,
   it did not pass. A bug's repro must pass on the same surface that failed.
-- Verify the **combined** tree, not just the units. `pnpm lint` already fails from 13 pre-existing
-  errors (3 in `gateway`, 10 in `backend-core`) — diff against baseline before calling anything a
-  regression.
+- Verify the **combined** tree, not just the units. `pnpm lint` exits non-zero on a clean tree — the
+  baseline, and every known pre-existing finding behind it, lives in
+  [`docs/quality/`](docs/quality/README.md). Diff against it before calling anything a regression.
 - **A worker that cannot build what it was handed stops and signals** `CONTRACT_CHANGE_REQUIRED`
   rather than quietly redefining a boundary.
 - **Never hand-edit the harness or `docs/architecture/` as a side effect of a feature task**;

@@ -3,8 +3,8 @@ name: task-classification
 description: >
   Classify a request before a workflow is chosen — task type, secondary tasks, scope, domains,
   complexity, risk, confidence, clarification need — as one JSON artifact the user sees. Semantic
-  intent, not keywords. Routes to the six canonical workflows. Load at routing time, at the
-  start of any non-trivial request, before planning or dispatching.
+  intent, not keywords. Load at routing time, at the start of any non-trivial request, before
+  planning or dispatching.
   Trigger: new request task routing workflow selection classify classification triage which workflow
   which process how to start where to start first step entry point, complexity scope risk size
   difficulty estimate, feature bug fix refactor architecture investigation performance, ambiguous
@@ -13,12 +13,12 @@ description: >
 
 # Task Classification
 
-Classify before selecting a workflow. The deliverable is one JSON block, and the user sees it.
+Classify before a workflow is chosen. The deliverable is one JSON block, and the user sees it.
+
 **Classify semantic intent, not keywords.** Read what must be true when the task is done, not which
 words the request contains. "Add a test for the adoption form" is not a feature — the behavior
-already exists and nothing user-visible changes; it is `testing` scope inside a `refactor` that
-strengthens the pin. "Improve the adoption form" is a feature. The verb in the request is not the
-task type; the outcome is.
+already exists and nothing user-visible changes. "Improve the adoption form" is a feature. The verb in
+the request is not the task type; the outcome is.
 
 ## The contract
 
@@ -40,19 +40,18 @@ task type; the outcome is.
 ```
 
 - `taskType` — the single primary type, from the six below.
-- `secondaryTasks` — other types present in the same request. They change required agents, review
-  depth, and verification. They do **not** change the workflow.
-- `scope` — from the twelve categories in [Scope](#scope). Only categories you actually touched.
-- `complexity` — orchestration depth, not diff size. See [Complexity](#complexity).
-- `risk` — verification depth, and independent of `complexity`. See [Risk](#risk).
-- `domains` — the implementation capabilities the task needs. See [Domains](#domains).
+- `secondaryTasks` — other types present in the same request. They raise review depth and
+  verification; they do not change the routing.
+- `scope` — from the twelve categories in [Scope](#scope). Only the categories you actually touched.
+- `complexity` — orchestration depth, not diff size.
+- `risk` — verification depth, independent of `complexity`.
+- `domains` — the implementation capabilities the task needs.
 - `confidence` — 0.0–1.0. Below ~0.6 means the request is ambiguous; set `requiresClarification`.
-- `workflow` — the canonical prompt this routes to. The mapping is in
-  [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow).
-- `requiredAgents` — the roles the risk and scope justify. `domains` decides which implementation
-  capabilities run, and this field names the roles those capabilities imply: `planning`,
-  `implementation`, and `verification`. Do not name a role that has nothing to check. Which lane
-  fills each role is not this skill's decision.
+- `workflow` — the canonical prompt this routes to. The mapping from `taskType` to workflow lives in
+  [the process document](../../workflows/harness-process.md#routing-a-request-to-a-workflow). Emit
+  it; do not follow it here.
+- `requiredAgents` — the roles the risk and scope justify, by role name (`planning`,
+  `implementation`, `verification`), not by lane. Do not name a role that has nothing to check.
 - `requiredVerification` — the checks that must pass, and who runs them. A lane with no named
   validator has not finished.
 - `requiresClarification` / `clarificationReason` — see [Output rules](#output-rules).
@@ -73,22 +72,8 @@ neighbour before committing.
 | `investigation`       | The user primarily wants understanding or evidence, not a code change                                                              | `bug-fix` — if there is a defect to repair, that is the primary and the investigation is secondary. |
 | `performance`         | The primary objective is a measured performance improvement                                                                        | `bug-fix` — a bug is wrong, perf is slow. No measurement, no `performance`.                         |
 
-A request can fail every positive test because two types are genuinely in play. That is a signal to
-name one as primary and put the other in `secondaryTasks` — not to average them.
-
-## Secondary tasks
-
-Tasks carry more than one dimension; the primary picks the workflow, the secondaries set the
-weight.
-
-- "Refactor the adoption form and add autosave." → primary `feature`, secondary `refactor`. The
-  autosave is new behavior; the form cleanup rides along. The refactor raises review depth, because
-  behavior must stay pinned while structure moves.
-- "Fix the auth bug by redesigning session management." → primary `bug-fix`, secondary
-  `architecture-change`, `risk: high`. The reported failure is what the user wants gone.
-
-Never let a secondary task take over the routing. If the architecture change is the bulk of the
-work, say so plainly in the reply; the workflow may be `architecture-change` after all.
+A request can fail every positive test because two types are genuinely in play. Name one as primary
+and put the other in `secondaryTasks` — do not average them.
 
 ## Scope
 
@@ -99,101 +84,63 @@ frontend  backend  database  api  gateway  core-service  document-service
 shared    testing  infrastructure  documentation  cross-system
 ```
 
-`cross-system` means the change spans more than one of the four services — say which, do not leave
-it as a bare category.
+`cross-system` means the change spans more than one of the four services — say which, do not leave it
+as a bare category. Work on `.pi/` is `infrastructure` and gets no category of its own.
 
-**Discover scope, never guess it.** A scope category you inferred from the request text is a
-hypothesis. Grep for the files, packages, and services the change lands in and confirm before
-emitting the JSON. An unverified `scope` sends the wrong agent to the wrong tree.
-
-Work on `.pi/` is `infrastructure`. It gets no scope category of its own.
+**Discover scope, never guess it.** A category inferred from the request text is a hypothesis. Grep
+for the files, packages, and services the change lands in and confirm before emitting the JSON. An
+unverified `scope` sends the wrong agent to the wrong tree.
 
 ## Domains
 
-`domains` answers which implementation capabilities the task needs, which is to say which workers
-must run:
+`domains` says which implementation capabilities the task needs, which is which workers must run.
 
 ```json
 "domains": ["frontend", "backend", "database"]
 ```
 
-`frontend` and `backend` are the two that dispatch today, and `database` joins them when the change
-is schema or persistence work. The list is deliberately open: `devops`, `mobile`, `data`, `security`
-and others may be added later without changing anything else in the harness.
+`frontend` and `backend` dispatch today; `database` joins them for schema or persistence work. The
+list is deliberately open — `devops`, `mobile`, `data`, `security` may be added later without changing
+anything else.
 
-`scope` keeps its values unchanged. It says where in the repository the change lands, and `gateway`,
-`core-service`, `document-service`, and `cross-system` name services and boundaries in this repo
-rather than capabilities, so they have no home in `domains`.
-
-**A value may appear in both lists, and that is not duplication.** They answer different questions,
-and different parts of the workflow read them. `scope` says where, `domains` says which workers.
-`database` stays in `scope` and also appears in `domains` for exactly that reason.
+`scope` and `domains` answer different questions and a value may appear in both. `scope` says where in
+the repository the change lands; `domains` says which capabilities it needs. `gateway`,
+`core-service`, `document-service`, and `cross-system` name services and boundaries, not capabilities,
+so they have no home in `domains`.
 
 ## Complexity
 
-Complexity is **orchestration depth** — how much delegation and planning the task justifies. Line
-count is not complexity; a five-file change inside one service is not a high-complexity task, and a
-two-file change to an auth contract is.
-
-Complexity and risk are **separate and independent**. Complexity measures how much the task is to
-orchestrate, and risk measures how badly a wrong answer is paid for. Low complexity never buys a
-lighter path when risk is high: a two-file change to authentication behavior is technically small and
-operationally high-risk, so it takes the strong path in full.
+Complexity is **orchestration depth** — how much planning and delegation the task justifies. Line
+count is not complexity; a five-file change inside one service is not high-complexity, and a two-file
+change to an auth contract is.
 
 - **low** — localized, one layer, established pattern, low ambiguity, straightforward verification.
-  Bind it on complexity **and** risk together, because the fast path is `low` and `low` only. Do the
-  work in the main session when both are low. Dispatching on a small diff with a high risk costs more
-  than it saves.
+  Do the work in the main session when risk is low too. The fast path is `low` complexity **and** `low`
+  risk, and nothing else buys it.
 - **medium** — multiple files or layers, non-trivial state or data flow, several tests, moderate
-  uncertainty. Dispatch per workstream, join the results yourself.
+  uncertainty.
 - **high** — multiple services, architecture boundaries, database changes, security-sensitive flows,
-  ambiguous domain behavior, integration that is hard to verify. Plan first, dispatch in verifiable
-  units, require a named validator per unit.
+  ambiguous domain behavior, integration that is hard to verify. Plan first, and require a named
+  validator per unit.
+
+Complexity and risk are separate. Low complexity never buys a lighter path when risk is high.
 
 ## Risk
 
 Risk sets verification depth.
 
 Always at least **high**: authentication, authorization, permissions, credentials, tokens, sessions,
-PII, security boundaries. In this repo that also covers anything touching the gateway's cookie and
-internal-JWT boundary — see `docs/architecture/authentication-architecture.md`.
+PII, security boundaries — including anything touching the gateway's cookie and internal-JWT boundary.
 
 A change to the harness itself is **high at minimum** and may not take a lightweight path:
-`.pi/agents`, `.pi/skills`, `.pi/workflows`, `.pi/settings.json`, model configuration, orchestrator
-behaviour. A harness change affects every future development task, so a
-wrong one is paid for repeatedly and stays invisible until much later.
+`.pi/agents`, `.pi/skills`, `.pi/workflows`, `.pi/settings.json`, model configuration, orchestration
+behavior. A harness change affects every future task, so a wrong one is paid for repeatedly and stays
+invisible until much later.
 
 **critical** is reserved for destructive operations: destructive database migrations, destructive data
-operations, production infrastructure changes.
-
-A `critical` classification **requires explicit human confirmation before any irreversible
-execution**. State the operation, say what it destroys, and wait. Proposing the plan is fine;
-running it is not. `critical` is never cleared by an agent's own confidence.
-
-## Routing
-
-Each of the six task types routes to exactly one workflow, and `taskType` is what picks it.
-`design-decision`, `parallel-execution`, and `handoff` are not task types. They are stages inside
-the workflows above, reached from the routed workflow rather than instead of it.
-
-The mapping from type to prompt, and the lane shape that `complexity`, `risk`, and `domains` imply,
-are in [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow). This
-skill produces the artifact that selects a workflow; it does not own the sequence that follows.
-
-### The shared contract
-
-When `domains` interact, the shared contract is settled before the independent implementation starts,
-so neither worker is guessing at the boundary the other is about to land. A full-stack task is
-**composed** from the domains that exist, and no `fullstack-dev` worker exists or should be created
-for it. Composition is what the coordinating role already does, and a role for it would be a role with
-nothing of its own to check.
-
-A contract is a durable handoff artifact that describes a boundary. It is not an agent, not a skill,
-and not a subsystem. At the code level that boundary is
-[`packages/shared/types`](../../../packages/shared/types), the types and Zod schemas both sides
-import instead of re-declaring. When a contract turns out to be insufficient mid-flight, the worker's
-next move is in
-[the contract change gate](../../workflows/harness-process.md#the-contract-change-gate).
+operations, production infrastructure changes. A `critical` classification requires explicit human
+confirmation before any irreversible execution. State the operation, say what it destroys, and wait.
+`critical` is never cleared by an agent's own confidence.
 
 ## Output rules
 
@@ -206,6 +153,10 @@ next move is in
    primary type was wrong, say which field changed and why.
 4. **Never classify from keywords alone.** If the type came from a word in the request rather than
    from the outcome, keep going until the outcome is known.
-5. **When the scope touches the harness, say which validation the change must pass.** A `.pi/` change
-   runs `pnpm pi-check`, and the reply names it. Leaving the validator implicit is how a change
-   renames a path, breaks a link, and reports itself verified.
+5. **When the scope touches the harness, name the validation it must pass.** A `.pi/` change runs
+   `pnpm pi-check`, and the reply names it. Leaving the validator implicit is how a change renames a
+   path, breaks a link, and reports itself verified.
+
+## Related
+
+- Principles: [principles](../principles/SKILL.md)

@@ -2,7 +2,7 @@
 // Validates the pi harness in .pi/ using pi's own resource loaders, so the check
 // fails for the same reasons pi would fail at startup. Run via `pnpm pi-check`.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { dirname, join, resolve, relative, sep } from 'node:path';
+import { basename, dirname, join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -61,9 +61,9 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-// 19 = 10 top-level skills + the 9 `code-review/<doctor>` skills, which pi-check reaches through
+// 21 = 12 top-level skills + the 9 `code-review/<doctor>` skills, which pi-check reaches through
 // the explicit `settings.json` entries rather than by recursing into `code-review/`.
-const EXPECTED_SKILLS = 19;
+const EXPECTED_SKILLS = 21;
 // `.pi/skills/` is the only skill registry. Zero is the value that keeps it that way: a `skills/`
 // directory reappearing under `.pi/agents/` is a second registry, and it turns red here rather than
 // becoming a third copy of a rule nobody notices drifting.
@@ -117,28 +117,12 @@ const SKILL_TO_AGENT_ALLOWLIST = [];
 // hold; editing the pinned line retires the entry rather than silently widening it.
 const SKILL_TO_WORKFLOW_ALLOWLIST = [
   {
-    // The `workflow` field's mapping.
+    // The `workflow` field's mapping. The skill emits the field; the process owns what follows.
     file: '.pi/skills/task-classification/SKILL.md',
     target: '.pi/workflows/harness-process.md',
-    line: '  [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow).',
+    line: '  [the process document](../../workflows/harness-process.md#routing-a-request-to-a-workflow). Emit',
     reason:
-      'The `workflow` field names the canonical prompt it routes to, and the mapping lives in the shared process document rather than in one of the ten workflow prompts. This skill emits the artifact that selects a workflow and disclaims owning the sequence that follows, so naming where the mapping lives is a pointer and not a dependency.',
-  },
-  {
-    // The type-to-prompt mapping, and the lane shape that complexity, risk, and domains imply.
-    file: '.pi/skills/task-classification/SKILL.md',
-    target: '.pi/workflows/harness-process.md',
-    line: 'are in [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow). This',
-    reason:
-      'Same pointer as the `workflow` field above: the mapping this skill applies is documented in the shared process document, and the skill says of itself that it produces the artifact which selects a workflow and does not own the sequence.',
-  },
-  {
-    // Where a worker is sent when a contract turns out to be insufficient.
-    file: '.pi/skills/task-classification/SKILL.md',
-    target: '.pi/workflows/harness-process.md',
-    line: '[the contract change gate](../../workflows/harness-process.md#the-contract-change-gate).',
-    reason:
-      'The contract change gate is a rule the coordinating agent enforces, not one of the nine stages of the gate sequence — it is a subsection of "The coordination role\'s rules" in the shared process document. The skill\'s own next move is to emit the artifact that selects a workflow, so it points at where the rule is documented rather than depending on it.',
+      'The `workflow` field names the canonical prompt the classification routes to, and the mapping lives in the shared process document rather than in any one of the workflow prompts. This skill emits the artifact that selects a workflow and states of itself that it does not own the sequence that follows, so naming where the mapping lives is a pointer and not a dependency.',
   },
   {
     // The lane shape each worked example implies.
@@ -189,7 +173,20 @@ const CATALOG_ONLY_SKILLS = [
   'test-doctor',
   'typecheck-doctor',
   'typescript-doctor',
+  // The two harness meta-skills are reached by path from `harness-validator`, which owns the
+  // run/interpret/fix contract for a `.pi/` change and links both. They are not granted to a lane,
+  // because the work they describe — writing a skill or an agent — is harness authoring rather than
+  // a lane's routine job, and granting them would put two skills' worth of authoring guidance into a
+  // lane's context on every unrelated task.
+  'skill-creator',
+  'agent-creator',
 ];
+
+// A SKILL.md is an execution entry point, not a knowledge base. Past this many lines the file is
+// carrying detail a `references/` file should hold, and every lane that grants the skill pays for it
+// on every task. The limit is a ratchet, raised only with a reason: lower is not a goal in itself, and
+// splitting a coherent rule across two files to satisfy a number is worse than the length.
+const MAX_SKILL_LINES = 250;
 
 const failures = [];
 const warnings = [];
@@ -928,6 +925,100 @@ for (const file of skillFiles) {
 
 console.log(
   `skill -> workflow: ${workflowPointers} pointers, ${workflowAllowlisted} allowlisted`,
+);
+
+// 6. Oversized SKILL.md. The frontmatter description is what an agent reads before deciding to load a
+// skill; the body is what every lane that grants it pays for on every task. A body past the limit is
+// carrying detail that belongs behind a reference, and the fix is to move that detail and link it —
+// not to shorten the rule. Reported as an architecture violation because the failure mode is a
+// context cost paid by lanes that never asked for it.
+const oversized = [];
+for (const file of skillFiles) {
+  if (basename(file) !== 'SKILL.md') continue;
+  const lines = readFileSync(file, 'utf8')
+    .replace(/\n$/, '')
+    .split('\n').length;
+  if (lines <= MAX_SKILL_LINES) continue;
+  oversized.push({ file, lines });
+  failures.push(
+    `ARCHITECTURE_VIOLATION: oversized SKILL.md — ${relative(repoRoot, file)}: ${lines} lines, limit ${MAX_SKILL_LINES}. Move the detail a task does not need on every load into a references/ file and link it from SKILL.md.`,
+  );
+}
+
+// 6b. Skill id against directory name. pi resolves a skill's invocable name as the frontmatter
+// `name`, falling back to the directory name, and it only warns on a malformed name — never on a name
+// that disagrees with its directory. So `style-doctor/` carrying `name: styling` is invoked as
+// `styling` while every reference in the repo still says `style-doctor`, and nothing errors.
+let skillIdMismatches = 0;
+for (const file of skillFiles) {
+  if (basename(file) !== 'SKILL.md') continue;
+  const dirName = basename(dirname(file));
+  const declared = readFileSync(file, 'utf8')
+    .match(/^---\n[\s\S]*?^name:[^\S\n]+(.+)$/m)?.[1]
+    ?.trim();
+  if (!declared) {
+    skillIdMismatches++;
+    failures.push(
+      `${relative(repoRoot, file)}: no \`name:\` in the frontmatter. pi would fall back to the directory name and every reference to the declared id would resolve to nothing.`,
+    );
+    continue;
+  }
+  if (declared === dirName) continue;
+  skillIdMismatches++;
+  failures.push(
+    `ARCHITECTURE_VIOLATION: skill id vs directory — ${relative(repoRoot, file)}: declares \`${declared}\` in a directory named \`${dirName}\`. pi invokes the frontmatter name, so every reference written as \`${dirName}\` resolves to nothing. Rename the directory or the frontmatter name so they agree.`,
+  );
+}
+
+// 7. Unreachable supporting file. A file under references/, scripts/, or assets/ that nothing in the
+// owning skill names loads nowhere, and because it still parses as valid markdown it reads as live on
+// disk. The test is a mention of the file's name in any of the skill's own markdown other than the
+// file itself, which covers a markdown link and a bare path inside a command alike — the i18n parity
+// script is named in a `node <path>` line rather than linked, and it is reachable.
+function collectFiles(dir, found = []) {
+  if (!existsSync(dir)) return found;
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) collectFiles(full, found);
+    else found.push(full);
+  }
+  return found;
+}
+
+const skillDirs = skillFiles
+  .filter((file) => basename(file) === 'SKILL.md')
+  .map((file) => dirname(file));
+let supportingFiles = 0;
+for (const skillDir of skillDirs) {
+  const ownMarkdown = collectFiles(skillDir).filter((file) =>
+    file.endsWith('.md'),
+  );
+  for (const sub of ['references', 'scripts', 'assets']) {
+    for (const target of collectFiles(join(skillDir, sub))) {
+      supportingFiles++;
+      const name = basename(target);
+      const mentioned = ownMarkdown.some(
+        (source) =>
+          source !== target && readFileSync(source, 'utf8').includes(name),
+      );
+      if (mentioned) continue;
+      failures.push(
+        `ARCHITECTURE_VIOLATION: unreachable supporting file — ${relative(repoRoot, target)}: no file in its skill names it, so nothing loads it. Link it from SKILL.md or delete it.`,
+      );
+    }
+  }
+}
+
+console.log(
+  `skill size: ${oversized.length} over ${MAX_SKILL_LINES} lines (largest ${Math.max(
+    0,
+    ...skillFiles
+      .filter((file) => basename(file) === 'SKILL.md')
+      .map(
+        (file) =>
+          readFileSync(file, 'utf8').replace(/\n$/, '').split('\n').length,
+      ),
+  )}), ${supportingFiles} supporting files reachable, ${skillIdMismatches} id/directory mismatches`,
 );
 
 for (const warning of warnings) console.warn(`warn  ${warning}`);

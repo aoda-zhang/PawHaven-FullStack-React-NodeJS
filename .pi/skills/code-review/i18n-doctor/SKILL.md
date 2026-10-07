@@ -51,9 +51,7 @@ node .pi/skills/code-review/i18n-doctor/scripts/check-locale-parity.mjs \
 ```
 
 Execute it — do not read its source and do not reconstruct the check by hand. A bundled script's code
-never enters your context; only its stdout and exit code do. That is the whole point of shipping it
-as a script, and the reason this replaces the old `jq` one-liners (which also assumed an undeclared
-external binary and silently skipped the nested `documents/pdf/` tree).
+never enters your context; only its stdout and exit code do.
 
 Each locale is a **directory** containing one `<module>.json` per module plus a `documents/pdf/`
 sub-tree — there is no flat `locales/en-US.json`. A locale directory missing from the script's
@@ -140,19 +138,11 @@ Only flag content that is truly visible to the end user: button labels, headings
 5. Manually review each Rule 1 match: distinguish true hardcoded text from false positives (URLs, attributes, component names, etc.).
 6. Report: list discovered directories and locale files, then list each true violation with file path, line number, and the hardcoded text content or the offending key.
 
-## Known hits — pre-existing, report as such
+## Pre-existing state
 
-Two observations that are true of the codebase today, so a review does not re-derive them as a
-regression:
-
-- **Rule 2 currently passes.** All three locales are present (`de-DE`, `en-US`, `zh-CN`), with 396
-  keys each apart from one `zh-CN` plural variant marked `n/a`. The script also prints a warning that
-  `footer` and `rescueGuide` are each claimed by both `documents/pdf/<name>.json` and `<name>.json`
-  and share one namespace — a real collision risk, not a failure, and not something to fix in an
-  unrelated change.
-- **Rule 1 returns matches that are not all violations.** The portal ships CJK strings inline in
-  several components rather than through `t()`. Those are genuine i18n gaps worth reporting once,
-  marked pre-existing — not per review, and never as a blocking finding.
+A review must not re-derive the codebase's current state as a regression. What each rule returns
+today, including the passing parity check and its namespace-collision warning, is recorded in
+[docs/quality](../../../../docs/quality/README.md).
 
 ## Related
 

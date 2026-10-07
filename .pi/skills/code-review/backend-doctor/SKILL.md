@@ -31,9 +31,9 @@ and `document-service`.
   filtered by level, and bypasses the logging infrastructure.
 - **This rule is not mechanically enforced.** `libs/eslint-config/node.js` sets `no-console: 'off'`
   for backend, so a green `pnpm lint` says nothing about it. The command is the only check.
-- **Known hit**: `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught
-  error with `console.log`. It is pre-existing — report it as a finding about the codebase, not as a
-  regression from the change under review.
+- Pre-existing hits this rule returns are recorded in
+  [docs/quality](../../../../docs/quality/README.md). Report them once, as findings about the
+  codebase, never as regressions from the change under review.
 
 ### Rule 2: TypeScript `any` type in backend
 

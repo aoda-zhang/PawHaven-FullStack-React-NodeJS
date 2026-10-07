@@ -116,8 +116,7 @@ paste the candidate list and the reasoning for each one you keep.
 - [typecheck-doctor](../../code-review/typecheck-doctor/SKILL.md) — mechanical compiler check
 - [boundary-doctor](../../code-review/boundary-doctor/SKILL.md) — package dependency direction
 
-## Known hits — pre-existing, report as such
+## Pre-existing hits
 
-- **T6** returns one hit: `packages/frontend-core/src/api/types.ts:54` declares
-  `export enum extraRequestHeader`. It is pre-existing. Report it as a finding about the codebase
-  once, not as a blocking finding on the change under review.
+Report only against the change under review. Every pre-existing hit these rules return, and the
+command that produces it, is recorded in [docs/quality](../../../../docs/quality/README.md).

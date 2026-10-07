@@ -1,11 +1,9 @@
 # Decision record format
 
-The output template for
-[architecture-design](../SKILL.md). An architect or a reviewer classifying risk does not need it
-until the moment they write the hand-back, which is why it is not in `SKILL.md`.
+The output template for [architecture-design](../SKILL.md). Read it when you write the hand-back.
 
-A design is a decision, not a description. The record must say **where the work goes and what it
-breaks**. A proposal that lists options without choosing one has not been designed.
+A design is a decision, not a description. The record says **where the work goes and what it breaks**.
+A proposal that lists options without choosing one has not been designed.
 
 ```markdown
 # Architecture Design: {feature}

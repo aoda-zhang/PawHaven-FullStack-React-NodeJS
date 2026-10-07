@@ -174,6 +174,4 @@ export class RescueController {
 
 There is **no event bus in this codebase** — `@nestjs/event-emitter` is not a dependency and
 `EventEmitter2` appears nowhere. Cross-module communication happens through an exported service
-method, or does not happen yet. The old docs described an event-driven pattern with an
-anti-corruption layer; it was never built. If you need it, that is a design decision, not a
-convention to follow.
+method, or does not happen yet. Introducing one is a design decision, not a convention to follow.

@@ -29,9 +29,6 @@ Schema: `apps/backend/core-service/src/prisma/mongodb/schema.prisma`. Generated 
 }
 ```
 
-The old docs said `prisma/schema.prisma` and `new PrismaClient(...)` in the constructor. Both wrong
-on this repo.
-
 ## Injection uses a decorator
 
 ```typescript

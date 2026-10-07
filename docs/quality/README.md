@@ -44,18 +44,47 @@ States: `healthy` / `needs attention` / `medium risk`.
 
 ## Harness
 
-- Skill dependency graph: **healthy**. `pnpm pi-check` exits 0 — 19/19 project skills, 0
-  agent-private skills, and a clean skill graph (28 nodes, 9 ordering edges).
-- Documentation freshness: **medium risk**. `pnpm quality-check` counts 26 historical mentions of
-  retired harness resources, each classified historical by a past-tense marker on its line or in
-  the section heading above it. They are allowed, but they
-  accumulate: every historical mention is a sentence a future reader must re-classify.
+- Skill dependency graph: **healthy**. `pnpm pi-check` exits 0 — 21/21 project skills, 0
+  agent-private skills, 0 oversized `SKILL.md` (limit 250 lines, largest 208), 26 supporting files
+  reachable, and a clean skill graph (30 nodes, 7 ordering edges).
+- Documentation freshness: **needs attention**. `pnpm quality-check` counts 7 historical mentions of
+  retired harness resources, each classified historical by a past-tense marker on its line or in the
+  section heading above it. They are allowed, but they accumulate; the refactor that took this count
+  from 26 deleted the two `retired-harness-corrections.md` references outright rather than rewording
+  them.
+- Doc map: **broken**. `pnpm quality-check` fails with `orphan-scan: entry point docs/README.cn.md is
+missing` — the file was deleted in `60fba4a`, and the orphan scan still lists it as an entry point.
+  Pre-existing, unrelated to any code change, and not fixed here.
 - Duplicate rules: 2 candidates, reported as warnings by `pnpm quality-check` — the contract-change
   gate text carried by both implementation agents, and one design-philosophy sentence shared by the
   two system-architecture docs. Neither is a failure; both are drift risks to decide on.
 - Model registry: none. `.pi/settings.json` carries only `thinking` tiers, and no model name is
   hardcoded in `.pi/` (see `.pi/README.md` § Model selection). This refactor deliberately does not
   introduce one.
+
+## Pre-existing findings the doctor rules hit
+
+Each line below is a hit that a review check returns against **the codebase rather than the change
+under review**. They are recorded here so a review reports them once, marked pre-existing, instead of
+re-reporting them on every diff that touches the file. Provenance: carried over from the checks that
+first recorded them; re-run the named command to confirm before relying on one.
+
+| Check                                     | Command                                                              | What it hits                                                                                                                                                                                                                                                                                      |
+| ----------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| backend-doctor R1 `console.log`           | `rg -n 'console\.log' apps/backend --glob '*.ts'`                    | `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught error                                                                                                                                                                                                            |
+| backend-doctor R2 / react-doctor S6 `any` | `rg -n ': any\b' apps/backend --glob '*.ts'`                         | the portal has zero `: any` outside tests, so any frontend hit is a regression                                                                                                                                                                                                                    |
+| typescript-doctor T6 `enum`               | `rg -n '\benum\s+\w+' <changed files>`                               | `packages/frontend-core/src/api/types.ts:54` declares `export enum extraRequestHeader`                                                                                                                                                                                                            |
+| boundary-doctor R1 cross-feature import   | the command in that rule                                             | `features/rescue-detail/components/VolunteerInfo.tsx` imports from `features/animal-follow/`; `features/report-animal/api/reportAnimal.mutations.ts` imports `homeQueryKeys` and `rescueCasesQueryKeys`; `features/report-animal/ReportAnimal.tsx` imports `useCurrentUser` from `features/auth/` |
+| boundary-doctor R6 window navigation      | the command in that rule                                             | `apps/frontend/portal/src/layout/RootLayoutFooter.tsx` calls `window.location.assign('/')` — a ⚠️ Warning, not blocking                                                                                                                                                                           |
+| style-doctor R4d inline `style={{}}`      | `rg -n 'style=\{\{' apps/frontend/portal/src --glob '*.tsx'`         | `features/home/components/AdoptablePetsSection.tsx:25` and `features/home/components/PetCard.tsx:27`, both `scrollSnap*`                                                                                                                                                                          |
+| style-doctor R2 raw Tailwind colours      | the command in that rule                                             | `layout/RootLayoutFooter.tsx` (`text-brown-7`, `bg-white/10`, `hover:text-white`) and `features/home/components/PetCard.tsx:40`                                                                                                                                                                   |
+| i18n-doctor R1 hardcoded strings          | the command in that rule                                             | the portal ships CJK strings inline in several components rather than through `t()`                                                                                                                                                                                                               |
+| react-doctor Step 0                       | `find apps/frontend -type d -name src -not -path '*/node_modules/*'` | `apps/frontend/portal` is the only frontend app; there is no `apps/frontend/admin`                                                                                                                                                                                                                |
+| `pnpm test:e2e`                           | `pnpm test:e2e`                                                      | collects zero specs; the `e2e/` directory is empty, so a pass proves nothing                                                                                                                                                                                                                      |
+
+Accepted exceptions that are **not** findings are stated inside the rule that hits them, so the next
+reviewer does not re-litigate them: `ScrollToTop.tsx` and `QueryProvider.tsx` in boundary-doctor R6,
+and the type-only sharing named in boundary-doctor R1.
 
 ## Quality invariants
 
