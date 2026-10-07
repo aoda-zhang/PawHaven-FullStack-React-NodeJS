@@ -5,7 +5,7 @@ acceptanceRole: writer
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-patterns, frontend, project-rules, principles, writing-standards, react-doctor
+skills: typescript, frontend-patterns, principles, writing-standards, react-doctor
 tools: read, grep, find, ls, edit, write, bash
 defaultContext: fresh
 maxSubagentDepth: 0
@@ -40,25 +40,26 @@ what actually shipped.
 
 ## Read the skill first
 
-This prompt defines your role. The **skill is the authority** for how to write code. Every skill
-named below is a project skill in `.pi/skills/`, granted to you by name from that one registry; there
+This prompt defines your role. The **skill is the authority** for how to write code. `frontend-patterns`
+is the project skill granted to you by name from that one registry; most rows below point at one of
+its per-area references rather than a second skill. There
 is no second, lane-private copy of any of them.
 
-| Task                                 | Read this skill     |
-| ------------------------------------ | ------------------- |
-| Component, hook, effect, memoization | `react`             |
-| Where a component belongs            | `component`         |
-| Styling and design tokens            | `style`             |
-| User-facing text                     | `i18n`              |
-| Server data, caching, invalidation   | `react-query`       |
-| Form, validation, submission         | `react-hook-form`   |
-| Client state                         | `redux`             |
-| Where a type lives                   | `typescript`        |
-| Concrete code patterns               | `frontend-patterns` |
+| Task                                 | Read this reference                                       |
+| ------------------------------------ | --------------------------------------------------------- |
+| Component, hook, effect, memoization | `frontend-patterns` → `references/react-standards.md`     |
+| Where a component belongs            | `frontend-patterns` → `references/component-placement.md` |
+| Styling and design tokens            | `frontend-patterns` → `references/styling.md`             |
+| User-facing text                     | `frontend-patterns` → `references/i18n.md`                |
+| Server data, caching, invalidation   | `frontend-patterns` → `references/data-fetching.md`       |
+| Form, validation, submission         | `frontend-patterns` → `references/forms.md`               |
+| Client state                         | `frontend-patterns` → `references/client-state.md`        |
+| Where a type lives                   | `typescript`                                              |
+| Concrete code patterns               | `frontend-patterns` → `references/patterns.md`            |
 
-**Where things live — the shared facts** — is the `frontend` project skill: the map, the API-layer
-file shapes, the real Redux hook names, the styling gate, the type homes, the i18n contract. It sits
-in `.pi/skills/` beside the skills above rather than inside this lane, because a reviewer needs the
+**Where things live — the shared facts** — is [the portal facts document](../../../../docs/frontend-portal.md):
+the map, the API-layer file shapes, the real Redux hook names, the styling gate, the type homes,
+the i18n contract. It sits in `docs/` rather than inside this lane, because a reviewer needs the
 same vocabulary you do, and two copies of a fact is how this harness once taught hook names that do
 not exist. Read it; do not retype it.
 
@@ -72,7 +73,7 @@ not exist. Read it; do not retype it.
    to notice when the task asks for something that would move a boundary, **before** you have written
    a file that moves it. If the task appears to require crossing a feature or package boundary, stop
    and say so rather than doing it.
-3. Read the relevant lens skill from the table above, plus `frontend` for the facts.
+3. Read the relevant lens skill from the table above, plus the portal facts document for the facts.
 4. Check whether the component or feature already exists. Do not duplicate.
 5. Implement following the skill and the existing patterns in the codebase.
 6. **Run the self-verification gate** below. This step is not optional, and it is not a summary you
@@ -87,7 +88,7 @@ If the contract you were handed turns out to be insufficient to build what was a
 redefine it. Emit `CONTRACT_CHANGE_REQUIRED` carrying the current contract, the proposed change, the
 reason, the affected domains, the affected files, and the risk — then hand it to the orchestrator,
 which routes it. The gate is stated once in
-[the contract change gate](../../../skills/project-rules/references/orchestrator.md#the-contract-change-gate).
+[the contract change gate](../../../workflows/harness-process.md#the-contract-change-gate).
 
 ## The self-verification gate
 

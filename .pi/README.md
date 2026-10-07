@@ -7,9 +7,9 @@ and nothing in `.pi/` ever read from it.
 This file is the map of the harness: what exists, why each piece is a separate thing, and where the
 process is defined. It is not the process. The gate sequence, the evidence contract, and the fix
 loop live in
-[`project-rules/references/orchestrator.md`](./skills/project-rules/references/orchestrator.md), and
+[`harness-process.md`](./workflows/harness-process.md), and
 the harness-integrity checks live in
-[`project-rules/references/harness-validator.md`](./skills/project-rules/references/harness-validator.md).
+[`harness-validator`](./skills/harness-validator/SKILL.md).
 Both are linked rather than restated here, because a rule stated twice drifts from its copy.
 
 ## Layout
@@ -17,8 +17,8 @@ Both are linked rather than restated here, because a rule stated twice drifts fr
 ```
 .pi/
 ├── settings.json          # skills, prompts, packages, subagent model config
-├── skills/                # 27 project skills (SKILL.md + references/), the single registry
-│   ├── <skill>/           # 18 top-level skills
+├── skills/                # 19 project skills (SKILL.md + references/), the single registry
+│   ├── <skill>/           # 10 top-level skills
 │   └── code-review/       # meta-skill + 9 doctors nested underneath
 ├── workflows/             # 10 process definitions, flat (/bug-fix, /feature-development, /harness-process, …)
 ├── agents/                # 9 subagent definitions, grouped by role
@@ -26,7 +26,6 @@ Both are linked rather than restated here, because a rule stated twice drifts fr
 │   ├── planning/          # explorer, planner, critic — read-only
 │   ├── implementation/    # frontend-dev, backend-dev — the two writers
 │   └── verification/      # tester, reviewer, browser-verifier — read-only
-├── handoffs/              # structured handoff artifacts for long-running work
 └── npm/                   # pi-subagents + deps (gitignored by npm/.gitignore)
 ```
 
@@ -63,8 +62,9 @@ permission boundary, or a toolset.
 context.** Two lanes that both need the design-token rule should read the same skill. Two lanes that
 both need to _judge the same diff_ should not be the same context.
 
-That rule is why the nine React skills the writer holds now live in `.pi/skills/` with everything
-else. While they sat inside `implementation/frontend-dev/skills/`, a reviewer could only reach them
+That rule is why the frontend methodology the writer holds now lives in `.pi/skills/` with everything
+else — one `frontend-patterns` skill with per-area references, granted once. While those rules sat
+inside `implementation/frontend-dev/skills/`, a reviewer could only reach them
 by reading another lane's directory, and two copies of a rule is how this harness once taught hook
 names that do not exist.
 
@@ -76,7 +76,7 @@ names that do not exist.
 | `explorer`         | Fast read-only recon. Returns compressed, checkable findings.                                                        | It keeps a codebase sweep out of the planner's context. A skill cannot compress a session; a lane can return findings instead. `thinking: low` because speed is the product.                                                                     |
 | `planner`          | Writes the implementation plan: files, data shapes, boundaries. Read-only.                                           | The plan must be written by a context that has not already decided how to implement. A plan written by the lane that will execute it encodes that lane's assumptions as given.                                                                   |
 | `critic`           | Reads a proposed plan and answers one question: is it fit to implement? Read-only.                                   | The planner reading its own plan is not a review. Conditional: it runs when a plan crosses a boundary or carries an expensive trade-off.                                                                                                         |
-| `frontend-dev`     | Writes React/TypeScript, self-tests with React Doctor and the targeted checks.                                       | It is the context that holds the change, separate from the one that judges it. It grants the nine React skills by name, so a component author gets the methodology loaded and a reviewer does not pay for it.                                    |
+| `frontend-dev`     | Writes React/TypeScript, self-tests with React Doctor and the targeted checks.                                       | It is the context that holds the change, separate from the one that judges it. It grants `frontend-patterns` by name, so a component author gets the methodology loaded and a reviewer does not pay for it.                                      |
 | `backend-dev`      | Writes NestJS service code, self-tests with typecheck and the targeted tests.                                        | Same reason as `frontend-dev`, on the other side of the stack. Its constraints differ from the frontend's, so it needs its own system prompt rather than a branch in one.                                                                        |
 | `tester`           | Verifies the implementation against the acceptance criteria, criterion by criterion. Holds no `edit` or `write`.     | Verification by the author of the change is not verification. It emits evidence, not a verdict, because the verdict has exactly one producer. A missing check is a report, not a test.                                                           |
 | `reviewer`         | Reviews the diff across the code-review dimensions. The **only** lane that emits `VERDICT: PASS` or `VERDICT: FAIL`. | Self-review cannot catch a self-consistent mistake. It is the single place a verdict is produced, so there is one standard for what counts as one. It has no edit tool, so findings go back to the developer lane.                               |
@@ -103,7 +103,7 @@ chain are already domain-neutral, so nothing in the process moves. The one place
 is the `domains` field of the classification artifact, whose value list
 [`task-classification`](./skills/task-classification/SKILL.md#domains) is deliberately open. If that
 claim turned out to be false, the process would change in exactly the places
-[`orchestrator.md`](./workflows/harness-process.md#the-gate-sequence) already
+[`harness-process.md`](./workflows/harness-process.md#the-gate-sequence) already
 names, and the only genuinely new artifact would be a grant set: which skills the lane holds, which
 tools it may use, and where its findings route. The harness does not ship `devops-dev` today,
 because a model that accommodates future domains does not have to contain them.
@@ -121,11 +121,11 @@ performed would be two workers' work plus a join the orchestrator already does.
 **The knowledge boundary is the grant, not the label.** All nine agents set `inheritSkills: false`
 and declare their own `skills:`, so a worker receives exactly its grants and nothing else. A future
 domain worker does not inherit the whole catalog by arriving. The process that enforces it is in
-[`orchestrator.md`](./skills/project-rules/references/orchestrator.md), not restated here.
+[the coordination role's rules](./workflows/harness-process.md#the-coordination-roles-rules), not restated here.
 
 **`docs/` is the canonical home for PawHaven-specific project knowledge.** `.pi/skills/` holds
 reusable technical capability, plus the operational index in
-[the `frontend` skill](./skills/frontend/SKILL.md#what-this-file-is), which is where an agent reads
+[docs/frontend-portal.md](../docs/frontend-portal.md#what-this-file-is), which is where an agent reads
 that the portal's files live and what they are called. No second project-knowledge hierarchy was
 created under `.pi/`, because a second one is a second place to look and a second copy to drift.
 
@@ -146,41 +146,54 @@ both the writer and the reader reach them.
 **`dev` is now `frontend-dev`.** With the router gone, a bare `dev` was ambiguous on its own. The
 agent moved from `.pi/agents/frontend/dev/dev.md` to
 `.pi/agents/implementation/frontend-dev/frontend-dev.agent.md`, and the nine React skills that once
-travelled with it now sit in `.pi/skills/` beside every other skill.
+travelled with it were dissolved into `.pi/skills/frontend-patterns/references/` beside every other skill.
 
 ## Skills
 
-27 project skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
+19 project skills in `.pi/skills/`, grouped by domain. Each agent loads a subset via `skills:`
 frontmatter, so there is one copy of every rule and one registry that holds all of them.
 
 | Domain         | Skills                                                                                                                                      | Used by                                                                                                               |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| project rules  | project-rules, principles                                                                                                                   | all agents                                                                                                            |
+| project rules  | principles                                                                                                                                  | all agents                                                                                                            |
+| harness        | harness-validator                                                                                                                           | reviewer                                                                                                              |
 | classification | task-classification                                                                                                                         | main session, at routing time                                                                                         |
 | backend        | backend                                                                                                                                     | backend-dev                                                                                                           |
 | testing        | testing-standards                                                                                                                           | tester, browser-verifier                                                                                              |
 | code review    | code-review + 9 doctors (`architecture-`, `backend-`, `boundary-`, `i18n-`, `react-`, `style-`, `test-`, `typecheck-`, `typescript-doctor`) | reviewer (all nine, through the `code-review` dispatch table), frontend-dev (`react-doctor` only, for its self-check) |
-| frontend lens  | react, component, style, i18n, react-query, react-hook-form, redux, typescript, frontend-patterns                                           | frontend-dev (typescript also granted by backend-dev)                                                                 |
-| frontend facts | frontend                                                                                                                                    | frontend-dev                                                                                                          |
+| frontend lens  | frontend-patterns, typescript                                                                                                               | frontend-dev (typescript also granted by backend-dev)                                                                 |
+| frontend facts | [docs/frontend-portal.md](../docs/frontend-portal.md) (project knowledge, not a skill)                                                      | frontend-dev                                                                                                          |
 | architecture   | architecture-design                                                                                                                         | planner, critic                                                                                                       |
 | standards      | writing-standards                                                                                                                           | planner, frontend-dev, backend-dev, tester                                                                            |
 
-The frontend **lens** skills hold how to write React here, and the **facts** that lens checks
-against live once in the shared `frontend` skill, so a rule and the fact it checks cannot drift
-apart. Nothing under `.pi/agents/` holds a skill, and `pnpm pi-check` fails if a `skills/`
-directory reappears there.
+The frontend **lens** skill holds how to write React here, and the **facts** that lens checks
+against live once in [docs/frontend-portal.md](../docs/frontend-portal.md), so a rule and the fact
+it checks cannot drift apart. Nothing under `.pi/agents/` holds a skill, and `pnpm pi-check` fails
+if a `skills/` directory reappears there.
 
 `settings.json` lists the 9 `code-review/<doctor>` skills individually and must keep doing so. pi
 stops recursing at any directory containing a `SKILL.md`, so a doctor nested under the `code-review`
 parent is only found through its explicit entry. Dropping one silently drops a skill.
+
+## What a skill may assert
+
+A skill states what this repo does — the pattern this repo uses with the file it lives in, a
+constraint a command here enforces, a correction to an older wrong note. It never states what the
+technology recommends in general, a constraint a reader might wish for, or a rule with no example
+in this repo. Every rule should answer one of three questions: **where is the code?** (the file,
+the export, the line), **which command catches it?** (`pnpm typecheck`, a `rg` pattern the reviewer
+can re-run), **what did the older note get wrong?** — if nothing, the rule may be generic advice and
+does not belong here yet. General best practice is a backlog, added only when a real change shows
+the gap. Name a tool by the command that runs it: `rg` / `find` for search, `bash` for execution,
+read the `SKILL.md` path for a skill, the `subagent` tool for dispatch.
 
 ## Slash commands (workflows)
 
 10 process definitions in `.pi/workflows/`, one per slash command. Each names its numbered steps,
 its decision points, and its failure recovery. None of them names a runner agent: a prompt runs in
 the session that invokes it. The files stay flat, because pi's prompt loader scans one directory
-for `.md` files and does not descend; [`documentation.md`](./skills/project-rules/references/documentation.md#4-workflow-documentation)
-owns that constraint.
+for `.md` files and does not descend — a nested subdirectory would not be found, and the slash
+command would silently stop existing.
 
 | Command                | What it does                                   |
 | ---------------------- | ---------------------------------------------- |
@@ -200,8 +213,8 @@ owns that constraint.
 Nine stages from classification to the human's final review, three of them conditional on scope and
 risk. A `browser-verifier` pass is conditional too, but it is not a numbered stage, so it is not part
 of the count. The sequence, the conditions, and that count are defined once, in
-[`orchestrator.md`](./workflows/harness-process.md#the-gate-sequence), along with
-the [evidence contract](./skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires)
+[`harness-process.md`](./workflows/harness-process.md#the-gate-sequence), along with
+the [evidence contract](./workflows/harness-process.md#evidence-what-a-pass-requires)
 that says what a `PASS` is and
 [the bounded fix loop](./workflows/harness-process.md#the-bounded-fix-loop) that
 decides whether a failure is an implementation defect or a wrong plan.
@@ -257,7 +270,7 @@ carries the classification rules; this section only says what the change has to 
 Before committing anything under `.pi/`:
 
 ```bash
-pnpm pi-check      # 27 project skills, 10 prompt commands, 9 agents, 0 agent-private skills, zero diagnostics
+pnpm pi-check      # 19 project skills, 10 prompt commands, 9 agents, 0 agent-private skills, zero diagnostics
 pnpm check:links   # every relative markdown link and anchor resolves
 ```
 
@@ -282,11 +295,11 @@ to it.
 
 `check:links` runs `scripts/check-md-links.mjs` over `.pi/`, `AGENTS.md`, `docs/`, and both root
 READMEs. It resolves anchors as well as paths, which is the half a grep cannot do and the half that
-catches a link whose heading was renamed. It skips any directory named `npm`, `handoffs`, `node_modules`,
-`dist`, or `build`, at any depth rather than by path prefix — so `.pi/npm` and `.pi/handoffs` go
+catches a link whose heading was renamed. It skips any directory named `npm`, `node_modules`,
+`dist`, or `build`, at any depth rather than by path prefix — so `.pi/npm` goes
 unscanned, and so would a `docs/build` created tomorrow.
 
-Three checks stay manual, because no script covers them today: a skill's directory name matching its
-frontmatter `name`, the whole link inventory in one view, and no live pointer to a retired harness.
-All three, with the commands, are in
-[`harness-validator.md`](./skills/project-rules/references/harness-validator.md#manual-checks).
+Two checks stay manual, because no script covers them today: a skill's directory name matching its
+frontmatter `name`, and the whole link inventory in one view.
+Both, with the commands, are in
+[`harness-validator`](./skills/harness-validator/SKILL.md#manual-checks).

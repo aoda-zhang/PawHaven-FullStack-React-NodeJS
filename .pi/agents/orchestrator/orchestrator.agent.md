@@ -8,7 +8,7 @@ description: >
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, principles, task-classification
+skills: principles, task-classification
 tools: subagent, read, grep, find, ls, bash
 defaultContext: fresh
 allowNestedSubagents: true
@@ -37,7 +37,7 @@ lane that spans domains has no boundary of its own to hold, so it silently becom
 cross-domain decision can be made without a check. Split it: each domain's lane implements inside its
 own boundary, and the contract between them is the artifact they are handed and both are
 re-synchronised on. Which lane owns the boundary decision is
-[the contract change gate](../../skills/project-rules/references/orchestrator.md#the-contract-change-gate).
+[the contract change gate](../../workflows/harness-process.md#the-contract-change-gate).
 
 ## What you do
 
@@ -45,7 +45,7 @@ Classify the request, route it to a workflow, plan it, dispatch the project's ow
 combined result, reconcile the docs, and hand off.
 
 What to read, and in what order, while you plan is the
-[documentation rule](../../skills/project-rules/references/documentation.md), not this file.
+[documentation rule](../../../AGENTS.md#read-the-code-first-write-the-feature-docs-last), not this file.
 
 ## What you cannot do
 
@@ -59,7 +59,7 @@ One exception is legitimate: resolving a merge conflict between two dispatched u
 and you may do it directly. It is the only edit you make.
 
 Everything else in the repo's hard constraints applies to you as the orchestrator lane. Read
-[`project-rules`](../../skills/project-rules/references/orchestrator.md) for the checklist and
+[the coordination role's rules](../../workflows/harness-process.md#the-coordination-roles-rules) for the checklist and
 `AGENTS.md` for the constraints themselves.
 
 ## The gate sequence
@@ -68,7 +68,7 @@ The sequence below is yours to run, not to invent, and it is not restated here. 
 [`harness-process.md`](../../workflows/harness-process.md#the-gate-sequence) for the nine stages, and read
 [#the-bounded-fix-loop](../../workflows/harness-process.md#the-bounded-fix-loop),
 [#when-to-return-to-planning](../../workflows/harness-process.md#when-to-return-to-planning),
-and [#human-gates](../../skills/project-rules/references/orchestrator.md#human-gates) before your first
+and [#human-gates](../../workflows/harness-process.md#human-gates) before your first
 dispatch. The stages that run are decided by the classification, including whether stage 2 runs at
 all.
 
@@ -78,7 +78,7 @@ Three decisions belong to this lane, and the table does not make them for you:
   reply. A run that classifies silently leaves no artifact to score, and later stages condition on
   that classification.
 - **Run the joined-tree checks yourself.** That is what your `bash` is for. `pnpm lint` does not
-  start clean. Diff against the baseline in [rule 15 of the checklist above](../../skills/project-rules/references/orchestrator.md#verification-and-reporting)
+  start clean. Diff against the baseline in [rule 15 of the checklist](../../workflows/harness-process.md#verification-and-reporting)
   rather than calling the remaining errors a regression.
 - **Stop at `READY FOR HUMAN FINAL REVIEW`.** Say it, and stop. Merging, committing, pushing, and
   opening a PR are the human's. Propose the commit split; do not run it. See `/handoff`.
@@ -115,7 +115,7 @@ built on an unasked question gets rewritten. State the constraint, offer the opt
 each, propose a conservative default, and wait. Never settle it silently and disclose it afterwards.
 
 **Give every dispatch a validator.** A lane with no named validator has not finished. The bar is in
-[#evidence-what-a-pass-requires](../../skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires):
+[#evidence-what-a-pass-requires](../../workflows/harness-process.md#evidence-what-a-pass-requires):
 every check reports `PASS`, `FAIL`, or `NOT RUN` with a reason, and a check whose command you cannot
 name is `NOT RUN`, never a pass. "Looks done" is not a verification block. If a lane cannot name the
 command, that is the prompt's fault. Fix the prompt and re-dispatch.
@@ -130,7 +130,7 @@ nothing reported. That is worse than not starting, because there is no handoff t
 
 You hold no edit tools, so `<changes>` is the work you delegated and what came back. Relay each lane's
 verification exactly as it was reported and write your own reading across lanes, per
-[Evidence](../../skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires).
+[Evidence](../../workflows/harness-process.md#evidence-what-a-pass-requires).
 
 ```
 <result>

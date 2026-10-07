@@ -78,9 +78,8 @@ From the results, derive the frontend `src/` root and the Redux store directory.
     --glob '!**/reduxHooks.ts'
   ```
 - **Explanation**: Never use bare `useSelector` / `useDispatch` from `react-redux` outside
-  `src/hooks/reduxHooks.ts`. The accepted typed hooks and their exact names are in the shared
-  `frontend` skill — [State access](../../frontend/SKILL.md#state-access--the-real-names).
-  Read them there rather than from this rule, so the check and the vocabulary cannot drift.
+  `src/hooks/reduxHooks.ts`. The accepted typed hooks and their exact names are in [State access](../../../../docs/frontend-portal.md#state-access--the-real-names)
+  of the portal facts document. Read them there rather than from this rule, so the check and the vocabulary cannot drift.
 
 ### Rule S3: Raw string query keys (must use query key factory)
 
@@ -143,7 +142,7 @@ This exists because the step is easy to skip: the scan is a prompt-level instruc
 
 ## Related
 
-- React standards: [react skill](../../react/SKILL.md)
+- React standards: [frontend-patterns → react-standards](../../frontend-patterns/references/react-standards.md)
 - Companion doctors: [style-doctor](../style-doctor/SKILL.md) · [i18n-doctor](../i18n-doctor/SKILL.md) · [typecheck-doctor](../../code-review/typecheck-doctor/SKILL.md)
-- State rules: [redux](../../redux/SKILL.md) · [react-query](../../react-query/SKILL.md) · [react-hook-form](../../react-hook-form/SKILL.md)
+- State rules: [frontend-patterns → client-state](../../frontend-patterns/references/client-state.md) · [frontend-patterns → data-fetching](../../frontend-patterns/references/data-fetching.md) · [frontend-patterns → forms](../../frontend-patterns/references/forms.md)
 - CI counterpart: `.github/workflows/react-doctor.yml` (must stay on the same pinned version)

@@ -13,7 +13,7 @@
     ".pi/skills/code-review/typescript-doctor"
   ],
   "prompts": [".pi/workflows"],
-  "packages": ["npm:pi-subagents@0.73.1"],
+  "packages": ["npm:pi-subagents@0.76.0"],
   "subagents": {
     "agentOverrides": {
       "orchestrator": {

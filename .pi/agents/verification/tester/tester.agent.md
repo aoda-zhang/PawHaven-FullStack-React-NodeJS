@@ -5,7 +5,7 @@ acceptanceRole: read-only
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, testing-standards, writing-standards
+skills: testing-standards, writing-standards
 tools: read, grep, find, ls, bash
 defaultContext: fresh
 ---

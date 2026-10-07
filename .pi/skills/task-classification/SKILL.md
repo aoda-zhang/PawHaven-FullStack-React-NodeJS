@@ -193,7 +193,7 @@ and not a subsystem. At the code level that boundary is
 [`packages/shared/types`](../../../packages/shared/types), the types and Zod schemas both sides
 import instead of re-declaring. When a contract turns out to be insufficient mid-flight, the worker's
 next move is in
-[the contract change gate](../project-rules/references/orchestrator.md#the-contract-change-gate).
+[the contract change gate](../../workflows/harness-process.md#the-contract-change-gate).
 
 ## Output rules
 

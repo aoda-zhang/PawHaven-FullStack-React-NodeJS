@@ -4,7 +4,7 @@ description: Reviews code changes for correctness, architecture consistency, sec
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, code-review, principles, react-doctor
+skills: code-review, principles, react-doctor, harness-validator
 tools: read, grep, find, ls, bash, watchdog_diff, contact_supervisor
 defaultContext: fork
 ---

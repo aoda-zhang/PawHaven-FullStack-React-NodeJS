@@ -78,7 +78,7 @@ never waits on a sibling and never re-reads shared state — it does its work an
 5. **Collect results.** Each unit's `<result>` block carries its `<changes>`, `<verification>`, and
    `<risks>`. Read every unit's report, relay each unit's verification exactly as it was reported, and
    write your own reading across the units, per
-   [Evidence](../skills/project-rules/references/orchestrator.md#evidence-what-a-pass-requires).
+   [Evidence](./harness-process.md#evidence-what-a-pass-requires).
 
 6. **Verify the combined tree.** Individual unit checks do not prove the integration. Run the full
    set on the merged result:

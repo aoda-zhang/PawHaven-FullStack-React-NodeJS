@@ -8,7 +8,7 @@ You own this task. Plan, review, verify. Delegate implementation to subagents, s
 
 The work stops here, at `READY FOR HUMAN FINAL REVIEW`. You propose; the human commits, pushes,
 and opens the PR. Committing is not yours to do — see
-[`references/git.md`](../skills/project-rules/references/git.md).
+[Commits](../../docs/development.md#commits).
 
 **AI verification does not replace human approval.** Every automated gate before this one answers one
 question: does the change do what it was asked to do? None of them answers whether this is what was
@@ -27,7 +27,7 @@ Answering any of those yourself is the failure this step exists to prevent.
 
 1. **Propose small, ordered commits — do not run them.** Suggest a split where each commit tells
    one part of the story, and give the message for each, per **sequence-verifiable-units** and the
-   git rule (`../skills/project-rules/references/git.md`). Then leave the changes in the working
+   git rule (`../../docs/development.md#commits`). Then leave the changes in the working
    tree.
 2. **Green check, one last time.** Run `pnpm typecheck`, the targeted tests for this change, and a
    full `pnpm build`. A failing check — including a build that doesn't package — means go back and

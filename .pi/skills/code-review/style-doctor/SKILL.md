@@ -213,5 +213,5 @@ and the real finding gets lost.
 ## Related
 
 - Best practices: [references/best-practices.md](references/best-practices.md)
-- Design system tokens: [styling skill](../../style/SKILL.md)
+- Design system tokens: [frontend-patterns → styling](../../frontend-patterns/references/styling.md)
 - Design gate: this skill IS the design gate (Figma is not used in this project)

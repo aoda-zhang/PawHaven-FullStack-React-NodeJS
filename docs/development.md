@@ -57,3 +57,24 @@ pnpm dev:local
 
 - `document-service` launches headless Chromium (Puppeteer) at runtime to render PDFs. Make sure the Chromium binary is available in your environment.
 - When you add or change a shared package, re-run `pnpm build:local` so downstream apps pick up the new build.
+
+## Commits
+
+Format: `<type>(<scope>): <description>`
+
+| Type       | When                                                |
+| ---------- | --------------------------------------------------- |
+| `feat`     | New feature                                         |
+| `fix`      | Bug fix                                             |
+| `docs`     | Documentation only                                  |
+| `refactor` | Code change that doesn't add a feature or fix a bug |
+| `chore`    | Build, CI, dependencies, config                     |
+| `test`     | Adding or updating tests                            |
+| `style`    | Formatting, whitespace (not CSS styling)            |
+
+Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update planner agent rules`
+
+Scopes in active use: `auth`, `rescue`, `pdf`, `email`, `home`, `stats`, `docs`, `chore`.
+
+Husky `commit-msg` runs commitlint and rejects non-conforming messages. One commit per logical
+change; `.pi/` changes are `docs(harness): ...` or `chore(harness): ...`.

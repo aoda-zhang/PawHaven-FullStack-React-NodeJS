@@ -5,7 +5,7 @@ acceptanceRole: writer
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, backend, typescript, principles, writing-standards
+skills: backend, typescript, principles, writing-standards
 tools: read, grep, find, ls, edit, write, bash
 defaultContext: fresh
 ---
@@ -45,7 +45,7 @@ If the contract you were handed turns out to be insufficient to build what was a
 redefine it. Emit `CONTRACT_CHANGE_REQUIRED` carrying the current contract, the proposed change, the
 reason, the affected domains, the affected files, and the risk — then hand it to the orchestrator,
 which routes it. The gate is stated once in
-[the contract change gate](../../../skills/project-rules/references/orchestrator.md#the-contract-change-gate).
+[the contract change gate](../../../workflows/harness-process.md#the-contract-change-gate).
 
 ## The self-verification gate
 

@@ -73,6 +73,12 @@ The shape is flat by design. There are **no** `entities/`, `use-cases/`, `DTO/`,
 subdirectories anywhere under `core-service/src/modules/`. Each module's public surface is its
 exported service class; DTOs are Zod schemas in `@pawhaven/shared`, not per-module classes.
 
+New business capabilities default to a new module here (in the three-file shape above), paired with
+a new portal feature directory — a new deployable service needs an explicit justification (see the
+Overview §2.2). Controller paths are kebab-case resource names (`rescues`, `adoptable-pets`,
+`animal-follow`, `report-animal`); the non-plural names (`home`, `guide`, `bootstrap`) are page
+names, not a pattern to copy.
+
 ### 1.3 Module Communication Rules
 
 ```

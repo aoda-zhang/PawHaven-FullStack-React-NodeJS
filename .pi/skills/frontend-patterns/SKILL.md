@@ -1,141 +1,77 @@
 ---
 name: frontend-patterns
 description: >
-  Concrete code patterns extracted from the PawHaven portal. Copy the shape, change the names.
-  Use when implementing a list page, a form, an API layer, or a route.
-  Trigger: pattern example list page form api route.
+  The PawHaven frontend skill. One router over the concrete code patterns and the per-area rules of
+  the portal: React component shape, forms, data fetching, client state, styling, i18n, and where a
+  component belongs. Use when writing or reviewing anything under apps/frontend/portal, or when
+  deciding whether a value belongs in a component, a slice, or a query.
+  Trigger: frontend react component hook form validation query redux state style token i18n
+  locale component placement promote shared ui package feature split extract refactor pattern
+  example list page form api route.
+metadata:
+  triggers:
+    - 'create a React component'
+    - 'fix a hook'
+    - 'build a form'
+    - 'fetch from the API'
+    - 'where does this value live'
+    - 'add a design token'
+    - 'add a translation'
+    - 'which package does this component go in'
+  not_triggers:
+    - 'write a NestJS service'
+    - 'backend endpoint or Prisma model'
 ---
 
 # Frontend patterns
 
-Every example below is copied from the real codebase. Match the shape. Where a file is described as
-optional, it is because a real feature does not have it — not because the template is flexible.
+## Purpose
 
-## API layer
+The portal's frontend methodology in one place. Seven former top-level skills — `react`,
+`react-hook-form`, `react-query`, `redux`, `style`, `i18n`, `component` — were dissolved into the
+references below, because seven invocable names for one domain meant seven grants to keep in sync
+and seven places a rule could be restated and drift. What is left is one skill a frontend writer
+grants once, and a reference per area.
 
-The files a feature needs depend on what it does. The `frontend` skill has the per-feature
-breakdown —
-[Feature layout](../frontend/references/portal-layout.md#feature-layout).
+Every rule in the references was read out of the running codebase. Where a rule and
+[the portal facts document](../../../docs/frontend-portal.md) could disagree, the facts document
+wins — it is the operational index, and a rule that drifts from it is the bug both exist to prevent.
 
-```ts
-// <name>.queryKeys.ts — every feature with server data has this
-export const <name>QueryKeys = {
-  all: ['<name>'] as const,
-  current: (id: string) => [...<name>QueryKeys.all, 'current', id] as const,
-};
-```
+## When to use
 
-```ts
-// <name>.api.ts — raw requests only
-import type { X } from '@pawhaven/shared/types';
-import { apiClient } from '@/utils/apiClient';
+- Writing or reviewing anything under `apps/frontend/portal` or `packages/ui` /
+  `packages/frontend-core`.
+- Deciding where a value lives: derived, URL, server, form, client, or local.
+- Deciding where a component belongs, or whether one should be promoted.
+- Adding a design token, a translation, or a locale.
 
-export const getX = async (): Promise<X> => apiClient.get<X>('/x');
-```
+## When not to use
 
-```ts
-// <name>.queries.ts — one options factory per read; absent when a feature has no read
-export const xQueryOptions = (id: string) => ({
-  queryKey: <name>QueryKeys.current(id),
-  queryFn: getX,
-  staleTime: 5 * 60 * 1000,
-  retry: false,
-});
-```
+- Backend NestJS code — that is [backend](../backend/SKILL.md).
+- Type discipline across both stacks — that is [typescript](../typescript/SKILL.md).
+- Whether a change needs a test, and what kind — that is
+  [testing-standards](../testing-standards/SKILL.md).
+- The review commands that enforce these rules — those live in the `code-review` doctors, not here.
 
-`apiClient` unwraps the envelope — request functions resolve to the payload directly.
+## References
 
-## Route
+Read the one that covers the area you are touching. Each is self-contained: the rules, the code that
+carries them, and the doctor that checks them.
 
-```ts
-// features/rescue-cases/route.tsx — the loader form, for a feature that reads
-import { rescueCasesQueryOptions } from './api/rescueCases.queries';
+| Reference                                                  | What it holds                                                                                                 | Read it when                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [patterns](./references/patterns.md)                       | The concrete shapes to copy: the API layer, a route, a list page, a form section, a loader guard              | Starting any feature work                                             |
+| [react-standards](./references/react-standards.md)         | Component shape, the state decision tree, effect discipline, React 19, the a11y floor                         | Writing or reviewing a component, hook, or effect                     |
+| [forms](./references/forms.md)                             | Schema-first validation, the `@pawhaven/ui/form` primitives, multi-section forms, field arrays, server errors | Building or changing any form                                         |
+| [data-fetching](./references/data-fetching.md)             | The four-file `api/` layer, the key factory, `queryOptions`, mutations, loaders, the single QueryClient       | Reading or writing anything from the API                              |
+| [client-state](./references/client-state.md)               | What belongs in Redux, the one registered slice, `reducerNames`, typed access, persistence                    | Deciding whether a value belongs in Redux at all, or touching a slice |
+| [styling](./references/styling.md)                         | The token gate pointer, writing a className, the package structure, token ordering, the scale tables          | Writing or reviewing any className                                    |
+| [i18n](./references/i18n.md)                               | The key rules, the locale contract pointer, adding a module or locale, the file layout, the inventory         | Writing any visible copy, adding a key, or wiring a language selector |
+| [component-placement](./references/component-placement.md) | The placement table, anatomy, composition over configuration, splitting, the package layout                   | Creating, moving, or promoting a component                            |
 
-import { getQueryClient } from '@/providers/QueryProvider';
-import { routePaths } from '@/router/routePaths';
+## Doctor
 
-export const rescueCasesLoader = async () => {
-  const queryClient = getQueryClient();
-  return queryClient.ensureQueryData(rescueCasesQueryOptions());
-};
-
-export const rescueCasesRoute = {
-  path: routePaths.rescueCases,
-  loader: rescueCasesLoader,
-  lazy: async () => {
-    const { RescueCasesPage } =
-      await import('@/features/rescue-cases/RescueCases');
-    return { Component: RescueCasesPage };
-  },
-};
-```
-
-A route with no loader of its own — `features/auth/route.tsx` — is `path` + `Component` + `handle`
-only. Do not add an empty loader.
-
-## List page
-
-```tsx
-const <Name>Page = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const items = useLoaderData() as Item[];
-  const [filter, setFilter] = useState('all');
-
-  return (
-    <div className="max-w-6xl px-4">
-      {items.map((item) => (
-        <Card key={item.id} onClick={() => navigate(`/path/${item.id}`)} />
-      ))}
-    </div>
-  );
-};
-```
-
-- `key` is a stable id, never the array index.
-- Translate at render: store the key in a constant, call `t(option.labelKey)`.
-- Layout container: `max-w-6xl px-4`.
-
-## Form section
-
-```tsx
-// Parent owns the form
-const form = useForm<FormValues>({
-  resolver: zodResolver(FormSchema),
-  defaultValues: initialValues,
-});
-
-// Section consumes context — never a second useForm
-const { control } = useFormContext<FormValues>();
-const watched = useWatch({ control, name: 'field' });
-
-<FormInput name="field" label={t('ns.field')} required />;
-```
-
-- Use `@pawhaven/ui/form` primitives, never raw `<input>`.
-- `useWatch` for a value that drives another field's visibility.
-
-## Loader / guard
-
-`features/auth/route.tsx` is the guard to copy — it reads the persisted profile off the store,
-prefetches through the same options the component reads, and redirects in the loader:
-
-```ts
-export const requireUser = async ({ request }: LoaderFunctionArgs) => {
-  const { pathname, search } = new URL(request.url);
-  const redirectTo = `${routePaths.login}?${routeSearchParams.redirect}=${encodeURIComponent(`${pathname}${search}`)}`;
-
-  try {
-    await getQueryClient().ensureQueryData(
-      currentUserQueryOptions(getCurrentUserId()),
-    );
-  } catch {
-    throw redirect(redirectTo);
-  }
-
-  return null;
-};
-```
-
-`getCurrentUserId()` reads `store.getState()` — valid in a loader, not in a component. Redirect in
-the loader. Never a render-time `if (isLoading) return <Redirect />`.
+[react-doctor](../code-review/react-doctor/SKILL.md) is the primary check for anything touching
+React pages or components, and it enumerates the project-specific rules the generic CLI cannot
+know. `style-doctor`, `i18n-doctor`, `typescript-doctor`, and `boundary-doctor` cover the rest; the
+scope-to-doctor mapping is in [code-review](../code-review/SKILL.md).

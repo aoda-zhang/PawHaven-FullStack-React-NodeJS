@@ -51,6 +51,7 @@ designing anything.
 | [route_authentication.md](./architecture/route_authentication.md)                                   | Frontend route guards — the authenticated parent route, `requireUser`, `/auth/me` priming                                   |
 | [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | Why PDFs render through React + Puppeteer instead of a template library, and the constraints that bite                      |
 | [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | Legacy redirect map from the pre-split document to the three above. No content of its own.                                  |
+| [service-boundaries.md](./architecture/service-boundaries.md)                                       | Backend service boundaries — the four services, the auth boundary, request/response shape                                   |
 
 `authentication-architecture.md` and `route_authentication.md` are the pair to read before touching
 anything auth-related — one covers the server trust boundary, the other the client route guard.
@@ -112,16 +113,38 @@ Operational docs for running the thing locally. Not design material — this is 
 
 The agent control layer lives in `.pi/`, not here.
 
-| Path                                                              | Covers                                          |
-| ----------------------------------------------------------------- | ----------------------------------------------- |
-| [.pi/README.md](../.pi/README.md)                                 | Index of skills, workflows, and the 9 subagents |
-| [.pi/workflows/](../.pi/workflows)                                | Slash-command workflows                         |
-| [.pi/skills/project-rules/](../.pi/skills/project-rules/SKILL.md) | Engineering standards, enforced as a skill      |
+| Path                               | Covers                                                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [.pi/README.md](../.pi/README.md)  | Index of skills, workflows, and the 9 subagents                                                         |
+| [.pi/workflows/](../.pi/workflows) | Slash-command workflows                                                                                 |
+| [AGENTS.md](../AGENTS.md)          | Hard constraints — git, code, dispatch, reporting; the harness map is [.pi/README.md](../.pi/README.md) |
 
 `pnpm pi-check` validates the harness. The retired `.opencode/` and `.codebuddy/` layers are gone;
 links into them are dead.
 
 ---
+
+## 7. Documentation standards
+
+- **Read the code first, write the docs last.** Architecture docs and code are the input;
+  `docs/features/` is the output, updated in the same change that invalidated it. A feature doc is
+  never an input to a decision.
+- **No ADR records.** When a decision changes the architecture, update the living docs under
+  `docs/architecture/` directly.
+- **Code comments explain why, not what.** Default to none; never comment self-evident code.
+- **Permanent docs live in `docs/`** and ship in the same change as the code that invalidated them.
+  Progress goes in replies — there is no temporary-notes file.
+- **Every handoff classifies Doc Impact** as `none` / `update` / `create`; the main session routes
+  doc edits to the lane that made the change.
+- **Root READMEs (EN ↔ CN) stay in sync** and reference all knowledge files. The agent-control layer
+  is `.pi/`, not `.opencode/` — links into it are dead.
+
+## 8. Repository quality
+
+The repository's quality record — what is healthy, what debt is accepted, and the mechanical
+invariants — lives in [`quality/README.md`](./quality/README.md). `pnpm quality-check` scans for
+orphaned docs, references to retired resources, and duplicate-rule candidates, and folds in
+`architecture-check` and `check:links`.
 
 ## Suggested reading order
 

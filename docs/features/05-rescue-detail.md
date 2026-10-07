@@ -227,7 +227,7 @@ mounts**. It is consumed only by `rescue-detail`:
 
 It is the one place two features share UI without it being promoted to `packages/ui`, even though
 the shared surface is a stable, self-contained button-plus-count pair. See
-[Component Rules](../../.pi/skills/project-rules/references/components.md).
+[Component placement](../../.pi/skills/frontend-patterns/references/component-placement.md#placement).
 
 ## 6. What Does Not Exist
 

@@ -59,6 +59,9 @@ packages/ui/src/components/timeline/*.test.tsx   # packages — inside the compo
 Backend uses `<name>.service.test.ts` beside the source. Frontend uses a `tests/` folder inside the
 feature or component directory. Both conventions are established; match whichever applies.
 
+`*.test.ts` / `*.test.tsx` is the only test suffix in the repo — there are no `.spec.ts` files
+and no `__tests__/` directories.
+
 ## Backend service tests
 
 `rescue.service.test.ts` is the reference. The shape:
@@ -109,7 +112,9 @@ dependency, this is why. Do not "fix" it by removing the plugin.
 
 ## What a test must earn
 
-A test earns its place by failing when the behaviour breaks. Before writing one, be able to answer:
+A test earns its place by failing when the behaviour breaks — that is the gate, not a number.
+**No coverage threshold is enforced**, not in any `vitest.config.ts`, not in CI. Do not quote a
+target percentage as a project rule. Before writing one, be able to answer:
 
 - **Which surface?** The original repro, on the same surface that failed. Inconclusive or
   wrong-surface is not a pass.

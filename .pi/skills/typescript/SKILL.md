@@ -12,9 +12,9 @@ description: >
 
 ## Where types live
 
-One shared location table, and the reasoning behind it, live in the `frontend` skill —
-[Where a type lives](../frontend/SKILL.md#where-a-type-lives). Do not restate
-it here. What is specific to writing code:
+One shared location table, and the reasoning behind it, live in [the portal facts document](../../../docs/frontend-portal.md) —
+[Where a type lives](../../../docs/frontend-portal.md#where-a-type-lives). Do not restate
+it here.
 
 ## Banned
 

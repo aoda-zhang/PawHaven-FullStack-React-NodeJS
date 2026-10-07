@@ -20,6 +20,8 @@
     "build": "turbo run build",
     "build:libs": "turbo run build --filter='./packages/*'",
     "token-check": "node packages/design-system/scripts/token-check.cjs",
+    "architecture-check": "node scripts/check-architecture.mjs",
+    "quality-check": "node scripts/check-quality.mjs",
     "pi-check": "node scripts/check-pi-harness.mjs",
     "check:links": "node scripts/check-md-links.mjs .",
     "doctor:react": "npx react-doctor@0.9.12",

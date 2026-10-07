@@ -12,7 +12,7 @@ description: >
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, testing-standards, principles
+skills: testing-standards, principles
 tools: read, grep, find, ls, bash
 defaultContext: fresh
 ---
@@ -160,6 +160,22 @@ screen, the interaction, the state, and the network status are.
 A check that could not run is `not-run` with the reason. Never report a pass you did not observe, and
 never substitute a source read for a browser check. A defect you found and could not fix is a
 finding, not a failure of your run — say which, and hand it back.
+
+## Verification evidence
+
+End every run with one evidence block per journey, in this shape. No real screenshot, DOM excerpt,
+console capture, or log behind a claim means no `PASS` on that claim — write `not-run` with the
+reason instead. `Evidence` links only artifacts this session produced (a screenshot file, a console
+capture, a network log); never a path from an earlier run and never a paraphrase of source code.
+
+```
+Target:   the route and the user journey verified
+Steps:    the exact actions driven (navigate, click, type, submit), in order
+Expected:  the intended screen, state, or message for each step
+Observed:  what the browser actually did, per step
+Evidence:  screenshot / DOM excerpt / console capture / network log, produced this session
+Result:    PASS | FAIL | NOT RUN — with the reason when not run
+```
 
 ## Result contract
 

@@ -11,7 +11,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 const repoRoot = resolve(process.argv[2] ?? '.');
 const ROOTS = ['.pi', 'AGENTS.md', 'docs', 'README.md', 'README.cn.md'];
-const SKIP_DIRS = new Set(['npm', 'handoffs', 'node_modules', 'dist', 'build']);
+const SKIP_DIRS = new Set(['npm', 'node_modules', 'dist', 'build']);
 
 // Findings this check reports but deliberately does not fail on, keyed by the same
 // `<file> -> <raw target>` string the report prints. Each one was measured against ROOTS with

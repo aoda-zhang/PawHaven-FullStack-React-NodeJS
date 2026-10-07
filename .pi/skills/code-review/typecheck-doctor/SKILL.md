@@ -68,5 +68,5 @@ package; do not add it back.
 
 ## Related
 
-- Frontend/backend standards: [react](../../react/SKILL.md) · [redux](../../redux/SKILL.md)
+- Frontend standards: [frontend-patterns → react-standards](../../frontend-patterns/references/react-standards.md) · [frontend-patterns → client-state](../../frontend-patterns/references/client-state.md)
 - Companion doctors: [react-doctor](../react-doctor/SKILL.md) · [style-doctor](../style-doctor/SKILL.md)

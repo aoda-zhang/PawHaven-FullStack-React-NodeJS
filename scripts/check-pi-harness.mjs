@@ -61,9 +61,9 @@ const settings = JSON.parse(
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
 
-// 27 = 18 top-level skills + the 9 `code-review/<doctor>` skills, which pi-check reaches through
+// 19 = 10 top-level skills + the 9 `code-review/<doctor>` skills, which pi-check reaches through
 // the explicit `settings.json` entries rather than by recursing into `code-review/`.
-const EXPECTED_SKILLS = 27;
+const EXPECTED_SKILLS = 19;
 // `.pi/skills/` is the only skill registry. Zero is the value that keeps it that way: a `skills/`
 // directory reappearing under `.pi/agents/` is a second registry, and it turns red here rather than
 // becoming a third copy of a rule nobody notices drifting.
@@ -97,19 +97,56 @@ const LANE_NAMES = EXPECTED_AGENTS;
 // is an example of a value the harness stores rather than a route to take. Each exception is pinned
 // to the file AND to the exact text of the line, so editing that line retires the exception instead
 // of silently widening it. Keep this list short: every entry is a place the dependency direction
-// has to be argued for, and an entry nobody can justify is a rule that was given away.
-const SKILL_TO_AGENT_ALLOWLIST = [
+// has to be argued for, and an entry nobody can justify is a rule that was given away. Empty today:
+// the two grant facts that would name a lane sit in `harness-validator/SKILL.md` — back under
+// `.pi/skills/` since the move from `.pi/harness-validator.md` — and are written as role/stage
+// expressions ("the review lane", "the frontend implementation lane"), so the lane-name scan
+// over `.pi/skills/` finds nothing to flag.
+const SKILL_TO_AGENT_ALLOWLIST = [];
+
+// A skill may point at a workflow only to name where a fact lives. Needing a workflow to run, or
+// routing work to one, inverts Workflow -> Agent -> Skill: the workflow owns the sequence, and a
+// skill reaching up into it is a second place the process lives. Pinning and reasons work exactly
+// as they do for SKILL_TO_AGENT_ALLOWLIST above, and the reason is not optional — the check below
+// fails on an entry that has none.
+//
+// Each entry authorises ONE pointer: one `target`, on one `line`, in one `file`. `target` is the
+// repo-relative path the destination resolves to, so an entry cannot be stretched to cover a second
+// workflow link appended to the same line — the line pin alone would allow that, and a pin that
+// covers more than it names is the hole this list is checked against. All three conditions must
+// hold; editing the pinned line retires the entry rather than silently widening it.
+const SKILL_TO_WORKFLOW_ALLOWLIST = [
   {
-    // Example of a grant, not a route. This document describes what the harness registry looks
-    // like, and "which agent grants which doctor" is a fact about the grants, not work handed to
-    // that agent.
-    file: '.pi/skills/project-rules/references/harness-validator.md',
-    line: '`reviewer` reaches all nine through this meta-skill',
+    // The `workflow` field's mapping.
+    file: '.pi/skills/task-classification/SKILL.md',
+    target: '.pi/workflows/harness-process.md',
+    line: '  [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow).',
+    reason:
+      'The `workflow` field names the canonical prompt it routes to, and the mapping lives in the shared process document rather than in one of the ten workflow prompts. This skill emits the artifact that selects a workflow and disclaims owning the sequence that follows, so naming where the mapping lives is a pointer and not a dependency.',
   },
   {
-    // Same, second grant example on the same paragraph.
-    file: '.pi/skills/project-rules/references/harness-validator.md',
-    line: '`frontend-dev` grants `react-doctor` by name',
+    // The type-to-prompt mapping, and the lane shape that complexity, risk, and domains imply.
+    file: '.pi/skills/task-classification/SKILL.md',
+    target: '.pi/workflows/harness-process.md',
+    line: 'are in [harness-process.md](../../workflows/harness-process.md#routing-a-request-to-a-workflow). This',
+    reason:
+      'Same pointer as the `workflow` field above: the mapping this skill applies is documented in the shared process document, and the skill says of itself that it produces the artifact which selects a workflow and does not own the sequence.',
+  },
+  {
+    // Where a worker is sent when a contract turns out to be insufficient.
+    file: '.pi/skills/task-classification/SKILL.md',
+    target: '.pi/workflows/harness-process.md',
+    line: '[the contract change gate](../../workflows/harness-process.md#the-contract-change-gate).',
+    reason:
+      'The contract change gate is a rule the coordinating agent enforces, not one of the nine stages of the gate sequence — it is a subsection of "The coordination role\'s rules" in the shared process document. The skill\'s own next move is to emit the artifact that selects a workflow, so it points at where the rule is documented rather than depending on it.',
+  },
+  {
+    // The lane shape each worked example implies.
+    file: '.pi/skills/task-classification/references/worked-examples.md',
+    target: '.pi/workflows/harness-process.md',
+    line: '([harness-process.md](../../../workflows/harness-process.md#lane-shapes)). Each is a request in',
+    reason:
+      'The examples are built on the two routing shapes, and the lane shapes those key on are documented in the shared process document rather than in this reference. The reference names where the fact lives; it does not need the workflow to run.',
   },
 ];
 
@@ -123,12 +160,13 @@ const SKILL_TO_AGENT_ALLOWLIST = [
 // so a 2-node pair is a different key from the 3-node triangle that contains it.
 //
 // Do NOT extend the filter to the `## Doctor` sections, which look like a second see-also section
-// and are not. Ten of the surviving edges are a skill naming the doctor that reviews it, and the
+// and are not. Four of the surviving edges are a skill naming the doctor that reviews it, and the
 // doctor's own back-reference is the half that sits in `## Related`. Filtering both halves would
-// drop `react -> react-doctor -> react` silently, and that pair carries weight: `react-doctor`
-// exists to review `react`, so a future rule written from a skill into its own doctor is a real
-// ordering edge the check must keep hold of. Symmetry of the reference is the thing that decides it,
-// not the name of the section it sits in.
+// drop the `frontend-patterns/references -> react-doctor` pairing silently, and that pair carries
+// weight: `react-doctor` exists to review the frontend references (`react-standards.md` names it in
+// `## Doctor`; the doctor names the reference back in `## Related`), so a future rule written from
+// a skill into its own doctor is a real ordering edge the check must keep hold of. Symmetry of the
+// reference is the thing that decides it, not the name of the section it sits in.
 const ALLOWED_SKILL_CYCLES = [];
 
 // Only the coordinating agent may dispatch. A second dispatcher is a second place the process
@@ -472,6 +510,69 @@ function scanSkillMarkdown(dir, found = []) {
   return found;
 }
 
+function unwrapAngleBrackets(destination) {
+  return destination.startsWith('<') && destination.endsWith('>')
+    ? destination.slice(1, -1)
+    : destination;
+}
+
+// Every markdown link destination in a file, as { index, line, destination }. Three forms reach a
+// path and all three are read: an inline `](dest)`, whose dest may be wrapped in `<>`; a
+// reference-style link — full `[text][label]`, collapsed `[text][]`, or shortcut `[label]` —
+// resolved through the file's own `[label]: dest` definitions; and the definition line itself,
+// which is a destination in its own right. A label with no definition is prose, not a link, and
+// yields nothing.
+function markdownLinkDestinations(text) {
+  const definitions = new Map();
+  for (const match of text.matchAll(/^\s{0,3}\[([^\]]+)\]:[ \t]*(\S+)/gm)) {
+    if (!definitions.has(match[1])) definitions.set(match[1], match[2]);
+  }
+  const defined = (label) => definitions.has(label);
+  const destinations = [];
+  text.split('\n').forEach((line, index) => {
+    const definition = /^\s{0,3}\[([^\]]+)\]:[ \t]*(\S+)/.exec(line);
+    if (definition) {
+      destinations.push({
+        index,
+        line,
+        destination: unwrapAngleBrackets(definition[2]),
+      });
+    }
+    for (const match of line.matchAll(/\]\(([^)\s]+)/g)) {
+      destinations.push({
+        index,
+        line,
+        destination: unwrapAngleBrackets(match[1]),
+      });
+    }
+    for (const match of line.matchAll(/\[([^\]]*)\]\[([^\]]*)\]/g)) {
+      const label = match[2] || match[1];
+      if (defined(label)) {
+        destinations.push({
+          index,
+          line,
+          destination: unwrapAngleBrackets(definitions.get(label)),
+        });
+      }
+    }
+    // A `[text][label]` pair's second bracket is a label, not a shortcut link, so it is skipped
+    // here by the character before it — otherwise a reference-style link is counted twice. A
+    // definition line is skipped because its label is a label, not a link.
+    if (definition) return;
+    for (const match of line.matchAll(/\[([^\]]+)\](?![[(])/g)) {
+      if (match.index > 0 && line[match.index - 1] === ']') continue;
+      if (defined(match[1])) {
+        destinations.push({
+          index,
+          line,
+          destination: unwrapAngleBrackets(definitions.get(match[1])),
+        });
+      }
+    }
+  });
+  return destinations;
+}
+
 for (const file of scanSkillMarkdown(join(repoRoot, '.pi', 'skills'))) {
   const raw = readFileSync(file, 'utf8');
   for (const match of raw.matchAll(/"requiredAgents"\s*:\s*\[([^\]]*)\]/g)) {
@@ -690,10 +791,10 @@ for (const file of skillFiles) {
     /\]\(((?:\.\.\/)+)([a-z0-9-]+(?:\/[a-z0-9-]+)*)\/SKILL\.md(?:#[^)]*)?\)/g,
   )) {
     // The prefix is consumed as written and resolved with it, because the depth is what the link
-    // says. The nine doctors sit one level deeper than the top-level skills, so their links are
-    // written `../../redux/SKILL.md`; assuming a single level up and appending the sibling under
-    // the doctor's own directory resolves nothing, every lookup misses, and the graph comes out
-    // smaller than the repo — a cycle check that passes because it never saw an edge.
+    // says. The frontend references sit one level deeper than the top-level skills, so their links
+    // are written `../../code-review/react-doctor/SKILL.md`; assuming a single level up and appending
+    // the sibling under the reference's own directory resolves nothing, every lookup misses, and the
+    // graph comes out smaller than the repo — a cycle check that passes because it never saw an edge.
     const to = skillIdByFile.get(
       resolve(dirname(file), match[1], match[2], 'SKILL.md'),
     );
@@ -754,6 +855,79 @@ for (const [key, cycle] of seenCycles) {
 
 console.log(
   `skill graph: ${skillGraph.size} nodes, ${orderingEdges} ordering edges, ${seeAlsoLinks} links inside ${seeAlsoSections} \`## Related\` sections filtered out`,
+);
+
+// 5. skill -> workflow. The third edge of the same boundary, and the one most likely to be added
+// by accident: a skill that says "the mapping is in the harness process" is one link away from a
+// skill that says "run the bug-fix workflow", and only the second one inverts the direction.
+//
+// Scope, stated once so the code and this comment cannot disagree: ANY markdown link destination
+// in `.pi/skills/**` that resolves to a path inside `.pi/workflows/`, including the directory
+// itself, is in scope. That covers an inline `](../../workflows/bug-fix.md)`, a directory link
+// `](../../workflows/)`, an angle-bracket destination `](<../../workflows/bug-fix.md>)`, and a
+// reference-style `[text][label]` resolved through the file's own `[label]:` definition — the
+// definition line is a destination in its own right and is counted too, so a reference-style
+// pointer is never half counted. A directory link is a pointer into the workflow tree rather than
+// a link to a capability, so it is not exempt either: it belongs on the allowlist, with its target
+// and its reason, if anyone genuinely needs it.
+//
+// The destination is resolved against the linking file's own directory and tested for landing inside
+// `.pi/workflows/`, never matched on the substring `workflows/`. Resolving is what keeps a pointer at
+// the CI workflow that pins a doctor's version out of scope: `code-review/react-doctor/SKILL.md:19`
+// names `.github/workflows/react-doctor.yml` as the source of the pinned version, which is a
+// capability fact about an external tool and not a harness workflow, and a substring test flags it
+// and forces a bogus allowlist entry to silence it.
+//
+// A bare backticked path is not a link and is never read here. `task-classification/SKILL.md:162`
+// lists `.pi/workflows` among the paths a harness change may not take a lightweight path through —
+// a scope list naming where rules live, not a dependency on one, and there is nothing to allowlist.
+const workflowsRoot = join(repoRoot, '.pi', 'workflows');
+const isWorkflowPath = (target) =>
+  target === workflowsRoot || target.startsWith(workflowsRoot + sep);
+let workflowPointers = 0;
+let workflowAllowlisted = 0;
+for (const entry of SKILL_TO_WORKFLOW_ALLOWLIST) {
+  if (!entry.reason?.trim()) {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: skill -> workflow — ${entry.file}: allowlist entry has no reason. A pointer is only legitimate when the reason it is not a dependency is written down.`,
+    );
+  }
+  // An entry whose target is missing or resolves outside the tree can never match a pointer, so it
+  // would sit here reading as a covered one while granting nothing.
+  const entryTarget = entry.target && resolve(repoRoot, entry.target);
+  if (!entryTarget || !isWorkflowPath(entryTarget)) {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: skill -> workflow — ${entry.file}: allowlist entry has no \`target\` that resolves inside .pi/workflows/. An entry that can never match a pointer is a rule that reads as covered and is not.`,
+    );
+  }
+}
+for (const file of skillFiles) {
+  const relPath = relative(repoRoot, file);
+  for (const link of markdownLinkDestinations(readFileSync(file, 'utf8'))) {
+    // An anchor or query is not part of the path, and a URL is not a path at all.
+    const path = link.destination.split('#')[0].split('?')[0];
+    if (!path || /^[a-z][a-z0-9+.-]*:/i.test(path)) continue;
+    const target = resolve(dirname(file), path);
+    if (!isWorkflowPath(target)) continue;
+    workflowPointers++;
+    const allowed = SKILL_TO_WORKFLOW_ALLOWLIST.some(
+      (entry) =>
+        entry.file === relPath &&
+        link.line.includes(entry.line) &&
+        entry.target === relative(repoRoot, target),
+    );
+    if (allowed) {
+      workflowAllowlisted++;
+      continue;
+    }
+    failures.push(
+      `ARCHITECTURE_VIOLATION: skill -> workflow — ${relPath}:${link.index + 1}: links to ${relative(repoRoot, target)}, which is a workflow. A skill teaches a capability; it does not route work to a workflow and does not own the sequence. Name the capability and the stage instead, or add the pointer to SKILL_TO_WORKFLOW_ALLOWLIST with the reason it is a pointer and not a dependency.`,
+    );
+  }
+}
+
+console.log(
+  `skill -> workflow: ${workflowPointers} pointers, ${workflowAllowlisted} allowlisted`,
 );
 
 for (const warning of warnings) console.warn(`warn  ${warning}`);

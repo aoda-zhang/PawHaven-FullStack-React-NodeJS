@@ -168,5 +168,5 @@ regressions from the change under review.
 ## Related
 
 - Architecture & graduation: [architecture-doctor](../architecture-doctor/SKILL.md)
-- Component graduation: [component](../../component/SKILL.md)
+- Component graduation: [frontend-patterns → component-placement](../../frontend-patterns/references/component-placement.md)
 - Backend modules: [backend-doctor](../backend-doctor/SKILL.md)

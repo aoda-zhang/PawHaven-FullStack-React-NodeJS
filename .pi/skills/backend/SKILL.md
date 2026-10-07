@@ -130,17 +130,20 @@ does anything else is a **blocking** finding regardless of how clean it looks.
 
 ## Conventions the linter will and will not catch
 
-`libs/eslint-config/node.js` sets `no-console: 'off'` for backend, and `no-explicit-any`,
-`max-classes-per-file`, `import/order` (with `newlines-between: always`) as **warnings**, not errors.
-`prettier/prettier` is switched off there — root Prettier still applies.
+`libs/eslint-config/node.js` sets `max-classes-per-file`, `import/order` (with `newlines-between:
+always`) as **warnings**, not errors, and switches `prettier/prettier` off there — root Prettier
+still applies.
 
-So: the linter will not stop a stray `console.log`, and a `pnpm lint` pass does **not** prove module
-boundaries were respected. Read the diff for those yourself. Use the `Logger` service rather than
-`console` anyway — that is a project convention, not an enforced rule.
+`no-console: 'off'` and `no-explicit-any`-as-warning are stated where they are enforced — in
+[backend-doctor](../code-review/backend-doctor/SKILL.md), whose `rg` commands are the only check for
+either. A `pnpm lint` pass does **not** prove module boundaries were respected either. Read the diff
+for those yourself. Use NestJS's `Logger` (`private readonly logger = new Logger(X.name)`, as every
+core-service module does) rather than `console` anyway — that is a project convention, not an
+enforced rule.
 
 Relative imports carry an explicit `.js` extension (ESM / NodeNext).
 
-## Validation
+## Running the checks
 
 ```bash
 pnpm --filter @pawhaven/core-service typecheck
@@ -149,9 +152,10 @@ pnpm --filter @pawhaven/core-service test
 cd apps/backend/core-service && npx prisma validate
 ```
 
-`pnpm lint` currently exits non-zero from **pre-existing** errors — 3 in `gateway`, 10 in
-`backend-core`. Use `npx turbo run lint --continue` to see all of them; a plain `pnpm lint` stops at
-the first failing package. Diff against baseline before calling lint a regression you caused.
+The lint baseline and how to read it live in [testing-standards](../testing-standards/SKILL.md#baseline):
+`pnpm lint` exits non-zero from pre-existing errors, so diff against the baseline before calling a
+failure a regression you caused. Use `npx turbo run lint --continue` to see all of them; a plain
+`pnpm lint` stops at the first failing package and hides the rest.
 
 There is no cross-module import linter. Run the grep yourself when it matters:
 

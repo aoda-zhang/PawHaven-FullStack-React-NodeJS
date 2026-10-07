@@ -284,7 +284,7 @@ validator carry it instead.
   "workflow": "refactor",
   "requiredAgents": ["verification"],
   "requiredVerification": [
-    "pnpm pi-check exits 0 — 27 project skills, 10 prompts, 9 agents load with zero diagnostics, and no skills/ directory under .pi/agents/",
+    "pnpm pi-check exits 0 — 19 project skills, 10 prompts, 9 agents load with zero diagnostics, and no skills/ directory under .pi/agents/",
     "node scripts/check-md-links.mjs . reports 0 broken",
     "npx prettier --check clean on every changed file"
   ],

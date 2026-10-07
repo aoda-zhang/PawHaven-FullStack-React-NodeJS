@@ -25,8 +25,10 @@ and `document-service`.
     --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/*.test.ts' --glob '!**/*.spec.ts'
   ```
 - **Explanation**: `console.log` is forbidden in backend production code. Use the NestJS `Logger`
-  (`private readonly logger = new Logger(ClassName.name)`) or the logging service. Console output is
-  uncontrolled, cannot be filtered by level, and bypasses the logging infrastructure.
+  (`private readonly logger = new Logger(ClassName.name)`), which is what every service in the tree
+  does. The app bootstrap wires `TraceLogger` from `@pawhaven/backend-core/logging` in as the
+  `LoggerService`; feature code does not instantiate it. Console output is uncontrolled, cannot be
+  filtered by level, and bypasses the logging infrastructure.
 - **This rule is not mechanically enforced.** `libs/eslint-config/node.js` sets `no-console: 'off'`
   for backend, so a green `pnpm lint` says nothing about it. The command is the only check.
 - **Known hit**: `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught

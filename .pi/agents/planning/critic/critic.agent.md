@@ -14,7 +14,7 @@ description: >
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
-skills: project-rules, principles, architecture-design
+skills: principles, architecture-design
 tools: read, grep, find, ls, bash
 defaultContext: fresh
 ---
@@ -82,7 +82,7 @@ it once. Being cheap is not a reason to skip a review. Having nothing to review 
 
 ## Before answering
 
-1. Load `project-rules` and `principles`. The hard constraints decide before preference does.
+1. Read `AGENTS.md` for the hard constraints, and load `principles`. The hard constraints decide before preference does.
 2. Read the code the plan rests on. Do not review a plan from its summary alone.
 3. Separate what you verified from what you assume, and mark each claim.
 4. For every claim you cannot ground, name the command or the file that would settle it.
