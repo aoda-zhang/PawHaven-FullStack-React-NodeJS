@@ -77,4 +77,5 @@ Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update plann
 Scopes in active use: `auth`, `rescue`, `pdf`, `email`, `home`, `stats`, `docs`, `chore`.
 
 Husky `commit-msg` runs commitlint and rejects non-conforming messages. One commit per logical
-change; `.pi/` changes are `docs(harness): ...` or `chore(harness): ...`.
+change; `harness-core/`, `adapters/`, and `validation/` changes are `docs(harness): ...` or
+`chore(harness): ...`, and they ship in their own change rather than inside a feature task.

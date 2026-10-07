@@ -1,6 +1,6 @@
 # PawHaven Frontend Portal
 
-Facts only. The **how** lives in the lens skill — [frontend-patterns](../.pi/skills/frontend-patterns/SKILL.md)
+Facts only. The **how** lives in the lens skill — [frontend-patterns](../harness-core/capabilities/frontend-development/skills/frontend-patterns/SKILL.md)
 (and its `references/` per-area rules) plus `typescript` for writing, and the four
 `*-doctor` skills for checking. If you find yourself restating a fact from this file in one of those,
 that is the bug this file exists to prevent.
@@ -166,9 +166,10 @@ owns the vocabulary those rules use, so a rule and the fact it checks cannot dri
 
 ## Related
 
-- [Writing](../.pi/skills/frontend-patterns/SKILL.md) — one router; per-area rules in its `references/`
-- [React standards](../.pi/skills/frontend-patterns/references/react.md) · [styling](../.pi/skills/frontend-patterns/references/styling.md) · [i18n](../.pi/skills/frontend-patterns/references/i18n.md) · [TypeScript](../.pi/skills/typescript/SKILL.md) · [client state](../.pi/skills/frontend-patterns/references/state.md) · [component placement](../.pi/skills/frontend-patterns/references/components.md)
-- [Doctors](../.pi/skills/code-review/react-doctor/SKILL.md) · [style](../.pi/skills/code-review/style-doctor/SKILL.md) · [i18n](../.pi/skills/code-review/i18n-doctor/SKILL.md) · [TypeScript](../.pi/skills/code-review/typescript-doctor/SKILL.md)
+- [Writing](../harness-core/capabilities/frontend-development/skills/frontend-patterns/SKILL.md) — one router; per-area rules in its `references/`
+- [React standards](../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/react.md) · [styling](../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/styling.md) · [i18n](../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/i18n.md) · [TypeScript](../harness-core/capabilities/development-foundations/skills/typescript/SKILL.md) · [client state](../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/state.md) · [component placement](../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/components.md)
+- [Component tests](../harness-core/capabilities/frontend-development/skills/testing-frontend/SKILL.md) · [React gate](../harness-core/capabilities/frontend-development/skills/react-doctor/SKILL.md)
+- Review: [frontend dimension](../harness-core/capabilities/code-review/skills/code-review/references/frontend.md) · [method](../harness-core/capabilities/code-review/skills/code-review/SKILL.md)
 - [Frontend architecture](./architecture/PawHaven-Frontend-Architecture.md) — the
   canonical home for why each rule above exists. §3 package ecosystem, §4 component boundaries,
   §5 routing, §6 state, §7 design tokens, §8 i18n, §9 module boundary enforcement. Read the section

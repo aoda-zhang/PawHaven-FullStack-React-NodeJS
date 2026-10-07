@@ -1,46 +1,42 @@
 {
   "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/schema/settings.schema.json",
   "skills": [
-    ".pi/skills",
-    ".pi/skills/code-review/architecture-doctor",
-    ".pi/skills/code-review/backend-doctor",
-    ".pi/skills/code-review/boundary-doctor",
-    ".pi/skills/code-review/i18n-doctor",
-    ".pi/skills/code-review/react-doctor",
-    ".pi/skills/code-review/style-doctor",
-    ".pi/skills/code-review/test-doctor",
-    ".pi/skills/code-review/typecheck-doctor",
-    ".pi/skills/code-review/typescript-doctor"
+    ".pi/capabilities"
   ],
-  "prompts": [".pi/workflows"],
-  "packages": ["npm:pi-subagents@0.76.0"],
+  "prompts": [
+    ".pi/workflows",
+    ".pi/workflows/patterns"
+  ],
+  "packages": [
+    "npm:pi-subagents@0.76.0"
+  ],
   "subagents": {
     "agentOverrides": {
+      "architect": {
+        "thinking": "high"
+      },
+      "backend-developer": {
+        "thinking": "medium"
+      },
+      "browser-verifier": {
+        "thinking": "medium"
+      },
+      "frontend-developer": {
+        "thinking": "medium"
+      },
+      "oracle": {
+        "thinking": "high"
+      },
       "orchestrator": {
+        "thinking": "high"
+      },
+      "reviewer": {
         "thinking": "high"
       },
       "scout": {
         "thinking": "low"
       },
-      "architect": {
-        "thinking": "high"
-      },
-      "oracle": {
-        "thinking": "high"
-      },
-      "frontend-dev": {
-        "thinking": "medium"
-      },
-      "backend-dev": {
-        "thinking": "medium"
-      },
       "tester": {
-        "thinking": "medium"
-      },
-      "reviewer": {
-        "thinking": "high"
-      },
-      "browser-verifier": {
         "thinking": "medium"
       }
     }

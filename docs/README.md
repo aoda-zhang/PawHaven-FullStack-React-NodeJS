@@ -53,6 +53,7 @@ designing anything.
 | [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | Why PDFs render through React + Puppeteer instead of a template library, and the constraints that bite                      |
 | [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | Legacy redirect map from the pre-split document to the three above. No content of its own.                                  |
 | [service-boundaries.md](./architecture/service-boundaries.md)                                       | Backend service boundaries — the four services, the auth boundary, request/response shape                                   |
+| [harness-migration.md](./architecture/harness-migration.md)                                         | How the AI development harness moved from a runtime-owned directory to a provider-neutral canonical source plus adapters    | Reading what `harness-core/` replaced, and why |
 
 `authentication-architecture.md` and `route_authentication.md` are the pair to read before touching
 anything auth-related — one covers the server trust boundary, the other the client route guard.
@@ -112,16 +113,19 @@ Operational docs for running the thing locally. Not design material — this is 
 
 ## 6. Agent harness
 
-The agent control layer lives in `.pi/`, not here.
+The agent control layer lives in [`harness-core/`](../harness-core), not here. `.pi/` is the generated
+Pi runtime output, rebuilt from it by `pnpm harness:generate`.
 
-| Path                               | Covers                                                                                                  |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [.pi/README.md](../.pi/README.md)  | Index of skills, workflows, and the 9 subagents                                                         |
-| [.pi/workflows/](../.pi/workflows) | Slash-command workflows                                                                                 |
-| [AGENTS.md](../AGENTS.md)          | Hard constraints — git, code, dispatch, reporting; the harness map is [.pi/README.md](../.pi/README.md) |
+| Path                                                            | Covers                                                          |
+| --------------------------------------------------------------- | --------------------------------------------------------------- |
+| [harness-core/README.md](../harness-core/README.md)             | Index of capabilities, skills, workflows, and rules             |
+| [harness-core/ARCHITECTURE.md](../harness-core/ARCHITECTURE.md) | The invariants the harness defends                              |
+| [harness-core/workflows/](../harness-core/workflows)            | The workflows, surfaced by an adapter as the runtime's commands |
+| [harness-core/rules/](../harness-core/rules)                    | The stable rules shared by every workflow                       |
+| [AGENTS.md](../AGENTS.md)                                       | Hard constraints — git, code, dispatch, reporting               |
 
-`pnpm pi-check` validates the harness. The retired `.opencode/` and `.codebuddy/` layers are gone;
-links into them are dead.
+`pnpm harness:verify` validates the harness. The retired `.opencode/`, `.codebuddy/`, and
+`.pi/skills/` layers are gone; links into them are dead.
 
 ---
 
@@ -138,7 +142,8 @@ links into them are dead.
 - **Every handoff classifies Doc Impact** as `none` / `update` / `create`; the main session routes
   doc edits to the lane that made the change.
 - **Root READMEs (EN ↔ CN) stay in sync** and reference all knowledge files. The agent-control layer
-  is `.pi/`, not `.opencode/` — links into it are dead.
+  is `harness-core/`; `.opencode/`, `.codebuddy/`, and `.pi/skills/` are retired — links into them are
+  dead.
 
 ## 8. Repository quality
 

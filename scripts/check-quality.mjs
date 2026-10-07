@@ -81,7 +81,7 @@ const DOC_ENTRY_POINTS = [
   'README.md',
   'README.cn.md',
   'AGENTS.md',
-  '.pi/README.md',
+  'harness-core/README.md',
 ];
 
 const MD_LINK = /\]\(([^)\s]+)\)/g;
@@ -164,6 +164,9 @@ function docLinkTargets(fromFile, body) {
 
 const RETIRED_PATHS = [
   '.pi/skills/project-rules/',
+  '.pi/skills/code-review/',
+  '.pi/policies/',
+  '.pi/config/models.yaml',
   '.pi/skills/frontend/',
   '.pi/handoffs/',
   '.opencode/',
@@ -370,7 +373,7 @@ const DELEGATED = [
   },
   {
     name: 'check:links',
-    args: [join(repoRoot, 'scripts/check-md-links.mjs'), repoRoot],
+    args: [join(repoRoot, 'harness-core/validation/check-links.mjs')],
     owns: 'markdown links and anchors',
   },
 ];

@@ -44,63 +44,67 @@ States: `healthy` / `needs attention` / `medium risk`.
 
 ## Harness
 
-- Skill dependency graph: **healthy**. `pnpm pi-check` exits 0 — 21/21 project skills, 0
-  agent-private skills, 0 oversized `SKILL.md` (limit 250 lines, largest 208), 27 supporting files
-  reachable, and a clean skill graph (30 nodes, 7 ordering edges).
-- Layer separation: **healthy**. Skills hold capability, `policies/` holds the rules every workflow
-  applies, `workflows/` holds ordering, `agents/` holds responsibility. `pi-check` fails on a skill that
-  reaches into either process directory, on a verification lane that can write, on an agent that pins its
-  own model, and on a dispatch to a lane name that no longer exists.
-- Model registry: **healthy**. `.pi/config/models.yaml` assigns every one of the nine lanes a tier, and
-  `.pi/settings.json` is rendered from it by `scripts/sync-model-tiers.mjs`; `pi-check` fails on drift.
-  Every tier is `model: inherit`, because this repo pins no provider — the tiers carry `thinking` and the
-  capability mapping, and pinning a provider later is one line per tier.
+- Canonical source: **healthy**. `harness-core/` holds 9 capability bundles, 9 agents, 16 skills, 12
+  workflows plus 1 pattern, and 4 rules. `pnpm harness:check` exits 0 — no duplicate component name,
+  no dangling grant or reference, no runtime field or provider model name inside canonical source, and
+  no orphan skill.
+- Layer separation: **healthy**. Capabilities hold capability, `rules/` holds the invariants every
+  workflow applies, `workflows/` holds ordering, `agents/` holds responsibility, `adapters/` holds
+  runtime translation. `validate-core` fails on a skill that reaches into a workflow or at an agent, on
+  a read-only agent that could write, on an agent that declares its own model, and on a workflow that
+  points into a generated runtime directory.
+- Runtime boundary: **healthy**. `.pi/` is generated output. `pnpm harness:generate` rebuilds it
+  directory-for-directory from `harness-core/`, and `pnpm harness:check:generated` fails on missing,
+  stale, or orphaned output. `pnpm pi:check` runs Pi's own `loadSkills` and `loadPromptTemplates`
+  against it: 16 project skills, 12 project prompts, 9 agents, 9 rendered tiers, zero diagnostics.
+- Model policy: **healthy**. `harness-core/config/model-policy.yaml` assigns each agent one of three
+  abstract tiers (`fast`, `balanced`, `strong`), and the adapter renders them into the runtime's
+  thinking levels. Every tier is `model: inherit`, because this repo pins no provider — pinning one
+  later is one line per tier in the adapter, and no agent changes.
+- Links: **healthy**. 718 relative links and anchors across `harness-core/`, `AGENTS.md`, `docs/`, and
+  both root READMEs resolve, with an empty `KNOWN_BROKEN` list.
 - Browser verification substrate: **healthy**. `e2e/smoke.spec.ts` proves the portal boots, mounts
   `#root`, and raises no uncaught exception, with only the portal up. A pass says nothing about a
   backend, and deeper journeys are the responsibility of the change that needs one.
-- Documentation freshness: **needs attention**. `pnpm quality-check` counts 7 historical mentions of
+- Documentation freshness: **needs attention**. `pnpm quality-check` counts historical mentions of
   retired harness resources, each classified historical by a past-tense marker on its line or in the
-  section heading above it. They are allowed, but they accumulate; the refactor that took this count
-  from 26 deleted the two `retired-harness-corrections.md` references outright rather than rewording
-  them.
+  section heading above it. They are allowed, but they accumulate; delete them rather than rewording.
 - Duplicate rules: 2 candidates, reported as warnings by `pnpm quality-check` — the contract-change
   gate text carried by both implementation agents, and one design-philosophy sentence shared by the
   two system-architecture docs. Neither is a failure; both are drift risks to decide on.
-- Model registry: none. `.pi/settings.json` carries only `thinking` tiers, and no model name is
-  hardcoded in `.pi/` (see `.pi/README.md` § Model selection). This refactor deliberately does not
-  introduce one.
 
-## Pre-existing findings the doctor rules hit
+## Pre-existing findings the review checks hit
 
-Each line below is a hit that a review check returns against **the codebase rather than the change
+Each line below is a hit that a review dimension returns against **the codebase rather than the change
 under review**. They are recorded here so a review reports them once, marked pre-existing, instead of
 re-reporting them on every diff that touches the file. Provenance: carried over from the checks that
 first recorded them; re-run the named command to confirm before relying on one.
 
-| Check                                     | Command                                                              | What it hits                                                                                                                                                                                                                                                                                      |
-| ----------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| backend-doctor R1 `console.log`           | `rg -n 'console\.log' apps/backend --glob '*.ts'`                    | `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught error                                                                                                                                                                                                            |
-| backend-doctor R2 / react-doctor S6 `any` | `rg -n ': any\b' apps/backend --glob '*.ts'`                         | the portal has zero `: any` outside tests, so any frontend hit is a regression                                                                                                                                                                                                                    |
-| typescript-doctor T6 `enum`               | `rg -n '\benum\s+\w+' <changed files>`                               | `packages/frontend-core/src/api/types.ts:54` declares `export enum extraRequestHeader`                                                                                                                                                                                                            |
-| boundary-doctor R1 cross-feature import   | the command in that rule                                             | `features/rescue-detail/components/VolunteerInfo.tsx` imports from `features/animal-follow/`; `features/report-animal/api/reportAnimal.mutations.ts` imports `homeQueryKeys` and `rescueCasesQueryKeys`; `features/report-animal/ReportAnimal.tsx` imports `useCurrentUser` from `features/auth/` |
-| boundary-doctor R6 window navigation      | the command in that rule                                             | `apps/frontend/portal/src/layout/RootLayoutFooter.tsx` calls `window.location.assign('/')` — a ⚠️ Warning, not blocking                                                                                                                                                                           |
-| style-doctor R4d inline `style={{}}`      | `rg -n 'style=\{\{' apps/frontend/portal/src --glob '*.tsx'`         | `features/home/components/AdoptablePetsSection.tsx:25` and `features/home/components/PetCard.tsx:27`, both `scrollSnap*`                                                                                                                                                                          |
-| style-doctor R2 raw Tailwind colours      | the command in that rule                                             | `layout/RootLayoutFooter.tsx` (`text-brown-7`, `bg-white/10`, `hover:text-white`) and `features/home/components/PetCard.tsx:40`                                                                                                                                                                   |
-| i18n-doctor R1 hardcoded strings          | the command in that rule                                             | the portal ships CJK strings inline in several components rather than through `t()`                                                                                                                                                                                                               |
-| react-doctor Step 0                       | `find apps/frontend -type d -name src -not -path '*/node_modules/*'` | `apps/frontend/portal` is the only frontend app; there is no `apps/frontend/admin`                                                                                                                                                                                                                |
-| `pnpm test:e2e`                           | `pnpm test:e2e`                                                      | collected zero specs until the browser substrate landed; `e2e/smoke.spec.ts` now proves the shell mounts, and still says nothing about a backend                                                                                                                                                  |
+The check ids are the ones `code-review/scripts/run-project-checks.mjs` prints.
+
+| Check                        | Dimension           | Command                                                                                                                     | What it hits                                                                                                                                                                                                                                                                                      |
+| ---------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BE-CONSOLE` `console.log`   | backend             | `rg -n 'console\.log' apps/backend --glob '*.ts'`                                                                           | `apps/backend/document-service/src/modules/email/email.service.ts` logs a caught error                                                                                                                                                                                                            |
+| `BE-ANY` / `FE-` `: any`     | backend, TypeScript | `rg -n ': any\b' apps/backend --glob '*.ts'`                                                                                | the portal has zero `: any` outside tests, so any frontend hit is a regression                                                                                                                                                                                                                    |
+| T6 `enum`                    | TypeScript          | `rg -n '\benum\s+\w+' <changed files>`                                                                                      | `packages/frontend-core/src/api/types.ts:54` declares `export enum extraRequestHeader`                                                                                                                                                                                                            |
+| cross-feature import         | architecture        | the command in [architecture.md](../../harness-core/capabilities/code-review/skills/code-review/references/architecture.md) | `features/rescue-detail/components/VolunteerInfo.tsx` imports from `features/animal-follow/`; `features/report-animal/api/reportAnimal.mutations.ts` imports `homeQueryKeys` and `rescueCasesQueryKeys`; `features/report-animal/ReportAnimal.tsx` imports `useCurrentUser` from `features/auth/` |
+| window navigation            | architecture        | the command in [architecture.md](../../harness-core/capabilities/code-review/skills/code-review/references/architecture.md) | `apps/frontend/portal/src/layout/RootLayoutFooter.tsx` calls `window.location.assign('/')` — a `MINOR`, not blocking                                                                                                                                                                              |
+| inline `style={{}}`          | frontend            | `rg -n 'style=\{\{' apps/frontend/portal/src --glob '*.tsx'`                                                                | `features/home/components/AdoptablePetsSection.tsx:25` and `features/home/components/PetCard.tsx:27`, both `scrollSnap*`                                                                                                                                                                          |
+| raw Tailwind colours         | frontend            | the command in [frontend.md](../../harness-core/capabilities/code-review/skills/code-review/references/frontend.md)         | `layout/RootLayoutFooter.tsx` (`text-brown-7`, `bg-white/10`, `hover:text-white`) and `features/home/components/PetCard.tsx:40`                                                                                                                                                                   |
+| hardcoded strings            | frontend            | the command in [frontend.md](../../harness-core/capabilities/code-review/skills/code-review/references/frontend.md)         | the portal ships CJK strings inline in several components rather than through `t()`                                                                                                                                                                                                               |
+| React gate project discovery | frontend            | `find apps/frontend -type d -name src -not -path '*/node_modules/*'`                                                        | `apps/frontend/portal` is the only frontend app; there is no `apps/frontend/admin`                                                                                                                                                                                                                |
+| `pnpm test:e2e`              | testing             | `pnpm test:e2e`                                                                                                             | collected zero specs until the browser substrate landed; `e2e/smoke.spec.ts` now proves the shell mounts, and still says nothing about a backend                                                                                                                                                  |
 
 Accepted exceptions that are **not** findings are stated inside the rule that hits them, so the next
-reviewer does not re-litigate them: `ScrollToTop.tsx` and `QueryProvider.tsx` in boundary-doctor R6,
-and the type-only sharing named in boundary-doctor R1.
+reviewer does not re-litigate them: `ScrollToTop.tsx` and `QueryProvider.tsx` in the raw-navigation
+rule, and the type-only sharing named in the cross-feature rule.
 
 ## Quality invariants
 
 Mechanical, and exit-0 on a clean tree:
 
 - `pnpm architecture-check` — package, feature, and service boundaries.
-- `pnpm check:links` — markdown links and anchors.
-- `pnpm pi-check` — harness and skill integrity.
+- `pnpm harness:verify` — canonical source, generated output, links, and the Pi runtime loader.
 - `pnpm token-check` — design tokens.
 - `pnpm quality-check` — orphaned docs, stale paths, duplicate-rule candidates (warnings).
 - `pnpm lint` — must stay at the 13-error baseline.
@@ -116,4 +120,10 @@ Mechanical, and exit-0 on a clean tree:
 
 ## Future work
 
-Future work: centralized model registry
+**A second runtime adapter.** `harness-core/adapters/README.md` records Pi as implemented and Codex,
+Claude Code, and Cursor as architecture-ready and unimplemented. Each needs a real capability and
+compatibility document before it exists; a placeholder directory is a promise a reader will believe.
+
+**A `security` capability.** Security is currently a review dimension. If it grows its own agents,
+commands, and knowledge, it graduates to a capability bundle — and at that point a dedicated security
+reviewer becomes the parallel-review shape the other dimensions use.

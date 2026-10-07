@@ -22,10 +22,17 @@
     "token-check": "node packages/design-system/scripts/token-check.cjs",
     "architecture-check": "node scripts/check-architecture.mjs",
     "quality-check": "node scripts/check-quality.mjs",
-    "pi-check": "node scripts/check-pi-harness.mjs",
-    "check:links": "node scripts/check-md-links.mjs .",
+    "harness:check": "node harness-core/validation/validate-core.mjs",
+    "harness:check:generated": "node harness-core/validation/validate-generated.mjs",
+    "harness:generate": "node harness-core/adapters/pi/generate.mjs",
+    "pi:generate": "node harness-core/adapters/pi/generate.mjs",
+    "pi:check": "node harness-core/adapters/pi/validate.mjs",
+    "harness:verify": "pnpm harness:check && pnpm harness:check:generated && pnpm check:links && pnpm pi:check && pnpm pi:smoke",
+    "check:links": "node harness-core/validation/check-links.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "pi-check": "pnpm harness:verify",
+    "pi:smoke": "node harness-core/adapters/pi/smoke.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

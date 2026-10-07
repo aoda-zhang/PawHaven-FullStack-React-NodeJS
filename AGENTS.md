@@ -7,6 +7,25 @@ Instructions for AI agents (and humans) working in this repository.
 PawHaven is an animal rescue & adoption platform — reporting stray animals, tracking rescue
 cases, adoption, and community stories. Monorepo: **pnpm workspaces + Turborepo**, TypeScript.
 
+## The AI development harness
+
+**`harness-core/` is the repository-owned, canonical AI development harness.** Agents, skills,
+workflows, rules, and model tiers are defined there and nowhere else. Coding-runtime directories are
+**generated adapters** — `.pi/` is what the Pi runtime loads, and an adapter rebuilds it from
+`harness-core/`.
+
+```text
+harness-core/  →  adapters/  →  .pi/
+   canonical      translation    generated
+```
+
+Start at [harness-core/README.md](./harness-core/README.md) for the map, and
+[harness-core/ARCHITECTURE.md](./harness-core/ARCHITECTURE.md) for the invariants. The harness is a
+map, not a document to memorise: read the file the task points you at.
+
+**Never edit `.pi/` by hand.** It is deleted and rebuilt by `pnpm harness:generate`, and a hand-edit
+looks reviewed right up until the next run discards it. Change `harness-core/`, or the adapter.
+
 ## Layout
 
 ```
@@ -22,6 +41,7 @@ apps/
 packages/                 # shared/ types+Zod, backend-core, frontend-core,
                           # design-system, i18n, ui
 libs/                     # eslint configs (web/ + node/), shared tooling
+harness-core/             # the canonical AI development harness
 ```
 
 ## Toolchain — read this before assuming versions
@@ -32,7 +52,8 @@ libs/                     # eslint configs (web/ + node/), shared tooling
 | pnpm       | **12.x** | `package.json` `packageManager` (`pnpm@12.4.1`) |
 | TypeScript | 5.9      | root `devDependencies`                          |
 
-`.nvmrc` and `engines.node` must stay equal — CI reads `engines.node` at runtime — and stay in sync with both READMEs and both `docs/development` guides.
+`.nvmrc` and `engines.node` must stay equal — CI reads `engines.node` at runtime — and stay in sync with
+both READMEs and both `docs/development` guides.
 
 ## Commands
 
@@ -47,34 +68,23 @@ pnpm lint            # turbo run lint
 pnpm test            # turbo run test
 pnpm test:e2e        # playwright
 pnpm build:libs      # only packages/*
+
+pnpm harness:verify  # the whole harness: source, generated output, links, Pi loader
 ```
 
-**Rebuild shared packages after changing anything in `packages/*`** — downstream apps consume
-the built output, not source. `document-service` needs a Chromium binary at runtime for PDF rendering.
-
-## Authentication architecture — non-negotiable invariant
-
-**The gateway alone owns browser cookies and browser JWTs.** Per request it signs a
-**short-lived ES256 internal JWT** for the target service into `x-gateway-jwt`. Downstream services
-**never** see browser tokens (`InternalJwtGuard` fails closed); handlers read identity via `@InternalJwt()`.
-
-Full detail: `docs/architecture/authentication-architecture.md`.
-
-## The agent harness
-
-Agent config lives in `.pi/`, committed project-locally — pi is the harness layer. The map is
-[`.pi/README.md`](.pi/README.md); `pnpm pi-check` and `pnpm check:links` validate it.
+**Rebuild shared packages after changing anything in `packages/*`** — downstream apps consume the
+built output, not source. `document-service` needs a Chromium binary at runtime for PDF rendering.
 
 ## Documentation
 
-`docs/` is split by what a document is **for** — start at [`docs/README.md`](docs/README.md).
-Operational portal facts are in [`docs/frontend-portal.md`](docs/frontend-portal.md).
+`docs/` is split by what a document is **for** — start at [`docs/README.md`](./docs/README.md).
+Operational portal facts are in [`docs/frontend-portal.md`](./docs/frontend-portal.md).
 
 ### Read the code first, write the feature docs last
 
-Entering a task, read the architecture docs for the area in scope, then the **code**.
-`docs/features/**` is never an input to a decision. Code and document disagree, the code is right.
-After the change is verified, update the feature doc from the code that shipped. Same change, same lane.
+Entering a task, read the architecture docs for the area in scope, then the **code**. `docs/features/**`
+is never an input to a decision. Code and document disagree, the code is right. After the change is
+verified, update the feature doc from the code that shipped. Same change, same lane.
 
 ## Hard constraints
 
@@ -109,8 +119,8 @@ Behavioural rules — the ones an agent gets wrong without being told.
 - **Every mutating change gets an independent review.** Dispatch `reviewer` as a separate context;
   a change nobody independent has read has not been reviewed. `reviewer` is the only lane that
   emits a verdict about code.
-- **Never micro-manage.** A dispatch names a scope, a data shape, and observable success criteria
-  — not a file list.
+- **Never micro-manage.** A dispatch names a scope, a data shape, and observable success criteria —
+  not a file list.
 - Classify before planning (Trivial / Standard / Architectural). Approval is not per-step: once
   given, reversible sub-steps just get done.
 - **A lane with no named validator has not finished.** Every check reads `PASS | FAIL | NOT RUN`,
@@ -120,11 +130,11 @@ Behavioural rules — the ones an agent gets wrong without being told.
   it did not pass. A bug's repro must pass on the same surface that failed.
 - Verify the **combined** tree, not just the units. `pnpm lint` exits non-zero on a clean tree — the
   baseline, and every known pre-existing finding behind it, lives in
-  [`docs/quality/`](docs/quality/README.md). Diff against it before calling anything a regression.
+  [`docs/quality/`](./docs/quality/README.md). Diff against it before calling anything a regression.
 - **A worker that cannot build what it was handed stops and signals** `CONTRACT_CHANGE_REQUIRED`
   rather than quietly redefining a boundary.
-- **Never hand-edit the harness or `docs/architecture/` as a side effect of a feature task**;
-  those changes deserve their own commit.
+- **Never hand-edit the harness** — `harness-core/`, `adapters/`, `validation/`, or a generated
+  runtime directory — as a side effect of a feature task; those changes deserve their own change.
 - **Never ask the user for Figma files or screenshots** — Figma is not used here; the token source
   is `packages/design-system/src/tokens/`.
 

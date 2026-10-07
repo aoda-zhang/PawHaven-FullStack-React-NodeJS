@@ -55,9 +55,9 @@
 
 # 🤖 AI Driver
 
-**`.pi/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent harness，将每个开发请求转化为结构化流水线：`分类 → 规划 → 分发执行通道 → 验证 → 对照架构与模式审查 → 更新文档`。
+**`harness-core/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent harness，将每个开发请求转化为结构化流水线：`分类 → 规划 → 分发执行通道 → 验证 → 对照架构与模式审查 → 更新文档`。
 
-👉 [进入 harness](./.pi/README.md) —— 19 个项目 skill、9 个斜杠命令工作流、9 个 subagent,以及它们强制的硬约束。由 `pnpm pi-check` 校验。
+👉 [进入 harness](./harness-core/README.md) —— 9 个 capability、16 个 skill、12 个 workflow、4 条 rule 与 9 个 agent。由 `pnpm harness:verify` 校验。
 
 ---
 
@@ -106,7 +106,7 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 | 文档                                                                     | 说明                                                                        |
 | ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| [AGENTS.md](./AGENTS.md) · [Harness](./.pi/README.md)                    | 每个 agent 必须遵守的硬约束，以及强制它们的 agent harness                   |
+| [AGENTS.md](./AGENTS.md) · [Harness](./harness-core/README.md)           | 每个 agent 必须遵守的硬约束，以及强制它们的 agent harness                   |
 | [身份认证与授权架构](./docs/architecture/authentication-architecture.md) | 网关持有的 Cookie JWT + 内部 ES256 JWT（InternalJwt）服务认证,`roles` claim |
 | [路由级认证](./docs/architecture/route_authentication.md)                | 前端路由守卫实现                                                            |
 

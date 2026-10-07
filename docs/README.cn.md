@@ -37,16 +37,17 @@ Not Exist** 一节里，而不是留给读者自行发现。[`product/`](./produ
 
 本项目的一个技术要点，或某个问题的设计。这些是设计任何东西之前应当先读的文档。
 
-| 文件                                                                                                | 覆盖内容                                                                         |
-| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [PawHaven-System-Architecture-Overview.md](./architecture/PawHaven-System-Architecture-Overview.md) | 总纲。服务拆分、C4 模型、数据架构、API 网关、安全、部署、设计决策                |
-| [PawHaven-Backend-Architecture.md](./architecture/PawHaven-Backend-Architecture.md)                 | `core-service` 模块化单体、以 NestJS 模块表达的限界上下文、服务间通信            |
-| [PawHaven-Frontend-Architecture.md](./architecture/PawHaven-Frontend-Architecture.md)               | 基于功能的模块结构、状态、路由、token、i18n                                      |
-| [authentication-architecture.md](./architecture/authentication-architecture.md)                     | **鉴权信任模型。** 网关持有浏览器 cookie、内部 ES256 JWT、下游校验、`roles` 声明 |
-| [route_authentication.md](./architecture/route_authentication.md)                                   | 前端路由守卫：受保护的父路由、`requireUser`、`/auth/me` 预热                     |
-| [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | 为什么 PDF 走 React + Puppeteer 而不是模板库,以及由此产生的约束                  |
-| [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | 拆分前文档的旧链接重定向表,本身无内容                                            |
-| [service-boundaries.md](./architecture/service-boundaries.md)                                       | 后端服务边界:四个服务、鉴权边界、请求/响应形状                                   |
+| 文件                                                                                                | 覆盖内容                                                                               |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| [PawHaven-System-Architecture-Overview.md](./architecture/PawHaven-System-Architecture-Overview.md) | 总纲。服务拆分、C4 模型、数据架构、API 网关、安全、部署、设计决策                      |
+| [PawHaven-Backend-Architecture.md](./architecture/PawHaven-Backend-Architecture.md)                 | `core-service` 模块化单体、以 NestJS 模块表达的限界上下文、服务间通信                  |
+| [PawHaven-Frontend-Architecture.md](./architecture/PawHaven-Frontend-Architecture.md)               | 基于功能的模块结构、状态、路由、token、i18n                                            |
+| [authentication-architecture.md](./architecture/authentication-architecture.md)                     | **鉴权信任模型。** 网关持有浏览器 cookie、内部 ES256 JWT、下游校验、`roles` 声明       |
+| [route_authentication.md](./architecture/route_authentication.md)                                   | 前端路由守卫：受保护的父路由、`requireUser`、`/auth/me` 预热                           |
+| [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | 为什么 PDF 走 React + Puppeteer 而不是模板库,以及由此产生的约束                        |
+| [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | 拆分前文档的旧链接重定向表,本身无内容                                                  |
+| [service-boundaries.md](./architecture/service-boundaries.md)                                       | 后端服务边界:四个服务、鉴权边界、请求/响应形状                                         |
+| [harness-migration.md](./architecture/harness-migration.md)                                         | AI 开发 harness 如何从运行时自有目录迁移为 provider-neutral canonical source + adapter | 了解 `harness-core/` 替换了什么,以及为什么 |
 
 涉及鉴权时,`authentication-architecture.md` 与 `route_authentication.md` 是一对:前者讲服务端信任
 边界,后者讲客户端路由守卫。
@@ -103,16 +104,19 @@ _Known defects_ 表记录实现与自身约定相矛盾之处——一个从不�
 
 ## 6. Agent harness
 
-Agent 控制层在 `.pi/`,不在这里。
+Agent 控制层在 [`harness-core/`](../harness-core),不在这里。`.pi/` 是生成出来的 Pi 运行时产物,由
+`pnpm harness:generate` 从 canonical source 重建。
 
-| 路径                               | 覆盖内容                                                                       |
-| ---------------------------------- | ------------------------------------------------------------------------------ |
-| [.pi/README.md](../.pi/README.md)  | 技能、工作流、策略、模型注册表与 9 个 subagent 的索引                          |
-| [.pi/workflows/](../.pi/workflows) | 斜杠命令工作流                                                                 |
-| [.pi/policies/](../.pi/policies)   | 跨工作流的稳定规则:验证、失败、契约、人工门                                    |
-| [AGENTS.md](../AGENTS.md)          | 硬约束——git、代码、派发、汇报;harness 地图见 [.pi/README.md](../.pi/README.md) |
+| 路径                                                            | 覆盖内容                                 |
+| --------------------------------------------------------------- | ---------------------------------------- |
+| [harness-core/README.md](../harness-core/README.md)             | capability、skill、workflow、rule 的索引 |
+| [harness-core/ARCHITECTURE.md](../harness-core/ARCHITECTURE.md) | harness 守护的不变量                     |
+| [harness-core/workflows/](../harness-core/workflows)            | workflow;由 adapter 暴露成运行时的命令   |
+| [harness-core/rules/](../harness-core/rules)                    | 跨 workflow 的稳定规则                   |
+| [AGENTS.md](../AGENTS.md)                                       | 硬约束——git、代码、派发、汇报            |
 
-`pnpm pi-check` 校验 harness。`.opencode/` 与 `.codebuddy/` 两层已退役,指向它们的链接是死链。
+`pnpm harness:verify` 校验 harness。`.opencode/`、`.codebuddy/` 与 `.pi/skills/` 三层已退役,
+指向它们的链接是死链。
 
 ---
 
@@ -123,7 +127,7 @@ Agent 控制层在 `.pi/`,不在这里。
 - **代码注释解释为什么,不解释做了什么。** 默认不写;永远不要给自明的代码加注释。
 - **永久文档放在 `docs/`**,与使其过时的代码在同一个变更里发布。进度写在回复里——没有临时笔记文件。
 - **每次交接都要给 Doc Impact 分类**,取值为 `none` / `update` / `create`;由主会话把文档改动路由给做出该改动的 lane。
-- **根 README(EN ↔ CN)保持同步**,并引用全部知识文件。Agent 控制层是 `.pi/`。
+- **根 README(EN ↔ CN)保持同步**,并引用全部知识文件。Agent 控制层是 `harness-core/`。
 
 ## 8. 仓库质量
 
