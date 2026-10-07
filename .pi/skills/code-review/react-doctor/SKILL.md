@@ -139,7 +139,7 @@ verification block must carry this evidence; a missing scan is a skipped step, n
 
 ## Related
 
-- React standards: [frontend-patterns → react-standards](../../frontend-patterns/references/react-standards.md)
+- React standards: [frontend-patterns → react](../../frontend-patterns/references/react.md)
 - Companion doctors: [style-doctor](../style-doctor/SKILL.md) · [i18n-doctor](../i18n-doctor/SKILL.md) · [typecheck-doctor](../../code-review/typecheck-doctor/SKILL.md)
-- State rules: [frontend-patterns → client-state](../../frontend-patterns/references/client-state.md) · [frontend-patterns → data-fetching](../../frontend-patterns/references/data-fetching.md) · [frontend-patterns → forms](../../frontend-patterns/references/forms.md)
+- State rules: [frontend-patterns → state](../../frontend-patterns/references/state.md) · [frontend-patterns → data-fetching](../../frontend-patterns/references/data-fetching.md) · [frontend-patterns → forms](../../frontend-patterns/references/forms.md)
 - CI counterpart: `.github/workflows/react-doctor.yml` (must stay on the same pinned version)

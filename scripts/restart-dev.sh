@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Kill PawHaven-owned processes listening on the local dev ports, then restart all apps.
-# Usage: pnpm dev:restart  (or: bash scripts/restart-dev.sh)
+# Usage: pnpm dev:local  (or: bash scripts/restart-dev.sh)
 
 set -euo pipefail
 

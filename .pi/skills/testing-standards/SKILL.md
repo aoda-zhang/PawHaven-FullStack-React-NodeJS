@@ -86,6 +86,15 @@ double, the error-path shape, HTTP tests, and what not to do.
 → [references/frontend-component-tests.md](./references/frontend-component-tests.md) — the working
 test file and the three polyfill stubs.
 
+## Browser verification
+
+`e2e/smoke.spec.ts` is the Playwright substrate: the portal boots, mounts its root, and raises no
+uncaught exception. It needs only the portal, which `playwright.config.ts` starts for you. A deeper
+journey belongs in its own spec file, added by the change that needs it.
+
+→ [references/browser-verification.md](./references/browser-verification.md) — the config, the commands,
+the ports, the preconditions, and the console/network capture snippets.
+
 ## backend-core needs SWC
 
 `packages/backend-core/vitest.config.ts` registers `unplugin-swc`. esbuild, vitest's default

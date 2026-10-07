@@ -73,7 +73,7 @@ grep -rn "from '.*components/" apps/frontend/portal/src/features/ \
 - A component in `packages/ui/` imported from only 1 feature → Suggestion, it could be
   feature-private.
 
-Placement rules: [component placement](../../frontend-patterns/references/component-placement.md).
+Placement rules: [component placement](../../frontend-patterns/references/components.md).
 
 ## Rule 5 — Feature folder structure · Warning
 

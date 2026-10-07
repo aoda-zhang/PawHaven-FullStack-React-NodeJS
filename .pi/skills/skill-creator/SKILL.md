@@ -35,7 +35,9 @@ No means do not create a skill:
 | A PawHaven fact — the module list, the token files, the export surface | `docs/`                                     |
 | A hard constraint — a thing that must never be violated                | the rule's existing owner, or the validator |
 | Workflow ordering — what happens when                                  | `.pi/workflows/`                            |
+| A rule that outlives one workflow — a threshold, a standard, a gate    | `.pi/policies/`                             |
 | A responsibility that needs its own context, tools, or permissions     | an agent                                    |
+| Which model a lane runs on                                             | `.pi/config/models.yaml`                    |
 | A one-off task                                                         | nowhere. Just do the task                   |
 
 A skill that only says what a technology recommends in general is not a skill. Every rule in this repo
@@ -93,7 +95,11 @@ workflow → agent → skill → reference / script / asset
 ```
 
 A skill may depend on another skill when composability is genuinely needed. It may never name a lane,
-route work to one, invoke a workflow, or act as an orchestrator. A reference is never a second skill.
+route work to one, invoke a workflow, reach into a policy, or act as an orchestrator. A reference is
+never a second skill.
+
+The rule in one line: a skill teaches a capability, and the capability has to be usable without the
+process that happens to call it.
 
 The registry is `.pi/skills/`, declared in `.pi/settings.json`. Never create a second registry, and
 never place a `skills/` directory under `.pi/agents/`.

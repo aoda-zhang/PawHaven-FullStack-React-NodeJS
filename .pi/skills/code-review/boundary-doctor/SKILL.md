@@ -158,5 +158,5 @@ and the better form. Report it as ⚠️ Warning against pre-existing code, not 
 ## Related
 
 - Architecture & graduation: [architecture-doctor](../architecture-doctor/SKILL.md)
-- Component graduation: [frontend-patterns → component-placement](../../frontend-patterns/references/component-placement.md)
+- Component graduation: [frontend-patterns → components](../../frontend-patterns/references/components.md)
 - Backend modules: [backend-doctor](../backend-doctor/SKILL.md)

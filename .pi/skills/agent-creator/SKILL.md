@@ -45,15 +45,23 @@ Both lines are required, and `pnpm pi-check` fails when either is missing.
 
 ## Frontmatter
 
-| Field                  | Rule                                                                             |
-| ---------------------- | -------------------------------------------------------------------------------- |
-| `name`                 | The lane's identity. Unique.                                                     |
-| `description`          | When to dispatch this lane, not what it knows.                                   |
-| `tools`                | The minimum that does the job. `subagent` belongs only to the coordinating lane. |
-| `skills`               | Grants by name. An agent reaches a skill by naming it here.                      |
-| `inheritSkills`        | `false`, so the lane carries exactly its grants.                                 |
-| `allowedAgents`        | Only on the lane that dispatches.                                                |
-| `allowNestedSubagents` | Only on the lane that dispatches, with `maxSubagentDepth` bounding it.           |
+| Field                  | Rule                                                                                                 |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `name`                 | The lane's identity. Unique.                                                                         |
+| `description`          | When to dispatch this lane, not what it knows.                                                       |
+| `tools`                | The minimum that does the job. `subagent` belongs only to the coordinating lane.                     |
+| `skills`               | Grants by name. An agent reaches a skill by naming it here.                                          |
+| `inheritSkills`        | `false`, so the lane carries exactly its grants.                                                     |
+| `allowedAgents`        | Only on the lane that dispatches.                                                                    |
+| `allowNestedSubagents` | Only on the lane that dispatches, with `maxSubagentDepth` bounding it.                               |
+| `permission`           | On every lane with no `edit`/`write` tool: `write: deny`, `edit: deny`. `pi-check` fails without it. |
+
+**Never declare `model` or `thinking` in the frontmatter.** The tier is decided in
+`.pi/config/models.yaml`, which `pi-check` enforces; a value here is the one that gets ignored.
+
+`permission:` is not a sandbox. pi rejects bash rules, so a lane that holds `bash` can still write
+through it. Grant `bash` only when the lane genuinely has to run something, and say in the body what it
+is for rather than implying the block makes it safe.
 
 ## What an agent defines
 

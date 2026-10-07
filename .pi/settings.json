@@ -19,13 +19,13 @@
       "orchestrator": {
         "thinking": "high"
       },
-      "critic": {
-        "thinking": "high"
-      },
-      "explorer": {
+      "scout": {
         "thinking": "low"
       },
-      "planner": {
+      "architect": {
+        "thinking": "high"
+      },
+      "oracle": {
         "thinking": "high"
       },
       "frontend-dev": {
@@ -41,7 +41,7 @@
         "thinking": "high"
       },
       "browser-verifier": {
-        "thinking": "low"
+        "thinking": "medium"
       }
     }
   }

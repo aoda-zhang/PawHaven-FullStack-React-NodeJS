@@ -2,13 +2,13 @@
 name: harness-validator
 description: >
   Harness integrity validation — the checks that keep `.pi/` internally consistent. The automated
-  pair is `pnpm pi-check` (structure, grants, dependency direction, size, reachability) and
-  `pnpm check:links` (relative markdown links and anchors); a few manual checks remain. Load before
-  committing anything under `.pi/`, and when a skill, agent, workflow, or grant is added, renamed, or
-  removed.
+  pair is `pnpm pi-check` (structure, grants, dependency direction, size, reachability, model tiers,
+  permission boundaries) and `pnpm check:links` (relative markdown links and anchors); one manual
+  check remains. Load before committing anything under `.pi/`, and when a skill, agent, policy,
+  workflow, or grant is added, renamed, or removed.
   Trigger: harness integrity check harness validation pi-check check:links skill grant dangling
-  grant unknown skill broken link anchor skill id directory name mismatch .pi change harness
-  refactor skill rename agent rename before commit.
+  grant unknown skill broken link anchor skill id directory name mismatch model tier drift .pi change
+  harness refactor skill rename agent rename before commit.
 ---
 
 # Harness Validator
@@ -17,13 +17,13 @@ Run the automated pair. Every change under `.pi/` clears `pnpm pi-check` and `pn
 before it is committed.
 
 ```bash
-pnpm pi-check      # automated: harness structure, direction, size, reachability
+pnpm pi-check      # automated: harness structure, direction, size, models, permissions
 pnpm check:links   # automated: relative markdown links and anchors
 ```
 
-A harness is config, and config fails silently. A skill named in an agent's `skills:` frontmatter
-that no longer exists does not error — the agent quietly stops seeing it, and the rule stops being
-applied weeks before anyone notices. None of that is visible in a diff. These checks make it visible.
+A harness is config, and config fails silently. A skill named in an agent's `skills:` frontmatter that
+no longer exists does not error — the agent quietly stops seeing it, and the rule stops being applied
+weeks before anyone notices. None of that is visible in a diff. These checks make it visible.
 
 ## What `pnpm pi-check` covers
 
@@ -31,24 +31,28 @@ applied weeks before anyone notices. None of that is visible in a diff. These ch
 would fail at startup. It is the only place the concrete checks are implemented; do not duplicate them
 in a shell one-liner.
 
-| Check                | Fails when                                                                                               |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| Counts               | The skill, prompt, or agent count differs from `EXPECTED_*`                                              |
-| Grant resolution     | An agent grants a skill name that resolves to nothing                                                    |
-| Reference resolution | `allowedAgents`, `agentOverrides`, or a `requiredAgents` array names something that does not exist       |
-| `skillPath`          | A path resolves to nothing, or a private skill no `skillPath` reaches                                    |
-| Orphan skill         | A project skill no agent grants and that is not catalog-only                                             |
-| Empty grant          | `inheritSkills: false` with no `skills:` to compensate                                                   |
-| Role/domain          | An agent body is missing its `**Role:**` or `**Domain:**` line                                           |
-| Duplicate name       | Two resources answer to one invocable skill name                                                         |
-| Size                 | A `SKILL.md` exceeds `MAX_SKILL_LINES`                                                                   |
-| Skill id             | A `SKILL.md`'s frontmatter `name` differs from its directory name, so one of the two resolves to nothing |
-| Reachability         | A file under a skill's `references/` is named nowhere in that skill                                      |
-| `skill -> agent`     | A skill names a lane in backticks instead of naming a role or a stage                                    |
-| `skill -> workflow`  | A skill links into `.pi/workflows/`, except on the pinned allowlist                                      |
-| Second registry      | A `skills/` directory appears under `.pi/agents/`                                                        |
-| Second dispatcher    | An agent other than the coordinating one holds `subagent`                                                |
-| Skill cycle          | Two skills each have to be read before the other, outside a `## Related` section                         |
+| Check                | Fails when                                                                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Counts               | The skill, prompt, or agent count differs from `EXPECTED_*`                                                                                                                  |
+| Grant resolution     | An agent grants a skill name that resolves to nothing                                                                                                                        |
+| Reference resolution | `allowedAgents`, `agentOverrides`, or a `requiredAgents` array names something that does not exist                                                                           |
+| `skillPath`          | A path resolves to nothing, or a private skill no `skillPath` reaches                                                                                                        |
+| Orphan skill         | A project skill no agent grants and that is not catalog-only                                                                                                                 |
+| Empty grant          | `inheritSkills: false` with no `skills:` to compensate                                                                                                                       |
+| Role/domain          | An agent body is missing its `**Role:**` or `**Domain:**` line                                                                                                               |
+| Duplicate name       | Two resources answer to one invocable skill name                                                                                                                             |
+| Size                 | A `SKILL.md` exceeds `MAX_SKILL_LINES`                                                                                                                                       |
+| Skill id             | A `SKILL.md`'s frontmatter `name` differs from its directory name, so one of the two resolves to nothing                                                                     |
+| Reachability         | A file under a skill's `references/`, `scripts/`, or `assets/` is named nowhere in that skill                                                                                |
+| `skill -> agent`     | A skill names a lane in backticks instead of naming a role or a stage                                                                                                        |
+| `skill -> process`   | A skill links into `.pi/workflows/` or `.pi/policies/`, except on the pinned allowlist                                                                                       |
+| Second registry      | A `skills/` directory appears under `.pi/agents/`                                                                                                                            |
+| Second dispatcher    | An agent other than the coordinating one holds `subagent`                                                                                                                    |
+| Retired lane name    | A backticked name in `.pi/agents/`, `.pi/policies/`, or `.pi/workflows/` is a lane that no longer exists                                                                     |
+| Skill cycle          | Two skills each have to be read before the other, outside a `## Related` section                                                                                             |
+| Model registry       | `.pi/config/models.yaml` names a lane that is not an agent, leaves an agent without a tier, or disagrees with the rendered `subagents.agentOverrides` in `.pi/settings.json` |
+| Model in an agent    | An agent frontmatter declares `model`, `thinking`, or `modelOverrides`. The registry decides, so the local value is the one that is ignored                                  |
+| Permission boundary  | A `verification`-role agent holds `edit` or `write`, or does not declare `permission:` with `write: deny` and `edit: deny`                                                   |
 
 The `EXPECTED_*` constants at the top of the script are the thing to update when the harness changes
 size, deliberately, in the same change that adds or removes the resource. Never loosen an expectation
@@ -58,11 +62,32 @@ to turn a red run green.
 from a missing file. Each allowlist entry in the script is a place the direction had to be argued for,
 so a new entry ships with its reason next to it.
 
+### What the model check actually enforces
+
+`.pi/config/models.yaml` is the single source for a lane's intelligence: a tier carries `capability`,
+`thinking`, `model`, and `fallback`, and a lane is assigned a tier. `scripts/sync-model-tiers.mjs`
+renders `subagents.agentOverrides` in `.pi/settings.json` from it — run that script after editing either
+file. The check exists because the two can disagree silently, and the lane then runs at a thinking level
+other than the one the registry claims to decide.
+
+Every tier is `model: inherit` today, because this repo pins no provider. The tiers still carry
+`thinking` and the capability mapping; pinning a provider later is one line per tier, and no agent
+changes.
+
+### What the permission check can and cannot enforce
+
+pi rejects bash rules. A `permission:` block can gate `edit` and `write`, and it cannot restrict what a
+`bash` call runs; there is no command allowlist or sandbox in this runtime, and `pi-guard` — the
+documented answer for command-level policy — is not installed here. So the enforceable boundary is the
+tool allowlist plus the denial, and this check holds both in place. The lanes that hold `bash` say so in
+their own bodies rather than implying the prose is a sandbox.
+
 ## What `pnpm check:links` covers
 
 `scripts/check-md-links.mjs` resolves every relative markdown link **and every anchor** across `.pi/`,
 `AGENTS.md`, `docs/`, and both root READMEs. It skips any directory named `npm`, `node_modules`,
-`dist`, or `build`, at any depth.
+`dist`, or `build`, at any depth. A break that is not in its in-file `KNOWN_BROKEN` list fails the run;
+the list is empty, and an entry added to it is a defect someone has to own.
 
 **It resolves anchors the way GitHub does.** GitHub lowercases the heading, drops every character that
 is not a word character, a space, or a hyphen, and turns each space into a hyphen **without collapsing
@@ -70,11 +95,9 @@ runs**. So `State access — the real names` slugifies to `#state-access--the-re
 hyphen where the em-dash was. A reader who slugifies differently will "fix" a link that is already
 correct. Do not hand-edit an anchor that `check:links` accepts.
 
-## Manual checks
+## Manual check
 
-Two things the scripts do not cover.
-
-### 1. The whole link inventory in one view
+One thing the scripts do not cover: the whole link inventory in one view.
 
 ```bash
 grep -rhoE '\]\((\.{1,2}/[^)#]+)\)' .pi AGENTS.md docs README.md README.cn.md --include="*.md" \
@@ -82,25 +105,14 @@ grep -rhoE '\]\((\.{1,2}/[^)#]+)\)' .pi AGENTS.md docs README.md README.cn.md --
 ```
 
 `check:links` tells you a link is broken; this tells you which links exist, so an unexpected target is
-visible. Do not eyeball a subset — read the whole list.
-
-### 2. No live pointer into a retired harness
-
-```bash
-grep -rn "\.codebuddy/\|\.opencode/" .pi AGENTS.md docs README.md README.cn.md \
-  --include="*.md" --exclude-dir=npm
-```
-
-A hit is either a **live pointer** to a directory that no longer exists, which a reader would copy and
-run, or a past-tense historical note. Fix the first. `pnpm quality-check` mechanizes this scan; the
-grep remains as the manual inventory.
+visible.
 
 ## Failure response
 
 1. **Do not ignore it.** A dangling grant or a dead reference means an agent is running with less
    methodology than you think, and nothing in the output says so.
-2. **Fix the reference, or restore the target.** Deleting a skill without removing the grants that
-   name it is the common version of this bug.
+2. **Fix the reference, or restore the target.** Deleting a skill without removing the grants that name
+   it is the common version of this bug.
 3. **Re-run until it passes**, then commit the fix in its own change.
 
 ## Related

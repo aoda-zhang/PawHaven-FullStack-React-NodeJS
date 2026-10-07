@@ -167,7 +167,7 @@ owns the vocabulary those rules use, so a rule and the fact it checks cannot dri
 ## Related
 
 - [Writing](../.pi/skills/frontend-patterns/SKILL.md) — one router; per-area rules in its `references/`
-- [React standards](../.pi/skills/frontend-patterns/references/react-standards.md) · [styling](../.pi/skills/frontend-patterns/references/styling.md) · [i18n](../.pi/skills/frontend-patterns/references/i18n.md) · [TypeScript](../.pi/skills/typescript/SKILL.md) · [client state](../.pi/skills/frontend-patterns/references/client-state.md) · [component placement](../.pi/skills/frontend-patterns/references/component-placement.md)
+- [React standards](../.pi/skills/frontend-patterns/references/react.md) · [styling](../.pi/skills/frontend-patterns/references/styling.md) · [i18n](../.pi/skills/frontend-patterns/references/i18n.md) · [TypeScript](../.pi/skills/typescript/SKILL.md) · [client state](../.pi/skills/frontend-patterns/references/state.md) · [component placement](../.pi/skills/frontend-patterns/references/components.md)
 - [Doctors](../.pi/skills/code-review/react-doctor/SKILL.md) · [style](../.pi/skills/code-review/style-doctor/SKILL.md) · [i18n](../.pi/skills/code-review/i18n-doctor/SKILL.md) · [TypeScript](../.pi/skills/code-review/typescript-doctor/SKILL.md)
 - [Frontend architecture](./architecture/PawHaven-Frontend-Architecture.md) — the
   canonical home for why each rule above exists. §3 package ecosystem, §4 component boundaries,

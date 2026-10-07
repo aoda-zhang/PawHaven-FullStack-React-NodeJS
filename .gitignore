@@ -148,3 +148,7 @@ apps/backend/document-service/src/assets/fonts/
 # codebuddy
 .codebuddy/memory/*.md
 .codebuddy/teams
+
+# playwright
+test-results
+playwright-report

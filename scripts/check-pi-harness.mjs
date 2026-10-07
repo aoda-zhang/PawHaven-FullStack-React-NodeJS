@@ -5,6 +5,8 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { resolveTiers } from './lib/model-registry.mjs';
+
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 let loadSkills;
@@ -71,15 +73,21 @@ const EXPECTED_PRIVATE_SKILLS = 0;
 const EXPECTED_PROMPTS = 10;
 const EXPECTED_AGENTS = [
   'orchestrator',
-  'planner',
-  'explorer',
+  'scout',
+  'architect',
+  'oracle',
   'frontend-dev',
   'backend-dev',
   'tester',
   'reviewer',
-  'critic',
   'browser-verifier',
 ];
+
+// Names that used to be a lane and are not one any more. Renaming a lane is silent in pi: a pointer
+// to the old name resolves to nothing, the dispatch falls back to a default agent, and the only thing
+// lost is the methodology the lane carried. A backticked retired name is a lane reference, so it is
+// checked rather than left to review.
+const RETIRED_LANE_NAMES = ['explorer', 'planner', 'critic'];
 
 // --- Architecture boundary: Workflow -> Agent -> Skill -> Reference/Script ---
 //
@@ -127,10 +135,10 @@ const SKILL_TO_WORKFLOW_ALLOWLIST = [
   {
     // The lane shape each worked example implies.
     file: '.pi/skills/task-classification/references/worked-examples.md',
-    target: '.pi/workflows/harness-process.md',
-    line: '([harness-process.md](../../../workflows/harness-process.md#lane-shapes)). Each is a request in',
+    target: '.pi/policies/verification-policy.md',
+    line: '([verification-policy](../../../policies/verification-policy.md#lane-shapes)). Each is a request in',
     reason:
-      'The examples are built on the two routing shapes, and the lane shapes those key on are documented in the shared process document rather than in this reference. The reference names where the fact lives; it does not need the workflow to run.',
+      'The examples are built on the two lane shapes, and those shapes are defined in the verification policy rather than in this reference. The reference names where the fact lives; it does not need the policy to run.',
   },
 ];
 
@@ -337,6 +345,9 @@ function scanAgents(dir) {
       const nestedMatch = fm.match(/^allowNestedSubagents:\s*(.+)/m);
       const skillPathMatch = fm.match(/^skillPath:\s*(.+)/m);
       const inheritSkillsMatch = fm.match(/^inheritSkills:\s*(.+)/m);
+      const modelMatch = fm.match(/^model:\s*(.+)/m);
+      const thinkingMatch = fm.match(/^thinking:\s*(.+)/m);
+      const modelOverridesMatch = fm.match(/^modelOverrides:\s*(.+)/m);
       const splitList = (value) =>
         value
           ?.split(/\s*,\s*/)
@@ -352,6 +363,11 @@ function scanAgents(dir) {
         allowNestedSubagents: nestedMatch?.[1]?.trim(),
         skillPath: skillPathMatch?.[1]?.trim(),
         inheritSkills: inheritSkillsMatch?.[1]?.trim(),
+        model: modelMatch?.[1]?.trim(),
+        thinking: thinkingMatch?.[1]?.trim(),
+        modelOverrides: modelOverridesMatch?.[1]?.trim(),
+        // The whole frontmatter text, so a `permission:` block can be read without a YAML parser.
+        frontmatter: fm,
         body: raw.slice(match[0].length),
       });
     }
@@ -878,9 +894,15 @@ console.log(
 // A bare backticked path is not a link and is never read here. `task-classification/SKILL.md:162`
 // lists `.pi/workflows` among the paths a harness change may not take a lightweight path through —
 // a scope list naming where rules live, not a dependency on one, and there is nothing to allowlist.
-const workflowsRoot = join(repoRoot, '.pi', 'workflows');
+// The process layer is `workflows/` and `policies/`: a workflow owns ordering, a policy owns a rule
+// that outlives one workflow, and a skill reaching into either is the same inversion of
+// `Workflow -> Agent -> Skill`. Both directories are checked by the same predicate so a skill cannot
+// escape the rule by linking a policy instead of a workflow.
+const processRoots = ['workflows', 'policies'].map((name) =>
+  join(repoRoot, '.pi', name),
+);
 const isWorkflowPath = (target) =>
-  target === workflowsRoot || target.startsWith(workflowsRoot + sep);
+  processRoots.some((root) => target === root || target.startsWith(root + sep));
 let workflowPointers = 0;
 let workflowAllowlisted = 0;
 for (const entry of SKILL_TO_WORKFLOW_ALLOWLIST) {
@@ -1020,6 +1042,117 @@ console.log(
       ),
   )}), ${supportingFiles} supporting files reachable, ${skillIdMismatches} id/directory mismatches`,
 );
+
+// 8. Model registry. No agent, workflow, or skill names a model: `.pi/config/models.yaml` records the
+// tier, and `settings.json` is rendered from it by `scripts/sync-model-tiers.mjs`. Three ways that
+// drifts, and every one of them is silent — a registry lane with no agent behind it, an agent nobody
+// tiered, and a rendered `settings.json` that no longer matches the registry, which is how a lane ends
+// up running at a different thinking level than the file that claims to decide it.
+let registryLanes = {};
+try {
+  ({ lanes: registryLanes } = resolveTiers(repoRoot));
+} catch (error) {
+  failures.push(`model registry: ${error.message}`);
+}
+
+for (const lane of Object.keys(registryLanes)) {
+  if (!discoveredNames.includes(lane)) {
+    failures.push(
+      `model registry: \`.pi/config/models.yaml\` assigns tier \`${registryLanes[lane].tier}\` to lane \`${lane}\`, which is not a discovered agent.`,
+    );
+  }
+}
+for (const name of discoveredNames) {
+  if (!registryLanes[name]) {
+    failures.push(
+      `model registry: agent \`${name}\` has no tier in \`.pi/config/models.yaml\`. Every lane's intelligence is decided there, so an untiered lane runs at pi's default and nothing says so.`,
+    );
+  }
+}
+
+const renderedOverrides = {};
+for (const [lane, resolved] of Object.entries(registryLanes)) {
+  const override = { thinking: resolved.thinking };
+  if (resolved.model !== 'inherit') override.model = resolved.model;
+  renderedOverrides[lane] = override;
+}
+if (
+  JSON.stringify(settings.subagents?.agentOverrides ?? {}) !==
+  JSON.stringify(renderedOverrides)
+) {
+  failures.push(
+    `model registry drift: \`.pi/settings.json\` subagents.agentOverrides does not match \`.pi/config/models.yaml\`. Run \`node scripts/sync-model-tiers.mjs\` and commit the result.`,
+  );
+}
+
+// Same rule one layer in: an agent that pins its own model or thinking level bypasses the registry,
+// and the tier it was assigned stops meaning anything.
+for (const agent of discoveredAgents) {
+  for (const [key, value] of [
+    ['model', agent.model],
+    ['thinking', agent.thinking],
+    ['modelOverrides', agent.modelOverrides],
+  ]) {
+    if (!value) continue;
+    failures.push(
+      `model registry: ${relative(repoRoot, agent.path)} declares \`${key}: ${value}\`. A lane's model is decided by \`.pi/config/models.yaml\`, so this value is the one that is ignored.`,
+    );
+  }
+}
+
+// 9. Permission boundary on a verification lane. The runtime's enforceable boundary is the tool
+// allowlist plus a `permission:` block; pi rejects bash rules, so a lane that holds `bash` can still
+// write through it and no configuration changes that. What is enforceable is that a verification lane
+// holds no `edit` or `write` tool and denies both explicitly, which is what fails here.
+const permissionBlock = (agent) =>
+  /^permissions?:\n((?:[ \t]+.*\n?)*)/m.exec(agent.frontmatter ?? '')?.[1] ??
+  '';
+
+const verificationTools = new Set(['edit', 'write']);
+for (const agent of discoveredAgents) {
+  const role = (agent.body ?? '').match(declaredField('Role'))?.[1];
+  if (role !== 'verification') continue;
+  for (const tool of agent.tools ?? []) {
+    if (verificationTools.has(tool)) {
+      failures.push(
+        `ARCHITECTURE_VIOLATION: verification lane can write — ${relative(repoRoot, agent.path)}: \`${agent.name}\` is role \`verification\` and holds the \`${tool}\` tool. Verification by a lane that can edit what it verifies is not independent.`,
+      );
+    }
+  }
+  const block = permissionBlock(agent);
+  if (
+    !/^\s+write:\s*deny\s*$/m.test(block) ||
+    !/^\s+edit:\s*deny\s*$/m.test(block)
+  ) {
+    failures.push(
+      `ARCHITECTURE_VIOLATION: verification lane has no write denial — ${relative(repoRoot, agent.path)}: \`${agent.name}\` must declare a \`permission:\` block with \`write: deny\` and \`edit: deny\`. The tool allowlist is the primary boundary and the denial is what makes the intent explicit and checked.`,
+    );
+  }
+}
+
+// 10. A retired lane name. Renaming a lane is silent in pi: the old name resolves to nothing, the
+// dispatch falls back to a default agent, and the methodology the lane carried is gone without a
+// diagnostic. A backticked retired name is a lane reference, not prose.
+const retiredLanePattern = new RegExp(
+  '`(' + RETIRED_LANE_NAMES.join('|') + ')`',
+  'g',
+);
+const processFiles = [
+  ...scanSkillMarkdown(join(repoRoot, '.pi', 'agents')),
+  ...scanSkillMarkdown(join(repoRoot, '.pi', 'policies')),
+  ...scanSkillMarkdown(join(repoRoot, '.pi', 'workflows')),
+];
+for (const file of processFiles) {
+  readFileSync(file, 'utf8')
+    .split('\n')
+    .forEach((text, index) => {
+      for (const match of text.matchAll(retiredLanePattern)) {
+        failures.push(
+          `ARCHITECTURE_VIOLATION: retired lane name — ${relative(repoRoot, file)}:${index + 1}: names \`${match[1]}\`, which is no longer a lane. A dispatch to it resolves to nothing.`,
+        );
+      }
+    });
+}
 
 for (const warning of warnings) console.warn(`warn  ${warning}`);
 

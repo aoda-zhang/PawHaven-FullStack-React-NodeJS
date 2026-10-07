@@ -1,6 +1,7 @@
 # PawHaven Documentation Index
 
 > Unified entry point for all project documentation.
+> Chinese mirror: [README.cn.md](./README.cn.md), kept in sync with this file.
 
 `docs/` is split by what a document is **for**, so you can tell from the path whether it is
 authority, intent, or background.

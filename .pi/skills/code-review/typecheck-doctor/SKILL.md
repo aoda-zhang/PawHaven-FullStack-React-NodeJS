@@ -67,5 +67,5 @@ These are **illustrative examples** — actual projects and names are discovered
 
 ## Related
 
-- Frontend standards: [frontend-patterns → react-standards](../../frontend-patterns/references/react-standards.md) · [frontend-patterns → client-state](../../frontend-patterns/references/client-state.md)
+- Frontend standards: [frontend-patterns → react](../../frontend-patterns/references/react.md) · [frontend-patterns → state](../../frontend-patterns/references/state.md)
 - Companion doctors: [react-doctor](../react-doctor/SKILL.md) · [style-doctor](../style-doctor/SKILL.md)

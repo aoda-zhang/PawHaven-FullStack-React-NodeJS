@@ -49,16 +49,16 @@ document wins, and the rule that drifted from it is the bug.
 
 Each reference is self-contained: the rule, the code that carries it, and the check that enforces it.
 
-| Reference                                                  | Holds                                                                                                         | Read it when                                                          |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| [patterns](./references/patterns.md)                       | The shapes to copy: the API layer, a route, a list page, a form section, a loader guard                       | Starting any feature work                                             |
-| [react-standards](./references/react-standards.md)         | Component shape, the state decision tree, effect discipline, React 19, the a11y floor                         | Writing or reviewing a component, hook, or effect                     |
-| [forms](./references/forms.md)                             | Schema-first validation, the `@pawhaven/ui/form` primitives, multi-section forms, field arrays, server errors | Building or changing any form                                         |
-| [data-fetching](./references/data-fetching.md)             | The four-file `api/` layer, the key factory, `queryOptions`, mutations, loaders, the single QueryClient       | Reading or writing anything from the API                              |
-| [client-state](./references/client-state.md)               | What belongs in Redux, the one registered slice, `reducerNames`, typed access, persistence                    | Deciding whether a value belongs in Redux at all, or touching a slice |
-| [styling](./references/styling.md)                         | The token gate pointer, writing a className, the package structure, token ordering, the scale tables          | Writing or reviewing any className                                    |
-| [i18n](./references/i18n.md)                               | The key rules, the locale contract pointer, adding a module or locale, the file layout, the inventory         | Writing any visible copy, adding a key, or wiring a language selector |
-| [component-placement](./references/component-placement.md) | The placement table, anatomy, composition over configuration, splitting, the package layout                   | Creating, moving, or promoting a component                            |
+| Reference                                        | Holds                                                                                                         | Read it when                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [feature-layout](./references/feature-layout.md) | The shapes to copy: the API layer, a route, a list page, a form section, a loader guard                       | Starting any feature work                                             |
+| [react](./references/react.md)                   | Component shape, the state decision tree, effect discipline, React 19, the a11y floor                         | Writing or reviewing a component, hook, or effect                     |
+| [forms](./references/forms.md)                   | Schema-first validation, the `@pawhaven/ui/form` primitives, multi-section forms, field arrays, server errors | Building or changing any form                                         |
+| [data-fetching](./references/data-fetching.md)   | The four-file `api/` layer, the key factory, `queryOptions`, mutations, loaders, the single QueryClient       | Reading or writing anything from the API                              |
+| [state](./references/state.md)                   | What belongs in Redux, the one registered slice, `reducerNames`, typed access, persistence                    | Deciding whether a value belongs in Redux at all, or touching a slice |
+| [styling](./references/styling.md)               | The token gate pointer, writing a className, the package structure, token ordering, the scale tables          | Writing or reviewing any className                                    |
+| [i18n](./references/i18n.md)                     | The key rules, the locale contract pointer, adding a module or locale, the file layout, the inventory         | Writing any visible copy, adding a key, or wiring a language selector |
+| [components](./references/components.md)         | The placement table, anatomy, composition over configuration, splitting, the package layout                   | Creating, moving, or promoting a component                            |
 
 ## Related
 

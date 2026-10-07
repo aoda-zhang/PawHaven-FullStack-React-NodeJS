@@ -1,8 +1,8 @@
 # Worked Examples
 
 One full classification per task type, plus three boundary cases and the two routing shapes the
-process file's lane sequences key on
-([harness-process.md](../../../workflows/harness-process.md#lane-shapes)). Each is a request in
+gate sequence's lane shapes key on
+([verification-policy](../../../policies/verification-policy.md#lane-shapes)). Each is a request in
 PawHaven's domain, with the reasoning that fixes the primary type and the evidence that set scope and
 domains.
 

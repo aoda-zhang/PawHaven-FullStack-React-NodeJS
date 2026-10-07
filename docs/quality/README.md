@@ -45,16 +45,24 @@ States: `healthy` / `needs attention` / `medium risk`.
 ## Harness
 
 - Skill dependency graph: **healthy**. `pnpm pi-check` exits 0 — 21/21 project skills, 0
-  agent-private skills, 0 oversized `SKILL.md` (limit 250 lines, largest 208), 26 supporting files
+  agent-private skills, 0 oversized `SKILL.md` (limit 250 lines, largest 208), 27 supporting files
   reachable, and a clean skill graph (30 nodes, 7 ordering edges).
+- Layer separation: **healthy**. Skills hold capability, `policies/` holds the rules every workflow
+  applies, `workflows/` holds ordering, `agents/` holds responsibility. `pi-check` fails on a skill that
+  reaches into either process directory, on a verification lane that can write, on an agent that pins its
+  own model, and on a dispatch to a lane name that no longer exists.
+- Model registry: **healthy**. `.pi/config/models.yaml` assigns every one of the nine lanes a tier, and
+  `.pi/settings.json` is rendered from it by `scripts/sync-model-tiers.mjs`; `pi-check` fails on drift.
+  Every tier is `model: inherit`, because this repo pins no provider — the tiers carry `thinking` and the
+  capability mapping, and pinning a provider later is one line per tier.
+- Browser verification substrate: **healthy**. `e2e/smoke.spec.ts` proves the portal boots, mounts
+  `#root`, and raises no uncaught exception, with only the portal up. A pass says nothing about a
+  backend, and deeper journeys are the responsibility of the change that needs one.
 - Documentation freshness: **needs attention**. `pnpm quality-check` counts 7 historical mentions of
   retired harness resources, each classified historical by a past-tense marker on its line or in the
   section heading above it. They are allowed, but they accumulate; the refactor that took this count
   from 26 deleted the two `retired-harness-corrections.md` references outright rather than rewording
   them.
-- Doc map: **broken**. `pnpm quality-check` fails with `orphan-scan: entry point docs/README.cn.md is
-missing` — the file was deleted in `60fba4a`, and the orphan scan still lists it as an entry point.
-  Pre-existing, unrelated to any code change, and not fixed here.
 - Duplicate rules: 2 candidates, reported as warnings by `pnpm quality-check` — the contract-change
   gate text carried by both implementation agents, and one design-philosophy sentence shared by the
   two system-architecture docs. Neither is a failure; both are drift risks to decide on.
@@ -80,7 +88,7 @@ first recorded them; re-run the named command to confirm before relying on one.
 | style-doctor R2 raw Tailwind colours      | the command in that rule                                             | `layout/RootLayoutFooter.tsx` (`text-brown-7`, `bg-white/10`, `hover:text-white`) and `features/home/components/PetCard.tsx:40`                                                                                                                                                                   |
 | i18n-doctor R1 hardcoded strings          | the command in that rule                                             | the portal ships CJK strings inline in several components rather than through `t()`                                                                                                                                                                                                               |
 | react-doctor Step 0                       | `find apps/frontend -type d -name src -not -path '*/node_modules/*'` | `apps/frontend/portal` is the only frontend app; there is no `apps/frontend/admin`                                                                                                                                                                                                                |
-| `pnpm test:e2e`                           | `pnpm test:e2e`                                                      | collects zero specs; the `e2e/` directory is empty, so a pass proves nothing                                                                                                                                                                                                                      |
+| `pnpm test:e2e`                           | `pnpm test:e2e`                                                      | collected zero specs until the browser substrate landed; `e2e/smoke.spec.ts` now proves the shell mounts, and still says nothing about a backend                                                                                                                                                  |
 
 Accepted exceptions that are **not** findings are stated inside the rule that hits them, so the next
 reviewer does not re-litigate them: `ScrollToTop.tsx` and `QueryProvider.tsx` in boundary-doctor R6,
