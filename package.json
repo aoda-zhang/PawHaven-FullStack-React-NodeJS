@@ -28,6 +28,8 @@
     "pi:generate": "node harness-core/adapters/pi/generate.mjs",
     "pi:check": "node harness-core/adapters/pi/validate.mjs",
     "harness:verify": "pnpm harness:check && pnpm harness:check:generated && pnpm check:links && pnpm pi:check && pnpm pi:smoke",
+    "harness:validate": "node harness-core/validation/validate-core.mjs",
+    "harness:smoke": "node harness-core/adapters/pi/smoke.mjs",
     "check:links": "node harness-core/validation/check-links.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged",

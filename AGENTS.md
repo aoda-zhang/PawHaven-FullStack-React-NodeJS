@@ -68,12 +68,43 @@ pnpm lint            # turbo run lint
 pnpm test            # turbo run test
 pnpm test:e2e        # playwright
 pnpm build:libs      # only packages/*
+pnpm build           # only apps (turbo run build)
 
 pnpm harness:verify  # the whole harness: source, generated output, links, Pi loader
 ```
 
+**Run a subset** with Turborepo package filters. Workspace names are `@pawhaven/<name>`
+(`core-service`, `auth-service`, `gateway`, `document-service`, `portal`, `shared`, `design-system`,
+…). Useful when you touched one area and don't want the whole tree:
+
+```bash
+pnpm --filter @pawhaven/core-service dev     # one service / app
+pnpm --filter @pawhaven/portal typecheck     # one workspace's check
+pnpm --filter @pawhaven/shared build         # rebuild one shared package
+pnpm --filter @pawhaven/core-service test    # all that package's vitest tests
+pnpm --filter @pawhaven/core-service exec vitest run path/to/foo.test.ts  # one test file
+```
+
+For the repo-wide `test` / `lint` / `typecheck`, `pnpm <cmd> --filter @pawhaven/<name>` runs just the
+matching workspace (Turborepo filter syntax, `--filter=...` also works).
+
 **Rebuild shared packages after changing anything in `packages/*`** — downstream apps consume the
 built output, not source. `document-service` needs a Chromium binary at runtime for PDF rendering.
+
+### Extra verification scripts
+
+Beyond the standard lint/typecheck/test, these guard the parts a normal run won't catch:
+
+```bash
+pnpm token-check       # design-system tokens haven't drifted from their source
+pnpm architecture-check # package layering / dependency-direction rules still hold
+pnpm quality-check     # known pre-existing findings vs. the current tree
+pnpm doctor:react      # react-doctor structural check (React 19 patterns)
+```
+
+`pnpm lint` intentionally exits non-zero on a clean tree against a known baseline — see
+[`docs/quality/`](./docs/quality/README.md). Diff against that baseline before calling anything a
+regression; don't "fix" a baseline finding unless the task is about it.
 
 ## Documentation
 
@@ -86,6 +117,24 @@ Entering a task, read the architecture docs for the area in scope, then the **co
 is never an input to a decision. Code and document disagree, the code is right. After the change is
 verified, update the feature doc from the code that shipped. Same change, same lane.
 
+### Docs that explain the cross-cutting design
+
+These span more than one service/app, so read them before assuming the boundaries from the layout
+above alone:
+
+- [`docs/architecture/authentication-architecture.md`](./docs/architecture/authentication-architecture.md)
+  — the gateway owns the browser cookie-JWT and mints a short-lived **ES256 internal JWT** into
+  `x-gateway-jwt`; every downstream service verifies it with `InternalJwtGuard` and reads identity via
+  `@InternalJwt()`. This is why no service handles browser tokens directly.
+- [`docs/architecture/service-boundaries.md`](./docs/architecture/service-boundaries.md) — what each of
+  the 4 backend services is allowed to own, and where a responsibility must not leak.
+- [`docs/architecture/PawHaven-System-Architecture-Overview.md`](./docs/architecture/PawHaven-System-Architecture-Overview.md)
+  and the per-layer [`PawHaven-Frontend-Architecture.md`](./docs/architecture/PawHaven-Frontend-Architecture.md)
+  / [`PawHaven-Backend-Architecture.md`](./docs/architecture/PawHaven-Backend-Architecture.md) — the
+  full picture (C4, gateway, modular monolith with 7 feature modules, shared-types flow).
+- [`packages/design-system/README.md`](./packages/design-system/README.md) — tokens + Tailwind v4
+  theme; the source of every style token (no hardcoded colours anywhere).
+
 ## Hard constraints
 
 Behavioural rules — the ones an agent gets wrong without being told.
@@ -96,6 +145,12 @@ Behavioural rules — the ones an agent gets wrong without being told.
   scripts, tests, config, and docs. Being asked to _make a change_ is not permission to commit.
 - Never push, open a PR, or babysit one. Never force-push, `reset --hard`, `clean`, or delete a
   branch without asking.
+- When a commit is wanted, it must follow Conventional Commits
+  (`<type>(<scope>): <description>`), enforced by Husky + commitlint. Types: `feat`, `fix`, `docs`,
+  `style`, `refactor`, `perf`, `test`, `chore`. Active scopes: `auth`, `rescue`, `pdf`, `email`,
+  `home`, `stats`, `docs`, `chore`. `harness-core/`, `adapters/`, and `validation/` changes are
+  `docs(harness): …` / `chore(harness): …` and ship in their own change, not inside a feature task.
+  See [`docs/development.md`](./docs/development.md#commits).
 
 ### Code
 

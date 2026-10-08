@@ -185,8 +185,8 @@ function readAgent(file) {
   };
 }
 
-// Agents live under a capability's `agents/` directory. A SKILL.md also carries a `name:`, so scanning
-// by frontmatter alone would count every skill as an agent and report 58 agents where there are nine.
+// Agents live directly under .pi/agents as <plugin>__<agent>.md. A SKILL.md also carries a `name:`,
+// so scanning by frontmatter alone would count every skill as an agent.
 const agentFiles = [];
 const collectAgents = (dir) => {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -196,7 +196,7 @@ const collectAgents = (dir) => {
       agentFiles.push(full);
   }
 };
-collectAgents(join(repoRoot, '.pi', 'capabilities'));
+collectAgents(join(repoRoot, '.pi', 'agents'));
 const agents = agentFiles.map(readAgent);
 const agentsByName = new Map(agents.map((a) => [a.name, a]));
 

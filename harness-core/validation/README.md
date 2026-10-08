@@ -53,15 +53,15 @@ What it fails on:
 - frontmatter that is missing, invalid, or disagrees with its file or directory name
 - a skill directory holding something other than `SKILL.md`, `references/`, `scripts/`, `assets/`
 - a file under `references/` or `scripts/` that nothing in `SKILL.md` names
-- a capability directory holding anything other than `agents/` and `skills/`
+- a plugin directory holding anything other than `agents/`, `skills/`, and optionally `commands/`
 - a runtime-specific field inside canonical agent frontmatter
 - a provider or model name anywhere in canonical source
 - a `modelTier` that disagrees with the model policy, or an agent the policy does not cover
 - a skill linking into a workflow or at an agent, or a skill that routes work to an agent
 - a workflow or rule pointing into a generated runtime directory
 - an orphaned skill: nothing grants it and nothing references it
-- a per-rule "doctor" skill, or the retired doctor-per-rule capability
-- a `**Role:**` / `**Domain:**` line, which is a second classification the capability directory already
+- a per-rule "doctor" skill, or the retired doctor-per-rule plugin
+- a `**Role:**` / `**Domain:**` line, which is a second classification the plugin directory already
   states
 
 ## `validate-generated.mjs`
@@ -79,9 +79,9 @@ Resolves every relative markdown link **and every anchor** across `harness-core/
 `docs/`, and both root READMEs. It skips any directory named `npm`, `node_modules`, `dist`, `build`, or
 `.pi`.
 
-`.pi/` is skipped on purpose: it mirrors the canonical tree, so every link in it is a link the canonical
-scan already proved. Scanning it would report each break twice and teach the reader that the count is
-the problem.
+`.pi/` is skipped on purpose: it is generated output, and the canonical scan already covers the same
+source links. Scanning it would report each break twice and teach the reader that the count is the
+problem.
 
 **It resolves anchors the way GitHub does** — lowercase the heading, drop everything that is not a word
 character, a space, or a hyphen, turn each space into a hyphen **without collapsing runs**. So
@@ -103,5 +103,5 @@ Loosening an expectation to turn a red run green is the failure this whole direc
 ## Related
 
 - How to read a failure and what to do about it:
-  [harness-validation](../capabilities/harness-maintenance/skills/harness-validation/SKILL.md)
+  [harness-validation](../plugins/harness-maintenance/skills/harness-validation/SKILL.md)
 - The invariants these checks defend: [ARCHITECTURE.md](../ARCHITECTURE.md)

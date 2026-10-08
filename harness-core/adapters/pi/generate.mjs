@@ -8,11 +8,12 @@
 // this again. Nothing here is hand-edited, because a hand-edit looks reviewed right up until the next
 // run discards it.
 //
-// The generated tree MIRRORS the canonical tree under .pi/ — same directories, same depth, same file
-// names — so every relative markdown link in a canonical file resolves identically in the generated
-// copy. Rewriting links per runtime would mean a second place a link can be wrong; mirroring means a
-// link is either right in both or wrong in both, and the link checker sees the same thing it sees in
-// the source.
+// This adapter performs a REAL translation, not a mirror. The canonical tree is organised by plugin,
+// agent, skill, workflow, and rule; Pi's native layout is agents/, skills/, prompts/, and settings.json.
+// The two are deliberately different: a flat agent namespace (plugin__agent) and a Pi skill tree
+// (.pi/skills/<plugin>/<skill>) are what the Pi loader expects, and they are not the same shape as the
+// canonical tree. Mirroring would have forced Pi's constraints back into canonical source; translating
+// keeps canonical runtime-neutral.
 import {
   existsSync,
   mkdirSync,
@@ -38,7 +39,7 @@ const GENERATED_HEADER =
 // Translation tables. Everything runtime-specific about Pi lives here and nowhere else.
 // ---------------------------------------------------------------------------------------------
 
-// Canonical capability names → Pi tool identifiers.
+// Canonical tool vocabulary → Pi tool identifiers.
 const TOOL_MAP = {
   read: ['read'],
   search: ['grep', 'find', 'ls'],
@@ -53,21 +54,16 @@ const TOOL_MAP = {
 // runtime does not mean rewriting nine agents.
 const PI_AGENT_SETTINGS = {
   orchestrator: {
-    // A fresh context per task is what makes a clean-context dispatch possible; the planner's
-    // reasoning must not leak into the writer's.
     systemPromptMode: 'replace',
     inheritProjectContext: true,
     defaultContext: 'fresh',
     canDispatch: true,
   },
   scout: {
-    // No systemPromptMode: scout inherits pi's base prompt, which is what makes it cheap.
     inheritProjectContext: true,
     defaultContext: 'fresh',
   },
   architect: {
-    // The planning agent reads the architecture documents itself and must not arrive with the
-    // orchestrator's framing already in its context.
     systemPromptMode: 'replace',
     inheritProjectContext: false,
   },
@@ -94,11 +90,7 @@ const PI_AGENT_SETTINGS = {
   reviewer: {
     systemPromptMode: 'replace',
     inheritProjectContext: true,
-    // Forked: the review runs on the diff plus what the reviewer needs, not on the whole session.
     defaultContext: 'fork',
-    // pi-subagents affordances with no canonical counterpart. The reviewer needs the change's diff
-    // and a channel to report upward; neither is a responsibility, so neither belongs in canonical
-    // source. Adding a third such tool means adding a line here with its reason.
     runtimeTools: ['watchdog_diff', 'contact_supervisor'],
   },
   'browser-verifier': {
@@ -108,8 +100,6 @@ const PI_AGENT_SETTINGS = {
   },
 };
 
-// Packages pi loads for this project. A runtime dependency is an adapter fact: the canonical source
-// does not know that this harness runs inside pi, or that it delegates to a pi extension.
 const PI_PACKAGES = ['npm:pi-subagents@0.76.0'];
 
 const SETTINGS_SCHEMA =
@@ -145,9 +135,6 @@ function parseFrontmatter(body, where) {
     const [, key, rawValue] = pair;
     const value = rawValue.trim();
 
-    // A block scalar (`>` folded, `|` literal) continues on the following more-indented lines. Reading
-    // only the indicator would silently drop the whole value, which is how an agent ends up generated
-    // with an empty description and nothing notices until it is never dispatched.
     if (value === '>' || value === '|' || value === '>-' || value === '|-') {
       const collected = [];
       while (i + 1 < lines.length && /^\s+\S/.test(lines[i + 1])) {
@@ -159,7 +146,6 @@ function parseFrontmatter(body, where) {
       continue;
     }
 
-    // A block list: every following line indented with `- `.
     if (value === '') {
       const items = [];
       while (i + 1 < lines.length && /^\s+-\s+/.test(lines[i + 1])) {
@@ -205,14 +191,12 @@ export function buildArtifacts() {
   const { agents: tierOfAgent } = resolveTiers(repoRoot);
 
   // --- agents -------------------------------------------------------------------------------
-  const agentFiles = walk(join(harnessCore, 'capabilities'))
+  // Canonical: plugins/<plugin>/agents/<name>.md
+  // Pi:        .pi/agents/<plugin>__<name>.md  (flat, namespaced by plugin)
+  const agentFiles = walk(join(harnessCore, 'plugins'))
     .filter((f) => f.endsWith('.md') && f.includes(`${sep}agents${sep}`))
     .sort();
 
-  // Read every agent before rendering any of them. The coordinating agent's reach is a function of the
-  // whole set, and computing it while rendering would depend on directory sort order — which is
-  // exactly the class of bug that ships an agent that cannot reach two of its siblings and says
-  // nothing about it.
   const parsedAgents = agentFiles.map((file) => {
     const rel = relative(harnessCore, file);
     const where = `harness-core/${rel}`;
@@ -229,6 +213,7 @@ export function buildArtifacts() {
 
   for (const { rel, where, data, content } of parsedAgents) {
     const name = data.name;
+    const plugin = rel.split(sep)[1];
 
     const settings = PI_AGENT_SETTINGS[name];
     if (!settings) {
@@ -259,8 +244,6 @@ export function buildArtifacts() {
     }
 
     const out = [`---`, `name: ${name}`];
-    // A folded block scalar, because a description containing ": " would end a plain YAML scalar and
-    // silently truncate the rest of the sentence.
     out.push('description: >-');
     out.push(`  ${description.split('\n').join(' ')}`);
     out.push(
@@ -271,8 +254,6 @@ export function buildArtifacts() {
     out.push(
       `inheritProjectContext: ${settings.inheritProjectContext === true}`,
     );
-    // No agent inherits the whole discovered catalog. Context is the cost being managed, and an agent
-    // that carries skills it will not apply pays for them on every task.
     out.push(`inheritSkills: false`);
     out.push(renderList('skills', asList(data.skills)).trimEnd());
     out.push(`tools: ${piTools.join(', ')}`);
@@ -296,44 +277,57 @@ export function buildArtifacts() {
     out.push('---', '');
 
     artifacts.set(
-      join('.pi', rel),
+      join('.pi', 'agents', `${plugin}__${name}.md`),
       `${out.join('\n')}\n${GENERATED_HEADER}\n${content.trimStart()}`,
     );
   }
 
   // --- skills -------------------------------------------------------------------------------
+  // Canonical: plugins/<plugin>/skills/<skill>/**
+  // Pi:        .pi/skills/<plugin>/<skill>/**
   const skillDirs = [];
-  for (const cap of readdirSync(join(harnessCore, 'capabilities'), {
+  for (const plugin of readdirSync(join(harnessCore, 'plugins'), {
     withFileTypes: true,
   })) {
-    if (!cap.isDirectory()) continue;
-    const skillsDir = join(harnessCore, 'capabilities', cap.name, 'skills');
+    if (!plugin.isDirectory()) continue;
+    const skillsDir = join(harnessCore, 'plugins', plugin.name, 'skills');
     if (!existsSync(skillsDir)) continue;
     for (const skill of readdirSync(skillsDir, { withFileTypes: true })) {
-      if (skill.isDirectory()) skillDirs.push(join(skillsDir, skill.name));
+      if (skill.isDirectory())
+        skillDirs.push({
+          plugin: plugin.name,
+          skill: skill.name,
+          dir: join(skillsDir, skill.name),
+        });
     }
   }
-  for (const dir of skillDirs.sort()) {
+  for (const { plugin, skill, dir } of skillDirs.sort((a, b) =>
+    `${a.plugin}/${a.skill}`.localeCompare(`${b.plugin}/${b.skill}`),
+  )) {
     for (const file of walk(dir).sort()) {
+      const rest = relative(dir, file);
       artifacts.set(
-        join('.pi', relative(harnessCore, file)),
+        join('.pi', 'skills', plugin, skill, rest),
         readFileSync(file, 'utf8'),
       );
     }
   }
 
-  // --- workflows ----------------------------------------------------------------------------
+  // --- workflows (as Pi prompts) ------------------------------------------------------------
+  // Canonical: workflows/**.md  →  Pi: .pi/prompts/**
   for (const file of walk(join(harnessCore, 'workflows')).sort()) {
-    artifacts.set(
-      join('.pi', relative(harnessCore, file)),
-      readFileSync(file, 'utf8'),
-    );
+    const rest = relative(join(harnessCore, 'workflows'), file);
+    artifacts.set(join('.pi', 'prompts', rest), readFileSync(file, 'utf8'));
   }
 
-  // --- rules --------------------------------------------------------------------------------
+  // --- rules (translated into Pi-native context) ---------------------------------------------
+  // Pi has no native rules directory. The adapter translates each rule into a prompt the runtime can
+  // actually load, under .pi/prompts/rules/. They are constraints, surfaced as runtime context, not as
+  // a fabricated native directory the runtime would ignore.
   for (const file of walk(join(harnessCore, 'rules')).sort()) {
+    const rest = relative(join(harnessCore, 'rules'), file);
     artifacts.set(
-      join('.pi', relative(harnessCore, file)),
+      join('.pi', 'prompts', 'rules', rest),
       readFileSync(file, 'utf8'),
     );
   }
@@ -355,13 +349,11 @@ export function buildArtifacts() {
 
   const settings = {
     $schema: SETTINGS_SCHEMA,
-    // One root each. pi recurses into a directory looking for SKILL.md and stops at the first one it
-    // finds, so a single root is correct here precisely because no skill contains another skill.
-    skills: ['.pi/capabilities'],
-    // pi's prompt loader scans one directory and does not descend, so every directory holding a
-    // workflow is named. The patterns directory is listed because it is a real workflow pattern that
-    // a workflow reaches for — it is not a task type, and routing never selects it.
-    prompts: ['.pi/workflows', '.pi/workflows/patterns'],
+    // Pi recurses into each root looking for SKILL.md, so one root per skill tree is correct.
+    skills: ['.pi/skills'],
+    // Pi's prompt loader scans one directory and does not descend, so every directory holding a
+    // workflow (or a translated rule) is named explicitly.
+    prompts: ['.pi/prompts', '.pi/prompts/patterns', '.pi/prompts/rules'],
     packages: PI_PACKAGES,
     subagents: { agentOverrides },
   };
@@ -389,23 +381,24 @@ Delete this directory and run \`pnpm harness:generate\` and it comes back identi
 the source changed and nothing regenerated it — which is what
 [\`harness:check:generated\`](../harness-core/validation/README.md) exists to catch.
 
-| What Pi loads                                       | Generated from                                                             |
-| --------------------------------------------------- | -------------------------------------------------------------------------- |
-| \`.pi/capabilities/**/agents/*.md\`                   | \`harness-core/capabilities/**/agents/*.md\`                                 |
-| \`.pi/capabilities/**/skills/*\`                      | \`harness-core/capabilities/**/skills/*\`                                    |
-| \`.pi/workflows/*.md\`, \`.pi/workflows/patterns/*.md\` | \`harness-core/workflows/**\`                                                |
-| \`.pi/rules/*.md\`                                    | \`harness-core/rules/*.md\`                                                  |
-| \`.pi/settings.json\`                                 | \`harness-core/config/model-policy.yaml\` + the adapter's translation tables |
+| What Pi loads                                       | Generated from                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ |
+| \`.pi/agents/<plugin>__<agent>.md\`                  | \`harness-core/plugins/<plugin>/agents/<agent>.md\`                              |
+| \`.pi/skills/<plugin>/<skill>/**\`                   | \`harness-core/plugins/<plugin>/skills/<skill>/**\`                              |
+| \`.pi/prompts/<workflow>.md\`, \`.pi/prompts/patterns/*.md\` | \`harness-core/workflows/**\`                                                |
+| \`.pi/prompts/rules/*.md\`                           | \`harness-core/rules/*.md\`                                                     |
+| \`.pi/settings.json\`                               | \`harness-core/config/model-policy.yaml\` + the adapter's translation tables     |
 
-The tree mirrors the canonical tree directory for directory, so every relative link in a canonical file
-resolves identically here. That is deliberate: rewriting links per runtime would create a second place
-a link can be wrong.
+The generated tree is NOT a mirror of the canonical tree. The adapter translates canonical semantics —
+plugin/agent/skill/workflow/rule — into Pi's native layout: a flat agent namespace, a Pi skill tree,
+and workflow prompts. That is the whole point of an adapter: canonical stays runtime-neutral, and the
+Pi specifics live only here.
 
 ## How to use it
 
 1. \`/trust\` once — project configuration only loads after trust.
 2. \`/reload\` after any \`pnpm harness:generate\`.
-3. The slash commands in the \`/\` menu are the workflows. Subagents are dispatched by name.
+3. The slash commands in the \`/\` menu are the workflows (prompts). Subagents are dispatched by name.
 4. Before committing anything under \`.pi/\`: \`pnpm harness:generate\`, then \`pnpm pi:check\`, then
    \`pnpm check:links\`.
 
@@ -428,13 +421,14 @@ reason behind each decision.
 // Write, or compare
 // ---------------------------------------------------------------------------------------------
 
-const GENERATED_ROOTS = ['.pi/capabilities', '.pi/workflows', '.pi/rules'];
+const GENERATED_ROOTS = ['.pi/agents', '.pi/skills', '.pi/prompts'];
 // Directories a previous layout of this adapter wrote. They are removed rather than migrated: their
 // content now lives under GENERATED_ROOTS, and leaving them behind would give the runtime two copies
-// of every rule with nothing saying which one it loaded.
+// of every component with nothing saying which one it loaded.
 const RETIRED_GENERATED_ROOTS = [
-  '.pi/agents',
-  '.pi/skills',
+  '.pi/capabilities',
+  '.pi/workflows',
+  '.pi/rules',
   '.pi/policies',
   '.pi/config',
 ];

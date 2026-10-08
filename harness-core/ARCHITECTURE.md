@@ -10,7 +10,7 @@ implementation guide: the procedure for changing the harness is
                             │
         ┌───────────────────┼────────────────────┐
         │                   │                    │
-   capabilities         workflows              rules
+     plugins            workflows              rules
         │
    ┌────┼──────┬────────┬────────┬────────┬─────────┐
    │    │      │        │        │        │         │
@@ -40,29 +40,29 @@ which. Every other invariant below is downstream of this one.
 **Enforced by:** `validation/validate-core.mjs` — duplicate component names, a second source-of-truth
 reference, and a generated directory named as an authority all fail.
 
-## 2. Capability bundle ownership
+## 2. Plugin ownership
 
-Work is grouped by **cohesive purpose** under `capabilities/<name>/`, and a bundle holds `agents/` and
-`skills/`. The directory is the classification; nothing inside an agent repeats it.
+Work is grouped by **cohesive purpose** under `plugins/<name>/`, and a plugin holds `agents/`, `skills/`,
+and optionally `commands/`. The directory is the classification; nothing inside an agent repeats it.
 
 **Why:** grouping by technology (`frontend/`, `backend/`) puts unrelated responsibilities in one
-bucket and splits a cohesive capability across two. A bundle is chosen because its parts serve one
+bucket and splits a cohesive capability across two. A plugin is chosen because its parts serve one
 purpose, not because they share a directory prefix.
 
-**What is deliberately absent:** `roles/`. A second classification parallel to the capability tree is a
+**What is deliberately absent:** `roles/`. A second classification parallel to the plugin tree is a
 second thing to keep in sync, and it disagrees silently.
 
-**Enforced by:** `validate-core.mjs` — a capability holding anything other than `agents/` and `skills/`
-fails.
+**Enforced by:** `validate-core.mjs` — a plugin holding anything other than `agents/`, `skills/`, and
+optionally `commands/` fails.
 
 ## 3. Agent, skill, workflow, and rule are different things
 
 ```text
-Capability = a cohesive area of work
-Agent      = an expert responsibility with its own context, tools, and authority
-Skill      = reusable, focused capability or knowledge
-Workflow   = a sequence: what happens, in what order
-Rule       = an invariant that survives across workflows
+Plugin  = a cohesive area of work
+Agent   = an expert responsibility with its own context, tools, and authority
+Skill   = reusable, focused capability or knowledge
+Workflow = a sequence: what happens, in what order
+Rule    = an invariant that survives across workflows
 ```
 
 They compose one way:
@@ -114,13 +114,18 @@ a task runs at the wrong intelligence level.
 
 ## 6. The runtime adapter boundary
 
-An adapter translates canonical source into one runtime's native layout: frontmatter field names, tool
-identifiers, the permission model, dispatch configuration, package lists, and the tier-to-model
-mapping.
+Canonical source is **runtime-neutral**. An adapter translates canonical semantics into one runtime's
+native layout: frontmatter field names, tool identifiers, the permission model, dispatch
+configuration, package lists, and the tier-to-model mapping.
 
-**Why:** every one of those is a fact about a runtime. Putting them in canonical source means a second
-runtime requires rewriting nine agents, and the fields nobody could translate would get smuggled into
-prose instead of being honestly dropped.
+This is a **translation**, not a mirror. The canonical tree (plugin / agent / skill / workflow / rule)
+is _not_ shaped like what Pi loads (agents / skills / prompts / settings.json). The adapter performs the
+mapping — for example a canonical agent at `plugins/<plugin>/agents/<name>.md` becomes a Pi agent at
+`.pi/agents/<plugin>__<name>.md`, and a canonical workflow becomes a Pi prompt. A generated tree that
+merely mirrored the canonical tree would force Pi's constraints back into canonical source.
+
+**Why:** every runtime fact in canonical source means a second runtime requires rewriting nine agents,
+and the fields nobody could translate would get smuggled into prose instead of being honestly dropped.
 
 **What an adapter may not do:** claim support it does not have. An adapter that cannot express a
 capability records it as unsupported and says what was lost. An empty directory named after an
@@ -131,25 +136,24 @@ unimplemented adapter is a lie a reader believes.
 ## 7. Generated artifacts are disposable
 
 Generated output can be deleted and rebuilt, and is never hand-maintained. The Pi adapter writes a
-tree that **mirrors the canonical tree directory for directory**, so every relative link in a
-canonical file resolves identically in the generated copy.
+Pi-native tree under `.pi/`; the canonical tree is never a mirror of it.
 
-**Why the mirroring matters:** rewriting links per runtime means a link is correct in one tree and
-wrong in another, and the link checker only ever sees one of them. Mirroring means a link is either
-right in both or wrong in both.
+**Why Pi-native, not mirrored:** Pi discovers agents, skills, and prompts through its own directory
+semantics, which differ from the canonical semantic model. The adapter exists precisely to bridge that
+gap; mirroring would erase the gap and push runtime constraints into canonical source.
 
 **Enforced by:** `validation/validate-generated.mjs` — missing output, stale output, and output for a
 component that no longer exists all fail.
 
 ## 8. Validation is mechanical and layered
 
-| Layer                | Proves                                                                         | Needs a runtime |
-| -------------------- | ------------------------------------------------------------------------------ | --------------- |
-| `validate-core`      | the canonical source is internally correct and provider-neutral                | no              |
-| `validate-generated` | the generated output matches the canonical source                              | no              |
-| `<runtime>/validate` | that runtime's own loader accepts what was generated                           | yes             |
-| `check-links`        | every relative link and anchor resolves                                        | no              |
-| `<runtime>/smoke`    | the runtime wires it together: grants resolve, dispatch reaches, tiers applied | yes             |
+| Layer                | Proves                                                                                                | Needs a runtime |
+| -------------------- | ----------------------------------------------------------------------------------------------------- | --------------- |
+| `validate-core`      | the canonical source is internally correct and provider-neutral, and the retired architecture is gone | no              |
+| `validate-generated` | the generated output matches the canonical source                                                     | no              |
+| `<runtime>/validate` | that runtime's own loader accepts what was generated                                                  | yes             |
+| `check-links`        | every relative link and anchor resolves                                                               | no              |
+| `<runtime>/smoke`    | the runtime wires it together: grants resolve, dispatch reaches, tiers applied                        | yes             |
 
 **Why the layering:** most harness defects are invisible to every check except one. A dangling grant,
 a stale generated file, and a loader that rejects a skill each fail differently, and a single combined
@@ -194,17 +198,17 @@ runtime validation lives only in the adapter that owns it.
 ## The three models this replaces
 
 **Doctor-per-rule.** Nine separately-loadable skills, one per rule family, each with its own copy of
-the surrounding doctrine and no defined owner. The replacement is one review capability with named
+the surrounding doctrine and no defined owner. The replacement is one review plugin with named
 dimensions: a **dimension** is a question asked of a change, its reference is how to ask it, and the
 rule it checks stays owned by the skill that owns the domain.
 
 **Role and domain in agent bodies.** A second classification parallel to the directory tree. The
-replacement is the capability directory, which already says it.
+replacement is the plugin directory, which already says it.
 
 **`.pi/` as canonical source.** A runtime's native layout cannot be a repository's source of truth: its
 loader stops recursing at any directory holding a `SKILL.md`, its prompt loader scans one directory and
 does not descend, and its field names belong to one product. Those are adapter facts. The replacement
-is canonical source plus an adapter that mirrors it.
+is canonical source plus an adapter that translates it.
 
 ## What is not an abstraction here
 

@@ -20,7 +20,7 @@ adapter is the remaining work.
 Everything a runtime needs to know that the canonical source deliberately does not state:
 
 - **Frontmatter field names** and their accepted values.
-- **Tool identifiers**, and the mapping from the canonical capability vocabulary to the runtime's names.
+- **Tool identifiers**, and the mapping from the canonical tool vocabulary to the runtime's names.
 - **The permission model** — how "read-only" is actually enforced, and what it does not enforce.
 - **Dispatch configuration** — which agent may dispatch, which agents it may reach, and how deep.
 - **Model resolution** — the abstract tier mapped to a runtime thinking level and, optionally, a model.
@@ -37,18 +37,23 @@ Everything a runtime needs to know that the canonical source deliberately does n
 - **A claim it cannot honour.** An adapter that cannot express a capability records it as unsupported
   and says what was lost. It does not approximate, and it does not quietly drop the thing.
 
+## Translation, not mirroring
+
+Canonical source is organised by plugin, agent, skill, workflow, and rule. No runtime lays files out that
+way. The adapter maps canonical semantics onto the runtime's native layout — for Pi that means a flat
+agent namespace (`.pi/agents/<plugin>__<agent>.md`), a Pi skill tree (`.pi/skills/<plugin>/<skill>/`),
+workflow prompts (`.pi/prompts/`), and `settings.json`. The two trees are deliberately different shapes;
+that difference is the adapter's whole reason to exist.
+
 ## Writing one
 
 1. **Read [ARCHITECTURE.md](../ARCHITECTURE.md) first.** The invariants are what make the adapter
    possible; an adapter that needs a canonical change is reporting that the invariant was wrong.
 2. **Model the target's discovery rules before its file formats.** Where it looks, how deep it
    recurses, and what it stops at are what decide the generated layout.
-3. **Prefer mirroring the canonical tree.** If the generated tree has the same directories at the same
-   depth, every relative link resolves identically in both and the link checker sees the same thing
-   twice instead of twice differently.
-4. **Translate, do not author.** Every output must be derivable from the canonical source by a rule in
+3. **Translate, do not mirror.** Every output must be derivable from the canonical source by a rule in
    the adapter.
-5. **Validate with the runtime's own loader**, and keep that code inside the adapter. The canonical
+4. **Validate with the runtime's own loader**, and keep that code inside the adapter. The canonical
    validator must stay importable without any runtime installed, or the harness can no longer be checked
    on a machine that has none.
 

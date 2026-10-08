@@ -1,98 +1,60 @@
-# The Pi adapter
+# Pi adapter
 
-Translates the canonical harness into the layout the Pi runtime loads. Pi is the only implemented
-adapter.
+The Pi runtime adapter. It translates `harness-core/` into the Pi-native layout under `.pi/`.
+
+This is the **only** place Pi-specific facts live. Everything here — frontmatter field names, tool
+identifiers, the permission syntax, dispatch configuration, the package list, and the abstract-tier →
+runtime-thinking mapping — would be wrong in canonical source, because canonical source is runtime-neutral
+and a second runtime must not require rewriting nine agents.
+
+## What it generates
+
+| Pi path                             | From canonical                                                        |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| `.pi/agents/<plugin>__<agent>.md`   | `plugins/<plugin>/agents/<agent>.md` (flattened, namespaced)          |
+| `.pi/skills/<plugin>/<skill>/**`    | `plugins/<plugin>/skills/<skill>/**` (copied)                         |
+| `.pi/prompts/<workflow>.md`         | `workflows/<workflow>.md`                                             |
+| `.pi/prompts/patterns/<pattern>.md` | `workflows/patterns/<pattern>.md`                                     |
+| `.pi/prompts/rules/<rule>.md`       | `rules/<rule>.md` (translated into runtime context)                   |
+| `.pi/settings.json`                 | `config/model-policy.yaml` + the translation tables in `generate.mjs` |
+| `.pi/README.md`                     | generated header                                                      |
+
+The canonical tree is **not** a mirror of `.pi/`. A canonical agent sits in a plugin's `agents/` directory;
+Pi wants a flat `agents/` with a plugin-prefixed name. A canonical workflow is a `workflows/` file; Pi
+wants a `prompts/` entry. The mapping is the adapter's job.
+
+## Translation decisions
+
+`generate.mjs` holds every Pi-specific decision as a table, each with a reason:
+
+- **`TOOL_MAP`** — canonical tool → Pi tool identifier (`read` → `read`, `dispatch` → `subagent`, …).
+- **`PI_AGENT_SETTINGS`** — per-agent Pi frontmatter that has no canonical counterpart (`systemPromptMode`,
+  `inheritProjectContext`, `defaultContext`, `runtimeTools`). Every agent needs an entry; an agent with no
+  entry silently inherits Pi defaults the canonical source deliberately does not state.
+- **`PI_PACKAGES`** — runtime extension packages Pi loads for this project.
+- **`model-policy` resolution** — `resolveTiers` maps each agent's abstract tier to a thinking level (and,
+  only if the policy pins one, a model). The canonical source names tiers; the adapter names runtimes.
+
+## Running it
 
 ```bash
-node harness-core/adapters/pi/generate.mjs           # write .pi/
-node harness-core/adapters/pi/generate.mjs --check   # exit 1 on drift, write nothing
-node harness-core/adapters/pi/validate.mjs           # prove pi's own loaders accept it
-node harness-core/adapters/pi/smoke.mjs               # prove pi wires the agents together
+node harness-core/adapters/pi/generate.mjs          # write .pi/
+node harness-core/adapters/pi/generate.mjs --check  # fail (exit 1) if .pi/ has drifted, write nothing
+node harness-core/adapters/pi/validate.mjs          # Pi's own loader accepts .pi/
+node harness-core/adapters/pi/smoke.mjs             # Pi wires it together (grants, dispatch, tiers)
 ```
 
-## The generated tree
+Or, from the repo root: `pnpm harness:generate`, `pnpm pi:check`, `pnpm pi:smoke`.
 
-```text
-.pi/
-├── settings.json                                        # generated from the model policy + the tables below
-├── README.md                                            # what this directory is
-├── capabilities/<capability>/agents/<name>.md          # from harness-core/capabilities/…
-├── capabilities/<capability>/skills/<skill>/…          # from harness-core/capabilities/…
-├── workflows/*.md                                       # from harness-core/workflows/
-├── workflows/patterns/*.md                             # from harness-core/workflows/patterns/
-└── rules/*.md                                           # from harness-core/rules/
-```
+## Determinism
 
-**It mirrors the canonical tree directory for directory.** That is the load-bearing decision: every
-relative markdown link in a canonical file resolves identically here, so a link is either right in both
-trees or wrong in both. Rewriting links per runtime would mean the canonical link checker and the
-runtime's view of the same link could disagree, and neither would know.
+Generation is pure and sorted, so two runs with no source change produce byte-identical `.pi/`. The drift
+check (`--check`, and `validate-generated.mjs`) rebuilds the tree in memory and compares. If `git diff`
+after a second `pnpm harness:generate` is non-empty, the generator is non-deterministic — fix it, do not
+commit the drift.
 
-Two consequences of Pi's discovery rules, both handled here rather than in the canonical source:
+## What this adapter must not do
 
-- **Pi's skill loader stops recursing at any directory holding a `SKILL.md`.** That is why one skill
-  root is enough here: no skill in this harness contains another skill. If one ever did, its nested
-  skills would each need an explicit entry, exactly as they did under the old nested layout.
-- **Pi's prompt loader scans one directory and does not descend.** So every directory holding a workflow
-  is listed in `prompts:`. The patterns directory is one of them — a workflow pattern is reached by a
-  workflow, and routing never selects it.
-
-## What the adapter decides, and why
-
-Canonical agent frontmatter is five fields. Pi needs more, and every addition below is an adapter
-decision with a reason, not a canonical fact.
-
-| Canonical                      | Pi                                                            | Why                                                                                                                                                      |
-| ------------------------------ | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `authority: read-only`         | `permission: {write: deny, edit: deny}`                       | Pi gates `edit` and `write` by tool, not by role. A read-only agent therefore holds neither tool _and_ declares the denial.                              |
-| `tools: [read, search, shell]` | `tools: read, grep, find, ls, bash`                           | Pi names each capability separately; the canonical vocabulary is coarser on purpose.                                                                     |
-| `modelTier: strong`            | `subagents.agentOverrides.<name>.thinking`                    | The tier is abstract; the thinking level is Pi's. Rendered from [model-policy.yaml](../../config/model-policy.yaml).                                     |
-| `skills: [a, b]`               | `skills: a, b` + `inheritSkills: false`                       | No agent inherits the whole discovered catalog. Context is the cost being managed.                                                                       |
-| —                              | `systemPromptMode`, `inheritProjectContext`, `defaultContext` | Pi's context-inheritance model. Whether an agent starts clean, inherits the project, or forks the session is a runtime behaviour, so it is a table here. |
-| —                              | `allowedAgents`, `allowNestedSubagents`, `maxSubagentDepth`   | Pi's dispatch configuration. Only the coordinating agent may dispatch; `maxSubagentDepth: 1` keeps a dispatched agent from dispatching again.            |
-| `authority: write`             | `acceptanceRole: writer`                                      | Pi classifies an agent by whether it edits. Derived from `authority` so the two cannot disagree.                                                         |
-
-### Runtime affordances with no canonical counterpart
-
-```js
-reviewer: {
-  runtimeTools: ['watchdog_diff', 'contact_supervisor'];
-}
-```
-
-Pi's subagent extension exposes these two tools. Neither is a responsibility — one gives the reviewer
-the change's diff, the other a channel to report upward — so neither belongs in canonical source. A
-third such tool means a third line here, with its reason.
-
-### The permission boundary is not a sandbox
-
-Pi rejects bash rules. `permission:` can gate `edit` and `write`; it **cannot** restrict what a `bash`
-call runs, and there is no command allowlist in this runtime.
-
-So the enforced boundary is the tool allowlist plus the denial, and the agents that hold a shell say so
-in their own bodies rather than implying the prose is a sandbox. `validate.mjs` checks the generated
-denial exists, because that is the part a generation regression could silently remove.
-
-### Packages
-
-`packages: ["npm:pi-subagents@0.76.0"]` — Pi loads its subagent extension from here. A runtime
-dependency is an adapter fact: the canonical source does not know that this harness runs inside Pi.
-
-## Validation
-
-`validate.mjs` uses **Pi's own loaders** (`loadSkills`, `loadPromptTemplates`) so the check fails for
-the same reasons Pi would fail at startup. That is the one thing this adapter does that the canonical
-validator must never do, and keeping it here is what lets `validate-core.mjs` stay importable on a
-machine with no runtime installed.
-
-It checks that Pi accepted the generated skills, prompts, and package extensions; that every agent's
-`allowedAgents` entry resolves; that a read-only agent denies writes and a writing agent does not; that
-exactly one agent may dispatch; that no agent frontmatter declares a model; and that every agent has a
-rendered tier.
-
-## Adding a second runtime
-
-Do not fork this adapter. Write a new one beside it, from
-[adapters/README.md](../README.md). If a second runtime needs something the canonical model cannot
-express, that is a finding about the model, and it belongs in its own change with the reasoning —
-not smuggled into an agent body to make one adapter work.
+- Read or write a provider model identifier into canonical source.
+- Keep a hand-maintained file under `.pi/`; every one of those is disposable.
+- Approximate a capability it cannot express. If Pi cannot represent something, record it as unsupported.

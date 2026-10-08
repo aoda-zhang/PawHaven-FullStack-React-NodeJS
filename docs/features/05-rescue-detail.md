@@ -227,7 +227,7 @@ mounts**. It is consumed only by `rescue-detail`:
 
 It is the one place two features share UI without it being promoted to `packages/ui`, even though
 the shared surface is a stable, self-contained button-plus-count pair. See
-[Component placement](../../harness-core/capabilities/frontend-development/skills/frontend-patterns/references/components.md#placement).
+[Component placement](../../harness-core/plugins/frontend-development/skills/frontend-patterns/references/components.md#placement).
 
 ## 6. What Does Not Exist
 

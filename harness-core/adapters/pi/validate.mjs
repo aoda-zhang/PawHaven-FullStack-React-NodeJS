@@ -137,9 +137,9 @@ const allPrompts = loadPromptTemplates({
 
 const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
 
-// Agents live under a capability's `agents/` directory. Everything else under `capabilities/` is a
-// skill, and a SKILL.md also has a `name:` in its frontmatter — scanning by frontmatter alone would
-// treat every skill as an agent and report the harness as full of agents with no tools.
+// Agents live directly under .pi/agents as <plugin>__<agent>.md. Everything else under .pi/ is a
+// skill or a prompt, and a SKILL.md also has a `name:` in its frontmatter — scanning by frontmatter
+// alone would treat every skill as an agent and report the harness as full of agents with no tools.
 function scanAgents(dir) {
   const found = [];
   if (!existsSync(dir)) return found;
@@ -166,7 +166,7 @@ function scanAgents(dir) {
   return found;
 }
 
-const agents = scanAgents(join(repoRoot, '.pi', 'capabilities')).sort((a, b) =>
+const agents = scanAgents(join(repoRoot, '.pi', 'agents')).sort((a, b) =>
   a.name.localeCompare(b.name),
 );
 
@@ -174,7 +174,7 @@ const agents = scanAgents(join(repoRoot, '.pi', 'capabilities')).sort((a, b) =>
 
 if (agents.length === 0) {
   fail(
-    'no agents discovered under .pi/capabilities — the generated tree is empty or misplaced',
+    'no agents discovered under .pi/agents — the generated tree is empty or misplaced',
   );
 }
 

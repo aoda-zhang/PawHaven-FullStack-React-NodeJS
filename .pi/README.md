@@ -15,23 +15,24 @@ Delete this directory and run `pnpm harness:generate` and it comes back identica
 the source changed and nothing regenerated it — which is what
 [`harness:check:generated`](../harness-core/validation/README.md) exists to catch.
 
-| What Pi loads                                       | Generated from                                                             |
-| --------------------------------------------------- | -------------------------------------------------------------------------- |
-| `.pi/capabilities/**/agents/*.md`                   | `harness-core/capabilities/**/agents/*.md`                                 |
-| `.pi/capabilities/**/skills/*`                      | `harness-core/capabilities/**/skills/*`                                    |
-| `.pi/workflows/*.md`, `.pi/workflows/patterns/*.md` | `harness-core/workflows/**`                                                |
-| `.pi/rules/*.md`                                    | `harness-core/rules/*.md`                                                  |
-| `.pi/settings.json`                                 | `harness-core/config/model-policy.yaml` + the adapter's translation tables |
+| What Pi loads                                       | Generated from                                                                 |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `.pi/agents/<plugin>__<agent>.md`                  | `harness-core/plugins/<plugin>/agents/<agent>.md`                              |
+| `.pi/skills/<plugin>/<skill>/**`                   | `harness-core/plugins/<plugin>/skills/<skill>/**`                              |
+| `.pi/prompts/<workflow>.md`, `.pi/prompts/patterns/*.md` | `harness-core/workflows/**`                                                |
+| `.pi/prompts/rules/*.md`                           | `harness-core/rules/*.md`                                                     |
+| `.pi/settings.json`                               | `harness-core/config/model-policy.yaml` + the adapter's translation tables     |
 
-The tree mirrors the canonical tree directory for directory, so every relative link in a canonical file
-resolves identically here. That is deliberate: rewriting links per runtime would create a second place
-a link can be wrong.
+The generated tree is NOT a mirror of the canonical tree. The adapter translates canonical semantics —
+plugin/agent/skill/workflow/rule — into Pi's native layout: a flat agent namespace, a Pi skill tree,
+and workflow prompts. That is the whole point of an adapter: canonical stays runtime-neutral, and the
+Pi specifics live only here.
 
 ## How to use it
 
 1. `/trust` once — project configuration only loads after trust.
 2. `/reload` after any `pnpm harness:generate`.
-3. The slash commands in the `/` menu are the workflows. Subagents are dispatched by name.
+3. The slash commands in the `/` menu are the workflows (prompts). Subagents are dispatched by name.
 4. Before committing anything under `.pi/`: `pnpm harness:generate`, then `pnpm pi:check`, then
    `pnpm check:links`.
 

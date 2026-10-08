@@ -1,11 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/schema/settings.schema.json",
   "skills": [
-    ".pi/capabilities"
+    ".pi/skills"
   ],
   "prompts": [
-    ".pi/workflows",
-    ".pi/workflows/patterns"
+    ".pi/prompts",
+    ".pi/prompts/patterns",
+    ".pi/prompts/rules"
   ],
   "packages": [
     "npm:pi-subagents@0.76.0"
