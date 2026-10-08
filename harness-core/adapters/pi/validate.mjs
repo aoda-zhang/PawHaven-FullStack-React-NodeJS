@@ -71,14 +71,43 @@ const warn = (message) => warnings.push(message);
 
 const settingsPath = join(repoRoot, '.pi', 'settings.json');
 if (!existsSync(settingsPath)) {
-  console.error(
-    'pi:check: .pi/settings.json is missing — run `pnpm harness:generate`.',
-  );
+  console.error('pi:check: .pi/settings.json is missing — run `pnpm pi:sync`.');
   process.exit(1);
 }
 const settings = JSON.parse(readFileSync(settingsPath, 'utf8'));
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
+
+// The runtime must reference canonical content, never copy it. A materialized tree under .pi/ is a
+// second source of truth — the drift the harness forbids. .pi/agents is the one allowed projection.
+for (const dir of ['skills', 'prompts', 'rules']) {
+  if (existsSync(join(repoRoot, '.pi', dir))) {
+    fail(
+      `.pi/${dir}/ exists — canonical content must be referenced directly, never copied. Remove it.`,
+    );
+  }
+}
+// Every referenced path must resolve into harness-core (direct reference, not a projection).
+for (const key of ['skills', 'prompts']) {
+  for (const entry of settings[key] ?? []) {
+    const target = resolve(repoRoot, entry);
+    if (!existsSync(target)) {
+      fail(
+        `${key}: \`${entry}\` does not resolve to a path under the repository.`,
+      );
+    } else if (
+      !relative(join(repoRoot, 'harness-core'), target).startsWith('..')
+    ) {
+      // good — inside harness-core
+    } else if (!relative(join(repoRoot, '.pi'), target).startsWith('..')) {
+      // allowed only for the harness extension, handled separately
+    } else {
+      warn(
+        `${key}: \`${entry}\` points outside harness-core — expected a direct reference.`,
+      );
+    }
+  }
+}
 
 // --- packages ---------------------------------------------------------------------------------
 
@@ -172,6 +201,32 @@ const agents = scanAgents(join(repoRoot, '.pi', 'agents')).sort((a, b) =>
 
 // --- checks -----------------------------------------------------------------------------------
 
+// Parses a frontmatter field that may be an inline comma list (`tools: a, b`) or a block list
+// (`tools:\n  - a`). Mirrors how smoke.mjs reads the same fields, so the two checks agree.
+function parseListField(fm, key) {
+  const inline = new RegExp(`^${key}:\\s*(.+)$`, 'm').exec(fm);
+  if (inline && !/^\s*-/.test(inline[1])) {
+    return inline[1]
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  const out = [];
+  let capture = false;
+  for (const line of fm.split('\n')) {
+    if (new RegExp(`^${key}:\\s*$`).test(line)) {
+      capture = true;
+      continue;
+    }
+    if (!capture) continue;
+    const m = /^\s+-\s+(.+)$/.exec(line);
+    if (m) out.push(m[1].trim());
+    else if (line.trim() === '') continue;
+    else break;
+  }
+  return out;
+}
+
 if (agents.length === 0) {
   fail(
     'no agents discovered under .pi/agents — the generated tree is empty or misplaced',
@@ -194,10 +249,7 @@ for (const agent of agents) {
   seen.set(agent.name, agent.path);
 
   const fm = agent.frontmatter;
-  const toolList = (/^tools:\s*(.+)$/m.exec(fm)?.[1] ?? '')
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean);
+  const toolList = parseListField(fm, 'tools');
   const denied = /^permission:\n((?:[ \t]+.*\n?)*)/m.exec(fm)?.[1] ?? '';
   const canWrite = toolList.includes('edit') || toolList.includes('write');
 
@@ -225,11 +277,8 @@ for (const agent of agents) {
   }
 
   // Every allowedAgents entry must resolve, or a dispatch silently falls back to a default.
-  const allowed = /^allowedAgents:\s*(.+)$/m.exec(fm)?.[1] ?? '';
-  for (const name of allowed
-    .split(',')
-    .map((n) => n.trim())
-    .filter(Boolean)) {
+  const allowed = parseListField(fm, 'allowedAgents');
+  for (const name of allowed) {
     if (!agents.some((a) => a.name === name)) {
       fail(
         `${relative(repoRoot, agent.path)}: allowedAgents names \`${name}\`, which no agent answers to`,

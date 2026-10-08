@@ -50,16 +50,16 @@ Review a change against:
 
 ## Review dimensions
 
-| Dimension                   | Reference                                       | Rules it checks live in                                                                                                                                           |
-| --------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code quality                | [code-quality.md](./references/code-quality.md) | this skill                                                                                                                                                        |
-| Architecture and boundaries | [architecture.md](./references/architecture.md) | [architecture-design](../../../architecture/skills/architecture-design/SKILL.md)                                                                                  |
-| Frontend                    | [frontend.md](./references/frontend.md)         | [frontend-patterns](../../../frontend-development/skills/frontend-patterns/SKILL.md) · [react-doctor](../../../frontend-development/skills/react-doctor/SKILL.md) |
-| Backend                     | [backend.md](./references/backend.md)           | [backend](../../../backend-development/skills/backend/SKILL.md)                                                                                                   |
-| TypeScript                  | [typescript.md](./references/typescript.md)     | [typescript](../../../javascript-typescript/skills/typescript/SKILL.md)                                                                                           |
-| Testing                     | [testing.md](./references/testing.md)           | [testing-standards](../../../testing/skills/testing-standards/SKILL.md)                                                                                           |
-| Security                    | [security.md](./references/security.md)         | this skill                                                                                                                                                        |
-| Performance                 | [performance.md](./references/performance.md)   | this skill                                                                                                                                                        |
+| Dimension                   | Reference                                       | Rules it checks live in                                                                                                                                                       |
+| --------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code quality                | [code-quality.md](./references/code-quality.md) | this skill                                                                                                                                                                    |
+| Architecture and boundaries | [architecture.md](./references/architecture.md) | [architecture-design](../../../architecture/skills/architecture-design/SKILL.md)                                                                                              |
+| Frontend                    | [frontend.md](./references/frontend.md)         | [frontend-patterns](../../../frontend-development/skills/frontend-patterns/SKILL.md) · React Doctor (external CLI: `pnpm doctor:react`, `.github/workflows/react-doctor.yml`) |
+| Backend                     | [backend.md](./references/backend.md)           | [backend](../../../backend-development/skills/backend/SKILL.md)                                                                                                               |
+| TypeScript                  | [typescript.md](./references/typescript.md)     | [typescript](../../../javascript-typescript/skills/typescript/SKILL.md)                                                                                                       |
+| Testing                     | [testing.md](./references/testing.md)           | [testing-standards](../../../testing/skills/testing-standards/SKILL.md)                                                                                                       |
+| Security                    | [security.md](./references/security.md)         | this skill                                                                                                                                                                    |
+| Performance                 | [performance.md](./references/performance.md)   | this skill                                                                                                                                                                    |
 
 **Always applicable**, whatever the scope: code quality, architecture, security, and testing.
 **Conditional**: frontend when the change touches frontend source or user-visible behaviour,

@@ -1,22 +1,26 @@
 ---
 name: tester
-description: >-
-  Acceptance verification. Checks whether an implementation satisfies its acceptance criteria, criterion by criterion, runs the existing suites, and reports per-criterion evidence with the commands behind it. Emits evidence, never a verdict. Use to verify behaviour before review, and to name the criteria that have no executable check at all. Trigger: verify acceptance criteria behaviour check test run suite evidence satisfied unverifiable criterion regression confirm prove.
-acceptanceRole: read-only
-systemPromptMode: replace
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  Acceptance verification. Checks whether an implementation satisfies its acceptance criteria,
+  criterion by criterion, runs the existing suites, and reports per-criterion evidence with the
+  commands behind it. Emits evidence, never a verdict. Use to verify behaviour before review, and to
+  name the criteria that have no executable check at all.
+  Trigger: verify acceptance criteria behaviour check test run suite evidence satisfied
+  unverifiable criterion regression confirm prove.
+modelTier: balanced
+authority: read-only
 skills:
   - testing-standards
   - writing-standards
-tools: read, grep, find, ls, bash
+tools:
+  - read
+  - search
+  - shell
 permission:
   write: deny
   edit: deny
-defaultContext: fresh
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

@@ -270,5 +270,5 @@ const filtered = useMemo(
 
 ## Doctor
 
-[react-doctor](../../react-doctor/SKILL.md) · S1 Redux server data ·
+[React Doctor](../../../../../../.github/workflows/react-doctor.yml) · S1 Redux server data ·
 S2 bare `useDispatch`/`useSelector` · S5 `console.log`

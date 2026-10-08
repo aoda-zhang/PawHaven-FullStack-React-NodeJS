@@ -272,5 +272,5 @@ it before reporting a form done.
 
 ## Doctor
 
-[react-doctor](../../react-doctor/SKILL.md) · S4 `useState` used for form values ·
+[React Doctor](../../../../../../.github/workflows/react-doctor.yml) · S4 `useState` used for form values ·
 [typescript-doctor](../../../../code-review/skills/code-review/references/typescript.md) · T4 untyped resolver

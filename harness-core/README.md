@@ -3,14 +3,14 @@
 The repository-owned, provider-neutral AI development harness for PawHaven.
 
 This directory is the **only** place an agent, a skill, a workflow, a rule, or a model tier is
-defined. Everything a coding runtime loads is generated from here by an adapter. If a rule is written
-anywhere else, one of the two copies is already wrong.
+defined. Everything a coding runtime loads is referenced from here by an adapter — nothing is copied.
+If a rule is written anywhere else, one of the two copies is already wrong.
 
 ```text
 harness-core/
 ├── plugins/          every agent and skill, grouped by cohesive domain
 │   ├── architecture/              agents: architect, oracle · skills: architecture-design
-│   ├── frontend-development/      agents: frontend-developer · skills: frontend-patterns, react-doctor, testing-frontend
+│   ├── frontend-development/      agents: frontend-developer · skills: frontend-patterns, testing-frontend
 │   ├── backend-development/       agents: backend-developer · skills: backend, backend-testing
 │   ├── javascript-typescript/     skills: typescript
 │   ├── testing/                  agents: tester · skills: testing-standards
@@ -24,8 +24,8 @@ harness-core/
 ├── rules/           cross-cutting invariants (verification, failure, contract, human-gates)
 ├── config/          model-policy.yaml — abstract tiers; no provider names
 ├── validation/      mechanical proof that the harness is internally correct
-└── adapters/        translation into one runtime's native layout
-    └── pi/          the implemented adapter → generates .pi/
+    └── adapters/        translation into one runtime's native layout
+        └── pi/          the thin Pi runtime adapter (settings + extension + agent projection)
 ```
 
 ## The map
@@ -79,10 +79,12 @@ vocabulary (plugin / agent / skill / workflow / rule / adapter) and the boundari
 ## Commands
 
 ```bash
-pnpm harness:generate      # regenerate .pi/ from this directory
 pnpm harness:validate      # validate the canonical source (this directory)
-pnpm harness:smoke         # prove the Pi runtime loads what was generated
-pnpm harness:verify        # validate + generate-check + links + pi check + pi smoke
+pnpm harness:runtime       # validate .pi/ is a faithful thin adapter (reference + agent bridge)
+pnpm pi:sync               # project canonical agents into .pi/agents (the one copy)
+pnpm pi:check              # Pi's own loader accepts the runtime
+pnpm pi:smoke              # Pi wires it together (grants, dispatch, tiers)
+pnpm harness:verify        # validate + runtime + links + pi check + pi smoke
 ```
 
 Run all of them before committing a harness change. A harness change that typechecks, packages, and
@@ -99,7 +101,9 @@ Four rules cover most of it:
 
 1. **One canonical owner per rule.** Everything else links to the owner. A rule stated twice is
    stated wrong once.
-2. **Change the source, never the output.** Generated artifacts (`.pi/`) are disposable; they are rebuilt.
+2. **Change the source, never the output.** The runtime references `harness-core/` directly. The only
+   exception is `.pi/agents/`, a rendered projection (frontmatter to Pi's format, body copied) rebuilt by
+   `pnpm pi:sync` — never edit it by hand.
 3. **No runtime syntax in canonical source.** A field that belongs to one runtime belongs in that
    runtime's adapter.
 4. **A harness change is its own reviewable change.** See

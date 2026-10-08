@@ -12,7 +12,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { resolveTiers } from '../config/model-policy.mjs';
+import { resolveAgentTiers } from '../config/model-policy.mjs';
 
 const harnessCore = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const repoRoot = resolve(harnessCore, '..');
@@ -94,7 +94,7 @@ for (const deadDir of [
     );
   }
 }
-// The generated tree must not contain any directory from the old Pi layout.
+// The `.pi/` runtime must not contain any directory from the old Pi layout.
 for (const deadGeneratedDir of [
   '.pi/capabilities',
   '.pi/workflows',
@@ -102,7 +102,7 @@ for (const deadGeneratedDir of [
 ]) {
   if (existsSync(join(repoRoot, deadGeneratedDir))) {
     fail(
-      `\`${deadGeneratedDir}\` still exists under .pi/. Run \`pnpm harness:generate\` to replace the old generated layout.`,
+      `\`${deadGeneratedDir}\` still exists under .pi/. Run \`pnpm pi:sync\` to rebuild the agent projection; copied trees are retired.`,
     );
   }
 }
@@ -394,32 +394,27 @@ for (const required of ['verification', 'failure', 'contract', 'human-gates']) {
 
 // --- 6. model policy -------------------------------------------------------------------------
 
-let tiers = {};
+let resolved = { agents: {}, tiers: {} };
 try {
-  ({ agents: tiers } = resolveTiers(repoRoot));
+  resolved = resolveAgentTiers(repoRoot);
 } catch (error) {
   fail(`model policy: ${error.message}`);
 }
+const knownTiers = new Set(Object.keys(resolved.tiers || {}));
 
 for (const { file } of agentFiles) {
   const { data } = parseFrontmatter(file);
   const name = data.name;
   if (!name) continue;
-  if (!data.modelTier) continue;
-  if (!tiers[name]) {
+  if (!data.modelTier) {
     fail(
-      `${rel(file)}: agent \`${name}\` has no tier in model-policy.yaml. Its intelligence would fall to a runtime default and nothing would say so.`,
+      `${rel(file)}: agent \`${name}\` declares no \`modelTier\`. Its intelligence would fall to a runtime default and nothing would say so.`,
     );
-  } else if (tiers[name].tier !== data.modelTier) {
-    fail(
-      `${rel(file)}: declares \`modelTier: ${data.modelTier}\` but model-policy.yaml says \`${tiers[name].tier}\`. Two answers to one question.`,
-    );
+    continue;
   }
-}
-for (const name of Object.keys(tiers)) {
-  if (!agentNames.has(name)) {
+  if (!knownTiers.has(data.modelTier)) {
     fail(
-      `model-policy.yaml assigns a tier to \`${name}\`, which is not an agent in plugins/.`,
+      `${rel(file)}: declares \`modelTier: ${data.modelTier}\`, which is not defined in model-policy.yaml tiers.`,
     );
   }
 }
@@ -582,9 +577,9 @@ for (const file of walk(workflowDir)
 
 // --- 8. no second source of truth ------------------------------------------------------------
 
-// The canonical source must not point at generated runtime output. The current generated layout
-// (.pi/agents, .pi/skills, .pi/prompts) is legitimate to *describe*, so only the retired directories
-// are forbidden here.
+// The canonical source must not point at runtime output. `.pi/agents` is the one legitimate projection
+// and is safe to describe; `.pi/skills`, `.pi/prompts`, and `.pi/rules` are forbidden (they would be a
+// second source of truth), so only the retired directories are forbidden here.
 const retiredInGenerated = [
   '.pi/workflows/',
   '.pi/policies/',
@@ -642,9 +637,9 @@ for (const name of DOCTOR_NAMES) {
   }
 }
 for (const [skillDir] of skillDirs) {
-  if (/^[a-z-]+-doctor$/.test(skillDir) && skillDir !== 'react-doctor') {
+  if (/^[a-z-]+-doctor$/.test(skillDir)) {
     fail(
-      `skill \`${skillDir}\` is a per-rule doctor. A dimension is a review question, not a skill; the rule belongs to the skill that owns the domain and the detection to the review dimension.`,
+      `skill \`${skillDir}\` is a per-rule doctor. A dimension is a review question, not a skill; the rule belongs to the skill that owns the domain and the detection to the review dimension. React Doctor is an external deterministic CLI (see .github/workflows/react-doctor.yml), not a harness skill.`,
     );
   }
 }

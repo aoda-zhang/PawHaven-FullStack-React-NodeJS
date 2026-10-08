@@ -1,22 +1,27 @@
 ---
 name: frontend-developer
-description: >-
-  Frontend implementation. Writes React and TypeScript for the portal under apps/frontend/portal and for the shared frontend packages, inside the scope it was dispatched with, following the project's component, state, data-fetching, form, styling and i18n patterns, and self-tests with the React gate before it reports. Trigger: implement frontend react component hook form page route styling token i18n translation state query mutation slice render layout ui.
-acceptanceRole: writer
-systemPromptMode: replace
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  Frontend implementation. Writes React and TypeScript for the portal under
+  apps/frontend/portal and for the shared frontend packages, inside the scope it was dispatched
+  with, following the project's component, state, data-fetching, form, styling and i18n patterns,
+  and self-tests with the React gate before it reports.
+  Trigger: implement frontend react component hook form page route styling token i18n translation
+  state query mutation slice render layout ui.
+modelTier: balanced
+authority: write
 skills:
   - typescript
   - frontend-patterns
-  - react-doctor
   - principles
   - writing-standards
-tools: read, grep, find, ls, bash, edit, write
-defaultContext: fresh
+tools:
+  - read
+  - search
+  - shell
+  - edit
+  - write
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 
@@ -82,7 +87,8 @@ Run this before you report. An agent that has not run its own checks has no evid
 a `PASS` you did not execute is not a pass.
 
 1. **The React gate** — mandatory for any change touching a React page, component, hook, or UI state.
-   The pinned invocation is in the `react-doctor` skill. Paste the raw output.
+   React Doctor is an external deterministic CLI (`pnpm doctor:react`, or `.github/workflows/react-doctor.yml`);
+   run it and paste the raw output. It is not a harness skill — its rules live in that workflow, not in harness-core.
 2. **Typecheck** the package you changed.
 3. **Lint**, diffed against the recorded baseline. A pre-existing finding is not yours; one you added
    is.

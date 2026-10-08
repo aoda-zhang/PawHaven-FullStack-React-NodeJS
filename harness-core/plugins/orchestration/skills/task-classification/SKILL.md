@@ -3,8 +3,8 @@ name: task-classification
 description: >
   Classify a request before a workflow is chosen — task type, secondary tasks, scope, domains,
   complexity, risk, confidence, clarification need — as one JSON artifact the user sees. Semantic
-  intent, not keywords. Load at routing time, at the start of any non-trivial request, before
-  planning or dispatching.
+  intent, not keywords. Load at routing time, before planning or dispatching any request that needs
+  a workflow.
   Trigger: new request task routing workflow selection classify classification triage which workflow
   which process how to start where to start first step entry point, complexity scope risk size
   difficulty estimate, feature bug fix refactor architecture investigation performance, ambiguous
@@ -112,7 +112,7 @@ change to an auth contract is.
 - **low** — localized, one layer, established pattern, low ambiguity, straightforward verification.
   Do the work in the main session when risk is low too. The fast path is `low` complexity **and** `low`
   risk, and nothing else buys it.
-- **medium** — multiple files or layers, non-trivial state or data flow, several tests, moderate
+- **medium** — multiple files or layers, meaningful state or data flow, several tests, moderate
   uncertainty.
 - **high** — multiple services, architecture boundaries, database changes, security-sensitive flows,
   ambiguous domain behavior, integration that is hard to verify. Plan first, and require a named

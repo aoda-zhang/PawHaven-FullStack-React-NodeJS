@@ -1,19 +1,24 @@
 {
   "$schema": "https://raw.githubusercontent.com/earendil-works/pi/main/schema/settings.schema.json",
   "skills": [
-    ".pi/skills"
+    "./harness-core/plugins"
   ],
   "prompts": [
-    ".pi/prompts",
-    ".pi/prompts/patterns",
-    ".pi/prompts/rules"
+    "./harness-core/workflows",
+    "./harness-core/workflows/patterns"
   ],
   "packages": [
     "npm:pi-subagents@0.76.0"
   ],
+  "extensions": [
+    "./.pi/extensions/harness.ts"
+  ],
   "subagents": {
     "agentOverrides": {
       "architect": {
+        "thinking": "high"
+      },
+      "oracle": {
         "thinking": "high"
       },
       "backend-developer": {
@@ -22,16 +27,13 @@
       "browser-verifier": {
         "thinking": "medium"
       },
+      "reviewer": {
+        "thinking": "high"
+      },
       "frontend-developer": {
         "thinking": "medium"
       },
-      "oracle": {
-        "thinking": "high"
-      },
       "orchestrator": {
-        "thinking": "high"
-      },
-      "reviewer": {
         "thinking": "high"
       },
       "scout": {

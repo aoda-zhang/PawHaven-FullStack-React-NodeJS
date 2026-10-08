@@ -12,7 +12,6 @@ authority: write
 skills:
   - typescript
   - frontend-patterns
-  - react-doctor
   - principles
   - writing-standards
 tools:
@@ -87,7 +86,8 @@ Run this before you report. An agent that has not run its own checks has no evid
 a `PASS` you did not execute is not a pass.
 
 1. **The React gate** — mandatory for any change touching a React page, component, hook, or UI state.
-   The pinned invocation is in the `react-doctor` skill. Paste the raw output.
+   React Doctor is an external deterministic CLI (`pnpm doctor:react`, or `.github/workflows/react-doctor.yml`);
+   run it and paste the raw output. It is not a harness skill — its rules live in that workflow, not in harness-core.
 2. **Typecheck** the package you changed.
 3. **Lint**, diffed against the recorded baseline. A pre-existing finding is not yours; one you added
    is.

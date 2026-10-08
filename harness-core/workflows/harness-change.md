@@ -41,20 +41,21 @@ A rule text that is _about_ application code is not this workflow. A rule that i
    one change unless one is a mechanical consequence of the other. Never the generated output: if a
    generated file needs a change, the change belongs in its source, and regeneration produces it.
 
-5. **Regenerate every runtime's output.** Generated artifacts are disposable. They are written by the
-   adapter, never edited by hand, and a hand-edit looks reviewed right up until the next regeneration
-   discards it.
+5. **Rebuild the agent projection.** `.pi/agents/` is the one disposable artifact: `pnpm pi:sync`
+   rebuilds it from canonical agents (frontmatter rendered to Pi's format, body copied). Everything else is
+   referenced directly via
+   `.pi/settings.json`, so there is nothing else to regenerate. Never hand-edit the projection.
 
 6. **Prove it, in this order.** Each step fails for a different reason and the first failure is the
    one that tells you the real cause.
 
    ```bash
-   pnpm harness:check           # the canonical source is internally correct
-   pnpm harness:generate        # the runtime output is current
-   pnpm harness:check:generated # the output matches the source, byte for byte
-   pnpm check:links             # every relative link and anchor resolves
-   pnpm pi:check                # a real runtime's own loader accepts what was generated
-   pnpm pi:smoke                # the runtime wires it together: grants resolve, dispatch reaches, tiers applied
+   pnpm harness:validate       # the canonical source is internally correct
+   pnpm pi:sync                # project canonical agents into .pi/agents
+   pnpm harness:runtime        # .pi/ is a faithful thin adapter of the source
+   pnpm check:links            # every relative link and anchor resolves
+   pnpm pi:check               # a real runtime's own loader accepts the referenced resources
+   pnpm pi:smoke               # the runtime wires it together: grants resolve, dispatch reaches, tiers applied
    ```
 
    A harness change that typechecks, packages, and passes a link check but was never loaded by the

@@ -7,18 +7,23 @@ the gate belongs where the decision is meaningful, not everywhere.
 
 Two rules here look contradictory and are not. The line is **reversibility**, not risk.
 
-| Situation                                     | What to do                                                       |
-| --------------------------------------------- | ---------------------------------------------------------------- |
-| Trivial, reversible, no contract change       | Just do it. Do not ask.                                          |
-| Standard or Architectural scope               | Present the classification and plan, get approval, then execute. |
-| Any sub-step after approval, still reversible | Just do it. Do not re-ask. Approval is not per-step.             |
+The task's `complexity` and `risk` (from the classification) decide where the human sits. The
+**fast path** is `complexity: low` **and** `risk: low`, reversible, no contract change. Anything
+**beyond the fast path** — `complexity` or `risk` at `medium` or above — needs a plan and the
+human's approval before execution.
+
+| Situation                                                       | What to do                                                       |
+| --------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Fast path: low complexity and low risk, reversible, no contract | Just do it. Do not ask.                                          |
+| Beyond the fast path (medium+ complexity or risk)               | Present the classification and plan, get approval, then execute. |
+| Any sub-step after approval, still reversible                   | Just do it. Do not re-ask. Approval is not per-step.             |
 
 ## Human gates
 
 The human decides at exactly two points. Everywhere else the harness runs to the end.
 
-**Plan approval.** A Standard or Architectural task stops before implementation and presents
-the classification and the plan. Trivial work does not stop, because there is nothing to weigh.
+**Plan approval.** A task beyond the fast path stops before implementation and presents the
+classification and the plan. Fast-path work does not stop, because there is nothing to weigh.
 
 **Final review.** Nothing is committed, pushed, or released without the human. The handoff is
 the artifact they read. `/handoff` produces it and stops there.
@@ -27,7 +32,7 @@ the artifact they read. `/handoff` produces it and stops there.
 
 **Always ask**, before the work, not after:
 
-- a Standard or Architectural plan
+- a plan for work beyond the fast path (medium+ complexity or risk)
 - a product or scope decision
 - an architecture decision
 - a material change to a shared contract

@@ -22,19 +22,15 @@
     "token-check": "node packages/design-system/scripts/token-check.cjs",
     "architecture-check": "node scripts/check-architecture.mjs",
     "quality-check": "node scripts/check-quality.mjs",
-    "harness:check": "node harness-core/validation/validate-core.mjs",
-    "harness:check:generated": "node harness-core/validation/validate-generated.mjs",
-    "harness:generate": "node harness-core/adapters/pi/generate.mjs",
-    "pi:generate": "node harness-core/adapters/pi/generate.mjs",
-    "pi:check": "node harness-core/adapters/pi/validate.mjs",
-    "harness:verify": "pnpm harness:check && pnpm harness:check:generated && pnpm check:links && pnpm pi:check && pnpm pi:smoke",
     "harness:validate": "node harness-core/validation/validate-core.mjs",
-    "harness:smoke": "node harness-core/adapters/pi/smoke.mjs",
+    "harness:runtime": "node harness-core/validation/validate-runtime.mjs",
+    "harness:verify": "pnpm harness:validate && pnpm harness:runtime && pnpm check:links && pnpm pi:check && pnpm pi:smoke",
     "check:links": "node harness-core/validation/check-links.mjs",
+    "pi:sync": "node harness-core/adapters/pi/sync-agents.mjs",
+    "pi:check": "node harness-core/adapters/pi/validate.mjs",
+    "pi:smoke": "node harness-core/adapters/pi/smoke.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
-    "lint-staged": "lint-staged",
-    "pi-check": "pnpm harness:verify",
-    "pi:smoke": "node harness-core/adapters/pi/smoke.mjs"
+    "lint-staged": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

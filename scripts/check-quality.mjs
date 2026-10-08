@@ -14,7 +14,7 @@
 //   - Architecture violations: `pnpm architecture-check` owns them; it is invoked below as a
 //     subprocess and its exit status is folded into this run's.
 //   - Link integrity: `pnpm check:links` owns it; invoked below for the same reason.
-//   - Harness/skill integrity: `pnpm pi-check` owns it — named as owner here, not reimplemented,
+//   - Harness/skill integrity: `pnpm harness:verify` owns it — named as owner here, not reimplemented,
 //     because it needs the pi runtime and is already wired into the harness workflow.
 //   - Design tokens: `pnpm token-check` owns them — a different domain, named as owner here.
 import { spawnSync } from 'node:child_process';
@@ -390,7 +390,7 @@ for (const { name, args, owns } of DELEGATED) {
 }
 
 console.log(
-  'owners not reimplemented here: pi-check — harness/skill integrity; token-check — design tokens',
+  'owners not reimplemented here: harness:verify — harness/skill integrity; token-check — design tokens',
 );
 
 // ---------------------------------------------------------------------------

@@ -15,48 +15,49 @@ The harness is configuration, and configuration fails silently. A skill named in
 longer exists does not error: the agent quietly stops seeing it, and the rule stops being applied
 weeks before anyone notices. None of that is visible in a diff. These checks make it visible.
 
-## The four commands
+## The commands
 
 ```bash
-pnpm harness:check           # the canonical source is internally correct
-pnpm harness:generate        # regenerate every runtime's output from that source
-pnpm harness:check:generated # the generated output matches the source, byte for byte
-pnpm check:links             # every relative link and anchor resolves
-pnpm pi:check                # the runtime's own loader accepts what was generated
-pnpm pi:smoke                # the runtime wires it together: grants resolve, dispatch reaches, tiers applied
+pnpm harness:validate       # the canonical source is internally correct
+pnpm harness:runtime        # .pi/ is a faithful thin adapter (reference + agent bridge)
+pnpm pi:sync                # project canonical agents into .pi/agents
+pnpm check:links            # every relative link and anchor resolves
+pnpm pi:check               # the runtime's own loader accepts the referenced resources
+pnpm pi:smoke               # the runtime wires it together: grants resolve, dispatch reaches, tiers applied
 ```
 
 `pnpm harness:verify` runs all of them in the order that reports a real cause first.
 
 **Order matters when one fails.** Read the first failure, not the last. A missing file fails the
-source check, the generated check, and the loader; fixing the source fixes all three, and chasing the
+source check, the runtime check, and the loader; fixing the source fixes all three, and chasing the
 last one wastes the change.
 
 ## Which failure means what
 
 | Failure                                                   | It means                                                             | Do this                                                                        |
 | --------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `harness:check` names a missing reference                 | A grant, a link, or a tier name resolves to nothing                  | Fix the name, or restore what it named. Do not delete the grant to silence it. |
-| `harness:check` reports a duplicate name                  | Two components answer to one name, so one of them wins invisibly     | Rename one. A duplicate is a silent loss, not a style issue.                   |
-| `harness:check` reports an illegal dependency             | A skill routes work to an agent, or an agent carries a runtime field | Move the knowledge down a level, or the field into the adapter.                |
-| `harness:check:generated` reports drift                   | The source changed and the output was not regenerated                | Run `pnpm harness:generate`. Never hand-edit generated output.                 |
-| `pi:check` fails to load a skill or a prompt              | The runtime rejects what the generator produced                      | Fix the adapter or the canonical source. Not the generated file.               |
+| `harness:validate` names a missing reference              | A grant, a link, or a tier name resolves to nothing                  | Fix the name, or restore what it named. Do not delete the grant to silence it. |
+| `harness:validate` reports a duplicate name               | Two components answer to one name, so one of them wins invisibly     | Rename one. A duplicate is a silent loss, not a style issue.                   |
+| `harness:validate` reports an illegal dependency          | A skill routes work to an agent, or an agent carries a runtime field | Move the knowledge down a level, or the field into the adapter.                |
+| `harness:runtime` reports an agent-bridge mismatch        | The source changed and `.pi/agents` was not reprojected              | Run `pnpm pi:sync`. Never hand-edit the projection.                            |
+| `pi:check` fails to load a skill or a prompt              | The runtime rejects what the reference points at                     | Fix the adapter or the canonical source. Not the projection.                   |
 | `pi:smoke` reports an empty grant or an unreachable agent | The generator produced something loadable that does not work         | Fix the generator. Nothing else in the tree can see this.                      |
 | `check:links` reports a broken link                       | A relative path or an anchor does not resolve                        | Fix the link. Never delete a document to make a link resolve.                  |
-| `harness:check` reports an orphan component               | Nothing can reach it, so it will drift from everything that does     | Grant it, link it, or delete it. An orphan is a promise nobody keeps.          |
+| `harness:validate` reports an orphan component            | Nothing can reach it, so it will drift from everything that does     | Grant it, link it, or delete it. An orphan is a promise nobody keeps.          |
 
 ## Drift
 
-Drift is the only failure that looks like a pass. The source is right, the output is stale, and
-nothing is broken until the runtime reads the stale copy.
+Drift is the only failure that looks like a pass. The canonical source is right, but `.pi/` no longer
+reflects it, and nothing is broken until the runtime reads the stale projection.
 
-The generated check compares what the generator produces **now** against what is on disk. It needs no
-runtime, so it runs before the loader check and it is the one that catches a source change nobody
-regenerated.
+The runtime check (`harness:runtime`) compares the projected `.pi/agents` and the rendered model-tier
+overrides **now** against canonical. It needs no runtime, so it runs before the loader check and it is
+the one that catches a source change nobody reprojected.
 
-**Generated output is disposable.** Delete it and regenerate; if it cannot be regenerated, it is not
-generated output, it is a second source of truth wearing the wrong name. Never edit it by hand — the
-next regeneration silently discards the edit, and the hand-edit looked reviewed.
+**The `.pi/agents` projection is disposable.** Delete it and re-run `pnpm pi:sync`; if it cannot be
+rebuilt, it is not a projection, it is a second source of truth wearing the wrong name. Never edit it by
+hand — the next sync silently discards the edit, and the hand-edit looked reviewed. Skills, prompts, and
+rules are referenced directly and cannot drift; the agent bridge is the only thing that can.
 
 ## A capability a runtime cannot express
 
@@ -80,7 +81,7 @@ One thing no script can tell you: whether the harness says the right thing. The 
 what exists, so an unexpected target is visible:
 
 ```bash
-pnpm harness:check
+pnpm harness:validate
 ```
 
 and read the output as a reader would — is the description enough to make an agent load this skill, and
@@ -88,14 +89,14 @@ is the router enough to act on without opening every reference?
 
 ## Before you finish
 
-- [ ] `harness:check` passes, and every fix is in the same change
-- [ ] `harness:generate` has been run and its output is committed
-- [ ] `harness:check:generated` passes — the output is current, not merely present
+- [ ] `harness:validate` passes, and every fix is in the same change
+- [ ] `pi:sync` has been run and the `.pi/agents` projection is current
+- [ ] `harness:runtime` passes — `.pi/` is a faithful adapter, the agent bridge matches
 - [ ] `check:links` passes
 - [ ] `pi:check` passes — a real runtime's loader accepts it
 - [ ] `pi:smoke` passes — the runtime wires it together, not merely loads it
 - [ ] The rules you touched still have exactly one canonical owner
-- [ ] Nothing was hand-edited under a generated directory
+- [ ] Nothing was hand-edited under `.pi/`
 
 A harness change is infrastructure, and infrastructure fails quietly. Every box above is a claim
 something proved.

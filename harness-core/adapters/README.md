@@ -41,9 +41,10 @@ Everything a runtime needs to know that the canonical source deliberately does n
 
 Canonical source is organised by plugin, agent, skill, workflow, and rule. No runtime lays files out that
 way. The adapter maps canonical semantics onto the runtime's native layout — for Pi that means a flat
-agent namespace (`.pi/agents/<plugin>__<agent>.md`), a Pi skill tree (`.pi/skills/<plugin>/<skill>/`),
-workflow prompts (`.pi/prompts/`), and `settings.json`. The two trees are deliberately different shapes;
-that difference is the adapter's whole reason to exist.
+agent namespace (`.pi/agents/<plugin>__<agent>.md`, the one projections), `settings.json` whose
+`skills:`/`prompts:`/`extensions:` keys point at `harness-core/` directly (no copy), and an extension
+that injects the cross-cutting rules as system-prompt context. Skills, prompts, and rules are referenced,
+not mirrored; only agents are projected.
 
 ## Writing one
 

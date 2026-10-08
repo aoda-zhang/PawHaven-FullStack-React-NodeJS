@@ -2,9 +2,9 @@
 
 Applies when the change touches frontend source or user-visible behaviour. The **rules** are owned by
 [frontend-patterns](../../../../frontend-development/skills/frontend-patterns/SKILL.md) and its
-references; the pinned React scan is owned by
-[react-doctor](../../../../frontend-development/skills/react-doctor/SKILL.md). This file is how a
-reviewer detects and judges a violation of them, and it does not restate them.
+references. The React scan is an external deterministic CLI — **React Doctor** (run via `pnpm doctor:react`,
+configured in `.github/workflows/react-doctor.yml`) — not a harness skill. This file is how a reviewer
+detects and judges a violation of the frontend rules; it does not restate them.
 
 ## Order
 
@@ -20,9 +20,9 @@ reviewer detects and judges a violation of them, and it does not restate them.
 npx react-doctor@0.9.12 -y --verbose --scope changed --include-untracked
 ```
 
-The invocation, the mandatory flags, and why the version is pinned are in the
-[react-doctor skill](../../../../frontend-development/skills/react-doctor/references/cli-reference.md).
-Read it there; do not restate the command here, because the pin is the thing that must not drift.
+The exact invocation, mandatory flags, and the pinned version live in
+`.github/workflows/react-doctor.yml` (run locally via `pnpm doctor:react`). Read that workflow; do not
+restate the command here, because the pin is the thing that must not drift.
 
 - **Every issue the scan reports is `BLOCKING`.**
 - **Paste the raw output**: the command, the project list it scanned, and the findings. A review that

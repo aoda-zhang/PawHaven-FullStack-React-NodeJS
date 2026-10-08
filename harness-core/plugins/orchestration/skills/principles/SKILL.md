@@ -2,7 +2,8 @@
 name: principles
 description: >
   PawHaven's decision-forcing principles — the reasoning moves that must change a decision, and the
-  duty to name which one did. Load before planning or implementing any non-trivial change, and while
+  duty to name which one did. Load before planning or implementing any change beyond the fast path
+  (medium+ complexity or risk), and while
   reviewing one. A principle cited with no decision behind it means the rule was skipped, not that it
   was satisfied.
   Trigger: principle decision tradeoff judgement call architecture choice

@@ -170,5 +170,5 @@ config decision, not permission to put non-serializable values in state.
 
 ## Doctor
 
-[react-doctor](../../react-doctor/SKILL.md) · S1 server data in a Redux slice ·
+[React Doctor](../../../../../../.github/workflows/react-doctor.yml) · S1 server data in a Redux slice ·
 S2 raw `useDispatch` / `useSelector`

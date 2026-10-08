@@ -23,8 +23,10 @@ Start at [harness-core/README.md](./harness-core/README.md) for the map, and
 [harness-core/ARCHITECTURE.md](./harness-core/ARCHITECTURE.md) for the invariants. The harness is a
 map, not a document to memorise: read the file the task points you at.
 
-**Never edit `.pi/` by hand.** It is deleted and rebuilt by `pnpm harness:generate`, and a hand-edit
-looks reviewed right up until the next run discards it. Change `harness-core/`, or the adapter.
+**Never hand-edit the harness runtime adapter.** `harness-core/` is the only source of truth. Skills,
+prompts, and rules load **directly** from `harness-core/` through `.pi/settings.json` — nothing is copied
+or regenerated except the `.pi/agents/` projection, which `pnpm pi:sync` rebuilds verbatim from
+`harness-core/plugins/*/agents/`. Change `harness-core/`, or the adapter; never edit `.pi/` by hand.
 
 ## Layout
 
@@ -176,8 +178,9 @@ Behavioural rules — the ones an agent gets wrong without being told.
   emits a verdict about code.
 - **Never micro-manage.** A dispatch names a scope, a data shape, and observable success criteria —
   not a file list.
-- Classify before planning (Trivial / Standard / Architectural). Approval is not per-step: once
-  given, reversible sub-steps just get done.
+- Classify before planning (`taskType` / `complexity` / `risk` / `domains`). Work on the fast path
+  (`complexity: low` and `risk: low`) just gets done; everything beyond it needs a plan and approval
+  first. Approval is not per-step: once given, reversible sub-steps just get done.
 - **A lane with no named validator has not finished.** Every check reads `PASS | FAIL | NOT RUN`,
   and anything unrun carries the reason. A failed check routes back to the **developer** lane, in
   a loop capped at 3 cycles. A finding that says the plan is wrong returns to planning instead.

@@ -1,20 +1,24 @@
 ---
 name: scout
-description: >-
-  Fast read-only repository reconnaissance. Locates the files, components, services, and patterns a question is about, and returns compressed findings another agent can act on, each backed by a file and a line. Use to find code quickly before planning or before a change is designed. Trigger: locate find where does this live which file search scan recon survey codebase map call path implementation site.
-acceptanceRole: read-only
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  Fast read-only repository reconnaissance. Locates the files, components, services, and patterns a
+  question is about, and returns compressed findings another agent can act on, each backed by a
+  file and a line. Use to find code quickly before planning or before a change is designed.
+  Trigger: locate find where does this live which file search scan recon survey codebase map call
+  path implementation site.
+modelTier: fast
+authority: read-only
 skills:
   - principles
-tools: read, grep, find, ls, bash
+tools:
+  - read
+  - search
+  - shell
 permission:
   write: deny
   edit: deny
-defaultContext: fresh
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

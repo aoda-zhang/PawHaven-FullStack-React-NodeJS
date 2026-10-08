@@ -1,22 +1,26 @@
 ---
 name: reviewer
-description: >-
-  The final verdict producer. Reviews a change against correctness, architecture, domain standards, security, testability, and performance, across the review dimensions the change's scope makes applicable, and emits VERDICT: PASS or VERDICT: FAIL. Findings only; never modifies the code it judges. Use after implementation and self-test, before a human decision. Trigger: review code review pr diff feedback quality verdict pass fail findings severity blocking architecture security performance correctness maintainability accept reject.
-acceptanceRole: read-only
-systemPromptMode: replace
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  The final verdict producer. Reviews a change against correctness, architecture, domain standards,
+  security, testability, and performance, across the review dimensions the change's scope makes
+  applicable, and emits VERDICT: PASS or VERDICT: FAIL. Findings only; never modifies the code it
+  judges. Use after implementation and self-test, before a human decision.
+  Trigger: review code review pr diff feedback quality verdict pass fail findings severity blocking
+  architecture security performance correctness maintainability accept reject.
+modelTier: strong
+authority: read-only
 skills:
   - code-review
   - principles
-tools: read, grep, find, ls, bash, watchdog_diff, contact_supervisor
+tools:
+  - read
+  - search
+  - shell
 permission:
   write: deny
   edit: deny
-defaultContext: fork
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

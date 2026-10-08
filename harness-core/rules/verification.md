@@ -10,26 +10,26 @@ workflow says "the gate sequence's call", the sequence below is what it means.
 
 Nine stages, in this order.
 
-| #   | Stage                      | Lane                          | When it runs                                 |
-| --- | -------------------------- | ----------------------------- | -------------------------------------------- |
-| 1   | Plan                       | `scout`, `architect`          | Always beyond Trivial                        |
-| 2   | Plan review                | `oracle`                      | Conditional, skipped for Trivial scope       |
-| 3   | Human plan approval        | the human                     | Standard and Architectural scope             |
-| 4   | Implementation             | `frontend-dev`, `backend-dev` | Always beyond Trivial                        |
-| 5   | Developer self-test        | the writing lane              | Every implementation lane, before it reports |
-| 6   | Independent verification   | `tester`                      | Conditional, `medium` or `high` complexity   |
-| 7   | Independent review         | `reviewer`                    | Every mutating change                        |
-| 8   | Combined-tree verification | `orchestrator`                | After the units are joined                   |
-| 9   | Human final review         | the human                     | Every change that survives to a handoff      |
+| #   | Stage                      | Lane                          | When it runs                                              |
+| --- | -------------------------- | ----------------------------- | --------------------------------------------------------- |
+| 1   | Plan                       | `scout`, `architect`          | Always beyond the fast path (low complexity and low risk) |
+| 2   | Plan review                | `oracle`                      | Conditional, skipped on the fast path                     |
+| 3   | Human plan approval        | the human                     | Beyond the fast path (medium+ complexity or risk)         |
+| 4   | Implementation             | `frontend-dev`, `backend-dev` | Always beyond the fast path                               |
+| 5   | Developer self-test        | the writing lane              | Every implementation lane, before it reports              |
+| 6   | Independent verification   | `tester`                      | Conditional, `medium` or `high` complexity                |
+| 7   | Independent review         | `reviewer`                    | Every mutating change                                     |
+| 8   | Combined-tree verification | `orchestrator`                | After the units are joined                                |
+| 9   | Human final review         | the human                     | Every change that survives to a handoff                   |
 
 ### Which stages are conditional
 
 Three of the nine are conditional, and the classification is the entire trigger:
 
-- **Stage 2 (plan review)** is skipped when the task classified as `Trivial`. A plan that
-  reads small is not a reason to skip it, and a plan that reads large does not promote a
-  Trivial task into a reviewed one.
-- **Stage 3 (human plan approval)** is skipped for Trivial scope, because there is nothing
+- **Stage 2 (plan review)** is skipped when the task is on the fast path — `complexity: low`
+  **and** `risk: low`. A plan that reads small is not a reason to skip it, and a plan that
+  reads large does not promote a fast-path task into a reviewed one.
+- **Stage 3 (human plan approval)** is skipped on the fast path, because there is nothing
   to weigh. See [the human-gate rule](./human-gates.md#human-gates).
 - **Stage 6 (independent verification)** runs when the task classified at `medium` or
   `high` **complexity OR at `high` or `critical` risk**, and is skipped otherwise. Risk is
@@ -58,7 +58,7 @@ the work sits in one layer with a straight verification. The developer self-test
 `architect` → **the shared contract** → `frontend-dev` and `backend-dev`, in parallel only
 where the dependencies permit → `tester` → `browser-verifier` on a user-facing surface →
 `reviewer` → combined-tree verification. Plan review is conditional; human plan approval is
-not, because a two-domain feature is Standard work at minimum.
+not, because a two-domain feature is beyond the fast path at minimum.
 
 **`low` complexity, `high` risk, `domains: [backend]`.** The strong path in full: planner,
 plan review, a named validator per unit, an independent acceptance lane, review, and the

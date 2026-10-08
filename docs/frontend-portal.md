@@ -168,7 +168,7 @@ owns the vocabulary those rules use, so a rule and the fact it checks cannot dri
 
 - [Writing](../harness-core/plugins/frontend-development/skills/frontend-patterns/SKILL.md) — one router; per-area rules in its `references/`
 - [React standards](../harness-core/plugins/frontend-development/skills/frontend-patterns/references/react.md) · [styling](../harness-core/plugins/frontend-development/skills/frontend-patterns/references/styling.md) · [i18n](../harness-core/plugins/frontend-development/skills/frontend-patterns/references/i18n.md) · [TypeScript](../harness-core/plugins/javascript-typescript/skills/typescript/SKILL.md) · [client state](../harness-core/plugins/frontend-development/skills/frontend-patterns/references/state.md) · [component placement](../harness-core/plugins/frontend-development/skills/frontend-patterns/references/components.md)
-- [Component tests](../harness-core/plugins/frontend-development/skills/testing-frontend/SKILL.md) · [React gate](../harness-core/plugins/frontend-development/skills/react-doctor/SKILL.md)
+- [Component tests](../harness-core/plugins/frontend-development/skills/testing-frontend/SKILL.md) · [React gate](../.github/workflows/react-doctor.yml) (external CLI: `pnpm doctor:react`)
 - Review: [frontend dimension](../harness-core/plugins/code-review/skills/code-review/references/frontend.md) · [method](../harness-core/plugins/code-review/skills/code-review/SKILL.md)
 - [Frontend architecture](./architecture/PawHaven-Frontend-Architecture.md) — the
   canonical home for why each rule above exists. §3 package ecosystem, §4 component boundaries,

@@ -1,22 +1,33 @@
 ---
 name: browser-verifier
-description: >-
-  Drives the running PawHaven portal in a real browser and reports what the screen actually did. Read-only toward source: it starts and stops dev servers, runs the repository's Playwright stack, and edits no application file. Use for user-visible UI, routing, forms, loading / empty / error states, navigation, auth flows, frontend/backend integration, and real user journeys. Trigger: browser verify check e2e playwright ui smoke screenshot console error network fail, loading empty error state, form submit validate, route navigation redirect, login auth cookie session, frontend backend integration.
-acceptanceRole: read-only
-systemPromptMode: replace
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  Drives the running PawHaven portal in a real browser and reports what the screen actually did.
+  Read-only toward source: it starts and stops dev servers, runs the repository's Playwright stack,
+  and edits no application file. Use for user-visible UI, routing, forms, loading / empty / error
+  states, navigation, auth flows, frontend/backend integration, and real user journeys.
+  Trigger: browser verify check e2e playwright ui smoke screenshot console error network fail,
+  loading empty error state, form submit validate, route navigation redirect, login auth cookie
+  session, frontend backend integration.
+modelTier: balanced
+authority: read-only
 skills:
   - browser-verification
   - principles
-tools: read, grep, find, ls, bash
+tools:
+  - read
+  - search
+  - shell
+Target: the route and the user journey verified
+Steps: the exact actions driven, in order
+Expected: the intended screen, state, or message for each step
+Observed: what the browser actually did, per step
+Evidence: screenshot / DOM excerpt / console capture / network log, produced this session
+Result: PASS | FAIL | NOT RUN — with the reason when not run
 permission:
   write: deny
   edit: deny
-defaultContext: fresh
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

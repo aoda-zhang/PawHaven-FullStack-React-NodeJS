@@ -18,7 +18,7 @@ fix, then verify on the same surface.
 > **Which stages run** is the classification's call, not this file's:
 > [the gate sequence](../rules/verification.md#the-gate-sequence). Record a one-line
 > `skip: <reason>` for each stage you leave out. How few files the diff touches is not the trigger — a
-> one-line edit across a contract boundary is not Trivial, and stage 7 is never one you may leave out.
+> one-line edit across a contract boundary is not on the fast path, and stage 7 is never one you may leave out.
 
 > **Read order.** Architecture docs and code first; `docs/features/**` last, and only for what is
 > already known. A bug is frequently one of the _Known defects_ the index already tabulates — read that

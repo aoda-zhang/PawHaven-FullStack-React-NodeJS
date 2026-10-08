@@ -5,7 +5,7 @@ question, because most harness defects are invisible to every check but one.
 
 ```bash
 node harness-core/validation/validate-core.mjs       # canonical source
-node harness-core/validation/validate-generated.mjs  # generated output is current
+node harness-core/validation/validate-runtime.mjs    # .pi/ is a faithful thin adapter
 node harness-core/validation/check-links.mjs         # links and anchors
 node harness-core/adapters/pi/validate.mjs           # the Pi loader accepts it
 node harness-core/adapters/pi/smoke.mjs              # the Pi runtime wires it together in practice
@@ -22,9 +22,9 @@ Read the **first** failure.
 | Layer                 | Question it answers                                                                           | Needs a runtime |
 | --------------------- | --------------------------------------------------------------------------------------------- | --------------- |
 | `validate-core`       | Is the canonical source internally correct and provider-neutral?                              | no              |
-| `validate-generated`  | Does the generated output still match the source?                                             | no              |
+| `validate-runtime`    | Is `.pi/` a faithful thin adapter — references resolve, no copy exists, agent bridge matches? | no              |
 | `check-links`         | Does every relative link and anchor resolve?                                                  | no              |
-| `adapters/*/validate` | Will the runtime's own loader accept what was generated?                                      | yes             |
+| `adapters/*/validate` | Will the runtime's own loader accept what was referenced?                                     | yes             |
 | `adapters/*/smoke`    | Does the runtime actually wire it together — grants resolve, dispatch reaches, tiers applied? | yes             |
 
 The loader check and the smoke test are not redundant. `validate` asks "can the runtime read this?";
@@ -35,7 +35,7 @@ sentence a reader uses to pick it was empty.
 **The app linter is deliberately not one of these layers.** `.eslintignore` excludes `harness-core/`
 and `.pi/` for the same reason it already excluded `scripts/`: the rules in `libs/eslint-config` are
 written for application source, and one that forbids `for…of` has nothing to say about a CLI script
-that walks a directory tree. Worse, `--fix` applied to generated output would edit it and turn a
+that walks a directory tree. Worse, `--fix` applied to the agent projection would edit it and turn a
 correct tree into a drifting one. Harness correctness is proved by the five checks above; nothing here
 depends on a stylistic linter passing.
 
@@ -64,14 +64,25 @@ What it fails on:
 - a `**Role:**` / `**Domain:**` line, which is a second classification the plugin directory already
   states
 
-## `validate-generated.mjs`
+## `validate-runtime.mjs`
 
-Rebuilds every artifact in memory from the canonical source and compares it to what is on disk. It
-imports the adapter's pure build function rather than shelling out to the generator, because a check
-that is only supposed to read must not be able to leave the working tree half-written.
+Proves the `.pi/` runtime is a correct thin adapter of `harness-core/`, without loading Pi itself. It
+checks four things the canonical validator cannot:
 
-It fails on missing output, stale output, and output belonging to a component that no longer exists.
-All three are drift, and drift is the only harness failure that looks like a pass.
+- **Reference integrity** — every path in `.pi/settings.json` (`skills`, `prompts`, `extensions`,
+  `packages`) resolves to a real resource (canonical directories under `harness-core/`, the rules
+  extension, or the Pi-managed npm tree).
+- **Forbidden projection** — `.pi/skills`, `.pi/prompts`, and `.pi/rules` must not exist. A copy of
+  canonical content under `.pi/` is a second source of truth and the drift the harness forbids.
+  `.pi/agents` is the one allowed projection.
+- **Agent bridge integrity** — every `.pi/agents/<plugin>__<name>.md` is byte-identical to its canonical
+  source, and `settings.subagents.agentOverrides` matches the tiers resolved from canonical `modelTier`
+  frontmatter.
+- **Extension bridge integrity** — the harness rules are wired in through the Pi extension, not copied as
+  prompt files.
+
+It stays import-free of anything Pi-specific; if it ever needs a runtime's loader, that belongs in
+`adapters/pi/validate.mjs`.
 
 ## `check-links.mjs`
 

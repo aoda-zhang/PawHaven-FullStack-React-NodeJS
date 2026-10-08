@@ -1,21 +1,26 @@
 ---
 name: backend-developer
-description: >-
-  Backend implementation. Writes NestJS service code for PawHaven — modules, services, controllers, Prisma access, and the shared Zod schemas they validate against — inside the scope it was dispatched with, and self-tests with typecheck and the targeted suites before it reports. Trigger: implement backend nestjs module service controller endpoint prisma schema migration dto guard pipe repository query api.
-acceptanceRole: writer
-systemPromptMode: replace
-inheritProjectContext: true
-inheritSkills: false
+description: >
+  Backend implementation. Writes NestJS service code for PawHaven — modules, services, controllers,
+  Prisma access, and the shared Zod schemas they validate against — inside the scope it was
+  dispatched with, and self-tests with typecheck and the targeted suites before it reports.
+  Trigger: implement backend nestjs module service controller endpoint prisma schema migration dto
+  guard pipe repository query api.
+modelTier: balanced
+authority: write
 skills:
   - backend
   - typescript
   - principles
   - writing-standards
-tools: read, grep, find, ls, bash, edit, write
-defaultContext: fresh
+tools:
+  - read
+  - search
+  - shell
+  - edit
+  - write
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

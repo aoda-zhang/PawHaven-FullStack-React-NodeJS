@@ -6,9 +6,11 @@
 // default, because a policy that parses to nothing resolves every agent to nothing and the harness
 // would then run without the tiering it claims to have.
 //
-// This module is the single reader of that file. Both the adapters and the validators import it, so
-// "what tier does this agent have" has exactly one answer.
-import { readFileSync } from 'node:fs';
+// Model policy has exactly one source of truth for tier intent: each agent declares `modelTier` in
+// its own frontmatter (harness-core/plugins/<plugin>/agents/<name>.md). This module reads the tiers
+// from model-policy.yaml and resolves every canonical agent's declared tier to a thinking level. It
+// never maintains a second agent -> tier map.
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -58,6 +60,7 @@ export function parseModelPolicy(text, label = 'model-policy.yaml') {
     const [, key, rest] = match;
     while (stack.length > 1 && indent <= stack[stack.length - 1].indent)
       stack.pop();
+
     const parent = stack[stack.length - 1];
     if (indent <= parent.indent) {
       throw new Error(`${where}: \`${key}\` is indented under nothing.`);
@@ -91,38 +94,75 @@ export function loadModelPolicy(
 }
 
 /**
- * Resolve every agent to a concrete tier. Throws when an agent names a tier that does not exist, or a
- * tier carries no thinking level, because either one silently degrades to a default.
+ * Read the top-level scalar keys `name` and `modelTier` from an agent's frontmatter.
+ * Only the two values the policy needs are extracted; the rest of the agent body is left untouched.
  */
-export function resolveTiers(repoRoot) {
+function readAgentFrontmatter(filePath) {
+  const text = readFileSync(filePath, 'utf8');
+  if (!text.startsWith('---')) return {};
+  const end = text.indexOf('\n---', 3);
+  if (end === -1) return {};
+  const block = text.slice(3, end);
+  const data = {};
+  for (const line of block.split('\n')) {
+    const m = /^([A-Za-z][\w-]*):\s*(.*)$/.exec(line);
+    if (m && line[0] !== ' ' && line[0] !== '\t') {
+      data[m[1]] = m[2].trim();
+    }
+  }
+  return data;
+}
+
+/** Discover every canonical agent under harness-core/plugins/<plugin>/agents/*.md. */
+export function discoverAgents(repoRoot) {
+  const pluginsDir = join(repoRoot, 'harness-core', 'plugins');
+  if (!existsSync(pluginsDir)) return [];
+  const agents = [];
+  for (const plugin of readdirSync(pluginsDir)) {
+    const agentDir = join(pluginsDir, plugin, 'agents');
+    if (!existsSync(agentDir)) continue;
+    for (const file of readdirSync(agentDir)) {
+      if (!file.endsWith('.md')) continue;
+      const filePath = join(agentDir, file);
+      const fm = readAgentFrontmatter(filePath);
+      if (!fm.name || !fm.modelTier) continue;
+      agents.push({
+        plugin,
+        name: fm.name,
+        modelTier: fm.modelTier,
+        filePath,
+      });
+    }
+  }
+  return agents;
+}
+
+/**
+ * Resolve every canonical agent to its tier. The agent's `modelTier` frontmatter is the source of
+ * truth; model-policy.yaml only defines what each tier means. Throws when an agent names a tier that
+ * does not exist, or a tier carries no thinking level.
+ */
+export function resolveAgentTiers(repoRoot) {
   const policy = loadModelPolicy(repoRoot);
-  const { tiers, agents } = policy;
+  const { tiers } = policy;
   if (!tiers || typeof tiers !== 'object') {
     throw new Error('model-policy.yaml: no `tiers:` map.');
   }
-  if (!agents || typeof agents !== 'object') {
-    throw new Error('model-policy.yaml: no `agents:` map.');
-  }
   const resolved = {};
-  for (const [agent, tierName] of Object.entries(agents)) {
-    const tier = tiers[tierName];
+  for (const agent of discoverAgents(repoRoot)) {
+    const tier = tiers[agent.modelTier];
     if (!tier) {
       throw new Error(
-        `model-policy.yaml: agent \`${agent}\` names tier \`${tierName}\`, which does not exist.`,
+        `agent \`${agent.name}\` declares tier \`${agent.modelTier}\`, which does not exist in model-policy.yaml.`,
       );
     }
     if (typeof tier.thinking !== 'string' || tier.thinking === '') {
       throw new Error(
-        `model-policy.yaml: tier \`${tierName}\` has no \`thinking:\` value.`,
+        `model-policy.yaml: tier \`${agent.modelTier}\` has no \`thinking:\` value.`,
       );
     }
-    if (tier.fallback !== undefined && !Array.isArray(tier.fallback)) {
-      throw new Error(
-        `model-policy.yaml: tier \`${tierName}\` \`fallback:\` must be a list or [].`,
-      );
-    }
-    resolved[agent] = {
-      tier: tierName,
+    resolved[agent.name] = {
+      tier: agent.modelTier,
       thinking: tier.thinking,
       model: tier.model ?? 'inherit',
       purpose: tier.purpose ?? '',

@@ -3,8 +3,8 @@ name: orchestrator
 description: >
   Owns a task end to end and writes no code. Classifies the request, routes it to a workflow, plans
   it, dispatches the project's agents, verifies the combined result, reconciles the docs, and hands
-  off. The entry point when a task needs more than one agent, or when scope is Standard or
-  Architectural. Use for any change spanning services, packages, or the UI.
+  off. The entry point when a task needs more than one agent, or when the work is beyond the fast
+  path (medium+ complexity or risk). Use for any change spanning services, packages, or the UI.
   Trigger: classify route workflow plan dispatch coordinate orchestrate hand off combined tree
   verification escalate contract change required human gate.
 modelTier: strong
@@ -41,8 +41,9 @@ units, which is coordination rather than implementation.
    [harness-process.md](../../../workflows/harness-process.md#routing-a-request-to-a-workflow). Which
    stages run, and what a `PASS` requires, is
    [rules/verification.md](../../../rules/verification.md).
-3. **Plan and get approval** for Standard and Architectural work before dispatching. Where the human
-   decides is [rules/human-gates.md](../../../rules/human-gates.md).
+3. **Plan and get approval** for work beyond the fast path (medium+ complexity or risk) before
+   dispatching. Where the human decides is
+   [rules/human-gates.md](../../../rules/human-gates.md).
 4. **Settle the shared contract in the plan**, never in an implementation lane. See
    [rules/contract.md](../../../rules/contract.md).
 5. **Dispatch.** One dispatch per workstream, naming a scope, a data shape, and observable success

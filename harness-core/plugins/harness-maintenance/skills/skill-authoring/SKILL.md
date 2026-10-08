@@ -122,9 +122,9 @@ process that happens to call it.**
 ## Validate
 
 ```bash
-pnpm harness:check     # canonical structure, name/directory agreement, reachability, direction
-pnpm harness:generate  # regenerate every runtime's output
-pnpm pi:check          # the runtime's own loader accepts what was generated
+pnpm harness:validate  # canonical structure, name/directory agreement, reachability, direction
+pnpm harness:runtime   # .pi/ is a faithful thin adapter (reference + agent bridge)
+pnpm pi:check          # the runtime's own loader accepts the referenced resources
 pnpm check:links       # every relative link and anchor resolves
 ```
 

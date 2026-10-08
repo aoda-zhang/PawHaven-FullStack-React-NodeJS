@@ -121,8 +121,9 @@ configuration, package lists, and the tier-to-model mapping.
 This is a **translation**, not a mirror. The canonical tree (plugin / agent / skill / workflow / rule)
 is _not_ shaped like what Pi loads (agents / skills / prompts / settings.json). The adapter performs the
 mapping — for example a canonical agent at `plugins/<plugin>/agents/<name>.md` becomes a Pi agent at
-`.pi/agents/<plugin>__<name>.md`, and a canonical workflow becomes a Pi prompt. A generated tree that
-merely mirrored the canonical tree would force Pi's constraints back into canonical source.
+`.pi/agents/<plugin>__<name>.md` (the one projection, rendered into Pi frontmatter), and a canonical workflow is
+referenced as a Pi prompt via `settings.json`. Everything else is referenced, not copied: a build that
+mirrored the canonical tree into `.pi/` would force Pi's constraints back into canonical source.
 
 **Why:** every runtime fact in canonical source means a second runtime requires rewriting nine agents,
 and the fields nobody could translate would get smuggled into prose instead of being honestly dropped.
@@ -133,25 +134,29 @@ unimplemented adapter is a lie a reader believes.
 
 **Currently:** [Pi](./adapters/pi) is implemented. No other adapter exists, and none is faked.
 
-## 7. Generated artifacts are disposable
+## 7. The runtime is a reference, not a build
 
-Generated output can be deleted and rebuilt, and is never hand-maintained. The Pi adapter writes a
-Pi-native tree under `.pi/`; the canonical tree is never a mirror of it.
+The Pi runtime reads `harness-core/` directly through `.pi/settings.json`. Skills, prompts, and rules are
+referenced; none of them is copied into `.pi/`. Only `.pi/agents/` is a projection — a rendered copy (Pi
+frontmatter, body kept) Pi
+needs because it can only discover agents from there — and it is disposable and rebuilt by `pnpm pi:sync`.
 
-**Why Pi-native, not mirrored:** Pi discovers agents, skills, and prompts through its own directory
-semantics, which differ from the canonical semantic model. The adapter exists precisely to bridge that
-gap; mirroring would erase the gap and push runtime constraints into canonical source.
+**Why reference, not generate:** Pi discovers skills and prompts from a directory path, and `harness-core/`
+already has the right shape. Copying it into `.pi/` creates a second copy that silently drifts. Rules are
+not a Pi concept, so they are injected as system-prompt context by an extension, again without
+duplication. There is nothing to rebuild except the agent projection.
 
-**Enforced by:** `validation/validate-generated.mjs` — missing output, stale output, and output for a
-component that no longer exists all fail.
+**Enforced by:** `validation/validate-runtime.mjs` — a materialized copy of skills, prompts, or rules
+under `.pi/` fails (it is a second source of truth), and `.pi/agents/` must be byte-identical to
+canonical.
 
 ## 8. Validation is mechanical and layered
 
 | Layer                | Proves                                                                                                | Needs a runtime |
 | -------------------- | ----------------------------------------------------------------------------------------------------- | --------------- |
 | `validate-core`      | the canonical source is internally correct and provider-neutral, and the retired architecture is gone | no              |
-| `validate-generated` | the generated output matches the canonical source                                                     | no              |
-| `<runtime>/validate` | that runtime's own loader accepts what was generated                                                  | yes             |
+| `validate-runtime`   | `.pi/` is a faithful thin adapter: references resolve, no copy exists, agent bridge matches canonical | no              |
+| `<runtime>/validate` | that runtime's own loader accepts the referenced resources                                            | yes             |
 | `check-links`        | every relative link and anchor resolves                                                               | no              |
 | `<runtime>/smoke`    | the runtime wires it together: grants resolve, dispatch reaches, tiers applied                        | yes             |
 

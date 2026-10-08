@@ -77,8 +77,8 @@ checklist.
 1. **Classify before planning.** Name the kind of task and the principle that drove the
    classification. An unclassified task gets the heavyweight path by default, which wastes effort; a
    misclassified one skips a needed gate.
-2. **Present the plan and get approval** before dispatching Standard or Architectural work. Trivial
-   work skips this. Which decisions stop and wait is in
+2. **Present the plan and get approval** before dispatching work beyond the fast path (medium+
+   complexity or risk). Fast-path work skips this. Which decisions stop and wait is in
    [rules/human-gates.md](../rules/human-gates.md).
 3. **Never implement anything yourself.** Features, bug fixes, refactors, one-line patches — all code
    changes go through an agent. You read diffs; you do not write them. The exception is joining a merge

@@ -113,8 +113,9 @@ Operational docs for running the thing locally. Not design material — this is 
 
 ## 6. Agent harness
 
-The agent control layer lives in [`harness-core/`](../harness-core), not here. `.pi/` is the generated
-Pi runtime output, rebuilt from it by `pnpm harness:generate`.
+The agent control layer lives in [`harness-core/`](../harness-core), not here. `.pi/` is the thin Pi
+runtime adapter: it references `harness-core/` directly through `settings.json`; only `.pi/agents/` is a
+verbatim projection rebuilt by `pnpm pi:sync`.
 
 | Path                                                            | Covers                                                          |
 | --------------------------------------------------------------- | --------------------------------------------------------------- |

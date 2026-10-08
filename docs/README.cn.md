@@ -104,8 +104,8 @@ _Known defects_ 表记录实现与自身约定相矛盾之处——一个从不�
 
 ## 6. Agent harness
 
-Agent 控制层在 [`harness-core/`](../harness-core),不在这里。`.pi/` 是生成出来的 Pi 运行时产物,由
-`pnpm harness:generate` 从 canonical source 重建。
+Agent 控制层在 [`harness-core/`](../harness-core),不在这里。`.pi/` 是轻量的 Pi 运行时适配器:它通过
+`settings.json` 直接引用 `harness-core/`;只有 `.pi/agents/` 是逐字投影,由 `pnpm pi:sync` 重建。
 
 | 路径                                                            | 覆盖内容                                 |
 | --------------------------------------------------------------- | ---------------------------------------- |

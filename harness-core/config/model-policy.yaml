@@ -13,6 +13,17 @@
 
 version: 1
 
+# The single source of truth for how intelligent an agent is. An agent declares `modelTier` in its
+# own frontmatter (harness-core/plugins/<plugin>/agents/<name>.md); this file resolves that tier to a
+# thinking level. Nothing in canonical source names a provider or a model identifier — a provider
+# belongs to an adapter, the only layer that knows a runtime's model identifiers.
+#
+# `model: inherit` means "use whatever model the session runs on". This repository pins no provider,
+# so every tier inherits today. Pinning one later is one line per tier here, and no agent changes.
+#
+# `fallback:` is an ordered list tried when the tier's model is unavailable. Empty, because nothing is
+# pinned to fail over from.
+
 tiers:
   # Cheap and mechanical: reading, locating, classifying. A wrong answer here is cheap to notice and
   # cheap to redo, so it does not deserve a deep-thinking budget.
@@ -39,14 +50,3 @@ tiers:
     thinking: high
     model: inherit
     fallback: []
-
-agents:
-  orchestrator: strong
-  scout: fast
-  architect: strong
-  oracle: strong
-  frontend-developer: balanced
-  backend-developer: balanced
-  tester: balanced
-  reviewer: strong
-  browser-verifier: balanced

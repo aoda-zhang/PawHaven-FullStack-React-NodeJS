@@ -107,9 +107,9 @@ validator.
 ## Validate
 
 ```bash
-pnpm harness:check     # canonical structure, names, grants, references, tiers, direction
-pnpm harness:generate  # regenerate every runtime's output
-pnpm pi:check          # the runtime's own loader accepts what was generated
+pnpm harness:validate  # canonical structure, names, grants, references, tiers, direction
+pnpm harness:runtime   # .pi/ is a faithful thin adapter (reference + agent bridge)
+pnpm pi:check          # the runtime's own loader accepts the referenced resources
 pnpm check:links       # every relative link and anchor resolves
 ```
 

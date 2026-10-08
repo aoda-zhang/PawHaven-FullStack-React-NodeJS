@@ -1,60 +1,72 @@
 # Pi adapter
 
-The Pi runtime adapter. It translates `harness-core/` into the Pi-native layout under `.pi/`.
+The thin Pi runtime adapter. It points `.pi/settings.json` at `harness-core/` so Pi loads skills,
+prompts, and rules **directly from canonical source** — nothing is copied. The harness-core directory
+is the only source of truth; this adapter holds only the wiring Pi needs to find it.
 
-This is the **only** place Pi-specific facts live. Everything here — frontmatter field names, tool
-identifiers, the permission syntax, dispatch configuration, the package list, and the abstract-tier →
+This is the **only** place Pi-specific facts live. Everything here — the `settings.json` key names, the
+extension that injects rules, the agent-projection step, the package list, and the abstract-tier →
 runtime-thinking mapping — would be wrong in canonical source, because canonical source is runtime-neutral
 and a second runtime must not require rewriting nine agents.
 
-## What it generates
+## What `.pi/` is, and is not
 
-| Pi path                             | From canonical                                                        |
-| ----------------------------------- | --------------------------------------------------------------------- |
-| `.pi/agents/<plugin>__<agent>.md`   | `plugins/<plugin>/agents/<agent>.md` (flattened, namespaced)          |
-| `.pi/skills/<plugin>/<skill>/**`    | `plugins/<plugin>/skills/<skill>/**` (copied)                         |
-| `.pi/prompts/<workflow>.md`         | `workflows/<workflow>.md`                                             |
-| `.pi/prompts/patterns/<pattern>.md` | `workflows/patterns/<pattern>.md`                                     |
-| `.pi/prompts/rules/<rule>.md`       | `rules/<rule>.md` (translated into runtime context)                   |
-| `.pi/settings.json`                 | `config/model-policy.yaml` + the translation tables in `generate.mjs` |
-| `.pi/README.md`                     | generated header                                                      |
+`.pi/` is a **reference**, not a build output.
 
-The canonical tree is **not** a mirror of `.pi/`. A canonical agent sits in a plugin's `agents/` directory;
-Pi wants a flat `agents/` with a plugin-prefixed name. A canonical workflow is a `workflows/` file; Pi
-wants a `prompts/` entry. The mapping is the adapter's job.
+| `.pi/` path                   | What it is                                                                                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `settings.json`               | Points Pi's `skills:`/`prompts:`/`extensions:`/`packages:` at `harness-core/` and `adapters/pi/`.                                                                                                 |
+| `extensions/harness.ts`       | The Harness Agent Bridge: loads `harness-core/rules/*.md` and injects them into the system prompt. No rule content is duplicated.                                                                 |
+| `agents/<plugin>__<agent>.md` | The **one** projection: a rendered copy of `harness-core/plugins/<plugin>/agents/<name>.md` (frontmatter transformed to Pi's format, body copied verbatim). Pi can only discover agents this way. |
+| `npm/`                        | Pi-managed install tree for declared `packages`.                                                                                                                                                  |
+
+There is **no** `.pi/skills/` or `.pi/prompts/` directory, and no rules tree under `.pi/`. Those would
+be a second copy of canonical content and the drift the harness forbids. If any appears, delete it.
+
+## Why a reference rather than a generation
+
+Pi's loaders accept a directory path and recurse for `SKILL.md` (skills) and read prompt templates from
+a directory (`prompts`). There is no value in copying `harness-core/plugins/*/skills` into `.pi/skills`
+when Pi can read `harness-core/plugins` directly. Rules are not a Pi concept at all, so they are injected
+as system-prompt context by the extension — also without duplication. Only agents have no "load from
+external path" API, so the single `.pi/agents/` projection exists.
+
+## The agent projection
+
+`sync-agents.mjs` is the one place `.pi/agents` is written:
+
+```
+harness-core/plugins/<plugin>/agents/<name>.md
+                |
+                |  render Pi frontmatter (tool mapping, permission boundary, dispatch config) + copy the body verbatim
+                v
+         .pi/agents/<plugin>__<name>.md
+```
+
+Nothing is transformed. It also resolves each canonical agent's `modelTier` frontmatter to the `thinking`
+level Pi expects and writes that into `settings.json`'s `subagents.agentOverrides`. Re-run whenever a
+canonical agent changes.
 
 ## Translation decisions
 
-`generate.mjs` holds every Pi-specific decision as a table, each with a reason:
-
-- **`TOOL_MAP`** — canonical tool → Pi tool identifier (`read` → `read`, `dispatch` → `subagent`, …).
-- **`PI_AGENT_SETTINGS`** — per-agent Pi frontmatter that has no canonical counterpart (`systemPromptMode`,
-  `inheritProjectContext`, `defaultContext`, `runtimeTools`). Every agent needs an entry; an agent with no
-  entry silently inherits Pi defaults the canonical source deliberately does not state.
-- **`PI_PACKAGES`** — runtime extension packages Pi loads for this project.
-- **`model-policy` resolution** — `resolveTiers` maps each agent's abstract tier to a thinking level (and,
-  only if the policy pins one, a model). The canonical source names tiers; the adapter names runtimes.
+`model-policy.mjs` holds the one Pi-specific mapping: `resolveAgentTiers` maps each agent's abstract
+tier (`modelTier` frontmatter) to a thinking level (and, only if the policy pins one, a model).
+`model-policy.yaml` defines what each tier means. The canonical source names tiers; this adapter names
+runtimes.
 
 ## Running it
 
 ```bash
-node harness-core/adapters/pi/generate.mjs          # write .pi/
-node harness-core/adapters/pi/generate.mjs --check  # fail (exit 1) if .pi/ has drifted, write nothing
-node harness-core/adapters/pi/validate.mjs          # Pi's own loader accepts .pi/
-node harness-core/adapters/pi/smoke.mjs             # Pi wires it together (grants, dispatch, tiers)
+node harness-core/adapters/pi/sync-agents.mjs   # project canonical agents into .pi/agents
+node harness-core/adapters/pi/validate.mjs      # Pi's own loader accepts the runtime
+node harness-core/adapters/pi/smoke.mjs         # Pi wires it together (grants, dispatch, tiers)
 ```
 
-Or, from the repo root: `pnpm harness:generate`, `pnpm pi:check`, `pnpm pi:smoke`.
-
-## Determinism
-
-Generation is pure and sorted, so two runs with no source change produce byte-identical `.pi/`. The drift
-check (`--check`, and `validate-generated.mjs`) rebuilds the tree in memory and compares. If `git diff`
-after a second `pnpm harness:generate` is non-empty, the generator is non-deterministic — fix it, do not
-commit the drift.
+Or, from the repo root: `pnpm pi:sync`, `pnpm pi:check`, `pnpm pi:smoke`.
 
 ## What this adapter must not do
 
+- Copy skills, prompts, or rules into `.pi/`. Reference them in `settings.json` instead.
 - Read or write a provider model identifier into canonical source.
-- Keep a hand-maintained file under `.pi/`; every one of those is disposable.
+- Keep a hand-maintained file under `.pi/` other than the agent projection; everything else is disposable.
 - Approximate a capability it cannot express. If Pi cannot represent something, record it as unsupported.

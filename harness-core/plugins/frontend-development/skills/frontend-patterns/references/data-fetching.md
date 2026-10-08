@@ -287,5 +287,5 @@ it before reporting a data-fetching change done.
 
 ## Doctor
 
-[react-doctor](../../react-doctor/SKILL.md) · S1 server data in Redux ·
+[React Doctor](../../../../../../.github/workflows/react-doctor.yml) · S1 server data in Redux ·
 S3 raw string query keys

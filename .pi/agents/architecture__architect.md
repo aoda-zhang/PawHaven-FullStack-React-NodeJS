@@ -1,22 +1,27 @@
 ---
 name: architect
-description: >-
-  Turns a feature or change request into an implementation plan another agent can build from: requirements, existing architecture, boundaries, data shapes, affected files, acceptance criteria, and implementation order. Read-only. Use when a change needs a decided design before any code is written. Trigger: plan design implementation plan architecture data shape contract acceptance criteria scope out of scope migration order estimate.
-acceptanceRole: read-only
-systemPromptMode: replace
-inheritProjectContext: false
-inheritSkills: false
+description: >
+  Turns a feature or change request into an implementation plan another agent can build from:
+  requirements, existing architecture, boundaries, data shapes, affected files, acceptance criteria,
+  and implementation order. Read-only. Use when a change needs a decided design before any code is
+  written.
+  Trigger: plan design implementation plan architecture data shape contract acceptance criteria
+  scope out of scope migration order estimate.
+modelTier: strong
+authority: read-only
 skills:
   - architecture-design
   - principles
   - writing-standards
-tools: read, grep, find, ls, bash
+tools:
+  - read
+  - search
+  - shell
 permission:
   write: deny
   edit: deny
 ---
 
-<!-- GENERATED FILE. Do not edit. Source: harness-core/. Regenerate with `pnpm harness:generate`. -->
 
 ## Purpose
 

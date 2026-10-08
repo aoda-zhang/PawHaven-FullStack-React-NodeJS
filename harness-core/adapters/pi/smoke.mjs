@@ -8,11 +8,11 @@
 //
 // Everything it asserts is read back out of the generated `.pi/` tree through Pi's own loaders, so a
 // generator that writes something plausible but unusable fails here.
-import { readdirSync, readFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { resolveTiers } from '../../config/model-policy.mjs';
+import { resolveAgentTiers } from '../../config/model-policy.mjs';
 
 const adapterDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(adapterDir, '..', '..', '..');
@@ -49,6 +49,31 @@ const settings = JSON.parse(
 );
 const agentDir =
   process.env.PI_AGENT_DIR ?? join(process.env.HOME ?? '', '.pi', 'agent');
+
+// The runtime must reference canonical content, never copy it. A materialized tree under .pi/ is a
+// second source of truth — the drift the harness forbids. .pi/agents is the one allowed projection.
+for (const dir of ['skills', 'prompts', 'rules']) {
+  if (existsSync(join(repoRoot, '.pi', dir))) {
+    fail(
+      `no materialized tree`,
+      `.pi/${dir}/ exists — remove it; reference harness-core directly`,
+    );
+  }
+}
+for (const key of ['skills', 'prompts']) {
+  for (const entry of settings[key] ?? []) {
+    const target = resolve(repoRoot, entry);
+    if (
+      !existsSync(target) ||
+      relative(join(repoRoot, 'harness-core'), target).startsWith('..')
+    ) {
+      fail(
+        `${key} reference`,
+        `\`${entry}\` must resolve into harness-core and be referenced directly`,
+      );
+    }
+  }
+}
 
 const FRONTMATTER = /^---\n([\s\S]*?)\n---/;
 
@@ -119,7 +144,6 @@ const REQUIRED_SKILLS = [
   'task-classification',
   'architecture-design',
   'frontend-patterns',
-  'react-doctor',
   'testing-frontend',
   'backend',
   'backend-testing',
@@ -295,7 +319,7 @@ if (grantsOk) {
 
 const REQUIRED_GRANTS = {
   reviewer: ['code-review', 'principles'],
-  'frontend-developer': ['frontend-patterns', 'react-doctor', 'typescript'],
+  'frontend-developer': ['frontend-patterns', 'typescript'],
   'backend-developer': ['backend', 'typescript'],
   tester: ['testing-standards'],
   'browser-verifier': ['browser-verification'],
@@ -328,7 +352,7 @@ if (grantProblems.length === 0) {
 
 // --- 7. The model policy was applied to the runtime configuration ---------------------------------
 
-const { agents: tierOfAgent } = resolveTiers(repoRoot);
+const { agents: tierOfAgent } = resolveAgentTiers(repoRoot);
 const overrides = settings.subagents?.agentOverrides ?? {};
 const tierProblems = [];
 for (const [name, resolved] of Object.entries(tierOfAgent)) {

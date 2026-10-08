@@ -35,7 +35,7 @@ move. The contract is the pinned behaviour. If behaviour changes, it is a featur
 4. **Plan review, then the human gate.** Dispatch `oracle` unless the classification skips stage 2. A
    public API, an export another package imports, and a module boundary are the changes a sibling lane
    will notice; a move inside one module usually is not. Write the plan artifact first, and do not
-   implement until it reads `VERDICT: PASS`. A Standard or Architectural plan also waits for human
+   implement until it reads `VERDICT: PASS`. A plan beyond the fast path also waits for human
    approval.
 5. **Refactor in verifiable units.** Move in small slices; after each slice the pin is still green.
    Delegate mechanical slices with an explicit scope, then review each diff yourself and write your own
