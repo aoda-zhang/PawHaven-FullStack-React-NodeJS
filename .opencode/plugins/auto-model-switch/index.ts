@@ -200,6 +200,42 @@ export default Plugin.define({
           sessionID,
           model: { providerID: next.providerID, id: next.modelID },
         });
+        try {
+          const s: any = await ctx.session.get({ sessionID });
+          const msgs =
+            s?.messages ??
+            s?.data?.messages ??
+            s?.turns ??
+            s?.data?.turns ??
+            s?.history ??
+            s?.data?.history;
+          if (Array.isArray(msgs) && msgs.length > 0) {
+            const lastUser = [...msgs]
+              .reverse()
+              .find(
+                (m: any) =>
+                  m?.role === 'user' ||
+                  m?.role === 'human' ||
+                  m?.kind === 'user' ||
+                  (m?.content ?? m?.text ?? '').length > 0,
+              );
+            const payload =
+              lastUser?.content ??
+              lastUser?.text ??
+              lastUser?.message ??
+              lastUser;
+            const sessionApi = ctx.session as any;
+            if (typeof sessionApi?.send === 'function' && payload) {
+              await sessionApi.send({ sessionID, message: payload });
+            } else if (typeof sessionApi?.submit === 'function' && payload) {
+              await sessionApi.submit({ sessionID, message: payload });
+            } else if (typeof sessionApi?.resubmit === 'function' && payload) {
+              await sessionApi.resubmit({ sessionID, message: payload });
+            } else if (typeof sessionApi?.retryTurn === 'function') {
+              await sessionApi.retryTurn({ sessionID });
+            }
+          }
+        } catch {}
         return true;
       } catch {
         return false;
@@ -247,7 +283,11 @@ export default Plugin.define({
       const next = normalize(ranked[idx + 1]);
       if (!next) return;
 
-      if (await switchTo(sid, next)) failures.set(key, 0);
+      if (await switchTo(sid, next)) {
+        failures.set(key, 0);
+        lastFailure.delete(sid);
+        sessionModel.set(sid, next);
+      }
     };
 
     const controller = new AbortController();

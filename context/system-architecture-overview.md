@@ -3,7 +3,7 @@
 > **Version**: v3.11 | **Date**: 2026-09-25
 > **Design Philosophy**: Pragmatic service decomposition. Modular monolith inside core-service. Extract only when necessary.
 >
-> **Related Docs**: [Frontend Architecture](PawHaven-Frontend-Architecture.md) | [Backend Architecture](PawHaven-Backend-Architecture.md) | [Authentication Architecture](authentication-architecture.md)
+> **Related Docs**: [Frontend Architecture](frontend-architecture.md) | [Backend Architecture](backend-architecture.md) | [Authentication Architecture](authentication-architecture.md)
 
 ---
 
@@ -552,12 +552,12 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### DD-4: Zod for Shared Schema Validation
 
-| Field            | Detail                                                                                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**       | Accepted                                                                                                                                                    |
-| **Context**      | Need type-safe validation working identically in frontend (form validation) and backend (request validation).                                               |
-| **Decision**     | All DTOs and domain types defined as Zod schemas in `@pawhaven/shared`. Frontend uses `@hookform/resolvers/zod`. Backend uses `nestjs-zod` validation pipe. |
-| **Consequences** | Single source of truth for validation. Automatic TypeScript type inference. ~12KB gzipped Zod in frontend — acceptable.                                     |
+| Field            | Detail                                                                                                                                                                                               |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                             |
+| **Context**      | Need type-safe validation working identically in frontend (form validation) and backend (request validation).                                                                                        |
+| **Decision**     | All DTOs and domain types defined as Zod schemas in `@pawhaven/shared`. Frontend uses `@hookform/resolvers/zod`. Backend uses Nest's global `StandardSchemaValidationPipe` with `@Body({ schema })`. |
+| **Consequences** | Single source of truth for validation. Automatic TypeScript type inference. ~12KB gzipped Zod in frontend — acceptable.                                                                              |
 
 ### DD-7: User-Tier `roles` vs RBAC `Role`, and core→auth counting over HTTP
 
@@ -612,49 +612,20 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ## 11. Module Boundary Enforcement
 
-### 11.1 ESLint Rules
+There are no custom ESLint boundary rules in this repo — `libs/eslint-config` ships shared
+lint presets only. Every boundary named in these documents is enforced by
+`scripts/check-architecture.mjs`, run through `pnpm architecture-check` and folded into
+`pnpm quality-check`:
 
-```javascript
-// .eslintrc.cjs — custom rules for core-service
-{
-  rules: {
-    // No cross-module imports of internal files
-    'import/no-restricted-paths': ['error', {
-      zones: [
-        {
-          target: './src/modules/rescue',
-          from: './src/modules/reporting',
-          except: [], // No exceptions — use service classes or events
-        },
-        // ... same for every module pair
-      ],
-    }],
-  },
-}
-```
+| Rule | Enforces                                                                                              |
+| ---- | ----------------------------------------------------------------------------------------------------- |
+| A1   | Package dependency direction, and that a backend service imports packages rather than another service |
+| A2   | Frontend cross-feature value imports, except an explicit allowlist                                    |
+| A3   | `core-service` cross-module imports only from `home`, via an explicit allowlist                       |
+| A4   | Only `portal` exists; there is no `apps/frontend/admin`                                               |
+| A5   | `apps/backend/config-service` is not a service                                                        |
 
-### 11.2 CI Architecture Fitness Function
-
-```bash
-#!/bin/bash
-# scripts/check-module-boundaries.sh
-# Runs in CI — fails if any module imports another module's internals
-
-# Check: No module imports another module's entities/use-cases directly
-FORBIDDEN_IMPORTS=$(grep -r "from.*modules/\(rescue\|reporting\|adoption\|content\|volunteer\)" \
-  apps/backend/core-service/src/modules/ \
-  --include="*.ts" \
-  | grep -v "modules/\1" \
-  | grep -v "events/" \
-  | grep -v "\.service" )
-
-if [ -n "$FORBIDDEN_IMPORTS" ]; then
-  echo "❌ Cross-module import detected. Use service classes or events instead."
-  echo "$FORBIDDEN_IMPORTS"
-  exit 1
-fi
-echo "✅ Module boundaries clean"
-```
+`pnpm token-check` separately gates styling against the design-token source.
 
 ---
 
@@ -689,4 +660,4 @@ echo "✅ Module boundaries clean"
 
 ---
 
-> **Related Docs**: [Frontend Architecture](PawHaven-Frontend-Architecture.md) | [Backend Architecture](PawHaven-Backend-Architecture.md) | [Authentication Architecture](authentication-architecture.md)
+> **Related Docs**: [Frontend Architecture](frontend-architecture.md) | [Backend Architecture](backend-architecture.md) | [Authentication Architecture](authentication-architecture.md)
