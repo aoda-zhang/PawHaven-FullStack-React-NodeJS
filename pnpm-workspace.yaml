@@ -7,6 +7,7 @@ packages:
   - '!**/src/prisma/**/client'
 
 allowBuilds:
+  '@google/genai': true
   '@nestjs/core': true
   '@parcel/watcher': true
   '@prisma/client': true
