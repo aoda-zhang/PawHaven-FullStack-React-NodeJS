@@ -1161,9 +1161,6 @@ importers:
       rxjs:
         specifier: ^7.8.0
         version: 7.8.2
-      uuid:
-        specifier: ^8.3.2
-        version: 8.3.2
       zod:
         specifier: ^4.3.6
         version: 4.4.3
@@ -1219,9 +1216,6 @@ importers:
       '@types/supertest':
         specifier: ^6.0.3
         version: 6.0.3
-      '@types/uuid':
-        specifier: ^8.3.4
-        version: 8.3.4
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(vitest@4.1.10)
@@ -3624,9 +3618,6 @@ packages:
   '@types/use-sync-external-store@0.0.6':
     resolution: {integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==}
 
-  '@types/uuid@8.3.4':
-    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
-
   '@types/validator@13.15.10':
     resolution: {integrity: sha512-T8L6i7wCuyoK8A/ZeLYt1+q0ty3Zb9+qbSSvrIVitzT3YjZqkTZ40IbRsPanlB4h1QB3JVL1SYCdR6ngtFYcuA==}
 
@@ -4724,8 +4715,8 @@ packages:
   domutils@3.0.1:
     resolution: {integrity: sha512-z08c1l761iKhDFtfXO04C7kTdPBLi41zwOZl00WS8b5eiaebNpY00HKbztwBq+e3vyqWNwWF3mP9YLUeqIrF+Q==}
 
-  domutils@3.1.0:
-    resolution: {integrity: sha512-H78uMmQtI2AhgDJjWeQmHwJJ2bLPD3GMmO7Zja/ZZh84wkm+4ut+IUnUdRa8uCGX88DiVx1j6FRe1XfxEgjEZA==}
+  domutils@3.2.2:
+    resolution: {integrity: sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw==}
 
   dot-prop@5.1.0:
     resolution: {integrity: sha512-n1oC6NBF+KM9oVXtjmen4Yo7HyAVWV2UUl50dCYJdw2924K6dX9bf9TTTWaKtYlRn0FEtxG27KS80ayVLixxJA==}
@@ -4807,10 +4798,6 @@ packages:
   enhanced-resolve@5.25.1:
     resolution: {integrity: sha512-nGXts5znJzmWPu+mIE9izCOzdg63oJca2mDzGWWTth7sr4aCToKcoyFVBQwN75Ij5Pf6p510EwkTqViTRzDV+w==}
     engines: {node: '>=10.13.0'}
-
-  entities@4.2.0:
-    resolution: {integrity: sha512-wEJa03bJgqEwPnkUqYdgmcfUXfm6+4hePQhntIvRy/1/+C4dFuhYHsgKBRjbQ6OWBh42P+VhAoCDO77DUh0e/Q==}
-    engines: {node: '>=0.12'}
 
   entities@4.4.0:
     resolution: {integrity: sha512-oYp7156SP8LkeGD0GF85ad1X9Ai79WtRsZ2gxJqtBuzH+98YUV6jkHEKlZkMbcrjJjIVJNIDP/3WL9wQkoPbWA==}
@@ -7696,10 +7683,6 @@ packages:
     resolution: {integrity: sha512-vzi9uRZ926x4XV73S/4qQaTwPXM2JBj6/6lI/byHH1jOpCzb0zDbfytgA9LcN/hzb2l7WQSQnxITOVx5un/wGw==}
     hasBin: true
 
-  uuid@8.3.2:
-    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
-    hasBin: true
-
   v8-compile-cache-lib@3.0.1:
     resolution: {integrity: sha512-wa7YjyUGfNZngI/vtK0UHAN+lgDCxBPCylVXGp0zu59Fz5aiGtNXaq3DhIov063MorB+VfufLh3JlF2KdTK3xg==}
 
@@ -9810,8 +9793,6 @@ snapshots:
 
   '@types/use-sync-external-store@0.0.6': {}
 
-  '@types/uuid@8.3.4': {}
-
   '@types/validator@13.15.10': {}
 
   '@types/webidl-conversions@7.0.3': {}
@@ -10757,7 +10738,7 @@ snapshots:
       boolbase: 1.0.0
       css-what: 6.1.0
       domhandler: 5.0.3
-      domutils: 3.1.0
+      domutils: 3.2.2
       nth-check: 2.0.1
     optional: true
 
@@ -10950,8 +10931,8 @@ snapshots:
   dom-serializer@2.0.0:
     dependencies:
       domelementtype: 2.3.0
-      domhandler: 5.0.2
-      entities: 4.2.0
+      domhandler: 5.0.3
+      entities: 4.4.0
 
   domelementtype@2.3.0: {}
 
@@ -10969,7 +10950,7 @@ snapshots:
       domelementtype: 2.3.0
       domhandler: 5.0.2
 
-  domutils@3.1.0:
+  domutils@3.2.2:
     dependencies:
       dom-serializer: 2.0.0
       domelementtype: 2.3.0
@@ -11048,8 +11029,6 @@ snapshots:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.3.3
-
-  entities@4.2.0: {}
 
   entities@4.4.0: {}
 
@@ -14242,8 +14221,6 @@ snapshots:
   utils-merge@1.0.1: {}
 
   uuid@13.0.2: {}
-
-  uuid@8.3.2: {}
 
   v8-compile-cache-lib@3.0.1: {}
 

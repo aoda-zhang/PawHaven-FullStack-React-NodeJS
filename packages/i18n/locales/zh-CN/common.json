@@ -36,6 +36,8 @@
     "owner_text_author_url": "https://aoda.vercel.app",
     "system_error": "哎呀，出错了",
     "system_error_info": "服务暂时出了点小状况，我们正在加紧修复。请稍后再试。",
+    "error_trace_id": "问题编号（反馈问题时请提供）",
+    "error_trace_id_copy": "复制问题编号",
     "retry": "重试",
     "recent_rescue": "近期救助动态",
     "rescue_status_pending": "待处理",

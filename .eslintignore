@@ -20,6 +20,7 @@ out/
 .vscode/
 .github/
 scripts/
+harness-core/
 logs/
 
 # Ignore specific monorepo folders that don't require linting
@@ -27,6 +28,10 @@ libs/tsconfig
 libs/eslint-config
 **/config/**
 packages/design-system/figma
+
+# Generated runtime output — written only by an adapter's generator. Linting a generated file either
+# duplicates the canonical check or, when a rule is fixable, edits the output and breaks the drift check.
+.pi/
 
 # Ignore all test files from linting (verification covered by vitest, not eslint)
 **/*.test.ts

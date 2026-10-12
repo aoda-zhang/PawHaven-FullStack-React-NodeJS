@@ -3,9 +3,9 @@ import { firstValueFrom } from 'rxjs';
 import { HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { v4 as uuidv4 } from 'uuid';
 
 import { httpHeaders } from '../../constants/httpHeaders.js';
+import { generateTraceId, getTraceId } from '../../trace/traceContext.js';
 import { signInternalJwt } from '../internal-jwt/sign.js';
 import { InternalJwtKind, type InternalJwt } from '../../types/index.js';
 
@@ -15,6 +15,11 @@ interface RequestOptions {
   headers?: Record<string, string>;
   config?: AxiosRequestConfig;
   returnResponse?: boolean;
+  /**
+   * Overrides the trace id propagated downstream. Defaults to the ambient
+   * request trace id so a service-to-service hop stays on the same trace.
+   */
+  traceId?: string;
 }
 
 interface MicroserviceOption {
@@ -105,8 +110,12 @@ export class HttpClientInstance {
   ): AxiosRequestConfig {
     const headers = {
       ...this.defaultHeaders,
-      ...this.buildInternalAuthHeaders(options),
+      ...this.buildInternalAuthHeaders(options, context.traceId),
       ...options?.headers,
+      // Applied last and from `context` alone, so the header, the `rid` claim
+      // and the log lines below can never disagree. Overriding goes through
+      // the dedicated `traceId` option, not a raw header, which keeps a single
+      // value authoritative for the whole call.
       [httpHeaders.traceId]: context.traceId,
     };
 
@@ -121,7 +130,8 @@ export class HttpClientInstance {
   }
 
   private buildInternalAuthHeaders(
-    options?: RequestOptions,
+    options: RequestOptions | undefined,
+    traceId: string,
   ): Record<string, string> {
     if (options?.headers?.[httpHeaders.gatewayJwt]) {
       return {};
@@ -141,7 +151,10 @@ export class HttpClientInstance {
       aud: this.serviceName,
       iat: nowInSeconds,
       exp: nowInSeconds + this.internalJwtTtlSeconds,
-      rid: uuidv4(),
+      // `rid` carries the trace id, so the JWT a callee verifies and the
+      // `x-trace-id` header it receives describe the same request. The guard
+      // cross-checks the two.
+      rid: traceId,
       sub: this.configService.get<string>('serviceName') ?? this.serviceName,
     };
     return signInternalJwt(claims, privateKey, keyId);
@@ -212,7 +225,10 @@ export class HttpClientInstance {
     transform: (response: AxiosResponse<T>) => TResult,
   ): Promise<TResult> {
     const context: RequestContext = {
-      traceId: uuidv4(),
+      // Reuse the inbound request's trace id so a service-to-service hop stays
+      // on the same trace. Falls back to a fresh id outside a request scope
+      // (cron jobs, queue consumers, bootstrap).
+      traceId: options?.traceId ?? getTraceId() ?? generateTraceId(),
       startTime: Date.now(),
       method,
       url: this.getFullURL(path),

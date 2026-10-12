@@ -7,8 +7,11 @@ import request from 'supertest';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { HttpExceptionFilter } from './httpExceptionFilter.js';
+import { httpHeaders } from '../../constants/httpHeaders.js';
+import { runWithTrace } from '../../trace/traceContext.js';
 
 const RAW_ERROR_ROUTE = '/raw-error';
+const DOWNSTREAM_ERROR_ROUTE = '/downstream-error';
 const HTTP_EXCEPTION_ROUTE = '/http-exception';
 const BUSINESS_ERROR_ROUTE = '/business-error';
 const PRISMA_UNIQUE_ROUTE = '/prisma-unique';
@@ -61,6 +64,20 @@ class ProbeController {
   @Get(PRISMA_INIT_ROUTE)
   prismaInit(): void {
     throwPrisma();
+  }
+
+  @Get(DOWNSTREAM_ERROR_ROUTE)
+  downstreamError(): void {
+    throw new HttpException(
+      {
+        traceId: 'downstream-hop-trace',
+        duration: 12,
+        message: 'Service unavailable',
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        data: null,
+      },
+      HttpStatus.SERVICE_UNAVAILABLE,
+    );
   }
 }
 
@@ -160,5 +177,55 @@ describe('HttpExceptionFilter', () => {
     expect(response.body.message).toBe(GENERIC_MESSAGE);
     expect(JSON.stringify(response.body)).not.toContain('prisma');
     expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+
+  it('omits traceId entirely when there is no trace context', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(RAW_ERROR_ROUTE);
+
+    expect(response.body).not.toHaveProperty('traceId');
+    expect(response.headers[httpHeaders.traceId]).toBeUndefined();
+  });
+
+  it('echoes the ambient trace id on the header and in the body', async () => {
+    app = await boot();
+    const response = await runWithTrace('ambient-trace', () =>
+      request(app!.getHttpServer()).get(RAW_ERROR_ROUTE),
+    );
+
+    expect(response.headers[httpHeaders.traceId]).toBe('ambient-trace');
+    expect(response.body.traceId).toBe('ambient-trace');
+  });
+
+  it('prefers the failed downstream hop trace id over the ambient one', async () => {
+    app = await boot();
+
+    // This is the shape `HttpClientInstance` throws when a service-to-service
+    // call fails: the payload carries the trace id of the call that broke.
+    const response = await runWithTrace('ambient-trace', () =>
+      request(app!.getHttpServer()).get(DOWNSTREAM_ERROR_ROUTE),
+    );
+
+    expect(response.body.traceId).toBe('downstream-hop-trace');
+    expect(response.headers[httpHeaders.traceId]).toBe('downstream-hop-trace');
+  });
+
+  it('falls back to the ambient trace id when the exception carries none', async () => {
+    app = await boot();
+    const response = await runWithTrace('ambient-trace', () =>
+      request(app!.getHttpServer()).get(HTTP_EXCEPTION_ROUTE),
+    );
+
+    expect(response.body.traceId).toBe('ambient-trace');
+  });
+
+  it('does not let an exception payload corrupt an unrelated error response', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      PRISMA_UNIQUE_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.CONFLICT);
+    expect(response.body).not.toHaveProperty('traceId');
   });
 });

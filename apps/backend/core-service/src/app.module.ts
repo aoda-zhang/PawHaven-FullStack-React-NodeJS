@@ -3,6 +3,7 @@ import { join } from 'path';
 import { AdoptionModule } from '@modules/adoption/adoption.module.js';
 import { AnimalFollowModule } from '@modules/animal-follow/animalFollow.module.js';
 import { BootstrapModule } from '@modules/bootstrap/bootstrap.module.js';
+import { GuideModule } from '@modules/guide/guide.module.js';
 import { HomeModule } from '@modules/home/home.module.js';
 import { RescueModule } from '@modules/rescue/rescue.module.js';
 import { ReportAnimalModule } from '@modules/report-animal/reportAnimal.module.js';
@@ -51,6 +52,7 @@ const configContext = import.meta.webpackContext('./config', {
     ReportAnimalModule,
     AdoptionModule,
     AnimalFollowModule,
+    GuideModule,
   ],
 })
 export class AppModule {}

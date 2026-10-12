@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": [
+    {
+      "package": "./plugins/free-model-filter",
+      "options": {
+        "freeOnly": true,
+        "freeMatch": ":free"
+      }
+    },
+    {
+      "package": "./plugins/coding-model-filter",
+      "options": {
+        "requireTools": true
+      }
+    },
+    {
+      "package": "./plugins/context-window-filter",
+      "options": {
+        "minContext": 131072
+      }
+    },
+    {
+      "package": "./plugins/auto-model-switch",
+      "options": {
+        "maxRetries": 1,
+        "pinDefault": true,
+        "annotate": true
+      }
+    }
+  ]
+}

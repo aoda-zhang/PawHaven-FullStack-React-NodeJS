@@ -4,3 +4,9 @@ build
 coverage
 *.log
 *.lock
+
+# Generated runtime output. Written only by an adapter's generator, so prettier would be a second
+# writer: it collapses short JSON arrays onto one line, `harness:check:generated` then reports the
+# tree stale, and the next `harness:generate` reverts the "fix". The canonical source under
+# harness-core/ is formatted; its output is not a formatting concern.
+.pi/

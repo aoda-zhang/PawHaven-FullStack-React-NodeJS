@@ -9,6 +9,7 @@ import { getLocale } from '../utils/locale/getLocale';
 
 import { getUTCTimestamp } from './encrypt';
 import { normalizeHttpError } from './errorHandle';
+import { recordTraceId } from './trace';
 import type { ApiClientOptions, ApiResponseType } from './types';
 import { RequestMode } from './types';
 
@@ -70,6 +71,10 @@ export const createApiClient = (options: ApiClientOptions) => {
   // ✅ Response interceptor
   Http.interceptors.response.use(
     (response: AxiosResponse<ApiResponseType>) => {
+      // Recorded before the envelope is unwrapped below, because that step
+      // discards the headers — the only place the trace id lives on a success.
+      recordTraceId(response);
+
       if (
         requestMode === RequestMode.resource ||
         bypassesEnvelope(response.config)

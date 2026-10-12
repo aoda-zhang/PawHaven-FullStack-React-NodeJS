@@ -1,0 +1,170 @@
+# PawHaven Documentation Index
+
+> Unified entry point for all project documentation.
+> Chinese mirror: [README.cn.md](./README.cn.md), kept in sync with this file.
+
+`docs/` is split by what a document is **for**, so you can tell from the path whether it is
+authority, intent, or background.
+
+| Directory       | Holds                                                                       | Read it when                                             |
+| --------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `architecture/` | A technical point, or the design of a specific problem, **in this project** | You are about to design or change something in that area |
+| `features/`     | One **portal feature**'s frontend **and** backend detail, as built          | After the change lands, to update the record from code   |
+| `product/`      | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap      |
+
+Design tokens are deliberately **not** documented here. They live in
+[`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by
+`pnpm token-check`. Read the token source; do not read a prose copy of it.
+
+---
+
+## `features/` describes the running system — and is written after the code
+
+Each document in `features/` describes what exists. Where the product blueprint promised more, the
+gap is stated in that document's **What Does Not Exist** section rather than being left for a reader
+to discover. [`product/`](./product/PawHaven-Product-Strategy-EN.md) holds the full ambition, and
+every feature doc links back to the section it came from.
+
+Each document is keyed on one folder in `apps/frontend/portal/src/features/*`, and chapter 1 numbers
+that page's sections. A backend module with no feature folder of its own is documented as a section
+of the page that consumes it.
+
+**Read them after the code, not before.** A feature doc is accurate as of the last change that
+reconciled it with the code, so it is a record to update rather than a source to design from. When one
+disagrees with the code, the code is right and the document is the thing that is out of date.
+
+One structural fact worth knowing before reading any of them: **`animalReports` is both the report
+and the case.** There is no `rescue_cases` table and no event that creates one.
+
+---
+
+## 1. Architecture
+
+A technical point or a problem's design in this project. These are the docs to read before
+designing anything.
+
+| File                                                                                                | Covers                                                                                                                      |
+| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [PawHaven-System-Architecture-Overview.md](./architecture/PawHaven-System-Architecture-Overview.md) | The hub. Service decomposition, C4 model, data architecture, API gateway, security, deployment, design decisions            |
+| [PawHaven-Backend-Architecture.md](./architecture/PawHaven-Backend-Architecture.md)                 | `core-service` modular monolith, bounded contexts as NestJS modules, inter-service communication                            |
+| [PawHaven-Frontend-Architecture.md](./architecture/PawHaven-Frontend-Architecture.md)               | Feature-based module structure, state, routing, tokens, i18n                                                                |
+| [authentication-architecture.md](./architecture/authentication-architecture.md)                     | **The auth trust model.** Gateway-owned browser cookies, the internal ES256 JWT, downstream verification, the `roles` claim |
+| [route_authentication.md](./architecture/route_authentication.md)                                   | Frontend route guards — the authenticated parent route, `requireUser`, `/auth/me` priming                                   |
+| [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | Why PDFs render through React + Puppeteer instead of a template library, and the constraints that bite                      |
+| [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | Legacy redirect map from the pre-split document to the three above. No content of its own.                                  |
+| [service-boundaries.md](./architecture/service-boundaries.md)                                       | Backend service boundaries — the four services, the auth boundary, request/response shape                                   |
+| [harness-migration.md](./architecture/harness-migration.md)                                         | How the AI development harness moved from a runtime-owned directory to a provider-neutral canonical source plus adapters    | Reading what `harness-core/` replaced, and why |
+
+`authentication-architecture.md` and `route_authentication.md` are the pair to read before touching
+anything auth-related — one covers the server trust boundary, the other the client route guard.
+
+## 2. Features
+
+One doc per **portal feature folder** (`apps/frontend/portal/src/features/*`), covering both sides
+of that feature. Within a document, chapter 1 breaks the page into numbered sections (1.1, 1.2,
+1.3 …) and the later chapters cover the data path underneath.
+
+A backend module with no feature folder of its own is documented as a section of the page that
+consumes it — `adoption` inside [Home](./features/02-home.md#4-adoptable-pets-read-only),
+`animal-follow` inside [Rescue Detail](./features/05-rescue-detail.md#14-follow).
+
+| File                                                              | Portal feature              | Route                           |
+| ----------------------------------------------------------------- | --------------------------- | ------------------------------- |
+| [README.md](./features/README.md)                                 | Index, service map, defects | —                               |
+| [01-auth.md](./features/01-auth.md)                               | `auth`                      | `/auth/login`, `/auth/register` |
+| [02-home.md](./features/02-home.md)                               | `home`                      | `/`                             |
+| [03-report-animal.md](./features/03-report-animal.md)             | `report-animal`             | `/report-animal`                |
+| [04-rescue-cases.md](./features/04-rescue-cases.md)               | `rescue-cases`              | `/rescue-cases`                 |
+| [05-rescue-detail.md](./features/05-rescue-detail.md)             | `rescue-detail`             | `/rescue/detail/:animalID`      |
+| [06-rescue-guide.md](./features/06-rescue-guide.md)               | `rescue-guide`              | `/rescue/guides`                |
+| [07-app-shell-bootstrap.md](./features/07-app-shell-bootstrap.md) | _(none — `layout/`)_        | wraps every route               |
+
+Every document was verified against the code, and each records two kinds of absence: **What Does
+Not Exist** for gaps in the design, and the index's _Known defects_ table for places where the
+implementation contradicts its own contract — a required field that is never persisted, a timeline
+that is a projection rather than history, a `NotFound` that 13 broken links all land on.
+
+## 3. Product
+
+| File                                                                         | Covers                                                                        |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| [PawHaven-Product-Strategy-EN.md](./product/PawHaven-Product-Strategy-EN.md) | Product blueprint v2.0 — animal lifecycle, personas, feature map, MVP roadmap |
+
+## 4. Design system — source, not documentation
+
+| Path                                                                           | Type | Description                        |
+| ------------------------------------------------------------------------------ | ---- | ---------------------------------- |
+| [src/tokens/](../packages/design-system/src/tokens)                            | CSS  | 12 design-token CSS variable files |
+| [src/theme.css](../packages/design-system/src/theme.css)                       | CSS  | Global theme definitions           |
+| [src/utilities.css](../packages/design-system/src/utilities.css)               | CSS  | Utility classes                    |
+| [scripts/build-tokens.mjs](../packages/design-system/scripts/build-tokens.mjs) | JS   | Token build script                 |
+
+Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
+not introduce raw colour values or magic numbers.
+
+## 5. Development
+
+Operational docs for running the thing locally. Not design material — this is the setup reference.
+
+| File                                     | Covers                                                          |
+| ---------------------------------------- | --------------------------------------------------------------- |
+| [development.md](./development.md)       | Prerequisites, build order, dev servers and ports, pnpm scripts |
+| [development.cn.md](./development.cn.md) | The same guide in Chinese; kept in sync with the English file   |
+
+## 6. Agent harness
+
+The agent control layer lives in [`harness-core/`](../harness-core), not here. `.pi/` is the thin Pi
+runtime adapter: it references `harness-core/` directly through `settings.json`; only `.pi/agents/` is a
+verbatim projection rebuilt by `pnpm pi:sync`.
+
+| Path                                                            | Covers                                                          |
+| --------------------------------------------------------------- | --------------------------------------------------------------- |
+| [harness-core/README.md](../harness-core/README.md)             | Index of capabilities, skills, workflows, and rules             |
+| [harness-core/ARCHITECTURE.md](../harness-core/ARCHITECTURE.md) | The invariants the harness defends                              |
+| [harness-core/workflows/](../harness-core/workflows)            | The workflows, surfaced by an adapter as the runtime's commands |
+| [harness-core/rules/](../harness-core/rules)                    | The stable rules shared by every workflow                       |
+| [AGENTS.md](../AGENTS.md)                                       | Hard constraints — git, code, dispatch, reporting               |
+
+`pnpm harness:verify` validates the harness. The retired `.opencode/`, `.codebuddy/`, and
+`.pi/skills/` layers are gone; links into them are dead.
+
+---
+
+## 7. Documentation standards
+
+- **Read the code first, write the docs last.** Architecture docs and code are the input;
+  `docs/features/` is the output, updated in the same change that invalidated it. A feature doc is
+  never an input to a decision.
+- **No ADR records.** When a decision changes the architecture, update the living docs under
+  `docs/architecture/` directly.
+- **Code comments explain why, not what.** Default to none; never comment self-evident code.
+- **Permanent docs live in `docs/`** and ship in the same change as the code that invalidated them.
+  Progress goes in replies — there is no temporary-notes file.
+- **Every handoff classifies Doc Impact** as `none` / `update` / `create`; the main session routes
+  doc edits to the lane that made the change.
+- **Root READMEs (EN ↔ CN) stay in sync** and reference all knowledge files. The agent-control layer
+  is `harness-core/`; `.opencode/`, `.codebuddy/`, and `.pi/skills/` are retired — links into them are
+  dead.
+
+## 8. Repository quality
+
+The repository's quality record — what is healthy, what debt is accepted, and the mechanical
+invariants — lives in [`quality/README.md`](./quality/README.md). `pnpm quality-check` scans for
+orphaned docs, references to retired resources, and duplicate-rule candidates, and folds in
+`architecture-check` and `check:links`.
+
+## Suggested reading order
+
+The three architecture documents, then the code, then — after the change is verified — the feature
+doc.
+
+```
+PawHaven-System-Architecture-Overview.md
+  → PawHaven-Frontend-Architecture.md  |  PawHaven-Backend-Architecture.md
+    (+ authentication-architecture.md / route_authentication.md when auth is in scope)
+  → the code in apps/ and packages/
+  → update docs/features/<feature>.md from what shipped
+```
+
+**Verify before you trust.** The architecture docs carry a `v3.11 / 2026-09-25` stamp and were checked
+against the code at that time. A feature doc is as-built as of the last change that reconciled it.

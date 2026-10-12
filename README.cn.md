@@ -1,0 +1,127 @@
+[English](./README.md) | [中文](./README.cn.md)
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-20232a?logo=react&logoColor=61dafb)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
+![pnpm](https://img.shields.io/badge/Package-pnpm-F69220?logo=pnpm&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-社区-7289DA?logo=discord&logoColor=white)](https://discord.gg/znnG258E)
+
+**PawHaven** 是一个全栈平台，旨在支持**流浪动物救援和领养**，连接志愿者、领养者和社区。
+
+平台允许用户报告救援案例、跟踪救援进度、分享救援故事，并提升动物救援信息的可见性与协调效率。
+
+除了应用功能外，PawHaven 也是**现代全栈工程实践**的展示，注重可扩展架构、可维护代码和高效开发流程。
+
+---
+
+# 🛠 环境准备
+
+- **Node.js**: `24.x`
+- **pnpm**: `12.x`
+
+安装依赖或运行项目前，请确保满足以上版本要求。
+
+---
+
+# ✨ 核心功能
+
+- **救援案例管理**  
+  创建和跟踪救援案例，帮助志愿者协调救援行动。
+
+- **认证与权限**  
+  使用 JWT 和基于角色的访问控制保证用户安全。
+
+- **知识库**  
+  提供救援指南和领养知识，通过集中式内容系统管理。
+
+- **社区互动**  
+  分享救援故事、交流经验，增强社区互动与连接。
+
+---
+
+# 🚀 技术栈与亮点
+
+| 层级     | 技术                                            | 亮点                            |
+| -------- | ----------------------------------------------- | ------------------------------- |
+| 前端     | React, TypeScript, React Query, React Hook Form | 可扩展的组件化架构              |
+| 后端     | NestJS, Node.js                                 | 微服务隔离，模块化单体          |
+| 架构     | Monorepo + `pnpm workspace`                     | 全栈 TypeScript，前后端共享类型 |
+| 代码规范 | ESLint, Prettier, Husky                         | 强制代码标准、pre-commit 钩子   |
+| CI/CD    | GitHub Actions                                  | 自动化流水线                    |
+
+---
+
+# 🤖 AI Driver
+
+**`.opencode/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent 编排器，将每个开发请求转化为结构化流水线：`规划 → 分发 Agent → 测试验证 → 对照架构与模式审查 → 知识更新`。
+
+👉 [进入 harness](./.opencode/skills/README.md) —— 22 个 skill、9 个斜杠命令工作流、`knowledge-update` agent,以及它们强制的项目规则
+
+---
+
+# 🤝 社区
+
+PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开源开发或项目架构讨论感兴趣的朋友加入社区。
+
+💬 **Discord**  
+👉 https://discord.gg/znnG258E
+
+在 Discord 你可以：
+
+- 讨论项目想法和功能设计
+- 探讨技术架构
+- 提问开发相关问题
+- 与其他贡献者协作
+
+---
+
+# 📚 文档
+
+文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`architecture/`（某个技术点或某个问题
+在本项目里的设计）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）。
+
+> ⚠️ `docs/features/` 是**蓝图，不是现状** —— 11 个 feature 中有 7 个写到的后端模块并不存在，
+> 其中的领域事件在后端代码里一次都没出现。
+
+### 产品与架构
+
+| 文档                                                                     | 说明                                                    |
+| ------------------------------------------------------------------------ | ------------------------------------------------------- |
+| [产品策略](./docs/product/PawHaven-Product-Strategy-EN.md) (英文)        | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
+| [系统架构](./docs/architecture/PawHaven-System-Architecture-Overview.md) | 4 服务架构、模块化单体、C4、网关、安全、设计决策        |
+| [设计系统](./packages/design-system/README.md)                           | Design tokens、Tailwind v4 主题、CSS 工具类             |
+
+### 认证一览
+
+浏览器 JWT / Cookie 只由 **网关** 持有。网关按请求解析调用者身份（F1–F4）、必要时刷新，并针对目标服务签发一个短时效的 **ES256 内部 JWT**，写入 `x-gateway-jwt` 头。下游服务永远看不到浏览器 token —— 由全局 `InternalJwtGuard` 校验内部 JWT（fail-closed），handler 通过 `@InternalJwt()` 读取身份，端点策略用 `@Public()` / `@OptionalAuth()` / 默认需认证表达。
+
+→ 完整细节见 [身份认证与授权架构](./docs/architecture/authentication-architecture.md)。
+
+### 工程
+
+| 文档                                                                     | 说明                                                                        |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| [项目规范](./.opencode/skills/project-rules/SKILL.md)                    | 编码规范、工具链、工作流 —— 以 skill 形式强制                               |
+| [身份认证与授权架构](./docs/architecture/authentication-architecture.md) | 网关持有的 Cookie JWT + 内部 ES256 JWT（InternalJwt）服务认证,`roles` claim |
+| [路由级认证](./docs/architecture/route_authentication.md)                | 前端路由守卫实现                                                            |
+
+---
+
+# 🧑‍💻 本地开发
+
+本地开发请见 [docs/development.cn.md](./docs/development.cn.md)。
+
+---
+
+# 🌟 贡献指南
+
+欢迎贡献代码与想法：
+
+1. 打开 issue 讨论想法
+2. Fork 仓库
+3. 创建功能分支
+4. 提交 Pull Request
+
+详情请查看 [LICENSE](./LICENSE) 文件。

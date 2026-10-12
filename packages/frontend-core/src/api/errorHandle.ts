@@ -14,6 +14,30 @@ interface ErrorResponse {
 }
 
 /**
+ * Header carrying the server-side correlation id. Mirrors
+ * `httpHeaders.traceId` in `packages/backend-core`; duplicated as a literal
+ * because the frontend must not depend on a backend package.
+ */
+const TRACE_ID_HEADER = 'x-trace-id';
+
+/**
+ * Reads the trace id from a response, preferring the header and falling back to
+ * the body field that downstream services set on error envelopes.
+ */
+export const readTraceId = (
+  headers?: Record<string, unknown> | null,
+  body?: unknown,
+): string | null => {
+  const fromHeader = headers?.[TRACE_ID_HEADER];
+  if (typeof fromHeader === 'string' && fromHeader.length > 0) {
+    return fromHeader;
+  }
+
+  const fromBody = (body as { traceId?: unknown } | null | undefined)?.traceId;
+  return typeof fromBody === 'string' && fromBody.length > 0 ? fromBody : null;
+};
+
+/**
  * Helper to check if error response matches a given status and one of the provided codes
  */
 const matchesStatusAndCode = (
@@ -152,6 +176,10 @@ export const normalizeHttpError = (error: any) => {
   let errorCode = error?.code ?? null;
   let errorMessage = error?.message ?? null;
   let errorHeaders = error?.response?.headers ?? null;
+  // Correlation id for the failed request, so a user can quote it in a bug
+  // report. Read from the response headers, falling back to the error body —
+  // downstream services put it in both places.
+  let errorTraceId: string | null = null;
 
   // Optional local token state, if available from context or error object
   const hasLocalToken = error?.hasLocalToken ?? false;
@@ -166,6 +194,7 @@ export const normalizeHttpError = (error: any) => {
     errorCode = code;
     errorMessage = message;
     errorHeaders = headers;
+    errorTraceId = readTraceId(headers, response?.data);
     errorType = mapErrorToType({
       ...response.data,
       status: response.status,
@@ -175,6 +204,7 @@ export const normalizeHttpError = (error: any) => {
   } else if (error?.message?.includes('Network')) {
     errorType = httpRequestErrors.NETWORK;
   } else {
+    errorTraceId = readTraceId(errorHeaders, error);
     // For non-axios errors, try to map with available info
     errorType = mapErrorToType({
       status: errorStatus,
@@ -189,6 +219,7 @@ export const normalizeHttpError = (error: any) => {
     type: errorType,
     status: errorStatus,
     code: errorCode,
+    traceId: errorTraceId,
     raw: error,
   };
 };

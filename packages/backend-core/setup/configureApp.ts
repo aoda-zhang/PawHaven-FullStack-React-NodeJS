@@ -7,6 +7,7 @@ import * as express from 'express';
 import helmet from 'helmet';
 
 import { httpHeaders } from '../constants/httpHeaders.js';
+import { traceMiddleware } from '../trace/trace.middleware.js';
 
 const toHeaderList = (value: string | string[] | undefined): string[] => {
   if (!value) {
@@ -25,6 +26,7 @@ export interface ConfigureAppOptions {
   enableHelmet?: boolean;
   enableBodyParser?: boolean;
   enableShutdownHooks?: boolean;
+  enableTrace?: boolean;
 }
 
 /**
@@ -43,9 +45,16 @@ export function configureApp(
     enableHelmet = true,
     enableBodyParser = true,
     enableShutdownHooks = true,
+    enableTrace = true,
   } = options;
 
   const configService = app.get(ConfigService);
+
+  // First, so a request rejected by the body parser or by any later stage still
+  // carries a trace id on the response and in the logs.
+  if (enableTrace) {
+    app.use(traceMiddleware);
+  }
 
   if (enableBodyParser) {
     const jsonBodyLimit = configService.getOrThrow<string>(

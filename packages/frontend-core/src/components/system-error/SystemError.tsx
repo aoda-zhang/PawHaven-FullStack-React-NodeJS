@@ -1,8 +1,9 @@
 import { Button } from '@pawhaven/ui';
-import { Home, RotateCw } from 'lucide-react';
+import { Copy, Home, RotateCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { getLastTraceId } from '../../api/trace';
 import { cn } from '../../utils/cn';
 import type { ErrorInfo } from '../router-error-fallback/RouterErrorFallback';
 
@@ -14,13 +15,30 @@ const retry = () => {
   window.location.reload();
 };
 
+/**
+ * Copies the reference id to the clipboard. The Clipboard API is unavailable
+ * in insecure contexts and can reject on permission, so failure is swallowed —
+ * the id is on screen either way and can be selected by hand.
+ */
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard?.writeText(text);
+  } catch {
+    // Nothing useful to do; the user can still read the id off the screen.
+  }
+};
+
 interface SystemErrorProps {
-  error?: Partial<ErrorInfo>;
+  error?: Partial<ErrorInfo> & { traceId?: string | null };
   footer?: ReactNode;
 }
 
-export const SystemError = ({ footer }: SystemErrorProps) => {
+export const SystemError = ({ error, footer }: SystemErrorProps) => {
   const { t } = useTranslation();
+  // Prefer the id carried by the error itself, falling back to the last one the
+  // API client saw — a render error boundary is often several requests removed
+  // from the failure, so the module-level value is frequently the better clue.
+  const traceId = error?.traceId ?? getLastTraceId();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -50,6 +68,23 @@ export const SystemError = ({ footer }: SystemErrorProps) => {
           <p className="text-text-secondary text-lg leading-relaxed">
             {t('common.system_error_info')}
           </p>
+
+          {traceId ? (
+            <div className="mt-6 flex flex-col items-center gap-2">
+              <span className="text-text-secondary text-sm">
+                {t('common.error_trace_id')}
+              </span>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(traceId)}
+                title={t('common.error_trace_id_copy')}
+                className="text-text-secondary hover:text-text inline-flex items-center gap-2 font-mono text-xs break-all transition-colors"
+              >
+                {traceId}
+                <Copy size={14} className="shrink-0" />
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-4">

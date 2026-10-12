@@ -47,7 +47,7 @@ SharedModule.forRoot({
 
 - `configModule/` — Dynamic configuration module for loading and providing config values from environment or files.
 - `httpClient/` — HTTP client module, interceptors, and exception filters. Provides outbound HTTP utilities and global error formatting.
-- `internalJwt/` — The internal-JWT concern, kept as one flat folder: `sign.ts`/`verify.ts` (HS256, `jsonwebtoken`), `errors.ts`, `internal-jwt.types.ts`, `InternalJwtGuard`, the `@InternalJwt()` decorator, and `InternalJwtModule` (registered through `SharedModule.forRoot` defaults, `internalJwt.enabled`-driven). Public surface: `index.ts` (the `@pawhaven/backend-core/internal-jwt` subpath). Endpoint-policy annotations (`@Public` / `@OptionalAuth`) stay in `../decorators/`.
+- `internalJwt/` — The internal-JWT concern, kept as one flat folder: `sign.ts`/`verify.ts` (ES256, `jsonwebtoken`), `errors.ts`, `internal-jwt.types.ts`, `InternalJwtGuard`, the `@InternalJwt()` decorator, and `InternalJwtModule` (registered through `SharedModule.forRoot` defaults, `internalJwt.enabled`-driven). Public surface: `index.ts` (the `@pawhaven/backend-core/internal-jwt` subpath). Endpoint-policy annotations (`@Public` / `@OptionalAuth`) stay in `../decorators/`.
 - `prisma/` — Dynamic Prisma module for database access, supporting per-service configuration.
 - `swagger/` — Swagger module for API documentation, auto-generates OpenAPI docs for your service.
 - `shared.module.ts` — The main entry point for importing predefined shared modules. Handles dynamic assembly of infrastructure modules.

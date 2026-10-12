@@ -235,7 +235,7 @@ graph TD
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Vercel Deployment Guide](https://vercel.com/docs/deployments)
 - [Turbo Repositories](https://turbo.build/repo/docs)
-- [Project README](../../README.MD)
+- [Project README](../../README.md)
 
 ## Support
 

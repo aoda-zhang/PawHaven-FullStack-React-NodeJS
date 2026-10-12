@@ -1,5 +1,4 @@
 /* eslint-disable no-param-reassign */
-import crypto from 'node:crypto';
 import type { ClientRequest, IncomingMessage } from 'node:http';
 import type { Socket } from 'node:net';
 
@@ -18,6 +17,7 @@ import {
   responseInterceptor,
 } from 'http-proxy-middleware';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
+import { resolveInboundTraceId } from '@pawhaven/backend-core/trace';
 import { readHeader } from '@pawhaven/backend-core/utils';
 import { HTTP_STATUS } from '@pawhaven/shared/constants';
 
@@ -257,12 +257,18 @@ export class ProxyService {
     });
   }
 
+  /**
+   * The trace middleware has normally already resolved and set the id by the
+   * time a request reaches the proxy, so this is a fallback for the paths that
+   * bypass it. Resolution itself is delegated so the gateway and the middleware
+   * can never mint different ids for the same request.
+   */
   private ensureTraceId(req: Request): string {
     const existing = readHeader(req.headers, httpHeaders.traceId);
     if (existing) {
       return existing;
     }
-    const generated = crypto.randomUUID();
+    const generated = resolveInboundTraceId(req.headers);
     req.headers[httpHeaders.traceId] = generated;
     return generated;
   }
