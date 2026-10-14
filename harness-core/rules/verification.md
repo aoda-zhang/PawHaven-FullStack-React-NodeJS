@@ -6,26 +6,6 @@ requires**. Every workflow applies this file; none of them restates it.
 Workflows own ordering. This file owns the thresholds and the evidence standard. When a
 workflow says "the gate sequence's call", the sequence below is what it means.
 
-## Verification mode for every task
-
-**Every task receives an explicit verification mode, even when the independent `tester` lane is
-skipped.** The orchestrator records `FAST`, `TARGETED`, or `FULL` from the task's complexity,
-risk, change type, and affected boundaries. The implementation lane uses that mode for its
-mandatory self-test (stage 5); when stage 6 is required, `tester` independently verifies the same
-mode and may raise it when evidence shows broader impact. The mode-selection rules and change-type
-matrix live in [the tester agent](../plugins/testing/agents/tester.md#step-2--choose-the-verification-mode).
-
-- `FAST`: isolated low-complexity, low-risk change; direct behaviour check plus applicable fast
-  package checks.
-- `TARGETED`: module-level feature or focused change; direct checks plus affected package suite
-  and relevant boundaries.
-- `FULL`: high/critical risk, high complexity, shared/public contracts, auth/security, persistence,
-  cross-package/service, dependency/toolchain, build/deployment, or other broad-impact change;
-  run the full required repository validation and applicable specialist checks.
-- High/critical risk always means `FULL`, regardless of diff size.
-- Every acceptance criterion must name its check method. If the required check cannot run, record
-  `NOT RUN` and why; a mode is not proof that its checks passed.
-
 ## The gate sequence
 
 Nine stages, in this order.
