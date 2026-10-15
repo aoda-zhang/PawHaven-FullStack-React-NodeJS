@@ -70,7 +70,12 @@ export function configureApp(
 
   if (enableHelmet) {
     app.use(
-      helmet.default({
+      (helmet.default as unknown as (
+        options: {
+          frameguard: { action: 'deny' };
+          crossOriginEmbedderPolicy: false;
+        },
+      ) => import('express').RequestHandler)({
         frameguard: { action: 'deny' },
         crossOriginEmbedderPolicy: false,
       }),
