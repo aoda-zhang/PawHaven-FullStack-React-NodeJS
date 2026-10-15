@@ -2,6 +2,5 @@
   "framework": "nest",
   "buildCommand": "pnpm --filter=@pawhaven/document-service build",
   "outputDirectory": "dist",
-  "installCommand": "pnpm install",
-  "startCommand": "node dist/main.js"
+  "installCommand": "pnpm install"
 }
