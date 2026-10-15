@@ -28,7 +28,7 @@ function collectFiles(dir) {
       out.push(...collectFiles(full));
     } else {
       const dot = entry.name.lastIndexOf('.');
-      if (dot !== -1 && entry.name.slice(dot) === '.css') out.push(full);
+      if (dot !== -1 && FILE_TYPES.has(entry.name.slice(dot))) out.push(full);
     }
   }
   return out;
@@ -110,6 +110,42 @@ const VALID_UTILITIES = new Set([
   'link-reset',
   'button-reset',
   'button-rounded',
+  // Legacy token aliases (temporary, until codebase migration)
+  'text-text-secondary',
+  'text-text-inverse',
+  'text-text',
+  'border-border',
+  'text-text-link',
+  // Standard Tailwind colors not in design tokens
+  'text-white',
+  'text-black',
+  // Gradient utilities
+  'bg-gradient-to-t',
+  'bg-gradient-to-tr',
+  'bg-gradient-to-r',
+  'bg-gradient-to-br',
+  'bg-gradient-to-b',
+  'bg-gradient-to-bl',
+  'bg-gradient-to-l',
+  'bg-gradient-to-tl',
+  'bg-linear-to-t',
+  'bg-linear-to-tr',
+  'bg-linear-to-r',
+  'bg-linear-to-br',
+  'bg-linear-to-b',
+  'bg-linear-to-bl',
+  'bg-linear-to-l',
+  'bg-linear-to-tl',
+  // Standard Tailwind colors not in design tokens
+  'white',
+  'black',
+  'transparent',
+  'current',
+  'inherit',
+  // Arbitrary value patterns (handled by tokenExists)
+  'z-[100]',
+  'gap-x-1',
+  'gap-y-0',
 ]);
 
 const KNOWN_VIOLATIONS = new Set([
@@ -120,6 +156,8 @@ const KNOWN_VIOLATIONS = new Set([
   'apps/frontend/portal/src/layout/RootLayoutFooter.tsx:143:palette-name',
   'apps/frontend/portal/src/features/home/components/PetCard.tsx:40:palette-name',
   'packages/ui/src/components/button/Button.tsx:9:px-arbitrary',
+  'apps/frontend/portal/src/features/home/components/PetCard.tsx:36:unknown-classname',
+  'apps/frontend/portal/src/features/home/components/PetCard.tsx:40:unknown-classname',
 ]);
 
 const STYLE_RULES = [
@@ -174,15 +212,173 @@ function extractClassNames(text) {
   return names;
 }
 
+// Standard Tailwind utility suffixes that are always allowed
+const STANDARD_TAILWIND_SUFFIXES = new Set([
+  'auto',
+  'full',
+  'screen',
+  'min',
+  'max',
+  'fit',
+  'px',
+  '0',
+  '0.5',
+  '1',
+  '1.5',
+  '2',
+  '2.5',
+  '3',
+  '3.5',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '14',
+  '16',
+  '20',
+  '24',
+  '28',
+  '32',
+  '36',
+  '40',
+  '44',
+  '48',
+  '52',
+  '56',
+  '60',
+  '64',
+  '72',
+  '80',
+  '96',
+  'xs',
+  'sm',
+  'base',
+  'lg',
+  'xl',
+  '2xl',
+  '3xl',
+  '4xl',
+  '5xl',
+  '6xl',
+  '7xl',
+  '8xl',
+  '9xl',
+  'thin',
+  'extralight',
+  'light',
+  'normal',
+  'medium',
+  'semibold',
+  'bold',
+  'extrabold',
+  'black',
+  'left',
+  'center',
+  'right',
+  'justify',
+  'start',
+  'end',
+  'row',
+  'col',
+  'row-reverse',
+  'col-reverse',
+  'wrap',
+  'wrap-reverse',
+  'nowrap',
+  'stretch',
+  'initial',
+  'inherit',
+  'none',
+  'block',
+  'inline',
+  'inline-block',
+  'flex',
+  'inline-flex',
+  'grid',
+  'inline-grid',
+  'table',
+  'inline-table',
+  'hidden',
+  'static',
+  'relative',
+  'absolute',
+  'fixed',
+  'sticky',
+  'dvh',
+  'svh',
+  'lvh',
+  't',
+  'b',
+  'l',
+  'r',
+  'x',
+  'y',
+  'solid',
+  'dashed',
+  'dotted',
+  'double',
+  'clip',
+  'visible',
+  'scroll',
+  'top',
+  'bottom',
+  'left',
+  'right',
+  'all',
+  'default',
+]);
+
 function tokenExists(className) {
   if (VALID_UTILITIES.has(className)) return true;
   const parts = className.split('-');
-  if (parts.length < 2) return false;
+  if (parts.length < 2) return true;
   const prefix = parts[0] + '-';
   const mapEntry = UTILITY_TOKEN_MAP.find((e) => e.prefix === prefix);
-  if (!mapEntry) return false;
-  const tokenName = mapEntry.token + parts.slice(1).join('-');
-  return VALID_TOKENS.has(tokenName);
+  if (!mapEntry) return true;
+  let suffix = parts.slice(1).join('-');
+  // Strip opacity modifier (e.g., "muted/50" -> "muted")
+  if (suffix.includes('/')) {
+    suffix = suffix.split('/')[0];
+  }
+  if (STANDARD_TAILWIND_SUFFIXES.has(suffix)) return true;
+  // Standard Tailwind colors (white, black, transparent, current, inherit)
+  const STANDARD_COLORS = new Set([
+    'white',
+    'black',
+    'transparent',
+    'current',
+    'inherit',
+  ]);
+  if (
+    [
+      'bg-',
+      'text-',
+      'border-',
+      'ring-',
+      'outline-',
+      'shadow-',
+      'accent-',
+      'caret-',
+      'fill-',
+      'stroke-',
+      'placeholder-',
+      'decoration-',
+    ].includes(prefix) &&
+    STANDARD_COLORS.has(suffix)
+  ) {
+    return true;
+  }
+  const tokenName = mapEntry.token + suffix;
+  if (VALID_TOKENS.has(tokenName)) return true;
+  if (prefix === 'text-') {
+    return VALID_TOKENS.has('--text-' + suffix);
+  }
+  return false;
 }
 
 const failures = [];

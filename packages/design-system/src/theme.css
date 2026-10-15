@@ -40,15 +40,15 @@
   --color-muted-strong: var(--color-brown-4);
 
   /* ═══ Text ═════════════════════════════════════════════ */
-  --color-text: var(--color-gray-9);
-  --color-text-secondary: var(--color-gray-7);
-  --color-text-tertiary: var(--color-gray-6);
+  --color-text-primary: var(--color-gray-9);
+  --color-text-muted: var(--color-gray-7);
+  --color-text-subtle: var(--color-gray-6);
   --color-text-placeholder: var(--color-gray-5);
-  --color-text-inverse: var(--color-gray-1);
-  --color-text-link: var(--color-primary);
+  --color-text-on-primary: var(--color-gray-1);
+  --color-link: var(--color-primary);
 
   /* ═══ Borders ════════════════════════════════════════ */
-  --color-border: var(--color-gray-5);
+  --color-border-default: var(--color-gray-5);
   --color-border-hover: var(--color-gray-6);
   --color-border-strong: var(--color-gray-7);
   --color-border-focus: var(--color-primary);
