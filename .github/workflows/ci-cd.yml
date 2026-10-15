@@ -101,64 +101,128 @@ jobs:
           path: apps/frontend/portal/dist
           retention-days: 2
 
-  deploy-backend:
-    name: Deploy backend to Vercel
+  deploy-backend-dev:
+    name: Deploy backend to Vercel (dev)
     needs: build
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cicd' }}
+    if: ${{ github.ref == 'refs/heads/develop' }}
     runs-on: ubuntu-latest
     environment:
-      name: vercel-backend
+      name: dev
       url: ${{ steps.deploy.outputs.url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm / Node
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with: { version: 9, run_install: false }
       - uses: actions/setup-node@v4
         with: { node-version-file: '.nvmrc', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile
-
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with: { name: backend-dist, path: ./dist-backend }
-
-      # Industry best practice: deploy per service with its own Vercel project secret.
-      # If you have one gateway entry-point, keep single deploy; else use matrix/loop.
-      - name: Deploy to Vercel (gateway / backend entry)
+      - name: Deploy Vercel dev
         id: deploy
         run: |
-          # Replace with your actual project settings / service folder
-          npx vercel@latest deploy \
-            --prod \
-            --token=${{ secrets.VERCEL_TOKEN }} \
-            --org-id=${{ secrets.VERCEL_ORG_ID }} \
-            --project-id=${{ secrets.VERCEL_PROJECT_ID_BACKEND }} \
-            --cwd=apps/backend/gateway
+          npx vercel@latest deploy --token=${{ secrets.VERCEL_TOKEN_DEV }} --org-id=${{ secrets.VERCEL_ORG_ID_DEV }} --project-id=${{ secrets.VERCEL_PROJECT_ID_BACKEND_DEV }} --cwd=apps/backend/gateway
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_DEV }}
 
-  deploy-portal:
-    name: Deploy portal to Cloudflare Pages
+  deploy-backend-uat:
+    name: Deploy backend to Vercel (uat)
     needs: build
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cicd' }}
+    if: ${{ github.ref == 'refs/heads/cicd' }}
     runs-on: ubuntu-latest
     environment:
-      name: cloudflare-portal
+      name: uat
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9, run_install: false }
+      - uses: actions/setup-node@v4
+        with: { node-version-file: '.nvmrc', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with: { name: backend-dist, path: ./dist-backend }
+      - name: Deploy Vercel uat
+        id: deploy
+        run: |
+          npx vercel@latest deploy --token=${{ secrets.VERCEL_TOKEN_UAT }} --org-id=${{ secrets.VERCEL_ORG_ID_UAT }} --project-id=${{ secrets.VERCEL_PROJECT_ID_BACKEND_UAT }} --cwd=apps/backend/gateway
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_UAT }}
+
+  deploy-backend-prod:
+    name: Deploy backend to Vercel (prod)
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 9, run_install: false }
+      - uses: actions/setup-node@v4
+        with: { node-version-file: '.nvmrc', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with: { name: backend-dist, path: ./dist-backend }
+      - name: Deploy Vercel prod
+        id: deploy
+        run: |
+          npx vercel@latest deploy --prod --token=${{ secrets.VERCEL_TOKEN_PROD }} --org-id=${{ secrets.VERCEL_ORG_ID_PROD }} --project-id=${{ secrets.VERCEL_PROJECT_ID_BACKEND_PROD }} --cwd=apps/backend/gateway
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_PROD }}
+
+  deploy-portal-dev:
+    name: Deploy portal to Cloudflare (dev)
+    needs: build
+    if: ${{ github.ref == 'refs/heads/develop' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: dev
+      url: https://pawhaven-portal-dev.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: portal-dist, path: ./portal-dist }
+      - run: |
+          npx wrangler@latest pages publish ./portal-dist --project-name=${{ secrets.CF_PAGES_PROJECT_NAME_DEV }} --branch=develop
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_DEV }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_DEV }}
+
+  deploy-portal-uat:
+    name: Deploy portal to Cloudflare (uat)
+    needs: build
+    if: ${{ github.ref == 'refs/heads/cicd' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: uat
+      url: https://pawhaven-portal-uat.pages.dev
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: portal-dist, path: ./portal-dist }
+      - run: |
+          npx wrangler@latest pages publish ./portal-dist --project-name=${{ secrets.CF_PAGES_PROJECT_NAME_UAT }} --branch=cicd
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_UAT }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_UAT }}
+
+  deploy-portal-prod:
+    name: Deploy portal to Cloudflare (prod)
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
       url: https://pawhaven-portal.pages.dev
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download portal artifact
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with: { name: portal-dist, path: ./portal-dist }
-      - name: Deploy to Cloudflare Pages
-        run: |
-          # Best practice: wrangler requires account token + project name
-          npx wrangler@latest pages publish ./portal-dist \
-            --project-name=${{ secrets.CF_PAGES_PROJECT_NAME }} \
-            --branch=main
+      - run: |
+          npx wrangler@latest pages publish ./portal-dist --project-name=${{ secrets.CF_PAGES_PROJECT_NAME_PROD }} --branch=main
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_PROD }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_PROD }}
