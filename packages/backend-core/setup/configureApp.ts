@@ -71,7 +71,7 @@ export function configureApp(
   if (enableHelmet) {
     app.use(
       (helmet.default as unknown as (
-        options: {
+        helmetOptions: {
           frameguard: { action: 'deny' };
           crossOriginEmbedderPolicy: false;
         },
