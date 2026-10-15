@@ -80,18 +80,16 @@
       "X-Sign",
       "x-locale"
     ],
-    "origin": ["http://localhost:3001"],
+    "origin": [
+      "http://localhost:3001"
+    ],
     "credentials": true,
     "optionsSuccessStatus": 204,
-    "methods": ["GET", "POST", "PUT", "OPTIONS"]
-  },
-  "dbConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "CORE_SERVICE_DB",
-        "uri": "${CORE_SERVICE_DB}"
-      }
-    }
-  ]
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "OPTIONS"
+    ]
+  }
 }
