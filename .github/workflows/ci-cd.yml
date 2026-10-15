@@ -1,0 +1,164 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main, develop, cicd]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Adjust if you need more memory for turbo builds
+  NODE_OPTIONS: --max-old-space-size=4096
+  PNPM_HOME: /home/runner/setup-pnpm
+
+jobs:
+  checks:
+    name: Lint / Security / Token / Type-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm lint
+        # Best practice: fail fast on style issues before build
+
+      - name: Security audit
+        run: pnpm audit --audit-level=moderate
+        # If you prefer stricter: --audit-level=low; add --ignore-practical for dev-only false positives
+
+      - name: Design-token check
+        run: node packages/design-system/scripts/token-check.cjs
+        # Scans apps/frontend and packages/ui against design-system tokens
+
+      # Optional but recommended industry practice for Nest/TS backend
+      - name: Type-check backend (gateway representative)
+        run: pnpm --filter @pawhaven/gateway typecheck
+        continue-on-error: true
+
+  build:
+    name: Install + Build
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace (backend + packages)
+        run: pnpm build
+        # Uses turbo; builds all apps/packages with build script
+
+      - name: Build portal (Cloudflare frontend)
+        run: pnpm --filter @pawhaven/portal build
+
+      - name: Upload backend artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: |
+            apps/backend/*/dist
+            apps/backend/gateway/dist
+          retention-days: 2
+
+      - name: Upload portal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-dist
+          path: apps/frontend/portal/dist
+          retention-days: 2
+
+  deploy-backend:
+    name: Deploy backend to Vercel
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cicd' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: vercel-backend
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm / Node
+        uses: pnpm/action-setup@v4
+        with: { version: 9, run_install: false }
+      - uses: actions/setup-node@v4
+        with: { node-version-file: '.nvmrc', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with: { name: backend-dist, path: ./dist-backend }
+
+      # Industry best practice: deploy per service with its own Vercel project secret.
+      # If you have one gateway entry-point, keep single deploy; else use matrix/loop.
+      - name: Deploy to Vercel (gateway / backend entry)
+        id: deploy
+        run: |
+          # Replace with your actual project settings / service folder
+          npx vercel@latest deploy \
+            --prod \
+            --token=${{ secrets.VERCEL_TOKEN }} \
+            --org-id=${{ secrets.VERCEL_ORG_ID }} \
+            --project-id=${{ secrets.VERCEL_PROJECT_ID_BACKEND }} \
+            --cwd=apps/backend/gateway
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+  deploy-portal:
+    name: Deploy portal to Cloudflare Pages
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/cicd' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: cloudflare-portal
+      url: https://pawhaven-portal.pages.dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download portal artifact
+        uses: actions/download-artifact@v4
+        with: { name: portal-dist, path: ./portal-dist }
+      - name: Deploy to Cloudflare Pages
+        run: |
+          # Best practice: wrangler requires account token + project name
+          npx wrangler@latest pages publish ./portal-dist \
+            --project-name=${{ secrets.CF_PAGES_PROJECT_NAME }} \
+            --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
