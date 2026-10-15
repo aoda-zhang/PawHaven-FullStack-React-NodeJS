@@ -35,11 +35,13 @@ export const FormPhoneInput = ({
               )}
             </div>
           )}
-          <PhoneInput
-            phone={field.value ?? ''}
-            hasError={Boolean(error)}
-            onPhoneChange={field.onChange}
-          />
+          <div data-testid={`form-phone-${name}`}>
+            <PhoneInput
+              phone={field.value ?? ''}
+              hasError={Boolean(error)}
+              onPhoneChange={field.onChange}
+            />
+          </div>
           {error && <p className="text-error mt-1 text-xs">{error.message}</p>}
         </div>
       )}

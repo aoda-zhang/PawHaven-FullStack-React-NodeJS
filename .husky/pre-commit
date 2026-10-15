@@ -3,3 +3,6 @@
 # Run ESLint + Prettier via lint-staged
 echo 	“🔍 Checking code syntax and formatting…”
 pnpm exec lint-staged
+
+echo "🔍 Checking design tokens…"
+pnpm --filter @pawhaven/design-system token-check

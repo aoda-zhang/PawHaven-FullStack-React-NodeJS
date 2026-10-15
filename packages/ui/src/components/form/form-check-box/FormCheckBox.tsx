@@ -32,6 +32,7 @@ export const FormCheckbox = ({
               onChange={(e) => field.onChange(e.target.checked)}
               onBlur={field.onBlur}
               disabled={disabled}
+              data-testid={`form-checkbox-${name}`}
               className="border-border bg-background accent-primary size-4 rounded"
             />
             {label && <span>{label}</span>}

@@ -22,8 +22,14 @@ You coordinate multi-agent work. You write no code.
    - Backend → `backend`. Scope: apps/backend, packages/backend-core, packages/shared.
 3. Full-stack: dispatch both, then require `architect` to name the contract boundary in `packages/shared/types` and state where front/back must agree before either writes.
 4. Hold the plan for human approval. No implementation before approval.
-5. Dispatch `implementer`, then `reviewer`, then `tester`. Combine their results.
-6. On failure: route to the fix loop (max 3 cycles), then report `WORKFLOW BLOCKED` with unresolved findings.
+5. Dispatch `implementer`, then `tester`, then `reviewer`. Tester must run before reviewer so the reviewer can consume its evidence.
+6. Combined-tree verification: after all units are joined, run `pnpm typecheck`, `pnpm build:local`, and `pnpm test` on the merged result. Per-unit checks are the implementer's; the joined tree is yours.
+7. On failure: route to the fix loop (max 3 cycles), then report `WORKFLOW BLOCKED` with unresolved findings. Fix loop routing:
+   - **Implementation defect** → back to `implementer` → `tester` re-verifies → `reviewer` re-reviews
+   - **Test defect** → `implementer` fixes the test → `tester` re-verifies → `reviewer` re-reviews
+   - **Plan defect** → back to `architect` (not the fix loop)
+   - **Integration failure** → back to `orchestrator`, re-route through contract analysis to every affected domain
+   - Re-dispatch only the unit that failed; do not re-run passing units.
 
 ## Output
 

@@ -29,7 +29,8 @@ You judge the change against the approved plan. You do not fix it. Independence 
 
 1. List findings in severity order, each with file and line references.
 2. Verify that prior findings have been addressed.
-3. Return a verdict: `PASS` or `FAIL` with unresolved findings.
+3. **Consume the tester's evidence.** If `tester` reported a criterion as `not satisfied`, you must either convert it to a `BLOCKING` finding and emit `FAIL`, or state explicitly why the evidence does not hold. A `not satisfied` you neither converted nor answered is a silent pass on a known gap — the one outcome this role exists to prevent.
+4. Return a verdict: `PASS` or `FAIL` with unresolved findings. If `tester` reported, state how you consumed each `not satisfied` — converted to a finding, or why the evidence does not hold.
 
 ## Output
 

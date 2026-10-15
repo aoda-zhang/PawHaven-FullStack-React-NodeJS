@@ -79,6 +79,7 @@ export const FormInput = ({
               maxLength={maxLength}
               required={required}
               aria-invalid={!!error}
+              data-testid={`form-input-${name}`}
               className={cn(
                 'border-border bg-background focus:border-primary w-full rounded-md border text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                 sizeClasses[size],
