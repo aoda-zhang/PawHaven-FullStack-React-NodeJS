@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import * as express from 'express';
-import helmet from 'helmet';
+import * as helmet from 'helmet';
 
 import { httpHeaders } from '../constants/httpHeaders.js';
 import { traceMiddleware } from '../trace/trace.middleware.js';
@@ -70,7 +70,12 @@ export function configureApp(
 
   if (enableHelmet) {
     app.use(
-      helmet({
+      (helmet.default as unknown as (
+        helmetOptions: {
+          frameguard: { action: 'deny' };
+          crossOriginEmbedderPolicy: false;
+        },
+      ) => import('express').RequestHandler)({
         frameguard: { action: 'deny' },
         crossOriginEmbedderPolicy: false,
       }),
