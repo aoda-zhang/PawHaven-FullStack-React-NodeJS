@@ -8,7 +8,6 @@ dayjs.extend(localizedFormat);
 const DAYJS_LOCALES: Record<string, string> = {
   'zh-cn': 'zh-cn',
   'en-us': 'en',
-  en: 'en',
   'de-de': 'de',
 };
 

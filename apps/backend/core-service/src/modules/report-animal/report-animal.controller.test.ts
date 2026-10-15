@@ -134,4 +134,123 @@ describe('ReportAnimalController validation', () => {
     expect(response.status).toBe(HTTP_STATUS_CREATED);
     expect(booted.create).toHaveBeenCalledWith(validReport(), CLAIMS);
   });
+
+  it('rejects photos that are not JPEG or PNG', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      reporterPhotos: [
+        'data:image/gif;base64,AAAA',
+        'data:image/webp;base64,BBBB',
+      ],
+    });
+    const body = (await response.json()) as ErrorBody;
+
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST);
+    expect(body.message).toEqual(
+      expect.arrayContaining([expect.stringContaining('JPG, JPEG or PNG')]),
+    );
+    expect(booted.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a description over 200 characters', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      description: 'a'.repeat(201),
+    });
+    const body = (await response.json()) as ErrorBody;
+
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST);
+    expect(body.message).toEqual(
+      expect.arrayContaining([expect.stringContaining('Description too long')]),
+    );
+    expect(booted.create).not.toHaveBeenCalled();
+  });
+
+  it('accepts a location with coordinates', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      location: {
+        address: 'Central Park',
+        latitude: 40.7829,
+        longitude: -73.9654,
+      },
+    });
+
+    expect(response.status).toBe(HTTP_STATUS_CREATED);
+    expect(booted.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        location: {
+          address: 'Central Park',
+          latitude: 40.7829,
+          longitude: -73.9654,
+        },
+      }),
+      CLAIMS,
+    );
+  });
+
+  it('accepts contactInfo with a valid email', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      contactInfo: { phone: '12345678', email: 'reporter@example.com' },
+    });
+
+    expect(response.status).toBe(HTTP_STATUS_CREATED);
+    expect(booted.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contactInfo: { phone: '12345678', email: 'reporter@example.com' },
+      }),
+      CLAIMS,
+    );
+  });
+
+  it('rejects contactInfo with an invalid email', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      contactInfo: { phone: '12345678', email: 'not-an-email' },
+    });
+    const body = (await response.json()) as ErrorBody;
+
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST);
+    expect(body.message).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('Invalid email address'),
+      ]),
+    );
+    expect(booted.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects more than 5 photos', async () => {
+    const booted = await boot();
+    app = booted.app;
+
+    const response = await booted.post({
+      ...validReport(),
+      reporterPhotos: Array(6).fill(PHOTO),
+    });
+    const body = (await response.json()) as ErrorBody;
+
+    expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST);
+    expect(body.message).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('At most 5 photos are allowed'),
+      ]),
+    );
+    expect(booted.create).not.toHaveBeenCalled();
+  });
 });
