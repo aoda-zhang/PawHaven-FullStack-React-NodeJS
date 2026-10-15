@@ -1,7 +1,6 @@
 import {
   authConfigSchema,
   corsConfigSchema,
-  dbConnectionsSchema,
   httpConfigSchema,
   microServiceConfigSchema,
   requiredInternalJwtSigningSchema,
@@ -16,7 +15,6 @@ export const gatewayConfigSchema = z.object({
   auth: authConfigSchema,
   internalJwt: requiredInternalJwtSigningSchema,
   throttle: throttleConfigSchema,
-  dbConnections: dbConnectionsSchema,
   microServices: z.array(microServiceConfigSchema).min(1),
   cors: corsConfigSchema,
 });
