@@ -11,7 +11,7 @@ export const mailTransportProvider: Provider = {
   useFactory: (configs: ConfigService): Transporter => {
     const email = configs.getOrThrow<EmailConfig>('email');
     if (email && (email as any).enabled === false) {
-      return createTransport({}) as Transporter;
+      return createTransport({ jsonTransport: true }) as Transporter;
     }
 
     return createTransport({
