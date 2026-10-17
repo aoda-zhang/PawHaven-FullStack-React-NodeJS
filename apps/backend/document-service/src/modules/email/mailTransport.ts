@@ -10,7 +10,7 @@ export const mailTransportProvider: Provider = {
   inject: [ConfigService],
   useFactory: (configs: ConfigService): Transporter => {
     const email = configs.getOrThrow<EmailConfig>('email');
-    if (email && (email as any).enabled === false) {
+    if (!email.enabled) {
       return createTransport({ jsonTransport: true }) as Transporter;
     }
 
