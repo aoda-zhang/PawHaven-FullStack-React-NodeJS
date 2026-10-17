@@ -80,16 +80,9 @@
       "X-Sign",
       "x-locale"
     ],
-    "origin": [
-      "http://localhost:3001"
-    ],
+    "origin": ["http://localhost:3001"],
     "credentials": true,
     "optionsSuccessStatus": 204,
-    "methods": [
-      "GET",
-      "POST",
-      "PUT",
-      "OPTIONS"
-    ]
+    "methods": ["GET", "POST", "PUT", "OPTIONS"]
   }
 }

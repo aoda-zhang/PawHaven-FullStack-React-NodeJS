@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import * as express from 'express';
-import * as helmet from 'helmet';
 
 import { httpHeaders } from '../constants/httpHeaders.js';
 import { traceMiddleware } from '../trace/trace.middleware.js';
@@ -23,7 +22,7 @@ export interface ConfigureAppOptions {
   enableVersioning?: boolean;
   enableCors?: boolean;
   enableCookieParser?: boolean;
-  enableHelmet?: boolean;
+  enableSecurityHeaders?: boolean;
   enableBodyParser?: boolean;
   enableShutdownHooks?: boolean;
   enableTrace?: boolean;
@@ -42,7 +41,7 @@ export function configureApp(
     enableVersioning = false,
     enableCors = true,
     enableCookieParser = true,
-    enableHelmet = true,
+    enableSecurityHeaders = true,
     enableBodyParser = true,
     enableShutdownHooks = true,
     enableTrace = true,
@@ -68,18 +67,14 @@ export function configureApp(
 
   app.disable('x-powered-by');
 
-  if (enableHelmet) {
-    app.use(
-      (helmet.default as unknown as (
-        helmetOptions: {
-          frameguard: { action: 'deny' };
-          crossOriginEmbedderPolicy: false;
-        },
-      ) => import('express').RequestHandler)({
-        frameguard: { action: 'deny' },
-        crossOriginEmbedderPolicy: false,
-      }),
-    );
+  // Built into Nest (>= 12.1) since `@nestjs/core` no longer needs the
+  // third-party `helmet` package for this. Defaults match helmet 8; we only
+  // tighten `X-Frame-Options` to `deny`.
+  if (enableSecurityHeaders) {
+    app.useSecurityHeaders({
+      xFrameOptions: { action: 'deny' },
+      crossOriginEmbedderPolicy: false,
+    });
   }
 
   if (enableShutdownHooks) {
