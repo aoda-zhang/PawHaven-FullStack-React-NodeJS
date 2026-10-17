@@ -89,14 +89,31 @@ export const featureFlagSchema = z.object({
   adoptablePetLimit: z.number().int().positive(),
 });
 
-export const emailConfigSchema = z.object({
-  from: z.string().min(1),
-  host: z.string().min(1),
-  port: z.number().int().positive(),
-  user: z.string().min(1),
-  password: z.string().min(1),
-  tls: z.object({ ciphers: z.string().min(1) }).optional(),
-});
+export const emailConfigSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    from: z.string().min(1),
+    host: z.string(),
+    port: z.number().int().positive(),
+    user: z.string(),
+    password: z.string(),
+    tls: z.object({ ciphers: z.string().min(1) }).optional(),
+  })
+  .superRefine((email, ctx) => {
+    if (!email.enabled) {
+      return;
+    }
+
+    (['host', 'user', 'password'] as const).forEach((key) => {
+      if (email[key].length === 0) {
+        ctx.addIssue({
+          code: 'custom',
+          path: [key],
+          message: `email.${key} must be non-empty when email.enabled is true`,
+        });
+      }
+    });
+  });
 
 export type EmailConfig = z.infer<typeof emailConfigSchema>;
 
