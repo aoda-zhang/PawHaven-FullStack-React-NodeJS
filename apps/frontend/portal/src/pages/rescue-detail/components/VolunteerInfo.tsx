@@ -28,8 +28,8 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
   const isPending = followMutation.isPending || unfollowMutation.isPending;
   const hasError = followMutation.isError || unfollowMutation.isError;
   const errorKey = followMutation.isError
-    ? 'animalFollow.follow_error'
-    : 'animalFollow.unfollow_error';
+    ? 'rescueDetail.follow_error'
+    : 'rescueDetail.unfollow_error';
 
   const handleFollow = () => followMutation.mutate(animalId);
   const handleUnfollow = () => unfollowMutation.mutate(animalId);

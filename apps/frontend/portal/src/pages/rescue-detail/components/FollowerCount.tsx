@@ -17,7 +17,7 @@ export const FollowerCount = ({
 
   return (
     <p className="text-text-secondary mt-2 text-center text-xs">
-      {t('animalFollow.followers_count', { count })}
+      {t('rescueDetail.followers_count', { count })}
     </p>
   );
 };

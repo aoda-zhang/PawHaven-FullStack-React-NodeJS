@@ -6,10 +6,10 @@ import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { bootstrapQueryKeys } from '@/app/api/bootstrap.queryKeys';
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { bootstrapQueryKeys } from '@/app/init/bootstrap.queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 
-import { useLogin, useLogout } from '../auth.mutations';
+import { useLogin, useLogout } from '../api/auth.mutations';
 
 const { mockSetProfile, mockEmptyProfile } = vi.hoisted(() => ({
   mockSetProfile: vi.fn((payload: unknown) => ({
@@ -34,7 +34,7 @@ vi.mock('@/app/store/globalReducer', () => ({
 }));
 
 // Mock API calls.
-vi.mock('../auth.api', () => ({
+vi.mock('../api/auth.api', () => ({
   postLogin: vi.fn().mockResolvedValue({
     user: { userId: 'u-123', email: 'test@test.com', roles: [] },
     expires_in: 900,

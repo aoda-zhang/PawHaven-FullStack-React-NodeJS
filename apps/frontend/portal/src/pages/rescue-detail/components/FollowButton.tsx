@@ -50,11 +50,11 @@ export const FollowButton = ({
         ) : (
           <Bookmark className="h-4 w-4" aria-hidden="true" />
         )}
-        {t(isFollowing ? 'animalFollow.following' : 'animalFollow.follow')}
+        {t(isFollowing ? 'rescueDetail.following' : 'rescueDetail.follow')}
       </Button>
       {hasError && (
         <p role="alert" className="text-error text-center text-xs">
-          {t(errorKey || 'animalFollow.follow_error')}
+          {t(errorKey || 'rescueDetail.follow_error')}
         </p>
       )}
     </div>

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { apiClient } from '@/shared/utils/apiClient';
 
-import { createReportAnimal } from '../reportAnimal.api';
+import { createReportAnimal } from '../api/reportAnimal.api';
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: {

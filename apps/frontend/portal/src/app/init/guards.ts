@@ -8,10 +8,6 @@ import {
 import { getQueryClient } from '@/app/providers/QueryProvider';
 import { routePaths, routeSearchParams } from '@/app/router/routePaths';
 
-/**
- * Auth guard loader: ensures the current-user query is resolved before the
- * authenticated section renders. If not resolvable, redirects to the login page.
- */
 export const requireUser = async ({ request }: LoaderFunctionArgs) => {
   const { pathname, search } = new URL(request.url);
   const redirectTo = `${routePaths.login}?${routeSearchParams.redirect}=${encodeURIComponent(`${pathname}${search}`)}`;

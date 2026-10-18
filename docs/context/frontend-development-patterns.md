@@ -1,8 +1,9 @@
 # PawHaven — Frontend Development Patterns
 
 > **This document answers one question: what a change to this frontend must look like.**
-> For where files live, read [Frontend Architecture](frontend-architecture.md) — §2.2 for directories, §8 for
-> placement. This document contains no file map and repeats no architecture rule.
+> For what each unit owns and which way the dependencies run, read
+> [Frontend Architecture](frontend-architecture.md) — §1 for the units, §2 for the direction. Every path
+> below is a locator; the code at that path is the authority.
 
 ---
 
@@ -20,9 +21,23 @@
 
 ### 2.1 New page
 
-1. Create `features/<kebab-name>/` with `route.tsx` and `<Name>.tsx`.
-2. Add every URL to `routePaths.ts`; reference the constant, never a literal.
-3. Export the route from `route.tsx`; the shell in `router/router.tsx` composes it.
+The app layer is `src/app/` in five segments. `init/` owns boot data — the bootstrap query, the
+current-user query, the root loader and the `requireUser` guard. `layout/` renders what it is given and
+fetches nothing: no `apiClient`, no query, no mutation. `providers/` composes the runtime, `router/`
+holds the URL table and composes the routes, `store/` holds Redux.
+
+A page slice is `pages/<slice>/`: `route.tsx` exports the routes, `index.tsx` is the page container,
+and `api/`, `components/` and `tests/` sit beside them. A slice adds `types.ts`, `constants.ts` or
+`utils/` only when it needs one. A slice with more than one route nests its containers in sub-folders;
+`auth` holds `login/` and `register/`.
+
+`components/` holds views. No `useQuery`, `useMutation` or Redux hook in a view — the owning hook lives
+in the container above it, which is `index.tsx` or a component that is itself the container for its
+children. Form-local `useState` and `react-hook-form` context reads are a view's own business.
+
+1. Create `pages/<kebab-name>/` with `route.tsx` and `index.tsx`.
+2. Add every URL to `app/router/routePaths.ts`; reference the constant, never a literal.
+3. Export the route from `route.tsx`; the shell in `app/router/router.tsx` composes it.
 4. Code-split with route-level `lazy:`; the page component is the lazy import.
 5. Load route-critical data in the loader through `queryClient.ensureQueryData`, read it with
    `useLoaderData()` — not with a query hook.
@@ -30,17 +45,23 @@
 
 ### 2.2 Requesting data
 
-| File                  | Owns                      | Rule                                                           |
-| --------------------- | ------------------------- | -------------------------------------------------------------- |
-| `<name>.api.ts`       | the raw request functions | the **only** file in the app that touches `apiClient`          |
-| `<name>.queries.ts`   | read hooks                | one per read; key factory decides cache identity               |
-| `<name>.queryKeys.ts` | the key factory           | no string literals outside it; per-feature hierarchy           |
-| `<name>.mutations.ts` | write hooks               | on success write the query or invalidate it — never leave both |
+| File                  | Owns                      | Rule                                                                |
+| --------------------- | ------------------------- | ------------------------------------------------------------------- |
+| `<name>.api.ts`       | the raw request functions | the only place a page slice touches `apiClient`                     |
+| `<name>.queries.ts`   | read hooks                | one per read; key factory decides cache identity                    |
+| `<name>.queryKeys.ts` | the key factory           | no string literals outside it; private keys nest under the base key |
+| `<name>.mutations.ts` | write hooks               | on success write the query or invalidate it — never leave both      |
 
+- `apiClient` is reached from `*.api.ts` files and from `app/init/`. Nothing else imports it.
 - The client unwraps the success envelope; a caller receives the payload, not the envelope.
 - Errors arrive already normalized, carrying `traceId`. Display it on error surfaces.
-- A `401` is handled globally by `frontend-core`, which redirects to login. Do not re-implement it.
-- `Download`/`postBlob` responses bypass the envelope; nothing to unwrap.
+- `frontend-core` normalizes a `401` to `httpRequestErrors.AUTH`. The portal decides what happens:
+  `requireUser` in `app/init/guards.ts` redirects, `onAuthError` in `app/providers/QueryProvider.tsx`
+  replaces the location. Do not re-implement either.
+- `download`/`postBlob` responses bypass the envelope; nothing to unwrap.
+- A key belongs in `src/shared/constants/sharedQueryKeys.ts` only when something outside its owner must
+  reach it — `sharedQueryKeys.auth.currentUser(userId)`, because `app/init/` owns the query while the
+  auth page owns the invalidation. Every other key stays with its owner.
 - Server state never enters Redux.
 
 ### 2.3 Form
@@ -49,17 +70,18 @@
 2. `react-hook-form` + `@hookform/resolvers/zod`; the resolver takes the shared schema directly.
 3. Compose fields from `@pawhaven/ui/form`; do not write a new input primitive for a one-off.
 4. Submit through a mutation; keep the payload in the schema's shape, not a hand-built object.
-5. Photo and file inputs convert to data URLs in the feature's `utils/`, never in a component.
+5. Photo and file inputs convert to data URLs in the slice's `utils/`, never in a component.
 
 ### 2.4 Component
 
-| Situation                                         | Home                                                                       |
-| ------------------------------------------------- | -------------------------------------------------------------------------- |
-| Used by one feature                               | that feature's `components/`                                               |
-| Pure presentation, needed by a second feature     | `packages/ui`                                                              |
-| Business-common (guards, error surfaces, widgets) | `packages/frontend-core/src/components/`                                   |
-| Shared logic and hooks                            | `packages/frontend-core/src/utils/`, or `src/shared/` for portal-only code |
-| Environment config                                | `src/config/`                                                              |
+| Situation                                                                                                                | Home                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Used by one page slice                                                                                                   | that slice's `components/`                                                  |
+| Pure presentation, needed by a second place                                                                              | `packages/ui`                                                               |
+| Shell chrome and error surfaces — brand, language selector, image upload, not-found, system error, router error fallback | `packages/frontend-core/src/components/`                                    |
+| Shared logic and hooks — date formatting, locale, storage, query defaults                                                | `packages/frontend-core/src/utils/` and `packages/frontend-core/src/hooks/` |
+| Portal-only shared code                                                                                                  | `apps/frontend/portal/src/shared/`                                          |
+| Environment config                                                                                                       | `src/config/`                                                               |
 
 Before moving a component into a package, remove its app dependencies: pass resolved hook state and
 literal values as props, and pass render slots (`footer?: ReactNode`). A package must never import from
@@ -70,7 +92,8 @@ literal values as props, and pass render slots (`footer?: ReactNode`). A package
 1. A new raw value → `packages/design-system/src/tokens/`.
 2. A new semantic role → `theme.css`, mapped onto a primitive.
 3. A repeated component pattern → `utilities.css` as an `@utility`.
-4. Consume it as a Tailwind semantic utility; merge conflicting classes with `cn()`.
+4. Consume it as a Tailwind semantic utility; merge conflicting classes with `cn()`, which
+   `@pawhaven/ui` owns.
 5. Class order is Prettier's job — do not hand-sort.
 
 Forbidden everywhere: raw hex, a raw Tailwind palette name (`text-gray-500`), a CSS-variable bypass
@@ -79,34 +102,35 @@ Forbidden everywhere: raw hex, a raw Tailwind palette name (`text-gray-500`), a 
 
 ### 2.6 Locale key
 
-1. Add it to the feature's namespace file in **all three** languages in the same change —
+1. Add it to the slice's namespace file in **all three** languages in the same change —
    `en-US`, `zh-CN`, `de-DE`. A key present in one and missing in another is a defect.
 2. Inside a file keys are `snake_case`; across files they are accessed as `camelCase`, so
    `rescueCases.json` holds the top-level key `rescue_cases`.
 3. Store the **key** in constants and option arrays and translate at render. Never store a rendered
    translation — it makes the stored value depend on the submitter's locale.
-4. Read it through `useTranslation`/`t()`; features do not import `@pawhaven/i18n` directly.
+4. Read it through `useTranslation`/`t()`; a slice does not import `@pawhaven/i18n` directly.
 5. A new language is a new folder plus an entry in `supportedLngs.js`.
 
 ### 2.7 Test
 
 - Vitest 4 + `@testing-library/react`; jsdom is already configured.
-- Location: `tests/` beside the code, or `api/tests/` for API files. `*.test.ts(x)`.
+- Location: a page slice has exactly one `tests/` directory, directly under `pages/<slice>/`, and every
+  test file sits flat inside it. No `api/tests/`, no nested directory. `*.test.ts(x)`.
 - A component test asserts what a user can observe. A bug's reproduction must fail before the fix and
   pass after it, on the same surface.
 - Do not restate the implementation in a test.
 
 ### 2.8 When the change belongs in a package
 
-A change graduates out of a feature when a second consumer needs it, or when it encodes a rule that
+A change graduates out of a page slice when a second consumer needs it, or when it encodes a rule that
 must hold for everyone. Before it moves: no app imports, its own tests, and its place in the dependency
-direction (`shared → design-system → ui → frontend-core`).
+direction ([Frontend Architecture](frontend-architecture.md) §2).
 
 ## 3. State access
 
 - Typed Redux hooks only: `useReduxDispatch`, `useReduxSelector` from `@/app/store/reduxHooks`. Raw
   `useDispatch`/`useSelector` outside that file is a defect.
-- `useGlobalState` from `@/store/globalReducer` is the per-slice convenience hook.
+- `useGlobalState` from `@/app/store/globalReducer` is the per-slice convenience hook.
 - `store.getState()` appears in loaders, never in a component.
 - Query cache persistence is opt-in per query with `meta.persist = true`; the default keeps nothing on
   disk.
@@ -118,7 +142,7 @@ direction (`shared → design-system → ui → frontend-core`).
 | Situation                   | Home                                     | Import                   |
 | --------------------------- | ---------------------------------------- | ------------------------ |
 | Used in more than one place | `packages/shared/types/<Name>.schema.ts` | `@pawhaven/shared/types` |
-| Used by exactly one feature | `features/<feature>/types.ts`            | relative                 |
+| Used by exactly one slice   | `pages/<slice>/types.ts`                 | relative                 |
 
 - Zod is the source of truth; the TS type is `z.infer` of the schema. Read enum members off the schema
   instead of repeating the literal union.
@@ -129,10 +153,10 @@ direction (`shared → design-system → ui → frontend-core`).
 
 ## 5. Boundaries while coding
 
-- No feature imports another feature. When one seems necessary, it is either a shared component
+- No page slice imports another page slice. When one seems necessary, it is either a shared component
   (§2.4) or a missing package export — decide which before writing the import.
 - Every deviation is an explicit entry in the `A2` allowlist of `scripts/check-architecture.mjs` and a
-  note in the affected feature's document. An unlisted deviation fails the gate.
+  note in the affected slice's document. An unlisted deviation fails the gate.
 - No package imports from `apps/`. No app imports from another app.
 
 ## 6. Hand off
@@ -143,13 +167,14 @@ direction (`shared → design-system → ui → frontend-core`).
 | Lint and format        | `pnpm lint`                                | turbo across workspaces; the portal extends `@pawhaven/eslint-config/web` and has no lint script of its own |
 | Tests                  | `pnpm --filter @pawhaven/portal test`      | the app; packages carry their own                                                                           |
 | Styling                | `pnpm token-check`                         | hardcoded colours, bypasses, `style={{}}`                                                                   |
-| Boundaries             | `pnpm architecture-check`                  | A1–A5                                                                                                       |
+| Boundaries             | `pnpm architecture-check`                  | A1–A6                                                                                                       |
 | Documentation links    | `pnpm check:links`                         | every relative link resolves                                                                                |
-| Shared package changed | `pnpm build:libs`                          | downstream apps consume `dist`/`build`, not source                                                          |
+| Shared package changed | `pnpm build:libs`                          | downstream apps consume `dist`/`build`, not source — run it before portal typecheck or test                 |
 
 Report what you checked and what you deliberately left alone. Name the command and its output for every
 claim; a plausible summary is not a pass.
 
 ## 7. Related
 
-- [Frontend Architecture](frontend-architecture.md) — where files live, what owns them.
+- [Frontend Architecture](frontend-architecture.md) — what each unit owns, and which direction the
+  dependencies run.
