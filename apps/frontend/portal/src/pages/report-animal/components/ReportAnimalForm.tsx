@@ -11,17 +11,23 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useCreateReportAnimal } from '../api/reportAnimal.mutations';
-import { FALLBACK_ID_SUFFIX_LENGTH } from '../constants';
+import { createFallbackCaseId } from '../utils/createFallbackCaseId';
 import { readFilesAsDataUrls } from '../utils/readFilesAsDataUrls';
 
 import { AnimalBasicsSection } from './AnimalBasicsSection';
 import { BehaviorContactSection } from './BehaviorContactSection';
 
-export const ReportAnimalForm = () => {
+interface ReportAnimalFormProps {
+  onSubmit: (dto: AnimalReportDto) => Promise<{ id?: string }>;
+  isPending?: boolean;
+}
+
+export const ReportAnimalForm = ({
+  onSubmit,
+  isPending = false,
+}: ReportAnimalFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { mutate: createReport, isPending } = useCreateReportAnimal();
   const [submitted, setSubmitted] = useState(false);
   const [caseId, setCaseId] = useState('');
 
@@ -63,7 +69,7 @@ export const ReportAnimalForm = () => {
     },
   });
 
-  const onSubmit = async (values: ReportAnimalFormValues) => {
+  const handleSubmit = async (values: ReportAnimalFormValues) => {
     const description = values.description?.trim() ?? '';
     const isUrgent = values.urgent;
     const reporterPhotos = await readFilesAsDataUrls(values.photos);
@@ -96,16 +102,10 @@ export const ReportAnimalForm = () => {
       },
     };
 
-    createReport(dto, {
-      onSuccess: (data) => {
-        setCaseId(
-          data?.id ??
-            `REP-${Date.now().toString().slice(-FALLBACK_ID_SUFFIX_LENGTH)}`,
-        );
-        setSubmitted(true);
-        window.scrollTo(0, 0);
-      },
-    });
+    const result = await onSubmit(dto);
+    setCaseId(result?.id ?? createFallbackCaseId());
+    setSubmitted(true);
+    window.scrollTo(0, 0);
   };
 
   if (submitted) {
@@ -137,7 +137,7 @@ export const ReportAnimalForm = () => {
 
   return (
     <FormProvider {...form}>
-      <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+      <form noValidate onSubmit={form.handleSubmit(handleSubmit)}>
         <div className="bg-card border-border mb-6 rounded-2xl border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
             {t('reportAnimal.basics_title')}

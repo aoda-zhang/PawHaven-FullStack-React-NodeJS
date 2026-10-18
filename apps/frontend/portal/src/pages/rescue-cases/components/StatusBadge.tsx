@@ -1,5 +1,5 @@
-import { cn } from '@pawhaven/frontend-core';
 import type { AnimalStatus } from '@pawhaven/shared/types';
+import { cn } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 
 import { getStatusColorByPrefix } from '@/shared/utils/getStatusColorByPrefix';

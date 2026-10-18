@@ -3,11 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { postLogin, postLogout, postRegister } from './auth.api';
 
-import { bootstrapQueryKeys } from '@/app/api/bootstrap.queryKeys';
+import { bootstrapQueryKeys } from '@/app/init/bootstrap.queryKeys';
 import { emptyProfile, setProfile } from '@/app/store/globalReducer';
 import { useReduxDispatch } from '@/app/store/reduxHooks';
 import type { ProfileType } from '@/pages/auth/types';
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 
 const toProfile = (session: SessionDto): ProfileType => ({
   accessToken: '', // JWTs are httpOnly cookies set by the gateway, invisible to JS

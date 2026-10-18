@@ -1,3 +1,4 @@
+import { downloadPdf } from '../api/pdf.api';
 import {
   rescueGuideCatalog,
   rescueGuidePresentations,
@@ -22,7 +23,11 @@ export const RescueGuideDownloads = () => {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {items.map((item) => (
-        <GuideDownloadCard key={item.slug} item={item} />
+        <GuideDownloadCard
+          key={item.slug}
+          item={item}
+          downloadPdf={downloadPdf}
+        />
       ))}
     </div>
   );

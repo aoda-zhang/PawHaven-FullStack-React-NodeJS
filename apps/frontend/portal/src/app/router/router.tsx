@@ -2,8 +2,8 @@ import { NotFound, RouterErrorFallback } from '@pawhaven/frontend-core';
 import { Loading } from '@pawhaven/ui';
 import { createBrowserRouter, ScrollRestoration } from 'react-router-dom';
 
-import { rootLoader, rootShouldRevalidate } from './rootLayout.loader';
-
+import { requireUser } from '@/app/init/guards';
+import { rootLoader, rootShouldRevalidate } from '@/app/init/loader';
 import { RootLayout } from '@/app/layout/RootLayout';
 import { RootLayoutFooter } from '@/app/layout/RootLayoutFooter';
 import { routePaths } from '@/app/router/routePaths';
@@ -11,7 +11,6 @@ import {
   AuthenticatedLayout,
   loginRoute,
   registerRoute,
-  requireUser,
 } from '@/pages/auth/route';
 import { homeRoute } from '@/pages/home/route';
 import { reportAnimalRoute } from '@/pages/report-animal/route';

@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/frontend-core';
+import { cn } from '@pawhaven/ui';
 import type { NavigateFunction } from 'react-router-dom';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';

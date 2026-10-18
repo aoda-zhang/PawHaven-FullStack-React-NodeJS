@@ -1,8 +1,8 @@
 import type { AnimalFollowResult } from '@pawhaven/shared/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { followAnimal, unfollowAnimal } from './animalFollow.api';
-import { animalFollowQueryKeys } from './animalFollow.queryKeys';
+import { followAnimal, unfollowAnimal } from './rescueDetail.api';
+import { rescueDetailQueryKeys } from './rescueDetail.queryKeys';
 
 const useFollowStatusMutation = (
   mutationFn: (animalId: string) => Promise<AnimalFollowResult>,
@@ -13,7 +13,7 @@ const useFollowStatusMutation = (
     mutationFn,
     onSuccess: (result) => {
       queryClient.setQueryData(
-        animalFollowQueryKeys.status(result.animalId),
+        rescueDetailQueryKeys.followStatus(result.animalId),
         result,
       );
     },

@@ -6,11 +6,14 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { followAnimal, unfollowAnimal } from '../animalFollow.api';
-import { useFollowAnimal, useUnfollowAnimal } from '../animalFollow.mutations';
-import { animalFollowQueryKeys } from '../animalFollow.queryKeys';
+import { followAnimal, unfollowAnimal } from '../api/rescueDetail.api';
+import {
+  useFollowAnimal,
+  useUnfollowAnimal,
+} from '../api/rescueDetail.mutations';
+import { rescueDetailQueryKeys } from '../api/rescueDetail.queryKeys';
 
-vi.mock('../animalFollow.api', () => ({
+vi.mock('../api/rescueDetail.api', () => ({
   followAnimal: vi.fn(),
   unfollowAnimal: vi.fn(),
 }));
@@ -61,7 +64,7 @@ describe('animalFollow mutations', () => {
 
     expect(vi.mocked(followAnimal).mock.calls[0]?.[0]).toBe(animalId);
     expect(
-      queryClient.getQueryData(animalFollowQueryKeys.status(animalId)),
+      queryClient.getQueryData(rescueDetailQueryKeys.followStatus(animalId)),
     ).toEqual(followedResult);
     expect(invalidateSpy).not.toHaveBeenCalled();
   });
@@ -83,7 +86,7 @@ describe('animalFollow mutations', () => {
 
     expect(vi.mocked(unfollowAnimal).mock.calls[0]?.[0]).toBe(animalId);
     expect(
-      queryClient.getQueryData(animalFollowQueryKeys.status(animalId)),
+      queryClient.getQueryData(rescueDetailQueryKeys.followStatus(animalId)),
     ).toEqual(unfollowedResult);
     expect(invalidateSpy).not.toHaveBeenCalled();
   });

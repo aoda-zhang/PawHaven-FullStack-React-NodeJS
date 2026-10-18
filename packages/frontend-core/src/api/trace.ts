@@ -45,8 +45,3 @@ export const recordTraceId = (response: unknown): string | null => {
 
 /** The most recent trace id seen, or null before the first response. */
 export const getLastTraceId = (): string | null => lastTraceId;
-
-/** Test seam. */
-export const resetLastTraceId = (): void => {
-  lastTraceId = null;
-};

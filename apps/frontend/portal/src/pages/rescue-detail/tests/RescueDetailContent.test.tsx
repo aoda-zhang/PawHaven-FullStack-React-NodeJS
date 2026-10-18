@@ -26,12 +26,10 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('../components/FollowButton', () => ({
-  FollowButton: () => null,
-}));
-
-vi.mock('../components/FollowerCount', () => ({
-  FollowerCount: () => null,
+vi.mock('../components/VolunteerInfo', () => ({
+  VolunteerInfo: ({ animalId }: { animalId: string }) => (
+    <span data-testid="volunteer-info">{animalId}</span>
+  ),
 }));
 
 const buildAnimal = (reporterName: string | null): RescueDetail => ({

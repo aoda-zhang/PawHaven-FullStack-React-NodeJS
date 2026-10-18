@@ -1,5 +1,5 @@
-import { cn } from '@pawhaven/frontend-core';
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
+import { cn } from '@pawhaven/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate } from 'react-router-dom';

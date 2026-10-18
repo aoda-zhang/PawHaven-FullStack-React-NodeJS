@@ -1,8 +1,6 @@
+import { SystemError, type ErrorInfo } from '@pawhaven/frontend-core';
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
-
-import type { ErrorInfo } from '../router-error-fallback/RouterErrorFallback';
-import { SystemError } from '../system-error/SystemError';
 
 export const ContentFallback = ({
   error,

@@ -199,7 +199,8 @@ for (const svc of BACKEND_SERVICES) {
 // (`rescue-detail|animal-follow` lived here until the `animal-follow` slice was
 // folded into `rescue-detail`; `report-animal|auth`, `report-animal|home` and
 // `report-animal|rescue-cases` lived here until report-animal was moved onto the
-// app-level `@/app/api/currentUser` and `@/shared/api/queryKeys` registries.)
+// app-level `@/app/init/currentUser` and `@/shared/constants/sharedQueryKeys`
+// registries.)
 const A2_ALLOWLIST = new Set([
   'apps/frontend/portal/src/pages/home|rescue-cases',
 ]);

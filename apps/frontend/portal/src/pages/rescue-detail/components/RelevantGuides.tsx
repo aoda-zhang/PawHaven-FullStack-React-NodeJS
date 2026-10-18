@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/frontend-core';
+import { cn } from '@pawhaven/ui';
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

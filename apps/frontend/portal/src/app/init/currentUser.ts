@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getCurrentProfile } from '@/app/store/currentProfile';
 import { useGlobalState } from '@/app/store/globalReducer';
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 import { apiClient } from '@/shared/utils/apiClient';
 
 const MS_PER_SECOND = 1000;

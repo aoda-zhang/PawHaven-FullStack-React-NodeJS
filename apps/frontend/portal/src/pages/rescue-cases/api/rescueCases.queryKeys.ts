@@ -1,4 +1,4 @@
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 
 export const rescueCasesQueryKeys = {
   all: sharedQueryKeys.rescueCases.all,

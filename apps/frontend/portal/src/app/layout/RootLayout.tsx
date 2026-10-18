@@ -1,4 +1,3 @@
-import { ContentFallback } from '@pawhaven/frontend-core';
 import type { BootstrapData } from '@pawhaven/shared/types';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
@@ -18,6 +17,7 @@ import { RootLayoutFooter } from './RootLayoutFooter';
 import { RootLayoutMenu } from './RootLayoutMenu';
 
 import { useGlobalState } from '@/app/store/globalReducer';
+import { ContentFallback } from '@/shared/components/ContentFallback';
 
 export const RootLayout = () => {
   const { isSysMaintain } = useGlobalState();

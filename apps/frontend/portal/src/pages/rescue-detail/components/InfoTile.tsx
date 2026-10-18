@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/frontend-core';
+import { cn } from '@pawhaven/ui';
 import type { ReactNode } from 'react';
 
 export interface InfoTileProps {

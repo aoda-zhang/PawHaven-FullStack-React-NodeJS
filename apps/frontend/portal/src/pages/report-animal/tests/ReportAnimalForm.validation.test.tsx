@@ -1,9 +1,7 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { ReportAnimalForm } from '../components/ReportAnimalForm';
@@ -26,22 +24,9 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
 }));
 
-const mutate = vi.fn();
+const onSubmit = vi.fn().mockResolvedValue({ id: 'test-id' });
 
-vi.mock('../api/reportAnimal.mutations', () => ({
-  useCreateReportAnimal: () => ({ mutate, isPending: false }),
-}));
-
-const renderForm = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false } },
-  });
-  const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-
-  return render(<ReportAnimalForm />, { wrapper: Wrapper });
-};
+const renderForm = () => render(<ReportAnimalForm onSubmit={onSubmit} />);
 
 describe('ReportAnimalForm validation messages', () => {
   it('does not submit and shows required errors for every empty required field', async () => {
@@ -52,7 +37,7 @@ describe('ReportAnimalForm validation messages', () => {
     );
 
     await waitFor(() => {
-      expect(mutate).not.toHaveBeenCalled();
+      expect(onSubmit).not.toHaveBeenCalled();
     });
 
     const expectedMessages = [

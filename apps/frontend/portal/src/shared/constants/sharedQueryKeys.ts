@@ -4,7 +4,7 @@
  * A key belongs here only when something outside its owner must reach it. A2
  * forbids page-to-page imports, so the home and rescue-cases keys that
  * `report-animal` invalidates cannot live in those pages. The auth prefix is
- * here for the same reason: `app/api/currentUser.ts` owns the query nested
+ * here for the same reason: `app/init/currentUser.ts` owns the query nested
  * under it, while the auth page owns the invalidation that clears it.
  *
  * Every other key stays in its owner's `api/<name>.queryKeys.ts`, which nests

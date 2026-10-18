@@ -3,8 +3,8 @@ import type {
   ShouldRevalidateFunctionArgs,
 } from 'react-router-dom';
 
-import { bootstrapQueryOptions } from '@/app/api/bootstrap.queries';
-import type { BootstrapScope } from '@/app/api/bootstrap.queryKeys';
+import { bootstrapQueryOptions } from '@/app/init/bootstrap.queries';
+import type { BootstrapScope } from '@/app/init/bootstrap.queryKeys';
 import { getQueryClient } from '@/app/providers/QueryProvider';
 import { routePaths } from '@/app/router/routePaths';
 import { reducerNames } from '@/app/store/reducerNames';

@@ -6,17 +6,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FollowButton } from '../components/FollowButton';
 
-const mocks = vi.hoisted(() => ({
-  followMutate: vi.fn(),
-  unfollowMutate: vi.fn(),
-  isFollowing: { value: false as boolean },
-  isLoading: { value: false as boolean },
-  mutationError: { value: 'none' as 'none' | 'follow' | 'unfollow' },
-  statusQuery: {
-    value: null as { animalId: string } | null,
-  },
-}));
-
 vi.mock('react-i18next', async () => {
   const actual = await vi.importActual('react-i18next');
   return {
@@ -28,110 +17,103 @@ vi.mock('react-i18next', async () => {
   };
 });
 
-vi.mock('../api/animalFollow.queries', () => ({
-  useFollowStatus: (animalId: string) => {
-    mocks.statusQuery.value = { animalId };
-    return {
-      data: { animalId: 'PAW-0001', isFollowing: mocks.isFollowing.value },
-      isLoading: mocks.isLoading.value,
-    };
-  },
-}));
-
-vi.mock('../api/animalFollow.mutations', () => ({
-  useFollowAnimal: () => ({
-    mutate: mocks.followMutate,
-    isPending: false,
-    isError: mocks.mutationError.value === 'follow',
-  }),
-  useUnfollowAnimal: () => ({
-    mutate: mocks.unfollowMutate,
-    isPending: false,
-    isError: mocks.mutationError.value === 'unfollow',
-  }),
-}));
+vi.mock('lucide-react', async () => {
+  const actual = await vi.importActual('lucide-react');
+  return {
+    ...(actual as Record<string, unknown>),
+    Bookmark: () => <span data-testid="bookmark-icon" />,
+    BookmarkCheck: () => <span data-testid="bookmark-check-icon" />,
+  };
+});
 
 const animalId = 'PAW-0001';
 
-const renderButton = () => render(<FollowButton animalId={animalId} />);
+const renderButton = (
+  props: Partial<React.ComponentProps<typeof FollowButton>> = {},
+) =>
+  render(<FollowButton animalId={animalId} isFollowing={false} {...props} />);
 
 describe('FollowButton', () => {
   beforeEach(() => {
-    mocks.followMutate.mockReset();
-    mocks.unfollowMutate.mockReset();
-    mocks.isFollowing.value = false;
-    mocks.isLoading.value = false;
-    mocks.mutationError.value = 'none';
-    mocks.statusQuery.value = null;
+    vi.clearAllMocks();
   });
 
-  it('renders the follow control without requiring a signed-in profile', () => {
+  it('renders the follow control from the props it was given', () => {
     renderButton();
 
     expect(screen.getByRole('button')).toBeInTheDocument();
-    expect(mocks.statusQuery.value).toEqual({ animalId });
+    expect(screen.getByTestId('bookmark-icon')).toBeInTheDocument();
+    expect(screen.queryByTestId('bookmark-check-icon')).toBeNull();
   });
 
   it('renders the follow state when the animal is not followed', () => {
-    renderButton();
+    renderButton({ isFollowing: false });
 
     expect(screen.getByRole('button')).toHaveTextContent('animalFollow.follow');
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('renders the following state when the animal is followed', () => {
-    mocks.isFollowing.value = true;
-
-    renderButton();
+    renderButton({ isFollowing: true });
 
     expect(screen.getByRole('button')).toHaveTextContent(
       'animalFollow.following',
     );
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('bookmark-check-icon')).toBeInTheDocument();
+    expect(screen.queryByTestId('bookmark-icon')).toBeNull();
   });
 
   it('follows the animal on click when not following', () => {
-    renderButton();
+    const onFollow = vi.fn();
+    const onUnfollow = vi.fn();
+
+    renderButton({ isFollowing: false, onFollow, onUnfollow });
 
     screen.getByRole('button').click();
 
-    expect(mocks.followMutate).toHaveBeenCalledWith(animalId);
-    expect(mocks.unfollowMutate).not.toHaveBeenCalled();
+    expect(onFollow).toHaveBeenCalledTimes(1);
+    expect(onUnfollow).not.toHaveBeenCalled();
   });
 
   it('unfollows the animal on click when following', () => {
-    mocks.isFollowing.value = true;
+    const onFollow = vi.fn();
+    const onUnfollow = vi.fn();
 
-    renderButton();
+    renderButton({ isFollowing: true, onFollow, onUnfollow });
 
     screen.getByRole('button').click();
 
-    expect(mocks.unfollowMutate).toHaveBeenCalledWith(animalId);
-    expect(mocks.followMutate).not.toHaveBeenCalled();
+    expect(onUnfollow).toHaveBeenCalledTimes(1);
+    expect(onFollow).not.toHaveBeenCalled();
   });
 
   it('disables the button while the follow status is loading', () => {
-    mocks.isLoading.value = true;
-
-    renderButton();
+    renderButton({ isLoading: true });
 
     expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  it('surfaces the follow error when the follow mutation fails', () => {
-    mocks.mutationError.value = 'follow';
+  it('shows the pending state while a follow action is in flight', () => {
+    const { container } = renderButton({ isPending: true });
 
-    renderButton();
+    expect(container.querySelector('.animate-spin')).not.toBeNull();
+  });
+
+  it('surfaces the follow error when the follow action fails', () => {
+    renderButton({ hasError: true, errorKey: 'animalFollow.follow_error' });
 
     expect(screen.getByRole('alert')).toHaveTextContent(
       'animalFollow.follow_error',
     );
   });
 
-  it('surfaces the unfollow error when the unfollow mutation fails', () => {
-    mocks.mutationError.value = 'unfollow';
-
-    renderButton();
+  it('surfaces the unfollow error when the unfollow action fails', () => {
+    renderButton({
+      isFollowing: true,
+      hasError: true,
+      errorKey: 'animalFollow.unfollow_error',
+    });
 
     expect(screen.getByRole('alert')).toHaveTextContent(
       'animalFollow.unfollow_error',

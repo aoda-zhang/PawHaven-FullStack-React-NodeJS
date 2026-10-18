@@ -1,6 +1,6 @@
-import { cn } from '@pawhaven/frontend-core';
 import { formatDateTime } from '@pawhaven/frontend-core/utils';
 import type { RescueDetail } from '@pawhaven/shared/types';
+import { cn } from '@pawhaven/ui';
 import { Clock, PawPrint } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';

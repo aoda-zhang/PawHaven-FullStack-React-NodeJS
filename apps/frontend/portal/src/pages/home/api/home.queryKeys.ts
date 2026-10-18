@@ -1,4 +1,4 @@
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 
 export const homeQueryKeys = {
   all: sharedQueryKeys.home.all,

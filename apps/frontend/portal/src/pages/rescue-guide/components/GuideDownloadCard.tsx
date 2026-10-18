@@ -1,16 +1,18 @@
-import { FileDownloadButton } from '@pawhaven/frontend-core';
-import { showToast } from '@pawhaven/ui';
+import { FileDownloadButton, showToast } from '@pawhaven/ui';
 import { Download } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import { downloadPdf } from '../api/pdf.api';
 import type { RescueGuideDownloadItem } from '../types';
 
 interface GuideDownloadCardProps {
   item: RescueGuideDownloadItem;
+  downloadPdf: (slug: string) => Promise<Blob>;
 }
 
-export const GuideDownloadCard = ({ item }: GuideDownloadCardProps) => {
+export const GuideDownloadCard = ({
+  item,
+  downloadPdf,
+}: GuideDownloadCardProps) => {
   const { t } = useTranslation();
 
   const GuideIcon = item.icon;

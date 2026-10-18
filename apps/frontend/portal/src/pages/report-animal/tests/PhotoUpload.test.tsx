@@ -27,6 +27,7 @@ vi.mock('@pawhaven/ui', () => ({
     <button type="button">{children}</button>
   ),
   Loading: () => null,
+  cn: (...classNames: unknown[]) => classNames.filter(Boolean).join(' '),
   notificationType: {},
   showToast: vi.fn(),
   ToastType: {},

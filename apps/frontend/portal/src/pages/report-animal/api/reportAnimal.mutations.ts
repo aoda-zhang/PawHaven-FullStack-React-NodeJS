@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { createReportAnimal } from './reportAnimal.api';
 
-import { sharedQueryKeys } from '@/shared/constants/queryKeys';
+import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 
 export const useCreateReportAnimal = () => {
   const queryClient = useQueryClient();

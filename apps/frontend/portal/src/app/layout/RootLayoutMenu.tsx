@@ -1,4 +1,5 @@
-import { Brand, LanguageSelector, cn } from '@pawhaven/frontend-core';
+import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
+import { cn } from '@pawhaven/ui';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 

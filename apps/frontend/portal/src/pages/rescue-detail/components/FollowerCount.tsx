@@ -1,22 +1,23 @@
 import { useTranslation } from 'react-i18next';
 
-import { useFollowStatus } from '../api/animalFollow.queries';
-
 interface FollowerCountProps {
-  animalId: string;
+  count?: number;
+  isLoading?: boolean;
 }
 
-export const FollowerCount = ({ animalId }: FollowerCountProps) => {
+export const FollowerCount = ({
+  count,
+  isLoading = false,
+}: FollowerCountProps) => {
   const { t } = useTranslation();
-  const { data } = useFollowStatus(animalId);
 
-  if (!data) {
+  if (isLoading || count == null) {
     return null;
   }
 
   return (
     <p className="text-text-secondary mt-2 text-center text-xs">
-      {t('animalFollow.followers_count', { count: data.followerCount })}
+      {t('animalFollow.followers_count', { count })}
     </p>
   );
 };

@@ -1,6 +1,6 @@
-import { cn } from '@pawhaven/frontend-core';
 import type { AnimalStatus } from '@pawhaven/shared/types';
 import {
+  cn,
   Timeline,
   TimelineConnector,
   TimelineContent,

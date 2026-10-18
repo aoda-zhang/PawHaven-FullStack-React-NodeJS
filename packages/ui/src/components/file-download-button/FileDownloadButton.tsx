@@ -1,6 +1,7 @@
-import { Button } from '@pawhaven/ui';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+
+import { Button } from '../button/Button';
 
 export interface FileDownloadButtonProps {
   fileFetchRequest: () => Promise<Blob>;

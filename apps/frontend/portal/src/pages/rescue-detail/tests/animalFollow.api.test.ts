@@ -8,7 +8,7 @@ import {
   followAnimal,
   getFollowStatus,
   unfollowAnimal,
-} from '../animalFollow.api';
+} from '../api/rescueDetail.api';
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: {

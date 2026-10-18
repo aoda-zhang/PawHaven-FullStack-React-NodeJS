@@ -2,35 +2,36 @@ import { Button } from '@pawhaven/ui';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  useFollowAnimal,
-  useUnfollowAnimal,
-} from '../api/animalFollow.mutations';
-import { useFollowStatus } from '../api/animalFollow.queries';
-
 interface FollowButtonProps {
   animalId: string;
+  isFollowing: boolean;
+  isLoading?: boolean;
+  isPending?: boolean;
+  hasError?: boolean;
+  errorKey?: string;
+  onFollow?: () => void;
+  onUnfollow?: () => void;
 }
 
-export const FollowButton = ({ animalId }: FollowButtonProps) => {
+export const FollowButton = ({
+  isFollowing,
+  isLoading = false,
+  isPending = false,
+  hasError = false,
+  errorKey = '',
+  onFollow,
+  onUnfollow,
+}: FollowButtonProps) => {
   const { t } = useTranslation();
-  const { data: status, isLoading } = useFollowStatus(animalId);
-  const followMutation = useFollowAnimal();
-  const unfollowMutation = useUnfollowAnimal();
-
-  const isFollowing = status?.isFollowing ?? false;
-  const isPending = followMutation.isPending || unfollowMutation.isPending;
-  const hasError = followMutation.isError || unfollowMutation.isError;
-  const errorKey = followMutation.isError
-    ? 'animalFollow.follow_error'
-    : 'animalFollow.unfollow_error';
 
   const handleClick = () => {
-    if (isFollowing) {
-      unfollowMutation.mutate(animalId);
+    if (isFollowing && onUnfollow) {
+      onUnfollow();
       return;
     }
-    followMutation.mutate(animalId);
+    if (!isFollowing && onFollow) {
+      onFollow();
+    }
   };
 
   return (
@@ -53,7 +54,7 @@ export const FollowButton = ({ animalId }: FollowButtonProps) => {
       </Button>
       {hasError && (
         <p role="alert" className="text-error text-center text-xs">
-          {t(errorKey)}
+          {t(errorKey || 'animalFollow.follow_error')}
         </p>
       )}
     </div>
