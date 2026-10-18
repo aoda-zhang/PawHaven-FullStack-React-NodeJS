@@ -7,12 +7,13 @@ import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 export const useCreateReportAnimal = () => {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ['reportAnimal', 'create'],
     mutationFn: createReportAnimal,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: sharedQueryKeys.rescueCases.all,
+        queryKey: sharedQueryKeys.rescueCases.all(),
       });
-      queryClient.invalidateQueries({ queryKey: sharedQueryKeys.home.all });
+      queryClient.invalidateQueries({ queryKey: sharedQueryKeys.home.all() });
     },
   });
 };

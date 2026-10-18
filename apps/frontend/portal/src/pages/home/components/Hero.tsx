@@ -1,27 +1,36 @@
-import type { HomeData } from '@pawhaven/shared/types';
+import type { HeroStats } from '@pawhaven/shared/types';
 import { ChevronRight } from 'lucide-react';
 import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
-export const Hero = () => {
+interface HeroProps {
+  heroStats: HeroStats;
+}
+
+export const Hero = ({ heroStats }: HeroProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { heroStats } = useLoaderData() as HomeData;
+
+  const safeStats = heroStats ?? {
+    totalRescues: 0,
+    totalAdopted: 0,
+    totalVolunteers: 0,
+  };
 
   const stats = [
     {
-      value: heroStats.totalRescues.toLocaleString(),
+      value: safeStats.totalRescues.toLocaleString(),
       labelKey: 'home.hero_stat_rescues',
     },
     {
-      value: heroStats.totalAdopted.toLocaleString(),
+      value: safeStats.totalAdopted.toLocaleString(),
       labelKey: 'home.hero_stat_adopted',
     },
     {
-      value: heroStats.totalVolunteers.toLocaleString(),
+      value: safeStats.totalVolunteers.toLocaleString(),
       labelKey: 'home.hero_stat_volunteers',
     },
   ] as const;

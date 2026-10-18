@@ -1,15 +1,17 @@
-import type { HomeData } from '@pawhaven/shared/types';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 import { RescueCasesSection } from '../rescue-cases/components/RescueCasesSection';
 
+import { homeQueryOptions } from './api/home.queries';
 import { AdoptablePetsSection } from './components/AdoptablePetsSection';
 import { Hero } from './components/Hero';
 import { StrayCTA } from './components/StrayCTA';
 
 export const Home = () => {
   const navigate = useNavigate();
-  const { latestRescues, adoptablePets } = useLoaderData() as HomeData;
+  const { data } = useSuspenseQuery(homeQueryOptions());
+  const { latestRescues, adoptablePets, heroStats } = data;
 
   const handleCaseClick = (id: string) => {
     navigate(`/rescue/detail/${id}`);
@@ -21,7 +23,7 @@ export const Home = () => {
 
   return (
     <div className="flex flex-col">
-      <Hero />
+      <Hero heroStats={heroStats} />
       <RescueCasesSection
         cases={latestRescues}
         onCaseClick={handleCaseClick}

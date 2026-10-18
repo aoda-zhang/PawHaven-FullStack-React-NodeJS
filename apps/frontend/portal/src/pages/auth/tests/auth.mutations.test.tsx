@@ -66,8 +66,11 @@ describe('Auth mutations — profile sync + bootstrap invalidation', () => {
     });
     mockSetProfile.mockClear();
     // Pre-populate cache with bootstrap and auth queries.
-    queryClient.setQueryData(bootstrapQueryKeys.all, { menus: [] });
-    queryClient.setQueryData(sharedQueryKeys.auth.all, { user: null });
+    queryClient.setQueryData(
+      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
+      { menus: [] },
+    );
+    queryClient.setQueryData(sharedQueryKeys.auth.all(), { user: null });
   });
 
   it('login onSuccess writes the profile and invalidates both bootstrap queries', async () => {
@@ -89,8 +92,10 @@ describe('Auth mutations — profile sync + bootstrap invalidation', () => {
     );
 
     // Both queries should be marked stale after invalidation.
-    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all);
-    const landingState = queryClient.getQueryState(bootstrapQueryKeys.all);
+    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all());
+    const landingState = queryClient.getQueryState(
+      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
+    );
 
     expect(authState?.isInvalidated).toBe(true);
     expect(landingState?.isInvalidated).toBe(true);
@@ -107,10 +112,13 @@ describe('Auth mutations — profile sync + bootstrap invalidation', () => {
 
     expect(mockSetProfile).toHaveBeenCalledWith(mockEmptyProfile);
 
-    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all);
-    const landingState = queryClient.getQueryState(bootstrapQueryKeys.all);
+    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all());
+    const landingState = queryClient.getQueryState(
+      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
+    );
 
-    expect(authState?.isInvalidated).toBe(true);
-    expect(landingState?.isInvalidated).toBe(true);
+    // removeQueries completely removes the query from cache
+    expect(authState).toBeUndefined();
+    expect(landingState).toBeUndefined();
   });
 });

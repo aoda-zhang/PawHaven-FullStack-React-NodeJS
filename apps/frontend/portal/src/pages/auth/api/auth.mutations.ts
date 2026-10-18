@@ -23,17 +23,19 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
   const dispatch = useReduxDispatch();
   return useMutation({
+    mutationKey: ['auth', 'login'],
     mutationFn: postLogin,
     onSuccess: (data) => {
       dispatch(setProfile(toProfile(data)));
-      queryClient.invalidateQueries({ queryKey: sharedQueryKeys.auth.all });
-      queryClient.invalidateQueries({ queryKey: bootstrapQueryKeys.all });
+      queryClient.invalidateQueries({ queryKey: sharedQueryKeys.auth.all() });
+      queryClient.invalidateQueries({ queryKey: bootstrapQueryKeys.all() });
     },
   });
 };
 
 export const useRegister = () => {
   return useMutation({
+    mutationKey: ['auth', 'register'],
     mutationFn: postRegister,
   });
 };
@@ -42,11 +44,16 @@ export const useLogout = () => {
   const queryClient = useQueryClient();
   const dispatch = useReduxDispatch();
   return useMutation({
+    mutationKey: ['auth', 'logout'],
     mutationFn: postLogout,
     onSuccess: () => {
       dispatch(setProfile(emptyProfile));
-      queryClient.invalidateQueries({ queryKey: sharedQueryKeys.auth.all });
-      queryClient.invalidateQueries({ queryKey: bootstrapQueryKeys.all });
+      queryClient.removeQueries({ queryKey: sharedQueryKeys.auth.all() });
+      queryClient.removeQueries({ queryKey: bootstrapQueryKeys.all() });
+      queryClient.removeQueries({
+        queryKey: sharedQueryKeys.rescueCases.all(),
+      });
+      queryClient.removeQueries({ queryKey: sharedQueryKeys.home.all() });
     },
   });
 };

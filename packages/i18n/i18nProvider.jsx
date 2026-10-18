@@ -23,10 +23,12 @@ const I18nLoadingFallback = () => {
   );
 };
 
-export const I18nProvider = ({ children }) => {
+export const I18nProvider = ({ children, loadingFallback }) => {
   return (
     <I18nextProvider i18n={i18n}>
-      <Suspense fallback={<I18nLoadingFallback />}>{children}</Suspense>
+      <Suspense fallback={loadingFallback ?? <I18nLoadingFallback />}>
+        {children}
+      </Suspense>
     </I18nextProvider>
   );
 };

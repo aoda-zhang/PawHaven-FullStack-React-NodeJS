@@ -34,6 +34,7 @@ export const currentUserQueryOptions = (userId: string) => ({
   queryFn: fetchCurrentUser,
   staleTime: CURRENT_USER_STALE_TIME_MS,
   retry: false,
+  meta: { persist: true },
 });
 
 export const useCurrentUser = () => {

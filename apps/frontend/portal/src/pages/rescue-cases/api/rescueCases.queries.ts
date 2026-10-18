@@ -5,6 +5,6 @@ import { rescueCasesQueryKeys } from './rescueCases.queryKeys';
 
 export const rescueCasesQueryOptions = () =>
   queryOptions({
-    queryKey: rescueCasesQueryKeys.all,
+    queryKey: rescueCasesQueryKeys.list(),
     queryFn: () => fetchRescueCases(),
   });

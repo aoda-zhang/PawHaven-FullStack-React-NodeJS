@@ -72,8 +72,11 @@ export const useMenuNavigation = ({
   };
 
   const resolvedItems = menuItems.map((item) => {
-    const classKey = item.classNames as unknown as MenuClassKey;
-    const baseClass = MENU_CLASSES[classKey] ?? '';
+    const baseClass = cn(
+      item.classNames
+        .filter((name): name is MenuClassKey => name in MENU_CLASSES)
+        .map((name) => MENU_CLASSES[name]),
+    );
     const isActive = activePath === item.to;
     const activeClass = isActive ? MENU_CLASSES.activeMenuItem : '';
     return {

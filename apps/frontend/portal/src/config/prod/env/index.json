@@ -16,7 +16,7 @@
     "refetchOnReconnect": true,
     "refetchOnWindowFocus": false,
     "staleTime": 30000,
-    "gcTime": 60000
+    "gcTime": 86400000
   },
   "sentry": {
     "dsn": "${PAWHAVEN_USER_SENTRY_DSN}"

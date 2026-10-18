@@ -49,7 +49,7 @@ describe('FollowButton', () => {
   it('renders the follow state when the animal is not followed', () => {
     renderButton({ isFollowing: false });
 
-    expect(screen.getByRole('button')).toHaveTextContent('animalFollow.follow');
+    expect(screen.getByRole('button')).toHaveTextContent('rescueDetail.follow');
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
@@ -57,7 +57,7 @@ describe('FollowButton', () => {
     renderButton({ isFollowing: true });
 
     expect(screen.getByRole('button')).toHaveTextContent(
-      'animalFollow.following',
+      'rescueDetail.following',
     );
     expect(screen.getByRole('button')).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByTestId('bookmark-check-icon')).toBeInTheDocument();
@@ -101,10 +101,10 @@ describe('FollowButton', () => {
   });
 
   it('surfaces the follow error when the follow action fails', () => {
-    renderButton({ hasError: true, errorKey: 'animalFollow.follow_error' });
+    renderButton({ hasError: true, errorKey: 'rescueDetail.follow_error' });
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'animalFollow.follow_error',
+      'rescueDetail.follow_error',
     );
   });
 
@@ -112,11 +112,11 @@ describe('FollowButton', () => {
     renderButton({
       isFollowing: true,
       hasError: true,
-      errorKey: 'animalFollow.unfollow_error',
+      errorKey: 'rescueDetail.unfollow_error',
     });
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'animalFollow.unfollow_error',
+      'rescueDetail.unfollow_error',
     );
   });
 });

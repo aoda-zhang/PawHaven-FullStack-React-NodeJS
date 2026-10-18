@@ -4,7 +4,7 @@ export interface BootstrapScope {
 }
 
 export const bootstrapQueryKeys = {
-  all: ['bootstrap'] as const,
+  all: () => ['bootstrap'] as const,
   data: (scope?: BootstrapScope) =>
-    [...bootstrapQueryKeys.all, 'data', ...(scope ? [scope] : [])] as const,
+    [...bootstrapQueryKeys.all(), 'data', ...(scope ? [scope] : [])] as const,
 };

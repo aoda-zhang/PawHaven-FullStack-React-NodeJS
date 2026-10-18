@@ -1,11 +1,13 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import { cn } from '@pawhaven/ui';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
+import { rescueCasesQueryOptions } from './api/rescueCases.queries';
 import { RescueCasesSection } from './components/RescueCasesSection';
-import type { FilterStatus, RescueCase } from './types';
+import type { FilterStatus } from './types';
 
 const FILTER_ALL: FilterStatus = 'all';
 
@@ -25,7 +27,7 @@ const RescueCasesPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const cases = useLoaderData() as RescueCase[];
+  const { data: cases } = useSuspenseQuery(rescueCasesQueryOptions());
   const [activeFilter, setActiveFilter] = useState<FilterStatus>(FILTER_ALL);
 
   const displayedCases =

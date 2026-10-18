@@ -15,7 +15,7 @@
   "query": {
     "refetchOnReconnect": true,
     "refetchOnWindowFocus": false,
-    "staleTime": 30000,
+    "staleTime": 300000,
     "gcTime": 60000
   },
   "sentry": {
