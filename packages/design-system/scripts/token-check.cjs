@@ -149,15 +149,15 @@ const VALID_UTILITIES = new Set([
 ]);
 
 const KNOWN_VIOLATIONS = new Set([
-  'apps/frontend/portal/src/features/home/components/AdoptablePetsSection.tsx:25:inline-style',
-  'apps/frontend/portal/src/features/home/components/PetCard.tsx:27:inline-style',
-  'apps/frontend/portal/src/layout/RootLayoutFooter.tsx:120:palette-name',
-  'apps/frontend/portal/src/layout/RootLayoutFooter.tsx:132:palette-name',
-  'apps/frontend/portal/src/layout/RootLayoutFooter.tsx:143:palette-name',
-  'apps/frontend/portal/src/features/home/components/PetCard.tsx:40:palette-name',
+  'apps/frontend/portal/src/pages/home/components/AdoptablePetsSection.tsx:25:inline-style',
+  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:37:inline-style',
+  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:123:palette-name',
+  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:135:palette-name',
+  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:146:palette-name',
+  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:palette-name',
   'packages/ui/src/components/button/Button.tsx:9:px-arbitrary',
-  'apps/frontend/portal/src/features/home/components/PetCard.tsx:36:unknown-classname',
-  'apps/frontend/portal/src/features/home/components/PetCard.tsx:40:unknown-classname',
+  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:46:unknown-classname',
+  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:unknown-classname',
 ]);
 
 const STYLE_RULES = [

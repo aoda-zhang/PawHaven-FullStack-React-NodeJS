@@ -1,11 +1,11 @@
 import '@pawhaven/ui/index.css';
 import '@pawhaven/frontend-core/index.css';
-import './index.css';
+import './app/index.css';
 
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { App } from './App';
+import { App } from './app/App';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

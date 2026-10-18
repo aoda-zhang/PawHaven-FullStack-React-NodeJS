@@ -6,11 +6,12 @@
 `docs/` is split by what a document is **for**, so you can tell from the path whether it is
 authority, intent, or background.
 
-| Directory       | Holds                                                                       | Read it when                                             |
-| --------------- | --------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `architecture/` | A technical point, or the design of a specific problem, **in this project** | You are about to design or change something in that area |
-| `features/`     | One **portal feature**'s frontend **and** backend detail, as built          | After the change lands, to update the record from code   |
-| `product/`      | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap      |
+| Directory       | Holds                                                                               | Read it when                                             |
+| --------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `architecture/` | A technical point, or the design of a specific problem, **in this project**         | You are about to design or change something in that area |
+| `context/`      | The living architecture and development-pattern docs ([index](./context/README.md)) | You are about to write the next piece of it              |
+| `features/`     | One **portal feature**'s frontend **and** backend detail, as built                  | After the change lands, to update the record from code   |
+| `product/`      | The product blueprint that `features/` cite                                         | You need the "why" behind a feature, or the roadmap      |
 
 Design tokens are deliberately **not** documented here. They live in
 [`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by

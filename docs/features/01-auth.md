@@ -1,6 +1,6 @@
-# Feature: Auth (`portal/src/features/auth`)
+# Feature: Auth (`portal/src/pages/auth`)
 
-> **Status**: Implemented · **Verified against**: `auth-service`, `gateway/identity`, `portal/features/auth`
+> **Status**: Implemented · **Verified against**: `auth-service`, `gateway/identity`, `portal/pages/auth`
 > **Feature docs**: [README](README.md) · **Sources**: [Authentication Architecture](../architecture/authentication-architecture.md) · [Route Authentication](../architecture/route_authentication.md) · [Product Blueprint §2](../product/PawHaven-Product-Strategy-EN.md)
 
 One document per portal feature folder. Chapter 1 breaks the feature into the sections a user
@@ -14,7 +14,7 @@ both — see [App Shell §1.1](07-app-shell-bootstrap.md#11-navigation).
 
 ### 1.1 Login
 
-`login/Login.tsx`. React Hook Form over `CredentialsDto` — exactly two fields, `email` and
+`login/index.tsx`. React Hook Form over `CredentialsDto` — exactly two fields, `email` and
 `password`, both `FormInput`. No remember-me, no forgot-password link, no social sign-in.
 
 On success it navigates to `searchParams.get('redirect') ?? '/'` with `replace: true`. The
@@ -22,11 +22,11 @@ On success it navigates to `searchParams.get('redirect') ?? '/'` with `replace: 
 signing in returns you to the page you asked for rather than always to the homepage.
 
 The secondary button calls `navigate(routePaths.register)`. There is no link back from register to
-login by route — `Register.tsx` has one, pointing at `routePaths.login`.
+login by route — `register/index.tsx` has one, pointing at `routePaths.login`.
 
 ### 1.2 Register
 
-`register/Register.tsx`. The same two fields, same `CredentialsDto`, same form shape. There is no
+`register/index.tsx`. The same two fields, same `CredentialsDto`, same form shape. There is no
 confirm-password field, no username field, no terms checkbox, and no password-strength indicator.
 `username` is derived server-side from the email local part; see [§4](#4-data-model).
 
@@ -50,7 +50,7 @@ accessible name.
 `getQueryClient().ensureQueryData(currentUserQueryOptions(userId))` inside a `try/catch` and
 `throw redirect(...)` on any failure, preserving `pathname + search` in the `redirect` param.
 
-It is attached to the `authenticated` parent route in `router/router.tsx`, and exactly one route is
+It is attached to the `authenticated` parent route in `app/router/router.tsx`, and exactly one route is
 nested under it: `reportAnimalRoute`. The other five are public.
 
 `currentUserQueryOptions` sets `staleTime` to 5 minutes and `retry: false`. The `userId` it keys on
@@ -153,8 +153,8 @@ cannot outlive the token it carries.
 | File                                | Role                                                                    |
 | ----------------------------------- | ----------------------------------------------------------------------- |
 | `route.tsx`                         | `loginRoute`, `registerRoute`, `requireUser`, `currentUserQueryOptions` |
-| `login/Login.tsx`                   | §1.1                                                                    |
-| `register/Register.tsx`             | §1.2                                                                    |
+| `login/index.tsx`                   | §1.1                                                                    |
+| `register/index.tsx`                | §1.2                                                                    |
 | `AuthLayout.tsx`                    | §1.3                                                                    |
 | `api/auth.api.ts`                   | The calls                                                               |
 | `api/auth.mutations.ts`             | `login` / `register` / `logout` mutations                               |
@@ -163,7 +163,7 @@ cannot outlive the token it carries.
 | `types.ts`                          | `CredentialsDto` and friends                                            |
 | `api/tests/auth.mutations.test.tsx` | The only test in the feature                                            |
 
-Session state lives in Redux (`store/globalReducer.ts`) — client session state, not server data.
+Session state lives in Redux (`app/store/globalReducer.ts`) — client session state, not server data.
 There is no profile feature, so nothing else consumes the user record.
 
 ## 7. What Does Not Exist

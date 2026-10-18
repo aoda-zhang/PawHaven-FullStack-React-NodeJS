@@ -111,7 +111,7 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 # 🧑‍💻 本地开发
 
-本地开发请见 [docs/development.cn.md](./docs/development.cn.md)。
+本地开发请见 [docs/context/development.md](./docs/context/development.cn.md)。
 
 ---
 

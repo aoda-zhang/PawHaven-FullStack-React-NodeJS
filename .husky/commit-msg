@@ -1,2 +1,5 @@
 #!/bin/sh
 npx --no -- commitlint --edit "$1"
+
+echo "🔍 Checking Rules-ACK trailer…"
+node scripts/check-rules-ack.mjs "$1"

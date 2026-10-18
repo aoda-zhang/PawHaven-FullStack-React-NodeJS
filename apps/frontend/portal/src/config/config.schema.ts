@@ -23,19 +23,6 @@ export const ConfigSchema = z.object({
     staleTime: z.number(),
     gcTime: z.number(),
   }),
-
-  // sentry: z.object({
-  //   dsn: z.string().optional(),
-  // }),
-
-  // analytics: z.object({
-  //   id: z.string().optional(),
-  // }),
-
-  // services: z.object({
-  //   user: z.httpUrl(),
-  //   notification: z.httpUrl(),
-  // }),
 });
 
 export type ConfigType = z.infer<typeof ConfigSchema>;

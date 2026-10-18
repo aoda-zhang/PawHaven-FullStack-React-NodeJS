@@ -13,6 +13,8 @@
 // - A4: frontend-portal.md ("There is no `apps/frontend/admin`") and
 //   service-boundaries.md §9 ("apps/frontend/portal is the only frontend app").
 // - A5: service-boundaries.md §2 ("config-service is not a service").
+// - A6: frontend-architecture.md §2 (Dependencies — a layer reads only the
+//   layers below it; `src/shared/` is the bottom one in the portal).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -113,7 +115,7 @@ for (const file of collectSource(UI_SRC, TS_EXTS)) {
   const rel = relative(repoRoot, file);
   const body = readFileSync(file, 'utf8');
   for (const match of body.matchAll(
-    /from\s+['"](@pawhaven\/frontend-core[^'"]*|@\/features\/[^'"]*|apps\/[^'"]*)['"]/g,
+    /from\s+['"](@pawhaven\/frontend-core[^'"]*|@\/pages\/[^'"]*|apps\/[^'"]*)['"]/g,
   )) {
     failures.push(
       `A1: ${rel}: @pawhaven/ui imports "${match[1]}" — ui must reach only design-system and i18n (frontend-architecture §3.3, §4.2)`,
@@ -125,7 +127,7 @@ for (const file of collectSource(CORE_SRC, TS_EXTS)) {
   const rel = relative(repoRoot, file);
   const body = readFileSync(file, 'utf8');
   for (const match of body.matchAll(
-    /from\s+['"](@\/features\/[^'"]*|apps\/[^'"]*)['"]/g,
+    /from\s+['"](@\/pages\/[^'"]*|apps\/[^'"]*)['"]/g,
   )) {
     failures.push(
       `A1: ${rel}: @pawhaven/frontend-core imports "${match[1]}" — frontend-core must not reach features or apps (frontend-architecture §4.2)`,
@@ -177,24 +179,46 @@ for (const svc of BACKEND_SERVICES) {
 // A2. Frontend cross-feature value imports.
 //
 // Source: frontend-architecture §2.3 (P2 "Features are isolated", "Feature A
-// → Feature B (any import)"). A value import whose source is @/features/X and
-// whose destination sits outside X is the violation. `import type` is
-// allowed — a type is a contract reference, not a runtime coupling.
+// → Feature B (any import)"). A value import whose destination sits outside the
+// importing page slice is the violation — whether written as `@/pages/X/…` or as
+// a relative specifier (`../X/…`), since both resolve to the same place.
+// `import type` is allowed — a type is a contract reference, not a runtime
+// coupling.
 // ---------------------------------------------------------------------------
 
-// Pre-existing feature-to-feature value imports, pinned to file + imported
-// feature. The rescue-detail → animal-follow pair is a documented deviation
-// (frontend-architecture §2.5 "Boundary note"). The report-animal pairs are
-// pre-existing, not yet recorded as deviations — the mutation invalidates the
-// home and rescue-cases queries after a report is created.
+// Pre-existing cross-page value imports, pinned to importing-page | target-page.
+//
+// `home|rescue-cases` is the one remaining deviation: Home embeds rescue-cases'
+// `RescueCasesSection` through a relative import — the exact form the
+// alias-only check used to miss. The section is a widget shared by two pages, so
+// the real fix is to lift it (with `CaseCard`/`StatusBadge` and the
+// `getStatusColorByPrefix` util it pulls in) into the shared layer
+// (packages/frontend-core). Pinned until then, so the deviation is visible
+// rather than silently unchecked.
+//
+// (`rescue-detail|animal-follow` lived here until the `animal-follow` slice was
+// folded into `rescue-detail`; `report-animal|auth`, `report-animal|home` and
+// `report-animal|rescue-cases` lived here until report-animal was moved onto the
+// app-level `@/app/init/currentUser` and `@/shared/constants/sharedQueryKeys`
+// registries.)
 const A2_ALLOWLIST = new Set([
-  'apps/frontend/portal/src/features/rescue-detail|animal-follow',
-  'apps/frontend/portal/src/features/report-animal|home',
-  'apps/frontend/portal/src/features/report-animal|rescue-cases',
-  'apps/frontend/portal/src/features/report-animal|auth',
+  'apps/frontend/portal/src/pages/home|rescue-cases',
 ]);
 
-const FEATURES_DIR = join(repoRoot, 'apps/frontend/portal/src/features');
+const FEATURES_DIR = join(repoRoot, 'apps/frontend/portal/src/pages');
+
+// The page slice an import line reaches into, or null when it does not reach
+// into any slice. Handles both `@/pages/<slice>/…` and relative specifiers.
+function crossPageTarget(file, text) {
+  const alias = text.match(/from\s+['"]@\/pages\/([^/'"]+)/);
+  if (alias) return alias[1];
+  const relSpec = text.match(/from\s+['"](\.[^'"]+)['"]/);
+  if (!relSpec) return null;
+  const resolved = relative(FEATURES_DIR, resolve(dirname(file), relSpec[1]));
+  if (resolved.startsWith('..') || resolved === '') return null;
+  return resolved.split('/')[0];
+}
+
 if (existsSync(FEATURES_DIR)) {
   for (const feature of readdirSync(FEATURES_DIR, { withFileTypes: true })) {
     if (!feature.isDirectory()) continue;
@@ -205,14 +229,13 @@ if (existsSync(FEATURES_DIR)) {
       const lines = readFileSync(file, 'utf8').split('\n');
       lines.forEach((text, index) => {
         if (/^\s*import\s+type\b/.test(text)) return;
-        const match = text.match(/from\s+['"]@\/features\/([^/'"]+)/);
-        if (!match) return;
-        if (match[1] === featureName) return;
-        const key = `${rel.split('/features/')[0]}/features/${featureName}|${match[1]}`;
-        const shortKey = `apps/frontend/portal/src/features/${featureName}|${match[1]}`;
+        const target = crossPageTarget(file, text);
+        if (!target || target === featureName) return;
+        const key = `${rel.split('/pages/')[0]}/pages/${featureName}|${target}`;
+        const shortKey = `apps/frontend/portal/src/pages/${featureName}|${target}`;
         if (A2_ALLOWLIST.has(shortKey) || A2_ALLOWLIST.has(key)) return;
         failures.push(
-          `A2: ${rel}:${index + 1}: feature "${featureName}" value-imports from feature "${match[1]}" — cross-feature imports are forbidden (frontend-architecture §2.3); \`import type\` is allowed`,
+          `A2: ${rel}:${index + 1}: feature "${featureName}" value-imports from feature "${target}" — cross-feature imports are forbidden (frontend-architecture §2.3); \`import type\` is allowed`,
         );
       });
     }
@@ -358,6 +381,40 @@ for (const file of a4Files) {
       `A5: ${rel}:${index + 1}: config-service treated as a service — it is config only, not a deployable (service-boundaries §2)`,
     );
   });
+}
+
+// ---------------------------------------------------------------------------
+// A6. Portal shared layer must not depend on the app or page layers.
+//
+// Source: frontend-architecture §2 (Dependencies — a layer reads only the layers
+// below it). `src/shared/` is the bottom layer of the portal, so it may reach the
+// packages, `src/config`, and itself — never `@/app/**` or `@/pages/**`, whether
+// written as an alias or as a relative specifier that climbs out of the slice.
+// Shared code that reaches upward is not shared: it is app code wearing a shared
+// path, and every layer above it then inherits the coupling.
+// ---------------------------------------------------------------------------
+
+const SHARED_SRC = join(repoRoot, 'apps/frontend/portal/src/shared');
+
+if (existsSync(SHARED_SRC)) {
+  for (const file of collectSource(SHARED_SRC, TS_EXTS)) {
+    const rel = relative(repoRoot, file);
+    const body = readFileSync(file, 'utf8');
+    for (const match of body.matchAll(
+      /from\s+['"](@\/(?:app|pages)\/[^'"]*)['"]/g,
+    )) {
+      failures.push(
+        `A6: ${rel}: shared imports "${match[1]}" — shared is the bottom layer; it must not depend on app or pages (frontend-architecture §2)`,
+      );
+    }
+    for (const match of body.matchAll(/from\s+['"](\.[^'"]*)['"]/g)) {
+      const resolved = relative(SHARED_SRC, resolve(dirname(file), match[1]));
+      if (!resolved.startsWith('..')) continue;
+      failures.push(
+        `A6: ${rel}: shared imports "${match[1]}" — resolves outside src/shared; shared is the bottom layer (frontend-architecture §2)`,
+      );
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
