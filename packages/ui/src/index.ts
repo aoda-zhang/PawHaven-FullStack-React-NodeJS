@@ -1,4 +1,5 @@
 export { Button, buttonVariants } from './components/button/Button';
+export { FileDownloadButton } from './components/file-download-button/FileDownloadButton';
 export {
   Carousel,
   type CarouselImage,
@@ -32,3 +33,4 @@ export {
   type ToastItem,
   type ShowToastInput,
 } from './components/toast/Toast';
+export { cn } from './utils/cn';

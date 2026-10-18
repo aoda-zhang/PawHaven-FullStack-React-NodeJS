@@ -31,6 +31,14 @@
     "carousel_previous": "Previous photo",
     "carousel_next": "Next photo",
     "basic_info": "Basic Information",
-    "urgent": "Urgent"
+    "urgent": "Urgent",
+    "follow": "Follow rescue progress",
+    "unfollow": "Unfollow",
+    "following": "Following rescue progress",
+    "followers_count": "{{count}} people following",
+    "followers_count_one": "{{count}} person following",
+    "followers_count_other": "{{count}} people following",
+    "follow_error": "Could not follow. Please try again.",
+    "unfollow_error": "Could not unfollow. Please try again."
   }
 }

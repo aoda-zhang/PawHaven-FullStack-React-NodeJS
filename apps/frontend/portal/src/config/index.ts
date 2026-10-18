@@ -2,9 +2,9 @@ import { resolveAppConfig, validateConfig } from '@pawhaven/shared/utils';
 
 import { ConfigSchema, type ConfigType } from './config.schema';
 import devConfig from './dev/env/index.json';
-import uatConfig from './uat/env/index.json';
-import testConfig from './test/env/index.json';
 import prodConfig from './prod/env/index.json';
+import testConfig from './test/env/index.json';
+import uatConfig from './uat/env/index.json';
 
 export const EnvVariables = {
   dev: 'dev',

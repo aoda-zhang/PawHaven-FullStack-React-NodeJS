@@ -9,6 +9,9 @@
 //   3. Duplicate-rule candidates — the same normative line in two or more files (§27 drift
 //      risk). Warning-only: the detector cannot tell a restatement from a reference, so a
 //      human decides every candidate.
+//   4. Rules drift — the copy of the ruleset inlined in AGENTS.md against the canonical
+//      docs/context/agent-constraints.md. Two copies, one source of truth: the check fails unless they say
+//      the same words.
 //
 // What it deliberately does NOT own — delegation, not duplication:
 //   - Architecture violations: `pnpm architecture-check` owns them; it is invoked below as a
@@ -392,6 +395,56 @@ for (const { name, args, owns } of DELEGATED) {
 console.log(
   'owners not reimplemented here: harness:verify — harness/skill integrity; token-check — design tokens',
 );
+
+function ruleWords(text) {
+  return text
+    .split('\n')
+    .filter((line) => !line.startsWith('#'))
+    .join(' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+// ---------------------------------------------------------------------------
+// 5. Rules pointer — the canonical rules file exists, and AGENTS.md leads to it.
+//
+// AGENTS.md is the file an agent reads without choosing to. It must lead to the
+// rules, and the rules must exist. AGENTS.md points at docs/context/README.md,
+// the index that names every file in this folder, including the canonical rules.
+// ---------------------------------------------------------------------------
+
+const CANONICAL_RULES = 'docs/context/agent-constraints.md';
+const CONTEXT_DIR = 'docs/context/';
+const ENTRY_COPY = 'AGENTS.md';
+
+{
+  const canonicalPath = join(repoRoot, CANONICAL_RULES);
+  if (!existsSync(canonicalPath)) {
+    findings.push(
+      `rules-drift  ${CANONICAL_RULES} — the canonical rules file is missing.`,
+    );
+    console.log('rules drift: 1 missing file');
+  } else if (ruleWords(readFileSync(canonicalPath, 'utf8')).length === 0) {
+    findings.push(
+      `rules-drift  ${CANONICAL_RULES} — the canonical rules file is empty.`,
+    );
+    console.log('rules drift: canonical rules file is empty');
+  } else if (
+    !readFileSync(join(repoRoot, ENTRY_COPY), 'utf8').includes(CONTEXT_DIR)
+  ) {
+    findings.push(
+      `rules-drift  ${ENTRY_COPY} does not point at ${CONTEXT_DIR}, so an agent reading only ` +
+        `${ENTRY_COPY} cannot reach ${CANONICAL_RULES}. Restore the reference.`,
+    );
+    console.log(
+      'rules drift: AGENTS.md does not point at the context directory',
+    );
+  } else {
+    console.log(
+      `rules drift: ${ENTRY_COPY} points at ${CONTEXT_DIR}; ${CANONICAL_RULES} present`,
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 
