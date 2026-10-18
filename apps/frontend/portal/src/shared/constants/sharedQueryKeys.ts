@@ -17,14 +17,14 @@
 
 export const sharedQueryKeys = {
   auth: {
-    all: ['auth'] as const,
+    all: () => ['auth'] as const,
     currentUser: (userId: string) =>
-      [...sharedQueryKeys.auth.all, 'current', userId] as const,
+      [...sharedQueryKeys.auth.all(), 'current', userId] as const,
   },
   home: {
-    all: ['home'] as const,
+    all: () => ['home'] as const,
   },
   rescueCases: {
-    all: ['rescueCases'] as const,
+    all: () => ['rescueCases'] as const,
   },
 } as const;

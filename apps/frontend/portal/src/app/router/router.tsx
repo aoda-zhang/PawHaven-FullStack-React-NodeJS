@@ -2,8 +2,6 @@ import { NotFound, RouterErrorFallback } from '@pawhaven/frontend-core';
 import { Loading } from '@pawhaven/ui';
 import { createBrowserRouter, ScrollRestoration } from 'react-router-dom';
 
-import { requireUser } from '@/app/init/guards';
-import { rootLoader, rootShouldRevalidate } from '@/app/init/loader';
 import { RootLayout } from '@/app/layout/RootLayout';
 import { RootLayoutFooter } from '@/app/layout/RootLayoutFooter';
 import { routePaths } from '@/app/router/routePaths';
@@ -38,8 +36,6 @@ const RouteHydrateFallback = () => <Loading />;
 export const rootRoute = {
   path: routePaths.home,
   Component: RootLayout,
-  loader: rootLoader,
-  shouldRevalidate: rootShouldRevalidate,
   ErrorBoundary: RouteErrorBoundary,
   HydrateFallback: RouteHydrateFallback,
   children: [
@@ -51,7 +47,6 @@ export const rootRoute = {
     rescueDetailRoute,
     {
       id: 'authenticated',
-      loader: requireUser,
       Component: AuthenticatedLayout,
       children: [reportAnimalRoute],
     },

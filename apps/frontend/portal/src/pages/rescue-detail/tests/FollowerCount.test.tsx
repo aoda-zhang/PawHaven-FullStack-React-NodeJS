@@ -36,6 +36,6 @@ describe('FollowerCount', () => {
   it('renders the follower count once it has loaded', () => {
     renderCount({ count: 7 });
 
-    expect(screen.getByText('animalFollow.followers_count')).toBeVisible();
+    expect(screen.getByText('rescueDetail.followers_count')).toBeVisible();
   });
 });

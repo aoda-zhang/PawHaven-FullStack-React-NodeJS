@@ -1,4 +1,3 @@
-import type { BootstrapData } from '@pawhaven/shared/types';
 import { Loading, NotificationBanner, Toast } from '@pawhaven/ui';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -9,24 +8,31 @@ import {
   useLocation,
   useNavigate,
   useNavigation,
-  useLoaderData,
 } from 'react-router-dom';
 
 import { useMenuVisibility } from './hooks/useMenuVisibility';
 import { RootLayoutFooter } from './RootLayoutFooter';
 import { RootLayoutMenu } from './RootLayoutMenu';
 
+import { useBootstrapQuery } from '@/app/init/bootstrap.queries';
+import type { BootstrapScope } from '@/app/init/bootstrap.queryKeys';
 import { useGlobalState } from '@/app/store/globalReducer';
 import { ContentFallback } from '@/shared/components/ContentFallback';
 
 export const RootLayout = () => {
-  const { isSysMaintain } = useGlobalState();
-  const bootstrapData = useLoaderData() as BootstrapData;
+  const { isSysMaintain, profile } = useGlobalState();
+  const { isMenuAvailable, isFooterAvailable, isAuthPage } =
+    useMenuVisibility();
+  const scope: BootstrapScope = {
+    userID: profile?.baseUserInfo?.userID ?? '',
+    menuUpdateAt: profile?.baseUserInfo?.globalMenuUpdateAt ?? '',
+  };
+  const { data: bootstrapData } = useBootstrapQuery(scope, {
+    enabled: !isAuthPage,
+  });
   const menus = bootstrapData?.menus ?? [];
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { isMenuAvailable, isFooterAvailable, isAuthPage } =
-    useMenuVisibility();
   const { pathname } = useLocation();
   const navigation = useNavigation();
 

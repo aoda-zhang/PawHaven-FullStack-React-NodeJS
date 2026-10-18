@@ -1,10 +1,23 @@
 import '@testing-library/jest-dom/vitest';
 
 import { render, screen } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { ReactNode } from 'react';
 
 import { RescueCasesPage } from '../index';
+import { rescueCasesQueryKeys } from '../api/rescueCases.queryKeys';
+
+// Mock the apiClient to avoid config loading
+vi.mock('@/shared/utils/apiClient', () => ({
+  apiClient: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
+}));
 
 const mockCases = [
   {
@@ -45,21 +58,47 @@ vi.mock('lucide-react', async (importOriginal) => {
   };
 });
 
-const renderPage = () => {
+const createWrapper = (queryClient: QueryClient) => {
+  const Wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  return Wrapper;
+};
+
+const renderPage = (queryClient: QueryClient) => {
+  // Pre-populate the query cache with mock data
+  queryClient.setQueryData(rescueCasesQueryKeys.list(), mockCases);
+
   const router = createMemoryRouter([
     {
       path: '/',
       Component: RescueCasesPage,
-      loader: () => mockCases,
     },
   ]);
 
-  return render(<RouterProvider router={router} />);
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>,
+  );
 };
 
 describe('RescueCasesPage', () => {
+  let queryClient: QueryClient;
+
+  beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+          gcTime: 0,
+        },
+      },
+    });
+  });
+
   it('renders the case list', async () => {
-    renderPage();
+    renderPage(queryClient);
 
     expect(await screen.findByText('rescue_cases.section_title')).toBeDefined();
     expect(await screen.findByText('Test Cat')).toBeDefined();

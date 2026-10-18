@@ -86,7 +86,7 @@ describe('VolunteerInfo follow wiring', () => {
     renderInfo();
 
     expect(
-      screen.getByRole('button', { name: /animalFollow\.follow$/ }),
+      screen.getByRole('button', { name: /rescueDetail\.follow$/ }),
     ).toHaveAttribute('aria-pressed', 'false');
   });
 
@@ -96,7 +96,7 @@ describe('VolunteerInfo follow wiring', () => {
     renderInfo();
 
     expect(
-      screen.getByRole('button', { name: /animalFollow\.following/ }),
+      screen.getByRole('button', { name: /rescueDetail\.following/ }),
     ).toHaveAttribute('aria-pressed', 'true');
   });
 
@@ -105,14 +105,14 @@ describe('VolunteerInfo follow wiring', () => {
 
     renderInfo();
 
-    expect(screen.getByText('animalFollow.followers_count')).toBeVisible();
+    expect(screen.getByText('rescueDetail.followers_count')).toBeVisible();
   });
 
   it('follows the animal on click when it is not followed', () => {
     mocks.status.value = status();
 
     renderInfo();
-    screen.getByRole('button', { name: /animalFollow\.follow$/ }).click();
+    screen.getByRole('button', { name: /rescueDetail\.follow$/ }).click();
 
     expect(mocks.followMutate).toHaveBeenCalledWith(animalId);
     expect(mocks.unfollowMutate).not.toHaveBeenCalled();
@@ -122,7 +122,7 @@ describe('VolunteerInfo follow wiring', () => {
     mocks.status.value = status({ isFollowing: true });
 
     renderInfo();
-    screen.getByRole('button', { name: /animalFollow\.following/ }).click();
+    screen.getByRole('button', { name: /rescueDetail\.following/ }).click();
 
     expect(mocks.unfollowMutate).toHaveBeenCalledWith(animalId);
     expect(mocks.followMutate).not.toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('VolunteerInfo follow wiring', () => {
     const { container } = renderInfo();
 
     expect(container.querySelector('button')).toBeDisabled();
-    expect(screen.queryByText('animalFollow.followers_count')).toBeNull();
+    expect(screen.queryByText('rescueDetail.followers_count')).toBeNull();
   });
 
   it('shows the pending state while a follow action is in flight', () => {
@@ -151,7 +151,7 @@ describe('VolunteerInfo follow wiring', () => {
     renderInfo();
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'animalFollow.follow_error',
+      'rescueDetail.follow_error',
     );
   });
 
@@ -162,7 +162,7 @@ describe('VolunteerInfo follow wiring', () => {
     renderInfo();
 
     expect(screen.getByRole('alert')).toHaveTextContent(
-      'animalFollow.unfollow_error',
+      'rescueDetail.unfollow_error',
     );
   });
 });

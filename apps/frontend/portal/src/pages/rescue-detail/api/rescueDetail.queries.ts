@@ -7,7 +7,6 @@ export const rescueDetailQueryOptions = (id: string) =>
   queryOptions({
     queryKey: rescueDetailQueryKeys.detail(id),
     queryFn: () => getRescueDetail(id),
-    enabled: !!id,
   });
 
 export const followStatusQueryOptions = (animalId: string) =>
@@ -15,6 +14,10 @@ export const followStatusQueryOptions = (animalId: string) =>
     queryKey: rescueDetailQueryKeys.followStatus(animalId),
     queryFn: () => getFollowStatus(animalId),
     enabled: !!animalId,
+    select: (data) => ({
+      isFollowing: data.isFollowing,
+      followerCount: data.followerCount,
+    }),
   });
 
 export const useFollowStatus = (animalId: string) =>

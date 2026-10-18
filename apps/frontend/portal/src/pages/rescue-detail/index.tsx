@@ -1,20 +1,18 @@
-import type { RescueDetail as RescueDetailData } from '@pawhaven/shared/types';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
-import { Await, useLoaderData } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import { rescueDetailQueryOptions } from './api/rescueDetail.queries';
 import { RescueDetailContent } from './components/RescueDetailContent';
 import { RescueDetailSkeleton } from './components/RescueDetailSkeleton';
 
 export const RescueDetail = () => {
-  const { animal } = useLoaderData() as {
-    animal: Promise<RescueDetailData>;
-  };
+  const { animalID } = useParams<{ animalID: string }>();
+  const { data: animal } = useSuspenseQuery(rescueDetailQueryOptions(animalID));
 
   return (
     <Suspense fallback={<RescueDetailSkeleton />}>
-      <Await resolve={animal}>
-        {(resolvedAnimal) => <RescueDetailContent animal={resolvedAnimal} />}
-      </Await>
+      <RescueDetailContent animal={animal} />
     </Suspense>
   );
 };

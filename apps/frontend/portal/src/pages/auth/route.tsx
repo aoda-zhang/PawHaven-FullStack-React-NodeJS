@@ -1,11 +1,36 @@
-import { Outlet } from 'react-router-dom';
+import { Loading } from '@pawhaven/ui';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense, use } from 'react';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 
 import { Login } from './login';
 import { Register } from './register';
 
-import { routePaths } from '@/app/router/routePaths';
+import {
+  currentUserQueryOptions,
+  getCurrentUserId,
+} from '@/app/init/currentUser';
+import { routePaths, routeSearchParams } from '@/app/router/routePaths';
 
-export const AuthenticatedLayout = () => <Outlet />;
+const AuthCheck = () => {
+  const location = useLocation();
+  const userId = getCurrentUserId();
+
+  const { data: user } = useSuspenseQuery(currentUserQueryOptions(userId));
+
+  if (!user) {
+    const redirectTo = `${routePaths.login}?${routeSearchParams.redirect}=${encodeURIComponent(location.pathname + location.search)}`;
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  return <Outlet />;
+};
+
+export const AuthenticatedLayout = () => (
+  <Suspense fallback={<Loading />}>
+    <AuthCheck />
+  </Suspense>
+);
 
 export const loginRoute = {
   path: routePaths.login,
