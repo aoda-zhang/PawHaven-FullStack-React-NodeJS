@@ -84,14 +84,5 @@
     "credentials": true,
     "optionsSuccessStatus": 204,
     "methods": ["GET", "POST", "PUT", "OPTIONS"]
-  },
-  "dbConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "CORE_SERVICE_DB",
-        "uri": "${CORE_SERVICE_DB}"
-      }
-    }
-  ]
+  }
 }

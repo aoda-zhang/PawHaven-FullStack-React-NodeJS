@@ -1,11 +1,12 @@
-# Feature: App Shell & Bootstrap (`portal/src/layout`)
+# Feature: App Shell & Bootstrap (`portal/src/app/layout`)
 
-> **Status**: Implemented, partial · **Verified against**: `core-service/modules/bootstrap`, `portal/src/layout`, `portal/src/router`
-> **Feature docs**: [README](README.md) · **Sources**: [Frontend Architecture](../architecture/PawHaven-Frontend-Architecture.md) · [Backend Architecture](../architecture/PawHaven-Backend-Architecture.md) · [Route Authentication](../architecture/route_authentication.md)
+> **Status**: Implemented, partial · **Verified against**: `core-service/modules/bootstrap`, `portal/src/app/layout`, `portal/src/app/init`, `portal/src/app/router`
+> **Feature docs**: [README](README.md) · **Sources**: [Frontend Architecture](../context/frontend-architecture.md) · [Backend Architecture](../architecture/PawHaven-Backend-Architecture.md) · [Route Authentication](../architecture/route_authentication.md)
 
-**This is not a portal feature folder.** It is `layout/` — the app shell every page renders inside,
-plus the one backend module that feeds it. It is documented here because it is real, working code
-with its own collection and endpoint, not because it is a page.
+**This is not a portal feature folder.** It is the app layer: `app/layout/` renders the shell every
+page sits inside and holds no data access; `app/init/` fetches what that shell consumes; one backend
+module feeds both. It is documented here because it is real, working code with its own collection
+and endpoint, not because it is a page.
 
 **Menus are config-driven; routes are not.** The frontend route tree is a static literal in
 `router/router.tsx`. The blueprint's claim that "new features ship by adding config entries without
@@ -169,20 +170,27 @@ links in §1.3.
 
 ## 6. Frontend Files
 
-| File                                           | Role                                            |
-| ---------------------------------------------- | ----------------------------------------------- |
-| `RootLayout.tsx`                               | §1 — the shell                                  |
-| `RootLayoutMenu.tsx` / `RootLayoutSidebar.tsx` | §1.1 — server-driven nav                        |
-| `RootLayoutFooter.tsx`                         | §1.3 — 13 dead links                            |
-| `hooks/useMenuVisibility.ts`                   | The two `handle` flags + `isAuthPage`           |
-| `hooks/useMenuNavigation.ts`                   | Active-state highlighting                       |
-| `menuClasses.ts`                               | Class-name mapping for menu rendering           |
-| `api/bootstrap.api.ts`                         | `GET /core/bootstrap`                           |
-| `api/bootstrap.queries.ts`                     | `bootstrapQueryOptions(scope)`                  |
-| `api/bootstrap.queryKeys.ts`                   | Key factory keyed by `{ userID, menuUpdateAt }` |
-| `api/rootLayout.loader.ts`                     | `rootLoader`, `rootShouldRevalidate`            |
-| `types.ts`                                     | `BootstrapScope`, `RouterInfoType`              |
-| `hooks/tests/useMenuNavigation.test.tsx`       | The shell's only test                           |
+The shell lives in `app/layout/` and holds no data access. The boot data lives in `app/init/`.
+
+| File                                                      | Role                                                                     |
+| --------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `app/layout/RootLayout.tsx`                               | §1 — the shell                                                           |
+| `app/layout/RootLayoutMenu.tsx` / `RootLayoutSidebar.tsx` | §1.1 — server-driven nav                                                 |
+| `app/layout/RootLayoutFooter.tsx`                         | §1.3 — 13 dead links                                                     |
+| `app/layout/hooks/useMenuVisibility.ts`                   | The two `handle` flags + `isAuthPage`                                    |
+| `app/layout/hooks/useMenuNavigation.ts`                   | Active-state highlighting                                                |
+| `app/layout/menuClasses.ts`                               | Class-name mapping for menu rendering                                    |
+| `app/layout/types.ts`                                     | `RouterInfoType`, `RouterHandle`                                         |
+| `app/init/bootstrap.api.ts`                               | `GET /core/bootstrap`                                                    |
+| `app/init/bootstrap.queries.ts`                           | `bootstrapQueryOptions(scope)`                                           |
+| `app/init/bootstrap.queryKeys.ts`                         | `BootstrapScope` + the key factory it keys by `{ userID, menuUpdateAt }` |
+| `app/init/loader.ts`                                      | `rootLoader`, `rootShouldRevalidate`                                     |
+| `app/init/guards.ts`                                      | `requireUser` — the one route guard                                      |
+| `app/init/currentUser.ts`                                 | `GET /auth/me` + the current-user query behind the guard                 |
+| `app/layout/hooks/tests/useMenuNavigation.test.tsx`       | The shell's only test                                                    |
+
+The guard sits in the app layer, not in `pages/auth/`; the auth page owns the mutations that
+invalidate the query `requireUser` reads.
 
 The cache key is built from a `{ userID, menuUpdateAt }` scope object rather than a flat key, which
 is the correct shape for a query that varies per user.
@@ -212,5 +220,5 @@ is the correct shape for a query that varies per user.
 - [Auth](01-auth.md) — the roles this feature filters on
 - [Home](02-home.md) — the other boot-time request
 - [Route Authentication](../architecture/route_authentication.md) — the one guard that exists
-- [Frontend Architecture](../architecture/PawHaven-Frontend-Architecture.md) — how the shell fits
+- [Frontend Architecture](../context/frontend-architecture.md) — how the shell fits
   into the route tree

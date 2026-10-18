@@ -47,6 +47,7 @@
     }
   ],
   "email": {
+    "enabled": false,
     "from": "no-reply@pawhaven.work",
     "host": "${EMAIL_SMTP_HOST}",
     "port": 587,

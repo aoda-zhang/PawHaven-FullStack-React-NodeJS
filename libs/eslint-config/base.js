@@ -113,11 +113,13 @@ module.exports = {
     // React components (.tsx) use PascalCase. JSON files (e.g. i18n locale
     // resources, tsconfig) must be camelCase too. ignoreMiddleExtensions lets
     // "config.schema.ts" / "*.client.ts" validate only the first segment.
+    // `main`/`route`/`router`/`index` are entry-point/plumbing filenames, not
+    // components, so PascalCase does not apply to them.
     // NOTE: nest-cli.json is exempted in .eslintignore (NestJS tool config).
     'check-file/filename-naming-convention': [
       'error',
       {
-        '**/!(main|route|router).tsx': 'PASCAL_CASE',
+        '**/!(main|route|router|index).tsx': 'PASCAL_CASE',
         '**/!(*.schema|*.types|*.type|*.dto).ts': 'CAMEL_CASE',
         '**/*.{js,jsx,cjs,mjs}': 'CAMEL_CASE',
         '**/*.json': 'CAMEL_CASE',

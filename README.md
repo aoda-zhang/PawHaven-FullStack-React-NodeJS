@@ -116,7 +116,7 @@ Browser JWT / cookies are owned by the **gateway** only. Per request it resolves
 
 # 🧑‍💻 Local Development
 
-See [docs/development.md](./docs/development.md).
+See [docs/context/development.md](./docs/context/development.md).
 
 ---
 

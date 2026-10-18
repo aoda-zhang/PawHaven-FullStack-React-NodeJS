@@ -1,10 +1,9 @@
-import { Button } from '@pawhaven/ui';
+import { Button, cn } from '@pawhaven/ui';
 import { Copy, Home, RotateCw } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { getLastTraceId } from '../../api/trace';
-import { cn } from '../../utils/cn';
 import type { ErrorInfo } from '../router-error-fallback/RouterErrorFallback';
 
 const handleGoHome = () => {

@@ -1,8 +1,7 @@
+import { cn } from '@pawhaven/ui';
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { cn } from '../../utils/cn';
 
 export interface MultiImageUploadProps {
   value: File[];
