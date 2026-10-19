@@ -37,7 +37,7 @@ Severity means user impact, not simply code style. “Implemented” means the c
 | P1 | Disabled/loading slotted Buttons must not activate links or other slotted controls | Implemented; CI pending | `components/button/Button.tsx` blocks capture-phase activation for disabled/loading `asChild`; Button tests cover disabled, loading, and native loading state |
 | P1 | Carousel state must not be synchronously updated during render and region needs an accessible name | Implemented; CI pending | `components/carousel/Carousel.tsx` syncs Embla state in an effect, exposes `label`, and gives slides position labels; regression test added |
 | P2 | Notification iconography must be decorative and announcements should match urgency | Implemented; CI pending | NotificationBanner icons are hidden from assistive tech; Toast uses `status` for success/info and `alert` for error/warning, with decorative icons |
-| P2 | Skeleton animation should respect reduced-motion preferences | Implemented | Skeleton includes `motion-reduce:animate-none`; Design System also defines a global reduced-motion rule |
+| P2 | Shared animations should respect reduced-motion preferences | Implemented; CI pending | Added `usePrefersReducedMotion` and applied it to Loading's Lottie autoplay/loop and Carousel autoplay; Skeleton includes `motion-reduce:animate-none`; Design System also defines a global reduced-motion rule |
 | P2 | UI package changes need focused build/test/consumer CSS checks that are not blocked by unrelated workspace lint | Implemented; workflow pending | Added `.github/workflows/ui-library.yml` to run token check, UI build/tests, Portal dependency build, and production CSS assertions |
 | P2 | Component API vocabulary and style sources need consistent future governance | Follow-up; no breaking API sweep | Record the migration rules below; existing consumer APIs are intentionally retained |
 | P2 | Storybook, automated visual regression, and browser/screen-reader checks need a conscious decision | Not implemented | No current UI-specific Storybook/visual-regression workflow was confirmed in inspected configuration; decide based on actual team/release needs |
@@ -78,10 +78,11 @@ Severity means user impact, not simply code style. “Implemented” means the c
 - **Regression coverage:** `packages/ui/src/components/carousel/tests/Carousel.test.tsx`.
 - **Remaining browser check:** Confirm keyboard operation and focus behavior in a real browser. The current tests use jsdom API polyfills and do not prove assistive-technology behavior.
 
-### 6. Toast and NotificationBanner
+### 6. Reduced motion, Toast, and NotificationBanner
 
-- **Changes:** Decorative icons are hidden from the accessibility tree. Toast severity determines announcement semantics: error/warning use `alert`, while success/info use `status`. Banner remains an alert and has a dismiss regression test.
-- **Regression coverage:** `packages/ui/src/components/toast/tests/Toast.test.tsx` and `packages/ui/src/components/notification-banner/tests/NotificationBanner.test.tsx`.
+- **Reduced motion:** `packages/ui/src/hooks/usePrefersReducedMotion.ts` uses `useSyncExternalStore` to observe the media preference. Loading pauses Lottie autoplay/loop, and Carousel avoids creating the autoplay plugin while reduced motion is preferred. Skeleton disables its CSS pulse.
+- **Notification changes:** Decorative icons are hidden from the accessibility tree. Toast severity determines announcement semantics: error/warning use `alert`, while success/info use `status`. Banner remains an alert and has a dismiss regression test.
+- **Regression coverage:** `packages/ui/src/components/loading/tests/Loading.test.tsx`, `packages/ui/src/components/toast/tests/Toast.test.tsx`, and `packages/ui/src/components/notification-banner/tests/NotificationBanner.test.tsx`.
 - **Remaining review:** Confirm timer behavior under browser tab suspension and whether repeated announcements should be deduplicated.
 
 ### 7. Focused quality gate
