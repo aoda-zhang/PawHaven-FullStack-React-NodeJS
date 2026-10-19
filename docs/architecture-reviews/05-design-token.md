@@ -300,3 +300,36 @@ export type SemanticColorPath =
 ```
 
 正式生成类型时应从 JSON schema 或 token source 自动生成，避免手写类型与 CSS 变量再次漂移。生成结果应包含已废弃 token 标记或兼容映射，并在 breaking change 时配套迁移说明。
+
+## 12. 机器可读前的源码 Token 清单（本分支静态盘点）
+
+本节从当前分支的 CSS 定义逐个提取 token 名称；Primitive 源文件共 **203 个定义**（按定义出现次数计数，不代表唯一 token 数）。语义层 `src/theme.css` 提取到 **81 个定义**，utility 层 `src/utilities.css` 提取到 **0 个自定义属性定义**。这些数量是源码盘点结果，不是 schema 验证结果；重复定义、主题覆盖和实际消费关系仍需结合检查器与消费点确认。
+
+| 源文件 | 定义数 | Token 名称 |
+|---|---:|---|
+| `src/tokens/color.css` | 70 | `--color-gray-1`, `--color-gray-2`, `--color-gray-3`, `--color-gray-4`, `--color-gray-5`, `--color-gray-6`, `--color-gray-7`, `--color-gray-8`, `--color-gray-9`, `--color-gray-10`, `--color-orange-1`, `--color-orange-2`, `--color-orange-3`, `--color-orange-4`, `--color-orange-5`, `--color-orange-6`, `--color-orange-7`, `--color-orange-8`, `--color-orange-9`, `--color-orange-10`, `--color-green-1`, `--color-green-2`, `--color-green-3`, `--color-green-4`, `--color-green-5`, `--color-green-6`, `--color-green-7`, `--color-green-8`, `--color-green-9`, `--color-green-10`, `--color-red-1`, `--color-red-2`, `--color-red-3`, `--color-red-4`, `--color-red-5`, `--color-red-6`, `--color-red-7`, `--color-red-8`, `--color-red-9`, `--color-red-10`, `--color-yellow-1`, `--color-yellow-2`, `--color-yellow-3`, `--color-yellow-4`, `--color-yellow-5`, `--color-yellow-6`, `--color-yellow-7`, `--color-yellow-8`, `--color-yellow-9`, `--color-yellow-10`, `--color-blue-1`, `--color-blue-2`, `--color-blue-3`, `--color-blue-4`, `--color-blue-5`, `--color-blue-6`, `--color-blue-7`, `--color-blue-8`, `--color-blue-9`, `--color-blue-10`, `--color-brown-1`, `--color-brown-2`, `--color-brown-3`, `--color-brown-4`, `--color-brown-5`, `--color-brown-6`, `--color-brown-7`, `--color-brown-8`, `--color-brown-9`, `--color-brown-10` |
+| `src/tokens/typography.css` | 32 | `--font-sans`, `--font-heading`, `--font-serif`, `--font-handwriting`, `--font-size-xs`, `--font-size-sm`, `--font-size-base`, `--font-size-lg`, `--font-size-xl`, `--font-size-2xl`, `--font-size-3xl`, `--font-size-4xl`, `--font-size-5xl`, `--font-size-6xl`, `--leading-none`, `--leading-tight`, `--leading-snug`, `--leading-normal`, `--leading-relaxed`, `--leading-loose`, `--leading-display`, `--tracking-tighter`, `--tracking-tight`, `--tracking-normal`, `--tracking-wide`, `--tracking-wider`, `--tracking-widest`, `--font-weight-normal`, `--font-weight-medium`, `--font-weight-semibold`, `--font-weight-bold`, `--font-weight-extrabold` |
+| `src/tokens/spacing.css` | 20 | `--spacing-px`, `--spacing-0`, `--spacing-1`, `--spacing-2`, `--spacing-3`, `--spacing-4`, `--spacing-5`, `--spacing-6`, `--spacing-7`, `--spacing-8`, `--spacing-9`, `--spacing-10`, `--spacing-12`, `--spacing-14`, `--spacing-16`, `--container-sm`, `--container-md`, `--container-lg`, `--container-xl`, `--container-2xl` |
+| `src/tokens/sizing.css` | 19 | `--size-0`, `--size-px`, `--size-1`, `--size-2`, `--size-3`, `--size-4`, `--size-6`, `--size-8`, `--size-10`, `--size-12`, `--size-16`, `--size-20`, `--size-24`, `--size-full`, `--size-min`, `--size-max`, `--size-fit`, `--size-95`, `--size-130` |
+| `src/tokens/border.css` | 5 | `--border-width-0`, `--border-width-1`, `--border-width-2`, `--border-width-4`, `--border-width-8` |
+| `src/tokens/radius.css` | 8 | `--radius-xs`, `--radius-sm`, `--radius-md`, `--radius-lg`, `--radius-xl`, `--radius-2xl`, `--radius-3xl`, `--radius-full` |
+| `src/tokens/shadow.css` | 14 | `--color-shadow`, `--color-shadow-light`, `--color-shadow-medium`, `--color-shadow-strong`, `--color-shadow-heavy`, `--color-shadow-dark`, `--color-shadow-inner`, `--shadow-xs`, `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-xl`, `--shadow-inner`, `--shadow-none` |
+| `src/tokens/breakpoint.css` | 6 | `--breakpoint-xs`, `--breakpoint-sm`, `--breakpoint-md`, `--breakpoint-lg`, `--breakpoint-xl`, `--breakpoint-2xl` |
+| `src/tokens/motion.css` | 16 | `--duration-75`, `--duration-100`, `--duration-150`, `--duration-200`, `--duration-300`, `--duration-500`, `--duration-700`, `--duration-1000`, `--ease-in`, `--ease-out`, `--ease-in-out`, `--ease-standard`, `--ease-decelerate`, `--ease-accelerate`, `--ease-bounce`, `--animate-paw-bounce` |
+| `src/tokens/opacity.css` | 6 | `--opacity-0`, `--opacity-25`, `--opacity-50`, `--opacity-75`, `--opacity-90`, `--opacity-100` |
+| `src/tokens/z-index.css` | 7 | `--z-index-0`, `--z-index-10`, `--z-index-20`, `--z-index-30`, `--z-index-40`, `--z-index-50`, `--z-index-auto` |
+
+### Semantic/theme aliases
+
+`--color-primary`, `--color-primary-hover`, `--color-primary-active`, `--color-primary-light`, `--color-primary-subtle`, `--color-primary-fg`, `--color-secondary`, `--color-secondary-hover`, `--color-secondary-active`, `--color-secondary-light`, `--color-background`, `--color-foreground`, `--color-muted`, `--color-accent`, `--color-accent-foreground`, `--color-card`, `--color-adoptable-bg`, `--color-adoptable-text`, `--color-surface`, `--color-background-subtle`, `--color-muted-strong`, `--color-text`, `--color-text-secondary`, `--color-text-tertiary`, `--color-text-placeholder`, `--color-text-inverse`, `--color-text-link`, `--color-border`, `--color-border-hover`, `--color-border-strong`, `--color-border-focus`, `--color-border-error`, `--color-divider`, `--color-hero-bg`, `--color-nav-bg`, `--color-dark-text`, `--color-body-text`, `--color-stat-labels`, `--color-footer-text`, `--color-footer-muted`, `--color-footer-secondary`, `--color-footer-bg`, `--color-error`, `--color-error-light`, `--color-success`, `--color-success-light`, `--color-warning`, `--color-warning-light`, `--color-warning-hover`, `--color-info`, `--color-info-light`, `--color-rescue-status-pending`, `--color-rescue-status-inProgress`, `--color-rescue-status-treated`, `--color-rescue-status-recovering`, `--color-rescue-status-awaitingAdoption`, `--color-rescue-status-adopted`, `--color-rescue-status-failed`, `--spacing-gutter`, `--spacing-section`, `--spacing-card`, `--spacing-input`, `--z-index-base`, `--z-index-dropdown`, `--z-index-sticky`, `--z-index-overlay`, `--z-index-modal`, `--z-index-notification`, `--z-index-toast`, `--radius-input`, `--radius-button`, `--radius-card`, `--radius-dialog`, `--shadow-card`, `--shadow-dropdown`, `--shadow-modal`, `--shadow-toast`, `--text-display`, `--text-stat`, `--text-body`, `--text-caption`
+
+### Utility/component-level custom properties
+
+未发现自定义属性定义。
+
+### 盘点限制与下一步
+
+- 当前清单记录的是 CSS 定义资产；还未把每个 token 与消费文件、消费组件、主题映射、重复定义、deprecated 状态建立完整关系。
+- `--size-95`、`--size-130` 等特殊尺寸应先查实际消费点和设计稿用途，不在缺少证据时批量重命名。
+- 目前 CSS 仍是 source of truth。不要在 JSON 和 CSS 两边人工维护相同值；只有在引入 schema、生成器、兼容 alias 与迁移策略后，才切换到 JSON/Design Tokens Format source。
+- MUI 目标映射仍是提案；在仓库内确认实际 MUI consumer 与主题入口之前，不创建第二套生产 theme。
