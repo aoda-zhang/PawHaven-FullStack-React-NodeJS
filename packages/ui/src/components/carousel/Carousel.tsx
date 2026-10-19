@@ -1,7 +1,5 @@
 import Autoplay from 'embla-carousel-autoplay';
-import useEmblaCarousel, {
-  type UseEmblaCarouselType,
-} from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import {
   useEffect,
@@ -13,7 +11,6 @@ import {
 import { cn } from '../../utils/cn';
 import { Button } from '../button/Button';
 
-type CarouselApi = UseEmblaCarouselType[1];
 type CarouselPlugin = Parameters<typeof useEmblaCarousel>[1];
 
 const DEFAULT_AUTOPLAY_DELAY_MS = 4000;
