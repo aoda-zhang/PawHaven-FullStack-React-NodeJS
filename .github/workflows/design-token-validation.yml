@@ -26,20 +26,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Resolve Node.js version
-        id: node-version
-        run: echo "version=$(node -p \"require('./package.json').engines.node || '24'\")" >> "$GITHUB_OUTPUT"
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: pnpm
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Enable package manager
+        run: |
+          corepack enable
+          corepack install
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
