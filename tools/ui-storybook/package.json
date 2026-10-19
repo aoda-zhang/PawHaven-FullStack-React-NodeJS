@@ -8,8 +8,6 @@
     "build-storybook": "storybook build --config-dir .storybook --output-dir storybook-static"
   },
   "dependencies": {
-    "@pawhaven/ui": "file:../../packages/ui",
-    "@pawhaven/design-system": "file:../../packages/design-system",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "react-hook-form": "7.64.0"
