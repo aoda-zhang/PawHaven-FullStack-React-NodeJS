@@ -66,6 +66,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
       )}
     >
       <Icon
+        aria-hidden="true"
         className={cn(
           'mt-0.5 size-5 shrink-0',
           filled ? 'text-current' : tone.icon,
@@ -94,7 +95,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
           onClick={() => setOpen(false)}
           className="hover:bg-background/20 shrink-0 rounded p-0.5 transition-colors"
         >
-          <X className="size-4" />
+          <X aria-hidden="true" className="size-4" />
         </button>
       )}
     </div>
