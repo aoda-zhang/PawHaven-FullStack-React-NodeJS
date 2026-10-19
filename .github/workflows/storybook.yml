@@ -63,7 +63,10 @@ jobs:
           STORYBOOK_BASE_PATH: /${{ github.event.repository.name }}/
         run: npm run --prefix tools/ui-storybook build-storybook
 
-      - name: Verify required component stories\n        run: node tools/ui-storybook/scripts/verify-stories.mjs\n\n      - name: Upload pull-request build artifact
+      - name: Verify required component stories
+        run: node tools/ui-storybook/scripts/verify-stories.mjs
+
+      - name: Upload pull-request build artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
