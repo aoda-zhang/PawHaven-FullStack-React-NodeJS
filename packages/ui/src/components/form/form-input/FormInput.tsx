@@ -1,5 +1,5 @@
 import { Eye, EyeOff } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
@@ -45,6 +45,9 @@ export const FormInput = ({
 }: FormInputProps) => {
   const { control } = useFormContext();
   const [showPassword, setShowPassword] = useState(false);
+  const generatedId = useId();
+  const inputId = `form-input-${name}-${generatedId}`;
+  const errorId = `${inputId}-error`;
 
   const isPasswordType = type === 'password';
   const shouldShowToggle = isPasswordType && showPasswordToggle;
@@ -60,18 +63,19 @@ export const FormInput = ({
           className={cn('baseFormContainer', className, fullWidth && 'w-full')}
         >
           {label && (
-            <div className="mb-2 text-sm font-medium">
+            <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
               {label}
               {required && (
                 <span className="text-error ml-0.5" aria-hidden="true">
                   *
                 </span>
               )}
-            </div>
+            </label>
           )}
           <div className="relative">
             <input
               {...field}
+              id={inputId}
               type={inputType}
               placeholder={placeholder}
               autoComplete={autoComplete}
@@ -79,6 +83,7 @@ export const FormInput = ({
               maxLength={maxLength}
               required={required}
               aria-invalid={!!error}
+              aria-describedby={error ? errorId : undefined}
               data-testid={`form-input-${name}`}
               className={cn(
                 'border-border bg-background focus:border-primary w-full rounded-md border text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
@@ -92,18 +97,23 @@ export const FormInput = ({
               <button
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-controls={inputId}
                 onClick={() => setShowPassword((s) => !s)}
                 className="text-text-secondary hover:text-text absolute top-1/2 right-3 -translate-y-1/2"
               >
                 {showPassword ? (
-                  <EyeOff className="size-4" />
+                  <EyeOff className="size-4" aria-hidden="true" />
                 ) : (
-                  <Eye className="size-4" />
+                  <Eye className="size-4" aria-hidden="true" />
                 )}
               </button>
             )}
           </div>
-          {error && <p className="text-error mt-1 text-xs">{error.message}</p>}
+          {error && (
+            <p id={errorId} role="alert" className="text-error mt-1 text-xs">
+              {error.message}
+            </p>
+          )}
         </div>
       )}
     />
