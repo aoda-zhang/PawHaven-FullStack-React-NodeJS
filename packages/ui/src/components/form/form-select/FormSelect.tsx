@@ -1,4 +1,5 @@
 import { ChevronDown } from 'lucide-react';
+import { useId } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
@@ -21,6 +22,9 @@ export const FormSelect = ({
   className,
 }: FormSelectProps) => {
   const { control } = useFormContext();
+  const generatedId = useId();
+  const selectId = `form-select-${name}-${generatedId}`;
+  const errorId = `${selectId}-error`;
 
   return (
     <Controller
@@ -31,13 +35,19 @@ export const FormSelect = ({
         <div
           className={cn('baseFormContainer', className, fullWidth && 'w-full')}
         >
-          {label && <div className="mb-2 text-sm font-medium">{label}</div>}
+          {label && (
+            <label htmlFor={selectId} className="mb-2 block text-sm font-medium">
+              {label}
+            </label>
+          )}
           <div className="relative">
             <select
               {...field}
+              id={selectId}
               disabled={disabled}
               value={field.value ?? ''}
               aria-invalid={!!error}
+              aria-describedby={error ? errorId : undefined}
               onChange={(event) => {
                 const matched = options?.find(
                   (item) => String(item.value) === event.target.value,
@@ -53,9 +63,16 @@ export const FormSelect = ({
                 </option>
               ))}
             </select>
-            <ChevronDown className="text-text-secondary pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2" />
+            <ChevronDown
+              aria-hidden="true"
+              className="text-text-secondary pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2"
+            />
           </div>
-          {error && <p className="text-error mt-1 text-xs">{error.message}</p>}
+          {error && (
+            <p id={errorId} role="alert" className="text-error mt-1 text-xs">
+              {error.message}
+            </p>
+          )}
         </div>
       )}
     />
