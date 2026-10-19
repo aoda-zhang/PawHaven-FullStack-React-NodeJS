@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
@@ -15,6 +16,9 @@ export const FormPhoneInput = ({
   className,
 }: FormPhoneInputProps) => {
   const { control } = useFormContext();
+  const generatedId = useId();
+  const inputId = `form-phone-${name}-${generatedId}`;
+  const errorId = `${inputId}-error`;
 
   return (
     <Controller
@@ -26,23 +30,29 @@ export const FormPhoneInput = ({
           className={cn('baseFormContainer', className, fullWidth && 'w-full')}
         >
           {label && (
-            <div className="mb-2 text-sm font-medium">
+            <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
               {label}
               {required && (
                 <span className="text-error ml-0.5" aria-hidden="true">
                   *
                 </span>
               )}
-            </div>
+            </label>
           )}
           <div data-testid={`form-phone-${name}`}>
             <PhoneInput
+              id={inputId}
+              errorId={errorId}
               phone={field.value ?? ''}
               hasError={Boolean(error)}
               onPhoneChange={field.onChange}
             />
           </div>
-          {error && <p className="text-error mt-1 text-xs">{error.message}</p>}
+          {error && (
+            <p id={errorId} role="alert" className="text-error mt-1 text-xs">
+              {error.message}
+            </p>
+          )}
         </div>
       )}
     />
