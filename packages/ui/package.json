@@ -25,7 +25,7 @@
     "test:cov": "vitest run --coverage",
     "test:watch": "vitest"
   },
-  "sideEffects": false,
+  "sideEffects": ["**/*.css"],
   "dependencies": {
     "@pawhaven/design-system": "workspace:*",
     "@radix-ui/react-slot": "^1.3.0",
