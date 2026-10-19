@@ -157,3 +157,146 @@
 - 原始 token scale 的重复、不规则性与所有消费点尚未形成完整机器可读 inventory。
 
 因此，本分支的静态改动已落地，但合并前仍必须通过实际 CI 与视觉验证；不得将未运行的验证视为通过。
+
+
+## 11. 目标 Token API 示例（设计提案，尚未接入构建）
+
+以下示例满足本专项 Prompt 对 JSON source、CSS output、Tailwind mapping、MUI mapping 和 TypeScript 类型示例的要求。**它们是目标方案，不代表本分支已经将 JSON 改为 source of truth。** 目前项目仍以 CSS 为实际 token 定义来源。
+
+### 11.1 JSON source 示例
+
+建议未来将 token source 拆成 primitive 与 semantic，并保留稳定 ID。不要把每一个 Tailwind spacing 值都重复录入 JSON；只有设计决策需要跨平台共享的 token 才应进入 source。
+
+```json
+{
+  "primitive": {
+    "color": {
+      "orange": {
+        "600": { "value": "#f7823a", "type": "color" }
+      },
+      "gray": {
+        "100": { "value": "#ffffff", "type": "color" },
+        "900": { "value": "#2f2f2f", "type": "color" }
+      }
+    },
+    "radius": {
+      "sm": { "value": "4px", "type": "dimension" },
+      "lg": { "value": "12px", "type": "dimension" }
+    }
+  },
+  "semantic": {
+    "color": {
+      "action": {
+        "primary": {
+          "value": "{primitive.color.orange.600}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "primary": {
+          "value": "{primitive.color.gray.900}",
+          "type": "color"
+        }
+      },
+      "surface": {
+        "card": {
+          "value": "{primitive.color.gray.100}",
+          "type": "color"
+        }
+      }
+    },
+    "component": {
+      "card": {
+        "radius": {
+          "value": "{primitive.radius.lg}",
+          "type": "dimension"
+        }
+      }
+    }
+  }
+}
+```
+
+在引入 JSON source 前，必须先决定 token transformation 工具、引用语法、校验 schema、CSS 变量命名和现有 CSS 的兼容策略；不要在 CSS 与 JSON 两边手工维护同一份 token。
+
+### 11.2 CSS output 示例
+
+```css
+:root {
+  --primitive-color-orange-600: #f7823a;
+  --primitive-color-gray-100: #ffffff;
+  --primitive-color-gray-900: #2f2f2f;
+  --primitive-radius-sm: 4px;
+  --primitive-radius-lg: 12px;
+
+  --color-action-primary: var(--primitive-color-orange-600);
+  --color-text-primary: var(--primitive-color-gray-900);
+  --color-surface-card: var(--primitive-color-gray-100);
+  --card-radius: var(--primitive-radius-lg);
+}
+```
+
+当前项目已使用 `--color-primary`、`--color-text`、`--radius-card` 等公开名称。若未来采用上述命名，必须通过兼容 alias 和分阶段迁移实现，不能直接替换现有名称。
+
+### 11.3 Tailwind v4 mapping 示例
+
+```css
+@theme {
+  --color-primary: var(--color-action-primary);
+  --color-text: var(--color-text-primary);
+  --color-surface: var(--color-surface-card);
+  --radius-card: var(--card-radius);
+}
+```
+
+Tailwind mapping 只应将稳定的语义 token 暴露为 utility namespace；产品组件不应因方便而重新选择 primitive palette。
+
+### 11.4 MUI mapping 示例（仅在确认 MUI 仍是实际消费者后采用）
+
+```ts
+import { createTheme } from '@mui/material/styles';
+
+export const muiTheme = createTheme({
+  palette: {
+    primary: { main: 'var(--color-action-primary)' },
+    text: { primary: 'var(--color-text-primary)' },
+    background: { paper: 'var(--color-surface-card)' },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+});
+```
+
+该示例只说明映射方向，不应直接复制为生产实现：MUI palette 对颜色值的运算、组件状态与 CSS variable 支持需要结合当前 MUI 版本验证。若 Portal 已不再消费 MUI，则不应为它保留第二套 theme 层。
+
+### 11.5 TypeScript API 示例
+
+```ts
+export const semanticTokens = {
+  color: {
+    action: {
+      primary: 'var(--color-action-primary)',
+    },
+    text: {
+      primary: 'var(--color-text-primary)',
+    },
+    surface: {
+      card: 'var(--color-surface-card)',
+    },
+  },
+  component: {
+    card: {
+      radius: 'var(--card-radius)',
+    },
+  },
+} as const;
+
+export type SemanticTokens = typeof semanticTokens;
+export type SemanticColorPath =
+  | 'color.action.primary'
+  | 'color.text.primary'
+  | 'color.surface.card';
+```
+
+正式生成类型时应从 JSON schema 或 token source 自动生成，避免手写类型与 CSS 变量再次漂移。生成结果应包含已废弃 token 标记或兼容映射，并在 breaking change 时配套迁移说明。
