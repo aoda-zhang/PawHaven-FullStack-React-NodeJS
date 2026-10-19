@@ -56,6 +56,12 @@ describe('Carousel', () => {
     expect(screen.getByRole('region')).toBeDefined();
   });
 
+  it('exposes a configurable accessible name for the carousel region', () => {
+    render(<Carousel images={images} label="Rescue animal photos" />);
+
+    expect(screen.getByRole('region', { name: 'Rescue animal photos' })).toBeInTheDocument();
+  });
+
   it('renders nav controls with the default labels', () => {
     render(<Carousel images={images} />);
 
