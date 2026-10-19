@@ -6,6 +6,7 @@ on:
       - "packages/design-system/**"
       - "packages/ui/**"
       - "apps/frontend/**"
+      - "apps/backend/document-service/**"
       - "pnpm-lock.yaml"
       - ".github/workflows/design-token-validation.yml"
   push:
@@ -49,3 +50,12 @@ jobs:
 
       - name: Build generated design tokens
         run: pnpm --filter @pawhaven/design-system build:tokens
+
+      - name: Build document-service and workspace dependencies
+        run: pnpm exec turbo run build --filter=@pawhaven/document-service...
+
+      - name: Typecheck document-service
+        run: pnpm --filter @pawhaven/document-service typecheck
+
+      - name: Test document-service
+        run: pnpm --filter @pawhaven/document-service test
