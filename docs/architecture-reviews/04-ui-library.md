@@ -4,13 +4,13 @@
 **Working branch:** `refactor/ui-library-audit`  
 **Pull request:** [#90 — refactor(ui): audit and improve shared UI library](https://github.com/aoda-zhang/PawHaven-FullStack-React-NodeJS/pull/90)  
 **Scope:** `packages/ui`, `packages/design-system`, and Portal consumption  
-**Status:** Source changes and regression tests are committed on the branch. Focused UI CI is configured; final build/test status must be read from the latest workflow run before merging.
+**Status:** Source changes and regression tests are committed on the branch. The focused [UI Library workflow](https://github.com/aoda-zhang/PawHaven-FullStack-React-NodeJS/actions/runs/39183975135) passed, including token validation, UI build/tests, Portal production build, and emitted-CSS assertions. React Doctor also passed. The separate whole-workspace Test workflow remains blocked by unrelated `@pawhaven/backend-core#lint` errors.
 
 ## Executive summary
 
 `@pawhaven/ui` is currently a shared UI kit, not a fully governed Design System. Retain the package and its current public entry points. The best near-term investment is reliability: correct CSS retention, accessible form controls and announcements, disabled/loading behavior, carousel state synchronization, and package-consumer verification. Avoid a broad API redesign until the existing consumer contract is inventoried.
 
-No confirmed P0 issue was found in the reviewed UI-library scope. The most consequential confirmed issues were P1/P2 accessibility and packaging defects. The source changes below address them; a successful CI run is still required to call them verified.
+No confirmed P0 issue was found in the reviewed UI-library scope. The most consequential confirmed issues were P1/P2 accessibility and packaging defects. The source changes below address them, and the focused UI workflow now verifies package build/tests and Portal CSS retention.
 
 Scores below are qualitative engineering judgments, not automated measurements.
 
@@ -18,10 +18,10 @@ Scores below are qualitative engineering judgments, not automated measurements.
 |---|---:|---:|---|
 | Public API consistency | 5/10 | 5/10 | Existing form and primitive vocabularies still differ; avoid breaking rename now |
 | Reuse and boundaries | 6/10 | 6/10 | Shared primitives coexist with composite and feature-leaning components |
-| Accessibility | 5/10 | 7/10, pending CI | Label/error semantics and announcement behavior have been improved and regression tests added |
+| Accessibility | 5/10 | 7/10, automated checks passed | Label/error semantics and announcement behavior have been improved and regression tests added |
 | Token integration | 7/10 | 7/10 | Semantic tokens exist but hard-coded/inline styles remain in some components |
-| Package/build contract | 6/10 | 8/10, pending CI | CSS is declared side-effectful; focused Portal production CSS check added |
-| Tests | 5/10 | 7/10, pending CI | Button, Carousel, forms, Toast, and NotificationBanner behavior now has focused coverage; this is not a coverage percentage |
+| Package/build contract | 6/10 | 8/10, focused CI passed | CSS is declared side-effectful; focused Portal production CSS check added |
+| Tests | 5/10 | 7/10, focused CI passed | Button, Carousel, forms, Toast, and NotificationBanner behavior now has focused coverage; this is not a coverage percentage |
 | Change governance | 4/10 | 5/10 | Governance guidance and a focused CI workflow added; ownership and release/version workflow remain lightweight |
 
 ## P0–P3 implementation tracker
@@ -31,14 +31,14 @@ Severity means user impact, not simply code style. “Implemented” means the c
 | Priority | Finding / acceptance condition | Status | Evidence / verification |
 |---|---|---|---|
 | P0 | No confirmed security, privacy, or data-integrity blocker in the reviewed UI package | No finding confirmed | Scope-limited source review; not a security certification |
-| P1 | CSS side effects must survive bundling | Implemented; CI pending | `packages/ui/package.json` now declares `sideEffects: ["**/*.css"]`; focused workflow builds Portal and checks emitted CSS |
+| P1 | CSS side effects must survive bundling | Implemented; focused CI passed | `packages/ui/package.json` now declares `sideEffects: ["**/*.css"]`; focused workflow builds Portal and checks emitted CSS |
 | P1 | Loading component must use the installed Lottie API and expose an accessible status | Implemented; CI pending | `components/loading/Loading.tsx` uses named `Lottie` and `src={animationData}`, `role="status"`, and an accessible label |
 | P1 | Form controls need real labels, required semantics, invalid state, and associated error text | Implemented; CI pending | Input, Select, TextArea, PhoneInput, Checkbox, Radio, and DateRange updated; regression tests added in `form/tests/FormAccessibility.test.tsx` |
 | P1 | Disabled/loading slotted Buttons must not activate links or other slotted controls | Implemented; CI pending | `components/button/Button.tsx` blocks capture-phase activation for disabled/loading `asChild`; Button tests cover disabled, loading, and native loading state |
 | P1 | Carousel state must not be synchronously updated during render and region needs an accessible name | Implemented; CI pending | `components/carousel/Carousel.tsx` syncs Embla state in an effect, exposes `label`, and gives slides position labels; regression test added |
 | P2 | Notification iconography must be decorative and announcements should match urgency | Implemented; CI pending | NotificationBanner icons are hidden from assistive tech; Toast uses `status` for success/info and `alert` for error/warning, with decorative icons |
-| P2 | Shared animations should respect reduced-motion preferences | Implemented; CI pending | Added `usePrefersReducedMotion` and applied it to Loading's Lottie autoplay/loop and Carousel autoplay; Skeleton includes `motion-reduce:animate-none`; Design System also defines a global reduced-motion rule |
-| P2 | UI package changes need focused build/test/consumer CSS checks that are not blocked by unrelated workspace lint | Implemented; workflow pending | Added `.github/workflows/ui-library.yml` to run token check, UI build/tests, Portal dependency build, and production CSS assertions |
+| P2 | Shared animations should respect reduced-motion preferences | Implemented; focused CI passed | Added `usePrefersReducedMotion` and applied it to Loading's Lottie autoplay/loop and Carousel autoplay; Skeleton includes `motion-reduce:animate-none`; Design System also defines a global reduced-motion rule |
+| P2 | UI package changes need focused build/test/consumer CSS checks that are not blocked by unrelated workspace lint | Implemented; focused CI passed | Added `.github/workflows/ui-library.yml` to run token check, UI build/tests, Portal dependency build, and production CSS assertions |
 | P2 | Component API vocabulary and style sources need consistent future governance | Follow-up; no breaking API sweep | Record the migration rules below; existing consumer APIs are intentionally retained |
 | P2 | Storybook, automated visual regression, and browser/screen-reader checks need a conscious decision | Not implemented | No current UI-specific Storybook/visual-regression workflow was confirmed in inspected configuration; decide based on actual team/release needs |
 | P3 | Private package release governance, ownership, deprecation, codemods, and Changesets | Deferred intentionally | Package is private and currently workspace-consumed; adding a release framework without an external release workflow would be premature |
@@ -95,7 +95,7 @@ Added `.github/workflows/ui-library.yml` to isolate UI-package verification from
 4. Portal production build and its workspace dependencies.
 5. Assertions that Design System tokens and a UI-library utility survive in the production CSS.
 
-The existing whole-workspace Test workflow at the previously inspected commit failed during `@pawhaven/backend-core#lint` on unrelated errors in backend-core test files (including naming-convention and restricted-syntax violations); Typecheck, Tests, and Build were skipped by that workflow. React Doctor passed for that earlier head. Do not interpret the workspace lint failure as proof of a UI failure, and do not interpret React Doctor as proof of package build/test success. Read the latest focused UI workflow run before merging.
+The focused [UI Library workflow](https://github.com/aoda-zhang/PawHaven-FullStack-React-NodeJS/actions/runs/39183975135) passed token validation, UI package build, all UI component tests, Portal production build, and CSS retention assertions. React Doctor passed on the same branch head. The separate whole-workspace Test workflow failed at `@pawhaven/backend-core#lint` on existing errors in backend-core test files (including filename-convention and restricted-syntax violations); its Typecheck, Tests, and Build stages were skipped. The failure is outside this UI-library diff, but it means the repository-wide required check is not green.
 
 ## Component inventory and classification
 
@@ -146,9 +146,9 @@ These classifications are based on inspected source and intent, not a formal own
 - [x] Carousel accessible naming and state synchronization improved; naming test added.
 - [x] Toast and NotificationBanner announcement semantics and tests improved.
 - [x] Focused UI quality workflow added.
-- [ ] Focused UI workflow passes on the latest branch head.
-- [ ] Confirm production CSS assertions pass in the generated Portal bundle.
+- [x] Focused UI workflow passes on the audited branch head.
+- [x] Production CSS assertions pass in the generated Portal bundle.
 - [ ] Confirm full existing consumer flows and browser keyboard/screen-reader behavior.
 - [ ] Decide whether Storybook/visual regression is justified by the current team workflow.
 
-**Merge gate:** Do not merge until the focused UI workflow is green. The broader workspace workflow must also be green or its unrelated lint blockers must be separately tracked and explicitly waived by the repository owner.
+**Merge gate:** The focused UI workflow is green. The broader workspace Test workflow remains red due to unrelated backend-core lint failures; resolve those separately or obtain an explicit repository-owner waiver before merging if that workflow is required.
