@@ -24,7 +24,9 @@
     "quality-check": "node scripts/check-quality.mjs",
     "check:links": "node harness-core/validation/check-links.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "storybook:ui": "npm install --prefix tools/ui-storybook && npm run --prefix tools/ui-storybook storybook",
+    "build:storybook:ui": "npm install --prefix tools/ui-storybook && npm run --prefix tools/ui-storybook build-storybook"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
