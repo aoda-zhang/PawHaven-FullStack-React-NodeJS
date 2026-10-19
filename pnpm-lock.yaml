@@ -1237,6 +1237,9 @@ importers:
       '@pawhaven/eslint-config':
         specifier: workspace:*
         version: link:../../libs/eslint-config
+      '@tailwindcss/cli':
+        specifier: ^4.1.14
+        version: 4.3.3
       tailwindcss:
         specifier: ^4.1.14
         version: 4.3.3
