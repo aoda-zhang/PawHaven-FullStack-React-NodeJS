@@ -132,9 +132,9 @@
 
 @utility card {
   background-color: var(--color-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-card);
   border: var(--border-width-1) solid var(--color-border);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
 }
 
 /* ═══ Form Utilities ════════════════════════════════════════ */
@@ -143,7 +143,7 @@
   width: 100%;
   padding: var(--spacing-input);
   border: var(--border-width-1) solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-input);
   background-color: var(--color-surface);
   color: var(--color-text);
   outline: none;
