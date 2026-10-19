@@ -41,6 +41,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Test token contract analyzer
+        run: pnpm --filter @pawhaven/design-system test:tokens
+
       - name: Check design token contract and frontend styles
         run: pnpm token-check
 
