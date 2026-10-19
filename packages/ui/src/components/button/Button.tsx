@@ -46,17 +46,27 @@ export const Button = ({
   loading = false,
   disabled,
   children,
+  onClickCapture,
   ...props
 }: ButtonProps) => {
   const Comp = asChild ? Slot : 'button';
+  const isUnavailable = Boolean(disabled || loading);
 
   return (
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      disabled={asChild ? undefined : disabled || loading}
-      aria-disabled={asChild && (disabled || loading) ? true : props['aria-disabled']}
+      disabled={asChild ? undefined : isUnavailable}
+      aria-disabled={asChild && isUnavailable ? true : props['aria-disabled']}
       aria-busy={loading || undefined}
+      onClickCapture={(event) => {
+        if (asChild && isUnavailable) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        onClickCapture?.(event);
+      }}
       {...props}
     >
       {loading && (
