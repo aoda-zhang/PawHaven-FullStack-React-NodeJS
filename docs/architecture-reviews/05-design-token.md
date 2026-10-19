@@ -16,8 +16,8 @@
 
 主要风险：
 1. **组件级 token 定义了却未被组件 utility 使用**：`theme.css` 定义 `--radius-card`、`--radius-input`、`--shadow-card`，但 `card` 和 `input-field` 仍直接引用 primitive。
-2. **token-check 不是完整的 token contract validator**：脚本扫描 Portal 和 `packages/ui`，通过正则收集 token 和解析静态 className；它并未验证所有 token 引用、主题映射、token 类型或 token 是否被消费。
-3. **已知违规被文件路径/行号白名单跳过**：`KNOWN_VIOLATIONS` 会让已知 inline style、palette class、arbitrary px 和 unknown classname 不阻断检查，行号随代码变化也容易失效。
+2. **token-check 已补充基础 Token Contract 检查，但仍非完整 schema validator**：现已检查 Design System CSS 中未定义的 `var(--...)` 引用和循环 alias，并输出重复定义警告；尚未提供 JSON schema、TypeScript token 类型生成或 unused token 的可靠静态分析。
+3. **历史违规曾被文件路径/行号白名单跳过**：已将 suppression 改为带原因、owner、到期日期的 JSON manifest；本分支同时修复了原有 9 项 suppression 对应的静态 inline style、palette utility、arbitrary px 和 unknown classname，因此当前 manifest 已清空。
 4. **没有发现显式 dark theme 映射**：已读取的 `src/theme.css` 只有默认 `@theme` 映射；在本次检查的文件中未发现 dark theme override。需全仓验证主题切换是否在其他入口实现。
 5. **token build 脚本耦合 pnpm 内部目录结构**：`scripts/build-tokens.mjs` 直接遍历 `node_modules/.pnpm` 并拼接 CLI 内部路径，且 package manifest 未声明 `@tailwindcss/cli` 为直接依赖；干净安装和 pnpm 布局变化可能导致构建失败。
 6. **文档与实际 token API 存在漂移风险**：README 示例使用 `rounded-xl`、`text-3xl` 等 primitive utility，同时声明颜色/字体/阴影使用 semantic tokens；规则需要明确区分“语义决策 token”和允许使用的结构尺度。
@@ -54,16 +54,16 @@
 - 验收：CSS 构建成功；组件视觉回归无差异。
 
 ### DT-02 — Token 检查器依赖行号白名单
-- 严重度：高；工作量：M；状态：待实施
+- 严重度：高；工作量：M；状态：已实施第一阶段
 - 证据：`scripts/token-check.cjs` 的 `KNOWN_VIOLATIONS` 以 `path:line:rule` 为 key，匹配后直接跳过；注释称它是 combined token/style gate。
-- 建议：将白名单迁移为带原因、owner、到期条件的结构化 suppression；每次运行报告 suppression 数量，并在新增 suppression 时失败。最终逐项消除旧违规后移除白名单。
-- 不建议本次直接删除白名单：那会将现有违规全部变成阻断项，可能造成无法区分新旧问题的噪音。
+- 已实施：新增 `packages/design-system/scripts/token-suppressions.json`，每项要求 `key`、`reason`、`owner`、`expiresOn`；检查器统计 suppression 数量，并让过期 suppression 重新成为失败项。本分支清理了已知 9 项违规并将 manifest 清空。
+- 验证要求：重新运行 `pnpm token-check`，确认 `legacy violations suppressed` 为 0，并处理新扫描发现的其他违规。
 
 ### DT-03 — 检查器未验证 token 系统自身
-- 严重度：高；工作量：M；状态：待实施
+- 严重度：高；工作量：M；状态：已实施基础检查
 - 证据：检查器的 `TARGETS` 仅为 `apps/frontend` 与 `packages/ui`；它从 token 文件收集自定义属性名，但不验证 `var(--x)` 引用是否存在，也不检查主题 alias 的引用图。
-- 建议：增加独立 token contract check：检查重复定义、未解析的 `var(--...)`、semantic token 对 primitive 的引用、循环 alias、token namespace 分类，以及未使用 token 报告（未使用项先报告，不立即失败）。
-- 验收：注入不存在的 token 引用和循环 alias 的 fixture 时检查失败；有效 token fixture 通过。
+- 已实施：检查器现在扫描 Design System 的 token、theme、utilities 和 CSS 入口，失败于未定义的 CSS variable 引用及循环 alias，并报告重复定义。重复定义目前只警告；token namespace 分类、unused token 分析和 schema validation 仍待补齐。
+- 验收待执行：注入不存在的 token 引用和循环 alias 的 fixture 时检查失败；有效 token fixture 通过。当前尚未在实际工作区执行脚本。
 
 ### DT-04 — Theme coverage 不足以证明支持 light/dark
 - 严重度：中；工作量：M/L；状态：待全仓验证
@@ -72,10 +72,10 @@
 - 验收：如果支持 dark mode，需覆盖 system/light/dark、刷新后持久化和首屏闪烁；如果不支持，应在设计系统文档明确当前主题范围。
 
 ### DT-05 — Token build 脚本依赖 pnpm 内部实现
-- 严重度：中；工作量：S；状态：待实施
+- 严重度：中；工作量：S；状态：已实施，待运行验证
 - 证据：`scripts/build-tokens.mjs` 扫描 `node_modules/.pnpm` 并拼接 `@tailwindcss/cli/dist/index.mjs`；`packages/design-system/package.json` 未声明 `@tailwindcss/cli` 直接依赖。
-- 建议：声明并锁定 CLI 依赖，通过 package script / package bin 调用 CLI；避免拼接 `.pnpm` 内部路径。
-- 验收：干净安装后运行 token build；不依赖本地已有的间接依赖或特定 store 布局。
+- 已实施：声明 `@tailwindcss/cli: ^4.1.14`，将 `pnpm-lock.yaml` 中 `packages/design-system` importer 同步到已锁定的 4.3.3，并改用 `pnpm exec tailwindcss`。
+- 验收待执行：干净安装后运行 token build，确认不依赖本地已有的间接依赖或特定 store 布局。
 
 ### DT-06 — Primitive/semantic/component 边界需要正式化
 - 严重度：中；工作量：S；状态：待实施
@@ -131,3 +131,29 @@
 ## 8. 限制
 
 本轮基于 GitHub 文件读取与代码搜索开展；没有在实际工作区执行 pnpm build、token-check、typecheck 或浏览器视觉回归。因此不把任何检查标记为“已通过”。报告中的未发现项是“当前证据不足”，不是断言仓库中不存在。
+
+
+## 9. 本分支实际实施记录
+
+以下修改已提交到 `refactor/design-token-audit`：
+
+- `packages/design-system/src/utilities.css`：`card` 使用 `--radius-card` / `--shadow-card`；`input-field` 使用 `--radius-input`。
+- `packages/design-system/scripts/token-check.cjs`：增加 CSS variable 引用完整性和 alias cycle 检查；输出重复定义提示；读取带 metadata 与到期日期的 suppression manifest。
+- `packages/design-system/scripts/token-suppressions.json`：新增后已清空。原有 9 项对应违规已在组件样式中迁移。
+- `packages/design-system/package.json` 与 `pnpm-lock.yaml`：显式声明并锁定 Tailwind CLI。
+- `packages/design-system/scripts/build-tokens.mjs`：移除直接扫描 `node_modules/.pnpm` 的逻辑，改用 package-local `pnpm exec tailwindcss`。
+- `packages/design-system/src/theme.css`：新增 `--color-footer-secondary` 语义 token。
+- `AdoptablePetsSection.tsx`：将水平滚动吸附从静态 inline style 迁移到 `snap-x snap-mandatory`。
+- `PetCard.tsx`：将卡片吸附、领养状态、图标背景/文本和 hover 状态迁移到 utility 与 semantic tokens。
+- `RootLayoutFooter.tsx`：将原始 `text-brown-7` palette class 迁移为 `text-footer-secondary`。
+- `Button.tsx`：将 `focus-visible:ring-[3px]` 改为 Tailwind 的 `focus-visible:ring-3` utility。
+
+## 10. 本次尚未完成 / 未验证的事项
+
+- 未在真实工作区执行 `pnpm token-check`、`pnpm --filter @pawhaven/design-system build:tokens`、TypeScript 检查、React Doctor 或浏览器视觉回归。
+- 未增加自动化 fixture 测试来证明 undefined variable 与 alias cycle 检查的失败行为。
+- 未完成全仓 MUI theme、dark mode 状态流、high contrast、reduced motion 的运行时验证。
+- 尚未生成 JSON token source、schema validation 或 TypeScript token types；当前 CSS 仍是 source of truth。
+- 原始 token scale 的重复、不规则性与所有消费点尚未形成完整机器可读 inventory。
+
+因此，本分支的静态改动已落地，但合并前仍必须通过实际 CI 与视觉验证；不得将未运行的验证视为通过。
