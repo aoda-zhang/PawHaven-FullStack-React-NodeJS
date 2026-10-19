@@ -409,10 +409,10 @@ function checkTokenContract() {
     }
     const content = readFileSync(file, 'utf8');
     const rel = relative(repoRoot, file);
-    const lines = content.split('\\n');
+    const lines = content.split('\n');
 
     lines.forEach((line, index) => {
-      const definitionRegex = /(--[\\w-]+)\\s*:/g;
+      const definitionRegex = /(--[\w-]+)\s*:/g;
       let definition;
       while ((definition = definitionRegex.exec(line)) !== null) {
         const name = definition[1];
@@ -420,7 +420,7 @@ function checkTokenContract() {
         definitions.get(name).push({ file: rel, line: index + 1 });
       }
 
-      const referenceRegex = /var\\(\\s*(--[\\w-]+)/g;
+      const referenceRegex = /var\(\s*(--[\w-]+)/g;
       let reference;
       while ((reference = referenceRegex.exec(line)) !== null) {
         references.push({
@@ -445,14 +445,14 @@ function checkTokenContract() {
   for (const file of sourceFiles) {
     if (!existsSync(file)) continue;
     const content = readFileSync(file, 'utf8');
-    const lines = content.split('\\n');
+    const lines = content.split('\n');
     lines.forEach((line, index) => {
-      const definitionRegex = /(--[\\w-]+)\\s*:\\s*([^;{}]+)/g;
+      const definitionRegex = /(--[\w-]+)\s*:\s*([^;{}]+)/g;
       let definition;
       while ((definition = definitionRegex.exec(line)) !== null) {
         const name = definition[1];
         const value = definition[2];
-        const refs = [...value.matchAll(/var\\(\\s*(--[\\w-]+)/g)].map((match) => match[1]);
+        const refs = [...value.matchAll(/var\(\s*(--[\w-]+)/g)].map((match) => match[1]);
         if (!graph.has(name)) graph.set(name, []);
         graph.get(name).push(...refs.map((target) => ({
           target,
