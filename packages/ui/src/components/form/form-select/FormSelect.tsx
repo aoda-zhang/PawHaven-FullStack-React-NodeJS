@@ -19,6 +19,7 @@ export const FormSelect = ({
   fullWidth = true,
   placeholder,
   disabled,
+  required,
   className,
 }: FormSelectProps) => {
   const { control } = useFormContext();
@@ -38,6 +39,11 @@ export const FormSelect = ({
           {label && (
             <label htmlFor={selectId} className="mb-2 block text-sm font-medium">
               {label}
+              {required && (
+                <span className="text-error ml-0.5" aria-hidden="true">
+                  *
+                </span>
+              )}
             </label>
           )}
           <div className="relative">
@@ -45,8 +51,9 @@ export const FormSelect = ({
               {...field}
               id={selectId}
               disabled={disabled}
+              required={required}
               value={field.value ?? ''}
-              aria-invalid={!!error}
+              aria-invalid={error ? true : undefined}
               aria-describedby={error ? errorId : undefined}
               onChange={(event) => {
                 const matched = options?.find(
