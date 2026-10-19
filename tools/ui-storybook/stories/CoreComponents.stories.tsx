@@ -17,24 +17,12 @@ import {
   TimelineSeparator,
 } from '../../../packages/ui/src/components/timeline/Timeline';
 
-const buttonMeta = {
+const meta = {
   title: 'UI Library/Core Components',
-  component: Button,
-  tags: ['autodocs'],
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
-    },
-    size: { control: 'select', options: ['default', 'sm', 'lg', 'icon'] },
-    loading: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-  },
-  args: { children: 'Button', variant: 'default', size: 'default', loading: false, disabled: false },
-} satisfies Meta<typeof Button>;
+} satisfies Meta;
 
-export default buttonMeta;
-type Story = StoryObj<typeof buttonMeta>;
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 export const ButtonVariants: Story = {
   render: () => (
