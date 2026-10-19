@@ -69,10 +69,21 @@ export const Button = ({
       }}
       {...props}
     >
-      {loading && (
-        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+      {asChild ? (
+        <>
+          {loading && (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          )}
+          <Slot.Slottable>{children}</Slot.Slottable>
+        </>
+      ) : (
+        <>
+          {loading && (
+            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          )}
+          {children}
+        </>
       )}
-      {children}
     </Comp>
   );
 };
