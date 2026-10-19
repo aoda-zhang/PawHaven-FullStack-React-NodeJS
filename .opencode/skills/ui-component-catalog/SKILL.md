@@ -1,6 +1,6 @@
 ---
 name: ui-component-catalog
-description: Find and correctly reuse PawHaven shared UI components. Use when implementing, refactoring, reviewing, or answering questions about UI components, forms, buttons, feedback, loading states, carousels, timelines, phone inputs, or the @pawhaven/ui library.
+description: Keyword-indexed lookup for PawHaven @pawhaven/ui components. Use when a task mentions Button, Carousel, FileDownloadButton, Loading, NotificationBanner, Phase, PhoneInput, PhotoPlaceholder, Skeleton, Timeline, Toast, FormInput, FormSelect, FormTextArea, FormCheckbox, FormRadio, FormDateRanger, FormPhoneInput, shared UI, design-system components, forms, loading states, alerts, toasts, timelines, or component reuse.
 ---
 
 # UI component catalog
