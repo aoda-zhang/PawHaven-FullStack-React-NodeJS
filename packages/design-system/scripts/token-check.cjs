@@ -148,17 +148,27 @@ const VALID_UTILITIES = new Set([
   'gap-y-0',
 ]);
 
-const KNOWN_VIOLATIONS = new Set([
-  'apps/frontend/portal/src/pages/home/components/AdoptablePetsSection.tsx:25:inline-style',
-  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:37:inline-style',
-  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:123:palette-name',
-  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:135:palette-name',
-  'apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:146:palette-name',
-  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:palette-name',
-  'packages/ui/src/components/button/Button.tsx:9:px-arbitrary',
-  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:46:unknown-classname',
-  'apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:unknown-classname',
-]);
+const SUPPRESSION_FILE = join(__dirname, 'token-suppressions.json');
+if (!existsSync(SUPPRESSION_FILE)) {
+  console.error('token-check: suppression manifest not found');
+  process.exit(2);
+}
+const SUPPRESSIONS = JSON.parse(readFileSync(SUPPRESSION_FILE, 'utf8'));
+const SUPPRESSION_BY_KEY = new Map(SUPPRESSIONS.map((item) => [item.key, item]));
+let suppressedCount = 0;
+
+function isSuppressed(key) {
+  const suppression = SUPPRESSION_BY_KEY.get(key);
+  if (!suppression) return false;
+  if (!suppression.reason || !suppression.owner || !suppression.expiresOn) {
+    throw new Error(`Invalid token suppression metadata: ${key}`);
+  }
+  if (suppression.expiresOn < new Date().toISOString().slice(0, 10)) {
+    return false;
+  }
+  suppressedCount++;
+  return true;
+}
 
 const STYLE_RULES = [
   {
@@ -510,14 +520,14 @@ for (const target of TARGETS) {
         if (!rule.fileTypes.includes(ext)) continue;
         if (!rule.pattern.test(text)) continue;
         const key = `${rel}:${index + 1}:${rule.id}`;
-        if (KNOWN_VIOLATIONS.has(key)) continue;
+        if (isSuppressed(key)) continue;
         failures.push(`${key}: ${rule.message} — ${text.trim()}`);
       }
       if (ext !== '.tsx' && ext !== '.ts') return;
       for (const className of extractClassNames(text)) {
         if (!tokenExists(className)) {
           const key = `${rel}:${index + 1}:unknown-classname`;
-          if (KNOWN_VIOLATIONS.has(key)) continue;
+          if (isSuppressed(key)) continue;
           failures.push(
             `${key}: unknown classname "${className}" — no matching design token`,
           );
@@ -528,8 +538,13 @@ for (const target of TARGETS) {
 }
 
 console.log(
-  `token-check: ${filesScanned} files scanned, ${VALID_TOKENS.size} tokens loaded`,
+  `token-check: ${filesScanned} files scanned, ${VALID_TOKENS.size} tokens loaded, ${suppressedCount} legacy violations suppressed`,
 );
+for (const suppression of SUPPRESSIONS) {
+  if (suppression.expiresOn < new Date().toISOString().slice(0, 10)) {
+    console.warn(`warn  token-check: expired suppression ${suppression.key} (owner: ${suppression.owner})`);
+  }
+}
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`fail  ${failure}`);
