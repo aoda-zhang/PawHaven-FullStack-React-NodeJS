@@ -71,11 +71,11 @@ jobs:
             echo "Portal production build emitted no CSS files." >&2
             exit 1
           fi
-          if ! grep -E -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
+          if ! grep -qE -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
             echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
             exit 1
           fi
-          if ! grep -F -- ".animate-spin" ${CSS_FILES}; then
+          if ! grep -qF -- ".animate-spin" ${CSS_FILES}; then
             echo "Expected UI-library animation utility was not found in the Portal bundle." >&2
             exit 1
           fi
