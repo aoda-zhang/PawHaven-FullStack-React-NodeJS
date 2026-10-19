@@ -1,0 +1,58 @@
+name: Storybook
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'tools/ui-storybook/**'
+      - 'packages/ui/**'
+      - 'packages/design-system/**'
+      - '.github/workflows/storybook.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build component catalogue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Resolve Node.js version from package.json
+        id: node_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+          if [[ -z "${NODE_VERSION}" ]]; then
+            echo "Missing engines.node in package.json" >&2
+            exit 1
+          fi
+          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node_version.outputs.node_version }}
+
+      - name: Enable pnpm and install workspace dependencies
+        run: |
+          corepack enable
+          corepack install
+          pnpm install --frozen-lockfile
+
+      - name: Install Storybook dependencies
+        run: npm install --prefix tools/ui-storybook --no-audit --no-fund
+
+      - name: Build Storybook
+        run: npm run --prefix tools/ui-storybook build-storybook
+
+      - name: Upload static Storybook artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pawhaven-ui-storybook
+          path: tools/ui-storybook/storybook-static
+          if-no-files-found: error
