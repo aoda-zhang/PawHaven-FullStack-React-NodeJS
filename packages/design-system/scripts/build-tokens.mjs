@@ -1,28 +1,18 @@
 import { execFileSync } from 'node:child_process';
-import { readdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
-const pnpmDir = join(process.cwd(), '..', '..', 'node_modules', '.pnpm');
-const cliDir = readdirSync(pnpmDir).find((d) =>
-  d.startsWith('@tailwindcss+cli@'),
-);
-
-if (!cliDir) {
-  throw new Error('@tailwindcss/cli not found in node_modules/.pnpm');
-}
-
-const entry = join(
-  pnpmDir,
-  cliDir,
-  'node_modules',
-  '@tailwindcss',
-  'cli',
-  'dist',
-  'index.mjs',
-);
+const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 execFileSync(
-  process.execPath,
-  [entry, '-i', './scripts/build-tokens.css', '-o', './dist/design-tokens.css'],
-  { stdio: 'inherit' },
+  'pnpm',
+  [
+    'exec',
+    'tailwindcss',
+    '-i',
+    './scripts/build-tokens.css',
+    '-o',
+    './dist/design-tokens.css',
+  ],
+  { cwd: packageDir, stdio: 'inherit' },
 );
