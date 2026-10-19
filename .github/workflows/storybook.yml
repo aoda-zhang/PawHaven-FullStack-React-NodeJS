@@ -8,6 +8,7 @@ on:
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
+      - 'pnpm-workspace.yaml'
   push:
     branches: [main]
     paths:
@@ -15,6 +16,7 @@ on:
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
+      - 'pnpm-workspace.yaml'
   workflow_dispatch:
 
 permissions:

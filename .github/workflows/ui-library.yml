@@ -8,6 +8,7 @@ on:
       - 'packages/design-system/**'
       - 'apps/frontend/portal/**'
       - '.github/workflows/ui-library.yml'
+      - 'pnpm-workspace.yaml'
   workflow_dispatch:
 
 permissions:
