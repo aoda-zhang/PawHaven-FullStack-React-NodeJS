@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
@@ -14,9 +15,12 @@ export const FormDateRanger = ({
   label,
   defaultValue,
   fullWidth = true,
+  required,
   className,
 }: FormDateRangerProps) => {
   const { control } = useFormContext();
+  const generatedId = useId();
+  const errorId = `form-date-range-${name}-${generatedId}-error`;
 
   return (
     <Controller
@@ -34,35 +38,48 @@ export const FormDateRanger = ({
         };
 
         return (
-          <div
+          <fieldset
             className={cn(
               'baseFormContainer',
               className,
               fullWidth && 'w-full',
             )}
+            aria-describedby={error ? errorId : undefined}
           >
-            {label && <div className="mb-2 text-sm font-medium">{label}</div>}
+            {label && (
+              <legend className="mb-2 text-sm font-medium">{label}</legend>
+            )}
             <div className="flex items-center gap-2">
               <input
                 type="date"
                 value={value?.[0] ?? ''}
-                onChange={(e) => update(0, e.target.value)}
+                onChange={(event) => update(0, event.target.value)}
+                onBlur={field.onBlur}
+                required={required}
                 aria-label={label ? `${label} start` : 'Start date'}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
                 className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
-              <span className="text-text-secondary">–</span>
+              <span className="text-text-secondary" aria-hidden="true">–</span>
               <input
                 type="date"
                 value={value?.[1] ?? ''}
-                onChange={(e) => update(1, e.target.value)}
+                onChange={(event) => update(1, event.target.value)}
+                onBlur={field.onBlur}
+                required={required}
                 aria-label={label ? `${label} end` : 'End date'}
+                aria-invalid={error ? true : undefined}
+                aria-describedby={error ? errorId : undefined}
                 className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
             </div>
             {error && (
-              <p className="text-error mt-1 text-xs">{error.message}</p>
+              <p id={errorId} role="alert" className="text-error mt-1 text-xs">
+                {error.message}
+              </p>
             )}
-          </div>
+          </fieldset>
         );
       }}
     />
