@@ -5,26 +5,14 @@ import { Carousel } from '../../../packages/ui/src/components/carousel/Carousel'
 import { NotificationBanner } from '../../../packages/ui/src/components/notification-banner/NotificationBanner';
 import { Toast, showToast } from '../../../packages/ui/src/components/toast/Toast';
 
-const bannerMeta = {
-  title: 'UI Library/Feedback',
-  component: NotificationBanner,
-  tags: ['autodocs'],
-  args: {
-    banner: {
-      id: 'storybook-maintenance',
-      type: 'info',
-      title: 'Rescue platform update',
-      message: 'The volunteer dashboard will be updated tonight.',
-      dismissible: true,
-      variant: 'standard',
-    },
-  },
-} satisfies Meta<typeof NotificationBanner>;
+const meta = {
+  title: 'UI Library/Feedback & Carousel',
+} satisfies Meta;
 
-export default bannerMeta;
-type BannerStory = StoryObj<typeof bannerMeta>;
+export default meta;
+type BannerStory = StoryObj<typeof meta>;
 
-export const NotificationBannerStory: BannerStory = {};
+export const NotificationBannerStory: BannerStory = {\n  render: () => (\n    <NotificationBanner\n      banner={{\n        id: 'storybook-maintenance',\n        type: 'info',\n        title: 'Rescue platform update',\n        message: 'The volunteer dashboard will be updated tonight.',\n        dismissible: true,\n        variant: 'standard',\n      }}\n    />\n  ),\n};
 
 export const NotificationBannerVariants: BannerStory = {
   render: () => (
