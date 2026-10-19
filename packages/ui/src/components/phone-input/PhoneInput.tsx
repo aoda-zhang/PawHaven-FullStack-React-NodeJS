@@ -25,12 +25,16 @@ interface PhoneInputProps {
   phone: string;
   hasError: boolean;
   onPhoneChange: (phone: string) => void;
+  id?: string;
+  errorId?: string;
 }
 
 export const PhoneInput = ({
   phone,
   hasError,
   onPhoneChange,
+  id,
+  errorId,
 }: PhoneInputProps) => {
   return (
     <PhoneInputWithCountry
@@ -39,7 +43,11 @@ export const PhoneInput = ({
       value={phone}
       onChange={(value) => onPhoneChange(value ?? '')}
       inputComponent={StyledInput}
-      numberInputProps={{ 'aria-invalid': hasError }}
+      numberInputProps={{
+        id,
+        'aria-invalid': hasError,
+        'aria-describedby': hasError ? errorId : undefined,
+      }}
       focusInputOnCountrySelection={false}
     />
   );
