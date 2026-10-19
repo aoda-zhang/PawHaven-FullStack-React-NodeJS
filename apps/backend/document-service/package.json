@@ -15,7 +15,8 @@
     "turbo:build": "turbo run build --filter=@pawhaven/document-service --env-mode=loose",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify:pdf-styles": "node ./scripts/verify-pdf-styles.mjs"
   },
   "dependencies": {
     "@fontsource/noto-sans-sc": "^5.3.0",
