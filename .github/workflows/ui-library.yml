@@ -66,7 +66,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CSS_FILES=$(find apps/frontend/portal/dist -type f -name '*.css' -print)
+          CSS_FILES=$(find apps/frontend/portal/build -type f -name '*.css' -print)
           if [[ -z "${CSS_FILES}" ]]; then
             echo "Portal production build emitted no CSS files." >&2
             exit 1
