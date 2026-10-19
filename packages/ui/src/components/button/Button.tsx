@@ -54,7 +54,9 @@ export const Button = ({
     <Comp
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
-      disabled={disabled || loading}
+      disabled={asChild ? undefined : disabled || loading}
+      aria-disabled={asChild && (disabled || loading) ? true : props['aria-disabled']}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading && (
