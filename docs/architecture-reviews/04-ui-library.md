@@ -58,7 +58,7 @@ This review is based on source and configuration inspection. Scores are qualitat
 
 - **Evidence:** `Button` supported loading but did not expose `aria-busy`.
 - **Change:** Expose busy state and keep the spinner decorative. For `asChild`, do not pass a native `disabled` attribute to a non-button child.
-- **Acceptance:** Native buttons disable during loading; slotted children expose disabled semantics and cannot activate while disabled/loading. The latter behavior needs an explicit interaction test.
+- **Acceptance:** Native buttons disable during loading; slotted children expose disabled semantics and cannot activate while disabled/loading. Regression tests now cover both disabled and loading slotted links; execution is pending CI.
 
 ### 7. Carousel state and semantics
 
