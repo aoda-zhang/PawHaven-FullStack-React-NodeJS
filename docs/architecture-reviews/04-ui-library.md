@@ -33,7 +33,7 @@ This review is based on source and configuration inspection. Scores are qualitat
 ### 2. Lottie API usage
 
 - **Evidence:** `packages/ui/src/components/loading/Loading.tsx` imported a named `Lottie` and passed `src={animationData}`.
-- **Change:** Use the named `Lottie` export from `lottie-react` with its `animationData` prop; add a status role and configurable accessible label.
+- **Change:** Use the named `Lottie` export from `lottie-react` v3 with its `src` prop (which accepts the parsed animation object); add a status role and configurable accessible label.
 - **Acceptance:** Typecheck and render the component in the Portal; verify the animation loads and the status has an accessible name.
 
 ### 3. FormInput accessibility
