@@ -62,7 +62,7 @@ jobs:
       - name: Build Portal and its workspace dependencies
         run: pnpm --filter @pawhaven/portal... build
 
-      - name: Verify production CSS contains design-system tokens
+      - name: Verify production CSS retains design-system tokens and UI utilities
         shell: bash
         run: |
           set -euo pipefail
@@ -73,5 +73,9 @@ jobs:
           fi
           if ! grep -E -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
             echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
+            exit 1
+          fi
+          if ! grep -F -- ".animate-spin" ${CSS_FILES}; then
+            echo "Expected UI-library animation utility was not found in the Portal bundle." >&2
             exit 1
           fi
