@@ -67,9 +67,10 @@
 
 ### DT-04 — Theme coverage 不足以证明支持 light/dark
 - 严重度：中；工作量：M/L；状态：待全仓验证
-- 证据：已读取的 `src/theme.css` 包含默认 `@theme` 语义映射，未见 `[data-theme="dark"]`、`.dark` 或系统偏好映射。
-- 建议：先检查主题 state、初始化、持久化和首屏 hydration；如果产品确实要求 dark mode，再设计语义 token override，不要简单反转 primitive palette。
-- 验收：如果支持 dark mode，需覆盖 system/light/dark、刷新后持久化和首屏闪烁；如果不支持，应在设计系统文档明确当前主题范围。
+- 证据：`src/theme.css` 只有默认 `@theme` 映射；全仓代码搜索未发现 `[data-theme="dark"]`、`.dark`、`prefers-color-scheme` 或运行时代码中的 theme persistence。搜索到的 `localStorage theme` 命中仅在架构 Prompt 文档中。
+- 结论：当前证据不支持“已实现 dark mode”的说法；是否需要 dark mode 仍取决于产品需求。
+- 建议：不要在本次 token 修复中擅自引入主题切换。若产品要求 dark mode，应新增 semantic token override，并验证初始化、持久化、hydration 和首屏闪烁。
+- 验收：如果支持 dark mode，覆盖 system/light/dark、刷新后持久化和首屏闪烁；如果不支持，在设计系统文档明确当前仅提供默认主题。
 
 ### DT-05 — Token build 脚本依赖 pnpm 内部实现
 - 严重度：中；工作量：S；状态：已实施，待运行验证
@@ -85,9 +86,9 @@
 
 ### DT-07 — Tailwind / MUI 双主题源尚未得到证据闭环
 - 严重度：待确认；工作量：M；状态：源码不足
-- 证据：Prompt 要求检查 MUI theme，但本次搜索没有得到可验证的 MUI theme 文件或 `createTheme` 命中。
-- 建议：全仓搜索 MUI theme provider、palette、spacing、shape、typography 的使用。如果 MUI 仍被使用，明确它是由 semantic tokens 映射，还是与 Tailwind 独立维护；不要只凭依赖声明下结论。
-- 验收：若 MUI 已不再用于 Portal，记录实际消费证据并考虑依赖治理；若仍在用，增加 token parity test。
+- 证据：GitHub 代码搜索对 `@mui/material` 与 `createTheme` 均为 0 命中；Portal 与 `packages/ui` 的 package manifest 均未声明 MUI 依赖；源码树中未发现独立 MUI theme 文件。
+- 结论：当前可见证据表明 Portal/UI 没有活跃的 MUI theme 消费链；不应仅为满足模板而新增第二套 MUI theme。
+- 建议：如果后续引入 MUI 组件，必须先确定其实际消费者，再将 palette/typography/shape 映射到稳定 semantic tokens，并增加 parity test。
 
 ## 4. 当前分层建议
 
@@ -152,7 +153,7 @@
 
 - 未在真实工作区执行 `pnpm token-check`、`pnpm --filter @pawhaven/design-system build:tokens`、TypeScript 检查、React Doctor 或浏览器视觉回归。
 - 未增加自动化 fixture 测试来证明 undefined variable 与 alias cycle 检查的失败行为。
-- 未完成全仓 MUI theme、dark mode 状态流、high contrast、reduced motion 的运行时验证。
+- MUI/theme 证据盘点已补充：`@mui/material` / `createTheme` 搜索均无命中，Portal/UI manifest 无 MUI 依赖；未发现运行时 dark mode 状态流。high contrast 与 reduced-motion 的实际行为仍需浏览器/a11y 验证。
 - 尚未生成 JSON token source、schema validation 或 TypeScript token types；当前 CSS 仍是 source of truth。
 - 原始 token scale 的重复、不规则性与所有消费点尚未形成完整机器可读 inventory。
 
