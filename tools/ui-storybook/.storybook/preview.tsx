@@ -1,7 +1,6 @@
 import type { Preview } from '@storybook/react-vite';
 
 import '../../../packages/ui/index.css';
-import 'react-phone-number-input/style.css';
 
 const preview: Preview = {
   parameters: {
