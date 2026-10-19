@@ -1,0 +1,56 @@
+[
+  {
+    "key": "apps/frontend/portal/src/pages/home/components/AdoptablePetsSection.tsx:25:inline-style",
+    "reason": "Static inline style should be migrated to a semantic utility or component token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/pages/home/components/PetCard.tsx:37:inline-style",
+    "reason": "Static inline style should be migrated to a semantic utility or component token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:123:palette-name",
+    "reason": "Footer palette utility should use a semantic design token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:135:palette-name",
+    "reason": "Footer palette utility should use a semantic design token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/app/layout/RootLayoutFooter.tsx:146:palette-name",
+    "reason": "Footer palette utility should use a semantic design token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:palette-name",
+    "reason": "Pet card palette utility should use a semantic design token.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "packages/ui/src/components/button/Button.tsx:9:px-arbitrary",
+    "reason": "Button padding should use the design-system spacing scale.",
+    "owner": "ui-library",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/pages/home/components/PetCard.tsx:46:unknown-classname",
+    "reason": "Resolve the utility against a declared token or custom utility.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  },
+  {
+    "key": "apps/frontend/portal/src/pages/home/components/PetCard.tsx:50:unknown-classname",
+    "reason": "Resolve the utility against a declared token or custom utility.",
+    "owner": "frontend-platform",
+    "expiresOn": "2026-11-30"
+  }
+]
