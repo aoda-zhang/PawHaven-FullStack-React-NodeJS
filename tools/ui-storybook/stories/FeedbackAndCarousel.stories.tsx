@@ -12,7 +12,20 @@ const meta = {
 export default meta;
 type BannerStory = StoryObj<typeof meta>;
 
-export const NotificationBannerStory: BannerStory = {\n  render: () => (\n    <NotificationBanner\n      banner={{\n        id: 'storybook-maintenance',\n        type: 'info',\n        title: 'Rescue platform update',\n        message: 'The volunteer dashboard will be updated tonight.',\n        dismissible: true,\n        variant: 'standard',\n      }}\n    />\n  ),\n};
+export const NotificationBannerStory: BannerStory = {
+  render: () => (
+    <NotificationBanner
+      banner={{
+        id: 'storybook-maintenance',
+        type: 'info',
+        title: 'Rescue platform update',
+        message: 'The volunteer dashboard will be updated tonight.',
+        dismissible: true,
+        variant: 'standard',
+      }}
+    />
+  ),
+};
 
 export const NotificationBannerVariants: BannerStory = {
   render: () => (
