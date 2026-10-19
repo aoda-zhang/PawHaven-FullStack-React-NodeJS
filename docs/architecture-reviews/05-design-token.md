@@ -355,3 +355,25 @@ export type SemanticColorPath =
 - `pnpm --filter @pawhaven/design-system build:tokens`：通过。
 - React Doctor：该提交结论 **success**。
 - 完整 Test workflow（lint/typecheck/tests/build）独立执行中；本报告不把 token 专项成功等同于全仓质量门禁成功。
+
+
+## 14. Backend document-service 集成验证（补充要求）
+
+### 实际消费链路
+
+- `apps/backend/document-service/src/modules/pdf/engine/index.css` 通过 Tailwind CSS v4 编译 PDF 样式。
+- `scripts/prebuild-pdf-style.mjs` 先调用 `scripts/sync-design-tokens.mjs`，将 `packages/design-system/src/tokens/*.css` 和 `src/theme.css` 同步到 `pdfRunTime/`，再执行 Tailwind CLI 输出 `pdf.generated.css`。
+- `styles.ts` 导入生成的 CSS 字符串；`pdfBuilder.ts` 将其内联到 Chromium 页面，因此 token 变更会影响真实 PDF 输出，不只是 Portal。
+- document-service 已声明自己的 `@tailwindcss/cli` 依赖；它不会依赖 Design System package 内部的 CLI 路径。
+
+### 已新增的 CI 验收
+
+- 独立 Token Validation workflow 的触发路径现在包括 `apps/backend/document-service/**`。
+- workflow 会通过 Turbo 构建 document-service 及其 workspace 依赖，确保 Nest/Rspack 的 PDF CSS import 链可以构建。
+- 新增 `apps/backend/document-service/scripts/verify-pdf-styles.mjs`，检查生成的 PDF CSS 非空，并确认模板实际使用的 `.text-body`、`.text-gray-6`、`.border-brown-3` 与 `--color-gray-6` 存在，同时拒绝未处理的 Tailwind `@import` / `@source` 指令。
+- workflow 还会运行 document-service 的 typecheck 和 Vitest 测试。
+- 本次变更之后的工作流结果需以最新 commit 对应的 GitHub Actions 为准；在看到最新 run 成功前，不把后端集成标记为已验证通过。
+
+### 验收范围与边界
+
+这条检查覆盖“同步 token 源文件 → Tailwind 编译 PDF CSS → CSS 被打包进 document-service → 检查代表性 token utilities → TypeScript 与服务测试”。它不能完全替代真实 PDF 的浏览器视觉快照。PDF 页面尺寸、分页、中文字体、页眉页脚与多语言版式仍应在发布前做至少一次实际渲染验证。
