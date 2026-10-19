@@ -5,6 +5,8 @@ packages:
   # Exclude Prisma generated client directories
   - '!**/prisma/**/client'
   - '!**/src/prisma/**/client'
+  # Storybook is intentionally installed independently with npm.
+  - '!libs/ui-storybook'
 
 allowBuilds:
   '@google/genai': true
