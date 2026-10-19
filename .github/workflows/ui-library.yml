@@ -1,0 +1,77 @@
+name: UI Library
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'packages/ui/**'
+      - 'packages/design-system/**'
+      - 'apps/frontend/portal/**'
+      - '.github/workflows/ui-library.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ui-library-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-library:
+    name: UI package, accessibility tests and Portal CSS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Resolve Node.js version from package.json
+        id: node_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+          if [[ -z "${NODE_VERSION}" ]]; then
+            echo "Missing engines.node in package.json" >&2
+            exit 1
+          fi
+          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node_version.outputs.node_version }}
+
+      - name: Enable package manager from package.json
+        run: |
+          corepack enable
+          corepack install
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check design tokens
+        run: pnpm token-check
+
+      - name: Build UI package and its workspace dependencies
+        run: pnpm --filter @pawhaven/ui... build
+
+      - name: Test UI components
+        run: pnpm --filter @pawhaven/ui test
+
+      - name: Build Portal and its workspace dependencies
+        run: pnpm --filter @pawhaven/portal... build
+
+      - name: Verify production CSS contains design-system tokens
+        shell: bash
+        run: |
+          set -euo pipefail
+          CSS_FILES=$(find apps/frontend/portal/dist -type f -name '*.css' -print)
+          if [[ -z "${CSS_FILES}" ]]; then
+            echo "Portal production build emitted no CSS files." >&2
+            exit 1
+          fi
+          if ! grep -E -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
+            echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
+            exit 1
+          fi
