@@ -18,7 +18,7 @@ export const Loading = ({
       aria-label={label}
     >
       <Lottie
-        animationData={animationData}
+        src={animationData}
         loop
         autoplay
         aria-hidden="true"
