@@ -67,10 +67,10 @@ describe('form control accessibility', () => {
       screen.getByRole('group', { name: 'Date range' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('textbox', { name: 'Date range start' }),
+      screen.getByLabelText('Date range start'),
     ).toBeRequired();
     expect(
-      screen.getByRole('textbox', { name: 'Date range end' }),
+      screen.getByLabelText('Date range end'),
     ).toBeRequired();
   });
 
