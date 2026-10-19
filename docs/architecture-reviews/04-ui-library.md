@@ -40,7 +40,7 @@ Severity means user impact, not simply code style. “Implemented” means the c
 | P2 | Shared animations should respect reduced-motion preferences | Implemented; focused CI passed | Added `usePrefersReducedMotion` and applied it to Loading's Lottie autoplay/loop and Carousel autoplay; Skeleton includes `motion-reduce:animate-none`; Design System also defines a global reduced-motion rule |
 | P2 | UI package changes need focused build/test/consumer CSS checks that are not blocked by unrelated workspace lint | Implemented; focused CI passed | Added `.github/workflows/ui-library.yml` to run token check, UI build/tests, Portal dependency build, and production CSS assertions |
 | P2 | Component API vocabulary and style sources need consistent future governance | Follow-up; no breaking API sweep | Record the migration rules below; existing consumer APIs are intentionally retained |
-| P2 | Storybook, automated visual regression, and browser/screen-reader checks need a conscious decision | Not implemented | No current UI-specific Storybook/visual-regression workflow was confirmed in inspected configuration; decide based on actual team/release needs |
+| P2 | A browsable Storybook catalogue must cover all exported UI components and build in CI | Implemented on this branch; CI pending | `tools/ui-storybook` includes interactive stories for core, feedback, carousel, and all seven form patterns; `.github/workflows/storybook.yml` builds on PRs and publishes GitHub Pages from `main` |\n| P2 | Automated visual regression and manual browser/screen-reader checks | Deferred | Storybook is the review surface; screenshot baselines and manual assistive-technology checks remain separate follow-ups |
 | P3 | Private package release governance, ownership, deprecation, codemods, and Changesets | Deferred intentionally | Package is private and currently workspace-consumed; adding a release framework without an external release workflow would be premature |
 | P3 | Clean up legacy names and unused props such as `FormDateRanger` and legacy text-field options | Deferred for compatibility | Rename only with consumer inventory, deprecation period, and tests; do not create a silent breaking change |
 
@@ -125,7 +125,7 @@ These classifications are based on inspected source and intent, not a formal own
 - Portal's package manifest does not list MUI, and repository code search did not return direct `@mui/material` import matches. Treat that as evidence against current MUI bypass—not as a substitute for a future automated import-boundary rule.
 - Prefer native HTML props and consistent controlled/uncontrolled contracts for new components. Standardize `size`, `variant`, `loading`, `disabled`, and error semantics prospectively rather than changing established APIs in bulk.
 - Use semantic Design System tokens. Avoid adding arbitrary Tailwind values or inline styles when an existing token/utility can express the requirement. Existing inline sizing in `FormTextArea` and uneven form variant vocabularies remain candidates for a later compatibility-safe cleanup.
-- Do not add Changesets, Storybook, or codemods without confirming the need for a release process, a visual-review workflow, or a real breaking migration.
+- Storybook is now part of the UI review workflow. Do not add Changesets or codemods without confirming the need for a release process or a real breaking migration.
 
 ## Governance plan
 
@@ -149,6 +149,6 @@ These classifications are based on inspected source and intent, not a formal own
 - [x] Focused UI workflow passes on the audited branch head.
 - [x] Production CSS assertions pass in the generated Portal bundle.
 - [ ] Confirm full existing consumer flows and browser keyboard/screen-reader behavior.
-- [ ] Decide whether Storybook/visual regression is justified by the current team workflow.
+- [x] Add Storybook stories for every exported UI component and form pattern.\n- [x] Add a CI build and GitHub Pages deployment workflow for `main`.\n- [ ] Confirm the Storybook build passes and the public Pages deployment succeeds after merge.\n- [ ] Decide whether screenshot-based visual regression is justified by the current team workflow.
 
 **Merge gate:** The focused UI workflow is green. The broader workspace Test workflow remains red due to unrelated backend-core lint failures; resolve those separately or obtain an explicit repository-owner waiver before merging if that workflow is required.
