@@ -3,6 +3,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import {
   useEffect,
+  useMemo,
   useState,
   type ComponentPropsWithoutRef,
   type KeyboardEvent,
@@ -10,6 +11,7 @@ import {
 
 import { cn } from '../../utils/cn';
 import { Button } from '../button/Button';
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 type CarouselPlugin = Parameters<typeof useEmblaCarousel>[1];
 
@@ -77,10 +79,13 @@ export const Carousel = ({
   nextLabel = 'Next slide',
   label = 'Image carousel',
 }: CarouselProps) => {
-  const [plugins] = useState<CarouselPlugin>(() =>
-    autoplay
-      ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: true })]
-      : undefined,
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const plugins = useMemo<CarouselPlugin>(
+    () =>
+      autoplay && !prefersReducedMotion
+        ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: true })]
+        : undefined,
+    [autoplay, autoplayDelay, prefersReducedMotion],
   );
 
   const [carouselRef, api] = useEmblaCarousel({ loop }, plugins);
