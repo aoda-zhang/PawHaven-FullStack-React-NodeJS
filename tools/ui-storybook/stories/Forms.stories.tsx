@@ -64,6 +64,57 @@ function FormPatternsDemo() {
   );
 }
 
+
+function SingleFormField({ field }: { field: 'input' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'dateRange' | 'phone' }) {
+  const methods = useForm({
+    defaultValues: {
+      fullName: 'Aoda Zhang',
+      animalType: 'dog',
+      urgency: 'normal',
+      contactPhone: '+8613800138000',
+      description: 'A friendly stray dog needs temporary shelter.',
+      termsAccepted: true,
+      rescueWindow: ['2026-10-19', '2026-10-26'],
+      password: 'pawhaven-demo',
+    },
+  });
+
+  return (
+    <FormProvider {...methods}>
+      <div className="w-full max-w-md">
+        {field === 'input' && <FormInput name="fullName" label="Contact name" required autoComplete="name" />}
+        {field === 'select' && (
+          <FormSelect
+            name="animalType"
+            label="Animal type"
+            required
+            options={[
+              { label: 'Dog', value: 'dog' },
+              { label: 'Cat', value: 'cat' },
+              { label: 'Other', value: 'other' },
+            ]}
+          />
+        )}
+        {field === 'textarea' && <FormTextArea name="description" label="Situation details" rows={4} />}
+        {field === 'checkbox' && <FormCheckbox name="termsAccepted" label="I confirm these details are accurate" required />}
+        {field === 'radio' && (
+          <FormRadio
+            name="urgency"
+            label="Rescue urgency"
+            required
+            options={[
+              { label: 'Normal', value: 'normal' },
+              { label: 'Urgent', value: 'urgent' },
+            ]}
+          />
+        )}
+        {field === 'dateRange' && <FormDateRanger name="rescueWindow" label="Preferred rescue window" required />}
+        {field === 'phone' && <FormPhoneInput name="contactPhone" label="Contact phone" required />}
+      </div>
+    </FormProvider>
+  );
+}
+
 const meta = {
   title: 'UI Library/Form Patterns',
   component: FormPatternsDemo,
@@ -96,4 +147,39 @@ export const PasswordField: Story = {
     };
     return <PasswordDemo />;
   },
+};
+
+export const FormInputStory: Story = {
+  name: 'FormInput',
+  render: () => <SingleFormField field="input" />,
+};
+
+export const FormSelectStory: Story = {
+  name: 'FormSelect',
+  render: () => <SingleFormField field="select" />,
+};
+
+export const FormTextAreaStory: Story = {
+  name: 'FormTextArea',
+  render: () => <SingleFormField field="textarea" />,
+};
+
+export const FormCheckboxStory: Story = {
+  name: 'FormCheckbox',
+  render: () => <SingleFormField field="checkbox" />,
+};
+
+export const FormRadioStory: Story = {
+  name: 'FormRadio',
+  render: () => <SingleFormField field="radio" />,
+};
+
+export const FormDateRangerStory: Story = {
+  name: 'FormDateRanger',
+  render: () => <SingleFormField field="dateRange" />,
+};
+
+export const FormPhoneInputStory: Story = {
+  name: 'FormPhoneInput',
+  render: () => <SingleFormField field="phone" />,
 };
