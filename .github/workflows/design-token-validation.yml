@@ -54,6 +54,9 @@ jobs:
       - name: Build document-service and workspace dependencies
         run: pnpm exec turbo run build --filter=@pawhaven/document-service...
 
+      - name: Verify compiled PDF design tokens and utilities
+        run: pnpm --filter @pawhaven/document-service verify:pdf-styles
+
       - name: Typecheck document-service
         run: pnpm --filter @pawhaven/document-service typecheck
 
