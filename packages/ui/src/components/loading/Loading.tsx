@@ -1,5 +1,7 @@
 import { Lottie } from 'lottie-react';
 
+import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
+
 import animationData from './loading.json';
 
 export interface LoadingProps {
@@ -11,6 +13,8 @@ export const Loading = ({
   label = 'Loading',
   className,
 }: LoadingProps) => {
+  const prefersReducedMotion = usePrefersReducedMotion();
+
   return (
     <div
       className={className ?? 'fixed inset-0 flex items-center justify-center'}
@@ -19,8 +23,8 @@ export const Loading = ({
     >
       <Lottie
         src={animationData}
-        loop
-        autoplay
+        loop={!prefersReducedMotion}
+        autoplay={!prefersReducedMotion}
         aria-hidden="true"
         className="size-16"
       />
