@@ -25,8 +25,8 @@
     "check:links": "node harness-core/validation/check-links.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged",
-    "storybook:ui": "npm install --prefix tools/ui-storybook && npm run --prefix tools/ui-storybook storybook",
-    "build:storybook:ui": "npm install --prefix tools/ui-storybook && npm run --prefix tools/ui-storybook build-storybook"
+    "storybook:ui": "npm install --prefix libs/ui-storybook && npm run --prefix libs/ui-storybook storybook",
+    "build:storybook:ui": "npm install --prefix libs/ui-storybook && npm run --prefix libs/ui-storybook build-storybook"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

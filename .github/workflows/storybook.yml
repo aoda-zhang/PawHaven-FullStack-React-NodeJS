@@ -4,14 +4,14 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - 'tools/ui-storybook/**'
+      - 'libs/ui-storybook/**'
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
   push:
     branches: [main]
     paths:
-      - 'tools/ui-storybook/**'
+      - 'libs/ui-storybook/**'
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
@@ -56,29 +56,29 @@ jobs:
           pnpm install --frozen-lockfile
 
       - name: Install Storybook dependencies
-        run: npm install --prefix tools/ui-storybook --no-audit --no-fund
+        run: npm install --prefix libs/ui-storybook --no-audit --no-fund
 
       - name: Build Storybook
         env:
           STORYBOOK_BASE_PATH: /${{ github.event.repository.name }}/
-        run: npm run --prefix tools/ui-storybook build-storybook
+        run: npm run --prefix libs/ui-storybook build-storybook
 
       - name: Verify required component stories
-        run: node tools/ui-storybook/scripts/verify-stories.mjs
+        run: node libs/ui-storybook/scripts/verify-stories.mjs
 
       - name: Upload pull-request build artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: pawhaven-ui-storybook
-          path: tools/ui-storybook/storybook-static
+          path: libs/ui-storybook/storybook-static
           if-no-files-found: error
 
       - name: Upload GitHub Pages artifact
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
         uses: actions/upload-pages-artifact@v3
         with:
-          path: tools/ui-storybook/storybook-static
+          path: libs/ui-storybook/storybook-static
 
   deploy:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
