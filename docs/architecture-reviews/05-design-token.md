@@ -333,3 +333,13 @@ export type SemanticColorPath =
 - `--size-95`、`--size-130` 等特殊尺寸应先查实际消费点和设计稿用途，不在缺少证据时批量重命名。
 - 目前 CSS 仍是 source of truth。不要在 JSON 和 CSS 两边人工维护相同值；只有在引入 schema、生成器、兼容 alias 与迁移策略后，才切换到 JSON/Design Tokens Format source。
 - MUI 目标映射仍是提案；在仓库内确认实际 MUI consumer 与主题入口之前，不创建第二套生产 theme。
+
+## 13. CI 验证记录（2026-10-19）
+
+- 独立工作流：`.github/workflows/design-token-validation.yml`
+- 验证提交：`2d66f2096c6f1f41c52aeff9917f088b44a035e7`
+- GitHub Actions：Design Token Validation run `39206132558`，结论 **success**。
+- `pnpm token-check`：通过；扫描 155 个文件，加载 284 个 CSS variables，检查 133 个 `var()` 引用；重复定义 0，legacy suppressions 0。
+- `pnpm --filter @pawhaven/design-system build:tokens`：通过，Tailwind CSS CLI v4.3.3。
+- React Doctor：同一提交结论 **success**。
+- 这证明当前 token contract 检查器和 token build 在 GitHub Actions 的干净依赖安装中可以执行；**它不等同于完整前端 lint/typecheck/test/build 或浏览器视觉回归通过**。完整 Test workflow 仍单独跟踪，任何失败都需区分本分支变更与仓库已有问题。
