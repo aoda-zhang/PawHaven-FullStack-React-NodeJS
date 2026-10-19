@@ -1,0 +1,51 @@
+name: Design Token Validation
+
+on:
+  pull_request:
+    paths:
+      - "packages/design-system/**"
+      - "packages/ui/**"
+      - "apps/frontend/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/design-token-validation.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/design-system/**"
+      - "packages/ui/**"
+      - "apps/frontend/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/design-token-validation.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  design-token-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve Node.js version
+        id: node-version
+        run: echo "version=$(node -p \"require('./package.json').engines.node || '24'\")" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check design token contract and frontend styles
+        run: pnpm token-check
+
+      - name: Build generated design tokens
+        run: pnpm --filter @pawhaven/design-system build:tokens
