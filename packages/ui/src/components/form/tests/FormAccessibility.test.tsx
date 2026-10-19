@@ -132,7 +132,7 @@ describe('form control accessibility', () => {
       screen.getByRole('radio', { name: 'Friendly' }),
     ).toHaveAttribute('aria-describedby');
     expect(
-      screen.getByRole('textbox', { name: 'Date range start' }),
+      screen.getByLabelText('Date range start'),
     ).toHaveAttribute('aria-describedby');
     expect(screen.getAllByRole('alert')).toHaveLength(7);
   });
