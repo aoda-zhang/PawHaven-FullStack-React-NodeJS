@@ -120,7 +120,7 @@ export const RootLayoutFooter = () => {
         <div className="mb-12 grid gap-10 lg:grid-cols-5">
           <div className="lg:col-span-1">
             <FooterBrand />
-            <p className="text-brown-7 mt-4 text-sm leading-relaxed">
+            <p className="text-footer-secondary mt-4 text-sm leading-relaxed">
               {t('footer.brand_description')}
             </p>
             <div className="mt-5 flex gap-2">
@@ -132,7 +132,7 @@ export const RootLayoutFooter = () => {
                   rel="noreferrer"
                   title={social.label}
                   aria-label={social.label}
-                  className="text-brown-7 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors hover:bg-white/20 hover:text-white"
+                  className="text-footer-secondary flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors hover:bg-white/20 hover:text-white"
                 >
                   <social.icon className="h-4 w-4" />
                 </a>
@@ -143,7 +143,7 @@ export const RootLayoutFooter = () => {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
             {footerColumns.map((column) => (
               <div key={column.heading}>
-                <h4 className="text-brown-7 mb-4 text-xs font-semibold tracking-widest uppercase">
+                <h4 className="text-footer-secondary mb-4 text-xs font-semibold tracking-widest uppercase">
                   {column.heading}
                 </h4>
                 <ul className="flex flex-col gap-2.5">
