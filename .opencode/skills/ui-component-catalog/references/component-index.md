@@ -1,0 +1,48 @@
+# UI component index
+
+Use this file for keyword matching and file discovery only. Read the linked source and README before using a component API.
+
+## Core and layout
+
+| Component | Purpose | Match keywords / user intent | Source of truth | README | Tests | Story |
+|---|---|---|---|---|---|---|
+| `Button` | Shared action control with variants, sizes, loading/disabled states, and slotted children. | button, CTA, submit, action, variant, size, loading button, disabled button, 按钮, 提交 | `packages/ui/src/components/button/Button.tsx` | `packages/ui/src/components/button/README.md` | `packages/ui/src/components/button/tests/Button.test.tsx` | `libs/ui-storybook/stories/CoreComponents.stories.tsx` |
+| `FileDownloadButton` | Fetches a Blob and starts a file download. | download, export file, download PDF, attachment, blob, 下载, 导出文件 | `packages/ui/src/components/file-download-button/FileDownloadButton.tsx` | `packages/ui/src/components/file-download-button/README.md` | `packages/ui/src/components/file-download-button/tests/FileDownloadButton.test.tsx` | `CoreComponents.stories.tsx` |
+| `Phase` | Read-only titled summary with label/value sections. | summary card, detail summary, key-value, label/value, phase, 摘要, 详情概览 | `packages/ui/src/components/phase/Phase.tsx` | `packages/ui/src/components/phase/README.md` | `packages/ui/src/components/phase/tests/Phase.test.tsx` | `CoreComponents.stories.tsx` |
+| `Timeline` family | Compound components for ordered events or progress: `Timeline`, `TimelineItem`, `TimelineSeparator`, `TimelineDot`, `TimelineConnector`, `TimelineContent`. | timeline, activity history, chronological events, progress history, status steps, 时间线, 操作历史, 进度记录 | `packages/ui/src/components/timeline/Timeline.tsx` | `packages/ui/src/components/timeline/README.md` | `packages/ui/src/components/timeline/index.test.tsx` | `CoreComponents.stories.tsx` |
+| `Carousel` | Image carousel with navigation and optional looping/controls. | carousel, slider gallery, image slider, slides, swipe gallery, 轮播图, 图片滑动 | `packages/ui/src/components/carousel/Carousel.tsx` | `packages/ui/src/components/carousel/README.md` | `packages/ui/src/components/carousel/tests/Carousel.test.tsx` | `libs/ui-storybook/stories/FeedbackAndCarousel.stories.tsx` |
+| `PhoneInput` | International phone number input with country selector and validation helper. | phone number, country calling code, international phone, telephone field, country selector, 电话输入, 国际区号 | `packages/ui/src/components/phone-input/PhoneInput.tsx` | `packages/ui/src/components/phone-input/README.md` | `packages/ui/src/components/phone-input/tests/PhoneInput.test.tsx` | `CoreComponents.stories.tsx` |
+| `PhotoPlaceholder` | Decorative placeholder when a photo is unavailable. | missing image, no photo, image fallback, avatar placeholder, photo empty state, 图片占位, 缺少照片 | `packages/ui/src/components/photo-placeholder/PhotoPlaceholder.tsx` | `packages/ui/src/components/photo-placeholder/README.md` | `packages/ui/src/components/photo-placeholder/tests/PhotoPlaceholder.test.tsx` | `CoreComponents.stories.tsx` |
+| `Skeleton` | Placeholder shapes while content loads. | skeleton, content placeholder, shimmer, loading placeholder, loading layout, 骨架屏, 加载占位 | `packages/ui/src/components/skeleton/Skeleton.tsx` | `packages/ui/src/components/skeleton/README.md` | `packages/ui/src/components/skeleton/tests/Skeleton.test.tsx` | `CoreComponents.stories.tsx` |
+
+## Loading and feedback
+
+| Component | Purpose | Match keywords / user intent | Source of truth | README | Tests | Story |
+|---|---|---|---|---|---|---|
+| `Loading` | Lottie loading indicator with accessible status text. | loading indicator, spinner, pending request, waiting state, loading animation, 加载中, 加载动画 | `packages/ui/src/components/loading/Loading.tsx` | `packages/ui/src/components/loading/README.md` | `packages/ui/src/components/loading/tests/Loading.test.tsx` | `CoreComponents.stories.tsx` |
+| `NotificationBanner` | Persistent inline info/success/warning/error message. | banner, inline alert, warning message, success message, error banner, persistent notice, 通知横幅, 页面提示 | `packages/ui/src/components/notification-banner/NotificationBanner.tsx` | `packages/ui/src/components/notification-banner/README.md` | `packages/ui/src/components/notification-banner/tests/NotificationBanner.test.tsx` | `FeedbackAndCarousel.stories.tsx` |
+| `Toast` / `showToast` | Transient toast feedback with severity and duration. | toast, snackbar, temporary notification, success feedback, operation failed, toast message, 轻提示, 操作反馈, 消息弹窗 | `packages/ui/src/components/toast/Toast.tsx` | `packages/ui/src/components/toast/README.md` | `packages/ui/src/components/toast/tests/Toast.test.tsx` | `FeedbackAndCarousel.stories.tsx` |
+
+## React Hook Form controls
+
+All controls below come from `@pawhaven/ui/form` and expect an existing React Hook Form context. Match by field intent, then inspect each component's props and source.
+
+| Component | Purpose | Match keywords / user intent | Source of truth | README | Tests | Story |
+|---|---|---|---|---|---|---|
+| `FormInput` | Text-like field; supports type, autocomplete, size/variant, and password visibility toggle. | text field, name, email, password, search input, max length, show password, 文本框, 密码框, 邮箱输入 | `packages/ui/src/components/form/form-input/FormInput.tsx` | `packages/ui/src/components/form/form-input/README.md` | `packages/ui/src/components/form/form-input/tests/FormInput.test.tsx` | `libs/ui-storybook/stories/Forms.stories.tsx` |
+| `FormSelect` | Select field that maps the chosen option back to its option value. | select, dropdown, choose one, enum field, species selector, 下拉选择, 单选下拉框 | `packages/ui/src/components/form/form-select/FormSelect.tsx` | `packages/ui/src/components/form/form-select/README.md` | `packages/ui/src/components/form/form-select/tests/FormSelect.test.tsx` | `Forms.stories.tsx` |
+| `FormTextArea` | Multiline free-text field with row/height settings. | textarea, long description, comments, notes, multiline, situation details, 多行文本, 描述输入 | `packages/ui/src/components/form/form-text-area/FormTextArea.tsx` | `packages/ui/src/components/form/form-text-area/README.md` | `packages/ui/src/components/form/form-text-area/tests/FormTextArea.test.tsx` | `Forms.stories.tsx` |
+| `FormCheckbox` | Boolean checkbox field. | checkbox, accept terms, confirm, consent, boolean option, check box, 复选框, 勾选, 同意条款 | `packages/ui/src/components/form/form-check-box/FormCheckBox.tsx` | `packages/ui/src/components/form/form-check-box/README.md` | `packages/ui/src/components/form/form-check-box/tests/FormCheckBox.test.tsx` | `Forms.stories.tsx` |
+| `FormRadio` | Single-choice radio group. | radio group, choose one option, urgency, behavior, one-of-many, 单选框, 单选组 | `packages/ui/src/components/form/form-radio/FormRadio.tsx` | `packages/ui/src/components/form/form-radio/README.md` | `packages/ui/src/components/form/form-radio/tests/FormRadio.test.tsx` | `Forms.stories.tsx` |
+| `FormDateRanger` | Two native date fields representing a start/end range. | date range, start date, end date, date period, time window, 日期范围, 开始日期, 结束日期 | `packages/ui/src/components/form/form-date-ranger/FormDateRanger.tsx` | `packages/ui/src/components/form/form-date-ranger/README.md` | `packages/ui/src/components/form/form-date-ranger/tests/FormDateRanger.test.tsx` | `Forms.stories.tsx` |
+| `FormPhoneInput` | React Hook Form adapter for the shared international phone input. | phone field in form, contact phone, mobile number, phone validation, 联系电话, 手机号表单 | `packages/ui/src/components/form/form-phone-input/FormPhoneInput.tsx` | `packages/ui/src/components/form/form-phone-input/README.md` | `packages/ui/src/components/form/form-phone-input/tests/FormPhoneInput.test.tsx` | `Forms.stories.tsx` |
+
+## Parent directories and shared utilities
+
+| Area | Use when | Locator |
+|---|---|---|
+| Form controls overview | Need to understand the shared React Hook Form convention or shared form tests. | `packages/ui/src/components/form/README.md`; `packages/ui/src/components/form/tests/FormAccessibility.test.tsx` |
+| Public component exports | Need to verify whether an item is exported from the package root. | `packages/ui/src/index.ts` |
+| Form public exports | Need to verify exports and form type aliases. | `packages/ui/src/components/form/index.ts` |
+| Design tokens / shared styles | Need component colors, spacing, typography, or CSS utility guidance. | Inspect `packages/design-system` and the UI stylesheet before choosing values. |
+| Component catalogue | Need to see live examples and visual states. | `libs/ui-storybook/stories/` |
