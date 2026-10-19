@@ -45,6 +45,7 @@ export const FormPhoneInput = ({
               errorId={errorId}
               phone={field.value ?? ''}
               hasError={Boolean(error)}
+              required={required}
               onPhoneChange={field.onChange}
             />
           </div>
