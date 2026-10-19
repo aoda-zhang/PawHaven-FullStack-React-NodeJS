@@ -103,17 +103,17 @@ export const Toast = () => {
   return (
     <div
       className="pointer-events-none fixed top-4 left-1/2 z-[100] flex w-full max-w-sm -translate-x-1/2 flex-col gap-2"
-      aria-live="polite"
     >
       {toasts.map((toast) => {
         const Icon = iconByType[toast.type];
         return (
           <div
             key={toast.id}
-            role="alert"
+            role={toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'}
             className="border-border bg-background/90 shadow-toast pointer-events-auto flex items-start gap-3 rounded-lg border px-4 py-3 backdrop-blur-md"
           >
             <Icon
+              aria-hidden="true"
               className={cn('mt-0.5 size-5 shrink-0', toneByType[toast.type])}
             />
             <div className="text-text flex-1 text-sm">{toast.message}</div>
@@ -126,7 +126,7 @@ export const Toast = () => {
               }}
               className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors"
             >
-              <X className="size-4" />
+              <X aria-hidden="true" className="size-4" />
             </button>
           </div>
         );
