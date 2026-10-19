@@ -24,6 +24,13 @@ const requiredStories = [
   'toast',
   'carousel',
   'all form components',
+  'forminput',
+  'formselect',
+  'formtextarea',
+  'formcheckbox',
+  'formradio',
+  'formdateranger',
+  'formphoneinput',
   'password field',
 ];
 
