@@ -152,7 +152,7 @@
 ## 10. 本次尚未完成 / 未验证的事项
 
 - 未在真实工作区执行 `pnpm token-check`、`pnpm --filter @pawhaven/design-system build:tokens`、TypeScript 检查、React Doctor 或浏览器视觉回归。
-- 未增加自动化 fixture 测试来证明 undefined variable 与 alias cycle 检查的失败行为。
+- 已新增 `scripts/token-contract.test.cjs`：覆盖有效 alias、undefined variable 失败和循环 alias 失败；由独立 token validation workflow 执行。
 - MUI/theme 证据盘点已补充：`@mui/material` / `createTheme` 搜索均无命中，Portal/UI manifest 无 MUI 依赖；未发现运行时 dark mode 状态流。high contrast 与 reduced-motion 的实际行为仍需浏览器/a11y 验证。
 - 尚未生成 JSON token source、schema validation 或 TypeScript token types；当前 CSS 仍是 source of truth。
 - 原始 token scale 的重复、不规则性与所有消费点尚未形成完整机器可读 inventory。
@@ -344,3 +344,14 @@ export type SemanticColorPath =
 - `pnpm --filter @pawhaven/design-system build:tokens`：通过，Tailwind CSS CLI v4.3.3。
 - React Doctor：同一提交结论 **success**。
 - 这证明当前 token contract 检查器和 token build 在 GitHub Actions 的干净依赖安装中可以执行；**它不等同于完整前端 lint/typecheck/test/build 或浏览器视觉回归通过**。完整 Test workflow 仍单独跟踪，任何失败都需区分本分支变更与仓库已有问题。
+
+
+### 后续验证（2026-10-19，fixture tests 已加入）
+
+- 验证提交：`86a1278bdbc6facb024e1fecca8495751bc4f620`
+- 独立工作流：Design Token Validation run `39206400927`，结论 **success**。
+- `pnpm --filter @pawhaven/design-system test:tokens`：3 个 fixture tests 通过（有效 alias、未定义变量、循环 alias）。
+- `pnpm token-check`：通过；真实仓库 155 个文件扫描通过，0 个 suppression。
+- `pnpm --filter @pawhaven/design-system build:tokens`：通过。
+- React Doctor：该提交结论 **success**。
+- 完整 Test workflow（lint/typecheck/tests/build）独立执行中；本报告不把 token 专项成功等同于全仓质量门禁成功。
