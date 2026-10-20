@@ -49,7 +49,6 @@ module.exports = {
       // Domain tokens that live in the app that owns the domain.
       extraCssFiles: [
         'apps/frontend/portal/src/shared/utils/rescue-status/rescueStatusColors.css',
-        'apps/frontend/portal/src/shared/utils/rescue-status/adoptableBadgeColors.css',
       ],
     },
   },

@@ -14,7 +14,7 @@
     "install:gateway": "pnpm --filter=@pawhaven/gateway... install",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext .ts --ignore-pattern \"dist/**\"",
+    "lint": "eslint . --ext .ts --ignore-pattern \"dist/**\" --ignore-path ../../../.eslintignore",
     "test": "vitest run",
     "test:cov": "vitest run --coverage"
   },

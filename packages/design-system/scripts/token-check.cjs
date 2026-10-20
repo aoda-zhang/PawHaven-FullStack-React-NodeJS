@@ -24,7 +24,6 @@ const TOKEN_DIRS = [
   'packages/design-system/src/tokens',
   'packages/design-system/src/theme.css',
   'apps/frontend/portal/src/shared/utils/rescue-status/rescueStatusColors.css',
-  'apps/frontend/portal/src/shared/utils/rescue-status/adoptableBadgeColors.css',
 ];
 
 // The file the comment/value drift check reads.

@@ -57,6 +57,18 @@ jobs:
         shell: bash
         run: pnpm --filter @pawhaven/core-service --filter @pawhaven/auth-service prisma:generate-mongodb
 
+      - name: Build shared packages
+        shell: bash
+        run: pnpm build:libs
+
+      - name: Architecture boundaries
+        shell: bash
+        run: pnpm architecture-check
+
+      - name: Repository quality
+        shell: bash
+        run: pnpm quality-check
+
       - name: Lint
         shell: bash
         run: pnpm lint

@@ -67,7 +67,7 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
-    "lint": "eslint . --ext .ts --ignore-pattern \"dist/**\"",
+    "lint": "eslint . --ext .ts --ignore-pattern \"dist/**\" --ignore-path ../../.eslintignore",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
     "test:watch": "vitest"

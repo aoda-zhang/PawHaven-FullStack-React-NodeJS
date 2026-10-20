@@ -80,11 +80,9 @@ function collectFiles(target, exts) {
 
 const DOC_ENTRY_POINTS = [
   'docs/README.md',
-  'docs/README.cn.md',
   'README.md',
   'README.cn.md',
   'AGENTS.md',
-  'harness-core/README.md',
 ];
 
 const MD_LINK = /\]\(([^)\s]+)\)/g;
