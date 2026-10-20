@@ -14,19 +14,19 @@ const GUIDES: Guide[] = [
     icon: '🚨',
     title: 'guide_injured',
     readTime: 'guide_injured_read',
-    highlight: 'bg-background-soft',
+    highlight: 'bg-background-subtle',
   },
   {
     icon: '🐱',
     title: 'guide_kitten',
     readTime: 'guide_kitten_read',
-    highlight: 'bg-background-soft',
+    highlight: 'bg-background-subtle',
   },
   {
     icon: '🚗',
     title: 'guide_vehicle',
     readTime: 'guide_vehicle_read',
-    highlight: 'bg-background-soft',
+    highlight: 'bg-background-subtle',
   },
 ];
 

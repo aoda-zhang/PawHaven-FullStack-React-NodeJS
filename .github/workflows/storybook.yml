@@ -1,0 +1,102 @@
+name: Storybook
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'packages/ui/**'
+      - 'packages/design-system/**'
+      - '.github/workflows/storybook.yml'
+      - 'pnpm-workspace.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/ui/**'
+      - 'packages/design-system/**'
+      - '.github/workflows/storybook.yml'
+      - 'pnpm-workspace.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storybook-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build component catalogue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Resolve Node.js version from package.json
+        id: node_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
+          if [[ -z "${NODE_VERSION}" ]]; then
+            echo "Missing engines.node in package.json" >&2
+            exit 1
+          fi
+          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ steps.node_version.outputs.node_version }}
+
+      - name: Enable pnpm and install workspace dependencies
+        run: |
+          corepack enable
+          corepack install
+          pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @pawhaven/ui exec playwright install --with-deps chromium
+
+      - name: Run Storybook accessibility tests
+        run: pnpm --filter @pawhaven/ui test-storybook
+
+      - name: Build Storybook
+        env:
+          STORYBOOK_BASE_PATH: /${{ github.event.repository.name }}/
+        run: pnpm --filter @pawhaven/ui build-storybook
+
+      - name: Verify required component stories
+        run: node packages/ui/scripts/verify-stories.mjs
+
+      - name: Upload pull-request build artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pawhaven-ui-storybook
+          path: packages/ui/dist/storybook-static
+          if-no-files-found: error
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: packages/ui/dist/storybook-static
+
+  deploy:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy Storybook
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -308,26 +308,26 @@ docs/architecture-reviews/
 
 ## 可直接复制执行的 Prompt
 
-你是负责多主题、多品牌和跨平台 Design Token 架构的 Design System Engineer。
+你是负责单一主题和跨平台 Design Token 架构的 Design System Engineer。
 
 请对下面的 PawHaven React Monorepo 执行 “@pawhaven/design-system 与 Design Token 专项审查”。
 
 【审查范围】
 
-- packages/design-system、globalTailwind.css、CSS custom properties
-- Tailwind theme、MUI theme、@pawhaven/ui 和 Portal 的 token 消费
-- light/dark、breakpoint、spacing、typography、elevation、motion、z-index
+- packages/design-system、apps/frontend/portal/src/shared/utils/rescueStatus/*.css、CSS custom properties
+- Tailwind theme、@pawhaven/ui 和 Portal 的 token 消费
+- color、breakpoint、spacing、typography、elevation、motion、z-index
 
 【重点检查】
 
 1. 提取 Color、Typography、Spacing、Size、Border、Radius、Shadow、Elevation、Breakpoint、Z-index、Motion、Opacity、Icon 和组件 token
 2. 为每个 token 记录名称、值、定义、消费组件、层级、主题映射、重复和硬编码
 3. 检查 primitive 是否泄漏到产品代码、scale 是否重复或不规则
-4. 检查 semantic token 是否被用途命名、dark mode 下语义是否仍成立
+4. 检查 semantic token 是否被用途命名、在每一种用途下语义是否仍成立
 5. 判断 Button、Input、Dialog、Card 等同时需要 component token，避免过少或过度 token 化
-6. 检查 light、dark、high contrast、system preference、持久化、首屏闪烁和 reduced motion
+6. 检查首屏闪烁和 reduced motion
 7. 检查 Tailwind arbitrary values、CSS variable 绕过、breakpoint 不一致和反向扫描 app
-8. 检查 MUI palette、spacing、typography、shape 是否来自统一 source
+8. 检查 palette、spacing、typography、shape 是否来自统一 source
 9. 检查 TypeScript 类型提示、schema validation、unused/deprecated/breaking 检测
 10. 检查命名、deprecation、changelog、owner、设计到代码工作流和生成管道
 
@@ -380,7 +380,7 @@ docs/architecture-reviews/
 4. 检查 Feature Integration 是否一般验证 Query、Form、Router、UI 和缓存更新
 5. 检查 E2E 是否覆盖关键旅程、稳定 selector、数据隔离、并行、trace、video 和 screenshot
 6. 检查 axe、键盘、focus order、form error、Dialog、reduced motion 和人工 a11y 项
-7. 检查 light/dark、响应式、交互状态的 Visual Regression 和 baseline 审查
+7. 检查响应式、交互状态的 Visual Regression 和 baseline 审查
 8. 检查 Zod/OpenAPI、mock response 和前后端 schema 漂移的 Contract Test
 9. 划分 PR、main、nightly、release 各自执行的门禁
 10. 避免只追求覆盖率或在多个层重复测试同一行为

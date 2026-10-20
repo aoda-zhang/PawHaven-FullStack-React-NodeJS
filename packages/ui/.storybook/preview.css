@@ -1,0 +1,12 @@
+/* Catalogue stylesheet for the Storybook preview.
+ *
+ * The package entry point `packages/ui/index.css` excludes the colocated
+ * `*.stories.tsx` files from its Tailwind sources, so the production Portal
+ * bundle never carries story-only utilities. The catalogue needs the opposite,
+ * so it declares its own sources instead of reusing the package entry point.
+ */
+@import '@pawhaven/design-system/index.css';
+@import 'react-phone-number-input/style.css';
+
+@source '../src/**/*.{ts,tsx}';
+@source './**/*.{ts,tsx}';

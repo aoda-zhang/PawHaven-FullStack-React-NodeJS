@@ -1,7 +1,7 @@
 # Feature: Rescue Detail (`portal/src/features/rescue-detail`)
 
 > **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `core-service/modules/animal-follow`, `portal/features/rescue-detail`, `portal/features/animal-follow`
-> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §4–8](../product/PawHaven-Product-Strategy-EN.md) · [Design tokens](../../packages/design-system/src/tokens)
+> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §4–8](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue/detail/:animalID`, the single-animal page. It is the most composite page in the portal: it
 renders six distinct regions, and it is the **only** place the `animal-follow` feature's UI appears.
@@ -21,7 +21,7 @@ not even a placeholder.
 A `Carousel` from `@pawhaven/ui` with `autoplay` and `loop`, `h-48 sm:h-60`, plus two absolutely
 positioned overlays:
 
-- **Status chip** (top-left): a coloured dot from `getStatusColorByPrefix({ status, prefix: 'bg' })`
+- **Status chip** (top-left): a coloured dot from `getRescueStatusColor({ status, prefix: 'bg' })`
   with a `bg-slate-400` fallback, beside `t('common.rescue_status_' + status)`.
 - **Type and address** (bottom, over a `from-black/70` gradient): the animal type via
   `t('reportAnimal.' + animalType, { defaultValue: animalType })`, and the address with a `MapPin`,
@@ -227,7 +227,7 @@ mounts**. It is consumed only by `rescue-detail`:
 
 It is the one place two features share UI without it being promoted to `packages/ui`, even though
 the shared surface is a stable, self-contained button-plus-count pair. See
-[Component placement](../../harness-core/plugins/frontend-development/skills/frontend-patterns/references/components.md#placement).
+[Component placement](../context/frontend-development-patterns.md#24-component).
 
 ## 6. What Does Not Exist
 

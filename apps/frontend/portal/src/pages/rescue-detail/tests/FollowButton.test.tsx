@@ -101,7 +101,7 @@ describe('FollowButton', () => {
   });
 
   it('surfaces the follow error when the follow action fails', () => {
-    renderButton({ hasError: true, errorKey: 'rescueDetail.follow_error' });
+    renderButton({ isError: true, errorKey: 'rescueDetail.follow_error' });
 
     expect(screen.getByRole('alert')).toHaveTextContent(
       'rescueDetail.follow_error',
@@ -111,7 +111,7 @@ describe('FollowButton', () => {
   it('surfaces the unfollow error when the unfollow action fails', () => {
     renderButton({
       isFollowing: true,
-      hasError: true,
+      isError: true,
       errorKey: 'rescueDetail.unfollow_error',
     });
 

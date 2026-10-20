@@ -1,7 +1,7 @@
 # Feature: Home (`portal/src/features/home`)
 
 > **Status**: Implemented · **Verified against**: `core-service/modules/home`, `core-service/modules/adoption`, `portal/features/home`
-> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §9](../product/PawHaven-Product-Strategy-EN.md) · [Frontend Architecture](../architecture/PawHaven-Frontend-Architecture.md) · [Design tokens](../../packages/design-system/src/tokens)
+> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §9](../product/product-strategy.md) · [Frontend Architecture](../context/frontend-architecture.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 The public landing page, `/`. It is the only page that aggregates two backend modules into one
 request, and the only place the adoptable-pets catalogue appears at all.
@@ -212,5 +212,5 @@ response surfaces as a render error instead of a parse error.
 
 - [Rescue Cases](04-rescue-cases.md) — the feed §1.2 embeds
 - [App Shell & Bootstrap](07-app-shell-bootstrap.md) — the other boot-time request
-- [Product Blueprint §3 (Discovery), §9 (Adoption)](../product/PawHaven-Product-Strategy-EN.md) —
+- [Product Blueprint §3 (Discovery), §9 (Adoption)](../product/product-strategy.md) —
   the intended section list and adoption flow

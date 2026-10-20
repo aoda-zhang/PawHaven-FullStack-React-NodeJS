@@ -2,7 +2,7 @@ import type { AnimalStatus } from '@pawhaven/shared/types';
 import { cn } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 
-import { getStatusColorByPrefix } from '@/shared/utils/getStatusColorByPrefix';
+import { getRescueStatusColor } from '@/shared/utils/rescue-status/getRescueStatusColor';
 
 interface StatusBadgeProps {
   status: AnimalStatus;
@@ -24,14 +24,14 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-white',
-        getStatusColorByPrefix({ status, prefix: 'bg' }),
+        'text-text-inverse inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+        getRescueStatusColor({ status, prefix: 'bg' }),
       )}
     >
       <span
         className={cn(
-          'inline-block h-1.5 w-1.5 rounded-full text-white',
-          getStatusColorByPrefix({ status, prefix: 'bg' }),
+          'text-text-inverse inline-block h-1.5 w-1.5 rounded-full',
+          getRescueStatusColor({ status, prefix: 'bg' }),
         )}
       />
       {t(STATUS_LABEL_KEYS[status])}

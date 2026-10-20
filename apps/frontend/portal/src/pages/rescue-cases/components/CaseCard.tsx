@@ -38,12 +38,12 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
         ) : (
           <PhotoPlaceholder iconClassName="h-12 w-12" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="from-foreground/40 absolute inset-0 bg-gradient-to-t to-transparent" />
         <div className="absolute top-3 left-3 flex gap-2">
           <StatusBadge status={caseData.status} />
         </div>
         <div className="absolute right-3 bottom-3 left-3">
-          <h3 className="font-serif text-lg leading-tight font-semibold text-white drop-shadow">
+          <h3 className="text-text-inverse font-serif text-lg leading-tight font-semibold drop-shadow">
             {caseData.title}
           </h3>
         </div>

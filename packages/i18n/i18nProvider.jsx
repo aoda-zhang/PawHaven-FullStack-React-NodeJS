@@ -5,19 +5,7 @@ import { i18n } from '.';
 
 const I18nLoadingFallback = () => {
   return (
-    <div
-      role="status"
-      aria-label="Loading translations"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100dvh',
-        opacity: 0.5,
-        fontSize: '0.875rem',
-        color: 'var(--color-text-secondary, #737373)',
-      }}
-    >
+    <div role="status" aria-label="Loading translations">
       Loading...
     </div>
   );

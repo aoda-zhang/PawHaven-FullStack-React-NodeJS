@@ -1,6 +1,7 @@
-import type { ProfileType } from './globalReducer';
 import { reducerNames } from './reducerNames';
 import { store } from './reduxStore';
+
+import type { ProfileType } from '@/pages/auth/types';
 
 /**
  * Reads the signed-in profile outside React.

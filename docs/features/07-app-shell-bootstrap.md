@@ -1,7 +1,7 @@
 # Feature: App Shell & Bootstrap (`portal/src/app/layout`)
 
 > **Status**: Implemented, partial · **Verified against**: `core-service/modules/bootstrap`, `portal/src/app/layout`, `portal/src/app/init`, `portal/src/app/router`
-> **Feature docs**: [README](README.md) · **Sources**: [Frontend Architecture](../context/frontend-architecture.md) · [Backend Architecture](../architecture/PawHaven-Backend-Architecture.md) · [Route Authentication](../architecture/route_authentication.md)
+> **Feature docs**: [README](README.md) · **Sources**: [Frontend Architecture](../context/frontend-architecture.md) · [Backend Architecture](../context/backend-architecture.md) · [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page)
 
 **This is not a portal feature folder.** It is the app layer: `app/layout/` renders the shell every
 page sits inside and holds no data access; `app/init/` fetches what that shell consumes; one backend
@@ -34,7 +34,7 @@ independent mechanisms for the same decision, and they happen to agree.
 ### 1.2 Maintenance banner
 
 When `isSysMaintain` is true in the Redux global slice, a `NotificationBanner`
-(`type: 'info'`, `variant: 'filled'`, `dismissible: false`) is pushed above the menu with the
+(`type: 'info'`, `variant: 'fill'`, `dismissible: false`) is pushed above the menu with the
 `common.mockDataWarning` message. This is the only place in the portal that acknowledges the
 project's data is placeholder.
 
@@ -184,13 +184,13 @@ The shell lives in `app/layout/` and holds no data access. The boot data lives i
 | `app/init/bootstrap.api.ts`                               | `GET /core/bootstrap`                                                    |
 | `app/init/bootstrap.queries.ts`                           | `bootstrapQueryOptions(scope)`                                           |
 | `app/init/bootstrap.queryKeys.ts`                         | `BootstrapScope` + the key factory it keys by `{ userID, menuUpdateAt }` |
-| `app/init/loader.ts`                                      | `rootLoader`, `rootShouldRevalidate`                                     |
-| `app/init/guards.ts`                                      | `requireUser` — the one route guard                                      |
 | `app/init/currentUser.ts`                                 | `GET /auth/me` + the current-user query behind the guard                 |
 | `app/layout/hooks/tests/useMenuNavigation.test.tsx`       | The shell's only test                                                    |
 
-The guard sits in the app layer, not in `pages/auth/`; the auth page owns the mutations that
-invalidate the query `requireUser` reads.
+The unauthenticated redirect lives in the app layer, not in `pages/auth/`: `onAuthError` in
+`app/providers/QueryProvider.tsx` replaces the location when a request comes back `401`, and
+`AuthenticatedLayout` in `pages/auth/route.tsx` renders a `<Navigate>` to the login page. The auth
+page owns the mutations that invalidate the current-user query those two read.
 
 The cache key is built from a `{ userID, menuUpdateAt }` scope object rather than a flat key, which
 is the correct shape for a query that varies per user.
@@ -201,8 +201,9 @@ is the correct shape for a query that varies per user.
   lazy component mapping. `Route` and `RoutePermission` are unread models.
 - **No `RequireRole` guard and no route-level permission check.** The permission machinery gates
   _menu visibility only_. `permissions` is returned to the client as codes and never enforced — a
-  user who hides a menu item can still call the endpoint behind it. The only guard is `requireUser`;
-  see [Route Authentication](../architecture/route_authentication.md).
+  user who hides a menu item can still call the endpoint behind it. The only authentication check
+  is the `401` redirect described above; see
+  [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page).
 - **No menu CRUD beyond create.** `POST /bootstrap/menu` is the only write; no update, no delete, no
   reorder, and **nothing in the portal calls it**.
 - **No admin UI** for menus, routes, roles, or permissions.
@@ -219,6 +220,6 @@ is the correct shape for a query that varies per user.
 
 - [Auth](01-auth.md) — the roles this feature filters on
 - [Home](02-home.md) — the other boot-time request
-- [Route Authentication](../architecture/route_authentication.md) — the one guard that exists
+- [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) — the one guard that exists
 - [Frontend Architecture](../context/frontend-architecture.md) — how the shell fits
   into the route tree

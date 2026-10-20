@@ -1,10 +1,9 @@
 import Autoplay from 'embla-carousel-autoplay';
-import useEmblaCarousel, {
-  type UseEmblaCarouselType,
-} from 'embla-carousel-react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import {
   useEffect,
+  useMemo,
   useState,
   type ComponentPropsWithoutRef,
   type KeyboardEvent,
@@ -13,7 +12,6 @@ import {
 import { cn } from '../../utils/cn';
 import { Button } from '../button/Button';
 
-type CarouselApi = UseEmblaCarouselType[1];
 type CarouselPlugin = Parameters<typeof useEmblaCarousel>[1];
 
 const DEFAULT_AUTOPLAY_DELAY_MS = 4000;
@@ -34,6 +32,7 @@ export interface CarouselProps {
   imageClassName?: string;
   previousLabel?: string;
   nextLabel?: string;
+  label?: string;
 }
 
 interface NavButtonProps extends ComponentPropsWithoutRef<typeof Button> {
@@ -77,22 +76,19 @@ export const Carousel = ({
   imageClassName,
   previousLabel = 'Previous slide',
   nextLabel = 'Next slide',
+  label = 'Image carousel',
 }: CarouselProps) => {
-  const [plugins] = useState<CarouselPlugin>(() =>
-    autoplay
-      ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: true })]
-      : undefined,
+  const plugins = useMemo<CarouselPlugin>(
+    () =>
+      autoplay
+        ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: true })]
+        : undefined,
+    [autoplay, autoplayDelay],
   );
 
   const [carouselRef, api] = useEmblaCarousel({ loop }, plugins);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-  const [trackedApi, setTrackedApi] = useState<CarouselApi>();
-  if (trackedApi !== api) {
-    setTrackedApi(api);
-    setCanScrollPrev(api?.canScrollPrev() ?? false);
-    setCanScrollNext(api?.canScrollNext() ?? false);
-  }
 
   useEffect(() => {
     const sync = () => {
@@ -101,18 +97,17 @@ export const Carousel = ({
       setCanScrollNext(api.canScrollNext());
     };
 
-    if (api) {
-      api.on('reInit', sync);
-      api.on('resize', sync);
-      api.on('select', sync);
-    }
+    if (!api) return undefined;
+
+    sync();
+    api.on('reInit', sync);
+    api.on('resize', sync);
+    api.on('select', sync);
 
     return () => {
-      if (api) {
-        api.off('reInit', sync);
-        api.off('resize', sync);
-        api.off('select', sync);
-      }
+      api.off('reInit', sync);
+      api.off('resize', sync);
+      api.off('select', sync);
     };
   }, [api]);
 
@@ -151,14 +146,16 @@ export const Carousel = ({
       className={cn('relative h-full', className)}
       role="region"
       aria-roledescription="carousel"
+      aria-label={label}
     >
       <div ref={carouselRef} className="h-full overflow-hidden">
         <div className="flex h-full">
-          {slides.map((slide) => (
+          {slides.map((slide, index) => (
             <div
               key={slide.src}
               role="group"
               aria-roledescription="slide"
+              aria-label={`${index + 1} of ${slides.length}`}
               className="h-full min-w-0 shrink-0 grow-0 basis-full"
             >
               <img

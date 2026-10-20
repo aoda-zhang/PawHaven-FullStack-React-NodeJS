@@ -1,7 +1,7 @@
 # Feature: Auth (`portal/src/pages/auth`)
 
 > **Status**: Implemented · **Verified against**: `auth-service`, `gateway/identity`, `portal/pages/auth`
-> **Feature docs**: [README](README.md) · **Sources**: [Authentication Architecture](../architecture/authentication-architecture.md) · [Route Authentication](../architecture/route_authentication.md) · [Product Blueprint §2](../product/PawHaven-Product-Strategy-EN.md)
+> **Feature docs**: [README](README.md) · **Sources**: [Trust Boundary](../context/backend-architecture.md#4-the-trust-boundary) · [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) · [Product Blueprint §2](../product/product-strategy.md)
 
 One document per portal feature folder. Chapter 1 breaks the feature into the sections a user
 actually sees; the later chapters cover the data path underneath.
@@ -185,7 +185,7 @@ There is no profile feature, so nothing else consumes the user record.
 
 ## 8. Related Docs
 
-- [Authentication Architecture](../architecture/authentication-architecture.md) — the full F1–F4 resolution and internal JWT contract
-- [Route Authentication](../architecture/route_authentication.md) — `requireUser` in context
+- [Trust Boundary](../context/backend-architecture.md#4-the-trust-boundary) — the internal JWT contract and what each service is allowed to trust
+- [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) — the app layer, and where `requireUser` sits
 - [App Shell & Bootstrap](07-app-shell-bootstrap.md) — resolves this user's menu items
 - [Report a Stray Animal](03-report-animal.md) — the one auth-gated route

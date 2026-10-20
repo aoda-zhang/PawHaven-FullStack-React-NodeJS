@@ -152,3 +152,6 @@ apps/backend/document-service/src/assets/fonts/
 # playwright
 test-results
 playwright-report
+
+# Generated Storybook static site
+packages/ui/dist/storybook-static/

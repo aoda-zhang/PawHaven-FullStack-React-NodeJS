@@ -1,21 +1,36 @@
-import { AlertTriangle, CheckCircle2, Info, XCircle, X } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  Info,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import { cn } from '../../utils/cn';
 
+export type BannerType = 'info' | 'warning' | 'error' | 'success';
+
+export type BannerVariant = 'standard' | 'fill' | 'accent';
+
+export interface BannerLink {
+  text: string;
+  href: string;
+}
+
 export interface BannerMessage {
-  id: string;
-  type?: 'info' | 'warning' | 'error' | 'success';
+  id?: string;
+  type?: BannerType;
   title?: string;
   message: string;
-  linkText?: string;
-  linkUrl?: string;
+  link?: BannerLink;
   dismissible?: boolean;
-  variant?: 'standard' | 'filled' | 'outlined';
+  variant?: BannerVariant;
   bannerWrapClassNames?: string;
 }
 
-const iconByType: Record<NonNullable<BannerMessage['type']>, typeof Info> = {
+const iconByType: Record<BannerType, typeof Info> = {
   info: Info,
   warning: AlertTriangle,
   error: XCircle,
@@ -23,24 +38,28 @@ const iconByType: Record<NonNullable<BannerMessage['type']>, typeof Info> = {
 };
 
 const toneByType: Record<
-  NonNullable<BannerMessage['type']>,
-  { icon: string; container: string }
+  BannerType,
+  { icon: string; container: string; role: 'alert' | 'status' }
 > = {
   info: {
     icon: 'text-info',
     container: 'border-info/40 bg-info/10',
+    role: 'status',
   },
   warning: {
     icon: 'text-warning',
     container: 'border-warning/40 bg-warning/10',
+    role: 'alert',
   },
   error: {
     icon: 'text-error',
     container: 'border-error/40 bg-error/10',
+    role: 'alert',
   },
   success: {
     icon: 'text-success',
     container: 'border-success/40 bg-success/10',
+    role: 'status',
   },
 };
 
@@ -48,27 +67,27 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
   const [open, setOpen] = useState(true);
   if (!open) return null;
 
-  const type = banner.type ?? 'info';
+  const { type = 'info', variant = 'standard', link } = banner;
   const Icon = iconByType[type];
   const tone = toneByType[type];
-  const filled = banner.variant === 'filled';
-  const outlined = banner.variant === 'outlined';
 
   return (
     <div
-      role="alert"
+      id={banner.id}
+      role={tone.role}
       className={cn(
         'flex items-start justify-start gap-3 border-b px-4 py-4 text-left text-sm lg:px-20',
         tone.container,
-        outlined && 'border-l-4',
-        filled && 'bg-primary/90 text-primary-fg',
+        variant === 'accent' && 'border-l-4',
+        variant === 'fill' && 'bg-primary/90 text-primary-fg',
         banner.bannerWrapClassNames,
       )}
     >
       <Icon
+        aria-hidden="true"
         className={cn(
           'mt-0.5 size-5 shrink-0',
-          filled ? 'text-current' : tone.icon,
+          variant === 'fill' ? 'text-current' : tone.icon,
         )}
       />
       <div className="flex-1">
@@ -76,25 +95,29 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
           <p className="mb-1 text-lg font-semibold">{banner.title}</p>
         )}
         <p>{banner.message}</p>
-        {banner.linkText && banner.linkUrl && (
+        {link && (
           <a
-            href={banner.linkUrl}
+            href={link.href}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="underline-offset-4 hover:underline"
           >
-            {banner.linkText}
+            {link.text}
+            <ExternalLink className="ml-1 inline size-4" aria-hidden="true" />
+            <span className="sr-only"> (opens in a new tab)</span>
           </a>
         )}
       </div>
       {banner.dismissible && (
         <button
           type="button"
-          aria-label="Dismiss notification"
+          aria-label={
+            banner.title ? `Dismiss ${banner.title}` : 'Dismiss notification'
+          }
           onClick={() => setOpen(false)}
           className="hover:bg-background/20 shrink-0 rounded p-0.5 transition-colors"
         >
-          <X className="size-4" />
+          <X aria-hidden="true" className="size-4" />
         </button>
       )}
     </div>

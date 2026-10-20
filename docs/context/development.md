@@ -53,6 +53,21 @@ pnpm dev:local
 | `pnpm test:e2e`   | Run Playwright end-to-end tests                              |
 | `pnpm dev:all`    | Build libs and start all dev servers (no port-kill pre-step) |
 
+## Component catalogue (Storybook)
+
+The Storybook lives inside the UI package, so it is run from that package:
+
+```bash
+pnpm --filter @pawhaven/ui storybook        # dev server on http://127.0.0.1:6006
+pnpm --filter @pawhaven/ui build-storybook  # static build → packages/ui/dist/storybook-static
+pnpm --filter @pawhaven/ui test-storybook   # runs the stories in Chromium and checks them with axe
+```
+
+Each component keeps its own story file next to its source, e.g.
+`packages/ui/src/components/button/Button.stories.tsx`. The Storybook has its own Tailwind scan
+scope, so what a story shows is not the same as what the Portal build produces — check the Portal
+with `pnpm build:local` when a change affects the product.
+
 ## Notes
 
 - `document-service` launches headless Chromium (Puppeteer) at runtime to render PDFs. Make sure the Chromium binary is available in your environment.

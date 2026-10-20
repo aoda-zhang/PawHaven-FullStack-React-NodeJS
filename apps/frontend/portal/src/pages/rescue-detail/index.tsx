@@ -7,7 +7,7 @@ import { RescueDetailContent } from './components/RescueDetailContent';
 import { RescueDetailSkeleton } from './components/RescueDetailSkeleton';
 
 export const RescueDetail = () => {
-  const { animalID } = useParams<{ animalID: string }>();
+  const { animalID = '' } = useParams<{ animalID: string }>();
   const { data: animal } = useSuspenseQuery(rescueDetailQueryOptions(animalID));
 
   return (

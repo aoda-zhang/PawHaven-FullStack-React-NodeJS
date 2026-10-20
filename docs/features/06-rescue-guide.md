@@ -1,7 +1,7 @@
 # Feature: Rescue Guide (`portal/src/features/rescue-guide`)
 
 > **Status**: Implemented · **Verified against**: `core-service/modules/guide`, `document-service/modules/pdf`, `portal/features/rescue-guide`
-> **Feature docs**: [README](README.md) · **Sources**: [PDF Generation](../architecture/PawHaven-PDF-Generation.md) · [Design tokens](../../packages/design-system/src/tokens)
+> **Feature docs**: [README](README.md) · **Sources**: [System Architecture §10](../context/system-architecture-overview.md#10-design-decisions) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue/guides`, four printable rescue guides rendered to PDF on demand. The catalogue is four
 string literals in a shared schema — no CMS, no article collection, no search.
@@ -108,7 +108,7 @@ download; a bare `@Post` would answer `201`, which breaks the client's blob hand
 
 Only `/internal/pdf/render` is reachable from this feature. The other four have no caller in the
 portal. `document-service` launches headless Chromium at runtime, so the binary must be present in
-the environment — see [PDF Generation](../architecture/PawHaven-PDF-Generation.md).
+the environment — see [System Architecture §10](../context/system-architecture-overview.md#10-design-decisions).
 
 ## 4. Data Model
 
@@ -180,6 +180,6 @@ from the first — belt and braces for data that is already validated by `GuideS
 
 ## 8. Related Docs
 
-- [PDF Generation](../architecture/PawHaven-PDF-Generation.md) — the renderer and its templates
+- [System Architecture §10](../context/system-architecture-overview.md#10-design-decisions) — DD-10, the renderer and its templates
 - [Rescue Detail](05-rescue-detail.md) — `RelevantGuides` links here
 - [Design tokens](../../packages/design-system/src/tokens) — the `bg-hero-bg` panel and icon sizing

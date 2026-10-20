@@ -6,10 +6,10 @@ import { renderHook, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+import { useLogin, useLogout } from '../api/auth.mutations';
+
 import { bootstrapQueryKeys } from '@/app/init/bootstrap.queryKeys';
 import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
-
-import { useLogin, useLogout } from '../api/auth.mutations';
 
 const { mockSetProfile, mockEmptyProfile } = vi.hoisted(() => ({
   mockSetProfile: vi.fn((payload: unknown) => ({

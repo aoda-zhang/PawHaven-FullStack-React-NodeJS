@@ -3,9 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import type { AnimalReportDto } from '@pawhaven/shared/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { apiClient } from '@/shared/utils/apiClient';
-
 import { createReportAnimal } from '../api/reportAnimal.api';
+
+import { apiClient } from '@/shared/utils/apiClient';
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: {

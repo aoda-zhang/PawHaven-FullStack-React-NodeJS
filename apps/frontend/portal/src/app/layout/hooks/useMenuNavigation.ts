@@ -9,7 +9,7 @@ import { useLogout } from '@/pages/auth/api/auth.mutations';
 const LOGOUT_MENU_CLASS = 'logout';
 
 const ACTION_ITEM_CLASS =
-  'px-3 py-2 rounded-lg bg-primary text-white font-semibold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors hover:bg-primary/90';
+  'px-3 py-2 rounded-lg bg-primary text-text-inverse font-semibold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors hover:bg-primary/90';
 
 const MENU_CLASSES = {
   menuItem:

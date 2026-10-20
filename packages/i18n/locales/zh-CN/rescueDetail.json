@@ -5,6 +5,8 @@
     "case_id": "案例编号 #{{id}}",
     "size": "体型大小",
     "animal_count": "动物数量",
+    "animal_count_value": "{{count}} 只",
+    "animal_count_value_other": "{{count}} 只",
     "coat_color": "毛色",
     "age": "大致年龄",
     "injury": "是否受伤",

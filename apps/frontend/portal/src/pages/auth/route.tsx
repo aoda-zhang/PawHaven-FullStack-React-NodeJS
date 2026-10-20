@@ -1,6 +1,6 @@
 import { Loading } from '@pawhaven/ui';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense, use } from 'react';
+import { Suspense } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 
 import { Login } from './login';

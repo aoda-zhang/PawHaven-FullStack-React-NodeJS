@@ -1,12 +1,3 @@
-/* ============================================================
-   Design System — Main entry point
-   ============================================================
-   1. tailwindcss (base)
-   2. tokens   (via src/tokens/index.css barrel)
-   3. theme    (semantic mappings)
-   4. utilities (custom utilities + component styles)
-   ============================================================ */
-
 @import 'tailwindcss';
 
 /* 1. Tokens — barrel import */
@@ -17,13 +8,6 @@
 
 /* 3. Utilities — Custom utilities + component styles */
 @import './src/utilities.css';
-
-/* Content scanning is the CONSUMER's responsibility: each app that imports
-   this stylesheet declares its own @source for any component packages outside
-   its own tree (e.g. @pawhaven/ui, @pawhaven/frontend-core). This package
-   stays standalone and does not reference sibling packages. */
-
-/* ── Base styles ─────────────────────────────────────────── */
 
 html,
 body {
@@ -38,16 +22,4 @@ body {
   isolation: isolate;
 }
 
-/* ── Reduced motion (WCAG 2.2 SC 2.3.3) ─────────────────── */
-@layer base {
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms;
-      animation-iteration-count: 1;
-      transition-duration: 0.01ms;
-      scroll-behavior: auto;
-    }
-  }
-}
+

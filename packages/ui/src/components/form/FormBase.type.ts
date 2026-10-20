@@ -1,11 +1,15 @@
+import type { ReactNode } from 'react';
+
 export interface BaseFormType {
   name: string;
-  label?: string;
+  label: string;
   defaultValue?: string | number;
-  type?: string;
   fullWidth?: boolean;
-  className?: string | string[];
+  className?: string;
   required?: boolean;
+  disabled?: boolean;
+  error?: ReactNode;
+  errorId?: string;
 }
 
 export interface BaseSelectType {
@@ -13,10 +17,5 @@ export interface BaseSelectType {
 }
 
 export interface BaseTextFieldType {
-  prefix?: string;
-  defaultPrefix?: boolean;
-  owPasswordToggle?: boolean;
-  suffix?: string;
   showPasswordToggle?: boolean;
-  defaultSuffix?: boolean;
 }

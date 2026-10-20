@@ -18,8 +18,6 @@ vi.mock('react-i18next', async () => {
   };
 });
 
-const FALLBACK_ID_SUFFIX_LENGTH = 8;
-
 const mapToDto = (values: {
   animalType: string;
   otherAnimalType: string;

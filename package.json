@@ -22,7 +22,8 @@
     "token-check": "node packages/design-system/scripts/token-check.cjs",
     "architecture-check": "node scripts/check-architecture.mjs",
     "quality-check": "node scripts/check-quality.mjs",
-    "check:links": "node harness-core/validation/check-links.mjs",
+    "check:links": "node scripts/check-docs-links.mjs docs",
+    "check:i18n": "node scripts/check-i18n-keys.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged"
   },
@@ -81,7 +82,8 @@
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.11.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "@pawhaven/eslint-plugin-design-colors": "workspace:*"
   },
   "packageManager": "pnpm@12.4.1"
 }

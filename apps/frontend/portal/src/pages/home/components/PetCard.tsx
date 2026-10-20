@@ -1,3 +1,4 @@
+import { cn } from '@pawhaven/ui';
 import { Clock, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -28,13 +29,10 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
       tabIndex={isInteractive ? 0 : undefined}
       role={isInteractive ? 'button' : undefined}
       aria-label={isInteractive ? pet.name : undefined}
-      className={[
-        'bg-background border-border w-64 flex-shrink-0 overflow-hidden rounded-2xl border shadow-sm transition-all',
+      className={cn(
+        'bg-background border-border w-64 flex-shrink-0 snap-start overflow-hidden rounded-2xl border shadow-sm transition-all',
         isInteractive && 'cursor-pointer hover:-translate-y-1 hover:shadow-md',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      style={{ scrollSnapAlign: 'start' }}
+      )}
     >
       <div className="bg-muted relative h-44">
         <img
@@ -43,11 +41,11 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
           className="h-full w-full object-cover"
         />
         <div className="absolute top-2 left-2">
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800">
+          <span className="bg-accent text-accent-foreground rounded-full px-2 py-0.5 text-xs font-semibold">
             {t('home.adoptable_badge')}
           </span>
         </div>
-        <div className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-gray-400 backdrop-blur-sm transition-colors hover:text-red-500">
+        <div className="bg-card/80 text-text-secondary hover:text-error absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition-colors">
           <Heart className="h-4 w-4" />
         </div>
       </div>

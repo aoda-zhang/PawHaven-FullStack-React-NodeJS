@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

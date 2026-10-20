@@ -12,10 +12,10 @@ export const StrayCTA = () => {
       aria-labelledby="home-cta-title"
     >
       <div className="px-4 text-center sm:px-6">
-        <PawPrint className="mx-auto mb-4 h-10 w-10 text-white" />
+        <PawPrint className="text-text-inverse mx-auto mb-4 h-10 w-10" />
         <h2
           id="home-cta-title"
-          className="font-heading mb-3 text-3xl font-bold text-white"
+          className="font-heading text-text-inverse mb-3 text-3xl font-bold"
         >
           {t('footer.cta_title')}
         </h2>
@@ -26,7 +26,7 @@ export const StrayCTA = () => {
           <button
             type="button"
             onClick={() => navigate('/report-animal')}
-            className="bg-primary flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-lg transition-opacity hover:opacity-90"
+            className="bg-primary text-text-inverse flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-lg transition-opacity hover:opacity-90"
           >
             <Camera className="h-4 w-4" />
             {t('footer.cta_button')}
@@ -34,7 +34,7 @@ export const StrayCTA = () => {
           <button
             type="button"
             onClick={() => navigate('/volunteer')}
-            className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+            className="border-text-inverse/20 bg-text-inverse/10 text-text-inverse hover:bg-text-inverse/20 flex items-center gap-2 rounded-xl border px-6 py-3 text-sm font-semibold transition-colors"
           >
             <Zap className="h-4 w-4" />
             {t('footer.cta_button_secondary')}

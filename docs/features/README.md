@@ -7,7 +7,7 @@ page that consumes it, not as a document of its own.
 
 Gaps are recorded in a **What Does Not Exist** section, so each is stated once at the point it
 matters rather than left for a reader to discover. The product ambition lives in
-[`../product/`](../product/PawHaven-Product-Strategy-EN.md); these documents describe the system as
+[`../product/`](../product/product-strategy.md); these documents describe the system as
 it is.
 
 ## Documents
@@ -108,5 +108,5 @@ contract. Each is documented at the point it occurs.
 
 ## Related
 
-- [`../architecture/`](../architecture/) — a technical point or a problem's design in this project
-- [`../product/`](../product/) — the product blueprint these features were meant to deliver
+- [`../context/`](../context/system-architecture-overview.md) — a technical point or a problem's design in this project
+- [`../product/`](../product/product-strategy.md) — the product blueprint these features were meant to deliver

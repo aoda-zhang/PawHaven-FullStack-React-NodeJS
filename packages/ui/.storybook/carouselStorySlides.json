@@ -1,0 +1,8 @@
+{
+  "textColor": "#ffffff",
+  "slides": [
+    { "title": "Rescue", "color": "#315d4a" },
+    { "title": "Care", "color": "#4c6b82" },
+    { "title": "Adoption", "color": "#96744d" }
+  ]
+}

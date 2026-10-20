@@ -1,7 +1,7 @@
 # Feature: Rescue Cases (`portal/src/features/rescue-cases`)
 
 > **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `portal/features/rescue-cases`
-> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §4–8](../product/PawHaven-Product-Strategy-EN.md) · [Design tokens](../../packages/design-system/src/tokens)
+> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §4–8](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue-cases`, the public browse feed. Rows are reports — there is no separate case table, so
 this feature and [Report a Stray Animal](03-report-animal.md) are two views of one collection.
@@ -186,5 +186,5 @@ whatever `staleTime` allows, with no refetch trigger tied to the route.
 - [Report a Stray Animal](03-report-animal.md) — the write path, on the same collection
 - [Rescue Detail](05-rescue-detail.md) — where a card navigates to
 - [Home](02-home.md) — embeds `RescueCasesSection`; the cross-feature import
-- [Product Blueprint §4–8](../product/PawHaven-Product-Strategy-EN.md) — the intended lifecycle,
+- [Product Blueprint §4–8](../product/product-strategy.md) — the intended lifecycle,
   which is where timelines, claims, and the transitions table come from

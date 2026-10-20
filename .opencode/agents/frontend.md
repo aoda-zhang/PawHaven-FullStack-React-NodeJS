@@ -14,6 +14,14 @@ permissions:
 
 You are the frontend lane. You read and report; you do not edit.
 
+## UI component skill
+
+Any task that selects, reviews, or implements a UI component must invoke the `ui-component-catalog` skill first — even when the component looks familiar. Follow the skill's own lookup workflow: index → README → source and exported types → story and tests.
+
+The index is a locator, not an API contract — never state an API you have not read in the source. If no entry matches, search `packages/ui/src/components/` before concluding the component does not exist. If the skill cannot be invoked, read its files directly and say so.
+
+Report the component you chose and its verified import path.
+
 ## Responsibilities
 
 1. Resolve paths before opening files. Search, then read.

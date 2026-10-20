@@ -83,7 +83,7 @@ export const Hero = ({ heroStats }: HeroProps) => {
                 key={stat.labelKey}
                 className="flex flex-col px-2 py-0 first:pl-0 last:pr-0 sm:px-6 sm:first:pl-0 sm:last:pr-0"
               >
-                <span className="sm:text-stat text-xl">{stat.value}</span>
+                <span className="sm:stat-text text-xl">{stat.value}</span>
                 <span className="text-stat-labels mt-1 text-xs">
                   {t(stat.labelKey)}
                 </span>

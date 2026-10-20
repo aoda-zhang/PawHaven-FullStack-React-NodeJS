@@ -36,18 +36,17 @@ export const GuideDownloadCard = ({
       <FileDownloadButton
         fileFetchRequest={() => downloadPdf(item.slug)}
         fileName={item.fileName}
-        fileType="PDF"
         onError={() => {
           showToast({
             type: 'error',
             message: t('rescueGuide.download_failed'),
           });
         }}
-        buttonClassName="w-full cursor-pointer"
-        contentClassName="flex items-center justify-center gap-2"
       >
-        <Download className="size-4" aria-hidden="true" />
-        <span>{t('rescueGuide.download')}</span>
+        <span className="flex items-center justify-center gap-2">
+          <Download className="size-4" aria-hidden="true" />
+          <span>{t('rescueGuide.download')}</span>
+        </span>
       </FileDownloadButton>
     </article>
   );

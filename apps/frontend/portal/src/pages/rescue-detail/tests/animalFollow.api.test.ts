@@ -2,13 +2,13 @@ import '@testing-library/jest-dom/vitest';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { apiClient } from '@/shared/utils/apiClient';
-
 import {
   followAnimal,
   getFollowStatus,
   unfollowAnimal,
 } from '../api/rescueDetail.api';
+
+import { apiClient } from '@/shared/utils/apiClient';
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: {

@@ -59,7 +59,7 @@ Ensure you meet these version requirements before installing dependencies or run
 
 **`.opencode/`** is the **AI-driven development engine** behind PawHaven — an agent orchestrator that turns every coding request into a structured pipeline: `plan → dispatch agents → verify with tests → review against architecture & patterns → update knowledge`.
 
-👉 [Enter the harness](./.opencode/skills/README.md) — 22 skills, 9 slash-command workflows, the `knowledge-update` agent, and the project rules they enforce
+👉 [Enter the harness](./.opencode/) — 7 skills, 5 slash-command workflows and 9 agents, plus the project rules they enforce
 
 ---
 
@@ -83,34 +83,23 @@ You can use the Discord server to:
 # 📚 Documentation
 
 Documentation lives in [`docs/`](./docs/README.md), split by what each document is **for**:
-`architecture/` (a technical point or a problem's design), `features/` (one portal feature's
-frontend and backend detail), `product/` (the blueprint `features/` cite).
+`context/` (how a change must look, and how the units fit together), `features/` (one portal
+feature's frontend and backend detail), `product/` (the blueprint `features/` cite), and
+`how-i-build/` (the reasoning behind the design system and the component library).
 
 > `docs/features/` is **as-built** — one document per portal feature folder, each verified against
 > the code. Gaps are recorded per feature, and
 > [known defects](./docs/features/README.md#known-defects-in-the-code) are tabulated in the index.
 
-### Product & Architecture
+### How I Build
 
-| Document                                                                            | Description                                                                       |
-| ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| [Product Strategy](./docs/product/PawHaven-Product-Strategy-EN.md)                  | Complete product blueprint — 7 modules, personas, value flywheel, roadmap         |
-| [System Architecture](./docs/architecture/PawHaven-System-Architecture-Overview.md) | 4-service architecture, modular monolith, C4, gateway, security, design decisions |
-| [Design System](./packages/design-system/README.md)                                 | Design tokens, Tailwind v4 theme, CSS utilities                                   |
-
-### Authentication at a Glance
-
-Browser JWT / cookies are owned by the **gateway** only. Per request it resolves the caller identity (F1–F4), refreshes when needed, and signs a short-lived **ES256 internal JWT** for the target service into the `x-gateway-jwt` header. Downstream services never see browser tokens — a global `InternalJwtGuard` verifies the internal JWT (fail closed) and handlers read the identity via `@InternalJwt()`, with endpoint policy expressed by `@Public()` / `@OptionalAuth()` / default-authenticated.
-
-→ Full detail: [Authentication & Authorization Architecture](./docs/architecture/authentication-architecture.md).
-
-### Engineering
-
-| Document                                                                                          | Description                                                                             |
-| ------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| [Project Standards](./.opencode/skills/project-rules/SKILL.md)                                    | Coding conventions, tooling, workflows — enforced as a skill                            |
-| [Authentication & Authorization Architecture](./docs/architecture/authentication-architecture.md) | Gateway-owned cookie JWT + internal ES256-JWT (InternalJwt) service auth, `roles` claim |
-| [Route-Level Authentication](./docs/architecture/route_authentication.md)                         | Frontend route guard implementation                                                     |
+| Document                                                              | Description                                                                                   |
+| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [Global Architecture](./docs/context/system-architecture-overview.md) | The whole system — services, packages, data flow, deployment                                  |
+| [Frontend Architecture](./docs/context/frontend-architecture.md)      | The frontend units and the direction their dependencies run in                                |
+| [Backend Architecture](./docs/context/backend-architecture.md)        | The backend services and packages, and how they depend on each other                          |
+| [Design Tokens](./docs/how-i-build/design-tokens.md)                  | Why a design system, how the token layers are built, how the lint plugin holds them honest    |
+| [UI Library](./docs/how-i-build/ui-library.md)                        | What `@pawhaven/ui` is, the quality gates around it, and how to browse and look up components |
 
 ---
 

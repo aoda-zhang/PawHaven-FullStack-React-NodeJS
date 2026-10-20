@@ -56,8 +56,8 @@ children. Form-local `useState` and `react-hook-form` context reads are a view's
 - The client unwraps the success envelope; a caller receives the payload, not the envelope.
 - Errors arrive already normalized, carrying `traceId`. Display it on error surfaces.
 - `frontend-core` normalizes a `401` to `httpRequestErrors.AUTH`. The portal decides what happens:
-  `requireUser` in `app/init/guards.ts` redirects, `onAuthError` in `app/providers/QueryProvider.tsx`
-  replaces the location. Do not re-implement either.
+  `onAuthError` in `app/providers/QueryProvider.tsx` replaces the location, and `AuthenticatedLayout`
+  in `pages/auth/route.tsx` renders a `<Navigate>` to the login page. Do not re-implement either.
 - `download`/`postBlob` responses bypass the envelope; nothing to unwrap.
 - A key belongs in `src/shared/constants/sharedQueryKeys.ts` only when something outside its owner must
   reach it — `sharedQueryKeys.auth.currentUser(userId)`, because `app/init/` owns the query while the
