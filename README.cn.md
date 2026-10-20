@@ -1,5 +1,7 @@
 [English](./README.md) | [中文](./README.cn.md)
 
+# 🐾 PawHaven - 流浪动物救援与领养平台
+
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232a?logo=react&logoColor=61dafb)
 ![Node.js](https://img.shields.io/badge/Node.js-43853D?logo=node.js&logoColor=white)
@@ -57,7 +59,7 @@
 
 **`.opencode/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent 编排器，将每个开发请求转化为结构化流水线：`规划 → 分发 Agent → 测试验证 → 对照架构与模式审查 → 知识更新`。
 
-👉 [进入 harness](./.opencode/skills/README.md) —— 22 个 skill、9 个斜杠命令工作流、`knowledge-update` agent,以及它们强制的项目规则
+👉 [进入 harness](./.opencode/) —— 7 个 skill、5 个斜杠命令工作流、9 个 agent,以及它们强制的项目规则
 
 ---
 
@@ -79,39 +81,28 @@ PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开�
 
 # 📚 文档
 
-文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`architecture/`（某个技术点或某个问题
-在本项目里的设计）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）。
+文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`context/`（一次改动应该长什么样、
+各单元怎么组合）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）、
+`how-i-build/`（design system 与组件库背后的设计理由）。
 
 > ⚠️ `docs/features/` 是**蓝图，不是现状** —— 11 个 feature 中有 7 个写到的后端模块并不存在，
 > 其中的领域事件在后端代码里一次都没出现。
 
-### 产品与架构
+### 我怎么搭的
 
-| 文档                                                                     | 说明                                                    |
-| ------------------------------------------------------------------------ | ------------------------------------------------------- |
-| [产品策略](./docs/product/PawHaven-Product-Strategy-EN.md) (英文)        | 完整产品全景设计 — 7 个模块、用户画像、价值闭环、路线图 |
-| [系统架构](./docs/architecture/PawHaven-System-Architecture-Overview.md) | 4 服务架构、模块化单体、C4、网关、安全、设计决策        |
-| [设计系统](./packages/design-system/README.md)                           | Design tokens、Tailwind v4 主题、CSS 工具类             |
-
-### 认证一览
-
-浏览器 JWT / Cookie 只由 **网关** 持有。网关按请求解析调用者身份（F1–F4）、必要时刷新，并针对目标服务签发一个短时效的 **ES256 内部 JWT**，写入 `x-gateway-jwt` 头。下游服务永远看不到浏览器 token —— 由全局 `InternalJwtGuard` 校验内部 JWT（fail-closed），handler 通过 `@InternalJwt()` 读取身份，端点策略用 `@Public()` / `@OptionalAuth()` / 默认需认证表达。
-
-→ 完整细节见 [身份认证与授权架构](./docs/architecture/authentication-architecture.md)。
-
-### 工程
-
-| 文档                                                                     | 说明                                                                        |
-| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| [项目规范](./.opencode/skills/project-rules/SKILL.md)                    | 编码规范、工具链、工作流 —— 以 skill 形式强制                               |
-| [身份认证与授权架构](./docs/architecture/authentication-architecture.md) | 网关持有的 Cookie JWT + 内部 ES256 JWT（InternalJwt）服务认证,`roles` claim |
-| [路由级认证](./docs/architecture/route_authentication.md)                | 前端路由守卫实现                                                            |
+| 文档                                                       | 说明                                                            |
+| ---------------------------------------------------------- | --------------------------------------------------------------- |
+| [全局架构](./docs/context/system-architecture-overview.md) | 整个系统 —— 服务、包、数据流、部署                              |
+| [前端架构](./docs/context/frontend-architecture.md)        | 前端各单元，以及它们之间的依赖方向                              |
+| [后端架构](./docs/context/backend-architecture.md)         | 后端各服务与包，以及它们之间的依赖关系                          |
+| [Design Token 体系](./docs/how-i-build/design-tokens.md)   | 为什么需要 design system、token 分层怎么建、lint 插件怎么守住它 |
+| [UI Library 体系](./docs/how-i-build/ui-library.md)        | `@pawhaven/ui` 是什么、周围有哪些质量门禁、怎么浏览和检索组件   |
 
 ---
 
 # 🧑‍💻 本地开发
 
-本地开发请见 [docs/context/development.md](./docs/context/development.cn.md)。
+本地开发请见 [docs/context/development.md](./docs/context/development.md)。
 
 ---
 
