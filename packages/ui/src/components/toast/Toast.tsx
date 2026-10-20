@@ -1,6 +1,6 @@
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { cn } from '../../utils/cn';
 
@@ -97,40 +97,125 @@ const toneByType: Record<ToastType, string> = {
   info: 'text-info',
 };
 
-export const Toast = () => {
-  const toasts = useSyncExternalStore(subscribe, getSnapshot);
+const isAssertiveType = (type: ToastType) =>
+  type === notificationType.error || type === notificationType.warning;
+
+let activeHost: symbol | null = null;
+const hostListeners = new Set<() => void>();
+
+const claimHost = (hostId: symbol): boolean => {
+  if (activeHost === null) {
+    activeHost = hostId;
+    return true;
+  }
+  return activeHost === hostId;
+};
+
+const useToastHost = (): boolean => {
+  const [hostId] = useState(() => Symbol('toast-host'));
+
+  const [isHost, setIsHost] = useState(false);
+
+  useEffect(() => {
+    const sync = () => setIsHost(claimHost(hostId));
+    sync();
+    hostListeners.add(sync);
+    return () => {
+      hostListeners.delete(sync);
+      if (activeHost === hostId) {
+        activeHost = null;
+        hostListeners.forEach((listener) => listener());
+      }
+    };
+  }, [hostId]);
+
+  return isHost;
+};
+
+interface ToastEntryProps {
+  toast: ToastItem;
+  onDismiss: (id: string) => void;
+}
+
+const ToastEntry = ({ toast, onDismiss }: ToastEntryProps) => {
+  const Icon = iconByType[toast.type];
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dismissRef = useRef<HTMLButtonElement>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const assertive = isAssertiveType(toast.type);
+
+  useEffect(() => {
+    if (!assertive) return undefined;
+
+    const container = containerRef.current;
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    dismissRef.current?.focus();
+
+    return () => {
+      const active = document.activeElement;
+      const focusIsInside =
+        active instanceof HTMLElement && container?.contains(active) === true;
+      if (focusIsInside || active === null || active === document.body) {
+        restoreFocusRef.current?.focus();
+      }
+    };
+  }, [assertive]);
 
   return (
     <div
-      className="pointer-events-none fixed top-4 left-1/2 z-[100] flex w-full max-w-sm -translate-x-1/2 flex-col gap-2"
+      ref={containerRef}
+      role={assertive ? 'alert' : 'status'}
+      className="border-border bg-background/90 shadow-toast pointer-events-auto flex items-start gap-3 rounded-lg border px-4 py-3 backdrop-blur-md"
     >
-      {toasts.map((toast) => {
-        const Icon = iconByType[toast.type];
-        return (
-          <div
+      <Icon
+        aria-hidden="true"
+        className={cn('mt-0.5 size-5 shrink-0', toneByType[toast.type])}
+      />
+      <div className="text-text flex-1 text-sm">{toast.message}</div>
+      <button
+        ref={dismissRef}
+        type="button"
+        aria-label="Dismiss notification"
+        onClick={() => onDismiss(toast.id)}
+        className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors"
+      >
+        <X aria-hidden="true" className="size-4" />
+      </button>
+    </div>
+  );
+};
+
+export const Toast = () => {
+  const toasts = useSyncExternalStore(subscribe, getSnapshot);
+  const isHost = useToastHost();
+
+  if (!isHost) return null;
+
+  return (
+    <div
+      role="region"
+      aria-label="Notifications"
+      className="z-toast pointer-events-none fixed top-4 left-1/2 flex w-full max-w-sm -translate-x-1/2 flex-col gap-2"
+    >
+      <div
+        aria-live="polite"
+        aria-atomic="false"
+        className="flex flex-col gap-2"
+      >
+        {toasts.map((toast) => (
+          <ToastEntry
             key={toast.id}
-            role={toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'}
-            className="border-border bg-background/90 shadow-toast pointer-events-auto flex items-start gap-3 rounded-lg border px-4 py-3 backdrop-blur-md"
-          >
-            <Icon
-              aria-hidden="true"
-              className={cn('mt-0.5 size-5 shrink-0', toneByType[toast.type])}
-            />
-            <div className="text-text flex-1 text-sm">{toast.message}</div>
-            <button
-              type="button"
-              aria-label="Dismiss notification"
-              onClick={() => {
-                clearTimer(toast.id);
-                dismissToast(toast.id);
-              }}
-              className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors"
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          </div>
-        );
-      })}
+            toast={toast}
+            onDismiss={(id) => {
+              clearTimer(id);
+              dismissToast(id);
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };

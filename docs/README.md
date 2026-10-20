@@ -1,17 +1,16 @@
 # PawHaven Documentation Index
 
 > Unified entry point for all project documentation.
-> Chinese mirror: [README.cn.md](./README.cn.md), kept in sync with this file.
 
 `docs/` is split by what a document is **for**, so you can tell from the path whether it is
 authority, intent, or background.
 
-| Directory       | Holds                                                                               | Read it when                                             |
-| --------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `architecture/` | A technical point, or the design of a specific problem, **in this project**         | You are about to design or change something in that area |
-| `context/`      | The living architecture and development-pattern docs ([index](./context/README.md)) | You are about to write the next piece of it              |
-| `features/`     | One **portal feature**'s frontend **and** backend detail, as built                  | After the change lands, to update the record from code   |
-| `product/`      | The product blueprint that `features/` cite                                         | You need the "why" behind a feature, or the roadmap      |
+| Directory               | Holds                                                                       | Read it when                                           |
+| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `context/`              | The living architecture and development-pattern docs                        | You are about to write the next piece of it            |
+| `features/`             | One **portal feature**'s frontend **and** backend detail, as built          | After the change lands, to update the record from code |
+| `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
+| `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
 Design tokens are deliberately **not** documented here. They live in
 [`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by
@@ -23,8 +22,8 @@ Design tokens are deliberately **not** documented here. They live in
 
 Each document in `features/` describes what exists. Where the product blueprint promised more, the
 gap is stated in that document's **What Does Not Exist** section rather than being left for a reader
-to discover. [`product/`](./product/PawHaven-Product-Strategy-EN.md) holds the full ambition, and
-every feature doc links back to the section it came from.
+to discover. [`product/`](./product/product-strategy.md) holds the full ambition, and every feature
+doc links back to the section it came from.
 
 Each document is keyed on one folder in `apps/frontend/portal/src/features/*`, and chapter 1 numbers
 that page's sections. A backend module with no feature folder of its own is documented as a section
@@ -39,31 +38,28 @@ and the case.** There is no `rescue_cases` table and no event that creates one.
 
 ---
 
-## 1. Architecture
+## 1. Context — the living architecture
 
-A technical point or a problem's design in this project. These are the docs to read before
-designing anything.
+The docs every change is measured against. Read the one that covers the area you are touching
+before designing anything.
 
-| File                                                                                                | Covers                                                                                                                      |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| [PawHaven-System-Architecture-Overview.md](./architecture/PawHaven-System-Architecture-Overview.md) | The hub. Service decomposition, C4 model, data architecture, API gateway, security, deployment, design decisions            |
-| [PawHaven-Backend-Architecture.md](./architecture/PawHaven-Backend-Architecture.md)                 | `core-service` modular monolith, bounded contexts as NestJS modules, inter-service communication                            |
-| [PawHaven-Frontend-Architecture.md](./architecture/PawHaven-Frontend-Architecture.md)               | Feature-based module structure, state, routing, tokens, i18n                                                                |
-| [authentication-architecture.md](./architecture/authentication-architecture.md)                     | **The auth trust model.** Gateway-owned browser cookies, the internal ES256 JWT, downstream verification, the `roles` claim |
-| [route_authentication.md](./architecture/route_authentication.md)                                   | Frontend route guards — the authenticated parent route, `requireUser`, `/auth/me` priming                                   |
-| [PawHaven-PDF-Generation.md](./architecture/PawHaven-PDF-Generation.md)                             | Why PDFs render through React + Puppeteer instead of a template library, and the constraints that bite                      |
-| [PawHaven-System-Architecture.md](./architecture/PawHaven-System-Architecture.md)                   | Legacy redirect map from the pre-split document to the three above. No content of its own.                                  |
-| [service-boundaries.md](./architecture/service-boundaries.md)                                       | Backend service boundaries — the four services, the auth boundary, request/response shape                                   |
-| [harness-migration.md](./architecture/harness-migration.md)                                         | How the AI development harness moved from a runtime-owned directory to a provider-neutral canonical source plus adapters    | Reading what `harness-core/` replaced, and why |
+| File                                                                           | Covers                                                                                                           |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| [system-architecture-overview.md](./context/system-architecture-overview.md)   | The hub. Service decomposition, C4 model, data architecture, API gateway, security, deployment, design decisions |
+| [backend-architecture.md](./context/backend-architecture.md)                   | `core-service` modular monolith, bounded contexts as NestJS modules, inter-service communication                 |
+| [frontend-architecture.md](./context/frontend-architecture.md)                 | Feature-based module structure, state, routing, tokens, i18n                                                     |
+| [frontend-development-patterns.md](./context/frontend-development-patterns.md) | What a frontend change must look like                                                                            |
+| [backend-development-patterns.md](./context/backend-development-patterns.md)   | What a backend change must look like                                                                             |
+| [development.md](./context/development.md)                                     | Prerequisites, build order, dev servers and ports, pnpm scripts                                                  |
+| [agent-constraints.md](./context/agent-constraints.md)                         | The rules every AI change must obey                                                                              |
 
-`authentication-architecture.md` and `route_authentication.md` are the pair to read before touching
-anything auth-related — one covers the server trust boundary, the other the client route guard.
+`[AGENTS.md](../AGENTS.md)` leads to these — it is the file an agent reads without choosing it.
 
 ## 2. Features
 
 One doc per **portal feature folder** (`apps/frontend/portal/src/features/*`), covering both sides
-of that feature. Within a document, chapter 1 breaks the page into numbered sections (1.1, 1.2,
-1.3 …) and the later chapters cover the data path underneath.
+of that feature. Within a document, chapter 1 breaks the page into numbered sections (1.1, 1.2, 1.3 …)
+and the later chapters cover the data path underneath.
 
 A backend module with no feature folder of its own is documented as a section of the page that
 consumes it — `adoption` inside [Home](./features/02-home.md#4-adoptable-pets-read-only),
@@ -87,85 +83,81 @@ that is a projection rather than history, a `NotFound` that 13 broken links all 
 
 ## 3. Product
 
-| File                                                                         | Covers                                                                        |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| [PawHaven-Product-Strategy-EN.md](./product/PawHaven-Product-Strategy-EN.md) | Product blueprint v2.0 — animal lifecycle, personas, feature map, MVP roadmap |
+| File                                                 | Covers                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------ |
+| [product-strategy.md](./product/product-strategy.md) | Product blueprint — animal lifecycle, personas, feature map, MVP roadmap |
 
-## 4. Design system — source, not documentation
+## 4. Architecture reviews
 
-| Path                                                                           | Type | Description                        |
-| ------------------------------------------------------------------------------ | ---- | ---------------------------------- |
-| [src/tokens/](../packages/design-system/src/tokens)                            | CSS  | 12 design-token CSS variable files |
-| [src/theme.css](../packages/design-system/src/theme.css)                       | CSS  | Global theme definitions           |
-| [src/utilities.css](../packages/design-system/src/utilities.css)               | CSS  | Utility classes                    |
-| [scripts/build-tokens.mjs](../packages/design-system/scripts/build-tokens.mjs) | JS   | Token build script                 |
+Each document is the record of one audit: what was found, what was changed, and what was left open.
+They are records, not living docs — the living docs are in `context/`.
+
+| File                                                            | Covers                                                            |
+| --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [02-feature-org.md](./architecture-reviews/02-feature-org.md)   | Evidence that the portal is organised by feature slice            |
+| [03-server-state.md](./architecture-reviews/03-server-state.md) | Server-state inventory checklist (not yet filled in)              |
+| [04-ui-library.md](./architecture-reviews/04-ui-library.md)     | The UI-library audit, the changes it produced, and the open items |
+
+[`artec.md`](./artec.md) holds the prompt handbook those audits are run from.
+[`how-i-build/`](./how-i-build/how-i-build-my-agent-team.md) holds the working notes on how the
+agent team itself is put together.
+
+## 5. Design system — source, not documentation
+
+| Path                                                             | Type | Description                        |
+| ---------------------------------------------------------------- | ---- | ---------------------------------- |
+| [src/tokens/](../packages/design-system/src/tokens)              | CSS  | 12 design-token CSS variable files |
+| [src/theme.css](../packages/design-system/src/theme.css)         | CSS  | Global theme definitions           |
+| [src/utilities.css](../packages/design-system/src/utilities.css) | CSS  | Utility classes                    |
 
 Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
 not introduce raw colour values or magic numbers.
 
-## 5. Development
-
-Operational docs for running the thing locally. Not design material — this is the setup reference.
-
-| File                                     | Covers                                                          |
-| ---------------------------------------- | --------------------------------------------------------------- |
-| [development.md](./development.md)       | Prerequisites, build order, dev servers and ports, pnpm scripts |
-| [development.cn.md](./development.cn.md) | The same guide in Chinese; kept in sync with the English file   |
-
 ## 6. Agent harness
 
-The agent control layer lives in [`harness-core/`](../harness-core), not here. `.pi/` is the thin Pi
-runtime adapter: it references `harness-core/` directly through `settings.json`; only `.pi/agents/` is a
-verbatim projection rebuilt by `pnpm pi:sync`.
+The agent control layer lives in [`.opencode/`](../.opencode) — the agents, the slash-command
+workflows, the skills and the model-filter plugins.
 
-| Path                                                            | Covers                                                          |
-| --------------------------------------------------------------- | --------------------------------------------------------------- |
-| [harness-core/README.md](../harness-core/README.md)             | Index of capabilities, skills, workflows, and rules             |
-| [harness-core/ARCHITECTURE.md](../harness-core/ARCHITECTURE.md) | The invariants the harness defends                              |
-| [harness-core/workflows/](../harness-core/workflows)            | The workflows, surfaced by an adapter as the runtime's commands |
-| [harness-core/rules/](../harness-core/rules)                    | The stable rules shared by every workflow                       |
-| [AGENTS.md](../AGENTS.md)                                       | Hard constraints — git, code, dispatch, reporting               |
-
-`pnpm harness:verify` validates the harness. The retired `.opencode/`, `.codebuddy/`, and
-`.pi/skills/` layers are gone; links into them are dead.
-
----
+| Path                               | Covers                                                                                          |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [agents/](../.opencode/agents)     | The roles a request is dispatched to                                                            |
+| [commands/](../.opencode/commands) | The slash-command workflows (`feature`, `bug-fix`, `refactor`, …)                               |
+| [skills/](../.opencode/skills)     | The task skills, including the [UI component catalog](../.opencode/skills/ui-component-catalog) |
+| [plugins/](../.opencode/plugins)   | The model-filter and model-switch plugins                                                       |
 
 ## 7. Documentation standards
 
 - **Read the code first, write the docs last.** Architecture docs and code are the input;
-  `docs/features/` is the output, updated in the same change that invalidated it. A feature doc is
+  `docs/features/` is the output, updated in the same change that invalidated them. A feature doc is
   never an input to a decision.
 - **No ADR records.** When a decision changes the architecture, update the living docs under
-  `docs/architecture/` directly.
+  `docs/context/` directly.
 - **Code comments explain why, not what.** Default to none; never comment self-evident code.
 - **Permanent docs live in `docs/`** and ship in the same change as the code that invalidated them.
   Progress goes in replies — there is no temporary-notes file.
 - **Every handoff classifies Doc Impact** as `none` / `update` / `create`; the main session routes
   doc edits to the lane that made the change.
-- **Root READMEs (EN ↔ CN) stay in sync** and reference all knowledge files. The agent-control layer
-  is `harness-core/`; `.opencode/`, `.codebuddy/`, and `.pi/skills/` are retired — links into them are
-  dead.
+- **Root READMEs (EN ↔ CN) stay in sync** and reference all knowledge files.
 
 ## 8. Repository quality
 
-The repository's quality record — what is healthy, what debt is accepted, and the mechanical
-invariants — lives in [`quality/README.md`](./quality/README.md). `pnpm quality-check` scans for
-orphaned docs, references to retired resources, and duplicate-rule candidates, and folds in
-`architecture-check` and `check:links`.
+The repository's mechanical invariants are checked by `pnpm quality-check`
+([`scripts/check-quality.mjs`](../scripts/check-quality.mjs)): orphaned docs, references to retired
+resources, and duplicate-rule candidates, folding in `architecture-check` and the markdown link
+check ([`scripts/check-docs-links.mjs`](../scripts/check-docs-links.mjs)).
 
 ## Suggested reading order
 
-The three architecture documents, then the code, then — after the change is verified — the feature
+The architecture documents, then the code, then — after the change is verified — the feature
 doc.
 
 ```
-PawHaven-System-Architecture-Overview.md
-  → PawHaven-Frontend-Architecture.md  |  PawHaven-Backend-Architecture.md
-    (+ authentication-architecture.md / route_authentication.md when auth is in scope)
+system-architecture-overview.md
+  → frontend-architecture.md  | backend-architecture.md
+    (+ frontend-development-patterns.md / backend-development-patterns.md when the change is in scope)
   → the code in apps/ and packages/
   → update docs/features/<feature>.md from what shipped
 ```
 
-**Verify before you trust.** The architecture docs carry a `v3.11 / 2026-09-25` stamp and were checked
+**Verify before you trust.** The context docs carry a `v3.11 / 2026-09-25` stamp and were checked
 against the code at that time. A feature doc is as-built as of the last change that reconciled it.

@@ -132,7 +132,7 @@ export const RootLayoutFooter = () => {
                   rel="noreferrer"
                   title={social.label}
                   aria-label={social.label}
-                  className="text-brown-7 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 transition-colors hover:bg-white/20 hover:text-white"
+                  className="text-brown-7 bg-text-inverse/10 hover:bg-text-inverse/20 hover:text-text-inverse flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
                 >
                   <social.icon className="h-4 w-4" />
                 </a>
@@ -151,7 +151,7 @@ export const RootLayoutFooter = () => {
                     <li key={link.label}>
                       <FooterLink
                         to={link.to}
-                        className="text-footer-text block text-left text-sm transition-colors hover:text-white"
+                        className="text-footer-text hover:text-text-inverse block text-left text-sm transition-colors"
                         label={link.label}
                       />
                     </li>

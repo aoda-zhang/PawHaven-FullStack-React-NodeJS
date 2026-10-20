@@ -1,0 +1,23 @@
+/* ============================================================
+   Rescue Status Colours — domain tokens for the rescue case
+   ============================================================
+   The design system owns the palette and the generic semantic
+   layer. Tokens that encode this product's domain live here, in
+   the app that owns the domain, so the design system stays free
+   of product vocabulary.
+
+   Rescue case status is the one domain colour set the portal
+   renders. `getRescueStatusColor.ts` maps a status to the utility
+   class these tokens generate.
+   ============================================================ */
+
+@theme {
+  /* ═══ Rescue Status Colours ═════════════════════════════ */
+  --color-rescue-status-pending: var(--color-yellow-6);
+  --color-rescue-status-in-progress: var(--color-blue-6);
+  --color-rescue-status-treated: var(--color-blue-10);
+  --color-rescue-status-recovering: var(--color-green-6);
+  --color-rescue-status-awaiting-adoption: var(--color-yellow-5);
+  --color-rescue-status-adopted: var(--color-green-8);
+  --color-rescue-status-failed: var(--color-gray-6);
+}

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { apiClient } from '@/shared/utils/apiClient';
-
 import { downloadPdf } from '../api/pdf.api';
+
+import { apiClient } from '@/shared/utils/apiClient';
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: {

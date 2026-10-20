@@ -21,7 +21,11 @@ module.exports = {
   },
 
   // Merge base plugins with additional frontend-specific plugins
-  plugins: [...baseEslintConfig.plugins, '@tanstack/query'],
+  plugins: [
+    ...baseEslintConfig.plugins,
+    '@tanstack/query',
+    '@pawhaven/eslint-plugin-design-colors',
+  ],
   settings: {
     react: {
       version: 'detect',
@@ -33,6 +37,20 @@ module.exports = {
       typescript: {
         alwaysTryTypes: true,
       },
+    },
+    // The design-token rules read the token vocabulary from the design-system
+    // CSS at lint time, so the CSS stays the single source of truth.
+    'design-colors': {
+      cssFiles: [
+        'packages/design-system/src/tokens',
+        'packages/design-system/src/theme.css',
+        'packages/design-system/src/utilities.css',
+      ],
+      // Domain tokens that live in the app that owns the domain.
+      extraCssFiles: [
+        'apps/frontend/portal/src/shared/utils/rescue-status/rescueStatusColors.css',
+        'apps/frontend/portal/src/shared/utils/rescue-status/adoptableBadgeColors.css',
+      ],
     },
   },
 
@@ -69,18 +87,39 @@ module.exports = {
 
     // React Query plugin rules
     '@tanstack/query/exhaustive-deps': 'error',
+
+    // Design-system token rules.
+    // no-inline-style stays a warning: the design system still has
+    // legitimate inline styles (scroll-snap) that the team may want to allow.
+    '@pawhaven/design-colors/no-unknown-color': 'error',
+    '@pawhaven/design-colors/no-raw-color': 'error',
   },
 
   overrides: [
     ...(baseEslintConfig.overrides || []),
     {
-      files: ['**/tests/**/*.{ts,tsx,js,jsx}'],
+      files: ['**/tests/**/*.{ts,tsx,js,jsx}', '**/*.{test,spec}.{ts,tsx}'],
       rules: {
         'import/no-extraneous-dependencies': [
           'error',
           { devDependencies: true },
         ],
         'no-magic-numbers': 'off',
+      },
+    },
+    {
+      // A test file mirrors the name of the file it tests, and the two
+      // naming conventions differ per package, so it is not governed here.
+      files: ['**/*.{test,spec}.{ts,tsx}'],
+      rules: {
+        'check-file/filename-naming-convention': 'off',
+      },
+    },
+    {
+      // Storybook requires this directory to be named `.storybook`.
+      files: ['**/.storybook', '**/.storybook/**'],
+      rules: {
+        'check-file/folder-naming-convention': 'off',
       },
     },
     {

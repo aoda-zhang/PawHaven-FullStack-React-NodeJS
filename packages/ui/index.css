@@ -1,3 +1,5 @@
 @import '@pawhaven/design-system/index.css';
+@import 'react-phone-number-input/style.css';
 
 @source './src/**/*.{ts,tsx}';
+@source not './src/**/*.stories.tsx';

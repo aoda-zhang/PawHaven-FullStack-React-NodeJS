@@ -1,7 +1,7 @@
 # Feature: Report a Stray Animal (`portal/src/features/report-animal`)
 
 > **Status**: Implemented · **Verified against**: `core-service/modules/report-animal`, `portal/features/report-animal`
-> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3](../product/PawHaven-Product-Strategy-EN.md) · [Design tokens](../../packages/design-system/src/tokens)
+> **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/report-animal`, the only auth-gated route in the portal. One scrolling form that writes a single
 row into `animalReports` with status `pending` — the same collection the rescue feed reads, so
@@ -239,5 +239,5 @@ cannot cross the wire and data URLs cannot exist in a form value.
 - [Rescue Cases](04-rescue-cases.md) — reads the same `animalReports` collection
 - [Home](02-home.md) — surfaces the newest reports; owns the other `StrayCTA` copy
 - [Auth](01-auth.md) — `requireUser`, the only guard on this route
-- [Product Blueprint §3 (Discovery)](../product/PawHaven-Product-Strategy-EN.md) — the intended
+- [Product Blueprint §3 (Discovery)](../product/product-strategy.md) — the intended
   version of this flow, including guest submission and duplicate detection

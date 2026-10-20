@@ -1,6 +1,6 @@
-import 'react-phone-number-input/style.css';
-import type { InputHTMLAttributes, Ref } from 'react';
-import PhoneInputWithCountry from 'react-phone-number-input';
+import { useId } from 'react';
+import type { InputHTMLAttributes, ReactNode, Ref } from 'react';
+import PhoneInputWithCountry, { type Country } from 'react-phone-number-input';
 
 import { cn } from '../../utils/cn';
 
@@ -21,37 +21,53 @@ const StyledInput = ({ className, ref, ...props }: StyledInputProps) => (
   />
 );
 
-interface PhoneInputProps {
+export interface PhoneInputProps {
   phone: string;
-  hasError: boolean;
   onPhoneChange: (phone: string) => void;
   id?: string;
+  error?: ReactNode;
   errorId?: string;
   required?: boolean;
+  disabled?: boolean;
+  defaultCountry?: Country;
 }
 
 export const PhoneInput = ({
   phone,
-  hasError,
   onPhoneChange,
   id,
+  error,
   errorId,
   required,
+  disabled,
+  defaultCountry = 'CN',
 }: PhoneInputProps) => {
+  const generatedId = useId();
+  const resolvedErrorId = errorId ?? `phone-input-error-${generatedId}`;
+  const isInvalid = error !== undefined;
+
   return (
-    <PhoneInputWithCountry
-      international
-      defaultCountry="CN"
-      value={phone}
-      onChange={(value) => onPhoneChange(value ?? '')}
-      inputComponent={StyledInput}
-      numberInputProps={{
-        id,
-        required,
-        'aria-invalid': hasError ? true : undefined,
-        'aria-describedby': hasError ? errorId : undefined,
-      }}
-      focusInputOnCountrySelection={false}
-    />
+    <>
+      <PhoneInputWithCountry
+        international
+        defaultCountry={defaultCountry}
+        value={phone}
+        onChange={(value) => onPhoneChange(value ?? '')}
+        inputComponent={StyledInput}
+        numberInputProps={{
+          id,
+          required,
+          'aria-invalid': isInvalid ? true : undefined,
+          'aria-describedby': isInvalid ? resolvedErrorId : undefined,
+        }}
+        focusInputOnCountrySelection={false}
+        disabled={disabled}
+      />
+      {isInvalid && (
+        <p id={resolvedErrorId} className="text-error mt-1 text-xs">
+          {error}
+        </p>
+      )}
+    </>
   );
 };

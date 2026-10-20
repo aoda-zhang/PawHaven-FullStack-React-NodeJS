@@ -47,7 +47,7 @@ export const Register = () => {
           >
             <FormInput
               variant="standard"
-              size="small"
+              size="sm"
               label={t('auth.email')}
               name="email"
               type="email"
@@ -58,7 +58,7 @@ export const Register = () => {
             <FormInput
               type="password"
               variant="standard"
-              size="small"
+              size="sm"
               label={t('auth.password')}
               name="password"
               required

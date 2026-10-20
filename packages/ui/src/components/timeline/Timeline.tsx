@@ -52,6 +52,7 @@ export const TimelineDot = ({
   ...props
 }: TimelineDotProps) => (
   <span
+    {...props}
     className={cn(
       'z-10 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border-2',
       variant === 'primary'
@@ -59,8 +60,7 @@ export const TimelineDot = ({
         : 'border-border bg-card text-text-secondary',
       className,
     )}
-    aria-hidden="true"
-    {...props}
+    aria-hidden={props['aria-hidden'] ?? 'true'}
   >
     {icon}
   </span>
@@ -72,10 +72,7 @@ export const TimelineConnector = ({
   ...props
 }: HTMLAttributes<HTMLSpanElement>) => (
   <span
-    className={cn(
-      'bg-border absolute top-8 h-[calc(100%-1rem)] w-0.5',
-      className,
-    )}
+    className={cn('bg-border absolute top-8 bottom-4 w-0.5', className)}
     {...props}
   />
 );

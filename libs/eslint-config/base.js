@@ -64,10 +64,10 @@ module.exports = {
         groups: [
           'builtin', // Node built-in modules
           'external', // npm modules
-          'internal', // internal packages
           'parent', // parent dirs
           'sibling', // sibling files
           'index', // index files
+          'internal', // the `@/…` path alias
           'object', // object imports
         ],
         'newlines-between': 'always',
@@ -119,7 +119,14 @@ module.exports = {
     'check-file/filename-naming-convention': [
       'error',
       {
-        '**/!(main|route|router|index).tsx': 'PASCAL_CASE',
+        // Schema, type and dto files keep the camelCase name of the module
+        // they describe, whatever their extension.
+        '**/*.schema.ts': 'CAMEL_CASE',
+        '**/*.types.ts': 'CAMEL_CASE',
+        '**/*.type.ts': 'CAMEL_CASE',
+        '**/*.dto.ts': 'CAMEL_CASE',
+        '**/!(main|route|router|index|*.schema|*.types|*.type|*.dto).tsx':
+          'PASCAL_CASE',
         '**/!(*.schema|*.types|*.type|*.dto).ts': 'CAMEL_CASE',
         '**/*.{js,jsx,cjs,mjs}': 'CAMEL_CASE',
         '**/*.json': 'CAMEL_CASE',

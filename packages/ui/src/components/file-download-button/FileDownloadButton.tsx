@@ -6,32 +6,24 @@ import { Button } from '../button/Button';
 export interface FileDownloadButtonProps {
   fileFetchRequest: () => Promise<Blob>;
   fileName?: string;
-  fileType: string;
-  label?: string | ReactNode;
+  onSuccess?: (blob: Blob) => void;
+  onError?: (error: unknown) => void;
   disabled?: boolean;
-  onSuccess?: (blob: Blob, fileType: string) => void;
-  onError?: (error: unknown, fileType: string) => void;
   children?: ReactNode;
-  buttonClassName?: string;
-  contentClassName?: string;
 }
 
 export const FileDownloadButton = ({
   fileFetchRequest,
   fileName,
-  fileType,
-  label,
-  disabled = false,
   onSuccess,
   onError,
+  disabled = false,
   children,
-  buttonClassName,
-  contentClassName,
 }: FileDownloadButtonProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = async () => {
-    if (!fileFetchRequest) return;
+    if (!fileFetchRequest || disabled) return;
 
     try {
       setIsDownloading(true);
@@ -45,12 +37,18 @@ export const FileDownloadButton = ({
       if (fileName) {
         anchor.download = fileName;
       }
+      anchor.hidden = true;
+      document.body.appendChild(anchor);
       anchor.click();
-      window.URL.revokeObjectURL(objectUrl);
-      onSuccess?.(blob, fileType);
+      anchor.remove();
+
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(objectUrl);
+      }, 0);
+
+      onSuccess?.(blob);
     } catch (error) {
-      onError?.(error, fileType);
-      console.error('[FileDownloadButton] Download failed:', error);
+      onError?.(error);
     } finally {
       setIsDownloading(false);
     }
@@ -61,9 +59,8 @@ export const FileDownloadButton = ({
       onClick={handleDownload}
       disabled={disabled || isDownloading}
       loading={isDownloading}
-      className={buttonClassName}
     >
-      <span className={contentClassName}>{children ?? label}</span>
+      <span>{children}</span>
     </Button>
   );
 };

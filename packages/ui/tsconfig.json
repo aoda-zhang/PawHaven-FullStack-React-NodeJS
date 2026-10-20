@@ -6,5 +6,11 @@
     "composite": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "build", "src/**/*.test.ts", "src/**/*.test.tsx"]
+  "exclude": [
+    "node_modules",
+    "build",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.stories.tsx"
+  ]
 }

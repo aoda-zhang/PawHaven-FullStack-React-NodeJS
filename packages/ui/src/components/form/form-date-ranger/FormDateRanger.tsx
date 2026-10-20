@@ -3,12 +3,11 @@ import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
 import type { BaseFormType } from '../FormBase.type';
+import { hasErrorContent, resolveErrorContent } from '../formControl';
 
 type DateRangeValue = [string | null, string | null] | null;
 
-export type FormDateRangerProps = BaseFormType & {
-  fullWidth?: boolean;
-};
+export type FormDateRangerProps = BaseFormType;
 
 export const FormDateRanger = ({
   name,
@@ -16,11 +15,17 @@ export const FormDateRanger = ({
   defaultValue,
   fullWidth = true,
   required,
+  disabled,
   className,
+  error: errorProp,
+  errorId: errorIdProp,
 }: FormDateRangerProps) => {
   const { control } = useFormContext();
   const generatedId = useId();
-  const errorId = `form-date-range-${name}-${generatedId}-error`;
+  const baseId = `form-date-range-${name}-${generatedId}`;
+  const startId = `${baseId}-start`;
+  const endId = `${baseId}-end`;
+  const errorId = errorIdProp ?? `${baseId}-error`;
 
   return (
     <Controller
@@ -36,6 +41,8 @@ export const FormDateRanger = ({
           const current = value ?? [null, null];
           field.onChange(index === 0 ? [next, current[1]] : [current[0], next]);
         };
+        const errorContent = resolveErrorContent(errorProp, error);
+        const isInvalid = Boolean(error) || hasErrorContent(errorProp);
 
         return (
           <fieldset
@@ -44,39 +51,51 @@ export const FormDateRanger = ({
               className,
               fullWidth && 'w-full',
             )}
-            aria-describedby={error ? errorId : undefined}
+            aria-describedby={isInvalid ? errorId : undefined}
           >
-            {label && (
-              <legend className="mb-2 text-sm font-medium">{label}</legend>
-            )}
+            <legend className="mb-2 text-sm font-medium">
+              {label}
+              {required && (
+                <span className="text-error ml-0.5" aria-hidden="true">
+                  *
+                </span>
+              )}
+            </legend>
             <div className="flex items-center gap-2">
+              <label htmlFor={startId} className="sr-only">
+                {`${label} start`}
+              </label>
               <input
+                id={startId}
                 type="date"
                 value={value?.[0] ?? ''}
+                ref={field.ref}
                 onChange={(event) => update(0, event.target.value)}
                 onBlur={field.onBlur}
-                required={required}
-                aria-label={label ? `${label} start` : 'Start date'}
-                aria-invalid={error ? true : undefined}
-                aria-describedby={error ? errorId : undefined}
+                disabled={disabled}
+                aria-invalid={isInvalid ? true : undefined}
                 className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
-              <span className="text-text-secondary" aria-hidden="true">–</span>
+              <span className="text-text-secondary" aria-hidden="true">
+                –
+              </span>
+              <label htmlFor={endId} className="sr-only">
+                {`${label} end`}
+              </label>
               <input
+                id={endId}
                 type="date"
                 value={value?.[1] ?? ''}
                 onChange={(event) => update(1, event.target.value)}
                 onBlur={field.onBlur}
-                required={required}
-                aria-label={label ? `${label} end` : 'End date'}
-                aria-invalid={error ? true : undefined}
-                aria-describedby={error ? errorId : undefined}
+                disabled={disabled}
+                aria-invalid={isInvalid ? true : undefined}
                 className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
             </div>
-            {error && (
-              <p id={errorId} role="alert" className="text-error mt-1 text-xs">
-                {error.message}
+            {isInvalid && (
+              <p id={errorId} className="text-error mt-1 text-xs">
+                {errorContent}
               </p>
             )}
           </fieldset>

@@ -154,4 +154,4 @@ test-results
 playwright-report
 
 # Generated Storybook static site
-libs/ui-storybook/storybook-static/
+packages/ui/dist/storybook-static/

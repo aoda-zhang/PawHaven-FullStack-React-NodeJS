@@ -5,9 +5,16 @@
    Naming Convention: color-{name}-{scale}
    Scale: 1 (lightest) to 10 (darkest)
    Example: color-gray-1, color-gray-2, ..., color-gray-10
+
+   One ramp runs one step further, to 11:
+   - brown-11 — the footer surface, which is darker than brown-10.
    ============================================================ */
 
 @theme {
+  /* Remove Tailwind's default palette so `bg-red-500` and friends do not
+     exist. The scales below are the only colours the design system has. */
+  --color-*: initial;
+
   /* ═══ Grayscale ═════════════════════════════════════ */
   --color-gray-1: #ffffff;
   --color-gray-2: #f8f8f8;
@@ -91,4 +98,5 @@
   --color-brown-8: #8f7b69;
   --color-brown-9: #6b5642;
   --color-brown-10: #4a392c;
+  --color-brown-11: #2f1f14;
 }

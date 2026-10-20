@@ -1,13 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 
-import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { ReactNode } from 'react';
 
-import { RescueCasesPage } from '../index';
 import { rescueCasesQueryKeys } from '../api/rescueCases.queryKeys';
+import { RescueCasesPage } from '../index';
 
 // Mock the apiClient to avoid config loading
 vi.mock('@/shared/utils/apiClient', () => ({
@@ -57,13 +56,6 @@ vi.mock('lucide-react', async (importOriginal) => {
     ChevronRight: () => null,
   };
 });
-
-const createWrapper = (queryClient: QueryClient) => {
-  const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-  return Wrapper;
-};
 
 const renderPage = (queryClient: QueryClient) => {
   // Pre-populate the query cache with mock data

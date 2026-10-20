@@ -7,7 +7,7 @@ interface FollowButtonProps {
   isFollowing: boolean;
   isLoading?: boolean;
   isPending?: boolean;
-  hasError?: boolean;
+  isError?: boolean;
   errorKey?: string;
   onFollow?: () => void;
   onUnfollow?: () => void;
@@ -17,7 +17,7 @@ export const FollowButton = ({
   isFollowing,
   isLoading = false,
   isPending = false,
-  hasError = false,
+  isError = false,
   errorKey = '',
   onFollow,
   onUnfollow,
@@ -52,7 +52,7 @@ export const FollowButton = ({
         )}
         {t(isFollowing ? 'rescueDetail.following' : 'rescueDetail.follow')}
       </Button>
-      {hasError && (
+      {isError && (
         <p role="alert" className="text-error text-center text-xs">
           {t(errorKey || 'rescueDetail.follow_error')}
         </p>

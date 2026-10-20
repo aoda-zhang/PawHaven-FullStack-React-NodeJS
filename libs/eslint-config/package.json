@@ -30,5 +30,8 @@
   },
   "dependencies": {
     "eslint-plugin-check-file": "^3.3.2"
+  },
+  "scripts": {
+    "test": "node --test plugin/design-colors/test/rules.test.js"
   }
 }

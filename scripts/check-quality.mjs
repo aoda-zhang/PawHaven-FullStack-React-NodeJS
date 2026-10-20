@@ -376,7 +376,7 @@ const DELEGATED = [
   },
   {
     name: 'check:links',
-    args: [join(repoRoot, 'harness-core/validation/check-links.mjs')],
+    args: [join(repoRoot, 'scripts/check-docs-links.mjs'), 'docs'],
     owns: 'markdown links and anchors',
   },
 ];

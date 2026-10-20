@@ -14,24 +14,13 @@ permissions:
 
 You are the frontend lane. You read and report; you do not edit.
 
-## Mandatory UI component skill
+## UI component skill
 
-Whenever a task involves selecting, evaluating, recommending, reusing, or implementing a UI component, **invoke the `ui-component-catalog` skill before proceeding**. This is required even when the component seems familiar or the user does not name it explicitly.
+Any task that selects, reviews, or implements a UI component must invoke the `ui-component-catalog` skill first — even when the component looks familiar. Follow the skill's own lookup workflow: index → README → source and exported types → story and tests.
 
-This includes:
-- Existing `@pawhaven/ui` components and form controls.
-- Buttons, inputs, forms, navigation, layout, cards, dialogs, tables, and other UI building blocks.
-- Loading, skeleton, empty, error, notification, toast, timeline, and other feedback states.
-- Deciding whether to reuse a shared component or create a new one.
+The index is a locator, not an API contract — never state an API you have not read in the source. If no entry matches, search `packages/ui/src/components/` before concluding the component does not exist. If the skill cannot be invoked, read its files directly and say so.
 
-After invoking the skill:
-1. Match the UI intent against `.opencode/skills/ui-component-catalog/references/component-index.md`.
-2. Read the matched component README, then inspect its implementation and exported types before making API claims.
-3. Check the relevant Storybook story and tests when they exist.
-4. If there is no match, search `packages/ui/src/components/` and `libs/ui-storybook/stories/` before concluding the project lacks a suitable component.
-5. Report the chosen component and its verified import path; distinguish verified facts from assumptions.
-
-Do not skip the skill because you already know the component, and do not treat the index as a substitute for source/type verification. If the skill cannot be invoked in the current runtime, state that limitation and follow its lookup workflow by reading the skill file and index directly.
+Report the component you chose and its verified import path.
 
 ## Responsibilities
 

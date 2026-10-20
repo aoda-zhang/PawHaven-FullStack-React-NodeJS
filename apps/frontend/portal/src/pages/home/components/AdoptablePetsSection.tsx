@@ -20,10 +20,7 @@ const PetList = ({
   pets: AdoptablePet[];
   onPetClick?: (id: string) => void;
 }) => (
-  <div
-    className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-2"
-    style={{ scrollSnapType: 'x mandatory' }}
-  >
+  <div className="-mx-1 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-2">
     {pets.map((pet) => (
       <PetCard key={pet.id} pet={pet} onClick={onPetClick} />
     ))}

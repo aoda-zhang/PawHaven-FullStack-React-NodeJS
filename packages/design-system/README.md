@@ -30,8 +30,13 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 ```html
 <div class="bg-primary text-text-inverse shadow-card rounded-xl">
   <h1 class="font-heading text-text text-3xl">Hello PawHaven</h1>
-  <button class="btn-primary btn-base rounded-xl px-4 py-2">Get Started</button>
-  <input class="input-field" placeholder="Search..." />
+  <button class="bg-primary text-text-inverse rounded-xl px-4 py-2">
+    Get Started
+  </button>
+  <input
+    class="border-border bg-background rounded-md border px-3 py-2"
+    placeholder="Search..."
+  />
 </div>
 ```
 
@@ -55,11 +60,11 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 
 ### Status colors
 
-Use `getStatusColorByPrefix` util — never hard-code status colors.
+Use the `getRescueStatusColor` util — never hard-code status colors.
 
 ```ts
-import { getStatusColorByPrefix } from '@/utils/getStatusColorByPrefix';
-const dotClass = getStatusColorByPrefix({
+import { getRescueStatusColor } from '@/shared/utils/rescueStatus/getRescueStatusColor';
+const dotClass = getRescueStatusColor({
   status: animal.status,
   prefix: 'bg',
 });
@@ -77,17 +82,12 @@ const dotClass = getStatusColorByPrefix({
 
 ### Composite utilities
 
-| Utility                                            | Description                                                 |
-| -------------------------------------------------- | ----------------------------------------------------------- |
-| `btn-primary` / `btn-secondary` / `btn-outline`    | Button variants                                             |
-| `btn-base`                                         | Base button reset                                           |
-| `card`                                             | Card surface (bg + border + shadow + rounded)               |
-| `input-field`                                      | Full-width form input with focus ring                       |
-| `form-error`                                       | Error text below form inputs                                |
-| `link` / `link-reset`                              | Semantic link styling                                       |
-| `flex-center` / `flex-between` / `flex-col-center` | Flex layouts                                                |
-| `focus-ring`                                       | Accessible focus-visible outline                            |
-| `text-hero` / `text-stat`                          | Composite typography (size + family + weight + line-height) |
+| Utility                   | Description                                                 |
+| ------------------------- | ----------------------------------------------------------- |
+| `focus-ring`              | Accessible focus-visible outline                            |
+| `text-hero` / `stat-text` | Composite typography (size + family + weight + line-height) |
+| `full-width`              | Full-bleed container                                        |
+| `baseFormContainer`       | The label/control/error stack the form controls render into |
 
 ## Token source
 

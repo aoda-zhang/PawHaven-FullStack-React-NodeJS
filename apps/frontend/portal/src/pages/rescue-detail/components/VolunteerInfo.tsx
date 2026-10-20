@@ -26,7 +26,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
   const unfollowMutation = useUnfollowAnimal();
   const isFollowing = status?.isFollowing ?? false;
   const isPending = followMutation.isPending || unfollowMutation.isPending;
-  const hasError = followMutation.isError || unfollowMutation.isError;
+  const isError = followMutation.isError || unfollowMutation.isError;
   const errorKey = followMutation.isError
     ? 'rescueDetail.follow_error'
     : 'rescueDetail.unfollow_error';
@@ -69,7 +69,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
 
             <button
               type="button"
-              className="border-border hover:bg-background-soft w-full cursor-pointer rounded-xl border py-2.5 text-sm font-semibold transition-colors"
+              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-xl border py-2.5 text-sm font-semibold transition-colors"
             >
               {t('rescueDetail.offer_assistance')}
             </button>
@@ -87,7 +87,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
           isFollowing={isFollowing}
           isLoading={isLoading}
           isPending={isPending}
-          hasError={hasError}
+          isError={isError}
           errorKey={errorKey}
           onFollow={handleFollow}
           onUnfollow={handleUnfollow}
@@ -95,7 +95,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
         <FollowerCount count={status?.followerCount} isLoading={isLoading} />
       </div>
 
-      <div className="border-border bg-card hover:bg-background-soft rounded-2xl border p-3 shadow-sm transition-colors">
+      <div className="border-border bg-card hover:bg-background-subtle rounded-2xl border p-3 shadow-sm transition-colors">
         <button
           type="button"
           className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"

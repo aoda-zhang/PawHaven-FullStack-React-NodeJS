@@ -4,7 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
-      - 'libs/ui-storybook/**'
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
@@ -12,7 +11,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'libs/ui-storybook/**'
       - 'packages/ui/**'
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
@@ -57,30 +55,33 @@ jobs:
           corepack install
           pnpm install --frozen-lockfile
 
-      - name: Install Storybook dependencies
-        run: npm install --prefix libs/ui-storybook --no-audit --no-fund
+      - name: Install Playwright Chromium
+        run: pnpm --filter @pawhaven/ui exec playwright install --with-deps chromium
+
+      - name: Run Storybook accessibility tests
+        run: pnpm --filter @pawhaven/ui test-storybook
 
       - name: Build Storybook
         env:
           STORYBOOK_BASE_PATH: /${{ github.event.repository.name }}/
-        run: npm run --prefix libs/ui-storybook build-storybook
+        run: pnpm --filter @pawhaven/ui build-storybook
 
       - name: Verify required component stories
-        run: node libs/ui-storybook/scripts/verify-stories.mjs
+        run: node packages/ui/scripts/verify-stories.mjs
 
       - name: Upload pull-request build artifact
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: pawhaven-ui-storybook
-          path: libs/ui-storybook/storybook-static
+          path: packages/ui/dist/storybook-static
           if-no-files-found: error
 
       - name: Upload GitHub Pages artifact
         if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
         uses: actions/upload-pages-artifact@v3
         with:
-          path: libs/ui-storybook/storybook-static
+          path: packages/ui/dist/storybook-static
 
   deploy:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')

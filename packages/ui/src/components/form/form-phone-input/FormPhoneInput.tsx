@@ -4,6 +4,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { cn } from '../../../utils/cn';
 import { PhoneInput } from '../../phone-input/PhoneInput';
 import type { BaseFormType } from '../FormBase.type';
+import { hasErrorContent, resolveErrorContent } from '../formControl';
 
 export type FormPhoneInputProps = BaseFormType;
 
@@ -13,23 +14,33 @@ export const FormPhoneInput = ({
   defaultValue = '',
   fullWidth = true,
   required,
+  disabled,
   className,
+  error: errorProp,
+  errorId: errorIdProp,
 }: FormPhoneInputProps) => {
   const { control } = useFormContext();
   const generatedId = useId();
   const inputId = `form-phone-${name}-${generatedId}`;
-  const errorId = `${inputId}-error`;
+  const errorId = errorIdProp ?? `${inputId}-error`;
 
   return (
     <Controller
       name={name}
       control={control}
       defaultValue={defaultValue}
-      render={({ field, fieldState: { error } }) => (
-        <div
-          className={cn('baseFormContainer', className, fullWidth && 'w-full')}
-        >
-          {label && (
+      render={({ field, fieldState: { error } }) => {
+        const errorContent = resolveErrorContent(errorProp, error);
+        const isInvalid = Boolean(error) || hasErrorContent(errorProp);
+
+        return (
+          <div
+            className={cn(
+              'baseFormContainer',
+              className,
+              fullWidth && 'w-full',
+            )}
+          >
             <label htmlFor={inputId} className="mb-2 block text-sm font-medium">
               {label}
               {required && (
@@ -38,24 +49,20 @@ export const FormPhoneInput = ({
                 </span>
               )}
             </label>
-          )}
-          <div data-testid={`form-phone-${name}`}>
-            <PhoneInput
-              id={inputId}
-              errorId={errorId}
-              phone={field.value ?? ''}
-              hasError={Boolean(error)}
-              required={required}
-              onPhoneChange={field.onChange}
-            />
+            <div data-testid={`form-phone-${name}`}>
+              <PhoneInput
+                id={inputId}
+                error={isInvalid ? errorContent : undefined}
+                errorId={errorId}
+                required={required}
+                disabled={disabled}
+                phone={field.value ?? ''}
+                onPhoneChange={field.onChange}
+              />
+            </div>
           </div>
-          {error && (
-            <p id={errorId} role="alert" className="text-error mt-1 text-xs">
-              {error.message}
-            </p>
-          )}
-        </div>
-      )}
+        );
+      }}
     />
   );
 };

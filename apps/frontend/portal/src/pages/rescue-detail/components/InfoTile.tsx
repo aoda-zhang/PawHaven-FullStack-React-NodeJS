@@ -9,12 +9,7 @@ export interface InfoTileProps {
 
 export const InfoTile = ({ label, value, className }: InfoTileProps) => {
   return (
-    <div
-      className={cn(
-        'bg-background-soft flex flex-col gap-0.5 rounded-xl p-3',
-        className,
-      )}
-    >
+    <div className={cn('flex flex-col gap-0.5', className)}>
       <span className="text-text-secondary text-xs">{label}</span>
       <span className="text-foreground text-sm break-words">{value}</span>
     </div>

@@ -5,5 +5,10 @@ import { cn } from '../../utils/cn';
 export type SkeletonProps = HTMLAttributes<HTMLDivElement>;
 
 export const Skeleton = ({ className, ...props }: SkeletonProps) => (
-  <div className={cn('bg-muted motion-reduce:animate-none animate-pulse', className)} {...props} />
+  <div
+    role="status"
+    aria-label="Loading"
+    {...props}
+    className={cn('bg-muted animate-pulse', className)}
+  />
 );

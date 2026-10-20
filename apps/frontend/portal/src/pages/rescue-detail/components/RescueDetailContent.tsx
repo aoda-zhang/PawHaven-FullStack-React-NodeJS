@@ -10,7 +10,7 @@ import { RelevantGuides } from './RelevantGuides';
 import { RescueTimeline } from './RescueTimeline';
 import { VolunteerInfo } from './VolunteerInfo';
 
-import { getStatusColorByPrefix } from '@/shared/utils/getStatusColorByPrefix';
+import { getRescueStatusColor } from '@/shared/utils/rescue-status/getRescueStatusColor';
 
 export const RescueDetailContent = ({
   animal,
@@ -58,20 +58,20 @@ export const RescueDetailContent = ({
           />
 
           <div className="pointer-events-none absolute top-3 left-3 z-10 flex flex-row gap-1.5">
-            <span className="text-foreground inline-flex items-center rounded-full bg-white/90 px-2 py-0.5 text-xs shadow-sm">
+            <span className="text-foreground bg-card/90 inline-flex items-center rounded-full px-2 py-0.5 text-xs shadow-sm">
               <span
-                className={`h-1.5 w-1.5 rounded-full ${getStatusColorByPrefix({ status: animal.status, prefix: 'bg' }) ?? 'bg-slate-400'}`}
+                className={`h-1.5 w-1.5 rounded-full ${getRescueStatusColor({ status: animal.status, prefix: 'bg' }) ?? 'bg-text-tertiary'}`}
               />
               {t(`common.rescue_status_${animal.status}`)}
             </span>
           </div>
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/70 to-transparent p-4">
-            <p className="text-2xl font-bold text-white drop-shadow-sm">
+          <div className="from-foreground/70 pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t to-transparent p-4">
+            <p className="text-text-inverse text-2xl font-bold drop-shadow-sm">
               {animalTypeLabel}
             </p>
             {animal.location?.address && (
-              <p className="mt-1 flex items-center gap-1 text-sm text-white/90">
+              <p className="text-text-inverse/90 mt-1 flex items-center gap-1 text-sm">
                 <MapPin className="h-4 w-4" aria-hidden="true" />
                 {animal.location.address}
               </p>

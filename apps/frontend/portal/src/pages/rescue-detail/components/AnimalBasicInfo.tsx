@@ -45,9 +45,9 @@ export const AnimalBasicInfo = ({
       },
       {
         label: t('rescueDetail.animal_count'),
-        value: `${animal.animalCount} ${t('reportAnimal.animal_count', {
+        value: t('rescueDetail.animal_count_value', {
           count: animal.animalCount,
-        })}`,
+        }),
         show: animal?.animalCount > 0,
       },
       {
@@ -83,7 +83,7 @@ export const AnimalBasicInfo = ({
 
   return (
     <div className={cn('flex flex-col', className)}>
-      <div className="grid grid-cols-2 gap-x-1 gap-y-0">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
         {infoItems
           .filter((item) => item.show !== false)
           .map((item, index) => (

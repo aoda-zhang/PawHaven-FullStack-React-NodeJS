@@ -9,6 +9,14 @@ on:
       - 'apps/frontend/portal/**'
       - '.github/workflows/ui-library.yml'
       - 'pnpm-workspace.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'packages/ui/**'
+      - 'packages/design-system/**'
+      - 'apps/frontend/portal/**'
+      - '.github/workflows/ui-library.yml'
+      - 'pnpm-workspace.yaml'
   workflow_dispatch:
 
 permissions:
@@ -56,6 +64,9 @@ jobs:
 
       - name: Build UI package and its workspace dependencies
         run: pnpm --filter @pawhaven/ui... build
+
+      - name: Verify UI package contract (exports map, build output, sideEffects)
+        run: pnpm --filter @pawhaven/ui verify:package
 
       - name: Test UI components
         run: pnpm --filter @pawhaven/ui test

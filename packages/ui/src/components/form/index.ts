@@ -18,6 +18,13 @@ export {
   type FormPhoneInputProps,
 } from './form-phone-input/FormPhoneInput';
 
+export {
+  FORM_CONTROL_SIZE_CLASSES,
+  FORM_CONTROL_VARIANT_CLASSES,
+  type FormControlSize,
+  type FormControlVariant,
+} from './formControl';
+
 export type {
   BaseFormType,
   BaseSelectType,

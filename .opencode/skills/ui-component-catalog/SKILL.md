@@ -1,6 +1,6 @@
 ---
 name: ui-component-catalog
-description: Keyword-indexed lookup for PawHaven @pawhaven/ui components. Use when a task mentions Button, Carousel, FileDownloadButton, Loading, NotificationBanner, Phase, PhoneInput, PhotoPlaceholder, Skeleton, Timeline, Toast, FormInput, FormSelect, FormTextArea, FormCheckbox, FormRadio, FormDateRanger, FormPhoneInput, shared UI, design-system components, forms, loading states, alerts, toasts, timelines, or component reuse.
+description: Keyword-indexed lookup for PawHaven @pawhaven/ui components. Use when a task mentions Button, Carousel, FileDownloadButton, Loading, NotificationBanner, PhoneInput, PhotoPlaceholder, Skeleton, Timeline, Toast, FormInput, FormSelect, FormTextArea, FormCheckbox, FormRadio, FormDateRanger, FormPhoneInput, shared UI, design-system components, forms, loading states, alerts, toasts, timelines, or component reuse.
 ---
 
 # UI component catalog
@@ -15,7 +15,7 @@ Use this skill to **find the right existing component**, not as a replacement fo
 4. Check the linked Storybook story for a real usage example and the component's test file for supported behavior and edge cases.
 5. Prefer an existing shared component over a local duplicate. Do not assume a component supports a prop unless the source/type confirms it.
 6. If several components match, compare their purpose and import path before choosing. Ask a concise question only when the UI intent remains ambiguous.
-7. When no entry matches, search `packages/ui/src/components/` and `libs/ui-storybook/stories/`; do not invent a component.
+7. When no entry matches, search `packages/ui/src/components/`; do not invent a component.
 
 ## Import rules
 

@@ -21,11 +21,19 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
+    "lint": "eslint src .storybook --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "verify:package": "node scripts/verify-package.mjs",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "storybook": "storybook dev --config-dir .storybook --host 0.0.0.0 --port 6006",
+    "build-storybook": "storybook build --config-dir .storybook --output-dir dist/storybook-static",
+    "test-storybook": "vitest run --config .storybook/vitest.config.ts"
   },
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "dependencies": {
     "@pawhaven/design-system": "workspace:*",
     "@radix-ui/react-slot": "^1.3.0",
@@ -54,15 +62,28 @@
   "devDependencies": {
     "@pawhaven/eslint-config": "workspace:*",
     "@pawhaven/tsconfig": "workspace:*",
+    "@storybook/addon-a11y": "10.6.2",
+    "@storybook/addon-docs": "10.6.2",
+    "@storybook/addon-vitest": "10.6.2",
+    "@storybook/react-vite": "10.6.2",
+    "@tailwindcss/vite": "4.3.3",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
-    "@types/node": "^24.7.1",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.1",
+    "@types/node": "24.13.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitest/browser": "4.1.10",
+    "@vitest/browser-playwright": "4.1.10",
     "@vitest/coverage-v8": "^4.1.11",
     "jsdom": "^29.1.1",
-    "tailwindcss": "^4.1.14",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "playwright": "1.63.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "storybook": "10.6.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "4.1.10",
+    "eslint-plugin-storybook": "10.6.2"
   }
 }

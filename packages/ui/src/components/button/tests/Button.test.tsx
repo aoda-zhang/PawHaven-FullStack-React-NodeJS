@@ -38,4 +38,23 @@ describe('Button', () => {
       'true',
     );
   });
+
+  it('renders the medium size and defaults to it', () => {
+    const { rerender } = render(<Button size="md">Save</Button>);
+
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('h-10');
+
+    rerender(<Button>Save</Button>);
+
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('h-10');
+  });
+
+  it('keeps a token backed focus indicator instead of suppressing the outline', () => {
+    render(<Button>Save</Button>);
+
+    const button = screen.getByRole('button', { name: 'Save' });
+
+    expect(button).toHaveClass('focus-ring');
+    expect(button.className).not.toContain('outline-none');
+  });
 });

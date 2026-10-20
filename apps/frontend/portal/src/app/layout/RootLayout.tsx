@@ -47,7 +47,7 @@ export const RootLayout = () => {
               banner={{
                 id: 'system-maintenance',
                 type: 'info',
-                variant: 'filled',
+                variant: 'fill',
                 message: t('common.mockDataWarning'),
                 dismissible: false,
               }}

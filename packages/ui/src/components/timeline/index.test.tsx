@@ -48,6 +48,23 @@ describe('Timeline', () => {
     expect(container.querySelector('span')).toBeInTheDocument();
   });
 
+  it('expresses the connector length with spacing tokens', () => {
+    const { container } = render(<TimelineConnector />);
+
+    expect(container.querySelector('span')?.className).not.toContain('calc(');
+  });
+
+  it('lets a caller expose a meaningful icon', () => {
+    const { container } = render(
+      <TimelineDot icon={<span>icon</span>} aria-hidden={false} />,
+    );
+
+    expect(container.querySelector('span')).toHaveAttribute(
+      'aria-hidden',
+      'false',
+    );
+  });
+
   it('renders its content children inside a div', () => {
     const { container } = render(<TimelineContent>body</TimelineContent>);
 

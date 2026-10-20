@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "sideEffects": [
-    "*.css"
+    "**/*.css"
   ],
   "exports": {
     "./index.css": "./index.css",
@@ -15,8 +15,7 @@
     "src/**"
   ],
   "scripts": {
-    "token-check": "node scripts/token-check.cjs",
-    "build:tokens": "node ./scripts/build-tokens.mjs"
+    "token-check": "node scripts/token-check.cjs"
   },
   "devDependencies": {
     "@pawhaven/eslint-config": "workspace:*",

@@ -11,7 +11,6 @@ import {
 
 import { cn } from '../../utils/cn';
 import { Button } from '../button/Button';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 type CarouselPlugin = Parameters<typeof useEmblaCarousel>[1];
 
@@ -79,13 +78,12 @@ export const Carousel = ({
   nextLabel = 'Next slide',
   label = 'Image carousel',
 }: CarouselProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const plugins = useMemo<CarouselPlugin>(
     () =>
-      autoplay && !prefersReducedMotion
+      autoplay
         ? [Autoplay({ delay: autoplayDelay, stopOnInteraction: true })]
         : undefined,
-    [autoplay, autoplayDelay, prefersReducedMotion],
+    [autoplay, autoplayDelay],
   );
 
   const [carouselRef, api] = useEmblaCarousel({ loop }, plugins);
@@ -99,7 +97,7 @@ export const Carousel = ({
       setCanScrollNext(api.canScrollNext());
     };
 
-    if (!api) return;
+    if (!api) return undefined;
 
     sync();
     api.on('reInit', sync);

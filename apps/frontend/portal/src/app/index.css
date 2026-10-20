@@ -1,3 +1,6 @@
 @import '@pawhaven/design-system/index.css';
 
+@import '../shared/utils/rescue-status/rescueStatusColors.css';
+@import '../shared/utils/rescue-status/adoptableBadgeColors.css';
+
 @source './**/*.{ts,tsx}';

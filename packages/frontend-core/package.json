@@ -29,7 +29,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
-    "test:cov": "vitest run --coverage"
+    "test:cov": "vitest run --coverage",
+    "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
     "@pawhaven/design-system": "workspace:*",
