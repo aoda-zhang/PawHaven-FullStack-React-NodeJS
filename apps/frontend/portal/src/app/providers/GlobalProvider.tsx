@@ -4,7 +4,11 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { bootstrapQueryOptions } from '@/app/init/bootstrap.queries';
-import { useLogin, useLogout, useRegister } from '@/pages/auth/api/auth.mutations';
+import {
+  useLogin,
+  useLogout,
+  useRegister,
+} from '@/pages/auth/api/auth.mutations';
 import {
   clearStoredSession,
   readStoredSession,
@@ -35,6 +39,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [userInfo, setUserInfo] = useState<StoredSession | null>(
     readStoredSession,
   );
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
 
   const loginMutation = useLogin();
   const registerMutation = useRegister();
@@ -51,14 +56,18 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     callbacks?: GlobalCallbacks,
   ) => {
     setUserInfo(storeSession(userId, expiresIn));
+    setIsBootstrapping(true);
 
     void queryClient
       .fetchQuery({
         ...bootstrapQueryOptions({ userID: userId, menuUpdateAt: '' }),
         staleTime: 0,
       })
-      .then(() => callbacks?.onSuccess?.())
-      .catch(() => undefined);
+      .then(() => {
+        setIsBootstrapping(false);
+        callbacks?.onSuccess?.();
+      })
+      .catch(() => setIsBootstrapping(false));
   };
 
   const login = (credentials: CredentialsDto, callbacks?: GlobalCallbacks) => {
@@ -111,7 +120,8 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         isPending:
           loginMutation.isPending ||
           registerMutation.isPending ||
-          logoutMutation.isPending,
+          logoutMutation.isPending ||
+          isBootstrapping,
         login,
         register,
         logout,
