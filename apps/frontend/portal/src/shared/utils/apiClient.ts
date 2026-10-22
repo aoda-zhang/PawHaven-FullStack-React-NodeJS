@@ -12,5 +12,4 @@ import { loadConfig } from '@/config';
 export const apiClient = createApiClient({
   timeout: loadConfig()?.api?.timeout,
   baseURL: '/api',
-  prefix: loadConfig()?.api?.prefix,
 });

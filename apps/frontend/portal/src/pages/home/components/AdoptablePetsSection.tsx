@@ -1,4 +1,5 @@
 import { ChevronRight } from 'lucide-react';
+import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { AdoptablePet } from '../types';
@@ -11,6 +12,7 @@ interface AdoptablePetsSectionProps {
   onPetClick?: (id: string) => void;
   onSeeAll?: () => void;
   isLoading?: boolean;
+  sectionRef?: Ref<HTMLElement>;
 }
 
 const PetList = ({
@@ -32,6 +34,7 @@ export const AdoptablePetsSection = ({
   onPetClick,
   onSeeAll,
   isLoading = false,
+  sectionRef,
 }: AdoptablePetsSectionProps) => {
   const { t } = useTranslation();
 
@@ -53,6 +56,8 @@ export const AdoptablePetsSection = ({
 
   return (
     <section
+      ref={sectionRef}
+      id="adoptable-pets"
       className="border-border bg-muted/50 border-t border-b py-10"
       aria-label={t('home.forever_home_aria_label')}
       aria-busy={isLoading}

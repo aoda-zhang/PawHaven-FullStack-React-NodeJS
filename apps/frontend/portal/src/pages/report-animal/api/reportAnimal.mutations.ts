@@ -9,6 +9,7 @@ export const useCreateReportAnimal = () => {
   return useMutation({
     mutationKey: ['reportAnimal', 'create'],
     mutationFn: createReportAnimal,
+    meta: { isShowClientError: true },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: sharedQueryKeys.rescueCases.all(),

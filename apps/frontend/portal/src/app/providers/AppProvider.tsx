@@ -4,15 +4,15 @@ import { Loading } from '@pawhaven/ui';
 import { type ReactNode } from 'react';
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 
+import { GlobalProvider } from './GlobalProvider';
 import { QueryErrorBoundary } from './QueryErrorBoundary';
 import { QueryProvider } from './QueryProvider';
 import { StoreProvider } from './StoreProvider';
 
-import { BootstrapProvider } from '@/app/init/BootstrapProvider';
 import { RootLayoutFooter } from '@/app/layout/RootLayoutFooter';
 
 type AppProviderProps = {
-  children: ReactNode;
+  children?: ReactNode;
 };
 
 const SystemErrorFallback = ({ error }: FallbackProps) => (
@@ -28,9 +28,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       <I18nProvider loadingFallback={<Loading />}>
         <StoreProvider>
           <QueryProvider>
-            <QueryErrorBoundary>
-              <BootstrapProvider>{children}</BootstrapProvider>
-            </QueryErrorBoundary>
+            <GlobalProvider>
+              <QueryErrorBoundary>{children}</QueryErrorBoundary>
+            </GlobalProvider>
           </QueryProvider>
         </StoreProvider>
       </I18nProvider>

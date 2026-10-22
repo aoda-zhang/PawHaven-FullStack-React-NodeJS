@@ -18,7 +18,7 @@ both — see [App Shell §1.1](07-app-shell-bootstrap.md#11-navigation).
 `password`, both `FormInput`. No remember-me, no forgot-password link, no social sign-in.
 
 On success it navigates to `searchParams.get('redirect') ?? '/'` with `replace: true`. The
-`redirect` param is what `requireUser` writes when it bounces an unauthenticated visitor, so
+`redirect` param is what `AuthenticatedLayout` writes when it bounces an unauthenticated visitor, so
 signing in returns you to the page you asked for rather than always to the homepage.
 
 The secondary button calls `navigate(routePaths.register)`. There is no link back from register to
@@ -46,16 +46,21 @@ accessible name.
 
 ### 1.4 Route guard
 
-`route.tsx` exports `requireUser`, the **only** route guard in the portal. It calls
-`getQueryClient().ensureQueryData(currentUserQueryOptions(userId))` inside a `try/catch` and
-`throw redirect(...)` on any failure, preserving `pathname + search` in the `redirect` param.
+`route.tsx` exports `AuthenticatedLayout`, the **only** route guard in the portal. It reads
+`userInfo` from the global context — the snapshot `GlobalProvider` loads from `localStorage` — and
+redirects to `/auth/login` immediately when there is no user, preserving `pathname + search` in the
+`redirect` param.
+
+When a local user exists the layout also validates it with
+`useSuspenseQuery(currentUserQueryOptions(userInfo.userId))` and redirects on an empty answer, so a
+stale device snapshot cannot open a protected page. That validation runs once per user, not at boot:
+an anonymous visitor issues no `/auth/me` request at all.
 
 It is attached to the `authenticated` parent route in `app/router/router.tsx`, and exactly one route is
 nested under it: `reportAnimalRoute`. The other five are public.
 
 `currentUserQueryOptions` sets `staleTime` to 5 minutes and `retry: false`. The `userId` it keys on
-is read from the Redux store at call time, so the guard re-reads session state rather than trusting
-its argument.
+comes from the context, never from the URL.
 
 ## 2. Session Lifecycle
 
@@ -150,21 +155,22 @@ cannot outlive the token it carries.
 
 ## 6. Frontend Files
 
-| File                                | Role                                                                    |
-| ----------------------------------- | ----------------------------------------------------------------------- |
-| `route.tsx`                         | `loginRoute`, `registerRoute`, `requireUser`, `currentUserQueryOptions` |
-| `login/index.tsx`                   | §1.1                                                                    |
-| `register/index.tsx`                | §1.2                                                                    |
-| `AuthLayout.tsx`                    | §1.3                                                                    |
-| `api/auth.api.ts`                   | The calls                                                               |
-| `api/auth.mutations.ts`             | `login` / `register` / `logout` mutations                               |
-| `api/auth.queries.ts`               | The `me` query                                                          |
-| `api/auth.queryKeys.ts`             | Key factory                                                             |
-| `types.ts`                          | `CredentialsDto` and friends                                            |
-| `api/tests/auth.mutations.test.tsx` | The only test in the feature                                            |
+| File                                | Role                                                             |
+| ----------------------------------- | ---------------------------------------------------------------- |
+| `route.tsx`                         | `loginRoute`, `registerRoute`, `AuthenticatedLayout`             |
+| `login/index.tsx`                   | §1.1                                                             |
+| `register/index.tsx`                | §1.2                                                             |
+| `AuthLayout.tsx`                    | §1.3                                                             |
+| `api/auth.api.ts`                   | The calls                                                        |
+| `api/auth.mutations.ts`             | `login` / `register` / `logout` mutations                        |
+| `app/init/currentUser.ts`           | `currentUserQueryOptions` — the `me` query the guard suspends on |
+| `app/providers/GlobalProvider.tsx`  | `locale` + `userInfo` context, `login` / `logout`                |
+| `api/tests/auth.mutations.test.tsx` | The only test in the feature                                     |
 
-Session state lives in Redux (`app/store/globalReducer.ts`) — client session state, not server data.
-There is no profile feature, so nothing else consumes the user record.
+Session state lives in the global context (`app/providers/GlobalProvider.tsx`) and is mirrored to
+`localStorage` under `userInfo` as `{ userId, expiresAt }` — a display hint, not a credential. It is
+dropped when it expires, when any request answers `401`, and on logout; `/auth/me` remains the
+authority. There is no profile feature, so nothing else consumes the user record.
 
 ## 7. What Does Not Exist
 
@@ -186,6 +192,6 @@ There is no profile feature, so nothing else consumes the user record.
 ## 8. Related Docs
 
 - [Trust Boundary](../context/backend-architecture.md#4-the-trust-boundary) — the internal JWT contract and what each service is allowed to trust
-- [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) — the app layer, and where `requireUser` sits
+- [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) — the app layer, and where the route guard sits
 - [App Shell & Bootstrap](07-app-shell-bootstrap.md) — resolves this user's menu items
 - [Report a Stray Animal](03-report-animal.md) — the one auth-gated route

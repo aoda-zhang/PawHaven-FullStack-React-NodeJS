@@ -2,6 +2,7 @@ import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
 import { cn } from '@pawhaven/ui';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
@@ -25,6 +26,7 @@ export const RootLayoutMenu = ({
   navigate,
   activePath,
 }: RootLayoutMenuProps) => {
+  const { t } = useTranslation();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
   const { resolvedItems, handleMenuClick } = useMenuNavigation({
@@ -82,7 +84,9 @@ export const RootLayoutMenu = ({
             className="cursor-pointer md:hidden"
             onClick={() => setSidebarOpen(!isSidebarOpen)}
             aria-label={
-              isSidebarOpen ? 'Close navigation menu' : 'Open navigation menu'
+              isSidebarOpen
+                ? t('common.close_navigation')
+                : t('common.open_navigation')
             }
             aria-expanded={isSidebarOpen}
           >

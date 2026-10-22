@@ -16,16 +16,23 @@ const HTTP_EXCEPTION_ROUTE = '/http-exception';
 const BUSINESS_ERROR_ROUTE = '/business-error';
 const PRISMA_UNIQUE_ROUTE = '/prisma-unique';
 const PRISMA_NOT_FOUND_ROUTE = '/prisma-not-found';
+const PRISMA_QUERY_ROUTE = '/prisma-query';
 const PRISMA_INIT_ROUTE = '/prisma-init';
+const PRISMA_UNKNOWN_ROUTE = '/prisma-unknown';
 const GENERIC_MESSAGE = 'Internal server error';
+const SERVICE_UNAVAILABLE_MESSAGE = 'Service temporarily unavailable';
 const PRISMA_LEAK =
   'Invalid `prisma.user.findUnique()` invocation: empty database name not allowed';
 
-const throwPrisma = (code?: string): never => {
-  throw Object.assign(new Error(PRISMA_LEAK), {
+const throwPrisma = (code?: string, name?: string): never => {
+  const error = Object.assign(new Error(PRISMA_LEAK), {
     code,
     clientVersion: '6.0.0',
   });
+  if (name) {
+    error.name = name;
+  }
+  throw error;
 };
 
 @Controller()
@@ -61,9 +68,19 @@ class ProbeController {
     throwPrisma('P2025');
   }
 
+  @Get(PRISMA_QUERY_ROUTE)
+  prismaQuery(): void {
+    throwPrisma('P2010');
+  }
+
   @Get(PRISMA_INIT_ROUTE)
   prismaInit(): void {
-    throwPrisma();
+    throwPrisma(undefined, 'PrismaClientInitializationError');
+  }
+
+  @Get(PRISMA_UNKNOWN_ROUTE)
+  prismaUnknown(): void {
+    throwPrisma(undefined, 'PrismaClientUnknownRequestError');
   }
 
   @Get(DOWNSTREAM_ERROR_ROUTE)
@@ -169,12 +186,40 @@ describe('HttpExceptionFilter', () => {
     expect(JSON.stringify(response.body)).not.toContain('prisma');
   });
 
-  it('keeps other Prisma errors (e.g. init failure) generic and non-leaking', async () => {
+  it('maps a Prisma query failure (P2010) to a safe 503 without leaking', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(PRISMA_QUERY_ROUTE);
+
+    expect(response.status).toBe(HttpStatus.SERVICE_UNAVAILABLE);
+    expect(response.body).toEqual({
+      status: HttpStatus.SERVICE_UNAVAILABLE,
+      isSuccess: false,
+      message: SERVICE_UNAVAILABLE_MESSAGE,
+      code: '',
+      data: null,
+    });
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+    expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+
+  it('maps a Prisma initialization failure to a safe 503 without leaking', async () => {
     app = await boot();
     const response = await request(app.getHttpServer()).get(PRISMA_INIT_ROUTE);
 
-    expect(response.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-    expect(response.body.message).toBe(GENERIC_MESSAGE);
+    expect(response.status).toBe(HttpStatus.SERVICE_UNAVAILABLE);
+    expect(response.body.message).toBe(SERVICE_UNAVAILABLE_MESSAGE);
+    expect(JSON.stringify(response.body)).not.toContain('prisma');
+    expect(JSON.stringify(response.body)).not.toContain('findUnique');
+  });
+
+  it('maps a Prisma unknown-request failure to a safe 503 without leaking', async () => {
+    app = await boot();
+    const response = await request(app.getHttpServer()).get(
+      PRISMA_UNKNOWN_ROUTE,
+    );
+
+    expect(response.status).toBe(HttpStatus.SERVICE_UNAVAILABLE);
+    expect(response.body.message).toBe(SERVICE_UNAVAILABLE_MESSAGE);
     expect(JSON.stringify(response.body)).not.toContain('prisma');
     expect(JSON.stringify(response.body)).not.toContain('findUnique');
   });

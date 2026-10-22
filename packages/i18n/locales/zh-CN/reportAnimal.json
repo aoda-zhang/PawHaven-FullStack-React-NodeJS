@@ -118,6 +118,10 @@
     "nav_continue": "继续",
     "nav_submit": "提交上报",
     "case_number_prefix": "案例编号 #",
+    "submit_failed": "无法确认上报结果，请先检查是否已生成记录，再决定是否重试。",
+    "submit_rejected": "提交的内容未通过校验，请检查后重试。",
+    "submit_rate_limited": "提交过于频繁，请稍后再试。",
+    "photos_read_failed": "无法读取照片，请重新选择照片后再试。",
     "unknown": "未知"
   }
 }

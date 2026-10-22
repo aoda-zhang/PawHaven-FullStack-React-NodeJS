@@ -1,6 +1,6 @@
-# Feature: Home (`portal/src/features/home`)
+# Feature: Home (`portal/src/pages/home`)
 
-> **Status**: Implemented · **Verified against**: `core-service/modules/home`, `core-service/modules/adoption`, `portal/features/home`
+> **Status**: Implemented · **Verified against**: `core-service/modules/home`, `core-service/modules/adoption`, `portal/pages/home`
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §9](../product/product-strategy.md) · [Frontend Architecture](../context/frontend-architecture.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 The public landing page, `/`. It is the only page that aggregates two backend modules into one
@@ -10,15 +10,15 @@ request, and the only place the adoptable-pets catalogue appears at all.
 
 `Home.tsx` renders four sections in this order, in a single `flex flex-col` column:
 
-| Order | Section        | Component                                    | Data key        |
-| ----- | -------------- | -------------------------------------------- | --------------- |
-| 1     | Hero           | `components/Hero.tsx`                        | `heroStats`     |
-| 2     | Rescue cases   | `rescue-cases/components/RescueCasesSection` | `latestRescues` |
-| 3     | Adoptable pets | `components/AdoptablePetsSection.tsx`        | `adoptablePets` |
-| 4     | Stray CTA      | `components/StrayCTA.tsx`                    | static          |
+| Order | Section        | Component                                          | Data key        |
+| ----- | -------------- | -------------------------------------------------- | --------------- |
+| 1     | Hero           | `components/Hero.tsx`                              | `heroStats`     |
+| 2     | Rescue cases   | `pages/rescue-cases/components/RescueCasesSection` | `latestRescues` |
+| 3     | Adoptable pets | `components/AdoptablePetsSection.tsx`              | `adoptablePets` |
+| 4     | Stray CTA      | `components/StrayCTA.tsx`                          | static          |
 
-`Home.tsx` and `Hero.tsx` **each call `useLoaderData()` independently** on the same route. Both
-read the same `HomeData`; neither receives it as a prop.
+`Home.tsx` calls `useSuspenseQuery(homeQueryOptions())` once and passes the resulting `HomeData`
+to the sections as props. `Hero.tsx` receives `heroStats`; it does not fetch.
 
 ### 1.1 Hero
 
@@ -28,69 +28,64 @@ declared with a module-level `preload(..., { as: 'image' })`, not a CMS asset.
 
 It holds the three hero stats, mapping `heroStats` through `toLocaleString()` against
 `home.hero_stat_rescues` / `_adopted` / `_volunteers`. Two CTAs: the primary navigates to
-`/report-animal`, the secondary is a second `<button>` in the same group with no `onClick` — a
-dead control.
+`routePaths.reportAnimal`; the secondary scrolls to `#adoptable-pets`.
 
 The headline uses `<Trans i18nKey="home.hero_headline" components={{ highlight: <em className="text-primary not-italic" /> }} />`,
 so the highlighted span is a component slot rather than a concatenated string.
 
 ### 1.2 Rescue cases
 
-`RescueCasesSection` imported from `../rescue-cases/components/`. This is a **cross-feature
-import**: `home` does not own it and `packages/ui` does not either, so a component used by two
-features has not been promoted out of `rescue-cases`. Full detail in
-[Rescue Cases](04-rescue-cases.md).
+`RescueCasesSection` lives in the `rescue-cases` slice at
+`pages/rescue-cases/components/RescueCasesSection.tsx` and is reused by both pages. The
+`home → rescue-cases` value import is the pinned A2 exception in `check-architecture.mjs`.
+Full detail in [Rescue Cases](04-rescue-cases.md).
 
 The homepage passes `showStatusSummary={false}` and omits `isLoading`, so the pending/in-progress
-counter the section can render is suppressed and the skeleton is never shown — the loader has
+counter the section can render is suppressed and the skeleton is never shown — the query has
 already resolved by the time `Home` renders.
 
 ### 1.3 Adoptable pets
 
 `components/AdoptablePetsSection.tsx` + `AdoptablePetsSectionSkeleton.tsx` + `components/PetCard.tsx`.
 A horizontal scroller of `PetCard`s. The section is **presentational** — it takes
-`pets`, `onPetClick`, `onSeeAll`, `isLoading` and fetches nothing; the loader supplies the rows.
+`pets`, `onPetClick`, `onSeeAll`, `isLoading` and fetches nothing; the home query supplies the rows.
 
-It carries a raw inline `style={{ scrollSnapType: 'x mandatory' }}` for the scroller, which
-`style-doctor` treats as a blocking violation.
-
-**Both of its links are dead.** `onPetClick` navigates to `/adopt/detail/${id}` and `onSeeAll` to
-`/adopt`. Neither path is in `routePaths` or `router.tsx`, so both land on the `path: '*'`
-`NotFound` route. The backend has a matching `GET /api/core/adoptable-pets/:id` endpoint with **no
-caller** — the same unfinished work seen from both ends.
+`Home` passes only `pets`, so cards are non-interactive and the optional "see all" button is not
+rendered. There are no dead adopt links in the current page.
 
 ### 1.4 Stray CTA
 
 `components/StrayCTA.tsx`. A full-bleed gradient band with a `PawPrint` mark, a heading and
-description taken from the `footer.*` namespace, and two buttons: `/report-animal` (works) and
-`/volunteer` (**dead route**).
+description taken from the `footer.*` namespace, and one `/report-animal` button
+(`routePaths.reportAnimal`). The dead `/volunteer` secondary CTA has been removed.
 
-**`StrayCTA` is duplicated.** A near-verbatim copy lives at
-`features/report-animal/components/StrayCTA.tsx`, differing only by a `full-width` class on the
-outer `<section>`. Two features use it, so by the project's own graduation rule it belongs in
-`packages/ui`; today it is a copy-paste that will drift.
+**`StrayCTA` is still duplicated.** A near-verbatim copy lives at
+`pages/report-animal/components/StrayCTA.tsx`, differing only by a `full-width` class on the
+outer `<section>`. Two pages use it, so it is a graduation candidate for `packages/ui`; today it
+is a copy-paste that can drift (tracked as P3-04).
 
 ## 2. End-to-End Flow
 
 ```mermaid
 flowchart TD
-    A[GET /] --> B[rootRoute loader<br/>rootLoader → GET /core/bootstrap]
-    B --> C[homeRoute loader<br/>homeLoader → GET /core/home]
-    C --> D[Home.tsx · useLoaderData]
+    A[GET /] --> B[RootLayout · useBootstrapQuery<br/>GET /core/bootstrap]
+    A --> C[homeRoute · eager component]
+    C --> D[Home · useSuspenseQuery<br/>homeQueryOptions → GET /core/home]
     D --> E[Hero · RescueCasesSection<br/>AdoptablePetsSection · StrayCTA]
     E --> F{click a case}
     F --> G[/rescue/detail/:id]
     E --> H{click a pet}
-    H --> I[/adopt/detail/:id → NotFound]
-    E --> J{CTA secondary}
-    J --> K[/volunteer → NotFound]
+    H --> I[No handler: cards are non-interactive]
+    E --> J{CTA}
+    J --> K[/report-animal]
 ```
 
-Two loaders, two TanStack Query caches. `rootLoader` primes bootstrap and returns
-`EMPTY_BOOTSTRAP` without any request on the login and register paths; `homeLoader` primes the
-home content. Both use `queryClient.ensureQueryData`, so a revisit is served from cache rather than
-refetched. `rootShouldRevalidate` re-runs the root loader only when crossing between an auth page
-and a non-auth page.
+There are no route loaders. `RootLayout` owns the bootstrap query and skips it on auth pages via
+`enabled: !isAuthPage`; the auth routes are lazy-loaded. `Home` reads the home query through
+TanStack Query's suspense cache, so a revisit is served from cache unless the query is stale.
+`homeRoute` imports `Home` eagerly, so the landing page is part of the initial bundle. The home
+request is all-or-nothing: if any of the three key reads fails, the query rejects and the nearest
+`ContentFallback` error boundary replaces the page content with the system error view.
 
 ## 3. Endpoint
 
@@ -106,6 +101,10 @@ and a non-auth page.
 
 Both limits come from `featureFlag.*` in config, not from query parameters.
 
+`getHomeData` uses `Promise.all`. The response is only returned when all three reads succeed; any
+rejected read rejects the request. Infrastructure failures are mapped by the shared exception
+filter (503), so the portal renders the system error view instead of a partial homepage.
+
 ### 3.1 Hero stats
 
 ```
@@ -120,9 +119,8 @@ Two caveats, both load-bearing:
 - `totalAdopted` sums two collections, and **no code ever writes `animalStatus: 'adopted'`** — see
   [Rescue Cases §5](04-rescue-cases.md#5-status). The rescue half of that number is structurally
   zero, so the figure is really "adopted pets in the hand-maintained catalogue".
-- The `volunteer-count` call is a genuine cross-service HTTP hop, wrapped in a `try/catch` that
-  logs a warning and falls back to `0`. The page renders a `0` volunteer count rather than an
-  error when `auth-service` is unreachable.
+- The `volunteer-count` call is a genuine cross-service HTTP hop. It is part of `heroStats`, so an
+  unreachable auth-service rejects the home request rather than rendering a misleading `0`.
 
 ## 4. Adoptable Pets (read-only)
 
@@ -169,28 +167,28 @@ queries the two collections in parallel and returns them side by side.
 ## 5. Data Model
 
 No homepage-owned collection. `HomeData` (`packages/shared/types/Home.schema.ts`) is a read model
-assembled at request time: `heroStats`, `latestRescues`, `adoptablePets`.
+assembled at request time from `heroStats`, `latestRescues` and `adoptablePets`. All three fields
+are required; there is no partial/degraded response shape.
 
 ## 6. Frontend Files
 
-| File                                                | Role                                           |
-| --------------------------------------------------- | ---------------------------------------------- |
-| `route.tsx`                                         | `homeRoute` (index), `homeLoader`              |
-| `Home.tsx`                                          | §1                                             |
-| `components/Hero.tsx`                               | §1.1                                           |
-| `components/AdoptablePetsSection.tsx`               | §1.3 — inline `style`, blocking `style-doctor` |
-| `components/AdoptablePetsSectionSkeleton.tsx`       | Loading state, unused on this route            |
-| `components/PetCard.tsx`                            | One pet                                        |
-| `components/StrayCTA.tsx`                           | §1.4 — duplicated in `report-animal`           |
-| `api/home.api.ts` / `.queries.ts` / `.queryKeys.ts` | The call and its cache key                     |
-| `types.ts`                                          | Section-local types                            |
-| `tests/AdoptablePetsSection.test.tsx`               | The only test                                  |
+| File                                                | Role                                   |
+| --------------------------------------------------- | -------------------------------------- |
+| `route.tsx`                                         | `homeRoute` (index, `Component: Home`) |
+| `index.tsx`                                         | §1                                     |
+| `components/Hero.tsx`                               | §1.1                                   |
+| `components/AdoptablePetsSection.tsx`               | §1.3 — presentational                  |
+| `components/AdoptablePetsSectionSkeleton.tsx`       | Loading state, unused on this route    |
+| `components/PetCard.tsx`                            | One pet                                |
+| `components/StrayCTA.tsx`                           | §1.4 — duplicated in `report-animal`   |
+| `api/home.api.ts` / `.queries.ts` / `.queryKeys.ts` | The call and its cache key             |
+| `types.ts`                                          | Section-local types                    |
+| `tests/AdoptablePetsSection.test.tsx`               | The only test                          |
 
-`homeRoute` is the only route in `router.tsx` that is **not** `lazy:` — it passes `Component: Home`
-directly, so the homepage is in the main bundle.
+`homeRoute` is eager. The auth routes are lazy; `RootLayout` remains the single bootstrap owner.
 
-`useLoaderData()` is cast `as HomeData` rather than parsed with `HomeDataSchema`, so a malformed
-response surfaces as a render error instead of a parse error.
+`home.api.ts` parses the response with `HomeDataSchema`, so a malformed response fails at the API
+boundary rather than during render.
 
 ## 7. What Does Not Exist
 

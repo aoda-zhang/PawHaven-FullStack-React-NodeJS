@@ -1,26 +1,27 @@
 import type { AnimalReportDto } from '@pawhaven/shared/types';
-import { Loading } from '@pawhaven/ui';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useCreateReportAnimal } from './api/reportAnimal.mutations';
 import { ReportAnimalForm } from './components/ReportAnimalForm';
 
-import { useCurrentUser } from '@/app/init/currentUser';
-
 export const ReportAnimal = () => {
   const { t } = useTranslation();
-  const { isLoading } = useCurrentUser();
+  const [submittedCaseId, setSubmittedCaseId] = useState('');
+  const [submitErrorKey, setSubmitErrorKey] = useState<string | null>(null);
   const { mutate: createReport, isPending } = useCreateReportAnimal();
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  const handleSubmit = (dto: AnimalReportDto): Promise<{ id?: string }> => {
-    return new Promise((resolve) => {
-      createReport(dto, {
-        onSuccess: (data) => resolve({ id: data?.id }),
-      });
+  const handleSubmit = (dto: AnimalReportDto) => {
+    setSubmitErrorKey(null);
+    createReport(dto, {
+      onSuccess: (result) => {
+        if (!result.id) {
+          setSubmitErrorKey('reportAnimal.submit_failed');
+          return;
+        }
+        setSubmittedCaseId(result.id);
+        window.scrollTo(0, 0);
+      },
     });
   };
 
@@ -32,7 +33,12 @@ export const ReportAnimal = () => {
       <p className="text-text-secondary mb-6 text-sm">
         {t('reportAnimal.subtitle')}
       </p>
-      <ReportAnimalForm onSubmit={handleSubmit} isPending={isPending} />
+      <ReportAnimalForm
+        onSubmit={handleSubmit}
+        isPending={isPending}
+        submittedCaseId={submittedCaseId}
+        submitErrorKey={submitErrorKey}
+      />
     </div>
   );
 };

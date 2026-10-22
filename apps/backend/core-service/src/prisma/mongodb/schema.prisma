@@ -28,6 +28,8 @@ model Menu {
   order      Int
 
   menuPermissions MenuPermission[]
+
+  @@index([order])
 }
 
 model Route {
@@ -143,7 +145,7 @@ model animalReports {
   age               String
   appearance        Json
   locationObj       Json
-  animalStatus      String @default("pending")
+  animalStatus      String    @default("pending")
   statusDescription String?
   description       String
   size              String
@@ -152,6 +154,7 @@ model animalReports {
   reporterPhotos    String[]
 
   @@index([animalStatus])
+  @@index([createdAt])
 }
 
 type Reporter {
@@ -196,4 +199,5 @@ model AdoptablePet {
   temperament    String
 
   @@index([adoptionStatus])
+  @@index([createdAt])
 }

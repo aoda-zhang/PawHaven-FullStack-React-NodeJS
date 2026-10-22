@@ -4,28 +4,45 @@ import { useTranslation } from 'react-i18next';
 import { Link, useInRouterContext, useNavigate } from 'react-router-dom';
 import type { NavigateFunction } from 'react-router-dom';
 
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
-const FooterLink = ({
-  to,
-  className,
-  label,
-}: {
+type FooterLinkProps = {
   to: string;
   className: string;
   label: string;
-}) => {
-  const inRouter = useInRouterContext();
-  return inRouter ? (
-    <Link to={to} className={className}>
+};
+
+const RouterFooterLink = ({ to, className, label }: FooterLinkProps) => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useGlobalContext();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      navigate(routePaths.login);
+    }
+  };
+
+  return (
+    <Link to={to} className={className} onClick={handleClick}>
       {label}
     </Link>
-  ) : (
-    <a href={to} className={className}>
-      {label}
-    </a>
   );
 };
+
+const StandaloneFooterLink = ({ to, className, label }: FooterLinkProps) => (
+  <a href={to} className={className}>
+    {label}
+  </a>
+);
+
+const FooterLink = (props: FooterLinkProps) =>
+  useInRouterContext() ? (
+    <RouterFooterLink {...props} />
+  ) : (
+    <StandaloneFooterLink {...props} />
+  );
 
 const RouterBrand = () => <Brand navigate={useNavigate()} />;
 
@@ -120,7 +137,7 @@ export const RootLayoutFooter = () => {
         <div className="mb-12 grid gap-10 lg:grid-cols-5">
           <div className="lg:col-span-1">
             <FooterBrand />
-            <p className="text-brown-7 mt-4 text-sm leading-relaxed">
+            <p className="text-footer-copy mt-4 text-sm leading-relaxed">
               {t('footer.brand_description')}
             </p>
             <div className="mt-5 flex gap-2">
@@ -132,7 +149,7 @@ export const RootLayoutFooter = () => {
                   rel="noreferrer"
                   title={social.label}
                   aria-label={social.label}
-                  className="text-brown-7 bg-text-inverse/10 hover:bg-text-inverse/20 hover:text-text-inverse flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+                  className="text-footer-copy bg-text-inverse/10 hover:bg-text-inverse/20 hover:text-text-inverse flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
                 >
                   <social.icon className="h-4 w-4" />
                 </a>
@@ -143,7 +160,7 @@ export const RootLayoutFooter = () => {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
             {footerColumns.map((column) => (
               <div key={column.heading}>
-                <h4 className="text-brown-7 mb-4 text-xs font-semibold tracking-widest uppercase">
+                <h4 className="text-footer-copy mb-4 text-xs font-semibold tracking-widest uppercase">
                   {column.heading}
                 </h4>
                 <ul className="flex flex-col gap-2.5">

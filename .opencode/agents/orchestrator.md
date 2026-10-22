@@ -12,6 +12,8 @@ permissions:
 
 ## Read before every task
 
+Every prompt reads these first, before any tool call, code, plan, or answer.
+
 | File                                                                                | Purpose                                                      |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [system-architecture-overview.md](./docs/context/system-architecture-overview.md)   | Whole-system shape: services, gateway, data flow, deployment |

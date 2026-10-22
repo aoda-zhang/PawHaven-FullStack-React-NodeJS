@@ -4,33 +4,32 @@ import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
+import { routePaths } from '@/app/router/routePaths';
+
 preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
 interface HeroProps {
   heroStats: HeroStats;
+  onAdoptClick: () => void;
 }
 
-export const Hero = ({ heroStats }: HeroProps) => {
+export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
-  const safeStats = heroStats ?? {
-    totalRescues: 0,
-    totalAdopted: 0,
-    totalVolunteers: 0,
-  };
+  const { isAuthenticated } = useGlobalContext();
 
   const stats = [
     {
-      value: safeStats.totalRescues.toLocaleString(),
+      value: heroStats.totalRescues.toLocaleString(),
       labelKey: 'home.hero_stat_rescues',
     },
     {
-      value: safeStats.totalAdopted.toLocaleString(),
+      value: heroStats.totalAdopted.toLocaleString(),
       labelKey: 'home.hero_stat_adopted',
     },
     {
-      value: safeStats.totalVolunteers.toLocaleString(),
+      value: heroStats.totalVolunteers.toLocaleString(),
       labelKey: 'home.hero_stat_volunteers',
     },
   ] as const;
@@ -60,7 +59,11 @@ export const Hero = ({ heroStats }: HeroProps) => {
             type="button"
             className="text-text-inverse bg-primary text-body cursor-pointer rounded-xl px-4 py-2 font-semibold transition-colors hover:opacity-90"
             onClick={() => {
-              navigate('/report-animal');
+              if (!isAuthenticated) {
+                navigate(routePaths.login);
+                return;
+              }
+              navigate(routePaths.reportAnimal);
             }}
           >
             <span className="flex items-center gap-1">
@@ -71,26 +74,25 @@ export const Hero = ({ heroStats }: HeroProps) => {
           <button
             type="button"
             className="text-dark-text cursor-pointer hover:underline"
+            onClick={onAdoptClick}
           >
             {t('home.hero_adopt_cta')}
           </button>
         </div>
 
-        {stats && (
-          <div className="divide-dark-text/15 text-dark-text mt-10 flex flex-row divide-x">
-            {stats.map((stat) => (
-              <div
-                key={stat.labelKey}
-                className="flex flex-col px-2 py-0 first:pl-0 last:pr-0 sm:px-6 sm:first:pl-0 sm:last:pr-0"
-              >
-                <span className="sm:stat-text text-xl">{stat.value}</span>
-                <span className="text-stat-labels mt-1 text-xs">
-                  {t(stat.labelKey)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="divide-dark-text/15 text-dark-text mt-10 flex flex-row divide-x">
+          {stats.map((stat) => (
+            <div
+              key={stat.labelKey}
+              className="flex flex-col px-2 py-0 first:pl-0 last:pr-0 sm:px-6 sm:first:pl-0 sm:last:pr-0"
+            >
+              <span className="sm:stat-text text-xl">{stat.value}</span>
+              <span className="text-stat-labels mt-1 text-xs">
+                {t(stat.labelKey)}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="relative hidden w-full lg:block lg:w-5/12">

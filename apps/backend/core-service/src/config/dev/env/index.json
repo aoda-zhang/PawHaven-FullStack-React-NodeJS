@@ -18,6 +18,11 @@
     "latestRescueLimit": 4,
     "adoptablePetLimit": 6
   },
+  "geocode": {
+    "url": "https://nominatim.openstreetmap.org/reverse",
+    "userAgent": "PawHaven/1.0",
+    "timeoutMs": 5000
+  },
   "dbConnections": [
     {
       "enable": true,

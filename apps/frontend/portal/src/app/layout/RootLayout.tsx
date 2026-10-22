@@ -16,16 +16,18 @@ import { RootLayoutMenu } from './RootLayoutMenu';
 
 import { useBootstrapQuery } from '@/app/init/bootstrap.queries';
 import type { BootstrapScope } from '@/app/init/bootstrap.queryKeys';
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { useGlobalState } from '@/app/store/globalReducer';
 import { ContentFallback } from '@/shared/components/ContentFallback';
 
 export const RootLayout = () => {
-  const { isSysMaintain, profile } = useGlobalState();
+  const { isSysMaintain } = useGlobalState();
+  const { userInfo } = useGlobalContext();
   const { isMenuAvailable, isFooterAvailable, isAuthPage } =
     useMenuVisibility();
   const scope: BootstrapScope = {
-    userID: profile?.baseUserInfo?.userID ?? '',
-    menuUpdateAt: profile?.baseUserInfo?.globalMenuUpdateAt ?? '',
+    userID: userInfo?.userId ?? '',
+    menuUpdateAt: '',
   };
   const { data: bootstrapData } = useBootstrapQuery(scope, {
     enabled: !isAuthPage,

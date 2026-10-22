@@ -21,6 +21,10 @@ export type { AdoptablePet } from './AdoptablePet.schema.js';
 export type { ApiResponseEnvelope } from './Envelope.schema.js';
 export type { HomeData } from './Home.schema.js';
 export type {
+  ReverseGeocodeQuery,
+  ReverseGeocodeResult,
+} from './Geocode.schema.js';
+export type {
   AnimalFollowStatus,
   AnimalFollowResult,
 } from './AnimalFollow.schema.js';
@@ -59,6 +63,10 @@ export { HeroStatsSchema } from './HeroStats.schema.js';
 export { AdoptablePetSchema } from './AdoptablePet.schema.js';
 export { ApiResponseEnvelopeSchema } from './Envelope.schema.js';
 export { HomeDataSchema } from './Home.schema.js';
+export {
+  ReverseGeocodeQuerySchema,
+  ReverseGeocodeResultSchema,
+} from './Geocode.schema.js';
 export {
   AnimalFollowStatusSchema,
   AnimalFollowResultSchema,

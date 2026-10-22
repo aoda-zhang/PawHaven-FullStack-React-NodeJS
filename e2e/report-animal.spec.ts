@@ -9,10 +9,15 @@ test.describe('report animal', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          user: {
-            userID: 'test-user-1',
+          status: 200,
+          isSuccess: true,
+          message: 'ok',
+          code: '0',
+          data: {
+            userId: 'test-user-1',
             username: 'Test User',
             email: 'test@example.com',
+            status: 'active',
           },
         }),
       }),
@@ -67,7 +72,13 @@ test.describe('report animal', () => {
       route.fulfill({
         status: 201,
         contentType: 'application/json',
-        body: JSON.stringify({ id: 'RPT-E2E-001' }),
+        body: JSON.stringify({
+          status: 201,
+          isSuccess: true,
+          message: 'ok',
+          code: '0',
+          data: { id: 'RPT-E2E-001' },
+        }),
       }),
     );
 
@@ -89,9 +100,9 @@ test.describe('report animal', () => {
       .blur();
 
     await page
-      .getByTestId('form-input-description')
+      .getByTestId('form-textarea-description')
       .fill('Found a friendly orange cat');
-    await page.getByTestId('form-input-description').blur();
+    await page.getByTestId('form-textarea-description').blur();
 
     await page.getByRole('radio', { name: /Small/i }).click();
     await page.getByRole('radio', { name: /Adult/i }).click();
@@ -135,7 +146,13 @@ test.describe('report animal', () => {
       route.fulfill({
         status: 201,
         contentType: 'application/json',
-        body: JSON.stringify({ id: 'RPT-E2E-002' }),
+        body: JSON.stringify({
+          status: 201,
+          isSuccess: true,
+          message: 'ok',
+          code: '0',
+          data: { id: 'RPT-E2E-002' },
+        }),
       }),
     );
 
@@ -156,8 +173,8 @@ test.describe('report animal', () => {
       .locator('input[type="tel"]')
       .blur();
 
-    await page.getByTestId('form-input-description').fill('Aggressive dog');
-    await page.getByTestId('form-input-description').blur();
+    await page.getByTestId('form-textarea-description').fill('Aggressive dog');
+    await page.getByTestId('form-textarea-description').blur();
 
     await page.getByRole('radio', { name: /Large/i }).click();
     await page.getByRole('radio', { name: /Adult/i }).click();

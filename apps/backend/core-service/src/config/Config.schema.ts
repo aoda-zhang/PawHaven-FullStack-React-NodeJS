@@ -2,6 +2,7 @@ import {
   corsConfigSchema,
   dbConnectionsSchema,
   featureFlagSchema,
+  geocodeConfigSchema,
   httpConfigSchema,
   internalJwtConfigSchema,
   microServiceConfigSchema,
@@ -13,6 +14,7 @@ export const coreServiceConfigSchema = z.object({
   http: httpConfigSchema,
   swagger: swaggerConfigSchema,
   featureFlag: featureFlagSchema,
+  geocode: geocodeConfigSchema,
   dbConnections: dbConnectionsSchema,
   cors: corsConfigSchema,
   internalJwt: internalJwtConfigSchema.refine(

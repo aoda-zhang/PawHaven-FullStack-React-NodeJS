@@ -114,10 +114,9 @@ Three behaviours here are easy to miss and worth stating outright:
   and trims, drops empties, dedupes, and falls back to `['guest']` when nothing survives — which is
   every newly registered user, since registration writes `roles: []`.
 
-The frontend cache key is `{ userID, menuUpdateAt }` from the Redux profile, so switching user
-produces a different key rather than reading the previous user's menus. `menuUpdateAt` comes from
-`profile.baseUserInfo.globalMenuUpdateAt`, and **nothing in the backend ever writes it** — it is
-always whatever the user record was seeded with.
+The frontend cache key is `{ userID, menuUpdateAt }` taken from the user info `GlobalProvider` reads
+from `localStorage` when it mounts, so switching user produces a different key rather than reading
+the previous user's menus. `menuUpdateAt` is not tracked yet and is always empty.
 
 `rootShouldRevalidate` re-runs the loader only when crossing between an auth page and a non-auth
 page. Logging in from `/auth/login` therefore re-runs it; ordinary navigation does not.
@@ -154,16 +153,16 @@ queries it. Route-level authorisation is designed in the schema and absent from 
 
 The 7 portal routes are literals in `router/router.tsx` and `routePaths.ts`:
 
-| Path                       | Constant                      | Component         | `lazy:` | Guard         |
-| -------------------------- | ----------------------------- | ----------------- | ------- | ------------- |
-| `/`                        | `routePaths.home`             | `Home`            | No      | Public        |
-| `/auth/login`              | `routePaths.login`            | `Login`           | No      | Public        |
-| `/auth/register`           | `routePaths.register`         | `Register`        | No      | Public        |
-| `/rescue/guides`           | `routePaths.rescueGuides`     | `RescueGuide`     | Yes     | Public        |
-| `/rescue-cases`            | `routePaths.rescueCases`      | `RescueCasesPage` | Yes     | Public        |
-| `/rescue/detail/:animalID` | `routePaths.rescueCaseDetail` | `RescueDetail`    | Yes     | Public        |
-| `/report-animal`           | `routePaths.reportAnimal`     | `ReportAnimal`    | Yes     | `requireUser` |
-| `*`                        | —                             | `NotFound`        | —       | Public        |
+| Path                       | Constant                      | Component         | `lazy:` | Guard                 |
+| -------------------------- | ----------------------------- | ----------------- | ------- | --------------------- |
+| `/`                        | `routePaths.home`             | `Home`            | No      | Public                |
+| `/auth/login`              | `routePaths.login`            | `Login`           | No      | Public                |
+| `/auth/register`           | `routePaths.register`         | `Register`        | No      | Public                |
+| `/rescue/guides`           | `routePaths.rescueGuides`     | `RescueGuide`     | Yes     | Public                |
+| `/rescue-cases`            | `routePaths.rescueCases`      | `RescueCasesPage` | Yes     | Public                |
+| `/rescue/detail/:animalID` | `routePaths.rescueCaseDetail` | `RescueDetail`    | Yes     | Public                |
+| `/report-animal`           | `routePaths.reportAnimal`     | `ReportAnimal`    | Yes     | `AuthenticatedLayout` |
+| `*`                        | —                             | `NotFound`        | —       | Public                |
 
 Adding a route is a code change and a rebuild. `NotFound` is the landing point for all 13 dead
 links in §1.3.

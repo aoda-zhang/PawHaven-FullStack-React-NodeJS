@@ -70,6 +70,7 @@ export const Register = () => {
               disabled={isPending}
               type="submit"
               className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
+              data-testid="auth-submit-button"
             >
               {t('auth.sighup')}
             </Button>

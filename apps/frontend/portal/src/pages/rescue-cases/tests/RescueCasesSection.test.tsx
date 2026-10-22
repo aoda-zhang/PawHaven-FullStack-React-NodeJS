@@ -1,17 +1,18 @@
 import '@testing-library/jest-dom/vitest';
 
+import type { RescueListItem } from '@pawhaven/shared/types';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RescueCasesSection } from '../components/RescueCasesSection';
-import type { RescueCase } from '../types';
 
 vi.mock('react-i18next', async () => {
   const actual = await vi.importActual('react-i18next');
   return {
     ...actual,
     useTranslation: () => ({
-      t: (key: string) => key,
+      t: (key: string, options?: Record<string, unknown>) =>
+        options === undefined ? key : `${key}:${JSON.stringify(options)}`,
       i18n: { language: 'en-US' },
     }),
   };
@@ -27,7 +28,7 @@ vi.mock('lucide-react', async () => {
   };
 });
 
-const mockCase: RescueCase = {
+const mockCase: RescueListItem = {
   id: 'PAW-0001',
   title: 'Test Cat',
   image: '/test.jpg',
@@ -53,5 +54,23 @@ describe('RescueCasesSection', () => {
 
     expect(screen.queryByTestId('rescue-cases-skeleton')).toBeNull();
     expect(screen.getByText('Test Cat')).toBeDefined();
+  });
+
+  it('renders the status summary through the count translations', () => {
+    render(
+      <RescueCasesSection
+        cases={[
+          mockCase,
+          { ...mockCase, id: 'PAW-0002', status: 'inProgress' },
+        ]}
+        onCaseClick={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'rescue_cases.status_summary:{"pendingCount":1,"inProgressCount":1}',
+      ),
+    ).toBeDefined();
   });
 });

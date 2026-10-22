@@ -92,11 +92,18 @@ that is a projection rather than history, a `NotFound` that 13 broken links all 
 Each document is the record of one audit: what was found, what was changed, and what was left open.
 They are records, not living docs — the living docs are in `context/`.
 
-| File                                                            | Covers                                                            |
-| --------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [02-feature-org.md](./architecture-reviews/02-feature-org.md)   | Evidence that the portal is organised by feature slice            |
-| [03-server-state.md](./architecture-reviews/03-server-state.md) | Server-state inventory checklist (not yet filled in)              |
-| [04-ui-library.md](./architecture-reviews/04-ui-library.md)     | The UI-library audit, the changes it produced, and the open items |
+| File                                                                                        | Covers                                                                                              |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [02-feature-org.md](./architecture-reviews/02-feature-org.md)                               | Feature-organisation evidence note — partial, not a completed audit                                 |
+| [03-server-state.md](./architecture-reviews/03-server-state.md)                             | Server-state inventory checklist — not yet filled in                                                |
+| [04-ui-library.md](./architecture-reviews/04-ui-library.md)                                 | UI-library audit record — describes the `refactor/ui-library-audit` branch, not every state on main |
+| [09-final-architecture-backlog.md](./architecture-reviews/09-final-architecture-backlog.md) | Final synthesis: scorecard, Top 20, P0–P3 backlog, 3-month roadmap, ADRs, top-10 issues             |
+
+The remaining specialized reviews — `01-tech-selection`, `04-state-ownership`, and `05`–`08` — exist
+only as unfilled checklists on their `review/*` branches and are not on `main`. The numbering differs
+between `artec.md`, the branches, and this index; treat the file names as identifiers. The final
+synthesis was rebuilt from the code and the feature records; §1.1 of the 09 record states exactly what
+was available and what was not.
 
 [`artec.md`](./artec.md) holds the prompt handbook those audits are run from.
 [`how-i-build/`](./how-i-build/how-i-build-my-agent-team.md) holds the working notes on how the

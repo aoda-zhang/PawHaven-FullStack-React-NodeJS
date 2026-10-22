@@ -29,10 +29,9 @@ export const RootLayoutSidebar = ({
   navigate,
   activePath,
 }: RootLayoutSidebarProps) => {
-  const navigateAndClose: NavigateFunction = (...args) => {
+  const navigateAndClose = (to: MenuItemType['to']) => {
     onCloseSidebar();
-    // @ts-expect-error: react-router types are complex, spreading args is safe
-    navigate(...args);
+    navigate(to);
   };
 
   const { resolvedItems } = useMenuNavigation({

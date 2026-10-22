@@ -1,5 +1,6 @@
 import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
+import { Prisma } from '@prismaClient/index.js';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RescueService } from './rescue.service.js';
@@ -217,6 +218,25 @@ describe('RescueService.findAll', () => {
     );
 
     warn.mockRestore();
+  });
+
+  it('lets a data-store failure reach the unified error handler', async () => {
+    const error = new Prisma.PrismaClientKnownRequestError(
+      'mongo unavailable',
+      {
+        code: 'P2010',
+        clientVersion: 'test',
+      },
+    );
+    const { service } = buildService(error);
+
+    await expect(service.findAll()).rejects.toBe(error);
+  });
+
+  it('lets an unexpected mapping failure reach the unified error handler', async () => {
+    const { service } = buildService(new Error('unexpected'));
+
+    await expect(service.findAll()).rejects.toThrow('unexpected');
   });
 });
 

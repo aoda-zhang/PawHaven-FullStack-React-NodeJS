@@ -78,10 +78,17 @@ const handleError = ({ queryOptions, errorInfo, meta }: ErrorHandleType) => {
       break;
     case httpRequestErrors.PERMISSION:
       queryOptions?.onPermissionError?.();
+      showErrorToast(errorMessage, {
+        ...(metaData?.toastOptions ?? {}),
+        type: metaData?.toastOptions?.type ?? notificationType.info,
+        duration:
+          metaData?.toastOptions?.duration ?? DEFAULT_ERROR_TOAST_DURATION_MS,
+      });
       break;
 
     // Server
     case httpRequestErrors.SERVER:
+    case httpRequestErrors.MAINTENANCE:
     case httpRequestErrors.UNKNOWN:
       if (meta?.isCriticalRequest && queryOptions?.onSysError) {
         queryOptions?.onSysError?.();
@@ -98,6 +105,14 @@ const handleError = ({ queryOptions, errorInfo, meta }: ErrorHandleType) => {
     // client------------
     case httpRequestErrors.BADREQUEST:
     case httpRequestErrors.RATELIMIT:
+      if (metaData?.isShowClientError) {
+        showErrorToast(errorMessage, {
+          ...(metaData?.toastOptions ?? {}),
+          type: metaData?.toastOptions?.type ?? notificationType.info,
+          duration:
+            metaData?.toastOptions?.duration ?? DEFAULT_ERROR_TOAST_DURATION_MS,
+        });
+      }
       break;
     // Network ----------
     case httpRequestErrors.NETWORK:
@@ -150,8 +165,8 @@ export const getRequestQueryOptions = (queryOptions: QueryOptionsType) => {
           if (!apiError) return false;
           const retryAbleErrors = [
             httpRequestErrors.NETWORK,
-            httpRequestErrors.UNKNOWN,
             httpRequestErrors.SERVER,
+            httpRequestErrors.MAINTENANCE,
           ] as const;
           return (
             failureCount < maxRetry &&

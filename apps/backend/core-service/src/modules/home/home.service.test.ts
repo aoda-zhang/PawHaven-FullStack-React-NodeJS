@@ -1,4 +1,3 @@
-import { HttpException, Logger } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -8,7 +7,7 @@ const VOLUNTEER_COUNT = 7;
 
 type CountResult = number | Error;
 
-const settle = (value: CountResult) =>
+const settle = <T>(value: T | Error) =>
   value instanceof Error ? Promise.reject(value) : Promise.resolve(value);
 
 const buildService = (
@@ -17,7 +16,7 @@ const buildService = (
     adoptedRescues?: CountResult;
     adoptedPets?: CountResult;
   },
-  lists: { rescues?: unknown[]; pets?: unknown[] } = {},
+  lists: { rescues?: unknown[] | Error; pets?: unknown[] | Error } = {},
   volunteerCount: CountResult = VOLUNTEER_COUNT,
 ) => {
   const { totalRescues = 0, adoptedRescues = 0, adoptedPets = 0 } = counts;
@@ -35,10 +34,10 @@ const buildService = (
   };
 
   const rescueService = {
-    findAll: vi.fn(() => Promise.resolve(lists.rescues ?? [])),
+    findAll: vi.fn(() => settle(lists.rescues ?? [])),
   };
   const adoptionService = {
-    findAll: vi.fn(() => Promise.resolve(lists.pets ?? [])),
+    findAll: vi.fn(() => settle(lists.pets ?? [])),
   };
 
   const httpClientService = {
@@ -141,55 +140,16 @@ describe('HomeService.getStats', () => {
     await expect(service.getStats()).rejects.toThrow('mongo unavailable');
   });
 
-  it('degrades gracefully when the auth volunteer-count call rejects', async () => {
+  it('rejects when the auth volunteer-count call fails', async () => {
     const { service } = buildService(
       {},
       {},
       new Error('auth service unavailable'),
     );
 
-    await expect(service.getStats()).resolves.toEqual({
-      totalRescues: 0,
-      totalAdopted: 0,
-      totalVolunteers: 0,
-    });
-  });
-
-  it('logs a warning when the auth volunteer-count call rejects', async () => {
-    const { service } = buildService(
-      {},
-      {},
-      new Error('auth service unavailable'),
+    await expect(service.getStats()).rejects.toThrow(
+      'auth service unavailable',
     );
-
-    const warnSpy = vi.spyOn(Logger.prototype, 'warn');
-    await service.getStats();
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('auth-service'),
-    );
-    warnSpy.mockRestore();
-  });
-
-  it('surfaces the downstream status and traceId in the warning', async () => {
-    const authError = new HttpException(
-      {
-        traceId: 'trace-abc-123',
-        status: 503,
-        message: 'Service unavailable',
-        duration: 12,
-        data: null,
-      },
-      503,
-    );
-    const { service } = buildService({}, {}, authError);
-
-    const warnSpy = vi.spyOn(Logger.prototype, 'warn');
-    await service.getStats();
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('status=503'));
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('traceId=trace-abc-123'),
-    );
-    warnSpy.mockRestore();
   });
 });
 
@@ -211,10 +171,28 @@ describe('HomeService.getHomeData', () => {
     });
   });
 
-  it('fails the page when the local data source is unavailable', async () => {
+  it('rejects when the stats section fails', async () => {
     const { service } = buildService({
       adoptedRescues: new Error('mongo unavailable'),
     });
+
+    await expect(service.getHomeData()).rejects.toThrow('mongo unavailable');
+  });
+
+  it('rejects when the rescue section fails', async () => {
+    const { service } = buildService(
+      { totalRescues: 2, adoptedRescues: 1, adoptedPets: 1 },
+      { rescues: new Error('mongo unavailable'), pets: [{ id: 'PET-0001' }] },
+    );
+
+    await expect(service.getHomeData()).rejects.toThrow('mongo unavailable');
+  });
+
+  it('rejects when the pets section fails', async () => {
+    const { service } = buildService(
+      { totalRescues: 2, adoptedRescues: 1, adoptedPets: 1 },
+      { rescues: [{ id: 'PAW-0001' }], pets: new Error('mongo unavailable') },
+    );
 
     await expect(service.getHomeData()).rejects.toThrow('mongo unavailable');
   });

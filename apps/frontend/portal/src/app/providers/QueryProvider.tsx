@@ -8,6 +8,7 @@ import { useState, type ReactNode } from 'react';
 import { routePaths, routeSearchParams } from '@/app/router/routePaths';
 import { loadConfig } from '@/config';
 import { useIsStableEnv } from '@/shared/hooks/useIsStableEnv';
+import { clearStoredSession } from '@/shared/utils/sessionHint';
 
 const FIVE_MINUTES_MS = 300_000;
 const THIRTY_MINUTES_MS = 1_800_000;
@@ -29,6 +30,7 @@ export const getQueryClient = (): QueryClient => {
       staleTime: queryConfig?.staleTime ?? FIVE_MINUTES_MS,
       gcTime: queryConfig?.gcTime ?? THIRTY_MINUTES_MS,
       onAuthError: () => {
+        clearStoredSession();
         const { pathname, search } = window.location;
         const isAuthPage =
           pathname === routePaths.login || pathname === routePaths.register;
@@ -38,7 +40,6 @@ export const getQueryClient = (): QueryClient => {
           );
         }
       },
-      onPermissionError: () => {},
     }),
   );
 

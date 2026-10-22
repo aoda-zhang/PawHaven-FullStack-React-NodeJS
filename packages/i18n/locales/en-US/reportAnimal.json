@@ -118,6 +118,8 @@
     "nav_continue": "Continue",
     "nav_submit": "Submit Report",
     "case_number_prefix": "Case #",
+    "submit_failed": "We couldn't confirm your report. Please check whether it was created before trying again.",
+    "photos_read_failed": "We couldn't read one of the photos. Please re-select them and try again.",
     "unknown": "Unknown"
   }
 }

@@ -37,7 +37,7 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
       <div className="bg-muted relative h-44">
         <img
           src={pet.photo}
-          alt={pet.name}
+          alt={isInteractive ? '' : pet.name}
           className="h-full w-full object-cover"
         />
         <div className="absolute top-2 left-2">
@@ -45,7 +45,10 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
             {t('home.adoptable_badge')}
           </span>
         </div>
-        <div className="bg-card/80 text-text-secondary hover:text-error absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm transition-colors">
+        <div
+          aria-hidden="true"
+          className="bg-card/80 text-text-secondary absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full backdrop-blur-sm"
+        >
           <Heart className="h-4 w-4" />
         </div>
       </div>

@@ -68,10 +68,13 @@
   --color-body-text: var(--color-brown-9); /* #6b5642 — hero/body copy */
   --color-stat-labels: var(--color-brown-8); /* #8f7b69 — stat captions */
   --color-footer-text: var(--color-brown-6); /* #d3c3b3 — footer links */
+  --color-footer-copy: var(--color-brown-7); /* footer body copy */
   --color-footer-muted: var(
     --color-brown-8
   ); /* #8f7b69 — footer muted labels */
   --color-footer-bg: var(--color-brown-11); /* #2f1f14 — footer surface */
+  --color-cta-bg: var(--color-brown-10); /* CTA gradient start */
+  --color-cta-bg-strong: var(--color-brown-9); /* CTA gradient end */
 
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6); /* #ef4444 */

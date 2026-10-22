@@ -1,8 +1,5 @@
 import type { AuthUser } from '@pawhaven/shared/types';
-import { useQuery } from '@tanstack/react-query';
 
-import { getCurrentProfile } from '@/app/store/currentProfile';
-import { useGlobalState } from '@/app/store/globalReducer';
 import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
 import { apiClient } from '@/shared/utils/apiClient';
 
@@ -19,26 +16,15 @@ const fetchCurrentUser = async (): Promise<AuthUser> => {
   return apiClient.get<AuthUser>('/auth/me');
 };
 
-/** The id used to key the current-user cache; `''` when signed out. */
-export const getCurrentUserId = (): string =>
-  getCurrentProfile()?.baseUserInfo?.userID ?? '';
-
 /**
- * Shared options for the current-user query.
+ * Options for the current-user query the auth guard suspends on.
  *
- * Both the auth route loader and `useCurrentUser()` build from this so they
- * agree on the cache key and only one request is ever in flight for it.
+ * The key carries the id the provider holds for the signed-in user, so a
+ * different user never reads the previous one's cached answer.
  */
 export const currentUserQueryOptions = (userId: string) => ({
   queryKey: sharedQueryKeys.auth.currentUser(userId),
   queryFn: fetchCurrentUser,
   staleTime: CURRENT_USER_STALE_TIME_MS,
   retry: false,
-  meta: { persist: true },
 });
-
-export const useCurrentUser = () => {
-  const { profile } = useGlobalState();
-  const userId = profile?.baseUserInfo?.userID ?? '';
-  return useQuery(currentUserQueryOptions(userId));
-};

@@ -5,6 +5,7 @@ export {
   dbConnectionsSchema,
   emailConfigSchema,
   featureFlagSchema,
+  geocodeConfigSchema,
   httpConfigSchema,
   internalJwtConfigSchema,
   microServiceConfigSchema,

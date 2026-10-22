@@ -6,9 +6,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useLogin } from '../api/auth.mutations';
 import { AuthLayout } from '../AuthLayout';
 
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths, routeSearchParams } from '@/app/router/routePaths';
 
 export const Login = () => {
@@ -18,7 +18,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
-  const { mutate, isPending } = useLogin();
+  const { login, isPending } = useGlobalContext();
 
   const from = searchParams.get(routeSearchParams.redirect) ?? routePaths.home;
 
@@ -37,7 +37,7 @@ export const Login = () => {
             className="mt-5 space-y-3"
             noValidate
             onSubmit={formProps.handleSubmit((data) => {
-              mutate(
+              login(
                 {
                   email: data.email,
                   password: data.password,
@@ -73,6 +73,7 @@ export const Login = () => {
               disabled={isPending}
               type="submit"
               className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
+              data-testid="auth-submit-button"
             >
               {t('auth.login')}
             </Button>

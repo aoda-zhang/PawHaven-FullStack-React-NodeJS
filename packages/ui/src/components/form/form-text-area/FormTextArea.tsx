@@ -88,6 +88,7 @@ export const FormTextArea = ({
               required={required}
               aria-invalid={isInvalid ? true : undefined}
               aria-describedby={isInvalid ? errorId : undefined}
+              data-testid={`form-textarea-${name}`}
               style={style}
               className={cn(
                 'border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',

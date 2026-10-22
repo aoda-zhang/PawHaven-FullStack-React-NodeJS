@@ -1,37 +1,13 @@
 import '@testing-library/jest-dom/vitest';
 
-import { configureStore } from '@reduxjs/toolkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, act } from '@testing-library/react';
-import { Provider } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { useLogin, useLogout } from '../api/auth.mutations';
 
 import { bootstrapQueryKeys } from '@/app/init/bootstrap.queryKeys';
 import { sharedQueryKeys } from '@/shared/constants/sharedQueryKeys';
-
-const { mockSetProfile, mockEmptyProfile } = vi.hoisted(() => ({
-  mockSetProfile: vi.fn((payload: unknown) => ({
-    type: 'global/setProfile',
-    payload,
-  })),
-  mockEmptyProfile: {
-    accessToken: '',
-    baseUserInfo: {
-      email: '',
-      userID: '',
-      globalMenuUpdateAt: '',
-      globalRouterUpdateAt: '',
-    },
-  },
-}));
-
-// Isolate the store module: importing the real one pulls in frontend-core (lottie), which jsdom cannot load.
-vi.mock('@/app/store/globalReducer', () => ({
-  setProfile: mockSetProfile,
-  emptyProfile: mockEmptyProfile,
-}));
 
 // Mock API calls.
 vi.mock('../api/auth.api', () => ({
@@ -45,35 +21,29 @@ vi.mock('../api/auth.api', () => ({
 }));
 
 const createWrapper = (queryClient: QueryClient) => {
-  const testStore = configureStore({
-    reducer: (state: Record<string, unknown> = {}) => state,
-  });
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <Provider store={testStore}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </Provider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
   Wrapper.displayName = 'AuthMutationTestWrapper';
   return Wrapper;
 };
 
-describe('Auth mutations — profile sync + bootstrap invalidation', () => {
+describe('Auth mutations — cache handoff on sign in/out', () => {
   let queryClient: QueryClient;
 
   beforeEach(() => {
     queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } },
     });
-    mockSetProfile.mockClear();
-    // Pre-populate cache with bootstrap and auth queries.
     queryClient.setQueryData(
-      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
+      bootstrapQueryKeys.data({ userID: '', menuUpdateAt: '' }),
       { menus: [] },
     );
-    queryClient.setQueryData(sharedQueryKeys.auth.all(), { user: null });
+    queryClient.setQueryData(sharedQueryKeys.home.all(), { heroStats: {} });
+    queryClient.setQueryData(sharedQueryKeys.rescueCases.all(), {});
   });
 
-  it('login onSuccess writes the profile and invalidates both bootstrap queries', async () => {
+  it('login marks the bootstrap query stale so the new identity rebuilds the menu', async () => {
     const { result } = renderHook(() => useLogin(), {
       wrapper: createWrapper(queryClient),
     });
@@ -85,23 +55,17 @@ describe('Auth mutations — profile sync + bootstrap invalidation', () => {
       });
     });
 
-    expect(mockSetProfile).toHaveBeenCalledWith(
-      expect.objectContaining({
-        baseUserInfo: expect.objectContaining({ userID: 'u-123' }),
-      }),
+    const bootstrapState = queryClient.getQueryState(
+      bootstrapQueryKeys.data({ userID: '', menuUpdateAt: '' }),
     );
 
-    // Both queries should be marked stale after invalidation.
-    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all());
-    const landingState = queryClient.getQueryState(
-      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
-    );
-
-    expect(authState?.isInvalidated).toBe(true);
-    expect(landingState?.isInvalidated).toBe(true);
+    expect(bootstrapState?.isInvalidated).toBe(true);
+    expect(
+      queryClient.getQueryData(sharedQueryKeys.auth.currentUser('u-123')),
+    ).toMatchObject({ userId: 'u-123' });
   });
 
-  it('logout onSuccess resets the profile and invalidates both bootstrap queries', async () => {
+  it('logout removes everything that was fetched for the signed-in user', async () => {
     const { result } = renderHook(() => useLogout(), {
       wrapper: createWrapper(queryClient),
     });
@@ -110,15 +74,16 @@ describe('Auth mutations — profile sync + bootstrap invalidation', () => {
       await result.current.mutateAsync();
     });
 
-    expect(mockSetProfile).toHaveBeenCalledWith(mockEmptyProfile);
-
-    const authState = queryClient.getQueryState(sharedQueryKeys.auth.all());
-    const landingState = queryClient.getQueryState(
-      bootstrapQueryKeys.data({ userID: 'u-123', menuUpdateAt: '' }),
-    );
-
-    // removeQueries completely removes the query from cache
-    expect(authState).toBeUndefined();
-    expect(landingState).toBeUndefined();
+    expect(
+      queryClient.getQueryState(
+        bootstrapQueryKeys.data({ userID: '', menuUpdateAt: '' }),
+      ),
+    ).toBeUndefined();
+    expect(
+      queryClient.getQueryState(sharedQueryKeys.home.all()),
+    ).toBeUndefined();
+    expect(
+      queryClient.getQueryState(sharedQueryKeys.rescueCases.all()),
+    ).toBeUndefined();
   });
 });

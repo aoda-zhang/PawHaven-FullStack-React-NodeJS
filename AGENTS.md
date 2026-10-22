@@ -2,6 +2,9 @@
 
 ## Read before every task
 
+Every prompt — fix, question, refactor, review, however small — reads these files first, before any
+tool call, code, plan, or answer.
+
 | File                                                                                | Purpose                                                      |
 | ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [system-architecture-overview.md](./docs/context/system-architecture-overview.md)   | Whole-system shape: services, gateway, data flow, deployment |
@@ -10,4 +13,5 @@
 | [frontend-development-patterns.md](./docs/context/frontend-development-patterns.md) | What a frontend change must look like                        |
 | [backend-development-patterns.md](./docs/context/backend-development-patterns.md)   | What a backend change must look like                         |
 | [development.md](./docs/context/development.md)                                     | Local build, run, and commit workflow                        |
+| [development.cn.md](./docs/context/development.cn.md)                               | 本地构建、运行与提交流程                                     |
 | [agent-constraints.md](./docs/context/agent-constraints.md)                         | Constraints every AI change must obey                        |

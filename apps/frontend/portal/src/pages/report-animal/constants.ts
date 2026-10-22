@@ -1,1 +1,0 @@
-export const FALLBACK_ID_SUFFIX_LENGTH = 8;

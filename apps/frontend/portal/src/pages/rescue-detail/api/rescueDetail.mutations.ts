@@ -26,7 +26,7 @@ const useFollowStatusMutation = (
           if (!old) return old;
           return {
             ...old,
-            isFollowed: type === 'follow',
+            isFollowing: type === 'follow',
             followerCount:
               type === 'follow' ? old.followerCount + 1 : old.followerCount - 1,
           };

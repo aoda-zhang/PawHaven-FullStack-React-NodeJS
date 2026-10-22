@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpClientService, InjectPrisma } from '@pawhaven/backend-core';
 import {
   databaseEngines,
@@ -18,8 +18,6 @@ import { RescueService } from '../rescue/rescue.service.js';
 
 @Injectable()
 export class HomeService {
-  private readonly logger = new Logger(HomeService.name);
-
   private readonly authClient = this.httpClientService.create(
     microServiceNames.AUTH,
   );
@@ -34,41 +32,22 @@ export class HomeService {
   ) {}
 
   async getStats(): Promise<HeroStats> {
-    const [totalRescues, adoptedRescues, adoptedPets] = await Promise.all([
-      this.prisma.animalReports.count({
-        where: { deletedAt: { isSet: false } },
-      }),
-      this.prisma.animalReports.count({
-        where: {
-          deletedAt: { isSet: false },
-          animalStatus: AnimalStatus.ADOPTED,
-        },
-      }),
-      this.prisma.adoptablePet.count({
-        where: { deletedAt: { isSet: false }, adoptionStatus: 'adopted' },
-      }),
-    ]);
-
-    let totalVolunteers = 0;
-    try {
-      const { data } =
-        await this.authClient.get<ApiResponseEnvelope>('/volunteer-count');
-      const { count } = data as { count: number };
-      totalVolunteers = typeof count === 'number' ? count : 0;
-    } catch (error) {
-      const httpError = error instanceof HttpException ? error : null;
-      const status = httpError ? httpError.getStatus() : 'unknown';
-      const payload = httpError ? httpError.getResponse() : null;
-      const traceId =
-        payload && typeof payload === 'object' && 'traceId' in payload
-          ? (payload as Record<string, unknown>).traceId
-          : undefined;
-      const message = error instanceof Error ? error.message : String(error);
-      this.logger.warn(
-        `Volunteer count from auth-service failed; falling back to totalVolunteers=0. ` +
-          `status=${status} message=${message} traceId=${traceId ?? 'n/a'}`,
-      );
-    }
+    const [totalRescues, adoptedRescues, adoptedPets, totalVolunteers] =
+      await Promise.all([
+        this.prisma.animalReports.count({
+          where: { deletedAt: { isSet: false } },
+        }),
+        this.prisma.animalReports.count({
+          where: {
+            deletedAt: { isSet: false },
+            animalStatus: AnimalStatus.ADOPTED,
+          },
+        }),
+        this.prisma.adoptablePet.count({
+          where: { deletedAt: { isSet: false }, adoptionStatus: 'adopted' },
+        }),
+        this.getVolunteerCount(),
+      ]);
 
     return {
       totalRescues,
@@ -91,10 +70,18 @@ export class HomeService {
       this.adoptionService.findAll(undefined, adoptablePetLimit),
     ]);
 
-    return {
-      heroStats,
-      latestRescues,
-      adoptablePets,
-    };
+    return { heroStats, latestRescues, adoptablePets };
+  }
+
+  private async getVolunteerCount(): Promise<number> {
+    const { data } =
+      await this.authClient.get<ApiResponseEnvelope>('/volunteer-count');
+    const { count } = data as { count: number };
+
+    if (typeof count !== 'number') {
+      throw new Error('Volunteer count response is invalid');
+    }
+
+    return count;
   }
 }

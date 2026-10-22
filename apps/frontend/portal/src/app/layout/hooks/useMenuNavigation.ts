@@ -3,8 +3,8 @@ import { cn, showToast } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction } from 'react-router-dom';
 
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
-import { useLogout } from '@/pages/auth/api/auth.mutations';
 
 const LOGOUT_MENU_CLASS = 'logout';
 
@@ -52,13 +52,13 @@ export const useMenuNavigation = ({
   navigate,
 }: UseMenuNavigationOptions) => {
   const { t } = useTranslation();
-  const { mutate: logout, isPending: isLogoutPending } = useLogout();
+  const { logout, isPending: isLogoutPending } = useGlobalContext();
 
   const isLoggedIn = menuItems.some(isLogoutItem);
 
   const handleMenuClick = (item: MenuItem) => {
     if (isLogoutItem(item) && !isLogoutPending) {
-      logout(undefined, {
+      logout({
         onSuccess: () => {
           navigate(routePaths.login, { replace: true });
         },

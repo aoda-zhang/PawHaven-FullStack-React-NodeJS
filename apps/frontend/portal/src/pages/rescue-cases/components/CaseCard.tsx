@@ -1,14 +1,13 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
+import type { RescueListItem } from '@pawhaven/shared/types';
 import { PhotoPlaceholder } from '@pawhaven/ui';
 import { Clock, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import type { RescueCase } from '../types';
-
 import { StatusBadge } from './StatusBadge';
 
 interface CaseCardProps {
-  caseData: RescueCase;
+  caseData: RescueListItem;
   onClick: (id: string) => void;
 }
 

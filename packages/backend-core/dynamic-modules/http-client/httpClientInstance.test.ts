@@ -244,3 +244,26 @@ describe('HttpClientInstance trace propagation', () => {
     expect(traceIds).toEqual(['verb-trace', 'verb-trace', 'verb-trace']);
   });
 });
+
+describe('HttpClientInstance external target', () => {
+  beforeEach(() => {
+    mockAxiosRequest.mockClear();
+  });
+
+  const externalInstance = () =>
+    makeInstance(microServiceNames.DOCUMENT, makeConfig(baseConfig()));
+
+  it('calls an absolute URL as given instead of prefixing the service route', async () => {
+    await externalInstance().get<string>('https://nominatim.example/reverse');
+
+    expect(lastRequestConfig().url).toBe('https://nominatim.example/reverse');
+  });
+
+  it('does not attach the internal jwt to a third-party target', async () => {
+    await externalInstance().get<string>('https://nominatim.example/reverse');
+
+    expect(
+      lastRequestConfig().headers?.[httpHeaders.gatewayJwt],
+    ).toBeUndefined();
+  });
+});

@@ -10,11 +10,8 @@ export const ConfigSchema = z.object({
   }),
 
   api: z.object({
-    enableSign: z.boolean(),
     baseURL: z.string(),
-    prefix: z.string(),
     timeout: z.number().min(100),
-    privateKey: z.string(),
   }),
 
   query: z.object({

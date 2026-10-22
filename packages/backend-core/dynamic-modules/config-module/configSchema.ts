@@ -89,6 +89,12 @@ export const featureFlagSchema = z.object({
   adoptablePetLimit: z.number().int().positive(),
 });
 
+export const geocodeConfigSchema = z.object({
+  url: z.string().url(),
+  userAgent: z.string().min(1),
+  timeoutMs: z.number().int().positive(),
+});
+
 export const emailConfigSchema = z
   .object({
     enabled: z.boolean().optional(),

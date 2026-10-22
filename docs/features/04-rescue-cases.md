@@ -1,6 +1,6 @@
-# Feature: Rescue Cases (`portal/src/features/rescue-cases`)
+# Feature: Rescue Cases (`portal/src/pages/rescue-cases`)
 
-> **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `portal/features/rescue-cases`
+> **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `portal/pages/rescue-cases`
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §4–8](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue-cases`, the public browse feed. Rows are reports — there is no separate case table, so
@@ -8,7 +8,7 @@ this feature and [Report a Stray Animal](03-report-animal.md) are two views of o
 
 ## 1. Sections
 
-`RescueCases.tsx` renders a filter bar and a list, inside `max-w-6xl px-4`.
+`RescueCasesPage` renders a filter bar and a list, inside `max-w-6xl px-4`.
 
 ### 1.1 Filter bar
 
@@ -25,8 +25,8 @@ local `useState<FilterStatus>`. Three options, from `FILTER_OPTIONS`:
 contradicts the project's snake_case key rule.
 
 Filtering is **client-side only** — `displayedCases` is a `cases.filter(...)` over the array the
-loader already fetched. Switching filters costs no request. Because the server call passes no
-status, the fetched set is whatever `latestRescueLimit` allows, so a filter can only ever narrow
+suspense query already fetched. Switching filters costs no request. Because the server call passes
+no status, the fetched set is whatever `latestRescueLimit` allows, so a filter can only ever narrow
 that window; it cannot reach a case the initial query did not return.
 
 Only two of the seven statuses are filterable. `treated`, `recovering`, `awaitingAdoption`,
@@ -35,10 +35,11 @@ Only two of the seven statuses are filterable. `treated`, `recovering`, `awaitin
 
 ### 1.2 Case list
 
-`components/RescueCasesSection.tsx` receives `cases={displayedCases}` and `onCaseClick`, and
-deliberately omits `onSeeAll` and `showStatusSummary` (defaults: absent / `true`). So the
-"see all" affordance is omitted — correct, since this _is_ the full list — but the pending /
-in-progress counter **is** rendered here, unlike on the homepage.
+`apps/frontend/portal/src/pages/rescue-cases/components/RescueCasesSection.tsx` receives
+`cases={displayedCases}` and `onCaseClick`, and deliberately omits `onSeeAll` and
+`showStatusSummary` (defaults: absent / `true`). So the "see all" affordance is omitted — correct,
+since this _is_ the full list — but the pending / in-progress counter **is** rendered here, unlike
+on the homepage.
 
 States:
 
@@ -48,7 +49,7 @@ States:
 | empty       | `rescue_cases.no_cases_found`, `py-16` centred |
 | populated   | `CaseCard` per case                            |
 
-`safeCases = cases ?? []` guards the null case even though the loader's type says otherwise.
+`safeCases = cases ?? []` guards the null case even though the query's parsed type says otherwise.
 
 `CaseCard` is a `div` with `role="button"`, `tabIndex={0}` and an `onKeyDown` that activates on
 `Enter` or `Space` — so the card is keyboard-reachable, but the `role="button"` element has no
@@ -61,16 +62,19 @@ animal type, `formatDateTime`, and a `MapPin` with the address. `distance` is no
 
 ```mermaid
 flowchart TD
-    A[GET /rescue-cases] --> B[rescueCasesLoader<br/>ensureQueryData GET /core/rescues]
-    B --> C[RescueCasesPage · useLoaderData]
+    A[GET /rescue-cases] --> B[rescueCasesRoute · lazy import]
+    B --> C[RescueCasesPage · useSuspenseQuery<br/>GET /core/rescues]
     C --> D[Filter bar · local useState]
     D --> E[displayedCases = cases.filter]
     E --> F[RescueCasesSection]
     F --> G[CaseCard per case<br/>image · StatusBadge · type · time · address]
     G --> H{click / Enter / Space}
-    H --> I[navigate /rescue/detail/:id]
+    H --> I[navigate routePaths.rescueCaseDetail]
     I --> J[Rescue Detail]
 ```
+
+`rescueCases.api.ts` parses the response with `RescueListItemSchema.array()`, so a shape drift
+fails at the API boundary. The route is lazy; there is no route loader.
 
 ## 3. Endpoints
 
@@ -145,21 +149,19 @@ of 10 cases with 5 photos each is 11 requests, not 1.
 
 ## 8. Frontend Files
 
-| File                                                                   | Role                                              |
-| ---------------------------------------------------------------------- | ------------------------------------------------- |
-| `route.tsx`                                                            | `rescueCasesRoute` + `rescueCasesLoader`; `lazy:` |
-| `RescueCases.tsx`                                                      | §1 — filter bar + list, page shell                |
-| `types.ts`                                                             | `RescueCase`, `FilterStatus`                      |
-| `components/RescueCasesSection.tsx`                                    | §1.2 — also imported by `home`                    |
-| `components/RescueCasesSectionSkeleton.tsx`                            | Loading state                                     |
-| `components/CaseCard.tsx`                                              | One card                                          |
-| `components/StatusBadge.tsx`                                           | Status pill                                       |
-| `components/RescueTimeline.tsx`                                        | §6 — the ladder                                   |
-| `components/CaseDetail.tsx`                                            | **Dead — no caller**                              |
-| `api/rescueCases.api.ts` / `.queries.ts` / `.queryKeys.ts`             | The call and its cache key                        |
-| `tests/RescueCasesPage.test.tsx` / `tests/RescueCasesSection.test.tsx` | The only two tests                                |
+| File                                                                   | Role                                                  |
+| ---------------------------------------------------------------------- | ----------------------------------------------------- |
+| `route.tsx`                                                            | `rescueCasesRoute` with `lazy:`                       |
+| `index.tsx`                                                            | §1 — filter bar + list, page shell                    |
+| `types.ts`                                                             | `FilterStatus`; `RescueCase` aliases `RescueListItem` |
+| `components/RescueCasesSection.tsx`                                    | Shared with `home`; A2 import exception pinned        |
+| `components/RescueCasesSectionSkeleton.tsx`                            | Loading state for the section                         |
+| `components/CaseCard.tsx`                                              | One case card                                         |
+| `components/StatusBadge.tsx`                                           | Status pill                                           |
+| `api/rescueCases.api.ts` / `.queries.ts` / `.queryKeys.ts`             | The call and its cache key                            |
+| `tests/RescueCasesPage.test.tsx` / `tests/RescueCasesSection.test.tsx` | The page and shared-widget tests                      |
 
-`rescueCasesLoader` uses `ensureQueryData` and takes no argument, so the feed is a single
+`rescueCasesRoute` is lazy. The query takes no argument, so the feed is a single
 uncached-by-parameter snapshot: visiting the page after another user reports a new animal serves
 whatever `staleTime` allows, with no refetch trigger tied to the route.
 
@@ -185,6 +187,6 @@ whatever `staleTime` allows, with no refetch trigger tied to the route.
 
 - [Report a Stray Animal](03-report-animal.md) — the write path, on the same collection
 - [Rescue Detail](05-rescue-detail.md) — where a card navigates to
-- [Home](02-home.md) — embeds `RescueCasesSection`; the cross-feature import
+- [Home](02-home.md) — embeds `RescueCasesSection`; the pinned cross-feature import
 - [Product Blueprint §4–8](../product/product-strategy.md) — the intended lifecycle,
   which is where timelines, claims, and the transitions table come from

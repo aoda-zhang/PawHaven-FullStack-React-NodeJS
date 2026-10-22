@@ -1,3 +1,4 @@
+import { Prisma } from '@prismaClient/index.js';
 import { describe, expect, it, vi } from 'vitest';
 
 import { AdoptionService } from './adoption.service.js';
@@ -101,6 +102,23 @@ describe('AdoptionService.findAll', () => {
     const [pet] = await service.findAll();
 
     expect(pet.animalType).toBe('rabbit');
+  });
+
+  it('lets a data-store failure reach the unified error handler', async () => {
+    const error = new Prisma.PrismaClientKnownRequestError(
+      'mongo unavailable',
+      {
+        code: 'P2010',
+        clientVersion: 'test',
+      },
+    );
+    const service = new AdoptionService({
+      adoptablePet: {
+        findMany: vi.fn(() => Promise.reject(error)),
+      },
+    } as never);
+
+    await expect(service.findAll()).rejects.toBe(error);
   });
 });
 

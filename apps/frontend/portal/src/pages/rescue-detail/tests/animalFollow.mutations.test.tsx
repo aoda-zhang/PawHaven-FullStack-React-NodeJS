@@ -69,6 +69,37 @@ describe('animalFollow mutations', () => {
     expect(invalidateSpy).not.toHaveBeenCalled();
   });
 
+  it('optimistically flips isFollowing before the follow request settles', async () => {
+    const queryClient = new QueryClient();
+    let resolveFollow: ((value: AnimalFollowResult) => void) | undefined;
+    vi.mocked(followAnimal).mockReturnValue(
+      new Promise((resolve) => {
+        resolveFollow = resolve;
+      }),
+    );
+    queryClient.setQueryData(
+      rescueDetailQueryKeys.followStatus(animalId),
+      unfollowedResult,
+    );
+
+    const { result } = renderHook(() => useFollowAnimal(), {
+      wrapper: createWrapper(queryClient),
+    });
+
+    act(() => {
+      result.current.mutate(animalId);
+    });
+
+    await waitFor(() =>
+      expect(
+        queryClient.getQueryData(rescueDetailQueryKeys.followStatus(animalId)),
+      ).toMatchObject({ isFollowing: true, followerCount: 4 }),
+    );
+
+    resolveFollow?.(followedResult);
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
   it('caches the returned status and follower count on unfollow without refetching', async () => {
     const queryClient = new QueryClient();
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');

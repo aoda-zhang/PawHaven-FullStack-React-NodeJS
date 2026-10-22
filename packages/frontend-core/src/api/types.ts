@@ -21,8 +21,6 @@ export const RequestMode = {
 export interface ApiClientOptions {
   baseURL?: string; // The base URL for API requests
   timeout?: number; // Optional request timeout
-  enableSign?: boolean; // Whether to use signature validation
-  prefix?: string; // endpoint prefix
   withCredentials?: boolean; // Is send cookies to backend automatically
   requestMode?: keyof typeof RequestMode;
 }
@@ -31,10 +29,10 @@ export type HttpRequestErrorType =
   (typeof httpRequestErrors)[keyof typeof httpRequestErrors];
 export interface ApiErrorInfo {
   type: HttpRequestErrorType;
-  status?: number;
+  status?: number | null;
   data?: Record<string, unknown>;
   raw?: unknown;
-  code: string;
+  code: string | null;
   /**
    * Server correlation id for the failed request, shown to the user so a bug
    * report can be tied to specific backend logs.

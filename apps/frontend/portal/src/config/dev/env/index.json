@@ -6,11 +6,8 @@
     "enableMaintenance": false
   },
   "api": {
-    "enableSign": false,
     "baseURL": "${PAWHAVEN_USER_API_BASE_URL}",
-    "prefix": "api",
-    "timeout": 5000,
-    "privateKey": "${PAWHAVEN_USER_API_PRIVATE_KEY}"
+    "timeout": 5000
   },
   "query": {
     "refetchOnReconnect": true,

@@ -1,17 +1,20 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck
 import { httpBusinessMappingCodes, HTTP_STATUS } from '@pawhaven/shared';
+import { isAxiosError } from 'axios';
 
-import { httpRequestErrors } from './types';
+import {
+  type ApiErrorInfo,
+  httpRequestErrors,
+  type HttpRequestErrorType,
+} from './types';
 
 interface ErrorResponse {
   status?: number | null;
   code?: string | null;
   message?: string | null;
   headers?: Record<string, string | string[] | undefined>;
-  // Optional token state to check local token presence
-  hasLocalToken?: boolean;
 }
+
+type ErrorHeaders = Record<string, string | string[] | undefined>;
 
 /**
  * Header carrying the server-side correlation id. Mirrors
@@ -19,6 +22,27 @@ interface ErrorResponse {
  * because the frontend must not depend on a backend package.
  */
 const TRACE_ID_HEADER = 'x-trace-id';
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const readHeaders = (value: unknown): ErrorHeaders | null => {
+  if (!isRecord(value)) return null;
+
+  const headers: ErrorHeaders = {};
+  Object.entries(value).forEach(([key, headerValue]) => {
+    if (typeof headerValue === 'string') {
+      headers[key] = headerValue;
+    } else if (
+      Array.isArray(headerValue) &&
+      headerValue.every((item) => typeof item === 'string')
+    ) {
+      headers[key] = headerValue;
+    }
+  });
+
+  return headers;
+};
 
 /**
  * Reads the trace id from a response, preferring the header and falling back to
@@ -95,6 +119,10 @@ const isAuthError = (errorRes: ErrorResponse): boolean => {
 const isPermissionError = (errorRes: ErrorResponse): boolean => {
   if (!errorRes) return false;
 
+  if (errorRes.status === HTTP_STATUS.FORBIDDEN) {
+    return true;
+  }
+
   // 1. Status + code
   if (
     matchesStatusAndCode(errorRes, HTTP_STATUS.FORBIDDEN, [
@@ -127,10 +155,10 @@ const isRateLimit = (errorRes: ErrorResponse): boolean => {
 /**
  * Check if the error is a bad request (client-side input error)
  */
-const isBadRequest = (errorRes: ErrorResponse): boolean =>
-  matchesStatusAndCode(errorRes, HTTP_STATUS.BAD_REQUEST, [
-    httpBusinessMappingCodes.validationError,
-  ]);
+const isBadRequest = (errorRes: ErrorResponse): boolean => {
+  if (!errorRes) return false;
+  return errorRes.status === HTTP_STATUS.BAD_REQUEST;
+};
 
 /**
  * Check if the error is a server-side internal error
@@ -148,6 +176,8 @@ const isServerError = (errorRes: ErrorResponse): boolean => {
  */
 const isMaintenance = (errorRes: ErrorResponse): boolean => {
   if (!errorRes) return false;
+  if (errorRes.status === HTTP_STATUS.SERVICE_UNAVAILABLE) return true;
+
   const { message } = errorRes;
   return (
     typeof message === 'string' && message.toLowerCase().includes('maintenance')
@@ -157,7 +187,7 @@ const isMaintenance = (errorRes: ErrorResponse): boolean => {
 /**
  * Map the response error to a corresponding httpRequestErrors type
  */
-const mapErrorToType = (errorRes: ErrorResponse) => {
+const mapErrorToType = (errorRes: ErrorResponse): HttpRequestErrorType => {
   if (isAuthError(errorRes)) return httpRequestErrors.AUTH;
   if (isPermissionError(errorRes)) return httpRequestErrors.PERMISSION;
   if (isBadRequest(errorRes)) return httpRequestErrors.BADREQUEST;
@@ -168,51 +198,60 @@ const mapErrorToType = (errorRes: ErrorResponse) => {
 };
 
 /**
- * Normalize various axios error shapes into a unified format
+ * Normalize various axios and non-axios error shapes into a unified format.
  */
-export const normalizeHttpError = (error: any) => {
-  let errorType = httpRequestErrors.UNKNOWN;
-  let errorStatus = error?.status ?? null;
-  let errorCode = error?.code ?? null;
-  let errorMessage = error?.message ?? null;
-  let errorHeaders = error?.response?.headers ?? null;
+export const normalizeHttpError = (error: unknown): ApiErrorInfo => {
+  let errorType: HttpRequestErrorType = httpRequestErrors.UNKNOWN;
+  let errorStatus: number | null = null;
+  let errorCode: string | null = null;
+  let errorMessage: string | null = null;
+  let errorHeaders: ErrorHeaders | null = null;
   // Correlation id for the failed request, so a user can quote it in a bug
-  // report. Read from the response headers, falling back to the error body —
-  // downstream services put it in both places.
+  // report. Read from the response headers, falling back to the error body.
   let errorTraceId: string | null = null;
 
-  // Optional local token state, if available from context or error object
-  const hasLocalToken = error?.hasLocalToken ?? false;
-
-  if (error?.isAxiosError && error?.response) {
+  if (isAxiosError(error)) {
     const { response } = error;
-    const { status } = response;
-    const code = response?.data?.code ?? error.code;
-    const message = response?.data?.message ?? error.message;
-    const headers = response.headers ?? null;
-    errorStatus = status;
-    errorCode = code;
-    errorMessage = message;
-    errorHeaders = headers;
-    errorTraceId = readTraceId(headers, response?.data);
-    errorType = mapErrorToType({
-      ...response.data,
-      status: response.status,
-      headers,
-      hasLocalToken,
-    });
-  } else if (error?.message?.includes('Network')) {
-    errorType = httpRequestErrors.NETWORK;
+    const data = isRecord(response?.data) ? response.data : null;
+
+    errorStatus = response?.status ?? null;
+    errorCode =
+      typeof data?.code === 'string' ? data.code : (error.code ?? null);
+    errorMessage =
+      typeof data?.message === 'string' ? data.message : error.message;
+    errorHeaders = readHeaders(response?.headers);
+    errorTraceId = readTraceId(errorHeaders, data ?? error);
+
+    if (response) {
+      errorType = mapErrorToType({
+        ...(data ?? {}),
+        status: response.status,
+        code: errorCode,
+        message: errorMessage,
+        headers: errorHeaders ?? undefined,
+      });
+    } else if ((errorMessage ?? '').toLowerCase().includes('network')) {
+      errorType = httpRequestErrors.NETWORK;
+    }
   } else {
+    const record = isRecord(error) ? error : null;
+
+    errorStatus = typeof record?.status === 'number' ? record.status : null;
+    errorCode = typeof record?.code === 'string' ? record.code : null;
+    errorMessage = typeof record?.message === 'string' ? record.message : null;
+    errorHeaders = readHeaders(record?.headers);
     errorTraceId = readTraceId(errorHeaders, error);
-    // For non-axios errors, try to map with available info
-    errorType = mapErrorToType({
-      status: errorStatus,
-      code: errorCode,
-      message: errorMessage,
-      headers: errorHeaders,
-      hasLocalToken,
-    });
+
+    if ((errorMessage ?? '').toLowerCase().includes('network')) {
+      errorType = httpRequestErrors.NETWORK;
+    } else {
+      errorType = mapErrorToType({
+        status: errorStatus,
+        code: errorCode,
+        message: errorMessage,
+        headers: errorHeaders ?? undefined,
+      });
+    }
   }
 
   return {

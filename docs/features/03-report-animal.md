@@ -9,7 +9,7 @@ row into `animalReports` with status `pending` — the same collection the rescu
 
 ## 1. Screens
 
-One route, one page shell (`ReportAnimal.tsx`), and one of three mutually exclusive card states.
+One route, one page container (`index.tsx`), and one of three mutually exclusive card states.
 The page is **not** a wizard: it is a single `<form>` that scrolls, with two fieldset cards and a
 submit button.
 
@@ -51,16 +51,22 @@ There is no email input. `contactInfo.email` is sent as a hard-coded `''`.
 The submit button is a `Button type="submit"` with `loading={isPending}` and
 `disabled={isPending}`, relabelled `reportAnimal.submitting` while in flight.
 
+A failed submission leaves the form editable. HTTP 400, HTTP 429, unreadable-photo failures, and a
+response missing the server `id` render an inline `NotificationBanner` above the submit button.
+Server, maintenance, network, auth, and permission failures are surfaced by the shared
+`MutationCache` toast instead, so they are not duplicated inline. `window.scrollTo(0, 0)` happens
+only on success.
+
 ### 1.3 Success card
 
 Once `submitted` is true the form is replaced by a confirmation card: a `CheckCircle` in
 `bg-success-light`, `reportAnimal.success_title`, the case number, a `success_volunteers` line, and
 a button back to `/`. The page also calls `window.scrollTo(0, 0)` on success.
 
-The displayed case number is `data?.id` when the response carries one, otherwise a **fabricated**
-`REP-${Date.now().toString().slice(-FALLBACK_ID_SUFFIX_LENGTH)}` — the last 8 digits of the
-current epoch-millisecond timestamp. The fallback is not a server-issued identifier and does
-not correspond to any record.
+The success card renders only after `onSubmit` resolves with a real server `id`. The displayed case
+number is `result.id` from the create response, and nothing is shown as a case number before that.
+A response that resolves **without** an `id` leaves the form visible and sets
+`reportAnimal.submit_failed`; no client-generated identifier and no placeholder case number exist.
 
 ### 1.4 Stray CTA
 
@@ -73,13 +79,13 @@ not correspond to any record.
 
 ```mermaid
 flowchart TD
-    A[GET /report-animal<br/>route behind requireUser] --> B[ReportAnimalForm<br/>one page · 2 fieldset cards]
+    A[GET /report-animal<br/>route behind AuthenticatedLayout] --> B[ReportAnimalForm<br/>one page · 2 fieldset cards]
     B --> C[AnimalBasicsSection<br/>location · type · count · colour · size · age · photos]
     C --> D[BehaviorContactSection<br/>behaviour · description · urgent · phone]
     D --> E{client Zod validation}
     E -- fail --> B
     E -- pass --> F[readFilesAsDataUrls<br/>Files → base64 data URLs]
-    F --> G[map form values → AnimalReportDto<br/>urgent → status · behavior → translated label]
+    F --> G[map form values → AnimalReportDto<br/>urgent → status · behavior → statusDescription]
     G --> H[POST /api/core/report-animal]
     H --> I[Gateway signs InternalJwt]
     I --> J[AnimalReportSchema inbound validation]
@@ -127,17 +133,12 @@ The rescue feed works around this by serving one photo per request through
 | `appearance`        | Json      | `{ color }` and nothing else                                                                                                               |
 | `locationObj`       | Json      | `{ address, latitude?, longitude? }`                                                                                                       |
 | `animalStatus`      | String    | Always `pending` on write                                                                                                                  |
-| `statusDescription` | String?   | The **translated label** for the chosen `behavior`                                                                                         |
+| `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                                     |
 | `description`       | String    | ≤ 200 chars, trimmed                                                                                                                       |
 | `reporterPhotos`    | String[]  | Base64 data URLs, 2–5 entries                                                                                                              |
 | `reporter`          | Object?   | `{ reporterID: claims.sub, reporterName }`                                                                                                 |
 | `status`            | String    | `@default("active")` — **written by nothing, read by nothing.** Not the DTO's `status`; see [§6](#6-two-contract-fields-the-service-drops) |
 | `deletedAt`         | DateTime? | Soft delete; this is what `findAll` actually filters on                                                                                    |
-
-`statusDescription` stores `t('reportAnimal.behavior_' + behavior)` — a **rendered translation**,
-not the enum value. The row therefore records whichever locale was active in the reporter's
-browser at submit time, and the same animal described by a `zh-CN` and an `en-US` reporter produces
-two different stored strings. Nothing reads it as an enum.
 
 ## 6. Two contract fields the service drops
 
@@ -176,7 +177,7 @@ so a four-value enum is collapsed to two by a boolean that means something else,
 `BEHAVIORS = friendly | wary | aggressive | unknown`. The two vocabularies overlap on exactly one
 value, `friendly`; `wary`/`aggressive`/`unknown` have no counterpart in `status`, and
 `dangerous`/`scared` have no counterpart in `behavior`. The user's actual behaviour answer is
-discarded as a label into `statusDescription`, and an unrelated boolean is sent in its place.
+stored as the raw enum string in `statusDescription`, and an unrelated boolean is sent in its place.
 
 The service then drops `status` too. The reason is almost certainly a **name collision**: the model
 also has a column called `status`, defaulting to `"active"`, which is a soft-delete-style flag and
@@ -184,27 +185,30 @@ has nothing to do with temperament. Nothing writes that column — `create` omit
 default — and nothing reads it either, since `findAll` filters on `deletedAt: { isSet: false }`
 rather than on `status`. It is a dead column whose name shadows a live contract field.
 
-Net effect: **the only behaviour signal that survives is a translated string**, and the
-`dangerous` value the form can send goes nowhere. `RescueListItemSchema` and `RescueDetailSchema`
-expose neither, so the rescue feed cannot distinguish a dangerous animal from a friendly one.
+Net effect: **the only behaviour signal that survives is the raw `behavior` string in
+`statusDescription`**, and the `dangerous` value the form can send goes nowhere.
+`RescueListItemSchema` and `RescueDetailSchema` expose `statusDescription` only as an optional
+free string and expose neither enum, so the rescue feed cannot distinguish a dangerous animal from
+a friendly one.
 
 ## 7. Frontend Files
 
-| File                                                                        | Role                                                     |
-| --------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `route.tsx`                                                                 | `reportAnimalRoute`; the only `requireUser`-nested route |
-| `ReportAnimal.tsx`                                                          | Page shell                                               |
-| `components/ReportAnimalForm.tsx`                                           | RHF form; owns the DTO mapping and the success card      |
-| `components/AnimalBasicsSection.tsx`                                        | §1.1                                                     |
-| `components/LocationSection.tsx`                                            | Address + coordinates                                    |
-| `components/PhotoUpload.tsx`                                                | File → data URL, count/size/type validation              |
-| `components/AnimalCountStepper.tsx`                                         | Count −/+                                                |
-| `components/BehaviorContactSection.tsx`                                     | §1.2                                                     |
-| `components/StrayCTA.tsx`                                                   | §1.4 — duplicated from `home`                            |
-| `constants.ts` / `components/types.ts`                                      | `ANIMAL_TYPES`, `SIZES`, `RescueAgeValues`               |
-| `utils/readFilesAsDataUrls.ts`                                              | `File[]` → `string[]`                                    |
-| `api/reportAnimal.api.ts` / `.mutations.ts` / `.queryKeys.ts`               | The call and its cache key                               |
-| `tests/PhotoUpload.test.tsx` / `tests/ReportAnimalForm.validation.test.tsx` | The only two tests                                       |
+| File                                        | Role                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `route.tsx`                                 | `reportAnimalRoute`; the only `AuthenticatedLayout`-nested route                                                         |
+| `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                   |
+| `components/ReportAnimalForm.tsx`           | RHF form; owns the DTO mapping and the success card                                                                      |
+| `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                     |
+| `components/LocationSection.tsx`            | Address + coordinates                                                                                                    |
+| `components/PhotoUpload.tsx`                | File → data URL, count/size/type validation                                                                              |
+| `components/AnimalCountStepper.tsx`         | Count −/+                                                                                                                |
+| `components/BehaviorContactSection.tsx`     | §1.2                                                                                                                     |
+| `components/StrayCTA.tsx`                   | §1.4 — duplicated from `home`                                                                                            |
+| `components/types.ts`                       | Re-exports `ANIMAL_TYPES`, `SIZES`, `BEHAVIORS`, `RescueAgeValues` and their types from `@pawhaven/shared/types`         |
+| `utils/readFilesAsDataUrls.ts`              | `File[]` → `string[]`                                                                                                    |
+| `utils/reportSubmitError.ts`                | Maps submit failures to the inline message key; returns `null` for errors already shown by the shared toast              |
+| `api/reportAnimal.api.ts` / `.mutations.ts` | The call; the mutation invalidates the rescue-feed and home keys                                                         |
+| `tests/`                                    | Component, validation, DTO-mapping and API tests, plus `ReportAnimal.submit` (400/429/500, unreadable photos, real `id`) |
 
 Validation is schema-first on both sides, and the two schemas are deliberately different shapes:
 `createReportAnimalFormSchema(messages)` builds a client Zod schema with translated messages,
@@ -217,17 +221,15 @@ cannot cross the wire and data URLs cannot exist in a form value.
 - **No edit or delete.** A submitted report is immutable through the API, and there is no delete
   path at all.
 - **No duplicate detection.** No radius/species dedupe, no `guestToken`.
-- **No guest submission.** The route is behind `requireUser`, contradicting the blueprint.
+- **No guest submission.** The route is behind `AuthenticatedLayout`, contradicting the blueprint.
 - **No urgency tiers.** `low/medium/high/critical` does not exist. The one `urgent` boolean is
   folded into a temperament enum the user never sees and the service then discards — see
   [§6.2](#62-status--and-a-name-collision). Nothing downstream can tell an urgent report from a
   calm one.
-- **No stored behaviour classification.** The user's `behavior` answer survives only as a
-  translated string in `statusDescription`; the `status` enum designed to carry it is dropped.
+- **No stored behaviour classification.** The user's `behavior` answer survives only as a raw,
+  untyped string in `statusDescription`; the `status` enum designed to carry it is dropped.
 - **No contact retention.** `contactInfo` is validated and dropped — see
   [§6.1](#61-contactinfo).
-- **No locale-independent data.** `statusDescription` holds a rendered translation, so the stored
-  value depends on the submitter's language.
 - **No case creation step, no volunteer notification, no content recommendation.** The report is
   the case; there is no event bus and no other module reacts to it.
 - **No geocoding.** `address` is typed; nothing resolves it to coordinates, and the feed renders
@@ -238,6 +240,6 @@ cannot cross the wire and data URLs cannot exist in a form value.
 
 - [Rescue Cases](04-rescue-cases.md) — reads the same `animalReports` collection
 - [Home](02-home.md) — surfaces the newest reports; owns the other `StrayCTA` copy
-- [Auth](01-auth.md) — `requireUser`, the only guard on this route
+- [Auth](01-auth.md) — `AuthenticatedLayout`, the only guard on this route
 - [Product Blueprint §3 (Discovery)](../product/product-strategy.md) — the intended
   version of this flow, including guest submission and duplicate detection

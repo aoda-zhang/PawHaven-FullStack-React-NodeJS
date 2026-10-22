@@ -9,6 +9,8 @@ import { rescueCasesQueryOptions } from './api/rescueCases.queries';
 import { RescueCasesSection } from './components/RescueCasesSection';
 import type { FilterStatus } from './types';
 
+import { routePaths } from '@/app/router/routePaths';
+
 const FILTER_ALL: FilterStatus = 'all';
 
 const FILTER_OPTIONS: Array<{ value: FilterStatus; labelKey: string }> = [
@@ -36,7 +38,9 @@ const RescueCasesPage = () => {
       : cases.filter((c) => c.status === activeFilter);
 
   const handleCaseClick = (id: string) => {
-    navigate(`/rescue/detail/${id}`);
+    navigate(
+      routePaths.rescueCaseDetail.replace(':animalID', encodeURIComponent(id)),
+    );
   };
 
   return (

@@ -27,9 +27,6 @@
   font-weight: var(--font-weight-bold);
 }
 
-/* ═══ Link Utilities ════════════════════════════════════════ */
-
-
 /* ═══ Focus Ring Utility ════════════════════════════════════ */
 
 @utility focus-ring {

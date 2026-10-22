@@ -5,6 +5,7 @@ import { AnimalFollowModule } from '@modules/animal-follow/animalFollow.module.j
 import { BootstrapModule } from '@modules/bootstrap/bootstrap.module.js';
 import { GuideModule } from '@modules/guide/guide.module.js';
 import { HomeModule } from '@modules/home/home.module.js';
+import { GeocodeModule } from '@modules/geocode/geocode.module.js';
 import { RescueModule } from '@modules/rescue/rescue.module.js';
 import { ReportAnimalModule } from '@modules/report-animal/reportAnimal.module.js';
 import { Module } from '@nestjs/common';
@@ -47,6 +48,7 @@ const configContext = import.meta.webpackContext('./config', {
       ],
     }),
     HomeModule,
+    GeocodeModule,
     BootstrapModule,
     RescueModule,
     ReportAnimalModule,

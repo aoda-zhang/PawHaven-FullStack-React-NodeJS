@@ -15,27 +15,22 @@ export class AdoptionService {
   ) {}
 
   async findAll(status?: string, limit?: number): Promise<AdoptablePet[]> {
-    try {
-      const parsedLimit = Number(limit);
-      const take =
-        Number.isInteger(parsedLimit) && parsedLimit > 0
-          ? parsedLimit
-          : undefined;
+    const parsedLimit = Number(limit);
+    const take =
+      Number.isInteger(parsedLimit) && parsedLimit > 0
+        ? parsedLimit
+        : undefined;
 
-      const pets = await this.prisma.adoptablePet.findMany({
-        where: {
-          deletedAt: { isSet: false },
-          ...(status ? { adoptionStatus: status } : {}),
-        },
-        orderBy: { createdAt: 'desc' },
-        take,
-      });
+    const pets = await this.prisma.adoptablePet.findMany({
+      where: {
+        deletedAt: { isSet: false },
+        ...(status ? { adoptionStatus: status } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      take,
+    });
 
-      return pets.map((pet) => this.toContract(pet));
-    } catch (error) {
-      this.logger.error('Failed to fetch adoptable pets', error);
-      throw new BadRequestException('Failed to fetch adoptable pets');
-    }
+    return pets.map((pet) => this.toContract(pet));
   }
 
   async findOne(id: string): Promise<AdoptablePet> {

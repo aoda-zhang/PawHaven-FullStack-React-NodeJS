@@ -22,7 +22,7 @@
 ### 2.1 New page
 
 The app layer is `src/app/` in five segments. `init/` owns boot data — the bootstrap query, the
-current-user query, the root loader and the `requireUser` guard. `layout/` renders what it is given and
+current-user query and the root loader. `layout/` renders what it is given and
 fetches nothing: no `apiClient`, no query, no mutation. `providers/` composes the runtime, `router/`
 holds the URL table and composes the routes, `store/` holds Redux.
 
@@ -60,8 +60,8 @@ children. Form-local `useState` and `react-hook-form` context reads are a view's
   in `pages/auth/route.tsx` renders a `<Navigate>` to the login page. Do not re-implement either.
 - `download`/`postBlob` responses bypass the envelope; nothing to unwrap.
 - A key belongs in `src/shared/constants/sharedQueryKeys.ts` only when something outside its owner must
-  reach it — `sharedQueryKeys.auth.currentUser(userId)`, because `app/init/` owns the query while the
-  auth page owns the invalidation. Every other key stays with its owner.
+  reach it — `sharedQueryKeys.rescueCases.all()`, because `report-animal` clears a slice it does not
+  own. Every other key stays with its owner.
 - Server state never enters Redux.
 
 ### 2.3 Form
@@ -131,6 +131,8 @@ direction ([Frontend Architecture](frontend-architecture.md) §2).
 - Typed Redux hooks only: `useReduxDispatch`, `useReduxSelector` from `@/app/store/reduxHooks`. Raw
   `useDispatch`/`useSelector` outside that file is a defect.
 - `useGlobalState` from `@/app/store/globalReducer` is the per-slice convenience hook.
+- `useGlobalContext` from `@/app/providers/GlobalProvider` is the only place the UI language and the
+  signed-in user are read. Do not mirror either into Redux or a second context.
 - `store.getState()` appears in loaders, never in a component.
 - Query cache persistence is opt-in per query with `meta.persist = true`; the default keeps nothing on
   disk.

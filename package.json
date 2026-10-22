@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "build:local": "pnpm run build:libs && pnpm run build",
     "dev:local": "bash scripts/restart-dev.sh",
-    "dev:all": "pnpm run build:libs && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
+    "dev:all": "pnpm run build:libs && bash scripts/kill-dev-ports.sh && turbo run dev --filter=@pawhaven/auth-service --filter=@pawhaven/core-service --filter=@pawhaven/gateway --filter=@pawhaven/document-service --filter=@pawhaven/portal",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "test:e2e": "playwright test",

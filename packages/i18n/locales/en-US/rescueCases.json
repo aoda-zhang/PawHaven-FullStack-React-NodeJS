@@ -2,8 +2,7 @@
   "rescue_cases": {
     "section_title": "Rescue Cases",
     "section_subtitle": "Track and support ongoing rescue operations in your area",
-    "pending_count": "{{count}} pending",
-    "in_progress_count": "{{count}} in progress",
+    "status_summary": "{{pendingCount}} pending · {{inProgressCount}} in progress",
     "filter_all": "All Cases",
     "view_list": "List",
     "view_map": "Map",

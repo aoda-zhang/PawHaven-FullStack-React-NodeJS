@@ -1,14 +1,13 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
+import type { RescueListItem } from '@pawhaven/shared/types';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-import type { RescueCase } from '../types';
 
 import { CaseCard } from './CaseCard';
 import { RescueCasesSectionSkeleton } from './RescueCasesSectionSkeleton';
 
 interface RescueCasesSectionProps {
-  cases: RescueCase[];
+  cases: RescueListItem[];
   onCaseClick: (id: string) => void;
   onSeeAll?: () => void;
   showStatusSummary?: boolean;
@@ -65,10 +64,10 @@ export const RescueCasesSection = ({
           </h2>
           {showStatusSummary && (
             <p className="text-text-secondary mt-0.5 text-sm">
-              {pendingCount}
-              {t('common.rescue_status_pending')}
-              {inProgressCount}
-              {t('common.rescue_status_inProgress')}
+              {t('rescue_cases.status_summary', {
+                pendingCount,
+                inProgressCount,
+              })}
             </p>
           )}
         </div>

@@ -2,8 +2,7 @@
   "rescue_cases": {
     "section_title": "救助案例",
     "section_subtitle": "追踪并支持您所在区域的救援行动",
-    "pending_count": "{{count}} 待处理",
-    "in_progress_count": "{{count}} 进行中",
+    "status_summary": "{{pendingCount}} 待处理 · {{inProgressCount}} 进行中",
     "filter_all": "全部案例",
     "view_list": "列表",
     "view_map": "地图",

@@ -4,32 +4,36 @@ import {
   type AnimalReportDto,
   type ReportAnimalFormValues,
 } from '@pawhaven/shared/types';
-import { Button } from '@pawhaven/ui';
+import { Button, NotificationBanner } from '@pawhaven/ui';
 import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { createFallbackCaseId } from '../utils/createFallbackCaseId';
 import { readFilesAsDataUrls } from '../utils/readFilesAsDataUrls';
 
 import { AnimalBasicsSection } from './AnimalBasicsSection';
 import { BehaviorContactSection } from './BehaviorContactSection';
 
+import { routePaths } from '@/app/router/routePaths';
+
 interface ReportAnimalFormProps {
-  onSubmit: (dto: AnimalReportDto) => Promise<{ id?: string }>;
+  onSubmit: (dto: AnimalReportDto) => void;
   isPending?: boolean;
+  submittedCaseId?: string;
+  submitErrorKey?: string | null;
 }
 
 export const ReportAnimalForm = ({
   onSubmit,
   isPending = false,
+  submittedCaseId = '',
+  submitErrorKey = null,
 }: ReportAnimalFormProps) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [submitted, setSubmitted] = useState(false);
-  const [caseId, setCaseId] = useState('');
+  const [photoErrorKey, setPhotoErrorKey] = useState<string | null>(null);
 
   const form = useForm<ReportAnimalFormValues>({
     resolver: zodResolver(
@@ -70,16 +74,30 @@ export const ReportAnimalForm = ({
   });
 
   const handleSubmit = async (values: ReportAnimalFormValues) => {
+    setPhotoErrorKey(null);
+
+    if (!values.age || !values.size) {
+      return;
+    }
+
     const description = values.description?.trim() ?? '';
     const isUrgent = values.urgent;
-    const reporterPhotos = await readFilesAsDataUrls(values.photos);
+
+    let reporterPhotos: string[];
+    try {
+      reporterPhotos = await readFilesAsDataUrls(values.photos);
+    } catch {
+      setPhotoErrorKey('reportAnimal.photos_read_failed');
+      return;
+    }
+
     const dto: AnimalReportDto = {
       animalType:
         values.animalType === 'other'
           ? values.otherAnimalType
           : values.animalType,
-      age: values.age!,
-      size: values.size!,
+      age: values.age,
+      size: values.size,
       animalCount: values.animalCount,
       appearance: {
         color: values.coatColor,
@@ -91,9 +109,7 @@ export const ReportAnimalForm = ({
           : {}),
       },
       status: isUrgent ? 'dangerous' : 'other',
-      statusDescription: values.behavior
-        ? t(`reportAnimal.behavior_${values.behavior}`)
-        : '',
+      statusDescription: values.behavior ?? '',
       reporterPhotos,
       description,
       contactInfo: {
@@ -102,13 +118,12 @@ export const ReportAnimalForm = ({
       },
     };
 
-    const result = await onSubmit(dto);
-    setCaseId(result?.id ?? createFallbackCaseId());
-    setSubmitted(true);
-    window.scrollTo(0, 0);
+    onSubmit(dto);
   };
 
-  if (submitted) {
+  const bannerKey = submitErrorKey ?? photoErrorKey;
+
+  if (submittedCaseId) {
     return (
       <div className="bg-card border-border rounded-2xl border p-8 text-center shadow-sm">
         <div className="bg-success-light mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
@@ -119,14 +134,14 @@ export const ReportAnimalForm = ({
         </h1>
         <p className="text-text-secondary mb-4 text-sm">
           {t('reportAnimal.case_number_prefix')}
-          {caseId}
+          {submittedCaseId}
         </p>
         <p className="text-text-secondary mb-6 text-sm">
           {t('reportAnimal.success_volunteers')}
         </p>
         <Button
           type="button"
-          onClick={() => navigate('/')}
+          onClick={() => navigate(routePaths.home)}
           className="w-full rounded-xl py-3"
         >
           {t('reportAnimal.success_home')}
@@ -157,6 +172,16 @@ export const ReportAnimalForm = ({
           </p>
           <BehaviorContactSection />
         </div>
+
+        {bannerKey && (
+          <NotificationBanner
+            banner={{
+              type: 'error',
+              message: t(bannerKey),
+              bannerWrapClassNames: 'mb-4 rounded-xl border lg:px-4',
+            }}
+          />
+        )}
 
         <Button
           type="submit"

@@ -71,44 +71,39 @@ export class RescueService {
   }
 
   async findAll(status?: string, limit?: number): Promise<RescueListItem[]> {
-    try {
-      const parsedLimit = Number(limit);
-      const take =
-        Number.isInteger(parsedLimit) && parsedLimit > 0
-          ? parsedLimit
-          : undefined;
+    const parsedLimit = Number(limit);
+    const take =
+      Number.isInteger(parsedLimit) && parsedLimit > 0
+        ? parsedLimit
+        : undefined;
 
-      const rescues = await this.prisma.animalReports.findMany({
-        where: {
-          deletedAt: { isSet: false },
-          ...(status ? { animalStatus: status } : {}),
-        },
-        orderBy: { createdAt: 'desc' },
-        take,
-        select: {
-          id: true,
-          animalType: true,
-          animalStatus: true,
-          description: true,
-          locationObj: true,
-          reporter: true,
-          createdAt: true,
-        },
-      });
+    const rescues = await this.prisma.animalReports.findMany({
+      where: {
+        deletedAt: { isSet: false },
+        ...(status ? { animalStatus: status } : {}),
+      },
+      orderBy: { createdAt: 'desc' },
+      take,
+      select: {
+        id: true,
+        animalType: true,
+        animalStatus: true,
+        description: true,
+        locationObj: true,
+        reporter: true,
+        createdAt: true,
+      },
+    });
 
-      const photoBearingIds = await this.findPhotoBearingIds(
-        rescues.map((record) => record.id),
-      );
+    const photoBearingIds = await this.findPhotoBearingIds(
+      rescues.map((record) => record.id),
+    );
 
-      return rescues
-        .map((record) =>
-          this.toListItemOrSkip(record, photoBearingIds.has(record.id)),
-        )
-        .filter((item): item is RescueListItem => item !== undefined);
-    } catch (error) {
-      this.logger.error('Failed to fetch rescues', error);
-      throw new BadRequestException('Failed to fetch rescues');
-    }
+    return rescues
+      .map((record) =>
+        this.toListItemOrSkip(record, photoBearingIds.has(record.id)),
+      )
+      .filter((item): item is RescueListItem => item !== undefined);
   }
 
   async findOne(id: string): Promise<RescueDetail> {

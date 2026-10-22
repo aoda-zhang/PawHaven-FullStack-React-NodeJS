@@ -1,17 +1,21 @@
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ScrollRestoration, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/router/routePaths';
 
 const CloseButton = ({ iconClassName }: { iconClassName: string }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <button
+      type="button"
       onClick={() => navigate(routePaths.home)}
+      aria-label={t('common.close')}
       className="text-text-secondary hover:text-text focus-ring cursor-pointer transition-colors"
     >
-      <X className={iconClassName} />
+      <X className={iconClassName} aria-hidden="true" />
     </button>
   );
 };

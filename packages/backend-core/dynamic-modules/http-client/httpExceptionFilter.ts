@@ -47,9 +47,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = 'Service error';
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let data = null;
-    // A downstream `HttpClientInstance` attaches the trace id of the failed
-    // call to the exception payload. Prefer it over the ambient id so the caller
-    // is pointed at the hop that actually broke, not at the hop that noticed.
     let traceId = getTraceId();
 
     if (exception instanceof HttpException) {
@@ -108,9 +105,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (ctxType === 'http') {
       const response = host.switchToHttp().getResponse();
-      // `setHeader` rather than a header on `.json()`: the trace middleware has
-      // normally set this already, and repeating it keeps the header present
-      // even where that middleware was bypassed.
       if (traceId && typeof response.setHeader === 'function') {
         response.setHeader(httpHeaders.traceId, traceId);
       }

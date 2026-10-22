@@ -57,9 +57,7 @@ const mapToDto = (values: {
         : {}),
     },
     status: isUrgent ? 'dangerous' : 'other',
-    statusDescription: values.behavior
-      ? `reportAnimal.behavior_${values.behavior}`
-      : '',
+    statusDescription: values.behavior ?? '',
     reporterPhotos,
     description,
     contactInfo: {

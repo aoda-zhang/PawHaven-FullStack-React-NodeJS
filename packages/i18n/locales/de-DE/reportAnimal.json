@@ -118,6 +118,10 @@
     "nav_continue": "Weiter",
     "nav_submit": "Meldung abschicken",
     "case_number_prefix": "Fall-Nr. #",
+    "submit_failed": "Ihre Meldung konnte nicht bestätigt werden. Bitte prüfen Sie, ob sie bereits erstellt wurde, bevor Sie es erneut versuchen.",
+    "submit_rejected": "Einige Angaben wurden abgelehnt. Bitte prüfen Sie Ihre Eingaben und versuchen Sie es erneut.",
+    "submit_rate_limited": "Zu viele Meldungen in kurzer Zeit. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
+    "photos_read_failed": "Ein Foto konnte nicht gelesen werden. Bitte wählen Sie die Fotos erneut aus und versuchen Sie es noch einmal.",
     "unknown": "Unbekannt"
   }
 }

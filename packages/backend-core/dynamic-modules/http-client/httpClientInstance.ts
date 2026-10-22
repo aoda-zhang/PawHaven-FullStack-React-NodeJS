@@ -39,6 +39,7 @@ interface RequestContext {
   method: HttpMethod;
   url: string;
   requestData: unknown;
+  isExternal: boolean;
 }
 
 export class HttpClientInstance {
@@ -88,6 +89,10 @@ export class HttpClientInstance {
     return host;
   }
 
+  private isExternalTarget(url: string): boolean {
+    return /^https?:\/\//i.test(url);
+  }
+
   private getFullURL(path: string): string {
     const currentMicroserviceOption = this.getCurrentMicroserviceOption();
     const cleanedBase = this.resolveServiceOrigin(currentMicroserviceOption);
@@ -108,16 +113,19 @@ export class HttpClientInstance {
     context: RequestContext,
     options?: RequestOptions,
   ): AxiosRequestConfig {
-    const headers = {
-      ...this.defaultHeaders,
-      ...this.buildInternalAuthHeaders(options, context.traceId),
-      ...options?.headers,
-      // Applied last and from `context` alone, so the header, the `rid` claim
-      // and the log lines below can never disagree. Overriding goes through
-      // the dedicated `traceId` option, not a raw header, which keeps a single
-      // value authoritative for the whole call.
-      [httpHeaders.traceId]: context.traceId,
-    };
+    const headers = context.isExternal
+      ? {
+          ...options?.config?.headers,
+          ...options?.headers,
+          'Accept-Encoding': 'identity',
+        }
+      : {
+          ...this.defaultHeaders,
+          ...this.buildInternalAuthHeaders(options, context.traceId),
+          ...options?.config?.headers,
+          ...options?.headers,
+          [httpHeaders.traceId]: context.traceId,
+        };
 
     return {
       timeout: this.configService.getOrThrow<number>('http.timeout'),
@@ -224,15 +232,14 @@ export class HttpClientInstance {
     options: RequestOptions | undefined,
     transform: (response: AxiosResponse<T>) => TResult,
   ): Promise<TResult> {
+    const isExternal = this.isExternalTarget(path);
     const context: RequestContext = {
-      // Reuse the inbound request's trace id so a service-to-service hop stays
-      // on the same trace. Falls back to a fresh id outside a request scope
-      // (cron jobs, queue consumers, bootstrap).
       traceId: options?.traceId ?? getTraceId() ?? generateTraceId(),
       startTime: Date.now(),
       method,
-      url: this.getFullURL(path),
+      url: isExternal ? path : this.getFullURL(path),
       requestData: data,
+      isExternal,
     };
 
     try {
