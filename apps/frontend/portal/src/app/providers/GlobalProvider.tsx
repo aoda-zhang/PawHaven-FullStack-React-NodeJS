@@ -4,7 +4,7 @@ import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { bootstrapQueryOptions } from '@/app/init/bootstrap.queries';
-import { useLogin, useLogout } from '@/pages/auth/api/auth.mutations';
+import { useLogin, useLogout, useRegister } from '@/pages/auth/api/auth.mutations';
 import {
   clearStoredSession,
   readStoredSession,
@@ -24,6 +24,7 @@ interface GlobalContextType {
   isAuthenticated: boolean;
   isPending: boolean;
   login: (credentials: CredentialsDto, callbacks?: GlobalCallbacks) => void;
+  register: (credentials: CredentialsDto, callbacks?: GlobalCallbacks) => void;
   logout: (callbacks?: GlobalCallbacks) => void;
 }
 
@@ -36,24 +37,54 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const loginMutation = useLogin();
+  const registerMutation = useRegister();
   const logoutMutation = useLogout();
+  const queryClient = useQueryClient();
 
   const setLocale = (locale: string) => {
     i18n.changeLanguage(locale).catch(() => undefined);
   };
 
-  const queryClient = useQueryClient();
+  const completeAuthentication = (
+    userId: string,
+    expiresIn: number,
+    callbacks?: GlobalCallbacks,
+  ) => {
+    setUserInfo(storeSession(userId, expiresIn));
+
+    void queryClient
+      .fetchQuery({
+        ...bootstrapQueryOptions({ userID: userId, menuUpdateAt: '' }),
+        staleTime: 0,
+      })
+      .then(() => callbacks?.onSuccess?.())
+      .catch(() => undefined);
+  };
+
   const login = (credentials: CredentialsDto, callbacks?: GlobalCallbacks) => {
     loginMutation.mutate(credentials, {
       onSuccess: (session) => {
-        setUserInfo(storeSession(session.user.userId, session.expires_in));
-        queryClient.prefetchQuery(
-          bootstrapQueryOptions({
-            userID: session.user.userId,
-            menuUpdateAt: '',
-          }),
+        completeAuthentication(
+          session.user.userId,
+          session.expires_in,
+          callbacks,
         );
-        callbacks?.onSuccess?.();
+      },
+      onError: callbacks?.onError,
+    });
+  };
+
+  const register = (
+    credentials: CredentialsDto,
+    callbacks?: GlobalCallbacks,
+  ) => {
+    registerMutation.mutate(credentials, {
+      onSuccess: (session) => {
+        completeAuthentication(
+          session.user.userId,
+          session.expires_in,
+          callbacks,
+        );
       },
       onError: callbacks?.onError,
     });
@@ -77,8 +108,12 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
         setLocale,
         userInfo,
         isAuthenticated: !!userInfo,
-        isPending: loginMutation.isPending || logoutMutation.isPending,
+        isPending:
+          loginMutation.isPending ||
+          registerMutation.isPending ||
+          logoutMutation.isPending,
         login,
+        register,
         logout,
       }}
     >
