@@ -14,10 +14,10 @@ export const RescueDetailSkeleton = () => (
         <Skeleton className="h-4 w-28 rounded-md" />
         <Skeleton className="h-8 w-2/3 rounded-md" />
         <Skeleton className="h-4 w-48 rounded-md" />
-        <Skeleton className="h-20 w-full rounded-xl" />
+        <Skeleton className="h-20 w-full rounded-media" />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton key={index} className="h-20 rounded-xl" />
+            <Skeleton key={index} className="h-20 rounded-media" />
           ))}
         </div>
       </div>
