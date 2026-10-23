@@ -17,7 +17,7 @@ export const RescueCasesSectionSkeleton = ({
     {Array.from({ length: count }, (_, index) => (
       <div
         key={index}
-        className="border-border bg-card overflow-hidden rounded-card border shadow-sm"
+        className="border-border bg-card overflow-hidden rounded-card-large border shadow-sm"
       >
         <div className="relative h-48">
           <Skeleton className="h-full w-full rounded-none" />
