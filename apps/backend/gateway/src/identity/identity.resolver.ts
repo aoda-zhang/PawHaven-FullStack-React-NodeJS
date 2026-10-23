@@ -286,11 +286,12 @@ export class IdentityResolver {
     if (inflight) {
       return inflight;
     }
-    const refreshAttempt = this.requestRefresh(refreshToken).catch(() => null);
+    const refreshAttempt = this.requestRefresh(refreshToken);
     this.refreshInflight.set(refreshToken, refreshAttempt);
-    refreshAttempt.finally(() => {
-      this.refreshInflight.delete(refreshToken);
-    });
+    refreshAttempt.then(
+      () => this.refreshInflight.delete(refreshToken),
+      () => this.refreshInflight.delete(refreshToken),
+    );
     return refreshAttempt;
   }
 
