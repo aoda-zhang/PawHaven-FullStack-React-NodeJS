@@ -34,7 +34,7 @@ Figma paths above are the recommended naming convention to implement, not a clai
 
 ### 3. Component tokens
 
-Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-card`, `--radius-panel`, `--shadow-card`, and `--shadow-modal`.
+Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-card`, `--radius-panel`, `--radius-icon`, `--radius-media`, `--shadow-card`, and `--shadow-modal`.
 
 Do not create a component token merely to duplicate a semantic token without a distinct component contract.
 
@@ -75,7 +75,7 @@ Use semantic aliases such as `--spacing-gutter`, `--spacing-section`, `--spacing
 
 The document-service prebuild copies the shared primitive tokens and semantic theme into its PDF runtime before compiling the PDF stylesheet. Keep PDF source styles token-based. PDF-specific typography, paper layout, and font fallback may differ from web styles when rendering requirements justify it, but colour choices should use shared semantic tokens unless the report specification explicitly requires a separate token.
 
-The token-check gate covers the shared design-system and frontend CSS plus the PDF engine entry stylesheet. It is a static guard, not a substitute for generated-PDF visual checks or accessibility contrast testing.
+The token-check gate covers shared design-system and frontend CSS plus the PDF engine entry stylesheet. ESLint validates token classes in application source. These static guards are not substitutes for generated-PDF visual checks or accessibility contrast testing.
 
 ## Change checklist
 
@@ -84,7 +84,7 @@ Before changing a token:
 1. Identify its semantic purpose and consumers.
 2. Check whether it affects a Tailwind utility used throughout the application.
 3. Update Figma Variables and the Token Catalog through the team's chosen sync process.
-4. Update the CSS token source and preserve compatibility aliases when needed.
+4. Update the CSS token source. Keep one canonical name per intent; any temporary compatibility alias must have a tracked migration and removal point.
 5. Run `pnpm token-check`, relevant package checks, and the document-service build.
 6. Inspect representative web screens and generated PDFs for visual regressions.
 7. Record any intentional contrast, font, or print-specific differences.
