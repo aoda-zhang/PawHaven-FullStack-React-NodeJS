@@ -93,16 +93,6 @@
   --color-info: var(--color-blue-6); /* #3b82f6 */
   --color-info-light: var(--color-blue-2); /* #dbeafe */
 
-  /* Explicit status aliases. Legacy names above remain supported. */
-  --color-status-error: var(--color-error);
-  --color-status-error-subtle: var(--color-error-light);
-  --color-status-success: var(--color-success);
-  --color-status-success-subtle: var(--color-success-light);
-  --color-status-warning: var(--color-warning);
-  --color-status-warning-subtle: var(--color-warning-light);
-  --color-status-info: var(--color-info);
-  --color-status-info-subtle: var(--color-info-light);
-
   /* ═══ Spacing Aliases ═════════════════════════════════ */
   --spacing-gutter: var(--spacing-5);
   --spacing-section: var(--spacing-10);
