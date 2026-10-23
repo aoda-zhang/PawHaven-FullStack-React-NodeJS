@@ -30,13 +30,13 @@ export const AuthenticatedLayout = () => {
   const { pathname, search } = useLocation();
   const { userInfo } = useGlobalContext();
 
-  if (!userInfo) {
-    return <Navigate to={toLogin(pathname, search)} replace />;
-  }
-
   return (
     <Suspense fallback={<Loading />}>
-      <AuthCheck userId={userInfo.userId} pathname={pathname} search={search} />
+      <AuthCheck
+        userId={userInfo?.userId ?? ''}
+        pathname={pathname}
+        search={search}
+      />
     </Suspense>
   );
 };
