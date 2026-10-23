@@ -8,7 +8,7 @@ export const RescueDetailSkeleton = () => (
   >
     <Skeleton className="mb-4 h-5 w-36 rounded-md" />
 
-    <div className="border-border bg-card overflow-hidden rounded-2xl border shadow-sm">
+    <div className="border-border bg-card overflow-hidden rounded-card border shadow-sm">
       <Skeleton className="h-72 w-full rounded-none" />
       <div className="space-y-4 p-5 sm:p-6">
         <Skeleton className="h-4 w-28 rounded-md" />
@@ -23,8 +23,8 @@ export const RescueDetailSkeleton = () => (
       </div>
     </div>
 
-    <Skeleton className="mt-6 h-40 w-full rounded-2xl" />
-    <Skeleton className="mt-4 h-48 w-full rounded-2xl" />
-    <Skeleton className="mt-4 h-64 w-full rounded-2xl" />
+    <Skeleton className="mt-6 h-40 w-full rounded-card" />
+    <Skeleton className="mt-4 h-48 w-full rounded-card" />
+    <Skeleton className="mt-4 h-64 w-full rounded-card" />
   </div>
 );
