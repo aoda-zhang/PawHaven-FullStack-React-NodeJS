@@ -32,9 +32,9 @@ import { HttpClientService } from '@pawhaven/backend-core';
 
 const client = this.httpClientService.create('auth-service');
 
-const data = await client.post('/auth-service/refresh', payload);
+const data = await client.post('/refresh, payload);
 
-const response = await client.post('/auth-service/refresh', payload, {
+const response = await client.post('/refresh, payload, {
   returnResponse: true,
 });
 ```
@@ -46,7 +46,7 @@ Gateway JWT refresh needs `Set-Cookie`, so it uses full response mode:
 ```typescript
 const authClient = this.httpClientService.create('auth-service');
 const response = await authClient.post(
-  '/auth-service/refresh',
+  '/refresh,
   {},
   {
     returnResponse: true,
