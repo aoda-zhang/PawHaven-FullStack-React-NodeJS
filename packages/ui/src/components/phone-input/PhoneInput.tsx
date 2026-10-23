@@ -14,7 +14,7 @@ const StyledInput = ({ className, ref, ...props }: StyledInputProps) => (
   <input
     ref={ref}
     className={cn(
-      'border-border bg-background text-foreground placeholder:text-text-secondary focus:border-primary focus:ring-primary/30 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none',
+      'border-border bg-background text-foreground placeholder:text-text-secondary focus:border-primary focus:ring-primary/30 w-full rounded-input border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none',
       className,
     )}
     {...props}
