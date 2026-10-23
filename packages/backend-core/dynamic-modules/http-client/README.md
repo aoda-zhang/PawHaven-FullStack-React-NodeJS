@@ -32,9 +32,9 @@ import { HttpClientService } from '@pawhaven/backend-core';
 
 const client = this.httpClientService.create('auth-service');
 
-const data = await client.post('/auth-service/refresh', payload);
+const data = await client.post('/refresh', payload);
 
-const response = await client.post('/auth-service/refresh', payload, {
+const response = await client.post('/refresh', payload, {
   returnResponse: true,
 });
 ```
