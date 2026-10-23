@@ -3,7 +3,6 @@
   "private": true,
   "name": "@pawhaven/auth-service",
   "type": "module",
-  "main": "build/main.js",
   "version": "1.0.0",
   "engines": {
     "node": "24.x"
