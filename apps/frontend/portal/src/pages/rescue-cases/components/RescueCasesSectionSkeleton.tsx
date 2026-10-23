@@ -26,18 +26,18 @@ export const RescueCasesSectionSkeleton = ({
             <Skeleton className="h-6 w-14 rounded-full" />
           </div>
           <div className="absolute bottom-3 left-3">
-            <Skeleton className="h-5 w-40 rounded-md" />
+            <Skeleton className="h-5 w-40 rounded-skeleton" />
           </div>
         </div>
         <div className="space-y-3 p-4">
           <div className="flex items-center gap-2">
             <Skeleton className="h-3.5 w-3.5 rounded-full" />
-            <Skeleton className="h-3 w-40 rounded-md" />
+            <Skeleton className="h-3 w-40 rounded-skeleton" />
           </div>
-          <Skeleton className="h-3 w-full rounded-md" />
-          <Skeleton className="h-3 w-3/4 rounded-md" />
+          <Skeleton className="h-3 w-full rounded-skeleton" />
+          <Skeleton className="h-3 w-3/4 rounded-skeleton" />
           <div className="border-border flex items-center justify-between border-t pt-3">
-            <Skeleton className="h-3 w-28 rounded-md" />
+            <Skeleton className="h-3 w-28 rounded-skeleton" />
             <Skeleton className="h-6 w-16 rounded-full" />
           </div>
         </div>
