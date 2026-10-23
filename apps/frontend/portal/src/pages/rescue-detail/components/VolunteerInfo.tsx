@@ -69,7 +69,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
 
             <button
               type="button"
-              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-panel border py-2.5 text-sm font-semibold transition-colors"
+              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-button border py-2.5 text-sm font-semibold transition-colors"
             >
               {t('rescueDetail.offer_assistance')}
             </button>
