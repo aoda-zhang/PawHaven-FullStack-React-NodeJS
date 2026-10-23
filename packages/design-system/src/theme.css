@@ -109,10 +109,12 @@
   --z-index-toast: 600;
 
   /* ═══ Border Radius ═══════════════════════════════════ */
-  --radius-input: var(--radius-sm);
-  --radius-button: var(--radius-md);
-  --radius-card: var(--radius-lg);
-  --radius-dialog: var(--radius-xl);
+  --radius-input: var(--radius-md);
+  --radius-button: var(--radius-xl);
+  --radius-card: var(--radius-2xl);
+  --radius-dialog: var(--radius-2xl);
+  --radius-panel: var(--radius-lg);
+  --radius-icon: var(--radius-xl);
 
   /* ═══ Shadows (Semantic aliases) ════════════════════════ */
   --shadow-card: var(--shadow-sm);
