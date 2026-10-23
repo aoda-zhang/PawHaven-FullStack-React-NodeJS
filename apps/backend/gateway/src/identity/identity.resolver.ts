@@ -19,12 +19,13 @@ import { isProd } from '@pawhaven/shared/utils';
 import type { Request, Response } from 'express';
 
 import { InternalJwtService } from '../internal-jwt/internalJwt.service.js';
+import { InternalJwtTargetResolver } from '../internal-jwt/internalJwtTarget.resolver.js';
+import type { InternalJwtIdentity } from '../internal-jwt/InternalJwt.types.js';
+
 import {
   ACCESS_TOKEN_TYPE,
   SESSION_EXPIRED_MESSAGE,
 } from './identity.constants.js';
-import { InternalJwtTargetResolver } from '../internal-jwt/internalJwtTarget.resolver.js';
-import type { InternalJwtIdentity } from '../internal-jwt/InternalJwt.types.js';
 
 const CLEAR_COOKIE_OPTIONS = 'Path=/; Max-Age=0; HttpOnly; SameSite=Strict';
 const PROD_SECURE_SUFFIX = '; Secure';
