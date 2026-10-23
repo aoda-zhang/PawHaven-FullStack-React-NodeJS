@@ -19,14 +19,13 @@ import { isProd } from '@pawhaven/shared/utils';
 import type { Request, Response } from 'express';
 
 import { InternalJwtService } from '../internal-jwt/internalJwt.service.js';
+import {
+  ACCESS_TOKEN_TYPE,
+  SESSION_EXPIRED_MESSAGE,
+} from './identity.constants.js';
 import { InternalJwtTargetResolver } from '../internal-jwt/internalJwtTarget.resolver.js';
 import type { InternalJwtIdentity } from '../internal-jwt/InternalJwt.types.js';
 
-const SESSION_EXPIRED_MESSAGE = 'Session expired, please login again';
-const ACCESS_TOKEN_TYPE = 'access';
-const MS_PER_SECOND = 1000;
-const MINIMUM_REFRESH_WINDOW_SECONDS = 1;
-const REFRESH_PATH = '/auth-service/refresh';
 const CLEAR_COOKIE_OPTIONS = 'Path=/; Max-Age=0; HttpOnly; SameSite=Strict';
 const PROD_SECURE_SUFFIX = '; Secure';
 const COOKIE_ENTRY_PATTERN = /^([^=]+)=([^;]+)/;
@@ -43,6 +42,10 @@ export class IdentityResolver {
   private readonly refreshFallbackSeconds: number;
 
   private readonly refreshWindowPercentage: number;
+
+  private readonly minimumRefreshWindowSeconds: number;
+
+  private readonly refreshPath: string;
 
   private readonly secureSuffix: string;
 
@@ -61,6 +64,12 @@ export class IdentityResolver {
     );
     this.refreshWindowPercentage = this.configService.getOrThrow<number>(
       'auth.jwtRefreshWindowPercentage',
+    );
+    this.minimumRefreshWindowSeconds = this.configService.getOrThrow<number>(
+      'identity.minimumRefreshWindowSeconds',
+    );
+    this.refreshPath = this.configService.getOrThrow<string>(
+      'identity.refreshPath',
     );
     this.secureSuffix = isProd(this.configService.get<string>('http.env'))
       ? PROD_SECURE_SUFFIX
@@ -203,13 +212,13 @@ export class IdentityResolver {
       return fallbackSeconds;
     }
     return Math.max(
-      MINIMUM_REFRESH_WINDOW_SECONDS,
+      this.minimumRefreshWindowSeconds,
       Math.floor(tokenLifetimeSeconds * this.refreshWindowPercentage),
     );
   }
 
   private static nowInSeconds(): number {
-    return Math.floor(Date.now() / MS_PER_SECOND);
+    return Math.floor(Date.now() / 1000);
   }
 
   private applyCookies(
@@ -295,7 +304,7 @@ export class IdentityResolver {
     );
     const authClient = this.httpClientService.create(microServiceNames.AUTH);
     const response = await authClient.post<unknown>(
-      REFRESH_PATH,
+      this.refreshPath,
       {},
       {
         returnResponse: true,
