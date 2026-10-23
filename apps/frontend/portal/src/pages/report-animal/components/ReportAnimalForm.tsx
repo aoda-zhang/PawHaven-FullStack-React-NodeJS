@@ -178,7 +178,7 @@ export const ReportAnimalForm = ({
             banner={{
               type: 'error',
               message: t(bannerKey),
-              bannerWrapClassNames: 'mb-4 rounded-button border lg:px-4',
+              bannerWrapClassNames: 'mb-4 rounded-panel border lg:px-4',
             }}
           />
         )}
