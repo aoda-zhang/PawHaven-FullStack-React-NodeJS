@@ -37,7 +37,8 @@ function walk(target) {
   return files;
 }
 
-const rawPalette = /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|blue|green|yellow|orange|gray|brown)-\d+\b/g;
+const rawPalette = /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|brown)-\d+\b/g;
+const arbitraryHexColor = /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g;
 const rawRadius = /\brounded-(?:xs|sm|md|lg|xl|2xl|3xl)(?:\/\d+)?\b/g;
 const arbitraryRadius = /\brounded-\[[^\]]+\]/g;
 
@@ -49,6 +50,7 @@ for (const scope of scopes) {
       if (file.endsWith('.css') && /^\s*\/\*/.test(line)) return;
       for (const [rule, pattern] of [
         ['raw-palette', rawPalette],
+        ['arbitrary-hex-color', arbitraryHexColor],
         ['raw-radius', rawRadius],
         ['arbitrary-radius', arbitraryRadius],
       ]) {
