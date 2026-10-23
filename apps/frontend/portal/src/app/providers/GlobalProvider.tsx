@@ -52,10 +52,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
 
   const completeAuthentication = (
     userId: string,
-    expiresIn: number,
     callbacks?: GlobalCallbacks,
   ) => {
-    setUserInfo(storeSession(userId, expiresIn));
+    setUserInfo(storeSession(userId));
     setIsBootstrapping(true);
 
     queryClient
@@ -75,7 +74,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
       onSuccess: (session) => {
         completeAuthentication(
           session.user.userId,
-          session.expires_in,
           callbacks,
         );
       },
