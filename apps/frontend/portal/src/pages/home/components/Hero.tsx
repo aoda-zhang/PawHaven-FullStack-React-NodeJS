@@ -101,7 +101,7 @@ export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
           <img
             src="/images/hero-rescue.jpg"
             alt={t('home.hero_image_alt')}
-            className="h-96 w-full rounded-card object-cover lg:h-[30rem]"
+            className="h-96 w-full rounded-card-large object-cover lg:h-[30rem]"
             width={640}
             height={480}
             fetchPriority="high"
