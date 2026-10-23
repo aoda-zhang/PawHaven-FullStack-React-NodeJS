@@ -6,9 +6,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useRegister } from '../api/auth.mutations';
 import { AuthLayout } from '../AuthLayout';
 
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
 export const Register = () => {
@@ -17,7 +17,7 @@ export const Register = () => {
   });
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { mutate, isPending } = useRegister();
+  const { register, isPending } = useGlobalContext();
 
   return (
     <AuthLayout>
@@ -34,7 +34,7 @@ export const Register = () => {
             className="mt-5 space-y-3"
             noValidate
             onSubmit={formProps.handleSubmit((data) => {
-              mutate(
+              register(
                 {
                   email: data.email,
                   password: data.password,

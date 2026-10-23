@@ -291,7 +291,7 @@ export default Plugin.define({
     };
 
     const controller = new AbortController();
-    void (async () => {
+    (async () => {
       try {
         for await (const event of ctx.event.subscribe({
           signal: controller.signal,
@@ -327,7 +327,7 @@ export default Plugin.define({
     // Initial fill, plus delayed re-checks in case filters commit after setup.
     await refreshCache();
     for (const delay of [3000, 10000, 30000]) {
-      setTimeout(() => void refreshAndReload(), delay);
+      setTimeout(() => refreshAndReload(), delay);
     }
 
     return () => controller.abort();
