@@ -13,7 +13,7 @@ interface RootLayoutSidebarProps {
 }
 
 const SIDEBAR_MENU_ITEM_CLASS =
-  'flex w-full items-center rounded-xl px-4 py-3 text-base font-medium transition-colors';
+  'flex w-full items-center rounded-button px-4 py-3 text-base font-medium transition-colors';
 
 const AUTH_MENU_CLASS_NAMES = ['login', 'logout'];
 
