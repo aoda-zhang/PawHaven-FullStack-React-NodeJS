@@ -17,7 +17,7 @@ export const AdoptablePetsSectionSkeleton = ({
     {Array.from({ length: count }, (_, index) => (
       <div
         key={index}
-        className="bg-background border-border w-64 flex-shrink-0 overflow-hidden rounded-2xl border shadow-sm"
+        className="bg-background border-border w-64 flex-shrink-0 overflow-hidden rounded-card border shadow-sm"
       >
         <Skeleton className="h-44 w-full rounded-none" />
         <div className="space-y-3 p-4">
