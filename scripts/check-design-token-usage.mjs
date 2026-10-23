@@ -53,7 +53,7 @@ for (const scope of scopes) {
     lines.forEach((line, index) => {
       if (file.endsWith('.css') && /^\s*\/\*/.test(line)) return;
       for (const [rule, pattern] of [
-        ...(!file.endsWith('/packages/design-system/src/tokens/color.css') && !file.endsWith('/packages/design-system/src/tokens\\color.css') ? [['raw-hex', rawHex]] : []),
+        ...(!file.includes('/packages/design-system/src/tokens/') ? [['raw-hex', rawHex]] : []),
         ['raw-palette', rawPalette],
         ['arbitrary-hex-color', arbitraryHexColor],
         ['raw-radius', rawRadius],
