@@ -24,17 +24,17 @@ Semantic tokens express why a value is used. Prefer these for application stylin
 | Card surface | `--color-card` | `Semantic / Color / Surface / Card` | Cards and content panels |
 | Default border | `--color-border` | `Semantic / Color / Border / Default` | Low-emphasis boundaries |
 | Primary action | `--color-primary` | `Semantic / Color / Action / Primary` | Main action |
-| Secondary action | `--color-action-secondary` | `Semantic / Color / Action / Secondary` | Secondary action, not a success status |
-| Success status | `--color-status-success` | `Semantic / Color / Status / Success` | Successful outcome or state |
-| Warning status | `--color-status-warning` | `Semantic / Color / Status / Warning` | Caution or attention |
-| Error status | `--color-status-error` | `Semantic / Color / Status / Error` | Error or destructive feedback |
-| Info status | `--color-status-info` | `Semantic / Color / Status / Info` | Informational feedback |
+| Secondary action | `--color-secondary` | `Semantic / Color / Action / Secondary` | Secondary action, not a success status |
+| Success status | `--color-success` | `Semantic / Color / Status / Success` | Successful outcome or state |
+| Warning status | `--color-warning` | `Semantic / Color / Status / Warning` | Caution or attention |
+| Error status | `--color-error` | `Semantic / Color / Status / Error` | Error or destructive feedback |
+| Info status | `--color-info` | `Semantic / Color / Status / Info` | Informational feedback |
 
-Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. Legacy CSS variables remain available to avoid breaking existing consumers.
+Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. The codebase uses one canonical semantic token per intent; do not add duplicate aliases such as `status-success` alongside `success` unless a migration requires a temporary, tracked compatibility layer.
 
 ### 3. Component tokens
 
-Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-card`, `--shadow-card`, and `--shadow-modal`.
+Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-card`, `--radius-panel`, `--shadow-card`, and `--shadow-modal`.
 
 Do not create a component token merely to duplicate a semantic token without a distinct component contract.
 
