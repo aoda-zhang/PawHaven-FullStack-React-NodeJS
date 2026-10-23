@@ -69,6 +69,10 @@ jobs:
         shell: bash
         run: pnpm token-check
 
+      - name: Cross-package token usage inventory
+        shell: bash
+        run: pnpm design-token-audit
+
       - name: Repository quality
         shell: bash
         run: pnpm quality-check
