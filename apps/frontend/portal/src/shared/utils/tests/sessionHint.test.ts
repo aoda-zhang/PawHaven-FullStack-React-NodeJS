@@ -8,44 +8,33 @@ import {
 
 import { createMemoryStorage } from './memoryStorage';
 
-describe('sessionHint — what the device keeps so the first paint knows the user', () => {
+describe('sessionHint — a non-authoritative identity hint', () => {
   beforeEach(() => {
     vi.stubGlobal('localStorage', createMemoryStorage());
   });
 
-  it('stamps the hint with the lifetime the server granted', () => {
-    const before = Date.now();
+  it('stores only the user id, without a client-side expiry', () => {
+    storeSession('u-1');
 
-    storeSession('u-1', 900);
-
-    const stored = JSON.parse(localStorage.getItem('userInfo') ?? 'null');
-
-    expect(stored.userId).toBe('u-1');
-    expect(stored.expiresAt).toBeGreaterThanOrEqual(before + 900_000);
-    expect(stored.expiresAt).toBeLessThanOrEqual(Date.now() + 900_000);
+    expect(JSON.parse(localStorage.getItem('userInfo') ?? 'null')).toEqual({
+      userId: 'u-1',
+    });
   });
 
-  it('returns the hint while it is still within its lifetime', () => {
-    storeSession('u-1', 900);
-
-    expect(readStoredSession()?.userId).toBe('u-1');
-    expect(localStorage.getItem('userInfo')).not.toBeNull();
-  });
-
-  it('drops the hint once its lifetime has passed', () => {
+  it('reads the hint while the server remains responsible for session validity', () => {
     localStorage.setItem(
       'userInfo',
       JSON.stringify({ userId: 'u-1', expiresAt: Date.now() - 1000 }),
     );
 
-    expect(readStoredSession()).toBeNull();
-    expect(localStorage.getItem('userInfo')).toBeNull();
+    expect(readStoredSession()).toEqual({ userId: 'u-1' });
+    expect(localStorage.getItem('userInfo')).not.toBeNull();
   });
 
-  it('drops a hint written by an older release, which has no lifetime', () => {
+  it('drops a malformed or legacy snapshot without a user id', () => {
     localStorage.setItem(
       'userInfo',
-      JSON.stringify({ userId: 'u-1', email: 'a@b.com', status: 'active' }),
+      JSON.stringify({ email: 'a@b.com', status: 'active' }),
     );
 
     expect(readStoredSession()).toBeNull();
@@ -64,7 +53,7 @@ describe('sessionHint — what the device keeps so the first paint knows the use
   });
 
   it('clears the hint on demand', () => {
-    storeSession('u-1', 900);
+    storeSession('u-1');
 
     clearStoredSession();
 
