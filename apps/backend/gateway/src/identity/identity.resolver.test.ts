@@ -60,7 +60,13 @@ const buildResolver = () => {
     targetResolver as never,
   );
 
-  return { resolver, jwtService, internalJwtService, target, httpClientService };
+  return {
+    resolver,
+    jwtService,
+    internalJwtService,
+    target,
+    httpClientService,
+  };
 };
 
 const accessToken = (jwtService: JwtService, claims: Partial<JwtVerifyInfo>) =>
@@ -151,7 +157,9 @@ describe('IdentityResolver username propagation', () => {
     expect(verified).not.toHaveProperty('username');
   });
 
-  it('refreshes an expired access token through the routed auth-service endpoint', async () => {
+  it(
+    'refreshes an expired access token through the routed auth-service endpoint',
+    async () => {
     const { resolver, jwtService, httpClientService } = buildResolver();
     const refreshedAccessToken = accessToken(jwtService, {
       username: 'reporter-two',
@@ -190,7 +198,8 @@ describe('IdentityResolver username propagation', () => {
         }),
       }),
     );
-  });
+    },
+  );
 
   it('resolves to anonymous when no session cookies are present', async () => {
     const { resolver } = buildResolver();
