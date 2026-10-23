@@ -38,7 +38,7 @@ const configService = {
     if (key === 'auth.jwtRefreshFallbackSeconds') return 60;
     if (key === 'auth.jwtRefreshWindowPercentage') return 0.2;
     if (key === 'identity.minimumRefreshWindowSeconds') return 1;
-    if (key === 'identity.refreshPath') return '/auth-service/refresh';
+    if (key === 'identity.refreshPath') return '/refresh';
     throw new Error(`unexpected config key ${key}`);
   }),
   get: vi.fn((key: string) => (key === 'http.env' ? 'test' : undefined)),
@@ -201,7 +201,7 @@ describe('IdentityResolver username propagation', () => {
         expect.stringContaining('refresh_token=refresh-2;'),
       );
       expect(post).toHaveBeenCalledWith(
-        '/auth-service/refresh',
+        '/refresh',
         {},
         expect.objectContaining({
           returnResponse: true,
