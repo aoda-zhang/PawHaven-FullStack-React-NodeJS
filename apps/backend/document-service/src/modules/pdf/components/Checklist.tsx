@@ -8,7 +8,7 @@ export interface ChecklistProps {
 export const Checklist = ({ checklist }: ChecklistProps): ReactElement => (
   <>
     {checklist?.items?.length ? (
-      <section className="border-border bg-primary-light mx-10 mb-5 break-inside-avoid rounded-card border px-5 py-4">
+      <section className="border-border bg-primary-light mx-10 mb-5 break-inside-avoid rounded-panel border px-5 py-4">
         <h3 className="text-label tracking-label text-accent-foreground mb-2.5 font-bold uppercase">
           {checklist.title}
         </h3>
