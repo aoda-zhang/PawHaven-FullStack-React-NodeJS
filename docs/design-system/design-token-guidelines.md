@@ -34,7 +34,7 @@ Figma paths above are the recommended naming convention to implement, not a clai
 
 ### 3. Component tokens
 
-Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-card`, `--radius-panel`, `--radius-icon`, `--radius-media`, `--radius-skeleton`, `--radius-section`, `--radius-hero`, `--shadow-card`, and `--shadow-modal`.
+Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-button-large`, `--radius-card`, `--radius-card-large`, `--radius-input-large`, `--radius-panel`, `--radius-icon`, `--radius-media`, `--radius-skeleton`, `--radius-section`, `--radius-hero`, `--shadow-card`, and `--shadow-modal`.
 
 Do not create a component token merely to duplicate a semantic token without a distinct component contract.
 
