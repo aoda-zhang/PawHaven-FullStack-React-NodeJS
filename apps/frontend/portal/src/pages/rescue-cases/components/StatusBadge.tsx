@@ -35,7 +35,7 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
       <span
         className={cn(
           'inline-block h-1.5 w-1.5 rounded-full',
-          getRescueStatusColor({ status, prefix: 'bg' }),
+          'bg-current',
         )}
       />
       {t(STATUS_LABEL_KEYS[status])}
