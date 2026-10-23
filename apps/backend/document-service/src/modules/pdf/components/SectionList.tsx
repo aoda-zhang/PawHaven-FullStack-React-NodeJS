@@ -10,7 +10,7 @@ export const SectionList = ({ sections }: SectionListProps): ReactElement => (
     {sections.map((section, sectionIndex) => (
       <article
         key={`section-${sectionIndex}`}
-        className="border-warning bg-card mb-5 break-inside-avoid rounded-card border-l-4 px-4 py-3.5"
+        className="border-warning bg-card mb-5 break-inside-avoid rounded-sm border-l-4 px-4 py-3.5"
       >
         <div className="mb-1.5 flex items-baseline gap-3">
           <span className="text-warning min-w-7 text-base leading-none font-extrabold">
