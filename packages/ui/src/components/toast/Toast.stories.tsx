@@ -32,7 +32,7 @@ const ToastDemo = () => {
           <button
             key={type}
             type="button"
-            className="border-border rounded-md border px-3 py-2 text-sm"
+            className="border-border rounded-input border px-3 py-2 text-sm"
             onClick={() => notify(type)}
           >
             Show {type} toast
