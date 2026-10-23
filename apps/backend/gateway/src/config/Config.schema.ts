@@ -13,6 +13,10 @@ export const gatewayConfigSchema = z.object({
   http: httpConfigSchema,
   swagger: swaggerConfigSchema,
   auth: authConfigSchema,
+  identity: z.object({
+    refreshPath: z.string().startsWith('/'),
+    minimumRefreshWindowSeconds: z.number().int().positive(),
+  }),
   internalJwt: requiredInternalJwtSigningSchema,
   throttle: throttleConfigSchema,
   microServices: z.array(microServiceConfigSchema).min(1),

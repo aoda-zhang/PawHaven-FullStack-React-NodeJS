@@ -30,7 +30,7 @@
   },
   "auth": {
     "jwtSecret": "${JWT_SECRET}",
-    "jwtExpiresIn": 180,
+    "jwtExpiresIn": 300,
     "jwtClockTolerance": 30,
     "jwtRefreshFallbackSeconds": 60,
     "jwtRefreshWindowPercentage": 0.2,
