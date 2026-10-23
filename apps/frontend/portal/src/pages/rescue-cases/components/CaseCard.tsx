@@ -25,7 +25,7 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
       tabIndex={0}
       role="button"
       aria-label={caseData.title}
-      className="border-border bg-card group cursor-pointer overflow-hidden rounded-card border shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+      className="border-border bg-card group cursor-pointer overflow-hidden rounded-card-large border shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="bg-muted relative h-48 overflow-hidden">
         {caseData.image ? (
