@@ -34,7 +34,7 @@ export const RelevantGuides = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+    <section className="bg-card border-border rounded-card border p-5 shadow-sm sm:p-6">
       <h2 className="text-text-secondary mb-4 flex items-center gap-2 text-xs font-bold tracking-wider uppercase">
         <BookOpen className="h-4 w-4" aria-hidden="true" />
         {t('rescueDetail.relevant_guides')}
