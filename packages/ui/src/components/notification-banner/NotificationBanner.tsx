@@ -92,7 +92,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
       />
       <div className="flex-1">
         {banner.title && (
-          <p className="mb-1 type-section-title">{banner.title}</p>
+          <p className="mb-1 text-lg font-semibold">{banner.title}</p>
         )}
         <p>{banner.message}</p>
         {link && (
