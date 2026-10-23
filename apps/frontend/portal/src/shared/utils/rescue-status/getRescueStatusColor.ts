@@ -82,3 +82,26 @@ export const getRescueStatusColor = ({
       throw new Error(`Unsupported prefix: ${prefix}`);
   }
 };
+
+
+/** Text foreground token class for readable rescue-status badges. */
+export type RescueStatusForegroundClass =
+  `text-rescue-status-${RescueStatusSuffix}-foreground`;
+
+const statusForegroundColors: Record<
+  RescueStatusType,
+  RescueStatusForegroundClass
+> = {
+  pending: 'text-rescue-status-pending-foreground',
+  inProgress: 'text-rescue-status-in-progress-foreground',
+  treated: 'text-rescue-status-treated-foreground',
+  recovering: 'text-rescue-status-recovering-foreground',
+  awaitingAdoption: 'text-rescue-status-awaiting-adoption-foreground',
+  adopted: 'text-rescue-status-adopted-foreground',
+  failed: 'text-rescue-status-failed-foreground',
+};
+
+export const getRescueStatusForegroundColor = ({
+  status,
+}: Pick<GetRescueStatusColorParams, 'status'>): RescueStatusForegroundClass =>
+  statusForegroundColors[status];
