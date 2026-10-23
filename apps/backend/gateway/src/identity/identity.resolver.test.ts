@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { verifyInternalJwt } from '@pawhaven/backend-core/internal-jwt';
@@ -38,7 +39,7 @@ const configService = {
     if (key === 'auth.jwtRefreshFallbackSeconds') return 60;
     if (key === 'auth.jwtRefreshWindowPercentage') return 0.2;
     if (key === 'identity.minimumRefreshWindowSeconds') return 1;
-    if (key === 'identity.refreshPath') return '/refresh;
+    if (key === 'identity.refreshPath') return '/refresh';
     throw new Error(`unexpected config key ${key}`);
   }),
   get: vi.fn((key: string) => (key === 'http.env' ? 'test' : undefined)),
@@ -201,7 +202,7 @@ describe('IdentityResolver username propagation', () => {
         expect.stringContaining('refresh_token=refresh-2;'),
       );
       expect(post).toHaveBeenCalledWith(
-        '/refresh,
+        '/refresh',
         {},
         expect.objectContaining({
           returnResponse: true,
@@ -212,6 +213,34 @@ describe('IdentityResolver username propagation', () => {
       );
     },
   );
+
+  it('clears cookies when refresh is rejected as unauthorized', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const post = vi.fn().mockRejectedValue(new UnauthorizedException());
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'expired-refresh-token',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+
+    expect(response.append).toHaveBeenCalledTimes(2);
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('access_token=;'),
+    );
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('refresh_token=;'),
+    );
+  });
 
   it('preserves session cookies when the auth service refresh request fails transiently', async () => {
     const { resolver, httpClientService } = buildResolver();

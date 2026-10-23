@@ -1,7 +1,12 @@
 /* eslint-disable no-param-reassign */
 import crypto from 'node:crypto';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { HttpClientService } from '@pawhaven/backend-core';
@@ -150,7 +155,19 @@ export class IdentityResolver {
     res: Response,
     refreshToken: string,
   ): Promise<JwtVerifyInfo | null> {
-    const refreshed = await this.adoptRefreshedCookies(req, res, refreshToken);
+    let refreshed: boolean;
+    try {
+      refreshed = await this.adoptRefreshedCookies(req, res, refreshToken);
+    } catch (error) {
+      if (
+        error instanceof HttpException &&
+        error.getStatus() === HttpStatus.UNAUTHORIZED
+      ) {
+        return null;
+      }
+      throw error;
+    }
+
     if (!refreshed) {
       return null;
     }
