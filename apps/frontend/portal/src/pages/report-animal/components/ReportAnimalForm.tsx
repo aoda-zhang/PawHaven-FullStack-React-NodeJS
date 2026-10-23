@@ -142,7 +142,7 @@ export const ReportAnimalForm = ({
         <Button
           type="button"
           onClick={() => navigate(routePaths.home)}
-          className="w-full rounded-button py-3"
+          className="w-full rounded-button-large py-3"
         >
           {t('reportAnimal.success_home')}
         </Button>
@@ -187,7 +187,7 @@ export const ReportAnimalForm = ({
           type="submit"
           loading={isPending}
           disabled={isPending}
-          className="w-full rounded-button py-3"
+          className="w-full rounded-button-large py-3"
         >
           {isPending ? t('reportAnimal.submitting') : t('reportAnimal.submit')}
         </Button>
