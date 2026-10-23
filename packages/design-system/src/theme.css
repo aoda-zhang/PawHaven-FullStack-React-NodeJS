@@ -21,9 +21,8 @@
   --color-primary-fg: var(--color-gray-1); /* #ffffff */
 
   /* ═══ Actions ════════════════════════════════════════════════ */
-  /* Keep secondary actions separate from status semantics, even when
-     both currently resolve to the same primitive colour. */
-  --color-secondary: var(--color-green-6); /* Backward-compatible alias */
+  /* Secondary action intent is independent of success status semantics. */
+  --color-secondary: var(--color-green-6);
   --color-secondary-hover: var(--color-green-7);
   --color-secondary-active: var(--color-green-8);
   --color-secondary-light: var(--color-green-1);
