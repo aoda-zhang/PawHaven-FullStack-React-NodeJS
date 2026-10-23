@@ -65,6 +65,10 @@ jobs:
         shell: bash
         run: pnpm architecture-check
 
+      - name: Design token audit
+        shell: bash
+        run: pnpm token-check
+
       - name: Repository quality
         shell: bash
         run: pnpm quality-check
