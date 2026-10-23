@@ -63,13 +63,13 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
               </div>
             </div>
 
-            <div className="bg-primary/5 text-primary mb-4 rounded-xl px-4 py-3 text-sm">
+            <div className="bg-primary/5 text-primary mb-4 rounded-panel px-4 py-3 text-sm">
               {t('rescueDetail.volunteer_handling')}
             </div>
 
             <button
               type="button"
-              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-xl border py-2.5 text-sm font-semibold transition-colors"
+              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-panel border py-2.5 text-sm font-semibold transition-colors"
             >
               {t('rescueDetail.offer_assistance')}
             </button>
