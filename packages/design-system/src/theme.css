@@ -27,10 +27,6 @@
   --color-secondary-hover: var(--color-green-7);
   --color-secondary-active: var(--color-green-8);
   --color-secondary-light: var(--color-green-1);
-  --color-action-secondary: var(--color-green-6);
-  --color-action-secondary-hover: var(--color-green-7);
-  --color-action-secondary-active: var(--color-green-8);
-  --color-action-secondary-subtle: var(--color-green-1);
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
@@ -115,6 +111,7 @@
   --radius-dialog: var(--radius-2xl);
   --radius-panel: var(--radius-lg);
   --radius-icon: var(--radius-xl);
+  --radius-media: var(--radius-xl);
 
   /* ═══ Shadows (Semantic aliases) ════════════════════════ */
   --shadow-card: var(--shadow-sm);
