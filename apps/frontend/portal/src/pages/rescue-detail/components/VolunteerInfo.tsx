@@ -36,7 +36,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
 
   return (
     <section className="space-y-4">
-      <div className="bg-card border-border rounded-card border p-5 shadow-sm sm:p-6">
+      <div className="bg-card border-border rounded-card-large border p-5 shadow-sm sm:p-6">
         {volunteer ? (
           <>
             <div className="mb-4 flex items-center gap-3">
@@ -81,7 +81,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
         )}
       </div>
 
-      <div className="border-border bg-card rounded-card border p-3 shadow-sm">
+      <div className="border-border bg-card rounded-card-large border p-3 shadow-sm">
         <FollowButton
           animalId={animalId}
           isFollowing={isFollowing}
@@ -95,7 +95,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
         <FollowerCount count={status?.followerCount} isLoading={isLoading} />
       </div>
 
-      <div className="border-border bg-card hover:bg-background-subtle rounded-card border p-3 shadow-sm transition-colors">
+      <div className="border-border bg-card hover:bg-background-subtle rounded-card-large border p-3 shadow-sm transition-colors">
         <button
           type="button"
           className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"
