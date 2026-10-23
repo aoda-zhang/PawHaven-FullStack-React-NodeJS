@@ -104,13 +104,23 @@ export class IdentityResolver {
 
     if (accessPayload) {
       if (refreshToken && this.shouldRefreshSoon(accessPayload)) {
-        const refreshedPayload = await this.refreshPayload(
-          req,
-          res,
-          refreshToken,
-        );
-        if (refreshedPayload) {
-          return this.identityFromPayload(refreshedPayload);
+        try {
+          const refreshedPayload = await this.refreshPayload(
+            req,
+            res,
+            refreshToken,
+          );
+          if (refreshedPayload) {
+            return this.identityFromPayload(refreshedPayload);
+          }
+        } catch (error) {
+          const currentAccessPayload = this.validPayload(
+            req.cookies?.[cookieKeys.access_token],
+          );
+          if (!currentAccessPayload) {
+            throw error;
+          }
+          return this.identityFromPayload(currentAccessPayload);
         }
       }
 
