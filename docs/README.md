@@ -114,6 +114,7 @@ agent team itself is put together.
 | [src/tokens/](../packages/design-system/src/tokens)              | CSS  | 12 design-token CSS variable files |
 | [src/theme.css](../packages/design-system/src/theme.css)         | CSS  | Global theme definitions           |
 | [src/utilities.css](../packages/design-system/src/utilities.css) | CSS  | Utility classes                    |
+| [design-token-guidelines.md](./design-system/design-token-guidelines.md) | Guide | Token layers, Figma naming, and cross-package usage contract |
 | [design-token-guidelines.md](./design-system/design-token-guidelines.md) | Guide | Token-layer contract, Figma naming, cross-package usage and migration checklist |
 
 Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
