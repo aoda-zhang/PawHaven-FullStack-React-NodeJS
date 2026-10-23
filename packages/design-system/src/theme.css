@@ -109,8 +109,11 @@
   --radius-card: var(--radius-2xl);
   --radius-dialog: var(--radius-2xl);
   --radius-panel: var(--radius-lg);
-  --radius-icon: var(--radius-xl);
+  --radius-icon: var(--radius-lg);
   --radius-media: var(--radius-xl);
+  --radius-skeleton: var(--radius-md);
+  --radius-section: var(--radius-sm);
+  --radius-hero: var(--radius-3xl);
 
   /* ═══ Shadows (Semantic aliases) ════════════════════════ */
   --shadow-card: var(--shadow-sm);
