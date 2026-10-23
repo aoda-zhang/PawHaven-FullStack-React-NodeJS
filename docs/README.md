@@ -12,9 +12,7 @@ authority, intent, or background.
 | `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
 | `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
-Design tokens are deliberately **not** documented here. They live in
-[`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by
-`pnpm token-check`. Read the token source; do not read a prose copy of it.
+Design-token values remain defined in [`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by `pnpm token-check`. The [design-token guidelines](./design-system/design-token-guidelines.md) document how to use the token layers and keep Figma, portal, shared UI, frontend-core, and PDF rendering aligned; it is guidance, not a duplicate token-value source.
 
 ---
 
@@ -116,6 +114,7 @@ agent team itself is put together.
 | [src/tokens/](../packages/design-system/src/tokens)              | CSS  | 12 design-token CSS variable files |
 | [src/theme.css](../packages/design-system/src/theme.css)         | CSS  | Global theme definitions           |
 | [src/utilities.css](../packages/design-system/src/utilities.css) | CSS  | Utility classes                    |
+| [design-token-guidelines.md](./design-system/design-token-guidelines.md) | Guide | Token-layer contract, Figma naming, cross-package usage and migration checklist |
 
 Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
 not introduce raw colour values or magic numbers.
