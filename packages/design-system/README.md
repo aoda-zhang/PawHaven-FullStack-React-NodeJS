@@ -9,7 +9,7 @@ Shared design tokens, theme, and utilities for the PawHaven monorepo.
 | **Color**               | Semantic only   | `bg-primary`, `text-text-secondary`, `border-border` |
 | **Typography role**     | Semantic only   | `type-page-title`, `type-section-title`, `type-body` |
 | **Shadow**              | Semantic only   | `shadow-card`, `shadow-dropdown`                     |
-| **Radius**              | Semantic roles  | `rounded-card`, `rounded-panel`, `rounded-button`, `rounded-input`, `rounded-icon`, `rounded-media` |
+| **Radius**              | Semantic roles  | `rounded-card`, `rounded-panel`, `rounded-button`, `rounded-input`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
 | **Spacing / layout**    | Primitive OK    | `pt-2`, `gap-3`, `w-full`, `flex-col`                |
 | **Sizing**              | Primitive OK    | `h-8`, `size-4`, `min-h-[44px]`                      |
 | **Responsive / states** | Primitive OK    | `md:flex`, `hover:opacity-90`, `focus:ring`          |
