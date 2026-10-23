@@ -9,7 +9,7 @@ Shared design tokens, theme, and utilities for the PawHaven monorepo.
 | **Color**               | Semantic only   | `bg-primary`, `text-text-secondary`, `border-border` |
 | **Typography role**     | Semantic only   | `type-page-title`, `type-section-title`, `type-body` |
 | **Shadow**              | Semantic only   | `shadow-card`, `shadow-dropdown`                     |
-| **Radius**              | Semantic roles  | `rounded-card`, `rounded-panel`, `rounded-button`, `rounded-input`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
+| **Radius**              | Semantic roles  | `rounded-card`, `rounded-card-large`, `rounded-panel`, `rounded-button`, `rounded-button-large`, `rounded-input`, `rounded-input-large`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
 | **Spacing / layout**    | Primitive OK    | `pt-2`, `gap-3`, `w-full`, `flex-col`                |
 | **Sizing**              | Primitive OK    | `h-8`, `size-4`, `min-h-[44px]`                      |
 | **Responsive / states** | Primitive OK    | `md:flex`, `hover:opacity-90`, `focus:ring`          |
@@ -76,7 +76,7 @@ const dotClass = getRescueStatusColor({
 | Class                                       | Token           |
 | ------------------------------------------- | --------------- |
 | `px-4` / `py-2` / `gap-3`                   | `--spacing-*`   |
-| `rounded-button` / `rounded-card` / `rounded-panel` / `rounded-input` / `rounded-icon` / `rounded-media` | `--radius-*` |
+| `rounded-button` / `rounded-button-large` / `rounded-card` / `rounded-card-large` / `rounded-panel` / `rounded-input` / `rounded-input-large` / `rounded-icon` / `rounded-media` / `rounded-skeleton` / `rounded-section` / `rounded-hero` | `--radius-*` |
 | `shadow-card` / `shadow-dropdown`           | `--shadow-*`    |
 | `text-3xl` / `text-6xl`                     | `--font-size-*` |
 | `font-heading` / `font-sans` / `font-serif` | `--font-*`      |
