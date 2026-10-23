@@ -168,3 +168,13 @@ system-architecture-overview.md
 
 **Verify before you trust.** The context docs carry a `v3.11 / 2026-09-25` stamp and were checked
 against the code at that time. A feature doc is as-built as of the last change that reconciled it.
+
+
+## 6. Engineering notes
+
+| File | Covers |
+| --- | --- |
+| [How I Build](./how-i-build/how-i-build-my-agent-team.md) | Agent workflow and engineering setup |
+| [ESLint configuration](./how-i-build/eslint-config.md) | Shared lint rules and configuration |
+| [Internationalization](./how-i-build/i18n.md) | i18n setup and translation conventions |
+| [React state](./how-i-build/react-state.md) | React state-management conventions |
