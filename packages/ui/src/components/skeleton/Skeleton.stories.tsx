@@ -16,7 +16,7 @@ export const SkeletonStory: Story = {
   render: () => (
     <div className="w-full max-w-md space-y-3">
       <Skeleton className="h-5 w-2/5 rounded" />
-      <Skeleton className="h-24 w-full rounded-lg" />
+      <Skeleton className="h-24 w-full rounded-panel" />
       <Skeleton className="h-4 w-4/5 rounded" />
     </div>
   ),
