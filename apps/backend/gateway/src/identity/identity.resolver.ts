@@ -1,7 +1,12 @@
 /* eslint-disable no-param-reassign */
 import crypto from 'node:crypto';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { HttpClientService } from '@pawhaven/backend-core';
@@ -99,13 +104,23 @@ export class IdentityResolver {
 
     if (accessPayload) {
       if (refreshToken && this.shouldRefreshSoon(accessPayload)) {
-        const refreshedPayload = await this.refreshPayload(
-          req,
-          res,
-          refreshToken,
-        );
-        if (refreshedPayload) {
-          return this.identityFromPayload(refreshedPayload);
+        try {
+          const refreshedPayload = await this.refreshPayload(
+            req,
+            res,
+            refreshToken,
+          );
+          if (refreshedPayload) {
+            return this.identityFromPayload(refreshedPayload);
+          }
+        } catch (error) {
+          const currentAccessPayload = this.validPayload(
+            req.cookies?.[cookieKeys.access_token],
+          );
+          if (!currentAccessPayload) {
+            throw error;
+          }
+          return this.identityFromPayload(currentAccessPayload);
         }
       }
 
@@ -150,7 +165,19 @@ export class IdentityResolver {
     res: Response,
     refreshToken: string,
   ): Promise<JwtVerifyInfo | null> {
-    const refreshed = await this.adoptRefreshedCookies(req, res, refreshToken);
+    let refreshed: boolean;
+    try {
+      refreshed = await this.adoptRefreshedCookies(req, res, refreshToken);
+    } catch (error) {
+      if (
+        error instanceof HttpException &&
+        error.getStatus() === HttpStatus.UNAUTHORIZED
+      ) {
+        return null;
+      }
+      throw error;
+    }
+
     if (!refreshed) {
       return null;
     }

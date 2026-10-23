@@ -1,5 +1,9 @@
 import crypto from 'node:crypto';
 
+import {
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { verifyInternalJwt } from '@pawhaven/backend-core/internal-jwt';
@@ -38,7 +42,7 @@ const configService = {
     if (key === 'auth.jwtRefreshFallbackSeconds') return 60;
     if (key === 'auth.jwtRefreshWindowPercentage') return 0.2;
     if (key === 'identity.minimumRefreshWindowSeconds') return 1;
-    if (key === 'identity.refreshPath') return '/refresh;
+    if (key === 'identity.refreshPath') return '/refresh';
     throw new Error(`unexpected config key ${key}`);
   }),
   get: vi.fn((key: string) => (key === 'http.env' ? 'test' : undefined)),
@@ -201,7 +205,7 @@ describe('IdentityResolver username propagation', () => {
         expect.stringContaining('refresh_token=refresh-2;'),
       );
       expect(post).toHaveBeenCalledWith(
-        '/refresh,
+        '/refresh',
         {},
         expect.objectContaining({
           returnResponse: true,
@@ -212,6 +216,58 @@ describe('IdentityResolver username propagation', () => {
       );
     },
   );
+
+  it('clears cookies when refresh is rejected as unauthorized', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const post = vi.fn().mockRejectedValue(new UnauthorizedException());
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'expired-refresh-token',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+
+    expect(response.append).toHaveBeenCalledTimes(2);
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('access_token=;'),
+    );
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('refresh_token=;'),
+    );
+  });
+
+  it('uses a still-valid access token when a proactive refresh fails transiently', async () => {
+    const { resolver, jwtService, httpClientService } = buildResolver();
+    const response = responseStub();
+    const token = accessToken(jwtService, {
+      exp: Math.floor(Date.now() / MS_PER_SECOND) + 30,
+    });
+    const post = vi
+      .fn()
+      .mockRejectedValue(new ServiceUnavailableException('upstream unavailable'));
+    httpClientService.create.mockReturnValue({ post });
+
+    const identity = await resolver.resolve(
+      requestWith({ access_token: token, refresh_token: 'refresh-1' }),
+      response,
+      '/api/core/rescues',
+    );
+
+    expect(identity).toMatchObject({
+      kind: InternalJwtKind.AUTHENTICATED,
+      sub: 'user-1',
+    });
+    expect(response.append).not.toHaveBeenCalled();
+  });
 
   it('preserves session cookies when the auth service refresh request fails transiently', async () => {
     const { resolver, httpClientService } = buildResolver();
