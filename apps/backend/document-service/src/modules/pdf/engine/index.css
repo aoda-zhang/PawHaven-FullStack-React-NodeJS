@@ -5,6 +5,12 @@
 @source '../templates/**/*.tsx';
 @source '../components/**/*.tsx';
 
+@theme {
+  --color-document-cover-start: var(--color-yellow-6);
+  --color-document-cover-middle: var(--color-yellow-7);
+  --color-document-cover-end: var(--color-brown-9);
+}
+
 @utility text-label {
   font-size: var(--font-size-sm);
   line-height: var(--leading-tight);
