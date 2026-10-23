@@ -12,8 +12,8 @@ export const FORM_CONTROL_SIZE_CLASSES: Record<FormControlSize, string> = {
 export const FORM_CONTROL_VARIANT_CLASSES: Record<FormControlVariant, string> =
   {
     standard: 'border-b border-border rounded-none bg-transparent',
-    outline: 'border-border bg-background border rounded-input focus:border-primary',
-    fill: 'bg-background-subtle border-transparent rounded-input focus:bg-background',
+    outline: 'border-border bg-background border rounded-input-large focus:border-primary',
+    fill: 'bg-background-subtle border-transparent rounded-input-large focus:bg-background',
   };
 
 export const hasErrorContent = (error: ReactNode | undefined): boolean =>
