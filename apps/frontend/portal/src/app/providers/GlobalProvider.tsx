@@ -58,7 +58,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
     setUserInfo(storeSession(userId, expiresIn));
     setIsBootstrapping(true);
 
-    void queryClient
+    queryClient
       .fetchQuery({
         ...bootstrapQueryOptions({ userID: userId, menuUpdateAt: '' }),
         staleTime: 0,
