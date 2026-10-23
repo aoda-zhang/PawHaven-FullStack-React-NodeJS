@@ -26,7 +26,7 @@ const SESSION_EXPIRED_MESSAGE = 'Session expired, please login again';
 const ACCESS_TOKEN_TYPE = 'access';
 const MS_PER_SECOND = 1000;
 const MINIMUM_REFRESH_WINDOW_SECONDS = 1;
-const REFRESH_PATH = '/refresh';
+const REFRESH_PATH = '/auth-service/refresh';
 const CLEAR_COOKIE_OPTIONS = 'Path=/; Max-Age=0; HttpOnly; SameSite=Strict';
 const PROD_SECURE_SUFFIX = '; Secure';
 const COOKIE_ENTRY_PATTERN = /^([^=]+)=([^;]+)/;
