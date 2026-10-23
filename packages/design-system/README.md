@@ -28,13 +28,14 @@ import '@pawhaven/design-system/index.css';
 All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components.
 
 ```html
-<div class="bg-primary text-text-inverse shadow-card rounded-xl">
-  <h1 class="font-heading text-text text-3xl">Hello PawHaven</h1>
-  <button class="bg-primary text-text-inverse rounded-xl px-4 py-2">
+<div class="bg-card text-text shadow-card rounded-card">
+  <h1 class="type-page-title text-text">Hello PawHaven</h1>
+  <p class="type-body">Rescue animals and connect with your community.</p>
+  <button class="bg-primary text-primary-fg rounded-button px-4 py-2">
     Get Started
   </button>
   <input
-    class="border-border bg-background rounded-md border px-3 py-2"
+    class="border-border bg-background rounded-input border px-3 py-2"
     placeholder="Search..."
   />
 </div>
@@ -75,7 +76,7 @@ const dotClass = getRescueStatusColor({
 | Class                                       | Token           |
 | ------------------------------------------- | --------------- |
 | `px-4` / `py-2` / `gap-3`                   | `--spacing-*`   |
-| `rounded-xl` / `rounded-lg`                 | `--radius-*`    |
+| `rounded-button` / `rounded-card` / `rounded-input` | `--radius-*` |
 | `shadow-card` / `shadow-dropdown`           | `--shadow-*`    |
 | `text-3xl` / `text-6xl`                     | `--font-size-*` |
 | `font-heading` / `font-sans` / `font-serif` | `--font-*`      |
@@ -100,3 +101,12 @@ Composite utilities: `src/utilities.css`
 ```bash
 pnpm --filter @pawhaven/design-system token-check       # raw hex / px / unknown classname
 ```
+
+
+## Semantic token rules
+
+- Use action tokens for interaction intent and status tokens for feedback intent. They may resolve to the same primitive colour today, but are separate contracts.
+- Prefer semantic typography utilities (`type-page-title`, `type-section-title`, `type-body`, `type-body-secondary`, `type-label`, `type-caption`) for recurring text roles.
+- Spacing primitives are intentionally backward-compatible. Do not renumber or change their values without auditing existing Tailwind classes and migrating affected layouts.
+- The document-service PDF stylesheet imports the shared token sources during prebuild. Keep its source styles token-based; the token-check script scans the PDF engine entry stylesheet.
+- See [Design Token Guidelines](../../docs/design-system/design-token-guidelines.md) for Figma naming, intent, and handoff rules.

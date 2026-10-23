@@ -20,11 +20,17 @@
   --color-primary-subtle: var(--color-orange-2); /* #ffedd5 */
   --color-primary-fg: var(--color-gray-1); /* #ffffff */
 
-  /* ═══ Secondary ══════════════════════════════════════════════ */
-  --color-secondary: var(--color-green-6); /* #4caf50 */
-  --color-secondary-hover: var(--color-green-7); /* #16a34a */
-  --color-secondary-active: var(--color-green-8); /* #15803d */
-  --color-secondary-light: var(--color-green-1); /* #f0fdf4 */
+  /* ═══ Actions ════════════════════════════════════════════════ */
+  /* Keep secondary actions separate from status semantics, even when
+     both currently resolve to the same primitive colour. */
+  --color-secondary: var(--color-green-6); /* Backward-compatible alias */
+  --color-secondary-hover: var(--color-green-7);
+  --color-secondary-active: var(--color-green-8);
+  --color-secondary-light: var(--color-green-1);
+  --color-action-secondary: var(--color-green-6);
+  --color-action-secondary-hover: var(--color-green-7);
+  --color-action-secondary-active: var(--color-green-8);
+  --color-action-secondary-subtle: var(--color-green-1);
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
@@ -87,6 +93,16 @@
   --color-info: var(--color-blue-6); /* #3b82f6 */
   --color-info-light: var(--color-blue-2); /* #dbeafe */
 
+  /* Explicit status aliases. Legacy names above remain supported. */
+  --color-status-error: var(--color-error);
+  --color-status-error-subtle: var(--color-error-light);
+  --color-status-success: var(--color-success);
+  --color-status-success-subtle: var(--color-success-light);
+  --color-status-warning: var(--color-warning);
+  --color-status-warning-subtle: var(--color-warning-light);
+  --color-status-info: var(--color-info);
+  --color-status-info-subtle: var(--color-info-light);
+
   /* ═══ Spacing Aliases ═════════════════════════════════ */
   --spacing-gutter: var(--spacing-5);
   --spacing-section: var(--spacing-10);
@@ -114,8 +130,13 @@
   --shadow-modal: var(--shadow-lg);
   --shadow-toast: var(--shadow-xl);
 
+  /* Typography roles expose intent without changing the existing size scale. */
   --text-display: var(--font-size-5xl);
+  --text-heading-page: var(--font-size-4xl);
+  --text-heading-section: var(--font-size-2xl);
   --text-stat: var(--font-size-3xl);
   --text-body: var(--font-size-base);
+  --text-body-secondary: var(--font-size-sm);
+  --text-label: var(--font-size-sm);
   --text-caption: var(--font-size-xs);
 }
