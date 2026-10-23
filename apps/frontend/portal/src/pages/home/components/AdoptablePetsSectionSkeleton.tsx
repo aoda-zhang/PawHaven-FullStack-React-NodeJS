@@ -22,15 +22,15 @@ export const AdoptablePetsSectionSkeleton = ({
         <Skeleton className="h-44 w-full rounded-none" />
         <div className="space-y-3 p-4">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-24 rounded-md" />
+            <Skeleton className="h-4 w-24 rounded-skeleton" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </div>
-          <Skeleton className="h-3 w-32 rounded-md" />
+          <Skeleton className="h-3 w-32 rounded-skeleton" />
           <div className="flex gap-1">
             <Skeleton className="h-5 w-14 rounded-full" />
             <Skeleton className="h-5 w-16 rounded-full" />
           </div>
-          <Skeleton className="h-3 w-24 rounded-md" />
+          <Skeleton className="h-3 w-24 rounded-skeleton" />
         </div>
       </div>
     ))}
