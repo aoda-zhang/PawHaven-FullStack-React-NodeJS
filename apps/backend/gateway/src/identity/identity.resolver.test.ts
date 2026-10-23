@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 
 import { JwtService } from '@nestjs/jwt';
+import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { verifyInternalJwt } from '@pawhaven/backend-core/internal-jwt';
 import {
   InternalJwtKind,
@@ -36,6 +37,8 @@ const configService = {
     if (key === 'auth.jwtClockTolerance') return 30;
     if (key === 'auth.jwtRefreshFallbackSeconds') return 60;
     if (key === 'auth.jwtRefreshWindowPercentage') return 0.2;
+    if (key === 'identity.minimumRefreshWindowSeconds') return 1;
+    if (key === 'identity.refreshPath') return '/auth-service/refresh';
     throw new Error(`unexpected config key ${key}`);
   }),
   get: vi.fn((key: string) => (key === 'http.env' ? 'test' : undefined)),
@@ -161,6 +164,7 @@ describe('IdentityResolver username propagation', () => {
     'refreshes an expired access token through the routed auth-service endpoint',
     async () => {
       const { resolver, jwtService, httpClientService } = buildResolver();
+      const response = responseStub();
       const refreshedAccessToken = accessToken(jwtService, {
         username: 'reporter-two',
       });
@@ -179,7 +183,7 @@ describe('IdentityResolver username propagation', () => {
           access_token: 'expired-or-invalid-access-token',
           refresh_token: 'refresh-1',
         }),
-        responseStub(),
+        response,
         '/api/core/rescues',
       );
 
@@ -188,6 +192,14 @@ describe('IdentityResolver username propagation', () => {
         sub: 'user-1',
         username: 'reporter-two',
       });
+      expect(response.append).toHaveBeenCalledWith(
+        httpHeaders.setCookie,
+        expect.stringContaining(`access_token=${refreshedAccessToken};`),
+      );
+      expect(response.append).toHaveBeenCalledWith(
+        httpHeaders.setCookie,
+        expect.stringContaining('refresh_token=refresh-2;'),
+      );
       expect(post).toHaveBeenCalledWith(
         '/auth-service/refresh',
         {},
