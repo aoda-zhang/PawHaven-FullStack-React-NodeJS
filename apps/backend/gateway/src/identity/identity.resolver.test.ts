@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 
+import { ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { verifyInternalJwt } from '@pawhaven/backend-core/internal-jwt';
@@ -212,6 +213,56 @@ describe('IdentityResolver username propagation', () => {
       );
     },
   );
+
+
+  it('clears cookies when refresh is rejected as unauthorized', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const post = vi.fn().mockRejectedValue(new UnauthorizedException());
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'expired-refresh-token',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+
+    expect(response.append).toHaveBeenCalledTimes(2);
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('access_token=;'),
+    );
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('refresh_token=;'),
+    );
+  });
+
+  it('propagates transient refresh failures without clearing cookies', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const error = new ServiceUnavailableException('Auth service unavailable');
+    const post = vi.fn().mockRejectedValue(error);
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'refresh-1',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toBe(error);
+
+    expect(response.append).not.toHaveBeenCalled();
+  });
 
   it('resolves to anonymous when no session cookies are present', async () => {
     const { resolver } = buildResolver();
