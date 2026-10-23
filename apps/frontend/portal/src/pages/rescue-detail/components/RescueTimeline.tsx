@@ -23,7 +23,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+    <section className="bg-card border-border rounded-card border p-5 shadow-sm sm:p-6">
       <h2 className="text-foreground mb-5 font-serif text-lg font-semibold">
         {t('reportAnimal.rescue_timeline')}
       </h2>
