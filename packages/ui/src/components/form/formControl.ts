@@ -11,7 +11,7 @@ export const FORM_CONTROL_SIZE_CLASSES: Record<FormControlSize, string> = {
 
 export const FORM_CONTROL_VARIANT_CLASSES: Record<FormControlVariant, string> =
   {
-    standard: 'border-b border-border rounded-none bg-transparent',
+    standard: 'border-b border-border rounded-input bg-transparent',
     outline: 'border-border bg-background border focus:border-primary',
     fill: 'bg-background-subtle border-transparent focus:bg-background',
   };
