@@ -26,7 +26,7 @@
     "sessionExpiresIn": 2592000
   },
   "identity": {
-    "refreshPath": "/auth-service/refresh",
+    "refreshPath": "/refresh",
     "minimumRefreshWindowSeconds": 1
   },
   "internalJwt": {
