@@ -72,7 +72,7 @@ export const FormSelect = ({
                   );
                   field.onChange(matched ? matched.value : event.target.value);
                 }}
-                className="border-border bg-background focus:border-primary text-text w-full appearance-none rounded-input border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-border bg-background focus:border-primary text-text w-full appearance-none rounded-input-large border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {placeholder && <option value="">{placeholder}</option>}
                 {options?.map((item) => (
