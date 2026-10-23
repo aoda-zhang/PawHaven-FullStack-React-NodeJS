@@ -25,6 +25,10 @@
     "refreshTokenRotationWindowSeconds": 86400,
     "sessionExpiresIn": 2592000
   },
+  "identity": {
+    "refreshPath": "/auth-service/refresh",
+    "minimumRefreshWindowSeconds": 1
+  },
   "internalJwt": {
     "enabled": false,
     "audience": "gateway",
