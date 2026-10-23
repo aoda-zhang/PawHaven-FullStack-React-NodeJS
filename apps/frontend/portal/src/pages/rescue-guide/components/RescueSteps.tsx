@@ -23,7 +23,7 @@ export const RescueSteps = () => {
         return (
           <li
             key={step.title}
-            className="bg-card border-border shadow-card hover:shadow-modal rounded-2xl border p-5 transition-transform duration-200 hover:-translate-y-1"
+            className="bg-card border-border shadow-card hover:shadow-modal rounded-card border p-5 transition-transform duration-200 hover:-translate-y-1"
           >
             <span className="bg-accent text-accent-foreground flex size-10 items-center justify-center rounded-xl">
               <StepIcon className="size-5" aria-hidden="true" />
