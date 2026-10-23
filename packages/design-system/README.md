@@ -46,7 +46,7 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 | Class                         | Token                    | Usage                         |
 | ----------------------------- | ------------------------ | ----------------------------- |
 | `bg-primary`                  | `--color-primary`        | Primary actions, brand        |
-| `bg-secondary`                | `--color-secondary`      | Secondary actions, success    |
+| `bg-secondary`                | `--color-secondary`      | Secondary actions    |
 | `bg-card`                     | `--color-card`           | Card surfaces                 |
 | `bg-background`               | `--color-background`     | Page background               |
 | `text-text`                   | `--color-text`           | Body text                     |
