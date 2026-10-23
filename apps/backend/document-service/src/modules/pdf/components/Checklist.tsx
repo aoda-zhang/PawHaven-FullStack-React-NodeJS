@@ -16,7 +16,7 @@ export const Checklist = ({ checklist }: ChecklistProps): ReactElement => (
           {checklist.items.map((item, itemIndex) => (
             <li
               key={`checklist-${itemIndex}`}
-              className="text-label text-primary-active before:border-warning mb-1.5 flex items-start gap-2 before:mt-1 before:h-2.5 before:w-2.5 before:shrink-0 before:rounded-sm before:border before:content-['']"
+              className="text-label text-primary-active before:border-warning mb-1.5 flex items-start gap-2 before:mt-1 before:h-2.5 before:w-2.5 before:shrink-0 before:rounded-section before:border before:content-['']"
             >
               {item}
             </li>
