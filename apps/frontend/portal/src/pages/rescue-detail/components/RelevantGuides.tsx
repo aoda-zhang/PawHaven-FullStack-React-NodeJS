@@ -46,7 +46,7 @@ export const RelevantGuides = () => {
             key={guide.title}
             type="button"
             className={cn(
-              'border-border hover:border-primary flex w-full items-start gap-3 rounded-panel border p-3 text-left transition-colors',
+              'border-border hover:border-primary flex w-full items-start gap-3 rounded-button border p-3 text-left transition-colors',
               guide.highlight,
             )}
           >
