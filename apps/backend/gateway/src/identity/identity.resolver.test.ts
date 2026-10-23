@@ -1,6 +1,9 @@
 import crypto from 'node:crypto';
 
-import { UnauthorizedException } from '@nestjs/common';
+import {
+  ServiceUnavailableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
 import { verifyInternalJwt } from '@pawhaven/backend-core/internal-jwt';
@@ -240,6 +243,30 @@ describe('IdentityResolver username propagation', () => {
       httpHeaders.setCookie,
       expect.stringContaining('refresh_token=;'),
     );
+  });
+
+  it('uses a still-valid access token when a proactive refresh fails transiently', async () => {
+    const { resolver, jwtService, httpClientService } = buildResolver();
+    const response = responseStub();
+    const token = accessToken(jwtService, {
+      exp: Math.floor(Date.now() / MS_PER_SECOND) + 30,
+    });
+    const post = vi
+      .fn()
+      .mockRejectedValue(new ServiceUnavailableException('upstream unavailable'));
+    httpClientService.create.mockReturnValue({ post });
+
+    const identity = await resolver.resolve(
+      requestWith({ access_token: token, refresh_token: 'refresh-1' }),
+      response,
+      '/api/core/rescues',
+    );
+
+    expect(identity).toMatchObject({
+      kind: InternalJwtKind.AUTHENTICATED,
+      sub: 'user-1',
+    });
+    expect(response.append).not.toHaveBeenCalled();
   });
 
   it('preserves session cookies when the auth service refresh request fails transiently', async () => {
