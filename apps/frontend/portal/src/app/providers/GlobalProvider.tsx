@@ -87,11 +87,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     registerMutation.mutate(credentials, {
       onSuccess: (session) => {
-        completeAuthentication(
-          session.user.userId,
-          session.expires_in,
-          callbacks,
-        );
+        completeAuthentication(session.user.userId, callbacks);
       },
       onError: callbacks?.onError,
     });
