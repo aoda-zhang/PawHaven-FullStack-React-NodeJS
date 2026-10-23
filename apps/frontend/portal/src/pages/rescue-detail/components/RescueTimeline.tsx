@@ -68,7 +68,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
                     <img
                       src={update.photo}
                       alt=""
-                      className="bg-muted mt-3 h-28 w-full rounded-xl object-cover"
+                      className="bg-muted mt-3 h-28 w-full rounded-media object-cover"
                     />
                   )}
                 </TimelineContent>
