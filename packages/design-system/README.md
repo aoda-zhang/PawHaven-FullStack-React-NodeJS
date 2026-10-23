@@ -7,7 +7,7 @@ Shared design tokens, theme, and utilities for the PawHaven monorepo.
 | Category                | Use             | Example                                              |
 | ----------------------- | --------------- | ---------------------------------------------------- |
 | **Color**               | Semantic only   | `bg-primary`, `text-text-secondary`, `border-border` |
-| **Typography role**     | Semantic only   | `text-text`, `text-text-link`, `font-heading`        |
+| **Typography role**     | Semantic only   | `type-page-title`, `type-section-title`, `type-body` |
 | **Shadow**              | Semantic only   | `shadow-card`, `shadow-dropdown`                     |
 | **Radius**              | Prefer semantic | `rounded-card`, `rounded-input`, `rounded-button`    |
 | **Spacing / layout**    | Primitive OK    | `pt-2`, `gap-3`, `w-full`, `flex-col`                |
@@ -86,7 +86,7 @@ const dotClass = getRescueStatusColor({
 | Utility                   | Description                                                 |
 | ------------------------- | ----------------------------------------------------------- |
 | `focus-ring`              | Accessible focus-visible outline                            |
-| `text-hero` / `stat-text` | Composite typography (size + family + weight + line-height) |
+| `type-*` / `text-hero` / `stat-text` | Semantic/composite typography roles |
 | `full-width`              | Full-bleed container                                        |
 | `baseFormContainer`       | The label/control/error stack the form controls render into |
 
