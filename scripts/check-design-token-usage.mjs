@@ -66,11 +66,8 @@ for (const scope of scopes) {
   }
 }
 
-const blocking = findings.filter(({ rule }) => rule === 'raw-palette');
-const radius = findings.filter(({ rule }) => rule !== 'raw-palette');
-console.log(`design-token-audit: ${findings.length} finding(s); ${blocking.length} raw palette violation(s), ${radius.length} radius migration candidate(s)`);
+console.log(`design-token-audit: ${findings.length} violation(s)`);
 for (const finding of findings) {
-  const prefix = finding.rule === 'raw-palette' ? 'fail' : 'todo';
-  console.log(`${prefix} ${finding.file}:${finding.line} [${finding.rule}] ${finding.value}`);
+  console.log(`fail ${finding.file}:${finding.line} [${finding.rule}] ${finding.value}`);
 }
-if (blocking.length) process.exitCode = 1;
+if (findings.length) process.exitCode = 1;
