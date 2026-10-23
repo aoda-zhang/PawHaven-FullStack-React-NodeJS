@@ -36,7 +36,7 @@ export const StrayCTA = () => {
               }
               navigate(routePaths.reportAnimal);
             }}
-            className="bg-primary text-text-inverse flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-lg transition-opacity hover:opacity-90"
+            className="bg-primary text-text-inverse flex items-center gap-2 rounded-button px-6 py-3 text-sm font-semibold shadow-lg transition-opacity hover:opacity-90"
           >
             <Camera className="h-4 w-4" />
             {t('footer.cta_button')}
