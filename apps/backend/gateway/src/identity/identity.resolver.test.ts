@@ -213,6 +213,25 @@ describe('IdentityResolver username propagation', () => {
     },
   );
 
+  it('preserves session cookies when the auth service refresh request fails transiently', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const post = vi.fn().mockRejectedValue(new Error('upstream unavailable'));
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'refresh-1',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toThrow('upstream unavailable');
+
+    expect(response.append).not.toHaveBeenCalled();
+  });
   it('resolves to anonymous when no session cookies are present', async () => {
     const { resolver } = buildResolver();
 
