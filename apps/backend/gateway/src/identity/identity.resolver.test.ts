@@ -38,7 +38,7 @@ const configService = {
     if (key === 'auth.jwtRefreshFallbackSeconds') return 60;
     if (key === 'auth.jwtRefreshWindowPercentage') return 0.2;
     if (key === 'identity.minimumRefreshWindowSeconds') return 1;
-    if (key === 'identity.refreshPath') return '/auth-service/refresh';
+    if (key === 'identity.refreshPath') return '/refresh;
     throw new Error(`unexpected config key ${key}`);
   }),
   get: vi.fn((key: string) => (key === 'http.env' ? 'test' : undefined)),
@@ -201,7 +201,7 @@ describe('IdentityResolver username propagation', () => {
         expect.stringContaining('refresh_token=refresh-2;'),
       );
       expect(post).toHaveBeenCalledWith(
-        '/auth-service/refresh',
+        '/refresh,
         {},
         expect.objectContaining({
           returnResponse: true,
@@ -213,6 +213,25 @@ describe('IdentityResolver username propagation', () => {
     },
   );
 
+  it('preserves session cookies when the auth service refresh request fails transiently', async () => {
+    const { resolver, httpClientService } = buildResolver();
+    const response = responseStub();
+    const post = vi.fn().mockRejectedValue(new Error('upstream unavailable'));
+    httpClientService.create.mockReturnValue({ post });
+
+    await expect(
+      resolver.resolve(
+        requestWith({
+          access_token: 'expired-or-invalid-access-token',
+          refresh_token: 'refresh-1',
+        }),
+        response,
+        '/api/core/rescues',
+      ),
+    ).rejects.toThrow('upstream unavailable');
+
+    expect(response.append).not.toHaveBeenCalled();
+  });
   it('resolves to anonymous when no session cookies are present', async () => {
     const { resolver } = buildResolver();
 
