@@ -50,7 +50,7 @@ const buildResolver = () => {
   };
   const internalJwtService = new InternalJwtService(configService as never);
   const targetResolver = { resolve: () => target };
-  const httpClientService = { create: vi.fn() };
+  const httpClientService = { create: vi.fn(() => ({ post: vi.fn() })) };
 
   const resolver = new IdentityResolver(
     jwtService,
@@ -60,7 +60,7 @@ const buildResolver = () => {
     targetResolver as never,
   );
 
-  return { resolver, jwtService, internalJwtService, target };
+  return { resolver, jwtService, internalJwtService, target, httpClientService };
 };
 
 const accessToken = (jwtService: JwtService, claims: Partial<JwtVerifyInfo>) =>
@@ -149,6 +149,47 @@ describe('IdentityResolver username propagation', () => {
       sub: 'user-1',
     });
     expect(verified).not.toHaveProperty('username');
+  });
+
+  it('refreshes an expired access token through the routed auth-service endpoint', async () => {
+    const { resolver, jwtService, httpClientService } = buildResolver();
+    const refreshedAccessToken = accessToken(jwtService, {
+      username: 'reporter-two',
+    });
+    const post = vi.fn().mockResolvedValue({
+      headers: {
+        'set-cookie': [
+          `access_token=${refreshedAccessToken}; Path=/; HttpOnly; SameSite=Lax`,
+          'refresh_token=refresh-2; Path=/; HttpOnly; SameSite=Strict',
+        ],
+      },
+    });
+    httpClientService.create.mockReturnValue({ post });
+
+    const identity = await resolver.resolve(
+      requestWith({
+        access_token: 'expired-or-invalid-access-token',
+        refresh_token: 'refresh-1',
+      }),
+      responseStub(),
+      '/api/core/rescues',
+    );
+
+    expect(identity).toMatchObject({
+      kind: InternalJwtKind.AUTHENTICATED,
+      sub: 'user-1',
+      username: 'reporter-two',
+    });
+    expect(post).toHaveBeenCalledWith(
+      '/auth-service/refresh',
+      {},
+      expect.objectContaining({
+        returnResponse: true,
+        headers: expect.objectContaining({
+          cookie: 'refresh_token=refresh-1',
+        }),
+      }),
+    );
   });
 
   it('resolves to anonymous when no session cookies are present', async () => {
