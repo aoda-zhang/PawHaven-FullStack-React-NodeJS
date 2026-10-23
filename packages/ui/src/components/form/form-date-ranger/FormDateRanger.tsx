@@ -74,7 +74,7 @@ export const FormDateRanger = ({
                 onBlur={field.onBlur}
                 disabled={disabled}
                 aria-invalid={isInvalid ? true : undefined}
-                className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
+                className="border-border bg-background focus:border-primary text-text w-full rounded-input border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
               <span className="text-text-secondary" aria-hidden="true">
                 –
@@ -90,7 +90,7 @@ export const FormDateRanger = ({
                 onBlur={field.onBlur}
                 disabled={disabled}
                 aria-invalid={isInvalid ? true : undefined}
-                className="border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none"
+                className="border-border bg-background focus:border-primary text-text w-full rounded-input border px-3 py-2 text-sm transition-colors focus:outline-none"
               />
             </div>
             {isInvalid && (
