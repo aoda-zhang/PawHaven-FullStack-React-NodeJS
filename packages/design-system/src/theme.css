@@ -80,13 +80,17 @@
   /* ═══ Status ════════════════════════════════════════════ */
   --color-error: var(--color-red-6); /* #ef4444 */
   --color-error-light: var(--color-red-2); /* #fee2e2 */
+  --color-error-foreground: var(--color-red-9); /* Text/icons on error-light surfaces */
   --color-success: var(--color-green-6); /* #4caf50 */
   --color-success-light: var(--color-green-2); /* #dcfce7 */
+  --color-success-foreground: var(--color-green-9); /* Text/icons on success-light surfaces */
   --color-warning: var(--color-yellow-6); /* #f59e0b */
   --color-warning-light: var(--color-yellow-2); /* #fef3c7 */
+  --color-warning-foreground: var(--color-yellow-10); /* Text/icons on warning-light surfaces */
   --color-warning-hover: var(--color-yellow-7); /* #d97706 */
   --color-info: var(--color-blue-6); /* #3b82f6 */
   --color-info-light: var(--color-blue-2); /* #dbeafe */
+  --color-info-foreground: var(--color-blue-9); /* Text/icons on info-light surfaces */
 
   /* ═══ Spacing Aliases ═════════════════════════════════ */
   --spacing-gutter: var(--spacing-5);
