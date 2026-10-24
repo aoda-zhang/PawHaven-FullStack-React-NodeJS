@@ -11,7 +11,10 @@ import { httpBusinessMappingCodes } from '@pawhaven/shared';
 
 import { httpHeaders } from '../../constants/httpHeaders.js';
 import { getTraceId } from '../../trace/traceContext.js';
-import { createHttpErrorResponse, type HttpResType } from '../../types/Http.types.js';
+import {
+  createHttpErrorResponse,
+  type HttpResType,
+} from '../../types/Http.types.js';
 
 import { mapPrismaError } from './prismaError.js';
 
