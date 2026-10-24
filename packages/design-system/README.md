@@ -1,97 +1,111 @@
-# PawHaven Design Token Guidelines
+# @pawhaven/design-system
 
-## Goals
+Shared design tokens, theme, and utilities for the PawHaven monorepo.
 
-Design tokens are shared design decisions, not just named values. Keep primitive values, semantic intent, and optional component-specific decisions separate. This document defines the handoff contract between Figma and the codebase; it does not claim that the current Figma file is automatically synchronized.
+## When to use semantic vs primitive
 
-## Token layers
+| Category                | Use            | Example                                                                                                                                                                                                                         |
+| ----------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Color**               | Semantic only  | `bg-primary`, `text-text-secondary`, `border-border`                                                                                                                                                                            |
+| **Typography role**     | Semantic only  | `type-page-title`, `type-section-title`, `type-body`                                                                                                                                                                            |
+| **Shadow**              | Semantic only  | `shadow-card`, `shadow-dropdown`                                                                                                                                                                                                |
+| **Radius**              | Semantic roles | `rounded-card`, `rounded-card-large`, `rounded-panel`, `rounded-button`, `rounded-button-large`, `rounded-input`, `rounded-input-large`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
+| **Spacing / layout**    | Primitive OK   | `pt-2`, `gap-3`, `w-full`, `flex-col`                                                                                                                                                                                           |
+| **Sizing**              | Primitive OK   | `h-8`, `size-4`, `min-h-[44px]`                                                                                                                                                                                                 |
+| **Responsive / states** | Primitive OK   | `md:flex`, `hover:opacity-90`, `focus:ring`                                                                                                                                                                                     |
 
-### 1. Primitive tokens
+> Rule of thumb: **design decisions** (color, type role, shadow depth, radius scale) → semantic. **Structural/layout** (space, size, breakpoint, interaction) → primitive.
 
-Primitive tokens define the available palette and scales. Examples in code include `--color-orange-6`, `--spacing-4`, `--radius-md`, and `--font-size-lg`.
+## Install
 
-Use primitives when defining a semantic token or for structural layout where the design system explicitly permits it. Avoid choosing raw palette colours directly for application UI.
+```ts
+// apps/frontend/portal/src/providers/AppProvider.tsx
+import '@pawhaven/design-system/index.css';
+```
 
-### 2. Semantic tokens
-
-<<<<<<< HEAD
-Semantic tokens express why a value is used. Prefer these for application styling:
-=======
+## Usage
 
 All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components. Primary backgrounds use `text-primary-fg` for their foreground, which is white.
 
-> > > > > > > refs/remotes/origin/fix/design-token-system
+```html
+<div class="bg-card text-text shadow-card rounded-card">
+  <h1 class="type-page-title text-text">Hello PawHaven</h1>
+  <p class="type-body">Rescue animals and connect with your community.</p>
+  <button class="bg-primary text-primary-fg rounded-button px-4 py-2">
+    Get Started
+  </button>
+  <input
+    class="border-border bg-background rounded-input border px-3 py-2"
+    placeholder="Search..."
+  />
+</div>
+```
 
-| Intent          | Code token               | Figma variable path                   | Guidance                        |
-| --------------- | ------------------------ | ------------------------------------- | ------------------------------- |
-| Main text       | `--color-text`           | `Semantic / Color / Text / Primary`   | Main content and headings       |
-| Secondary text  | `--color-text-secondary` | `Semantic / Color / Text / Secondary` | Supporting copy; check contrast |
-| Page background | `--color-background`     | `Semantic / Color / Surface / Page`   | Standard page surface           |
-| Card surface    | `--color-card`           | `Semantic / Color / Surface / Card`   | Cards and content panels        |
-| Default border  | `--color-border`         | `Semantic / Color / Border / Default` | Low-emphasis boundaries         |
-| Primary action  | `--color-primary`        | `Semantic / Color / Action / Primary` | Main action                     |
-| Success status  | `--color-success`        | `Semantic / Color / Status / Success` | Successful outcome or state     |
-| Warning status  | `--color-warning`        | `Semantic / Color / Status / Warning` | Caution or attention            |
-| Error status    | `--color-error`          | `Semantic / Color / Status / Error`   | Error or destructive feedback   |
-| Info status     | `--color-info`           | `Semantic / Color / Status / Info`    | Informational feedback          |
+### Semantic color utilities
 
-Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. Keep one canonical semantic token per intent; do not add aliases unless they represent a real, separately used role or are part of a tracked migration. This project currently supports a Light theme only: do not add Dark-theme variants or complete token families pre-emptively. Add a status-specific foreground token only when an actual component needs readable text/icons on a light status background and the existing status token does not provide sufficient contrast. For normal-sized text, target WCAG 2.2 AA contrast of at least 4.5:1; choose foregrounds for the actual background rather than automatically reusing the brand accent.
+| Class                         | Token                    | Usage                                        |
+| ----------------------------- | ------------------------ | -------------------------------------------- |
+| `bg-primary`                  | `--color-primary`        | Primary actions, brand                       |
+| `bg-card`                     | `--color-card`           | Card surfaces                                |
+| `bg-background`               | `--color-background`     | Page background                              |
+| `text-text`                   | `--color-text`           | Body text                                    |
+| `text-text-secondary`         | `--color-text-secondary` | Subtle text                                  |
+| `text-text-inverse`           | `--color-text-inverse`   | Text on dark surfaces and inverse text roles |
+| `text-primary-fg`             | `--color-primary-fg`     | White text/icons on Primary backgrounds      |
+| `text-text-link`              | `--color-text-link`      | Links                                        |
+| `border-border`               | `--color-border`         | Card borders, dividers                       |
+| `bg-error` / `text-error`     | `--color-error`          | Error states                                 |
+| `bg-success` / `text-success` | `--color-success`        | Success states                               |
+| `bg-warning` / `text-warning` | `--color-warning`        | Warning states                               |
+| `bg-info` / `text-info`       | `--color-info`           | Info states                                  |
 
-### 3. Component tokens
+### Status colors
 
-Create component-specific tokens only when a component needs a stable decision that is not adequately expressed by shared semantics. Existing examples include `--radius-button`, `--radius-button-large`, `--radius-card`, `--radius-card-large`, `--radius-input-large`, `--radius-panel`, `--radius-icon`, `--radius-media`, `--radius-skeleton`, `--radius-section`, `--radius-hero`, `--shadow-card`, and `--shadow-modal`.
+Use the `getRescueStatusColor` util — never hard-code status colors.
 
-Do not create a component token merely to duplicate a semantic token without a distinct component contract.
+```ts
+import { getRescueStatusColor } from '@/shared/utils/rescueStatus/getRescueStatusColor';
+const dotClass = getRescueStatusColor({
+  status: animal.status,
+  prefix: 'bg',
+});
+```
 
-## Figma setup and selection
+### Spacing, radius, shadow
 
-Create Figma Variable Collections for:
+| Class                                                                                                                                                                                                                                      | Token           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| `px-4` / `py-2` / `gap-3`                                                                                                                                                                                                                  | `--spacing-*`   |
+| `rounded-button` / `rounded-button-large` / `rounded-card` / `rounded-card-large` / `rounded-panel` / `rounded-input` / `rounded-input-large` / `rounded-icon` / `rounded-media` / `rounded-skeleton` / `rounded-section` / `rounded-hero` | `--radius-*`    |
+| `shadow-card` / `shadow-dropdown`                                                                                                                                                                                                          | `--shadow-*`    |
+| `text-3xl` / `text-6xl`                                                                                                                                                                                                                    | `--font-size-*` |
+| `font-heading` / `font-sans` / `font-serif`                                                                                                                                                                                                | `--font-*`      |
 
-- **Primitives**: palette, spacing, radius, typography scales.
-- **Semantic**: text, surface, border, action, and status.
-- **Component**: only component-specific overrides that have a real use case.
+### Composite utilities
 
-Keep the semantic collection limited to roles used by the current Light UI. Do not create parallel light/dark collections until a Dark theme is an actual requirement.
+| Utility                              | Description                                                 |
+| ------------------------------------ | ----------------------------------------------------------- |
+| `focus-ring`                         | Accessible focus-visible outline                            |
+| `type-*` / `text-hero` / `stat-text` | Semantic/composite typography roles                         |
+| `full-width`                         | Full-bleed container                                        |
+| `baseFormContainer`                  | The label/control/error stack the form controls render into |
 
-When styling a design element, select a semantic variable by its purpose. For example, a rescue card uses `Semantic / Color / Surface / Card`; its title uses `Semantic / Color / Text / Primary`; its secondary description uses `Semantic / Color / Text / Secondary`. Do not choose a primitive such as `orange-6` directly for a button if the semantic action token is available.
+## Token source
 
-Add a Token Catalog page to the Figma file. Each entry should show the variable path, a live sample, purpose, intended use, and important contrast/state notes. Keep examples connected to actual Variables instead of manually drawing colour swatches that can drift.
+Semantic tokens: `src/theme.css`
+Primitive tokens: `src/tokens/*.css`
+Composite utilities: `src/utilities.css`
 
-## Typography roles
+## Checks
 
-Use the semantic utilities in code for recurring roles:
+```bash
+pnpm --filter @pawhaven/design-system token-check       # raw hex / px / unknown classname
+```
 
-| Role           | Code utility          | Intended use                   |
-| -------------- | --------------------- | ------------------------------ |
-| Page title     | `type-page-title`     | Main page heading              |
-| Section title  | `type-section-title`  | Section heading                |
-| Body           | `type-body`           | Default paragraph              |
-| Secondary body | `type-body-secondary` | Supporting paragraph           |
-| Label          | `type-label`          | Form labels and compact labels |
-| Caption        | `type-caption`        | Metadata and fine print        |
+## Semantic token rules
 
-In Figma, create matching Text Styles with the same role names and documented family, size, weight, line-height, and letter-spacing. Confirm font availability and language fallbacks before treating the Figma and PDF rendering as identical.
-
-## Spacing and migration safety
-
-The current spacing scale includes custom values that differ from Tailwind's defaults. These values may affect many utilities such as `p-5`, `gap-6`, and `mt-10`. Do not normalize or renumber the scale as an isolated token cleanup. First audit actual usage, document the intended scale, and migrate layouts with visual regression checks.
-
-Use semantic aliases such as `--spacing-gutter`, `--spacing-section`, `--spacing-card`, and `--spacing-input` when expressing repeated design decisions.
-
-## Cross-platform contract
-
-The document-service prebuild copies the shared primitive tokens and semantic theme into its PDF runtime before compiling the PDF stylesheet. Keep PDF source styles token-based. PDF-specific typography, paper layout, and font fallback may differ from web styles when rendering requirements justify it, but colour choices should use shared semantic tokens unless the report specification explicitly requires a separate token.
-
-The token-check gate covers shared design-system and frontend CSS plus the PDF engine entry stylesheet. ESLint validates token classes in application source. These static guards are not substitutes for generated-PDF visual checks or accessibility contrast testing.
-
-## Change checklist
-
-Before changing a token:
-
-1. Identify its semantic purpose and consumers.
-2. Check whether it affects a Tailwind utility used throughout the application.
-3. Update Figma Variables and the Token Catalog through the team's chosen sync process.
-4. Update the CSS token source. Keep one canonical name per intent; any temporary compatibility alias must have a tracked migration and removal point.
-5. Run `pnpm token-check`, relevant package checks, and the document-service build.
-6. Inspect representative web screens and generated PDFs for visual regressions.
-7. Record any intentional contrast, font, or print-specific differences.
+- Use action tokens for interaction intent and status tokens for feedback intent. They may resolve to the same primitive colour today, but are separate contracts.
+- Prefer semantic typography utilities (`type-page-title`, `type-section-title`, `type-body`, `type-body-secondary`, `type-label`, `type-caption`) for recurring text roles.
+- Spacing primitives are intentionally backward-compatible. Do not renumber or change their values without auditing existing Tailwind classes and migrating affected layouts.
+- The document-service PDF stylesheet imports the shared token sources during prebuild. Keep its source styles token-based; the token-check script scans the PDF engine entry stylesheet.
+- See [Design Token Guidelines](./docs/design-token-guidelines.md) for Figma naming, intent, and handoff rules.

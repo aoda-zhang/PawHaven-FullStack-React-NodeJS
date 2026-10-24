@@ -12,7 +12,7 @@ authority, intent, or background.
 | `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
 | `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
-Design-system documentation lives with its owner package: the [token guidelines](../packages/design-system/docs/design-token-guidelines.md) define usage and handoff rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
+Design-system documentation lives with its owner package: the [package README](../packages/design-system/README.md) defines token usage and handoff rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
 
 ---
 
@@ -109,7 +109,7 @@ agent team itself is put together.
 
 ## 5. Design system
 
-The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [token guidelines](../packages/design-system/docs/design-token-guidelines.md) for token-layer and cross-package rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
+The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [design-system README](../packages/design-system/README.md) for token-layer and cross-package rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
 
 ## 6. Agent harness
 
