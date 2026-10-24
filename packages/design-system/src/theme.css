@@ -19,10 +19,6 @@
   --color-primary-light: var(--color-orange-1); /* #fff7ed */
   --color-primary-fg: var(--color-gray-10); /* Accessible foreground on the primary action color */
 
-  /* ═══ Actions ════════════════════════════════════════════════ */
-  /* Secondary action intent is independent of success status semantics. */
-  --color-secondary: var(--color-green-6);
-  --color-secondary-fg: var(--color-gray-10); /* Accessible foreground on the secondary action color */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
