@@ -29,12 +29,8 @@ Semantic tokens express why a value is used. Prefer these for application stylin
 | Warning status | `--color-warning` | `Semantic / Color / Status / Warning` | Caution or attention |
 | Error status | `--color-error` | `Semantic / Color / Status / Error` | Error or destructive feedback |
 | Info status | `--color-info` | `Semantic / Color / Status / Info` | Informational feedback |
-| Error text/icon on a light status surface | `--color-error-foreground` | `Semantic / Color / Status / Error / Foreground` | Use with `--color-error-light` backgrounds |
-| Success text/icon on a light status surface | `--color-success-foreground` | `Semantic / Color / Status / Success / Foreground` | Use with `--color-success-light` backgrounds |
-| Warning text/icon on a light status surface | `--color-warning-foreground` | `Semantic / Color / Status / Warning / Foreground` | Use with `--color-warning-light` backgrounds |
-| Info text/icon on a light status surface | `--color-info-foreground` | `Semantic / Color / Status / Info / Foreground` | Use with `--color-info-light` backgrounds |
 
-Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. The codebase uses one canonical semantic token per intent; do not add duplicate aliases such as `status-success` alongside `success` unless a migration requires a temporary, tracked compatibility layer. Status foreground roles are distinct from status accent colors: use the `*-foreground` token for readable text/icons on the matching `*-light` surface, and validate contrast for each actual foreground/background pair before use. For normal-sized text, target WCAG 2.2 AA contrast of at least 4.5:1; semantic foreground tokens on primary/secondary actions, links, and placeholder text must be chosen for the intended background rather than simply reusing the brand accent.
+Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. Keep one canonical semantic token per intent; do not add aliases unless they represent a real, separately used role or are part of a tracked migration. This project currently supports a Light theme only: do not add Dark-theme variants or complete token families pre-emptively. Add a status-specific foreground token only when an actual component needs readable text/icons on a light status background and the existing status token does not provide sufficient contrast. For normal-sized text, target WCAG 2.2 AA contrast of at least 4.5:1; choose foregrounds for the actual background rather than automatically reusing the brand accent.
 
 ### 3. Component tokens
 
@@ -49,6 +45,8 @@ Create Figma Variable Collections for:
 - **Primitives**: palette, spacing, radius, typography scales.
 - **Semantic**: text, surface, border, action, and status.
 - **Component**: only component-specific overrides that have a real use case.
+
+Keep the semantic collection limited to roles used by the current Light UI. Do not create parallel light/dark collections until a Dark theme is an actual requirement.
 
 When styling a design element, select a semantic variable by its purpose. For example, a rescue card uses `Semantic / Color / Surface / Card`; its title uses `Semantic / Color / Text / Primary`; its secondary description uses `Semantic / Color / Text / Secondary`. Do not choose a primitive such as `orange-6` directly for a button if the semantic action token is available.
 
