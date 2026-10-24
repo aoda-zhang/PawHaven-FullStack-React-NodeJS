@@ -20,6 +20,7 @@ const FALLBACK_SERVICE_NAME = 'service';
 export async function bootstrapApp(
   module: Type<unknown>,
   options: BootstrapAppOptions = {},
+  nestFactory: typeof NestFactory = NestFactory,
 ): Promise<NestExpressApplication> {
   const {
     listenHost = DEFAULT_LISTEN_HOST,
@@ -32,7 +33,7 @@ export async function bootstrapApp(
   let app: NestExpressApplication;
 
   try {
-    app = await NestFactory.create<NestExpressApplication>(module, {
+    app = await nestFactory.create<NestExpressApplication>(module, {
       bufferLogs: true,
       forceCloseConnections: true,
       bodyParser: false,
