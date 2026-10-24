@@ -108,4 +108,4 @@ pnpm --filter @pawhaven/design-system token-check       # raw hex / px / unknown
 - Prefer semantic typography utilities (`type-page-title`, `type-section-title`, `type-body`, `type-body-secondary`, `type-label`, `type-caption`) for recurring text roles.
 - Spacing primitives are intentionally backward-compatible. Do not renumber or change their values without auditing existing Tailwind classes and migrating affected layouts.
 - The document-service PDF stylesheet imports the shared token sources during prebuild. Keep its source styles token-based; the token-check script scans the PDF engine entry stylesheet.
-- See [Design Token Guidelines](../../docs/design-system/design-token-guidelines.md) for Figma naming, intent, and handoff rules.
+- See [Design Token Guidelines](./docs/design-token-guidelines.md) for Figma naming, intent, and handoff rules.
