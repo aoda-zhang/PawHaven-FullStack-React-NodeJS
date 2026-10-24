@@ -7,7 +7,7 @@
   },
   "api": {
     "baseURL": "${PAWHAVEN_USER_API_BASE_URL}",
-    "timeout": 5000
+    "timeout": 20000
   },
   "query": {
     "refetchOnReconnect": true,
