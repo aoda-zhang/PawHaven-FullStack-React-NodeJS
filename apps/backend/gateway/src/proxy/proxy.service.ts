@@ -135,15 +135,7 @@ export class ProxyService {
       res.removeHeader('content-length');
       res.removeHeader('content-encoding');
       return JSON.stringify(
-        createHttpErrorResponse(
-          statusCode,
-          statusCode === HTTP_STATUS.GATEWAY_TIMEOUT
-            ? 'Request timeout'
-            : 'Service error',
-          '',
-          null,
-          traceId,
-        ),
+        createHttpErrorResponse(statusCode, undefined, '', null, traceId),
       );
     }
 
