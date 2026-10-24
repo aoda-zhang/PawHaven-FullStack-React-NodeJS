@@ -28,7 +28,7 @@ export class PdfService implements OnModuleDestroy {
         this.configService.get<string>('pdf.chromiumExecutablePath'),
       );
       this.browserPromise = launchPromise;
-      launchPromise.catch(() => {
+      void launchPromise.catch(() => {
         if (this.browserPromise === launchPromise) {
           this.browserPromise = null;
         }
