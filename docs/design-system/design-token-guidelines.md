@@ -29,8 +29,12 @@ Semantic tokens express why a value is used. Prefer these for application stylin
 | Warning status | `--color-warning` | `Semantic / Color / Status / Warning` | Caution or attention |
 | Error status | `--color-error` | `Semantic / Color / Status / Error` | Error or destructive feedback |
 | Info status | `--color-info` | `Semantic / Color / Status / Info` | Informational feedback |
+| Error text/icon on a light status surface | `--color-error-foreground` | `Semantic / Color / Status / Error / Foreground` | Use with `--color-error-light` backgrounds |
+| Success text/icon on a light status surface | `--color-success-foreground` | `Semantic / Color / Status / Success / Foreground` | Use with `--color-success-light` backgrounds |
+| Warning text/icon on a light status surface | `--color-warning-foreground` | `Semantic / Color / Status / Warning / Foreground` | Use with `--color-warning-light` backgrounds |
+| Info text/icon on a light status surface | `--color-info-foreground` | `Semantic / Color / Status / Info / Foreground` | Use with `--color-info-light` backgrounds |
 
-Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. The codebase uses one canonical semantic token per intent; do not add duplicate aliases such as `status-success` alongside `success` unless a migration requires a temporary, tracked compatibility layer.
+Figma paths above are the recommended naming convention to implement, not a claim that the existing Figma file already contains them. The codebase uses one canonical semantic token per intent; do not add duplicate aliases such as `status-success` alongside `success` unless a migration requires a temporary, tracked compatibility layer. Status foreground roles are distinct from status accent colors: use the `*-foreground` token for readable text/icons on the matching `*-light` surface, and validate contrast for each actual foreground/background pair before use.
 
 ### 3. Component tokens
 
