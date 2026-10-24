@@ -42,7 +42,7 @@ export class GuideService {
       {
         returnResponse: true,
         headers: { [httpHeaders.appLocale]: locale },
-        config: { responseType: 'arraybuffer', timeout: 30_000 },
+        config: { responseType: 'arraybuffer' },
       },
     );
 
