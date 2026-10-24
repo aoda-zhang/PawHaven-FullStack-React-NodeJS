@@ -17,15 +17,11 @@
   --color-primary-hover: var(--color-orange-7); /* #f66b26 */
   --color-primary-active: var(--color-orange-8); /* #e65a1a */
   --color-primary-light: var(--color-orange-1); /* #fff7ed */
-  --color-primary-subtle: var(--color-orange-2); /* #ffedd5 */
   --color-primary-fg: var(--color-gray-10); /* Accessible foreground on the primary action color */
 
   /* ═══ Actions ════════════════════════════════════════════════ */
   /* Secondary action intent is independent of success status semantics. */
   --color-secondary: var(--color-green-6);
-  --color-secondary-hover: var(--color-green-7);
-  --color-secondary-active: var(--color-green-8);
-  --color-secondary-light: var(--color-green-1);
   --color-secondary-fg: var(--color-gray-10); /* Accessible foreground on the secondary action color */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
@@ -45,16 +41,12 @@
   --color-text: var(--color-gray-9); /* #2f2f2f */
   --color-text-secondary: var(--color-gray-7); /* #737373 */
   --color-text-tertiary: var(--color-gray-6); /* #a3a3a3 */
-  --color-text-placeholder: var(--color-gray-7); /* Readable placeholder text on light surfaces */
   --color-text-inverse: var(--color-gray-1); /* #ffffff */
   --color-text-link: var(--color-orange-9); /* Accessible link color on light surfaces */
 
   /* ═══ Borders ════════════════════════════════════════ */
   --color-border: var(--color-gray-5); /* #d4d4d4 */
   --color-border-hover: var(--color-gray-6); /* #a3a3a3 */
-  --color-border-strong: var(--color-gray-7); /* #737373 */
-  --color-border-focus: var(--color-primary); /* #f7823a */
-  --color-border-error: var(--color-red-6); /* #ef4444 */
   --color-divider: var(--color-brown-6); /* #d3c3b3 — hero stats divider */
 
   /* ═══ Page-Specific Surfaces and Text ═══════════════════ */
