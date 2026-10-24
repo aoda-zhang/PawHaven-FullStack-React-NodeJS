@@ -65,6 +65,22 @@ const startCapturingUpstream = async (): Promise<Server> => {
   return server;
 };
 
+const startFailingUpstream = async (
+  statusCode: number,
+  contentType: string,
+  body: string,
+): Promise<Server> => {
+  const server = createServer((_req, res) => {
+    res.statusCode = statusCode;
+    res.setHeader('Content-Type', contentType);
+    res.end(body);
+  });
+  await new Promise<void>((resolve) => {
+    server.listen(0, '127.0.0.1', () => resolve());
+  });
+  return server;
+};
+
 // Kept unanchored so it can be composed into a larger pattern (e.g. matching a
 // uuid inside a raw HTTP response head) without dragging `^`/`$` along.
 const UUID_SOURCE =
@@ -182,6 +198,55 @@ describe('ProxyService: upstream failures reach the caller', () => {
       code: '',
       data: null,
     });
+  });
+
+  it('sanitizes infrastructure JSON returned with an upstream 504', async () => {
+    upstream = await startFailingUpstream(
+      HTTP_STATUS.GATEWAY_TIMEOUT,
+      'application/json',
+      JSON.stringify({
+        title: 'Gateway timeout',
+        ray_id: 'private-ray-id',
+        zone: 'internal-origin.example',
+        detail: 'Origin diagnostic details',
+      }),
+    );
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway).get(PROXY_PATH);
+
+    expect(response.status).toBe(HTTP_STATUS.GATEWAY_TIMEOUT);
+    expect(response.body).toEqual({
+      status: HTTP_STATUS.GATEWAY_TIMEOUT,
+      isSuccess: false,
+      message: 'Request timeout',
+      code: '',
+      data: null,
+    });
+    expect(response.text).not.toContain('private-ray-id');
+    expect(response.text).not.toContain('internal-origin.example');
+    expect(response.text).not.toContain('Origin diagnostic details');
+  });
+
+  it('sanitizes an upstream HTML 5xx error page', async () => {
+    upstream = await startFailingUpstream(
+      500,
+      'text/html',
+      '<html><body>Internal stack trace and origin details</body></html>',
+    );
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway).get(PROXY_PATH);
+
+    expect(response.status).toBe(500);
+    expect(response.body).toEqual({
+      status: 500,
+      isSuccess: false,
+      message: 'Service error',
+      code: '',
+      data: null,
+    });
+    expect(response.text).not.toContain('Internal stack trace');
   });
 });
 

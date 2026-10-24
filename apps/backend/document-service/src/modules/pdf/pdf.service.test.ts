@@ -118,6 +118,42 @@ describe('PdfService lazy browser initialization', () => {
     expect(launchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('shares one Chromium launch across concurrent render requests', async () => {
+    const service = buildService();
+    let resolveLaunch!: (value: Browser) => void;
+    launchMock.mockImplementationOnce(
+      () => new Promise<Browser>((resolve) => {
+        resolveLaunch = resolve;
+      }),
+    );
+
+    const first = service.renderPdf(body, locale);
+    const second = service.renderPdf(body, locale);
+    expect(launchMock).toHaveBeenCalledTimes(1);
+
+    resolveLaunch(browser);
+    await Promise.all([first, second]);
+
+    expect(launchMock).toHaveBeenCalledTimes(1);
+    expect(buildPdfMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries Chromium initialization after a failed launch', async () => {
+    const service = buildService();
+    launchMock
+      .mockRejectedValueOnce(new Error('spawn ENOENT'))
+      .mockResolvedValueOnce(browser);
+
+    await expect(service.renderPdf(body, locale)).rejects.toThrow(
+      /Chromium is not available/,
+    );
+    await expect(service.renderPdf(body, locale)).resolves.toEqual(
+      Buffer.from('pdf'),
+    );
+
+    expect(launchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('throws a clear error when Chromium cannot be launched', async () => {
     launchMock.mockRejectedValueOnce(new Error('spawn ENOENT'));
 

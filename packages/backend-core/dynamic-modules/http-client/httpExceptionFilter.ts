@@ -11,7 +11,10 @@ import { httpBusinessMappingCodes } from '@pawhaven/shared';
 
 import { httpHeaders } from '../../constants/httpHeaders.js';
 import { getTraceId } from '../../trace/traceContext.js';
-import { HttpResType } from '../../types/Http.types.js';
+import {
+  createHttpErrorResponse,
+  type HttpResType,
+} from '../../types/Http.types.js';
 
 import { mapPrismaError } from './prismaError.js';
 
@@ -89,14 +92,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const code = BUSINESS_CODES.has(message) ? message : '';
 
-    const errorResponse: HttpResType = {
+    const errorResponse: HttpResType = createHttpErrorResponse(
       status,
-      isSuccess: false,
       message,
       code,
       data,
-      ...(traceId ? { traceId } : {}),
-    };
+      traceId,
+    );
 
     this.logger.error(
       `Exception caught (context: ${ctxType}):`,
