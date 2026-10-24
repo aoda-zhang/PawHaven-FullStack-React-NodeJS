@@ -1,3 +1,4 @@
+export { createHttpErrorResponse } from './Http.types.js';
 export type { HttpResType } from './Http.types.js';
 export { InternalJwtSchema } from './InternalJwt.schema.js';
 export {
