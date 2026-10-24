@@ -1,3 +1,5 @@
+import { HttpStatus } from '@nestjs/common';
+
 export interface HttpResType {
   isSuccess: boolean;
   message: string;
@@ -12,11 +14,11 @@ export interface HttpResType {
   traceId?: string;
 }
 
-
 /** Builds the shared public error envelope used by Nest handlers and gateway proxy responses. */
 export const createHttpErrorResponse = (
   status: number,
-  message = status === 504 ? 'Request timeout' : 'Service error',
+  message =
+    status === HttpStatus.GATEWAY_TIMEOUT ? 'Request timeout' : 'Service error',
   code = '',
   data: unknown = null,
   traceId?: string,
