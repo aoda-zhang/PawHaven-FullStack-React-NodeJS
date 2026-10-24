@@ -12,7 +12,7 @@ authority, intent, or background.
 | `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
 | `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
-Design-token values remain defined in [`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by `pnpm token-check`. The [design-token guidelines](./design-system/design-token-guidelines.md) document how to use the token layers and keep Figma, portal, shared UI, frontend-core, and PDF rendering aligned; it is guidance, not a duplicate token-value source.
+Design-system documentation lives with its owner package: the [token guidelines](../packages/design-system/docs/design-token-guidelines.md) define usage and handoff rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
 
 ---
 
@@ -170,7 +170,7 @@ system-architecture-overview.md
 against the code at that time. A feature doc is as-built as of the last change that reconciled it.
 
 
-## 6. Engineering notes
+## 9. Engineering notes
 
 | File | Covers |
 | --- | --- |
