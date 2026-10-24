@@ -17,6 +17,7 @@ import {
   responseInterceptor,
 } from 'http-proxy-middleware';
 import { httpHeaders } from '@pawhaven/backend-core/constants';
+import { createHttpErrorResponse } from '@pawhaven/backend-core/types';
 import { resolveInboundTraceId } from '@pawhaven/backend-core/trace';
 import { readHeader } from '@pawhaven/backend-core/utils';
 import { HTTP_STATUS } from '@pawhaven/shared/constants';
@@ -121,23 +122,29 @@ export class ProxyService {
     const isJson = contentType.includes('application/json');
     const statusCode = proxyRes.statusCode ?? res.statusCode;
 
-    // Infrastructure and upstream 5xx bodies are not part of the public API
-    // contract. Never pass through HTML error pages or diagnostic JSON.
+    // Preserve service-generated error envelopes. Infrastructure responses
+    // bypass Nest's global exception filter, so normalize only non-envelope 5xx.
     if (statusCode >= 500) {
-      const timedOut = statusCode === HTTP_STATUS.GATEWAY_TIMEOUT;
+      const body = isJson ? JSON.parse(buffer.toString('utf8') || 'null') : null;
+      if (body && typeof body === 'object' && 'isSuccess' in body) {
+        return buffer;
+      }
+
       res.statusCode = statusCode;
       res.setHeader(httpHeaders.contentType, 'application/json; charset=utf-8');
       res.removeHeader('content-length');
       res.removeHeader('content-encoding');
-      return JSON.stringify({
-        status: statusCode,
-        isSuccess: false,
-        message: timedOut
-          ? 'The service timed out. Please try again later.'
-          : 'The service is temporarily unavailable. Please try again later.',
-        code: timedOut ? 'UPSTREAM_TIMEOUT' : 'UPSTREAM_ERROR',
-        data: null,
-      });
+      return JSON.stringify(
+        createHttpErrorResponse(
+          statusCode,
+          statusCode === HTTP_STATUS.GATEWAY_TIMEOUT
+            ? 'Request timeout'
+            : 'Service error',
+          '',
+          null,
+          traceId,
+        ),
+      );
     }
 
     if (
