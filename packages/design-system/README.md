@@ -14,7 +14,13 @@ Use primitives when defining a semantic token or for structural layout where the
 
 ### 2. Semantic tokens
 
+<<<<<<< HEAD
 Semantic tokens express why a value is used. Prefer these for application styling:
+=======
+
+All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components. Primary backgrounds use `text-primary-fg` for their foreground, which is white.
+
+> > > > > > > refs/remotes/origin/fix/design-token-system
 
 | Intent          | Code token               | Figma variable path                   | Guidance                        |
 | --------------- | ------------------------ | ------------------------------------- | ------------------------------- |
