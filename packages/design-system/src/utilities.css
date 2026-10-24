@@ -52,3 +52,54 @@
     margin-block: 0;
   }
 }
+
+
+/* Semantic typography roles. Keep the primitives above available for layout
+   exceptions; use these roles for recurring content hierarchy. */
+@utility type-page-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-heading-page);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+}
+
+@utility type-section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-heading-section);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility type-body {
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-relaxed);
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility type-body-secondary {
+  font-family: var(--font-sans);
+  font-size: var(--text-body-secondary);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility type-label {
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-normal);
+}
+
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
+}

@@ -9,11 +9,11 @@ import { routePaths } from '@/app/router/routePaths';
 const LOGOUT_MENU_CLASS = 'logout';
 
 const ACTION_ITEM_CLASS =
-  'px-3 py-2 rounded-lg bg-primary text-text-inverse font-semibold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors hover:bg-primary/90';
+  'px-3 py-2 rounded-panel bg-primary text-text-inverse font-semibold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors hover:bg-primary/90';
 
 const MENU_CLASSES = {
   menuItem:
-    'cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-text-secondary transition-colors hover:text-foreground hover:bg-muted',
+    'cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-panel text-sm font-medium text-text-secondary transition-colors hover:text-foreground hover:bg-muted',
   activeMenuItem: 'bg-accent text-primary',
   login: ACTION_ITEM_CLASS,
   logout: ACTION_ITEM_CLASS,

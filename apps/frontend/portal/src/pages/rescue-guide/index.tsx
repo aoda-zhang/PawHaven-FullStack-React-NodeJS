@@ -8,7 +8,7 @@ export const RescueGuide = () => {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <header className="bg-hero-bg border-border rounded-3xl border p-6 sm:p-8">
+      <header className="bg-hero-bg border-border rounded-hero border p-6 sm:p-8">
         <span className="text-stat-labels text-xs font-semibold tracking-widest uppercase">
           {t('rescueGuide.eyebrow')}
         </span>

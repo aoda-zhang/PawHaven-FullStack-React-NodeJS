@@ -20,4 +20,12 @@
   --color-rescue-status-awaiting-adoption: var(--color-yellow-5);
   --color-rescue-status-adopted: var(--color-green-8);
   --color-rescue-status-failed: var(--color-gray-6);
+
+  --color-rescue-status-pending-foreground: var(--color-gray-10);
+  --color-rescue-status-in-progress-foreground: var(--color-gray-10);
+  --color-rescue-status-treated-foreground: var(--color-gray-1);
+  --color-rescue-status-recovering-foreground: var(--color-gray-10);
+  --color-rescue-status-awaiting-adoption-foreground: var(--color-gray-10);
+  --color-rescue-status-adopted-foreground: var(--color-gray-1);
+  --color-rescue-status-failed-foreground: var(--color-gray-10);
 }

@@ -4,15 +4,15 @@ Shared design tokens, theme, and utilities for the PawHaven monorepo.
 
 ## When to use semantic vs primitive
 
-| Category                | Use             | Example                                              |
-| ----------------------- | --------------- | ---------------------------------------------------- |
-| **Color**               | Semantic only   | `bg-primary`, `text-text-secondary`, `border-border` |
-| **Typography role**     | Semantic only   | `text-text`, `text-text-link`, `font-heading`        |
-| **Shadow**              | Semantic only   | `shadow-card`, `shadow-dropdown`                     |
-| **Radius**              | Prefer semantic | `rounded-card`, `rounded-input`, `rounded-button`    |
-| **Spacing / layout**    | Primitive OK    | `pt-2`, `gap-3`, `w-full`, `flex-col`                |
-| **Sizing**              | Primitive OK    | `h-8`, `size-4`, `min-h-[44px]`                      |
-| **Responsive / states** | Primitive OK    | `md:flex`, `hover:opacity-90`, `focus:ring`          |
+| Category                | Use            | Example                                                                                                                                                                                                                         |
+| ----------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Color**               | Semantic only  | `bg-primary`, `text-text-secondary`, `border-border`                                                                                                                                                                            |
+| **Typography role**     | Semantic only  | `type-page-title`, `type-section-title`, `type-body`                                                                                                                                                                            |
+| **Shadow**              | Semantic only  | `shadow-card`, `shadow-dropdown`                                                                                                                                                                                                |
+| **Radius**              | Semantic roles | `rounded-card`, `rounded-card-large`, `rounded-panel`, `rounded-button`, `rounded-button-large`, `rounded-input`, `rounded-input-large`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
+| **Spacing / layout**    | Primitive OK   | `pt-2`, `gap-3`, `w-full`, `flex-col`                                                                                                                                                                                           |
+| **Sizing**              | Primitive OK   | `h-8`, `size-4`, `min-h-[44px]`                                                                                                                                                                                                 |
+| **Responsive / states** | Primitive OK   | `md:flex`, `hover:opacity-90`, `focus:ring`                                                                                                                                                                                     |
 
 > Rule of thumb: **design decisions** (color, type role, shadow depth, radius scale) → semantic. **Structural/layout** (space, size, breakpoint, interaction) → primitive.
 
@@ -25,16 +25,17 @@ import '@pawhaven/design-system/index.css';
 
 ## Usage
 
-All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components.
+All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components. Primary backgrounds use `text-primary-fg` for their foreground, which is white.
 
 ```html
-<div class="bg-primary text-text-inverse shadow-card rounded-xl">
-  <h1 class="font-heading text-text text-3xl">Hello PawHaven</h1>
-  <button class="bg-primary text-text-inverse rounded-xl px-4 py-2">
+<div class="bg-card text-text shadow-card rounded-card">
+  <h1 class="type-page-title text-text">Hello PawHaven</h1>
+  <p class="type-body">Rescue animals and connect with your community.</p>
+  <button class="bg-primary text-primary-fg rounded-button px-4 py-2">
     Get Started
   </button>
   <input
-    class="border-border bg-background rounded-md border px-3 py-2"
+    class="border-border bg-background rounded-input border px-3 py-2"
     placeholder="Search..."
   />
 </div>
@@ -42,21 +43,21 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 
 ### Semantic color utilities
 
-| Class                         | Token                    | Usage                         |
-| ----------------------------- | ------------------------ | ----------------------------- |
-| `bg-primary`                  | `--color-primary`        | Primary actions, brand        |
-| `bg-secondary`                | `--color-secondary`      | Secondary actions, success    |
-| `bg-card`                     | `--color-card`           | Card surfaces                 |
-| `bg-background`               | `--color-background`     | Page background               |
-| `text-text`                   | `--color-text`           | Body text                     |
-| `text-text-secondary`         | `--color-text-secondary` | Subtle text                   |
-| `text-text-inverse`           | `--color-text-inverse`   | Text on dark/primary surfaces |
-| `text-text-link`              | `--color-text-link`      | Links                         |
-| `border-border`               | `--color-border`         | Card borders, dividers        |
-| `bg-error` / `text-error`     | `--color-error`          | Error states                  |
-| `bg-success` / `text-success` | `--color-success`        | Success states                |
-| `bg-warning` / `text-warning` | `--color-warning`        | Warning states                |
-| `bg-info` / `text-info`       | `--color-info`           | Info states                   |
+| Class                         | Token                    | Usage                                        |
+| ----------------------------- | ------------------------ | -------------------------------------------- |
+| `bg-primary`                  | `--color-primary`        | Primary actions, brand                       |
+| `bg-card`                     | `--color-card`           | Card surfaces                                |
+| `bg-background`               | `--color-background`     | Page background                              |
+| `text-text`                   | `--color-text`           | Body text                                    |
+| `text-text-secondary`         | `--color-text-secondary` | Subtle text                                  |
+| `text-text-inverse`           | `--color-text-inverse`   | Text on dark surfaces and inverse text roles |
+| `text-primary-fg`             | `--color-primary-fg`     | White text/icons on Primary backgrounds      |
+| `text-text-link`              | `--color-text-link`      | Links                                        |
+| `border-border`               | `--color-border`         | Card borders, dividers                       |
+| `bg-error` / `text-error`     | `--color-error`          | Error states                                 |
+| `bg-success` / `text-success` | `--color-success`        | Success states                               |
+| `bg-warning` / `text-warning` | `--color-warning`        | Warning states                               |
+| `bg-info` / `text-info`       | `--color-info`           | Info states                                  |
 
 ### Status colors
 
@@ -72,22 +73,22 @@ const dotClass = getRescueStatusColor({
 
 ### Spacing, radius, shadow
 
-| Class                                       | Token           |
-| ------------------------------------------- | --------------- |
-| `px-4` / `py-2` / `gap-3`                   | `--spacing-*`   |
-| `rounded-xl` / `rounded-lg`                 | `--radius-*`    |
-| `shadow-card` / `shadow-dropdown`           | `--shadow-*`    |
-| `text-3xl` / `text-6xl`                     | `--font-size-*` |
-| `font-heading` / `font-sans` / `font-serif` | `--font-*`      |
+| Class                                                                                                                                                                                                                                      | Token           |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| `px-4` / `py-2` / `gap-3`                                                                                                                                                                                                                  | `--spacing-*`   |
+| `rounded-button` / `rounded-button-large` / `rounded-card` / `rounded-card-large` / `rounded-panel` / `rounded-input` / `rounded-input-large` / `rounded-icon` / `rounded-media` / `rounded-skeleton` / `rounded-section` / `rounded-hero` | `--radius-*`    |
+| `shadow-card` / `shadow-dropdown`                                                                                                                                                                                                          | `--shadow-*`    |
+| `text-3xl` / `text-6xl`                                                                                                                                                                                                                    | `--font-size-*` |
+| `font-heading` / `font-sans` / `font-serif`                                                                                                                                                                                                | `--font-*`      |
 
 ### Composite utilities
 
-| Utility                   | Description                                                 |
-| ------------------------- | ----------------------------------------------------------- |
-| `focus-ring`              | Accessible focus-visible outline                            |
-| `text-hero` / `stat-text` | Composite typography (size + family + weight + line-height) |
-| `full-width`              | Full-bleed container                                        |
-| `baseFormContainer`       | The label/control/error stack the form controls render into |
+| Utility                              | Description                                                 |
+| ------------------------------------ | ----------------------------------------------------------- |
+| `focus-ring`                         | Accessible focus-visible outline                            |
+| `type-*` / `text-hero` / `stat-text` | Semantic/composite typography roles                         |
+| `full-width`                         | Full-bleed container                                        |
+| `baseFormContainer`                  | The label/control/error stack the form controls render into |
 
 ## Token source
 
@@ -100,3 +101,11 @@ Composite utilities: `src/utilities.css`
 ```bash
 pnpm --filter @pawhaven/design-system token-check       # raw hex / px / unknown classname
 ```
+
+## Semantic token rules
+
+- Use action tokens for interaction intent and status tokens for feedback intent. They may resolve to the same primitive colour today, but are separate contracts.
+- Prefer semantic typography utilities (`type-page-title`, `type-section-title`, `type-body`, `type-body-secondary`, `type-label`, `type-caption`) for recurring text roles.
+- Spacing primitives are intentionally backward-compatible. Do not renumber or change their values without auditing existing Tailwind classes and migrating affected layouts.
+- The document-service PDF stylesheet imports the shared token sources during prebuild. Keep its source styles token-based; the token-check script scans the PDF engine entry stylesheet.
+- See [Design Token Guidelines](./docs/design-token-guidelines.md) for Figma naming, intent, and handoff rules.

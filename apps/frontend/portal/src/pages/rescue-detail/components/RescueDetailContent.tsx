@@ -47,7 +47,7 @@ export const RescueDetailContent = ({
       </button>
 
       {animal.photos.length > 0 && (
-        <div className="relative mb-4 h-48 overflow-hidden rounded-2xl sm:h-60">
+        <div className="relative mb-4 h-48 overflow-hidden rounded-card-large sm:h-60">
           <Carousel
             images={animal.photos}
             autoplay
@@ -82,7 +82,7 @@ export const RescueDetailContent = ({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+          <section className="bg-card border-border rounded-card-large border p-5 shadow-sm sm:p-6">
             <h2 className="text-foreground mb-5 font-serif text-lg font-semibold">
               {t('rescueDetail.basic_info')}
             </h2>

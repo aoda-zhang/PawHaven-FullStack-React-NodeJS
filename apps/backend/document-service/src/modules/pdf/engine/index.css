@@ -5,6 +5,12 @@
 @source '../templates/**/*.tsx';
 @source '../components/**/*.tsx';
 
+@theme {
+  --color-document-cover-start: var(--color-yellow-6);
+  --color-document-cover-middle: var(--color-yellow-7);
+  --color-document-cover-end: var(--color-brown-9);
+}
+
 @utility text-label {
   font-size: var(--font-size-sm);
   line-height: var(--leading-tight);
@@ -32,8 +38,8 @@
   body {
     margin: 0;
     padding: 0;
-    background: #ffffff;
-    color: #1b1b19;
+    background: var(--color-card);
+    color: var(--color-text);
     font-family:
       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
       Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei',

@@ -23,7 +23,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+    <section className="bg-card border-border rounded-card-large border p-5 shadow-sm sm:p-6">
       <h2 className="text-foreground mb-5 font-serif text-lg font-semibold">
         {t('reportAnimal.rescue_timeline')}
       </h2>
@@ -68,7 +68,7 @@ export const RescueTimeline = ({ updates }: RescueTimelineProps) => {
                     <img
                       src={update.photo}
                       alt=""
-                      className="bg-muted mt-3 h-28 w-full rounded-xl object-cover"
+                      className="bg-muted mt-3 h-28 w-full rounded-media object-cover"
                     />
                   )}
                 </TimelineContent>

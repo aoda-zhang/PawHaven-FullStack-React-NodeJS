@@ -13,5 +13,5 @@ type Story = StoryObj<typeof meta>;
 
 export const PhotoPlaceholderStory: Story = {
   name: 'PhotoPlaceholder',
-  render: () => <PhotoPlaceholder className="h-48 w-72 rounded-lg" />,
+  render: () => <PhotoPlaceholder className="h-48 w-72 rounded-panel" />,
 };
