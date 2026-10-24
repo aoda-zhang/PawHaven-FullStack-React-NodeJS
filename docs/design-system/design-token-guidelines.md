@@ -24,7 +24,6 @@ Semantic tokens express why a value is used. Prefer these for application stylin
 | Card surface | `--color-card` | `Semantic / Color / Surface / Card` | Cards and content panels |
 | Default border | `--color-border` | `Semantic / Color / Border / Default` | Low-emphasis boundaries |
 | Primary action | `--color-primary` | `Semantic / Color / Action / Primary` | Main action |
-| Secondary action | `--color-secondary` | `Semantic / Color / Action / Secondary` | Secondary action, not a success status |
 | Success status | `--color-success` | `Semantic / Color / Status / Success` | Successful outcome or state |
 | Warning status | `--color-warning` | `Semantic / Color / Status / Warning` | Caution or attention |
 | Error status | `--color-error` | `Semantic / Color / Status / Error` | Error or destructive feedback |
