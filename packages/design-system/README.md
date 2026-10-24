@@ -25,7 +25,7 @@ import '@pawhaven/design-system/index.css';
 
 ## Usage
 
-All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components.
+All classnames reference **semantic tokens** from `theme.css`. Never use raw primitives (`--color-gray-6`) directly in components. Primary backgrounds use `text-primary-fg` for their foreground, which is white.
 
 ```html
 <div class="bg-card text-text shadow-card rounded-card">
@@ -50,7 +50,8 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 | `bg-background`               | `--color-background`     | Page background               |
 | `text-text`                   | `--color-text`           | Body text                     |
 | `text-text-secondary`         | `--color-text-secondary` | Subtle text                   |
-| `text-text-inverse`           | `--color-text-inverse`   | Text on dark/primary surfaces |
+| `text-text-inverse`           | `--color-text-inverse`   | Text on dark surfaces and inverse text roles |
+| `text-primary-fg`             | `--color-primary-fg`     | White text/icons on Primary backgrounds |
 | `text-text-link`              | `--color-text-link`      | Links                         |
 | `border-border`               | `--color-border`         | Card borders, dividers        |
 | `bg-error` / `text-error`     | `--color-error`          | Error states                  |
