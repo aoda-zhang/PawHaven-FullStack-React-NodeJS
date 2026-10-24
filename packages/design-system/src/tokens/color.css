@@ -99,4 +99,13 @@
   --color-brown-9: #6b5642;
   --color-brown-10: #4a392c;
   --color-brown-11: #2f1f14;
+
+  /* ═══ Shadow Colors ══════════════════════════════════ */
+  --color-shadow: #000000;
+  --color-shadow-light: rgba(0, 0, 0, 0.04);
+  --color-shadow-medium: rgba(0, 0, 0, 0.12);
+  --color-shadow-strong: rgba(0, 0, 0, 0.16);
+  --color-shadow-heavy: rgba(0, 0, 0, 0.18);
+  --color-shadow-dark: rgba(0, 0, 0, 0.22);
+  --color-shadow-inner: rgba(0, 0, 0, 0.06);
 }
