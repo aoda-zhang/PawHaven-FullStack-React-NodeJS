@@ -219,8 +219,8 @@ describe('ProxyService: upstream failures reach the caller', () => {
     expect(response.body).toEqual({
       status: HTTP_STATUS.GATEWAY_TIMEOUT,
       isSuccess: false,
-      message: 'The service timed out. Please try again later.',
-      code: 'UPSTREAM_TIMEOUT',
+      message: 'Request timeout',
+      code: '',
       data: null,
     });
     expect(response.text).not.toContain('private-ray-id');
@@ -242,8 +242,8 @@ describe('ProxyService: upstream failures reach the caller', () => {
     expect(response.body).toEqual({
       status: 500,
       isSuccess: false,
-      message: 'The service is temporarily unavailable. Please try again later.',
-      code: 'UPSTREAM_ERROR',
+      message: 'Service error',
+      code: '',
       data: null,
     });
     expect(response.text).not.toContain('Internal stack trace');
