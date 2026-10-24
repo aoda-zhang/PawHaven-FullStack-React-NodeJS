@@ -107,18 +107,9 @@ was available and what was not.
 [`how-i-build/`](./how-i-build/how-i-build-my-agent-team.md) holds the working notes on how the
 agent team itself is put together.
 
-## 5. Design system — source, not documentation
+## 5. Design system
 
-| Path                                                             | Type | Description                        |
-| ---------------------------------------------------------------- | ---- | ---------------------------------- |
-| [src/tokens/](../packages/design-system/src/tokens)              | CSS  | 12 design-token CSS variable files |
-| [src/theme.css](../packages/design-system/src/theme.css)         | CSS  | Global theme definitions           |
-| [src/utilities.css](../packages/design-system/src/utilities.css) | CSS  | Utility classes                    |
-| [design-token-guidelines.md](./design-system/design-token-guidelines.md) | Guide | Token layers, Figma naming, and cross-package usage contract |
-| [design-token-guidelines.md](./design-system/design-token-guidelines.md) | Guide | Token-layer contract, Figma naming, cross-package usage and migration checklist |
-
-Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
-not introduce raw colour values or magic numbers.
+The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [token guidelines](../packages/design-system/docs/design-token-guidelines.md) for token-layer and cross-package rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
 
 ## 6. Agent harness
 
@@ -168,13 +159,3 @@ system-architecture-overview.md
 
 **Verify before you trust.** The context docs carry a `v3.11 / 2026-09-25` stamp and were checked
 against the code at that time. A feature doc is as-built as of the last change that reconciled it.
-
-
-## 9. Engineering notes
-
-| File | Covers |
-| --- | --- |
-| [How I Build](./how-i-build/how-i-build-my-agent-team.md) | Agent workflow and engineering setup |
-| [ESLint configuration](./how-i-build/eslint-config.md) | Shared lint rules and configuration |
-| [Internationalization](./how-i-build/i18n.md) | i18n setup and translation conventions |
-| [React state](./how-i-build/react-state.md) | React state-management conventions |
