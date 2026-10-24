@@ -38,6 +38,7 @@
   ); /* #c2410b — text on accent backgrounds */
   --color-card: var(--color-gray-1); /* #ffffff — card surfaces */
   --color-surface: var(--color-gray-1); /* Shared surface used by auth layouts and popovers */
+  --color-surface: var(--color-gray-1); /* Shared surface used by auth layouts and popovers */
   --color-background-subtle: var(--color-brown-3); /* #f6e9df */
   --color-muted-strong: var(--color-brown-4); /* #ecdccf */
 
