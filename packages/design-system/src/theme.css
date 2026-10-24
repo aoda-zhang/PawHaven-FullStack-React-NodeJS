@@ -17,7 +17,7 @@
   --color-primary-hover: var(--color-orange-7); /* #f66b26 */
   --color-primary-active: var(--color-orange-8); /* #e65a1a */
   --color-primary-light: var(--color-orange-1); /* #fff7ed */
-  --color-primary-fg: var(--color-gray-10); /* Accessible foreground on the primary action color */
+  --color-primary-fg: var(--color-text-inverse); /* White foreground on primary backgrounds */
 
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
