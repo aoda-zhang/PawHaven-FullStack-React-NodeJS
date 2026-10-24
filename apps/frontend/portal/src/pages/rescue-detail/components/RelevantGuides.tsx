@@ -34,7 +34,7 @@ export const RelevantGuides = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+    <section className="bg-card border-border rounded-card-large border p-5 shadow-sm sm:p-6">
       <h2 className="text-text-secondary mb-4 flex items-center gap-2 text-xs font-bold tracking-wider uppercase">
         <BookOpen className="h-4 w-4" aria-hidden="true" />
         {t('rescueDetail.relevant_guides')}
@@ -46,7 +46,7 @@ export const RelevantGuides = () => {
             key={guide.title}
             type="button"
             className={cn(
-              'border-border hover:border-primary flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-colors',
+              'border-border hover:border-primary flex w-full items-start gap-3 rounded-button-large border p-3 text-left transition-colors',
               guide.highlight,
             )}
           >

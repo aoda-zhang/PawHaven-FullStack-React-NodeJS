@@ -29,7 +29,7 @@ export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         <CloseButton iconClassName="size-6" />
       </div>
 
-      <div className="bg-surface sm:border-border sm:shadow-modal flex min-h-0 w-full flex-1 flex-col sm:max-h-[calc(100dvh-4rem)] sm:max-w-[28rem] sm:flex-none sm:rounded-lg sm:border">
+      <div className="bg-surface sm:border-border sm:shadow-modal flex min-h-0 w-full flex-1 flex-col sm:max-h-[calc(100dvh-4rem)] sm:max-w-[28rem] sm:flex-none sm:rounded-panel sm:border">
         <div className="hidden shrink-0 justify-end pt-4 pr-4 sm:flex">
           <CloseButton iconClassName="size-5" />
         </div>

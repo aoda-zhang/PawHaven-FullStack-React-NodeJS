@@ -29,13 +29,15 @@ const TOKEN_DIRS = [
 // The file the comment/value drift check reads.
 const THEME_SOURCE = 'packages/design-system/src/theme.css';
 
-// Every CSS file the rules run on. `apps/backend` is out of scope: the PDF
-// engine carries its own copy of the palette.
+// CSS files covered by the design-token gate. The PDF stylesheet is included
+// explicitly because its generated runtime tokens are synced from this package
+// during document-service prebuild; source CSS must not hard-code palette values.
 const CSS_DIRS = [
   'packages/design-system',
   'packages/ui',
   'packages/frontend-core',
   'apps/frontend',
+  'apps/backend/document-service/src/modules/pdf/engine/index.css',
 ];
 
 // The primitive palette is the one place a colour may be written down: it is

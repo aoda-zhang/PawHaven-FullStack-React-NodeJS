@@ -64,7 +64,7 @@ export const NotFound = ({
           <Button
             onClick={goToHome}
             className={cn(
-              'bg-warning text-text-inverse hover:bg-warning-hover rounded-xl px-8 py-3 text-base font-semibold',
+              'bg-warning text-text-inverse hover:bg-warning-hover rounded-button-large px-8 py-3 text-base font-semibold',
             )}
           >
             <Home size={18} />
@@ -73,7 +73,7 @@ export const NotFound = ({
           <Button
             variant="outline"
             onClick={goBack}
-            className={cn('rounded-xl px-8 py-3 text-base font-semibold')}
+            className={cn('rounded-button-large px-8 py-3 text-base font-semibold')}
           >
             <ArrowLeft size={18} />
             {t('common.go_back', 'Go Back')}

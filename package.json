@@ -25,7 +25,8 @@
     "check:links": "node scripts/check-docs-links.mjs docs",
     "check:i18n": "node scripts/check-i18n-keys.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "design-token-audit": "node scripts/check-design-token-usage.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

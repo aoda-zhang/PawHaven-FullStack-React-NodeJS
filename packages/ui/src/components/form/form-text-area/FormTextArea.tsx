@@ -91,7 +91,7 @@ export const FormTextArea = ({
               data-testid={`form-textarea-${name}`}
               style={style}
               className={cn(
-                'border-border bg-background focus:border-primary text-text w-full rounded-md border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                'border-border bg-background focus:border-primary text-text w-full rounded-input-large border px-3 py-2 text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                 'max-h-(--form-textarea-max-height) min-h-(--form-textarea-min-height)',
               )}
             />

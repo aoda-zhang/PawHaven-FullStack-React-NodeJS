@@ -36,7 +36,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
 
   return (
     <section className="space-y-4">
-      <div className="bg-card border-border rounded-2xl border p-5 shadow-sm sm:p-6">
+      <div className="bg-card border-border rounded-card-large border p-5 shadow-sm sm:p-6">
         {volunteer ? (
           <>
             <div className="mb-4 flex items-center gap-3">
@@ -63,13 +63,13 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
               </div>
             </div>
 
-            <div className="bg-primary/5 text-primary mb-4 rounded-xl px-4 py-3 text-sm">
+            <div className="bg-primary/5 text-primary mb-4 rounded-panel px-4 py-3 text-sm">
               {t('rescueDetail.volunteer_handling')}
             </div>
 
             <button
               type="button"
-              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-xl border py-2.5 text-sm font-semibold transition-colors"
+              className="border-border hover:bg-background-subtle w-full cursor-pointer rounded-button-large border py-2.5 text-sm font-semibold transition-colors"
             >
               {t('rescueDetail.offer_assistance')}
             </button>
@@ -81,7 +81,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
         )}
       </div>
 
-      <div className="border-border bg-card rounded-2xl border p-3 shadow-sm">
+      <div className="border-border bg-card rounded-card-large border p-3 shadow-sm">
         <FollowButton
           animalId={animalId}
           isFollowing={isFollowing}
@@ -95,7 +95,7 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
         <FollowerCount count={status?.followerCount} isLoading={isLoading} />
       </div>
 
-      <div className="border-border bg-card hover:bg-background-subtle rounded-2xl border p-3 shadow-sm transition-colors">
+      <div className="border-border bg-card hover:bg-background-subtle rounded-card-large border p-3 shadow-sm transition-colors">
         <button
           type="button"
           className="text-text-secondary hover:text-foreground flex w-full cursor-pointer items-center justify-center gap-2 py-2 text-sm font-medium transition-colors"

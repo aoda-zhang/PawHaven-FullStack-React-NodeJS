@@ -125,7 +125,7 @@ export const ReportAnimalForm = ({
 
   if (submittedCaseId) {
     return (
-      <div className="bg-card border-border rounded-2xl border p-8 text-center shadow-sm">
+      <div className="bg-card border-border rounded-card-large border p-8 text-center shadow-sm">
         <div className="bg-success-light mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
           <CheckCircle className="text-success h-8 w-8" />
         </div>
@@ -142,7 +142,7 @@ export const ReportAnimalForm = ({
         <Button
           type="button"
           onClick={() => navigate(routePaths.home)}
-          className="w-full rounded-xl py-3"
+          className="w-full rounded-button-large py-3"
         >
           {t('reportAnimal.success_home')}
         </Button>
@@ -153,7 +153,7 @@ export const ReportAnimalForm = ({
   return (
     <FormProvider {...form}>
       <form noValidate onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="bg-card border-border mb-6 rounded-2xl border p-6 shadow-sm">
+        <div className="bg-card border-border mb-6 rounded-card-large border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
             {t('reportAnimal.basics_title')}
           </h2>
@@ -163,7 +163,7 @@ export const ReportAnimalForm = ({
           <AnimalBasicsSection />
         </div>
 
-        <div className="bg-card border-border mb-6 rounded-2xl border p-6 shadow-sm">
+        <div className="bg-card border-border mb-6 rounded-card-large border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
             {t('reportAnimal.behavior_title')}
           </h2>
@@ -178,7 +178,7 @@ export const ReportAnimalForm = ({
             banner={{
               type: 'error',
               message: t(bannerKey),
-              bannerWrapClassNames: 'mb-4 rounded-xl border lg:px-4',
+              bannerWrapClassNames: 'mb-4 rounded-panel border lg:px-4',
             }}
           />
         )}
@@ -187,7 +187,7 @@ export const ReportAnimalForm = ({
           type="submit"
           loading={isPending}
           disabled={isPending}
-          className="w-full rounded-xl py-3"
+          className="w-full rounded-button-large py-3"
         >
           {isPending ? t('reportAnimal.submitting') : t('reportAnimal.submit')}
         </Button>

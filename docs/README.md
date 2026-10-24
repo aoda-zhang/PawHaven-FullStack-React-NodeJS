@@ -12,9 +12,7 @@ authority, intent, or background.
 | `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
 | `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
-Design tokens are deliberately **not** documented here. They live in
-[`packages/design-system/src/tokens/`](../packages/design-system/src/tokens) and are enforced by
-`pnpm token-check`. Read the token source; do not read a prose copy of it.
+Design-system documentation lives with its owner package: the [package README](../packages/design-system/README.md) defines token usage and handoff rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
 
 ---
 
@@ -109,16 +107,9 @@ was available and what was not.
 [`how-i-build/`](./how-i-build/how-i-build-my-agent-team.md) holds the working notes on how the
 agent team itself is put together.
 
-## 5. Design system — source, not documentation
+## 5. Design system
 
-| Path                                                             | Type | Description                        |
-| ---------------------------------------------------------------- | ---- | ---------------------------------- |
-| [src/tokens/](../packages/design-system/src/tokens)              | CSS  | 12 design-token CSS variable files |
-| [src/theme.css](../packages/design-system/src/theme.css)         | CSS  | Global theme definitions           |
-| [src/utilities.css](../packages/design-system/src/utilities.css) | CSS  | Utility classes                    |
-
-Enforced by `pnpm token-check`. The project uses Tailwind semantic utilities over these tokens; do
-not introduce raw colour values or magic numbers.
+The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [design-system README](../packages/design-system/README.md) for token-layer and cross-package rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
 
 ## 6. Agent harness
 
