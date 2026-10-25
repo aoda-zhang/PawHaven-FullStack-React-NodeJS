@@ -31,7 +31,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          model: opencode/mimo-v2.5-free
+          model: opencode/mimo-v2.6-flash-free
           agent: pr-reviewer
           use_github_token: true
           prompt: |
