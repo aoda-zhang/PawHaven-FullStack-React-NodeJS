@@ -5,6 +5,7 @@ steps: 12
 permission:
   read: allow
   edit: deny
+  skill: allow
   glob: deny
   grep: deny
   bash:
