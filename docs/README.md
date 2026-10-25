@@ -12,7 +12,7 @@ authority, intent, or background.
 | `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
 | `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
 
-Design-system documentation lives with its owner package: the [package README](../packages/design-system/README.md) defines token usage and handoff rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
+Design-system documentation lives with its owner package: the [package README](../packages/design-system/README.md) defines token usage and handoff rules, and the [token source directory](../packages/design-system/src/tokens/) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
 
 ---
 
@@ -87,29 +87,14 @@ that is a projection rather than history, a `NotFound` that 13 broken links all 
 
 ## 4. Architecture reviews
 
-Each document is the record of one audit: what was found, what was changed, and what was left open.
-They are records, not living docs — the living docs are in `context/`.
-
-| File                                                                                        | Covers                                                                                              |
-| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| [02-feature-org.md](./architecture-reviews/02-feature-org.md)                               | Feature-organisation evidence note — partial, not a completed audit                                 |
-| [03-server-state.md](./architecture-reviews/03-server-state.md)                             | Server-state inventory checklist — not yet filled in                                                |
-| [04-ui-library.md](./architecture-reviews/04-ui-library.md)                                 | UI-library audit record — describes the `refactor/ui-library-audit` branch, not every state on main |
-| [09-final-architecture-backlog.md](./architecture-reviews/09-final-architecture-backlog.md) | Final synthesis: scorecard, Top 20, P0–P3 backlog, 3-month roadmap, ADRs, top-10 issues             |
-
-The remaining specialized reviews — `01-tech-selection`, `04-state-ownership`, and `05`–`08` — exist
-only as unfilled checklists on their `review/*` branches and are not on `main`. The numbering differs
-between `artec.md`, the branches, and this index; treat the file names as identifiers. The final
-synthesis was rebuilt from the code and the feature records; §1.1 of the 09 record states exactly what
-was available and what was not.
-
-[`artec.md`](./artec.md) holds the prompt handbook those audits are run from.
-[`how-i-build/`](./how-i-build/how-i-build-my-agent-team.md) holds the working notes on how the
-agent team itself is put together.
+Historical review artifacts referenced by earlier versions of this index are not present on `main`.
+Current architecture decisions and development constraints are maintained in
+[`context/`](./context/system-architecture-overview.md) and
+[`agent-constraints.md`](./context/agent-constraints.md).
 
 ## 5. Design system
 
-The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [design-system README](../packages/design-system/README.md) for token-layer and cross-package rules, and the [visual token catalog](../packages/design-system/docs/design-token/index.html) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
+The design-system source and its documentation live together in [`packages/design-system/`](../packages/design-system/README.md). Use the [design-system README](../packages/design-system/README.md) for token-layer and cross-package rules, and the [token source directory](../packages/design-system/src/tokens/) to browse the current token inventory. Token changes are enforced by `pnpm token-check`; use semantic utilities rather than raw colours or magic numbers.
 
 ## 6. Agent harness
 
@@ -122,6 +107,8 @@ workflows, the skills and the model-filter plugins.
 | [commands/](../.opencode/commands) | The slash-command workflows (`feature`, `bug-fix`, `refactor`, …)                               |
 | [skills/](../.opencode/skills)     | The task skills, including the [UI component catalog](../.opencode/skills/ui-component-catalog) |
 | [plugins/](../.opencode/plugins)   | The model-filter and model-switch plugins                                                       |
+
+Implementation notes: [design tokens](./how-i-build/design-tokens.md), [ESLint configuration](./how-i-build/eslint-config.md), [internationalization](./how-i-build/i18n.md), [React state](./how-i-build/react-state.md), and the [UI library](./how-i-build/ui-library.md). The [agent-team workflow](./how-i-build/how-i-build-my-agent-team.md) documents the orchestration and approval sequence.
 
 ## 7. Documentation standards
 

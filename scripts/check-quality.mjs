@@ -169,7 +169,6 @@ const RETIRED_PATHS = [
   '.pi/config/models.yaml',
   '.pi/skills/frontend/',
   '.pi/handoffs/',
-  '.opencode/',
   '.codebuddy/',
   'new-feature.md',
 ];

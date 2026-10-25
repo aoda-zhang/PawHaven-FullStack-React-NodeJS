@@ -254,6 +254,16 @@ const SOURCE_RULES = [
     message: 'raw Tailwind palette name — use a semantic token',
   },
   {
+    id: 'px-arbitrary',
+    pattern: /-\[[0-9]*\.?[0-9]+px\]/g,
+    message: 'px in an arbitrary value — use a design token or rem',
+  },
+  {
+    id: 'var-bypass',
+    pattern: /(bg|text|border|ring|outline|shadow|accent|caret|fill|stroke|placeholder|decoration)-\[var\(--color-/g,
+    message: 'CSS-variable bypass — use the design token utility class directly',
+  },
+  {
     id: 'arbitrary-hex-color',
     pattern: /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g,
     message: 'arbitrary hex colour — use a semantic design token',
@@ -269,6 +279,62 @@ const SOURCE_RULES = [
     message: 'arbitrary radius — use the approved radius token',
   },
 ];
+
+function stripSourceComments(source) {
+  const output = source.split('');
+  let state = 'code';
+
+  for (let index = 0; index < source.length; index++) {
+    const current = source[index];
+    const next = source[index + 1];
+
+    if (state === 'code') {
+      if (current === "'" || current === '"' || current.charCodeAt(0) === 96) {
+        state = current;
+      } else if (current === '/' && next === '/') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'line-comment';
+      } else if (current === '/' && next === '*') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'block-comment';
+      }
+      continue;
+    }
+
+    if (state === 'line-comment') {
+      if (current === '\n') {
+        state = 'code';
+      } else {
+        output[index] = ' ';
+      }
+      continue;
+    }
+
+    if (state === 'block-comment') {
+      if (current === '*' && next === '/') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'code';
+      } else if (current !== '\n') {
+        output[index] = ' ';
+      }
+      continue;
+    }
+
+    if (current === '\\') {
+      index++;
+      continue;
+    }
+    if (current === state) state = 'code';
+  }
+
+  return output.join('');
+}
 
 function collectSourceFiles(target) {
   const absolute = join(repoRoot, target);
@@ -302,9 +368,7 @@ for (const scope of SOURCE_SCOPES) {
     sourceFilesScanned++;
     const rel = relative(repoRoot, file).split(sep).join('/');
     const original = readFileSync(file, 'utf8');
-    const code = original
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/^\s*\/\/.*$/gm, '');
+    const code = stripSourceComments(original);
     const lines = code.split('\n');
     lines.forEach((line, index) => {
       for (const rule of SOURCE_RULES) {

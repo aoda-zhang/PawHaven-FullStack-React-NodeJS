@@ -5,6 +5,10 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -17,31 +21,38 @@ concurrency:
 
 jobs:
   review:
-    if: ${{ !github.event.pull_request.draft }}
+    if: >-
+      !github.event.pull_request.draft &&
+      (
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.full_name == github.repository) ||
+        (github.event_name == 'pull_request_target' &&
+         github.event.pull_request.head.repo.full_name != github.repository)
+      )
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout pull request
+      - name: Checkout trusted review context
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.repository.default_branch || github.event.pull_request.head.sha }}
+          persist-credentials: false
 
       - name: Run OpenCode PR reviewer
         uses: anomalyco/opencode/github@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENCODE_CONFIG_CONTENT: '{"default_agent":"pr-reviewer"}'
+          OPENCODE_CONFIG_CONTENT: >-
+            {"default_agent":"pr-reviewer","experimental":{"todo":true},"plugins":[{"package":"./plugins/free-model-filter","options":{"freeOnly":true,"freeMatch":":free"}},{"package":"./plugins/coding-model-filter","options":{"requireTools":true}},{"package":"./plugins/context-window-filter","options":{"minContext":131072}},{"package":"./plugins/auto-model-switch","options":{"maxRetries":1,"pinDefault":true,"annotate":true}}]}
         with:
           model: opencode/mimo-v2.6-flash-free
           agent: pr-reviewer
           use_github_token: true
           prompt: |
-            Review only the current pull request diff. Treat the diff supplied by
-            the GitHub review action as the source of scope. Inspect only changed
-            files and the minimum directly relevant context needed to validate
-            findings. Do not scan/search the repository, read unrelated docs,
-            enumerate directories, run builds/tests, or use subagents. Stop once
-            there is enough evidence to report actionable findings. Do not modify
-            files or the pull request. Report severity, confidence, changed
-            file/line, evidence, impact, and a concrete recommendation. If no
-            actionable findings exist, say so and note any limitations.
+            Review only the current pull request diff supplied by the GitHub review action.
+            Inspect changed files and the minimum directly relevant context needed to validate
+            findings. Do not scan/search the repository, enumerate directories, inspect unrelated
+            docs, run builds/tests, use subagents, or execute shell commands. Do not modify files
+            or the pull request. Stop when actionable findings are supported by evidence. Report
+            severity, confidence, changed file/line, evidence, impact, and a concrete recommendation.
+            If no actionable findings exist, say so and note any limitations.

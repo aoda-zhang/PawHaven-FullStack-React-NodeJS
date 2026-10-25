@@ -25,7 +25,29 @@ function frontmatter(content, name) {
 }
 
 function deniesEdit(frontmatterText) {
-  return /-\s*action:\s*edit\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*deny/m.test(frontmatterText);
+  const mapRules = [...frontmatterText.matchAll(/^  edit:[ \t]*(allow|deny)[ \t]*$/gm)];
+  if (mapRules.length > 0) return mapRules.at(-1)[1] === 'deny';
+
+  const listRules = [
+    ...frontmatterText.matchAll(
+      /-\s*action:\s*edit\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm,
+    ),
+  ];
+  return listRules.length > 0 && listRules.at(-1)[1] === 'deny';
+}
+
+function deniesAllBash(frontmatterText) {
+  const permissionBlock = frontmatterText.match(
+    /^permission:[ \t]*\n((?:[ \t].*(?:\n|$))*)/m,
+  )?.[1] ?? '';
+  const bashBlock = permissionBlock.match(
+    /^  bash:[ \t]*\n((?: {4}.*(?:\n|$))*)/m,
+  )?.[1] ?? '';
+
+  return (
+    /^ {4}["']?\*["']?[ \t]*:[ \t]*deny[ \t]*$/m.test(bashBlock) &&
+    !/^ {4}.*:[ \t]*allow[ \t]*$/m.test(bashBlock)
+  );
 }
 
 const agents = {
@@ -83,9 +105,8 @@ if (!/wait for explicit user approval/i.test(instructions) ||
 
 
 const prReviewerFrontmatter = frontmatter(prReviewer, 'pr-reviewer');
-if (!deniesEdit(prReviewerFrontmatter) ||
-    !/-\s*action:\s*shell\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*deny/m.test(prReviewerFrontmatter)) {
-  failures.push('pr-reviewer must deny both edits and shell execution');
+if (!deniesEdit(prReviewerFrontmatter) || !deniesAllBash(prReviewerFrontmatter)) {
+  failures.push('pr-reviewer must deny edits and all shell execution');
 }
 if (!/agent:\s*pr-reviewer/.test(opencodeReviewWorkflow) ||
     !/contents:\s*read/.test(opencodeReviewWorkflow) ||

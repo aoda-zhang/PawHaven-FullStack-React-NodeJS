@@ -1,7 +1,7 @@
 ---
 description: Read-only, diff-first pull request reviewer for PawHaven.
 mode: primary
-steps: 8
+steps: 12
 permission:
   read: allow
   edit: deny
@@ -9,11 +9,6 @@ permission:
   grep: deny
   bash:
     "*": deny
-    "git diff*": allow
-    "git status*": allow
-    "git show*": allow
-    "git log*": allow
-    "git merge-base*": allow
   task: deny
   webfetch: deny
   websearch: deny

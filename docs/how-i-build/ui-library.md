@@ -101,5 +101,4 @@ purpose changes, **update only that one row in the index**.
   accessibility notes, migration guide
 - [Design Tokens](design-tokens.md) — where the component colours come from and how they are
   enforced
-- [UI Library audit record](../architecture-reviews/04-ui-library.md) — what this refactor changed
-  and what is still open
+- [Frontend development patterns](../context/frontend-development-patterns.md) — the current frontend implementation conventions
