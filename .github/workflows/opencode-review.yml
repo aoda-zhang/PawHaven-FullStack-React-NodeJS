@@ -30,6 +30,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENCODE_CONFIG_CONTENT: '{"default_agent":"pr-reviewer"}'
         with:
           model: opencode/mimo-v2.6-flash-free
           agent: pr-reviewer
