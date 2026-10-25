@@ -34,7 +34,7 @@ function deniesEdit(text) {
 function checkSkill(name, review = false) {
   const content = read(`.opencode/skills/${name}/SKILL.md`);
   const meta = frontmatter(content, `skill ${name}`);
-  if (!new RegExp(`^name:\\s*${name.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\s*$`, 'm').test(meta)) {
+  if (!new RegExp(`^name:\\s*${name}\\s*$`, 'm').test(meta)) {
     failures.push(`Skill frontmatter name must be ${name}`);
   }
   if (review && !/severity[\s\S]*confidence[\s\S]*file and line[\s\S]*evidence[\s\S]*impact[\s\S]*recommended fix/i.test(content)) {
