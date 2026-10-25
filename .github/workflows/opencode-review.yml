@@ -1,0 +1,42 @@
+name: OpenCode PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: opencode-pr-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Run OpenCode PR reviewer
+        uses: anomalyco/opencode/github@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: opencode/mimo-v2.5-free
+          agent: pr-reviewer
+          use_github_token: true
+          prompt: |
+            Review this pull request only. Follow the repository's
+            .opencode/agents/pr-reviewer.md instructions. Do not modify files,
+            push commits, or make changes. Report only actionable findings
+            supported by the diff and repository evidence, including severity,
+            confidence, file/line, impact, and a concrete recommendation.
