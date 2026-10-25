@@ -9,7 +9,7 @@ A defect report authorizes investigation, not implementation.
 
 1. Confirm this is a defect and establish the affected surface.
 2. Reproduce where possible and record **Reproduced**, **Not reproduced**, or **Unable to verify**, with observed input/output or the environmental blocker.
-3. Use `explorer` for read-only evidence and trace actual boundaries; do not reference an undefined `scout` agent.
+3. Use `explorer` for read-only evidence and trace actual boundaries.
 4. Propose a plan with evidence, root-cause hypothesis, exact scope, risks, acceptance criteria, and same-surface reproduction/regression checks.
 5. Wait for explicit user approval before any modification. If evidence changes the diagnosis or materially expands scope, request approval for a revised plan.
 6. After approval, let `implementer` load relevant development Skills dynamically; then run `tester` and `reviewer` in order.
