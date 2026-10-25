@@ -36,8 +36,12 @@ jobs:
           agent: pr-reviewer
           use_github_token: true
           prompt: |
-            Review this pull request only. Follow the repository's
-            .opencode/agents/pr-reviewer.md instructions. Do not modify files,
-            push commits, or make changes. Report only actionable findings
-            supported by the diff and repository evidence, including severity,
-            confidence, file/line, impact, and a concrete recommendation.
+            Review only the current pull request diff. Treat the diff supplied by
+            the GitHub review action as the source of scope. Inspect only changed
+            files and the minimum directly relevant context needed to validate
+            findings. Do not scan/search the repository, read unrelated docs,
+            enumerate directories, run builds/tests, or use subagents. Stop once
+            there is enough evidence to report actionable findings. Do not modify
+            files or the pull request. Report severity, confidence, changed
+            file/line, evidence, impact, and a concrete recommendation. If no
+            actionable findings exist, say so and note any limitations.
