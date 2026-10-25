@@ -38,6 +38,8 @@ const commands = {
   refactor: read('.opencode/commands/refactor.md'),
 };
 const instructions = read('AGENTS.md');
+const prReviewer = read('.opencode/agents/pr-reviewer.md');
+const opencodeReviewWorkflow = read('.github/workflows/opencode-review.yml');
 const constraints = read('docs/context/agent-constraints.md');
 const configText = read('.opencode/opencode.json');
 const buildPath = join(root, '.opencode/agents/build.md');
@@ -77,6 +79,19 @@ if (!/before modifying any code, configuration, tests, scripts, or documentation
 if (!/wait for explicit user approval/i.test(instructions) ||
     !/agent-constraints\.md/.test(instructions)) {
   failures.push('AGENTS.md must point to canonical constraints and state the approval gate');
+}
+
+
+const prReviewerFrontmatter = frontmatter(prReviewer, 'pr-reviewer');
+if (!deniesEdit(prReviewerFrontmatter) ||
+    !/-\s*action:\s*shell\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*deny/m.test(prReviewerFrontmatter)) {
+  failures.push('pr-reviewer must deny both edits and shell execution');
+}
+if (!/agent:\s*pr-reviewer/.test(opencodeReviewWorkflow) ||
+    !/contents:\s*read/.test(opencodeReviewWorkflow) ||
+    /contents:\s*write/.test(opencodeReviewWorkflow) ||
+    !/pull-requests:\s*write/.test(opencodeReviewWorkflow)) {
+  failures.push('OpenCode review workflow must use the read-only reviewer, keep repository contents read-only, and only allow PR feedback');
 }
 
 if (failures.length) {

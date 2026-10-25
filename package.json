@@ -26,7 +26,6 @@
     "check:i18n": "node scripts/check-i18n-keys.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged",
-    "design-token-audit": "node scripts/check-design-token-usage.mjs",
     "agent-workflow-check": "node scripts/check-agent-workflow.mjs"
   },
   "lint-staged": {
