@@ -1,26 +1,20 @@
 ---
 name: testing-backend
-description: Verify backend services, APIs, authentication, persistence, shared contracts, and service integration.
+description: Choose backend-specific checks for APIs, services, persistence, auth, and shared contracts.
 ---
 
-# Backend verification
+# Backend Verification
 
-Load for backend, API, shared-contract, or service integration changes. Inspect the affected service's actual scripts and test conventions before choosing checks.
+Load for backend, API, shared-contract, persistence, or service-integration changes. Use `verify` for shared check-selection, evidence, and status rules.
 
-## Choose the appropriate checks
+## Backend-specific checks
 
-- **Business logic:** unit tests for validation, transformations, authorization decisions, and failure branches.
-- **HTTP/API behaviour:** integration tests for routes, status codes, request validation, response shape, and error mapping.
-- **Authentication and permissions:** verify both permitted and denied requests, token/claims expectations, and service-to-service boundaries when affected.
-- **Persistence:** verify reads/writes, transaction or consistency expectations, duplicate/missing records, and failure handling.
-- **Shared contracts:** verify producers and consumers agree at runtime where possible. Typechecking alone does not prove payload/schema compatibility.
-- **Cross-service changes:** check the direct service and relevant consumers; include integration/contract evidence when a shared boundary changes.
-- **Configuration, dependency, build, or deployment changes:** inspect runtime entry points and deployment assumptions. Use the higher verification mode when blast radius is broad.
+- Business logic: validation, transformations, authorization decisions, and failure branches.
+- HTTP/API: route behavior, status codes, request validation, response shape, and error mapping.
+- Authentication: permitted and denied paths, claims, token expectations, and service-to-service boundaries.
+- Persistence: reads/writes, transaction or consistency behavior, duplicate/missing records, and failure handling.
+- Shared contracts: producer-consumer compatibility at runtime where possible; typechecking alone is insufficient.
+- Cross-service changes: test the direct service and relevant consumers.
+- Configuration/dependency/deployment changes: inspect entry points and deployment assumptions; raise verification depth when blast radius is broad.
 
-## Commands
-
-Inspect root and package package.json files. Prefer affected-service tests and typechecks first, then the broader checks required by the mode selected by Tester. Never invent a script or infer that a check passed because it was skipped.
-
-## Report
-
-Capture exact commands, exit codes, relevant output, and any unavailable environment dependencies. Separate product failures from infrastructure failures only when the evidence supports the distinction. Do not modify tests or application code during verification.
+Inspect actual package scripts and test conventions before choosing commands. Report exact commands, exit codes, evidence, and unavailable dependencies. Do not modify application code or tests during verification.

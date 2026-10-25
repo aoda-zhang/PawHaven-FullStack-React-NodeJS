@@ -1,12 +1,12 @@
 ---
 name: documentation-review
-description: Review documentation for factual accuracy, consistency, usability, links, and alignment with implementation.
+description: Review changed documentation against source behavior and project terminology.
 ---
 
-# Documentation review
+# Documentation Review
 
-Load for documentation-only changes or material docs changed alongside implementation. Verify instructions match actual code, scripts, exports, config, and supported behavior; examples are runnable or clearly illustrative; links and paths resolve; terminology is consistent; claims distinguish facts from assumptions; and limitations are stated. For architecture docs, check diagrams and prose agree. Prefer focused edits and preserve accurate existing content.
+Load for documentation-only changes or material documentation claims changed alongside code.
 
-## Finding format
+Verify that instructions match actual code, scripts, exports, configuration, and supported behavior; examples are runnable or clearly illustrative; links and paths resolve; terminology is consistent; and claims distinguish facts from assumptions. For diagrams, verify that edges and labels agree with the prose.
 
-Severity (critical/high/medium/low); confidence; file and line; trigger/condition; evidence; impact; recommended fix; verification status or uncertainty.
+Preserve accurate content and make focused corrections. Use the finding format defined by the Reviewer agent.

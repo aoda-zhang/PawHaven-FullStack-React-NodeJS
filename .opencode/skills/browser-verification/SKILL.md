@@ -1,31 +1,26 @@
 ---
 name: browser-verification
-description: Verify real browser journeys for UI, routing, forms, authentication, and end-to-end behaviour.
+description: Verify real browser journeys for user-facing acceptance criteria.
 ---
 
-# Browser verification
+# Browser Verification
 
-Load when acceptance criteria depend on behaviour in a running application, especially UI interactions, routes, forms, navigation, authentication, or frontend-to-backend journeys.
+Load when acceptance depends on a running application's UI, routing, forms, navigation, authentication, or frontend-to-backend behavior.
 
 ## Preconditions
 
-1. Inspect the existing browser automation and Playwright setup before acting.
-2. Use the existing browser tooling and test framework. Do not install another framework or driver.
-3. Confirm the required app, backend services, credentials, and test data are available. If not, report the blocker and mark the check NOT RUN.
+1. Inspect the existing browser automation and Playwright setup; use the project's current tooling.
+2. Confirm the required app/services, credentials, and test data are available. If not, report the blocker and mark the journey NOT RUN.
 
-## Run the journey
+## Run
 
-1. Map each relevant acceptance criterion to a concrete user journey and observable outcome.
-2. Exercise the real running application, not only source code, mocks, or isolated component renders.
-3. Check the expected visible state and relevant loading, empty, error, and success states.
-4. For route changes, test direct URL entry and navigation where applicable.
-5. For forms, cover valid input and relevant validation/error cases.
-6. For authentication or permissions, verify both allowed and denied paths when in scope.
-7. Inspect relevant browser console errors and failed network/API requests.
-8. Run the existing pnpm test:e2e suite when it covers the change and the script is available.
+1. Map each in-scope acceptance criterion to a user journey and observable result.
+2. Exercise the running application. Source inspection, mocks, and component renders do not prove a real journey.
+3. Cover relevant success, loading, empty, validation, and failure states.
+4. For routes, test direct entry and in-app navigation where relevant. For authorization, test allowed and denied paths when in scope.
+5. Inspect browser-console errors and failed network requests related to the journey.
+6. Run the existing E2E suite only when it covers the change and its script is available.
 
 ## Evidence
 
-Record the exact journey, environment/surface tested, observed outcome, and command output where applicable. Report screenshots or artifacts only when actually produced. Do not treat a successful page load as proof that all acceptance criteria passed.
-
-If the environment blocks the journey, state what was unavailable and the closest check actually completed. Do not infer a pass from a mock or a different runtime surface.
+Report the journey, environment, observed result, and actual command/artifacts. If blocked, name the missing dependency and the closest check completed. Never infer a pass from a page load or a mock.

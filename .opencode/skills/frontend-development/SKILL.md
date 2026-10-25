@@ -1,16 +1,17 @@
 ---
 name: frontend-development
-description: Implement React UI, routes, client state, design-system, localization, and frontend package changes using PawHaven's canonical patterns.
+description: Implement frontend changes using PawHaven's canonical frontend patterns.
 ---
 
-# Frontend development entry point
+# Frontend Development
 
-Use for React pages/components, routes, browser state, frontend data access, UI packages, design tokens, or localization.
+Load for React UI, routing, client state/data, UI packages, design tokens, or localization changes.
 
-1. Read `docs/context/frontend-architecture.md` for ownership/dependency direction and `docs/context/frontend-development-patterns.md` for implementation rules. Read relevant sections only.
-2. For component selection/reuse, load `ui-component-catalog` first. Verify README, source/exported types, story, and tests; the index is not an API contract.
-3. Preserve page ownership, query/mutation boundaries, shared schemas, localization, and design tokens. Do not duplicate a schema, component, query key, or token.
-4. If API/shared schema boundaries change, trace producer and consumer; load `backend-development` when backend files are in scope.
-5. Add/update tests only within approved scope. Use existing scripts and conventions; do not invent scripts or install a framework.
-6. For React page/component changes, run the project's React Doctor check when available and report the exact result.
-7. Hand off changed files, states covered, checks, and remaining risks.
+## Required actions
+
+1. Read the relevant sections of `docs/context/frontend-architecture.md` and `docs/context/frontend-development-patterns.md`. Treat them as the source of truth; do not restate their rules here.
+2. Implement only the approved change and follow those documents. If a required decision is not covered there, make the smallest justified addition and explain it.
+3. When selecting or reusing a shared UI component, load `ui-component-catalog` and verify the component's source and exported types.
+4. For API or shared-schema changes, trace the producer and consumers; load `backend-development` when backend files are in scope.
+5. For React page or component changes, run the project's React Doctor check when available.
+6. Report changed files, relevant patterns checked, exact checks and results, and unresolved gaps.

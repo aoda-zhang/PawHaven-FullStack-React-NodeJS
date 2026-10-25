@@ -1,14 +1,12 @@
 ---
 name: contract-code-review
-description: Review API, shared schema/type, and producer-consumer boundaries for compatibility and runtime correctness.
+description: Review API and shared-schema changes across producers and consumers.
 ---
 
-# Contract code review
+# Contract Code Review
 
-Trace changed contracts from producer to relevant consumers. Inspect canonical schema/type, serialization and validation, optionality/nullability, enums, error shape, status codes, compatibility, and boundary tests. Typecheck alone does not prove runtime compatibility. For cross-service calls, verify path prefixes, auth claims, timeout/error mapping, and payload shape when implicated.
+Load when a diff changes API payloads, shared schemas/types, serialization, or a producer-consumer boundary.
 
-Identify breaking changes and the affected producer/consumer pair.
+Trace each changed contract from its canonical definition through affected producers and consumers. Check optionality/nullability, enums, validation, serialization, status/error shape, backward compatibility, and boundary tests. For service calls, check prefixes, auth claims, timeout/error mapping, and payload shape when implicated.
 
-## Finding format
-
-Severity (critical/high/medium/low); confidence; file and line; trigger/condition; evidence; impact; recommended fix; verification status or uncertainty.
+Name the affected producer-consumer pair and any breaking change. Use the finding format defined by the Reviewer agent.

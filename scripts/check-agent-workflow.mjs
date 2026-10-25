@@ -37,8 +37,8 @@ function checkSkill(name, review = false) {
   if (!new RegExp(`^name:\\s*${name}\\s*$`, 'm').test(meta)) {
     failures.push(`Skill frontmatter name must be ${name}`);
   }
-  if (review && !/severity[\s\S]*confidence[\s\S]*file and line[\s\S]*evidence[\s\S]*impact[\s\S]*recommended fix/i.test(content)) {
-    failures.push(`${name} must document the shared finding format`);
+  if (review && !/finding format defined by the Reviewer agent/i.test(content)) {
+    failures.push(`${name} must reference the shared finding format instead of duplicating it`);
   }
 }
 

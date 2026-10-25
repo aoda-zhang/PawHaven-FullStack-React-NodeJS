@@ -1,12 +1,12 @@
 ---
 name: infrastructure-review
-description: Review CI workflows, deployment configuration, build tooling, environment wiring, and runtime operations.
+description: Review CI/CD, deployment, build, runtime configuration, and operational changes.
 ---
 
-# Infrastructure review
+# Infrastructure Review
 
-Load when the diff changes CI/CD, deployment config, build tooling, runtime entrypoints, environment variables, permissions, release steps, or operational behavior. Check trigger coverage; trusted/untrusted PR execution; token permissions and credential persistence; branch/ref selection; secret exposure; dependency/runtime compatibility; environment variable propagation; artifact/build paths; timeout/retry semantics; rollback/recovery; and whether workflow commands exist. Avoid unrelated redesign.
+Load only when the diff changes CI/CD, deployment configuration, build tooling, runtime entry points, environment wiring, permissions, release steps, or operational behavior.
 
-## Finding format
+Check applicable trigger coverage; trusted/untrusted PR execution; token permissions and credential persistence; branch/ref selection; secret exposure; dependency/runtime compatibility; environment propagation; artifact paths; timeout/retry behavior; rollback/recovery; and whether referenced workflow commands exist.
 
-Severity (critical/high/medium/low); confidence; file and line; trigger/condition; evidence; impact; recommended fix; verification status or uncertainty.
+Avoid unrelated redesign. Use the finding format defined by the Reviewer agent.

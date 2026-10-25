@@ -1,12 +1,14 @@
 ---
 name: backend-code-review
-description: Review NestJS services, API handlers, validation, errors, authentication, and service integration changes.
+description: Review backend diffs for API, auth, service-boundary, error-handling, and persistence regressions.
 ---
 
-# Backend code review
+# Backend Code Review
 
-Review changed backend behavior against `docs/context/backend-architecture.md` and `docs/context/backend-development-patterns.md` where relevant. Check request validation and schemas; auth/public-route intent and claims; HTTP status and response envelope behavior; error normalization and trace IDs; service-to-service calls and timeout/error handling; config ownership; resource cleanup; persistence consistency and failure branches; observability; and regression coverage. Confirm behavior from source/tests rather than assuming framework defaults. Shared/browser-visible contracts also require `contract-code-review`.
+Load only when the diff affects backend code.
 
-## Finding format
+Read relevant backend architecture and development patterns; do not duplicate their rules here. Verify changed behavior from source and tests, not assumed framework defaults.
 
-Severity (critical/high/medium/low); confidence; file and line; trigger/condition; evidence; impact; recommended fix; verification status or uncertainty.
+Review applicable areas: request validation; auth/public-route intent and claims; HTTP status and response envelopes; error normalization and trace IDs; service calls and timeout/error mapping; configuration ownership; resource cleanup; persistence consistency; observability; and regression coverage. Load `contract-code-review` for changed producer-consumer contracts.
+
+Report evidence-backed findings using the finding format defined by the Reviewer agent.

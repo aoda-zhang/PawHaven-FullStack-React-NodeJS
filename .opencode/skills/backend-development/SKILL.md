@@ -1,15 +1,17 @@
 ---
 name: backend-development
-description: Implement NestJS services, APIs, authentication, persistence, and backend integration using PawHaven's canonical patterns.
+description: Implement backend changes using PawHaven's canonical backend patterns.
 ---
 
-# Backend development entry point
+# Backend Development
 
-Use for backend services, HTTP/API behavior, authentication, persistence, service calls, or backend runtime configuration.
+Load for NestJS services, APIs, authentication, persistence, service calls, or backend runtime configuration.
 
-1. Read `docs/context/backend-architecture.md` for ownership/dependency direction and `docs/context/backend-development-patterns.md` for implementation rules. Read relevant sections only.
-2. If browser-facing payloads, shared Zod schemas, or types change, read corresponding frontend patterns and trace both producers and consumers. Do not duplicate shared contracts.
-3. Preserve NestJS conventions, Zod validation, status constants, response interceptors, service-client boundaries, and trace propagation as applicable.
-4. Treat auth, persistence, cross-service, deployment, and configuration changes as high-risk until evidence establishes otherwise.
-5. Add/update tests only within approved scope. Inspect actual package scripts and test conventions before choosing checks.
-6. Hand off changed files, API/contract behavior, checks, and unverified runtime assumptions.
+## Required actions
+
+1. Read relevant sections of `docs/context/backend-architecture.md` and `docs/context/backend-development-patterns.md`. These documents own architecture and implementation rules; do not duplicate them here.
+2. Implement only the approved change. If a required decision is not covered by the canonical docs, choose the smallest evidence-based addition and report it.
+3. For browser-facing payloads or shared schemas/types, trace the producer and consumers and read the corresponding frontend patterns.
+4. Treat auth, persistence, cross-service calls, deployment, and configuration changes as high-risk; select verification accordingly.
+5. Inspect actual package scripts before choosing checks. Do not invent commands or test infrastructure.
+6. Hand off changed files, affected contracts/services, exact checks and results, and unverified runtime assumptions.

@@ -1,12 +1,12 @@
 ---
 name: security-review
-description: Review authentication, authorization, secrets, untrusted input, trust boundaries, and security-sensitive behavior.
+description: Review changes that affect identity, authorization, secrets, untrusted data, or trust boundaries.
 ---
 
-# Security review
+# Security Review
 
-Load when the diff touches identity/session/token handling, authorization, untrusted input/output, file uploads/downloads, sensitive data, secrets, permissions, network boundaries, or security config. Check authentication versus authorization; deny-by-default behavior; validation/output encoding; secret/token exposure; SSRF/path traversal/injection risks where relevant; unsafe deserialization; sensitive logging; CORS/CSRF/session handling; permission expansion; and abuse/resource exhaustion. Tie each concern to a reachable path and concrete impact. Do not label theoretical concerns confirmed vulnerabilities without evidence.
+Load when the diff touches identity/session/token handling, authorization, untrusted input/output, uploads/downloads, sensitive data, secrets, permissions, network boundaries, or security configuration.
 
-## Finding format
+Trace each concern to a reachable path. Check authentication versus authorization, deny-by-default behavior, validation/output encoding, secret/token exposure, SSRF/path traversal/injection, unsafe deserialization, sensitive logging, CORS/CSRF/session handling, permission expansion, and abuse/resource exhaustion when relevant.
 
-Severity (critical/high/medium/low); confidence; file and line; trigger/condition; evidence; impact; recommended fix; verification status or uncertainty.
+Do not label a theoretical concern a confirmed vulnerability without evidence. Use the finding format defined by the Reviewer agent.

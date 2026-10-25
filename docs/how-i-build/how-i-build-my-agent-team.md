@@ -25,44 +25,38 @@ This team is designed around evidence, explicit approval, clear ownership, and v
 
 ## Recommended workflow
 
-```text
-Read-only exploration (parallel when independent)
-                    |
-                    v
-Architect synthesizes one plan and dependency graph
-                    |
-                    v
-Human approval — stop until explicitly approved
-                    |
-                    v
-Split into bounded work units; define dependencies and file ownership
-                    |
-                    v
-Implement independent units (parallel only when safe and supported)
-                    |
-                    v
-Integrate and freeze the implementation diff
-                    |
-                    v
-Run isolated tests in parallel; serialize shared-resource tests
-                    |
-                    v
-Tester consolidates criterion-level evidence
-                    |
-                    v
-Independent specialist reviews (parallel when supported)
-                    |
-                    v
-Reviewer consolidates and deduplicates findings
-                    |
-                    v
-Fix confirmed issues -> re-test affected criteria -> re-review final diff
-                    |
-                    v
-Combined-tree verification and explicit handoff
+```mermaid
+flowchart TD
+    A["Orchestrator: Understand the task"] --> B["Explorer: Gather evidence"]
+    B --> C["Architect: Form a unified plan"]
+    C --> D{"User approval?"}
+    D -- No --> E["Stop and wait"]
+    D -- Yes --> F["Split implementation work and define contracts"]
+    F --> G1["Implementer: Work unit A"]
+    F --> G2["Implementer: Work unit B"]
+    F --> G3["Implementer: Work unit C"]
+    G1 --> H["Freeze the implementation diff for testing"]
+    G2 --> H
+    G3 --> H
+    H --> I1["Tester: Test group A"]
+    H --> I2["Tester: Test group B"]
+    H --> I3["Tester: Static and build checks"]
+    I1 --> J["Tester: Consolidate results"]
+    I2 --> J
+    I3 --> J
+    J --> K1["Reviewer: Specialist review A"]
+    J --> K2["Reviewer: Specialist review B"]
+    J --> K3["Reviewer: Security and contract review"]
+    K1 --> L["Reviewer: Consolidate findings and decide"]
+    K2 --> L
+    K3 --> L
+    L --> M{"Blocking issues?"}
+    M -- Yes --> N["Fix issues and re-verify"]
+    N --> H
+    M -- No --> O["Final delivery and report"]
 ```
 
-This diagram describes the intended operating model. It is not a claim that every step is automatically parallelized by OpenCode.
+This diagram defines the intended workflow, not a guarantee of automatic parallel execution. Dispatch work concurrently only when the runtime supports it and the parallelization conditions below are met; otherwise execute the work units sequentially.
 
 ## Parallelization contract
 
