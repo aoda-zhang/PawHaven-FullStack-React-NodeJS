@@ -42,6 +42,10 @@ function checkSkill(name, review = false) {
   }
 }
 
+function requirePattern(content, pattern, message) {
+  if (!pattern.test(content)) failures.push(message);
+}
+
 const agentNames = ['orchestrator', 'architect', 'explorer', 'implementer', 'tester', 'reviewer', 'pr-reviewer'];
 const agents = Object.fromEntries(agentNames.map(name => [name, read(`.opencode/agents/${name}.md`)]));
 const commands = Object.fromEntries(['feature', 'bug-fix', 'refactor', 'document'].map(name => [name, read(`.opencode/commands/${name}.md`)]));
@@ -49,6 +53,7 @@ const config = read('.opencode/opencode.json');
 const constraints = read('docs/context/agent-constraints.md');
 const instructions = read('AGENTS.md');
 const prWorkflow = read('.github/workflows/opencode-review.yml');
+const teamGuide = read('docs/how-i-build/how-i-build-my-agent-team.md');
 
 for (const name of ['frontend', 'backend', 'build']) {
   if (existsSync(join(root, `.opencode/agents/${name}.md`))) failures.push(`fixed ${name} agent must be removed; route from actual scope`);
@@ -96,11 +101,23 @@ if (!/edit:\s*deny/.test(prMeta) || !/bash:[\s\S]*?\*.*?:\s*deny/.test(prMeta) |
     /contents:\s*write/.test(prWorkflow) || !/pull-requests:\s*write/.test(prWorkflow)) {
   failures.push('PR review must remain read-only for repository contents and use the dedicated reviewer');
 }
+
+requirePattern(teamGuide, /Agent execution matrix/i, 'agent-team guide must document the execution matrix');
+requirePattern(teamGuide, /Parallelization contract/i, 'agent-team guide must document parallelization conditions');
+requirePattern(teamGuide, /Human approval/i, 'agent-team guide must retain the human approval gate');
+requirePattern(agents.orchestrator, /Parallelization gate/i, 'orchestrator must define a parallelization gate');
+requirePattern(agents.architect, /work units/i, 'architect must define bounded work units');
+requirePattern(agents.architect, /file ownership/i, 'architect must define file ownership boundaries');
+requirePattern(agents.implementer, /Never concurrently edit the same file/i, 'implementer must prevent concurrent file-write conflicts');
+requirePattern(agents.tester, /Before parallel execution/i, 'tester must check isolation before parallel test execution');
+requirePattern(agents.reviewer, /Loading multiple Skills.*does not create independent reviewers/i, 'reviewer must distinguish Skills from independent reviewers');
+requirePattern(agents.reviewer, /deduplicate/i, 'reviewer must consolidate duplicate findings');
+
 if (/\bscout\b/.test(commands['bug-fix'])) failures.push('bug-fix command references undefined scout agent');
 
 if (failures.length) {
   for (const failure of failures) console.error(`FAIL ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log('agent-workflow-check: OK — approval gates, scope-based Skill routing, shared review format, and read-only PR review are configured');
+  console.log('agent-workflow-check: OK — approval gates, scope-based Skill routing, parallelization safety, shared review format, and read-only PR review are configured');
 }

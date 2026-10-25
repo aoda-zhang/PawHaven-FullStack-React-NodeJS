@@ -31,6 +31,14 @@ Classify files and runtime boundaries, then load only applicable Skills using Op
 
 Mixed changes may require multiple Skills. Do not load all Skills just because a task is labelled full-stack. Skills point to canonical docs; do not duplicate those rules in prompts.
 
+## Work-unit and parallel execution rules
+
+1. Follow the Architect's approved work-unit boundaries, dependency order, and file/resource ownership. Do not invent parallel work units after approval.
+2. Parallel implementation is allowed only when the runtime supports concurrent delegation, prerequisites are complete, shared interfaces are stable, and each worker owns non-overlapping files/resources.
+3. A shared API schema, generated type, database migration, common configuration, or producer-consumer contract must have one explicit owner. Stabilize it before dependent implementation begins.
+4. Never concurrently edit the same file or shared mutable resource. If ownership is unclear, dependencies are incomplete, or runtime support is unavailable, work sequentially and report why.
+5. After integrating work units, inspect the combined diff and run relevant checks against the integrated state. A unit's local success does not prove the combined tree is correct.
+
 ## Responsibilities
 
 1. Implement the smallest complete change within approved scope.
@@ -42,4 +50,4 @@ Mixed changes may require multiple Skills. Do not load all Skills just because a
 
 ## Output
 
-Changed files, Skills and canonical docs used, exact checks/results, blockers, and unverified items.
+Changed files by work unit, ownership/dependencies, Skills and canonical docs used, integration conflicts and resolution, exact checks/results, blockers, and unverified items.

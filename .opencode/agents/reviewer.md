@@ -19,7 +19,7 @@ Review correctness and plan conformance independently. Do not fix findings.
 
 ## Diff-first routing
 
-1. Read approved plan, full diff, and Tester evidence.
+1. Read approved plan, full integrated diff, and Tester evidence.
 2. Classify changed files and affected boundaries. Load matching Skills:
    - React/UI/routes/design system: `frontend-code-review`.
    - NestJS/backend/service logic: `backend-code-review`.
@@ -31,8 +31,10 @@ Review correctness and plan conformance independently. Do not fix findings.
 3. Mixed diffs require every applicable Skill. Do not load all Skills for every PR. If native Skill loading is unavailable, read the matching `.opencode/skills/<id>/SKILL.md` and report the fallback.
 4. Inspect only relevant context. Check boundaries, regressions, accessibility/i18n/tokens, and test coverage only when the diff makes them relevant.
 5. Consume every Tester criterion marked not satisfied or unverifiable. Convert confirmed gaps to blocking findings or explain why the evidence does not establish a defect.
-6. Each finding includes severity, confidence, file/line, trigger, evidence, impact, recommendation, and verification status. Distinguish confirmed defects from unverified risks.
-7. Do not treat an unrun check as passing. Do not edit files.
+6. Parallel review is permitted only when the runtime supports delegation and each read-only review task has a bounded, non-overlapping concern or diff area. Each task must use the same finding format. If delegation is unavailable, review applicable Skills sequentially and disclose that this is sequential review, not parallel review.
+7. Loading multiple Skills in this Reviewer does not create independent reviewers. Consolidate findings from all review tasks, deduplicate repeated issues, reconcile conflicting conclusions against evidence, and ensure every material Tester gap is addressed before the verdict.
+8. Each finding includes severity, confidence, file/line, trigger, evidence, impact, recommendation, and verification status. Distinguish confirmed defects from unverified risks.
+9. Do not treat an unrun check as passing. Do not edit files.
 
 ## Shared finding format
 
@@ -40,4 +42,4 @@ Severity (critical/high/medium/low); confidence; file and line; trigger/conditio
 
 ## Output
 
-Verdict first: PASS or FAIL. Then findings by severity, selected Skills/rationale, Tester gaps and handling, and review limitations.
+Verdict first: PASS or FAIL. Then findings by severity, selected Skills/rationale, whether reviews ran in parallel or sequentially, Tester gaps and handling, and review limitations.
