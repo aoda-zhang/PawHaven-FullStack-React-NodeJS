@@ -24,100 +24,83 @@ function frontmatter(content, name) {
   return match[1];
 }
 
-function deniesEdit(frontmatterText) {
-  const mapRules = [...frontmatterText.matchAll(/^  edit:[ \t]*(allow|deny)[ \t]*$/gm)];
-  if (mapRules.length > 0) return mapRules.at(-1)[1] === 'deny';
-
-  const listRules = [
-    ...frontmatterText.matchAll(
-      /-\s*action:\s*edit\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm,
-    ),
-  ];
+function deniesEdit(text) {
+  const mapRules = [...text.matchAll(/^  edit:[ \t]*(allow|deny)[ \t]*$/gm)];
+  if (mapRules.length) return mapRules.at(-1)[1] === 'deny';
+  const listRules = [...text.matchAll(/-\s*action:\s*edit\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm)];
   return listRules.length > 0 && listRules.at(-1)[1] === 'deny';
 }
 
-function deniesAllBash(frontmatterText) {
-  const permissionBlock = frontmatterText.match(
-    /^permission:[ \t]*\n((?:[ \t].*(?:\n|$))*)/m,
-  )?.[1] ?? '';
-  const bashBlock = permissionBlock.match(
-    /^  bash:[ \t]*\n((?: {4}.*(?:\n|$))*)/m,
-  )?.[1] ?? '';
-
-  return (
-    /^ {4}["']?\*["']?[ \t]*:[ \t]*deny[ \t]*$/m.test(bashBlock) &&
-    !/^ {4}.*:[ \t]*allow[ \t]*$/m.test(bashBlock)
-  );
+function checkSkill(name, review = false) {
+  const content = read(`.opencode/skills/${name}/SKILL.md`);
+  const meta = frontmatter(content, `skill ${name}`);
+  if (!new RegExp(`^name:\\s*${name.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\s*$`, 'm').test(meta)) {
+    failures.push(`Skill frontmatter name must be ${name}`);
+  }
+  if (review && !/severity[\s\S]*confidence[\s\S]*file and line[\s\S]*evidence[\s\S]*impact[\s\S]*recommended fix/i.test(content)) {
+    failures.push(`${name} must document the shared finding format`);
+  }
 }
 
-const agents = {
-  orchestrator: read('.opencode/agents/orchestrator.md'),
-  implementer: read('.opencode/agents/implementer.md'),
-};
-const commands = {
-  feature: read('.opencode/commands/feature.md'),
-  bugFix: read('.opencode/commands/bug-fix.md'),
-  refactor: read('.opencode/commands/refactor.md'),
-};
-const instructions = read('AGENTS.md');
-const prReviewer = read('.opencode/agents/pr-reviewer.md');
-const opencodeReviewWorkflow = read('.github/workflows/opencode-review.yml');
+const agentNames = ['orchestrator', 'architect', 'explorer', 'implementer', 'tester', 'reviewer', 'pr-reviewer'];
+const agents = Object.fromEntries(agentNames.map(name => [name, read(`.opencode/agents/${name}.md`)]));
+const commands = Object.fromEntries(['feature', 'bug-fix', 'refactor', 'document'].map(name => [name, read(`.opencode/commands/${name}.md`)]));
+const config = read('.opencode/opencode.json');
 const constraints = read('docs/context/agent-constraints.md');
-const configText = read('.opencode/opencode.json');
-const buildPath = join(root, '.opencode/agents/build.md');
+const instructions = read('AGENTS.md');
+const prWorkflow = read('.github/workflows/opencode-review.yml');
 
-if (existsSync(buildPath)) {
-  failures.push('custom build agent must be removed');
+for (const name of ['frontend', 'backend', 'build']) {
+  if (existsSync(join(root, `.opencode/agents/${name}.md`))) failures.push(`fixed ${name} agent must be removed; route from actual scope`);
 }
-if (!/"default_agent"\s*:\s*"orchestrator"/.test(configText)) {
-  failures.push('OpenCode default_agent must be orchestrator after removing the custom build agent');
-}
+if (!/"default_agent"\s*:\s*"orchestrator"/.test(config)) failures.push('default_agent must remain orchestrator');
 
-const orchestratorFrontmatter = frontmatter(agents.orchestrator, 'orchestrator');
-if (!deniesEdit(orchestratorFrontmatter) ||
-    !/mandatory approval gate/i.test(agents.orchestrator) ||
-    !/wait for the user to explicitly approve/i.test(agents.orchestrator) ||
-    !/do not dispatch `implementer`/i.test(agents.orchestrator)) {
-  failures.push('orchestrator must deny edits and require explicit approval before implementation dispatch');
+if (!deniesEdit(frontmatter(agents.orchestrator, 'orchestrator')) ||
+    !/explicit approval/i.test(agents.orchestrator) ||
+    !/actual.*scope|scope.*actual/i.test(agents.orchestrator) ||
+    !/dynamically/i.test(agents.orchestrator)) {
+  failures.push('orchestrator must deny edits, require approval, and route from actual scope');
 }
-if (!/explicit user approval/i.test(agents.implementer) ||
-    !/if approval is absent, ambiguous/i.test(agents.implementer)) {
-  failures.push('implementer must refuse edits without explicit approval of the current plan');
+if (!/explicitly approved/i.test(agents.implementer) ||
+    !/frontend-development/.test(agents.implementer) ||
+    !/backend-development/.test(agents.implementer) ||
+    !/action:\s*skill/.test(frontmatter(agents.implementer, 'implementer'))) {
+  failures.push('implementer must require approval and route through development Skills');
+}
+if (!/testing-frontend/.test(agents.tester) || !/testing-backend/.test(agents.tester) || !/verify/.test(agents.tester)) {
+  failures.push('tester must load shared verification guidance and relevant test Skills');
+}
+for (const skill of ['frontend-development', 'backend-development']) checkSkill(skill);
+for (const skill of ['frontend-code-review', 'backend-code-review', 'contract-code-review', 'database-code-review', 'infrastructure-review', 'security-review', 'documentation-review']) {
+  checkSkill(skill, true);
+}
+for (const name of ['frontend-code-review', 'backend-code-review', 'contract-code-review', 'database-code-review', 'infrastructure-review', 'security-review', 'documentation-review']) {
+  if (!agents.reviewer.includes(name) || !agents['pr-reviewer'].includes(name)) failures.push(`reviewer and pr-reviewer must route to ${name} when applicable`);
 }
 for (const [name, content] of Object.entries(commands)) {
-  if (!/human approval gate/i.test(content) ||
-      !/wait for explicit approval/i.test(content) ||
-      !/do not edit files before approval|do not edit files or dispatch implementation/i.test(content)) {
-    failures.push(`${name} command must enforce the same explicit approval gate`);
-  }
-  if (/small, reversible[^\n]*may proceed|small[^\n]*exception/i.test(content)) {
-    failures.push(`${name} command must not contain a small-change approval exception`);
+  if (!/wait for explicit user approval|wait for explicit approval/i.test(content) ||
+      !/before (any )?(modification|editing|modifying files)/i.test(content)) {
+    failures.push(`${name} command must enforce approval before modifications`);
   }
 }
-if (!/before modifying any code, configuration, tests, scripts, or documentation/i.test(constraints) ||
+if (!/approval before every modification/i.test(constraints) ||
     !/No size-, urgency-, reversibility-, or domain-based exception/i.test(constraints)) {
-  failures.push('canonical agent constraints must define approval-before-modification without exceptions');
+  failures.push('canonical constraints must require approval before every modification without exceptions');
 }
-if (!/wait for explicit user approval/i.test(instructions) ||
-    !/agent-constraints\.md/.test(instructions)) {
+if (!/agent-constraints\.md/.test(instructions) || !/explicit user approval/i.test(instructions)) {
   failures.push('AGENTS.md must point to canonical constraints and state the approval gate');
 }
-
-
-const prReviewerFrontmatter = frontmatter(prReviewer, 'pr-reviewer');
-if (!deniesEdit(prReviewerFrontmatter) || !deniesAllBash(prReviewerFrontmatter)) {
-  failures.push('pr-reviewer must deny edits and all shell execution');
+const prMeta = frontmatter(agents['pr-reviewer'], 'pr-reviewer');
+if (!/edit:\s*deny/.test(prMeta) || !/bash:[\s\S]*?\*.*?:\s*deny/.test(prMeta) ||
+    !/agent:\s*pr-reviewer/.test(prWorkflow) || !/contents:\s*read/.test(prWorkflow) ||
+    /contents:\s*write/.test(prWorkflow) || !/pull-requests:\s*write/.test(prWorkflow)) {
+  failures.push('PR review must remain read-only for repository contents and use the dedicated reviewer');
 }
-if (!/agent:\s*pr-reviewer/.test(opencodeReviewWorkflow) ||
-    !/contents:\s*read/.test(opencodeReviewWorkflow) ||
-    /contents:\s*write/.test(opencodeReviewWorkflow) ||
-    !/pull-requests:\s*write/.test(opencodeReviewWorkflow)) {
-  failures.push('OpenCode review workflow must use the read-only reviewer, keep repository contents read-only, and only allow PR feedback');
-}
+if (/\bscout\b/.test(commands['bug-fix'])) failures.push('bug-fix command references undefined scout agent');
 
 if (failures.length) {
   for (const failure of failures) console.error(`FAIL ${failure}`);
   process.exitCode = 1;
 } else {
-  console.log('agent-workflow-check: OK — orchestrator is the default entry point and all file-change entry points require explicit plan approval');
+  console.log('agent-workflow-check: OK — approval gates, scope-based Skill routing, shared review format, and read-only PR review are configured');
 }
