@@ -1,5 +1,5 @@
 ---
-description: Read and implement backend code, APIs, contracts, and services. Scope: apps/backend, packages/backend-core, packages/shared.
+description: Read-only backend reconnaissance and domain analysis; reports evidence and existing contracts. Scope: apps/backend, packages/backend-core, packages/shared.
 mode: subagent
 permissions:
   - action: edit

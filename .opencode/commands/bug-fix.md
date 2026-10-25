@@ -1,60 +1,24 @@
 ---
-description: Reproduce, root-cause, fix, and verify a bug with runtime evidence
+description: Reproduce a defect, propose a root-cause fix, wait for approval, then verify
+agent: orchestrator
 ---
 
 # Bug Fix
 
-You own this task. Plan, verify. Stay in the lead.
+Use the approval-first project workflow. A defect report authorizes investigation, not implementation.
 
-Be scientific. Every shipped line traces to runtime evidence. Reproduce first, then root-cause, then
-fix, then verify on the same surface.
-
-> **Step 0 — Route.** This workflow is for a defect. A slow-but-correct surface is a performance
-> issue; a "where does this live" question is investigation. State in one line what request type you
-> judged this to be, and why.
-
-> **Read order.** Architecture docs and code first; `docs/features/**` last, and only for what is
-> already known — a bug may be one of the _Known defects_ the index already tabulates. Read that to
-> avoid re-reporting a known issue, never to decide what the code does.
-
-## Steps
-
-1. **Reproduce it yourself, on the matching surface**, and capture the **before evidence** — the
-   failing output, the screenshot, the console or network capture on the reproduction path — because
-   step 5 replays that same path. Every attempt ends in exactly one of three outcomes:
-   - **Reproduced.** You have a surface, an input, and an output to compare against. Continue.
-   - **Not reproduced.** You may not ship a fix on this evidence. Keep hunting for the trigger, or say
-     plainly that the report could not be reproduced and stop. A speculative patch against an
-     unreproduced report is a guess that lands as a permanent code change.
-   - **Unable to verify.** The surface is environmental and unreachable. Ship nothing. Capture the
-     closest repro you can, name exactly what is missing, and hand that to the human. Inability to
-     reproduce is evidence about the surface, not about the report.
-2. **Binary-search the cause.** Form candidate hypotheses and rule them out with runtime evidence —
-   logs, breakpoints, data inspection. Dispatch the `scout` subagent when the surface is wide;
-   converge on the root cause yourself.
-3. **Plan the fix.** Design the smallest fix that addresses the root cause: fix the cause, not the
-   symptom, and prefer removing code over adding it. A belt-and-suspenders change that might help is a
-   hypothesis, not a fix. If the fix moves a component, package, or API boundary, present the plan to
-   the human before implementing.
-4. **Implement.** Keep the diff as small as the root cause allows, and review it yourself against the
-   repro.
-5. **Verify on the same surface.** Re-run the **same reproduction path** and capture the **after
-   evidence** on it — the same commands, the same journey, the same captures — then compare before
-   against after. The original repro passes, **on the same surface that failed**; a check that runs
-   against a different surface, build path, or browser proves something else. Inconclusive or
-   wrong-surface is not a pass.
-6. **Review the diff before finishing.** Walk the full diff against the before/after pair and name
-   anything the fix could have broken elsewhere. On a failure, the fix loop applies: fix and re-verify,
-   at most **3 cycles**, then stop and report `WORKFLOW BLOCKED` with the unresolved findings. A
-   finding that says the diagnosis is wrong returns to step 2 instead of the loop.
-7. **Reconcile the docs, last.** A fixed defect is a row in the _Known defects_ table that is now
-   wrong. Update the affected `docs/features/<feature>.md` section and the index row. If nothing
-   described the defect, Doc Impact is `none`.
-8. **Propose the commit split** so the failing repro would land before the fix.
-9. **Stop at the handoff.** Present the summary. Nothing is committed or pushed without the human.
+1. Confirm this is a defect rather than a performance issue or a "where does this live" question. State the route and why.
+2. Reproduce the issue on the matching surface and capture before evidence. Record one of:
+   - **Reproduced:** surface, input, and observed output are available.
+   - **Not reproduced:** continue investigating or report that the trigger could not be reproduced; do not propose an evidence-free patch as a confirmed fix.
+   - **Unable to verify:** state the environmental blocker and stop short of claiming a fix.
+3. Investigate candidate causes using runtime evidence, logs, tests, and code paths. Use `scout` when the surface is broad; distinguish observed facts from hypotheses.
+4. Produce a written fix plan before editing. Include the supported root-cause hypothesis, evidence, exact scope, intended fix, risks/regression surfaces, acceptance criteria, and the same-surface reproduction/regression checks.
+5. **Human approval gate:** present the plan and wait for explicit approval in the current conversation. Do not edit files before approval. This applies to every fix, including apparently trivial or reversible fixes.
+6. After approval, implement the smallest root-cause fix. If evidence disproves the approved diagnosis or requires material scope changes, stop and request approval for a revised plan.
+7. Re-run the same reproduction path on the same surface, capture after evidence, and add a regression check. Review the complete diff. On failure, fix and re-verify for at most three cycles, then report `WORKFLOW BLOCKED`.
+8. Reconcile affected feature documentation last. Stop at handoff. Do not commit or push unless explicitly requested.
 
 ## Reply
 
-What was broken, the root cause, the fix, and how you verified it. Paste the failing-then-passing repro
-output verbatim, and show the before/after pair with the comparison between them. State explicitly any
-environment that was missing and prevented reproduction.
+Before approval: report the reproduction status, evidence, root-cause hypothesis, proposed change, risks, and verification plan, then wait. After approval: report the root cause, fix, before/after evidence, exact checks, and any environment that prevented verification.

@@ -9,9 +9,8 @@
 //   3. Duplicate-rule candidates — the same normative line in two or more files (§27 drift
 //      risk). Warning-only: the detector cannot tell a restatement from a reference, so a
 //      human decides every candidate.
-//   4. Rules drift — the copy of the ruleset inlined in AGENTS.md against the canonical
-//      docs/context/agent-constraints.md. Two copies, one source of truth: the check fails unless they say
-//      the same words.
+//   4. Rules pointer — the canonical docs/context/agent-constraints.md is reachable from AGENTS.md.
+//   5. Approval workflow — every file-change entry point requires explicit plan approval.
 //
 // What it deliberately does NOT own — delegation, not duplication:
 //   - Architecture violations: `pnpm architecture-check` owns them; it is invoked below as a
@@ -376,6 +375,11 @@ const DELEGATED = [
     name: 'check:links',
     args: [join(repoRoot, 'scripts/check-docs-links.mjs'), 'docs'],
     owns: 'markdown links and anchors',
+  },
+  {
+    name: 'agent-workflow-check',
+    args: [join(repoRoot, 'scripts/check-agent-workflow.mjs')],
+    owns: 'approval-first agent and command entry points',
   },
 ];
 

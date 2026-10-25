@@ -1,5 +1,5 @@
 ---
-description: Read and implement frontend code, patterns, and components. Scope: apps/frontend, packages/ui, packages/frontend-core, packages/design-system, packages/i18n.
+description: Read-only frontend reconnaissance and domain analysis; reports evidence and existing patterns. Scope: apps/frontend, packages/ui, packages/frontend-core, packages/design-system, packages/i18n.
 mode: subagent
 permissions:
   - action: edit

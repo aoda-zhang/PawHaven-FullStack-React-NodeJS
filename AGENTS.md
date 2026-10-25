@@ -1,17 +1,23 @@
-# AGENTS.md
+# Project Instructions
 
-## Read before every task
+OpenCode loads this file automatically. Treat it as the project-wide entry point, not a copy of the full engineering handbook.
 
-Every prompt — fix, question, refactor, review, however small — reads these files first, before any
-tool call, code, plan, or answer.
+## Before substantive work
 
-| File                                                                                | Purpose                                                      |
-| ----------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| [system-architecture-overview.md](./docs/context/system-architecture-overview.md)   | Whole-system shape: services, gateway, data flow, deployment |
-| [frontend-architecture.md](./docs/context/frontend-architecture.md)                 | Frontend units and their dependency direction                |
-| [backend-architecture.md](./docs/context/backend-architecture.md)                   | Backend units, module boundaries, shared kernel              |
-| [frontend-development-patterns.md](./docs/context/frontend-development-patterns.md) | What a frontend change must look like                        |
-| [backend-development-patterns.md](./docs/context/backend-development-patterns.md)   | What a backend change must look like                         |
-| [development.md](./docs/context/development.md)                                     | Local build, run, and commit workflow                        |
-| [development.cn.md](./docs/context/development.cn.md)                               | 本地构建、运行与提交流程                                     |
-| [agent-constraints.md](./docs/context/agent-constraints.md)                         | Constraints every AI change must obey                        |
+1. Read [agent-constraints.md](./docs/context/agent-constraints.md) before proposing or making project changes.
+2. Read only the architecture and development-pattern documents relevant to the task:
+   - [System architecture](./docs/context/system-architecture-overview.md)
+   - [Frontend architecture](./docs/context/frontend-architecture.md) and [frontend patterns](./docs/context/frontend-development-patterns.md)
+   - [Backend architecture](./docs/context/backend-architecture.md) and [backend patterns](./docs/context/backend-development-patterns.md)
+   - [Development workflow](./docs/context/development.md) or [中文开发流程](./docs/context/development.cn.md)
+3. Inspect the current code and available scripts before deciding what to change or verify.
+
+## Change-control baseline
+
+- Read-only investigation and explanation do not require a plan approval.
+- Before any code, configuration, test, or documentation file is modified, present a written plan and wait for explicit user approval in the current conversation.
+- No exception for a change being small, reversible, urgent, or single-domain. Silence or a request to investigate is not approval to implement.
+- Implement only the approved scope. If the approach or scope must change, stop and obtain approval for the revised plan.
+- Do not commit, push, or create a PR unless explicitly requested.
+
+The detailed, checkable rules live in [agent-constraints.md](./docs/context/agent-constraints.md). Keep this file short; do not duplicate the handbook here.
