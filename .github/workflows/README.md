@@ -244,3 +244,16 @@ For issues or questions about workflows:
 - Check existing issues in the repository
 - Contact the DevOps team
 - Review the workflow logs for error details
+
+
+### OpenCode PR Review (`opencode-review.yml`)
+
+**Purpose**: Run the repository's read-only `.opencode/agents/pr-reviewer.md` agent on non-draft pull requests targeting `main`.
+
+**Triggers**: Pull request opened, synchronized with new commits, reopened, or marked ready for review.
+
+**Model**: `opencode/mimo-v2.5-free` through OpenCode. The workflow does not require an `OPENAI_API_KEY`; it uses the workflow-scoped `GITHUB_TOKEN` to publish the result. The first run must be checked in Actions to verify that the selected free model is available in the hosted runner.
+
+**Permissions**: Read repository contents and write PR/issue comments. The reviewer is instructed to be read-only and does not receive permission to push code.
+
+**Troubleshooting**: If the run reports that the model is unavailable or authentication is required, check the current OpenCode model catalog and runner logs before changing the model or adding any paid-provider secret.
