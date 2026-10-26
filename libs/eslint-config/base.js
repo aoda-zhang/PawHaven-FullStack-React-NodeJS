@@ -170,6 +170,7 @@ module.exports = {
         'no-unused-expressions': 'off',
         'no-magic-numbers': 'off',
         'prettier/prettier': 'off',
+        'max-lines': 'off',
       },
     },
     {

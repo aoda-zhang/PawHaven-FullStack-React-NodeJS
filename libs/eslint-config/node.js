@@ -26,6 +26,13 @@ module.exports = {
 
   rules: {
     ...baseEslintConfig.rules,
+
+    // Function-size guard: one function should fit in a reviewable screen.
+    'max-lines-per-function': [
+      'error',
+      { max: 30, skipBlankLines: true, skipComments: true },
+    ],
+
     // Node.js specific adjustments
     'no-console': 'off', // Allow console for server logging
     'node/no-missing-import': 'off', // Allow unresolved imports handled by bundlers or TypeScript
@@ -69,4 +76,14 @@ module.exports = {
     'prettier/prettier': 'off',
     '@typescript-eslint/consistent-type-imports': 'off',
   },
+
+  overrides: [
+    ...(baseEslintConfig.overrides || []),
+    {
+      files: ['**/tests/**/*.{ts,tsx,js,jsx}', '**/*.{test,spec}.{ts,tsx}'],
+      rules: {
+        'max-lines-per-function': 'off',
+      },
+    },
+  ],
 };
