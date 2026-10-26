@@ -26,7 +26,7 @@
     "check:i18n": "node scripts/check-i18n-keys.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged",
-    "design-token-audit": "node scripts/check-design-token-usage.mjs"
+    "agent-workflow-check": "node scripts/check-agent-workflow.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
@@ -62,6 +62,7 @@
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
+    "@pawhaven/eslint-plugin-design-colors": "workspace:*",
     "@playwright/test": "^1.63.0",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
@@ -82,9 +83,8 @@
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
-    "turbo": "^2.11.3",
-    "typescript": "^5.9.3",
-    "@pawhaven/eslint-plugin-design-colors": "workspace:*"
+    "turbo": "^2.11.10",
+    "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@12.4.1"
 }

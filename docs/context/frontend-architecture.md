@@ -9,15 +9,15 @@
 
 Two apps (one of them planned), five packages.
 
-| Unit                      | Path                     | What it is for                                                                                                                                                                     |
-| ------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@pawhaven/portal`        | `apps/frontend/portal`   | The public site. Every user-facing feature — animal reports, guides, rescue cases — lives here.                                                                                    |
-| `@pawhaven/admin`         | `apps/frontend/admin`    | The backoffice for this site. **Not started yet.**                                                                                                                                 |
-| `@pawhaven/shared`        | `packages/shared`        | What both front and back end must agree on — Zod schemas, constants, pure utilities. It carries no UI code and no back-end code.                                                   |
-| `@pawhaven/design-system` | `packages/design-system` | The visual source of truth. It holds no components — only the tokens, theme and utility classes every component and page builds its styling from.                                  |
-| `@pawhaven/i18n`          | `packages/i18n`          | Where every string is maintained — on every component and page, plus the PDF templates and email content in the back end's `document-service`. Nothing renders a hardcoded string. |
-| `@pawhaven/ui`            | `packages/ui`            | Pure components, no business logic. Where a component is used by more than one front-end place, this is where it lives.                                                            |
-| `@pawhaven/frontend-core` | `packages/frontend-core` | The shared front-end layer: whatever more than one front-end place needs — the API client, error handling, storage, and the components that carry business meaning.                |
+| Unit                      | Path                     | What it is for                                                                                                                                                      |
+| ------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pawhaven/portal`        | `apps/frontend/portal`   | The public site. Every user-facing feature — animal reports, guides, rescue cases — lives here.                                                                     |
+| `@pawhaven/admin`         | `apps/frontend/admin`    | The backoffice for this site. **Not started yet.**                                                                                                                  |
+| `@pawhaven/shared`        | `packages/shared`        | Cross-side kernel — Zod schemas, constants, pure utilities. Rules: [System Architecture §6](system-architecture-overview.md#6-shared-kernel-rules).                 |
+| `@pawhaven/design-system` | `packages/design-system` | The visual source of truth. It holds no components — only the tokens, theme and utility classes every component and page builds its styling from.                   |
+| `@pawhaven/i18n`          | `packages/i18n`          | Where every string is maintained — on every component and page. Nothing renders a hardcoded string.                                                                 |
+| `@pawhaven/ui`            | `packages/ui`            | Pure components, no business logic. Where a component is used by more than one front-end place, this is where it lives.                                             |
+| `@pawhaven/frontend-core` | `packages/frontend-core` | The shared front-end layer: whatever more than one front-end place needs — the API client, error handling, storage, and the components that carry business meaning. |
 
 ## 2. Dependencies
 

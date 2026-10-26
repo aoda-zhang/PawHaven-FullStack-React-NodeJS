@@ -6,12 +6,12 @@
 
 ## The four buckets
 
-| Bucket              | Tool                                              | Owns                                                                    | Survives refresh?    |
-| ------------------- | ------------------------------------------------- | ----------------------------------------------------------------------- | -------------------- |
-| **App context**     | `GlobalProvider` + `useGlobalContext()` (Context) | `locale`, `userInfo`, `isAuthenticated`, `isPending`, `login`, `logout` | Yes (`localStorage`) |
-| **Global UI state** | Redux Toolkit + `redux-persist`                   | `isSysMaintain`                                                         | Yes (`localStorage`) |
-| **Server state**    | TanStack Query (`useQuery`, `useMutation`)        | API data, bootstrap, rescue cases, reports                              | No (re-fetched)      |
-| **Component state** | `useState` + `react-hook-form`                    | Form values, toggles, local loading                                     | No                   |
+| Bucket              | Tool                                              | Owns                                                                                | Survives refresh?                              |
+| ------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **App context**     | `GlobalProvider` + `useGlobalContext()` (Context) | `locale`, `userInfo`, `isAuthenticated`, `isPending`, `login`, `register`, `logout` | Yes (`localStorage`)                           |
+| **Global UI state** | Redux Toolkit + `redux-persist`                   | `isSysMaintain`                                                                     | Yes (`localStorage`)                           |
+| **Server state**    | TanStack Query (`useQuery`, `useMutation`)        | API data, bootstrap, rescue cases, reports                                          | Only queries marked `meta.persist` (bootstrap) |
+| **Component state** | `useState` + `react-hook-form`                    | Form values, toggles, local loading                                                 | No                                             |
 
 ## App context: `GlobalProvider` / `useGlobalContext()`
 
@@ -27,6 +27,7 @@ const {
   isAuthenticated,
   isPending,
   login,
+  register,
   logout,
 } = useGlobalContext();
 ```
@@ -35,22 +36,22 @@ const {
 
 - `locale` — the active UI language, mirrored from `i18n.language`; `setLocale(lng)` delegates to
   `i18n.changeLanguage`, which is what persists the choice under `i18nextLng`
-- `userInfo` — the identity hint `{ userId, expiresAt }`, seeded from `localStorage` when the
-  provider mounts. It is not a credential and not the authority: it only says which id to paint the
-  shell with until `/auth/me` answers. A hint past `expiresAt` — or one written by an older release
-  without that field — is discarded on read by `app/providers/sessionHint.ts`
+- `userInfo` — the identity hint `{ userId }`, seeded from `localStorage` when the provider mounts.
+  It is not a credential and not the authority: it only says which id to paint the shell with until
+  `/auth/me` answers. It is validated and discarded on read by
+  `apps/frontend/portal/src/shared/utils/sessionHint.ts`
 - `isAuthenticated` — derived: `!!userInfo`
-- `isPending` — true while a login or logout call is in flight
-- `login(credentials, callbacks?)` — `POST /auth/login`, writes the hint with
-  `expiresAt = now + expires_in`, seeds `currentUser` in the query cache, invalidates and refetches
-  `bootstrap`
+- `isPending` — true while a login, register or logout call is in flight, or while bootstrapping
+- `login(credentials, callbacks?)` — `POST /auth/login`, writes the hint, seeds `currentUser` in the
+  query cache, and fetches `bootstrap` through `queryClient.fetchQuery`
 - `logout(callbacks?)` — `POST /auth/logout`, clears the hint, removes the `bootstrap`,
   `rescueCases` and `home` query caches
 
 The hint is also cleared by `QueryProvider`'s `onAuthError`, so a `401` from any request drops it
 instead of leaving a signed-in shell behind. Only the id is stored — no email, no status, no token.
 
-The register call stays a page-local mutation (`useRegister`); it does not establish a session.
+`register(credentials, callbacks?)` runs the same `completeAuthentication` path after `POST
+/auth/register`: it writes the session hint and fetches `bootstrap`, so registering signs the user in.
 
 ### Why Context, not Redux
 
@@ -128,8 +129,10 @@ belong in the global store.
 - **Error handling**: `MutationCache.onError` → `handleError` → `showErrorToast` with
   `errorMessage.<CODE>` i18n keys; `401` triggers `onAuthError` → redirect to login
 
-Server state is **not** persisted across refreshes — it is re-fetched. The only cross-refresh state
-is the app context (`locale`, `userInfo`) and the Redux-held `isSysMaintain` flag.
+Server state is persisted only for queries that opt in with `meta.persist === true` — today that is
+`bootstrap`, stored through `PersistQueryClientProvider` (localStorage, 24 h max age). Every other
+query is re-fetched on refresh; the app context (`locale`, `userInfo`) and the Redux-held
+`isSysMaintain` flag also survive.
 
 ## Component state: `useState` + `react-hook-form`
 

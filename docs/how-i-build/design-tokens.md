@@ -46,8 +46,9 @@ The rule is a single line: **components may only use semantic tokens; primitives
 into product code.** "When to use semantic vs primitive" is covered in
 [design-system README § When to use semantic vs primitive](../../packages/design-system/README.md).
 
-The semantic layer is pure mapping, so re-skinning or changing the brand colour happens in one
-place:
+The semantic layer is mapping for colour, spacing and radius; z-index is the exception — its
+`--z-index-*` values are declared directly in `theme.css`. Re-skinning or changing the brand colour
+still happens in one place:
 
 ```css
 /* packages/design-system/src/theme.css */
@@ -117,11 +118,11 @@ update in JavaScript.
 
 ### 3. CLI and CI
 
-| Command            | What it checks                                                                                                                                 |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm lint`        | The plugin rules plus ordinary lint. Runs in CI and in the commit hook.                                                                        |
-| `pnpm token-check` | The design-system **CSS sources themselves**: raw hex, hardcoded px, and whether a semantic-layer comment still matches the value it annotates |
-| `pnpm check:i18n`  | Whether a translation key exists — the same "wrong but invisible" class of problem                                                             |
+| Command            | What it checks                                                                                                                                                              |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm lint`        | The plugin rules plus ordinary lint. Runs in CI; the commit hook runs lint-staged (ESLint + Prettier) on staged files.                                                      |
+| `pnpm token-check` | Token drift across the workspace — CSS **and** source files: raw hex, palette names, hardcoded px, raw radius, `var(--color-*)` bypasses, plus semantic-layer comment drift |
+| `pnpm check:i18n`  | Whether a translation key exists — the same "wrong but invisible" class of problem                                                                                          |
 
 `pnpm token-check` earns its place because the plugin governs **how components write colour**,
 while it cannot govern **whether the token layer itself is correct**. The two are complementary,

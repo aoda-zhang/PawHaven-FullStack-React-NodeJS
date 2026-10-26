@@ -12,8 +12,7 @@
 //   in exactly one place").
 // - A4: frontend-portal.md ("There is no `apps/frontend/admin`") and
 //   service-boundaries.md §9 ("apps/frontend/portal is the only frontend app").
-// - A5: service-boundaries.md §2 ("config-service is not a service").
-// - A6: frontend-architecture.md §2 (Dependencies — a layer reads only the
+// - A5: frontend-architecture.md §2 (Dependencies — a layer reads only the
 //   layers below it; `src/shared/` is the bottom one in the portal).
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
@@ -349,42 +348,7 @@ for (const file of a4Files) {
 }
 
 // ---------------------------------------------------------------------------
-// A5. `apps/backend/config-service` treated as a service.
-//
-// Source: service-boundaries §2 ("config-service is not a service"). It has
-// no package.json, no src/, no NestJS module, and no HTTP surface. A code,
-// config, or script reference that counts it as a deployable — a port, an
-// endpoint, a service-list entry — is the violation. Docs that explain it is
-// not a service are not scanned.
-// ---------------------------------------------------------------------------
-
-const A5_SERVICE_HINTS = [
-  /port/i,
-  /service/i,
-  /deploy/i,
-  /endpoint/i,
-  /microservice/i,
-  /808\d/,
-];
-
-for (const file of a4Files) {
-  const rel = relative(repoRoot, file);
-  if (rel === 'scripts/check-architecture.mjs') continue;
-  if (rel.includes('service-boundaries.md')) continue;
-  const lines = readFileSync(file, 'utf8').split('\n');
-  lines.forEach((text, index) => {
-    if (!/config-service/.test(text)) return;
-    if (!/apps\/backend\/config-service|backend\/config-service/.test(text))
-      return;
-    if (!A5_SERVICE_HINTS.some((hint) => hint.test(text))) return;
-    failures.push(
-      `A5: ${rel}:${index + 1}: config-service treated as a service — it is config only, not a deployable (service-boundaries §2)`,
-    );
-  });
-}
-
-// ---------------------------------------------------------------------------
-// A6. Portal shared layer must not depend on the app or page layers.
+// A5. Portal shared layer must not depend on the app or page layers.
 //
 // Source: frontend-architecture §2 (Dependencies — a layer reads only the layers
 // below it). `src/shared/` is the bottom layer of the portal, so it may reach the
@@ -404,14 +368,14 @@ if (existsSync(SHARED_SRC)) {
       /from\s+['"](@\/(?:app|pages)\/[^'"]*)['"]/g,
     )) {
       failures.push(
-        `A6: ${rel}: shared imports "${match[1]}" — shared is the bottom layer; it must not depend on app or pages (frontend-architecture §2)`,
+        `A5: ${rel}: shared imports "${match[1]}" — shared is the bottom layer; it must not depend on app or pages (frontend-architecture §2)`,
       );
     }
     for (const match of body.matchAll(/from\s+['"](\.[^'"]*)['"]/g)) {
       const resolved = relative(SHARED_SRC, resolve(dirname(file), match[1]));
       if (!resolved.startsWith('..')) continue;
       failures.push(
-        `A6: ${rel}: shared imports "${match[1]}" — resolves outside src/shared; shared is the bottom layer (frontend-architecture §2)`,
+        `A5: ${rel}: shared imports "${match[1]}" — resolves outside src/shared; shared is the bottom layer (frontend-architecture §2)`,
       );
     }
   }

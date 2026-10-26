@@ -21,8 +21,8 @@
 
 ### 2.1 New page
 
-The app layer is `src/app/` in five segments. `init/` owns boot data — the bootstrap query, the
-current-user query and the root loader. `layout/` renders what it is given and
+The app layer is `src/app/` in five segments. `init/` owns boot data — the bootstrap query and the
+current-user query. `layout/` renders what it is given and
 fetches nothing: no `apiClient`, no query, no mutation. `providers/` composes the runtime, `router/`
 holds the URL table and composes the routes, `store/` holds Redux.
 
@@ -39,8 +39,7 @@ children. Form-local `useState` and `react-hook-form` context reads are a view's
 2. Add every URL to `app/router/routePaths.ts`; reference the constant, never a literal.
 3. Export the route from `route.tsx`; the shell in `app/router/router.tsx` composes it.
 4. Code-split with route-level `lazy:`; the page component is the lazy import.
-5. Load route-critical data in the loader through `queryClient.ensureQueryData`, read it with
-   `useLoaderData()` — not with a query hook.
+5. Fetch page data through the slice's query hooks (see §2.2).
 6. Add the route to the authenticated parent only if it needs a session.
 
 ### 2.2 Requesting data
@@ -169,7 +168,7 @@ direction ([Frontend Architecture](frontend-architecture.md) §2).
 | Lint and format        | `pnpm lint`                                | turbo across workspaces; the portal extends `@pawhaven/eslint-config/web` and has no lint script of its own |
 | Tests                  | `pnpm --filter @pawhaven/portal test`      | the app; packages carry their own                                                                           |
 | Styling                | `pnpm token-check`                         | hardcoded colours, bypasses, `style={{}}`                                                                   |
-| Boundaries             | `pnpm architecture-check`                  | A1–A6                                                                                                       |
+| Boundaries             | `pnpm architecture-check`                  | A1–A5                                                                                                       |
 | Documentation links    | `pnpm check:links`                         | every relative link resolves                                                                                |
 | Shared package changed | `pnpm build:libs`                          | downstream apps consume `dist`/`build`, not source — run it before portal typecheck or test                 |
 

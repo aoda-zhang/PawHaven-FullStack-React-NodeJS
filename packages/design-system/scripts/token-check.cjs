@@ -66,8 +66,23 @@ const CSS_RULES = [
   {
     id: 'palette-name',
     pattern:
-      /(text|bg|border)-(red|blue|green|yellow|orange|gray|brown)-[0-9]+/,
+      /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|brown)-\d+\b/,
     message: 'raw Tailwind palette name — use a semantic token',
+  },
+  {
+    id: 'arbitrary-hex-color',
+    pattern: /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/,
+    message: 'arbitrary hex colour — use a semantic design token',
+  },
+  {
+    id: 'raw-radius',
+    pattern: /\brounded-(?:xs|sm|md|lg|xl|2xl|3xl)(?:\/\d+)?\b/,
+    message: 'raw radius utility — use the approved radius token',
+  },
+  {
+    id: 'arbitrary-radius',
+    pattern: /\brounded-\[[^\]]+\]/,
+    message: 'arbitrary radius — use the approved radius token',
   },
   {
     id: 'var-bypass',
@@ -216,10 +231,161 @@ for (const dir of CSS_DIRS) {
   }
 }
 
+
+// Source-code counterpart of the CSS token gate. This replaces the former
+// check-design-token-usage.mjs so all design-token enforcement has one entry point.
+const SOURCE_SCOPES = [
+  'packages/design-system/src',
+  'packages/ui/src',
+  'packages/frontend-core/src',
+  'apps/frontend/portal/src',
+  'apps/backend/document-service/src/modules/pdf',
+];
+const SOURCE_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs']);
+const SOURCE_RULES = [
+  {
+    id: 'raw-hex',
+    pattern: /#[0-9a-fA-F]{3,8}\b/g,
+    message: 'raw hex colour — read the colour from a design token',
+  },
+  {
+    id: 'raw-palette',
+    pattern: /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|brown)-\d+\b/g,
+    message: 'raw Tailwind palette name — use a semantic token',
+  },
+  {
+    id: 'px-arbitrary',
+    pattern: /-\[[0-9]*\.?[0-9]+px\]/g,
+    message: 'px in an arbitrary value — use a design token or rem',
+  },
+  {
+    id: 'var-bypass',
+    pattern: /(bg|text|border|ring|outline|shadow|accent|caret|fill|stroke|placeholder|decoration)-\[var\(--color-/g,
+    message: 'CSS-variable bypass — use the design token utility class directly',
+  },
+  {
+    id: 'arbitrary-hex-color',
+    pattern: /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g,
+    message: 'arbitrary hex colour — use a semantic design token',
+  },
+  {
+    id: 'raw-radius',
+    pattern: /\brounded-(?:xs|sm|md|lg|xl|2xl|3xl)(?:\/\d+)?\b/g,
+    message: 'raw radius utility — use the approved radius token',
+  },
+  {
+    id: 'arbitrary-radius',
+    pattern: /\brounded-\[[^\]]+\]/g,
+    message: 'arbitrary radius — use the approved radius token',
+  },
+];
+
+function stripSourceComments(source) {
+  const output = source.split('');
+  let state = 'code';
+
+  for (let index = 0; index < source.length; index++) {
+    const current = source[index];
+    const next = source[index + 1];
+
+    if (state === 'code') {
+      if (current === "'" || current === '"' || current.charCodeAt(0) === 96) {
+        state = current;
+      } else if (current === '/' && next === '/') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'line-comment';
+      } else if (current === '/' && next === '*') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'block-comment';
+      }
+      continue;
+    }
+
+    if (state === 'line-comment') {
+      if (current === '\n') {
+        state = 'code';
+      } else {
+        output[index] = ' ';
+      }
+      continue;
+    }
+
+    if (state === 'block-comment') {
+      if (current === '*' && next === '/') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        index++;
+        state = 'code';
+      } else if (current !== '\n') {
+        output[index] = ' ';
+      }
+      continue;
+    }
+
+    if (current === '\\') {
+      index++;
+      continue;
+    }
+    if (current === state) state = 'code';
+  }
+
+  return output.join('');
+}
+
+function collectSourceFiles(target) {
+  const absolute = join(repoRoot, target);
+  if (!existsSync(absolute)) return null;
+  if (statSync(absolute).isFile()) {
+    const extension = absolute.slice(absolute.lastIndexOf('.'));
+    return SOURCE_EXTENSIONS.has(extension) ? [absolute] : [];
+  }
+  const found = [];
+  for (const entry of readdirSync(absolute, { withFileTypes: true })) {
+    if (SKIP_DIRS.has(entry.name)) continue;
+    const child = join(absolute, entry.name);
+    if (entry.isDirectory()) {
+      found.push(...collectSourceFiles(relative(repoRoot, child)));
+    } else {
+      const extension = entry.name.slice(entry.name.lastIndexOf('.'));
+      if (SOURCE_EXTENSIONS.has(extension)) found.push(child);
+    }
+  }
+  return found;
+}
+
+let sourceFilesScanned = 0;
+for (const scope of SOURCE_SCOPES) {
+  const files = collectSourceFiles(scope);
+  if (files === null) {
+    console.error('token-check: source scope not found: ' + scope);
+    process.exit(2);
+  }
+  for (const file of files) {
+    sourceFilesScanned++;
+    const rel = relative(repoRoot, file).split(sep).join('/');
+    const original = readFileSync(file, 'utf8');
+    const code = stripSourceComments(original);
+    const lines = code.split('\n');
+    lines.forEach((line, index) => {
+      for (const rule of SOURCE_RULES) {
+        if (rule.id === 'raw-hex' && rel.startsWith('packages/design-system/src/tokens/')) continue;
+        rule.pattern.lastIndex = 0;
+        for (const match of line.matchAll(rule.pattern)) {
+          fail(rel, index + 1, rule.id, rule.message + ' (' + match[0] + ')');
+        }
+      }
+    });
+  }
+}
+
 checkCommentDrift(join(repoRoot, THEME_SOURCE));
 
 console.log(
-  `token-check: ${filesScanned} CSS files scanned, ${tokenValues.size} tokens loaded`,
+  `token-check: ${filesScanned} CSS files and ${sourceFilesScanned} source files scanned, ${tokenValues.size} tokens loaded`,
 );
 
 if (failures.length > 0) {

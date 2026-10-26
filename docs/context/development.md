@@ -60,7 +60,7 @@ The Storybook lives inside the UI package, so it is run from that package:
 ```bash
 pnpm --filter @pawhaven/ui storybook        # dev server on http://127.0.0.1:6006
 pnpm --filter @pawhaven/ui build-storybook  # static build → packages/ui/dist/storybook-static
-pnpm --filter @pawhaven/ui test-storybook   # runs the stories in Chromium and checks them with axe
+pnpm --filter @pawhaven/ui test-storybook   # runs the stories in real Chromium (Vitest browser mode)
 ```
 
 Each component keeps its own story file next to its source, e.g.
@@ -89,8 +89,10 @@ Format: `<type>(<scope>): <description>`
 
 Examples: `feat(rescue): add 7-stage state machine`, `docs(agents): update planner agent rules`
 
-Scopes in active use: `auth`, `rescue`, `pdf`, `email`, `home`, `stats`, `docs`, `chore`.
+Scopes in active use: `design-system`, `portal`, `gateway`, `core-service`, `backend-core`,
+`document-service`, `auth-service`, `ci`, `opencode`.
 
-Husky `commit-msg` runs commitlint and rejects non-conforming messages. The same hook requires a
+Husky `commit-msg` runs commitlint and rejects non-conforming messages; `pre-commit` runs
+lint-staged (ESLint + Prettier) and the design-system `token-check`.
 
 One commit per logical change.

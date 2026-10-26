@@ -11,12 +11,12 @@ Four services, two packages.
 
 | Unit                         | Path                            | What it is for                                                                                                                                                                                             |
 | ---------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@pawhaven/gateway`          | `apps/backend/gateway`          | The only process the browser reaches. It verifies the session, mints an internal token per hop, throttles, and wraps the response. It holds no business logic and no database.                             |
-| `@pawhaven/core-service`     | `apps/backend/core-service`     | The business modules — rescue, report, adoption, home, guide, follow, bootstrap. A modular monolith: one deployable, one module per domain.                                                                |
+| `@pawhaven/gateway`          | `apps/backend/gateway`          | The only process the browser reaches; its design lives in [System Architecture §5](system-architecture-overview.md#5-api-gateway-design). It holds no business logic and no database.                      |
+| `@pawhaven/core-service`     | `apps/backend/core-service`     | The business modules as one modular monolith: one deployable, one module per domain. Module list and rules: §3.                                                                                            |
 | `@pawhaven/auth-service`     | `apps/backend/auth-service`     | Credentials and sessions. It issues and refreshes the browser cookies. It is the only service that writes user identity.                                                                                   |
 | `@pawhaven/document-service` | `apps/backend/document-service` | Rendering and delivery. It turns a template plus a locale into PDF bytes, and sends mail. It holds no database and calls no other service.                                                                 |
 | `@pawhaven/backend-core`     | `packages/backend-core`         | The shared back-end layer: `SharedModule`, the internal-JWT guard, sign and verify, the Prisma module, the service-to-service HTTP client, the trace contract, and the app bootstrap every service shares. |
-| `@pawhaven/shared`           | `packages/shared`               | What both front and back end must agree on — Zod schemas, constants, pure utilities. It carries no UI code and no back-end code.                                                                           |
+| `@pawhaven/shared`           | `packages/shared`               | Cross-side kernel — Zod schemas, constants, pure utilities. Rules: [System Architecture §6](system-architecture-overview.md#6-shared-kernel-rules).                                                        |
 
 `@pawhaven/i18n` is listed in `core-service` and `document-service` dependencies, but only
 `document-service` reads it, through its Node-only `@pawhaven/i18n/resources` entry.
@@ -58,12 +58,12 @@ depends on `shared` and on nothing else in the workspace.
 
 ## 3. Modules inside `core-service`
 
-Seven modules, each a folder with a controller, a service, and its tests.
+Eight modules, each a folder with a module, a controller, a service, and its tests.
 
 ```
 apps/backend/core-service/src/modules/
 ├── rescue/          ├── adoption/      ├── guide/        ├── bootstrap/
-├── report-animal/   ├── animal-follow/ └── home/
+├── report-animal/   ├── animal-follow/ ├── home/         └── geocode/
 ```
 
 - A module's public surface is its exported service class. A module reaches a sibling only through
