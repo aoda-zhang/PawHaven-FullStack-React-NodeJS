@@ -58,13 +58,13 @@ module.exports = {
 
     // File-size guard: warn when a file grows past 200 effective lines.
     'max-lines': [
-      'warn',
+      'error',
       { max: 200, skipBlankLines: true, skipComments: true },
     ],
 
     'react/react-in-jsx-scope': 'off', // Not required since React 17+
     'react/prop-types': 'off', // Prop types handled by TypeScript
-    'react/jsx-filename-extension': ['warn', { extensions: ['.jsx', '.tsx'] }],
+    'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
     'react/jsx-pascal-case': [
       'error',
       { allowAllCaps: true, allowNamespace: true },
