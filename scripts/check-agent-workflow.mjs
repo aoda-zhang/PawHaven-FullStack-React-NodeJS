@@ -35,6 +35,31 @@ function deniesEdit(text) {
   return listRules.length > 0 && listRules.at(-1)[1] === 'deny';
 }
 
+// OpenCode applies the last matching permission rule, so collect every
+// wildcard bash rule (scalar, nested-map, and list form) and judge by position.
+function deniesShell(text) {
+  const rules = [];
+  for (const m of text.matchAll(/^  bash:[ \t]*(allow|deny)[ \t]*$/gm)) {
+    rules.push([m.index, m[1]]);
+  }
+  const block = text.match(/^  bash:[ \t]*\n((?: {4,}[^\n]*\n?)*)/m);
+  if (block) {
+    for (const m of block[1].matchAll(
+      /['"]?\*['"]?[ \t]*:[ \t]*(allow|deny)/g,
+    )) {
+      rules.push([block.index + m.index, m[1]]);
+    }
+  }
+  for (const m of text.matchAll(
+    /-\s*action:\s*bash\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm,
+  )) {
+    rules.push([m.index, m[1]]);
+  }
+  if (!rules.length) return false;
+  rules.sort((a, b) => a[0] - b[0]);
+  return rules.at(-1)[1] === 'deny';
+}
+
 function checkSkill(name, review = false) {
   const content = read(`.opencode/skills/${name}/SKILL.md`);
   const meta = frontmatter(content, `skill ${name}`);
@@ -160,7 +185,7 @@ if (
 const prMeta = frontmatter(agents['pr-reviewer'], 'pr-reviewer');
 if (
   !/edit:\s*deny/.test(prMeta) ||
-  !/bash:[\s\S]*?\*.*?:\s*deny/.test(prMeta) ||
+  !deniesShell(prMeta) ||
   !/agent:\s*pr-reviewer/.test(prWorkflow) ||
   !/contents:\s*read/.test(prWorkflow) ||
   /contents:\s*write/.test(prWorkflow) ||

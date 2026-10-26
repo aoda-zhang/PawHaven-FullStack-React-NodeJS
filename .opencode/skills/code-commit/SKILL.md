@@ -15,7 +15,7 @@ Load when the user wants to commit and push code changes, or when a commit messa
 4. **Write subject** — Concise description (≥5 chars, ≤100 chars total header) in imperative mood. Chinese allowed.
 5. **Construct message** — Format: `type(scope?): subject` (e.g., `feat(parser): add new feature`).
 6. **Validate with commitlint** — Run `pnpm commitlint --edit` or `echo "<message>" | pnpm commitlint` to verify.
-7. **Commit and push** — If validation passes, run `git commit -m "<message>"` then `git push`.
+7. **Commit and push** — Only when the user has explicitly instructed commit and push in the current conversation; otherwise stop after validation and report the message. If instructed and validation passes, run `git commit -m "<message>"` then `git push`.
 
 ## Commitlint rules (from commitlint.config.cjs)
 

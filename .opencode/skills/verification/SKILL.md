@@ -9,7 +9,7 @@ Load for any verification work. The Tester chooses the layer-specific reference;
 
 ## Required actions
 
-1. Identify the verification layer(s) from the acceptance criteria: backend/API, frontend/UI, browser/E2E, static/build, or specialist.
+1. Identify the verification layer(s) from the acceptance criteria: backend/API, frontend/UI, browser/E2E, or static/build.
 2. For each layer, load the corresponding reference under `references/` and follow its checklist.
 3. Apply the shared rules in this skill: select the lowest layer that proves each criterion, run only existing checks, record exact commands and evidence, classify failures with evidence.
 4. Account for every acceptance criterion, including criteria with no executable check.
