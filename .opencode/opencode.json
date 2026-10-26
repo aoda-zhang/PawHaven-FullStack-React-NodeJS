@@ -8,7 +8,7 @@
     {
       "package": "./plugins/free-model-filter",
       "options": {
-        "freeOnly": true,
+        "freeOnly": false,
         "freeMatch": ":free"
       }
     },

@@ -23,9 +23,10 @@ Implement only the plan the user explicitly approved in the current conversation
 ## Skill routing
 
 Classify files and runtime boundaries, then load only applicable Skills using OpenCode's native `skill` tool:
-- React pages/components, routes, client state/data, UI packages, tokens or localization: `frontend-development`.
-- Backend services, APIs, auth, persistence, service integration or backend runtime: `backend-development`.
-- Documentation edits: `documentation`.
+
+- Changes affecting backend services, APIs, auth, persistence, service integration or backend runtime: `development`.
+- React pages/components, routes, client state/data, UI packages, design tokens, or localization changes: `development`.
+- Documentation edits: no specialist skill needed.
 - UI component selection/reuse: also `ui-component-catalog`.
 - Other concerns: inspect available Skills and load one only when its description matches.
 

@@ -1,9 +1,4 @@
----
-name: browser-verification
-description: Verify real browser journeys for user-facing acceptance criteria.
----
-
-# Browser Verification
+# Browser Verification Reference
 
 Load when acceptance depends on a running application's UI, routing, forms, navigation, authentication, or frontend-to-backend behavior.
 

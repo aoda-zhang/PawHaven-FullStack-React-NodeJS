@@ -1,9 +1,4 @@
----
-name: backend-development
-description: Implement backend changes using PawHaven's canonical backend patterns.
----
-
-# Backend Development
+# Backend Development Reference
 
 Load for NestJS services, APIs, authentication, persistence, service calls, or backend runtime configuration.
 
@@ -15,3 +10,14 @@ Load for NestJS services, APIs, authentication, persistence, service calls, or b
 4. Treat auth, persistence, cross-service calls, deployment, and configuration changes as high-risk; select verification accordingly.
 5. Inspect actual package scripts before choosing checks. Do not invent commands or test infrastructure.
 6. Hand off changed files, affected contracts/services, exact checks and results, and unverified runtime assumptions.
+
+## Canonical patterns cover
+
+- Module/controller/service structure
+- DTO validation with class-validator
+- Guards, interceptors, pipes, exception filters
+- ConfigModule with joi/zod validation
+- TypeORM/Prisma patterns: repositories, transactions, migrations
+- Service-to-service calls: HTTP client, timeouts, circuit breakers
+- Auth: JWT, roles, permissions, service-to-service tokens
+- Observability: structured logging, metrics, traces

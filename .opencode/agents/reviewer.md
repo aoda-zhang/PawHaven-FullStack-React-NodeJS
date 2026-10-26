@@ -21,13 +21,13 @@ Review correctness and plan conformance independently. Do not fix findings.
 
 1. Read approved plan, full integrated diff, and Tester evidence.
 2. Classify changed files and affected boundaries. Load matching Skills:
-   - React/UI/routes/design system: `frontend-code-review`.
-   - NestJS/backend/service logic: `backend-code-review`.
-   - API payloads, shared schemas/types, producer-consumer boundaries: `contract-code-review`.
-   - Database schema, migrations, queries, persistence semantics: `database-code-review`.
-   - CI, deployment, runtime config, build/release infrastructure: `infrastructure-review`.
-   - Auth, authorization, secrets, untrusted input, security-sensitive behavior: `security-review`.
-   - Documentation-only or material documentation claims: `documentation-review`.
+   - React/UI/routes/design system: `code-review`.
+   - NestJS/backend/service logic: `code-review`.
+   - API payloads, shared schemas/types, producer-consumer boundaries: `code-review`.
+   - Database schema, migrations, queries, persistence semantics: `code-review`.
+   - CI, deployment, runtime config, build/release infrastructure: `code-review`.
+   - Auth, authorization, secrets, untrusted input, security-sensitive behavior: `code-review`.
+   - Documentation-only or material documentation claims: documentation changes only, no specialist skill needed.
 3. Mixed diffs require every applicable Skill. Do not load all Skills for every PR. If native Skill loading is unavailable, read the matching `.opencode/skills/<id>/SKILL.md` and report the fallback.
 4. Inspect only relevant context. Check boundaries, regressions, accessibility/i18n/tokens, and test coverage only when the diff makes them relevant.
 5. Consume every Tester criterion marked not satisfied or unverifiable. Convert confirmed gaps to blocking findings or explain why the evidence does not establish a defect.
