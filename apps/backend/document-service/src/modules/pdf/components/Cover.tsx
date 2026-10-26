@@ -10,7 +10,7 @@ export const Cover = ({ title, subtitle }: CoverProps): ReactElement => {
   const isVertical = !isLatinText(title);
 
   return (
-    <div className="from-document-cover-start via-document-cover-middle to-document-cover-end relative flex min-h-screen break-after-page flex-col justify-end bg-gradient-to-br px-10 py-14 text-text-inverse">
+    <div className="from-document-cover-start via-document-cover-middle to-document-cover-end text-text-inverse relative flex min-h-screen break-after-page flex-col justify-end bg-gradient-to-br px-10 py-14">
       <div className="absolute inset-0 flex items-center justify-center">
         <h1
           className={`text-display m-0 leading-tight font-bold ${isVertical ? '[writing-mode:vertical-rl]' : ''}`}

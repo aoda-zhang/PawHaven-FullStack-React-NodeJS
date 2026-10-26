@@ -73,7 +73,9 @@ export const NotFound = ({
           <Button
             variant="outline"
             onClick={goBack}
-            className={cn('rounded-button-large px-8 py-3 text-base font-semibold')}
+            className={cn(
+              'rounded-button-large px-8 py-3 text-base font-semibold',
+            )}
           >
             <ArrowLeft size={18} />
             {t('common.go_back', 'Go Back')}

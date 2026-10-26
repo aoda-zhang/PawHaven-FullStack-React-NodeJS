@@ -125,7 +125,9 @@ export class ProxyService {
     // Preserve service-generated error envelopes. Infrastructure responses
     // bypass Nest's global exception filter, so normalize only non-envelope 5xx.
     if (statusCode >= 500) {
-      const body = isJson ? JSON.parse(buffer.toString('utf8') || 'null') : null;
+      const body = isJson
+        ? JSON.parse(buffer.toString('utf8') || 'null')
+        : null;
       if (body && typeof body === 'object' && 'isSuccess' in body) {
         return buffer;
       }

@@ -17,8 +17,9 @@
   --color-primary-hover: var(--color-orange-7); /* #f66b26 */
   --color-primary-active: var(--color-orange-8); /* #e65a1a */
   --color-primary-light: var(--color-orange-1); /* #fff7ed */
-  --color-primary-fg: var(--color-text-inverse); /* White foreground on primary backgrounds */
-
+  --color-primary-fg: var(
+    --color-text-inverse
+  ); /* White foreground on primary backgrounds */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
@@ -29,7 +30,9 @@
     --color-orange-9
   ); /* #c2410b — text on accent backgrounds */
   --color-card: var(--color-gray-1); /* #ffffff — card surfaces */
-  --color-surface: var(--color-gray-1); /* Shared surface used by auth layouts and popovers */
+  --color-surface: var(
+    --color-gray-1
+  ); /* Shared surface used by auth layouts and popovers */
   --color-background-subtle: var(--color-brown-3); /* #f6e9df */
   --color-muted-strong: var(--color-brown-4); /* #ecdccf */
 
@@ -38,7 +41,9 @@
   --color-text-secondary: var(--color-gray-7); /* #737373 */
   --color-text-tertiary: var(--color-gray-6); /* #a3a3a3 */
   --color-text-inverse: var(--color-gray-1); /* #ffffff */
-  --color-text-link: var(--color-orange-9); /* Accessible link color on light surfaces */
+  --color-text-link: var(
+    --color-orange-9
+  ); /* Accessible link color on light surfaces */
 
   /* ═══ Borders ════════════════════════════════════════ */
   --color-border: var(--color-gray-5); /* #d4d4d4 */

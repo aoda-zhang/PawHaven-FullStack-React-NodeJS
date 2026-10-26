@@ -72,10 +72,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const login = (credentials: CredentialsDto, callbacks?: GlobalCallbacks) => {
     loginMutation.mutate(credentials, {
       onSuccess: (session) => {
-        completeAuthentication(
-          session.user.userId,
-          callbacks,
-        );
+        completeAuthentication(session.user.userId, callbacks);
       },
       onError: callbacks?.onError,
     });

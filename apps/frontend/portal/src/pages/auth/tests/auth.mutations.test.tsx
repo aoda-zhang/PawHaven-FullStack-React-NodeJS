@@ -52,7 +52,10 @@ describe('Auth mutations — session cache handoff', () => {
     });
 
     await act(async () => {
-      await result.current.mutateAsync({ email: 'test@test.com', password: 'x' });
+      await result.current.mutateAsync({
+        email: 'test@test.com',
+        password: 'x',
+      });
     });
 
     expect(

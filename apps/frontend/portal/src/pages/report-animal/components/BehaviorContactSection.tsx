@@ -29,7 +29,7 @@ export const BehaviorContactSection = () => {
         required
       />
 
-      <div className="bg-error-light border-error/20 flex items-start gap-2 rounded-panel border p-3 text-sm">
+      <div className="bg-error-light border-error/20 rounded-panel flex items-start gap-2 border p-3 text-sm">
         <AlertTriangle className="text-error mt-0.5 h-4 w-4 flex-shrink-0" />
         <span className="text-foreground">
           {t('reportAnimal.emergency_note')}
@@ -47,7 +47,7 @@ export const BehaviorContactSection = () => {
       <FormCheckbox name="urgent" label={t('reportAnimal.urgent_toggle')} />
 
       {isUrgent && (
-        <div className="bg-primary-light border-primary/30 flex items-start gap-2 rounded-panel border p-3 text-sm">
+        <div className="bg-primary-light border-primary/30 rounded-panel flex items-start gap-2 border p-3 text-sm">
           <AlertTriangle className="text-primary mt-0.5 h-4 w-4 flex-shrink-0" />
           <span className="text-foreground">
             {t('reportAnimal.response_note')}

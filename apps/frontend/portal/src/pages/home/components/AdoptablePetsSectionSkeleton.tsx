@@ -17,20 +17,20 @@ export const AdoptablePetsSectionSkeleton = ({
     {Array.from({ length: count }, (_, index) => (
       <div
         key={index}
-        className="bg-background border-border w-64 flex-shrink-0 overflow-hidden rounded-card-large border shadow-sm"
+        className="bg-background border-border rounded-card-large w-64 flex-shrink-0 overflow-hidden border shadow-sm"
       >
         <Skeleton className="h-44 w-full rounded-none" />
         <div className="space-y-3 p-4">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-4 w-24 rounded-skeleton" />
+            <Skeleton className="rounded-skeleton h-4 w-24" />
             <Skeleton className="h-4 w-4 rounded-full" />
           </div>
-          <Skeleton className="h-3 w-32 rounded-skeleton" />
+          <Skeleton className="rounded-skeleton h-3 w-32" />
           <div className="flex gap-1">
             <Skeleton className="h-5 w-14 rounded-full" />
             <Skeleton className="h-5 w-16 rounded-full" />
           </div>
-          <Skeleton className="h-3 w-24 rounded-skeleton" />
+          <Skeleton className="rounded-skeleton h-3 w-24" />
         </div>
       </div>
     ))}

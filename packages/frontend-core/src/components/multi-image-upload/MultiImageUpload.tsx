@@ -170,7 +170,7 @@ export const MultiImageUpload = ({
         {previews.map((item) => (
           <div
             key={item.id}
-            className="group border-border relative aspect-square overflow-hidden rounded-media border"
+            className="group border-border rounded-media relative aspect-square overflow-hidden border"
           >
             {item.url && (
               <img
@@ -194,7 +194,7 @@ export const MultiImageUpload = ({
             type="button"
             onClick={() => inputRef.current?.click()}
             aria-label={addLabel ?? t('imageUpload.add')}
-            className="border-border text-text-secondary hover:border-primary/40 hover:bg-muted flex aspect-square flex-col items-center justify-center gap-1 rounded-media border-2 border-dashed transition-colors"
+            className="border-border text-text-secondary hover:border-primary/40 hover:bg-muted rounded-media flex aspect-square flex-col items-center justify-center gap-1 border-2 border-dashed transition-colors"
           >
             <ImagePlus className="h-6 w-6" />
             <span className="text-xs">{addLabel ?? t('imageUpload.add')}</span>

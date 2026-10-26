@@ -89,7 +89,9 @@ export const SystemError = ({ error, footer }: SystemErrorProps) => {
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             onClick={retry}
-            className={cn('rounded-button-large px-8 py-3 text-base font-semibold')}
+            className={cn(
+              'rounded-button-large px-8 py-3 text-base font-semibold',
+            )}
           >
             <RotateCw size={18} />
             {t('common.retry', 'Try Again')}
@@ -97,7 +99,9 @@ export const SystemError = ({ error, footer }: SystemErrorProps) => {
           <Button
             variant="outline"
             onClick={handleGoHome}
-            className={cn('rounded-button-large px-8 py-3 text-base font-semibold')}
+            className={cn(
+              'rounded-button-large px-8 py-3 text-base font-semibold',
+            )}
           >
             <Home size={18} />
             {t('common.go_to_home', 'Go Home')}

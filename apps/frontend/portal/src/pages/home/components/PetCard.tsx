@@ -30,7 +30,7 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
       role={isInteractive ? 'button' : undefined}
       aria-label={isInteractive ? pet.name : undefined}
       className={cn(
-        'bg-background border-border w-64 flex-shrink-0 snap-start overflow-hidden rounded-card-large border shadow-sm transition-all',
+        'bg-background border-border rounded-card-large w-64 flex-shrink-0 snap-start overflow-hidden border shadow-sm transition-all',
         isInteractive && 'cursor-pointer hover:-translate-y-1 hover:shadow-md',
       )}
     >

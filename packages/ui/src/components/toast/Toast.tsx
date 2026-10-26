@@ -168,7 +168,7 @@ const ToastEntry = ({ toast, onDismiss }: ToastEntryProps) => {
     <div
       ref={containerRef}
       role={assertive ? 'alert' : 'status'}
-      className="border-border bg-background/90 shadow-toast pointer-events-auto flex items-start gap-3 rounded-panel border px-4 py-3 backdrop-blur-md"
+      className="border-border bg-background/90 shadow-toast rounded-panel pointer-events-auto flex items-start gap-3 border px-4 py-3 backdrop-blur-md"
     >
       <Icon
         aria-hidden="true"

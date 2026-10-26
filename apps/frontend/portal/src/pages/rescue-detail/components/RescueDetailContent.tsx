@@ -47,7 +47,7 @@ export const RescueDetailContent = ({
       </button>
 
       {animal.photos.length > 0 && (
-        <div className="relative mb-4 h-48 overflow-hidden rounded-card-large sm:h-60">
+        <div className="rounded-card-large relative mb-4 h-48 overflow-hidden sm:h-60">
           <Carousel
             images={animal.photos}
             autoplay

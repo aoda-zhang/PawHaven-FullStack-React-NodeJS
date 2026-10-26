@@ -8,7 +8,7 @@ export interface ContactsProps {
 export const Contacts = ({ contacts }: ContactsProps): ReactElement => (
   <>
     {contacts?.items?.length ? (
-      <section className="border-border bg-primary-light mx-10 mb-5 break-inside-avoid rounded-panel border px-5 py-4">
+      <section className="border-border bg-primary-light rounded-panel mx-10 mb-5 break-inside-avoid border px-5 py-4">
         <h3 className="text-label tracking-label text-accent-foreground mb-2.5 font-bold uppercase">
           {contacts.title}
         </h3>
@@ -16,7 +16,7 @@ export const Contacts = ({ contacts }: ContactsProps): ReactElement => (
           {contacts.items.map((contact, contactIndex) => (
             <div
               key={`contact-${contactIndex}`}
-              className="border-border bg-card flex flex-col gap-0.5 rounded-input border px-2.5 py-2"
+              className="border-border bg-card rounded-input flex flex-col gap-0.5 border px-2.5 py-2"
             >
               <span className="text-fineprint tracking-print text-warning-hover font-semibold uppercase">
                 {contact.label}

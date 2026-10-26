@@ -117,7 +117,7 @@ export const LocationSection = () => {
 
   return (
     <div>
-      <div className="bg-muted border-border mb-4 flex h-40 items-center justify-center rounded-media border">
+      <div className="bg-muted border-border rounded-media mb-4 flex h-40 items-center justify-center border">
         {renderMapContent()}
       </div>
       <Button

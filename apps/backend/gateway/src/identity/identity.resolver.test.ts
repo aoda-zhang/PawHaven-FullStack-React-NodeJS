@@ -164,58 +164,55 @@ describe('IdentityResolver username propagation', () => {
     expect(verified).not.toHaveProperty('username');
   });
 
-  it(
-    'refreshes an expired access token through the routed auth-service endpoint',
-    async () => {
-      const { resolver, jwtService, httpClientService } = buildResolver();
-      const response = responseStub();
-      const refreshedAccessToken = accessToken(jwtService, {
-        username: 'reporter-two',
-      });
-      const post = vi.fn().mockResolvedValue({
-        headers: {
-          'set-cookie': [
-            `access_token=${refreshedAccessToken}; Path=/; HttpOnly; SameSite=Lax`,
-            'refresh_token=refresh-2; Path=/; HttpOnly; SameSite=Strict',
-          ],
-        },
-      });
-      httpClientService.create.mockReturnValue({ post });
+  it('refreshes an expired access token through the routed auth-service endpoint', async () => {
+    const { resolver, jwtService, httpClientService } = buildResolver();
+    const response = responseStub();
+    const refreshedAccessToken = accessToken(jwtService, {
+      username: 'reporter-two',
+    });
+    const post = vi.fn().mockResolvedValue({
+      headers: {
+        'set-cookie': [
+          `access_token=${refreshedAccessToken}; Path=/; HttpOnly; SameSite=Lax`,
+          'refresh_token=refresh-2; Path=/; HttpOnly; SameSite=Strict',
+        ],
+      },
+    });
+    httpClientService.create.mockReturnValue({ post });
 
-      const identity = await resolver.resolve(
-        requestWith({
-          access_token: 'expired-or-invalid-access-token',
-          refresh_token: 'refresh-1',
-        }),
-        response,
-        '/api/core/rescues',
-      );
+    const identity = await resolver.resolve(
+      requestWith({
+        access_token: 'expired-or-invalid-access-token',
+        refresh_token: 'refresh-1',
+      }),
+      response,
+      '/api/core/rescues',
+    );
 
-      expect(identity).toMatchObject({
-        kind: InternalJwtKind.AUTHENTICATED,
-        sub: 'user-1',
-        username: 'reporter-two',
-      });
-      expect(response.append).toHaveBeenCalledWith(
-        httpHeaders.setCookie,
-        expect.stringContaining(`access_token=${refreshedAccessToken};`),
-      );
-      expect(response.append).toHaveBeenCalledWith(
-        httpHeaders.setCookie,
-        expect.stringContaining('refresh_token=refresh-2;'),
-      );
-      expect(post).toHaveBeenCalledWith(
-        '/refresh',
-        {},
-        expect.objectContaining({
-          returnResponse: true,
-          headers: expect.objectContaining({
-            cookie: 'refresh_token=refresh-1',
-          }),
+    expect(identity).toMatchObject({
+      kind: InternalJwtKind.AUTHENTICATED,
+      sub: 'user-1',
+      username: 'reporter-two',
+    });
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining(`access_token=${refreshedAccessToken};`),
+    );
+    expect(response.append).toHaveBeenCalledWith(
+      httpHeaders.setCookie,
+      expect.stringContaining('refresh_token=refresh-2;'),
+    );
+    expect(post).toHaveBeenCalledWith(
+      '/refresh',
+      {},
+      expect.objectContaining({
+        returnResponse: true,
+        headers: expect.objectContaining({
+          cookie: 'refresh_token=refresh-1',
         }),
-      );
-    },
-  );
+      }),
+    );
+  });
 
   it('clears cookies when refresh is rejected as unauthorized', async () => {
     const { resolver, httpClientService } = buildResolver();
@@ -253,7 +250,9 @@ describe('IdentityResolver username propagation', () => {
     });
     const post = vi
       .fn()
-      .mockRejectedValue(new ServiceUnavailableException('upstream unavailable'));
+      .mockRejectedValue(
+        new ServiceUnavailableException('upstream unavailable'),
+      );
     httpClientService.create.mockReturnValue({ post });
 
     const identity = await resolver.resolve(

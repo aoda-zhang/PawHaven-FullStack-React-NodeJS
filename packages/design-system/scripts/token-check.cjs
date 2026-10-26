@@ -71,7 +71,8 @@ const CSS_RULES = [
   },
   {
     id: 'arbitrary-hex-color',
-    pattern: /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/,
+    pattern:
+      /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/,
     message: 'arbitrary hex colour — use a semantic design token',
   },
   {
@@ -231,7 +232,6 @@ for (const dir of CSS_DIRS) {
   }
 }
 
-
 // Source-code counterpart of the CSS token gate. This replaces the former
 // check-design-token-usage.mjs so all design-token enforcement has one entry point.
 const SOURCE_SCOPES = [
@@ -241,7 +241,14 @@ const SOURCE_SCOPES = [
   'apps/frontend/portal/src',
   'apps/backend/document-service/src/modules/pdf',
 ];
-const SOURCE_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs']);
+const SOURCE_EXTENSIONS = new Set([
+  '.js',
+  '.jsx',
+  '.ts',
+  '.tsx',
+  '.mjs',
+  '.cjs',
+]);
 const SOURCE_RULES = [
   {
     id: 'raw-hex',
@@ -250,7 +257,8 @@ const SOURCE_RULES = [
   },
   {
     id: 'raw-palette',
-    pattern: /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|brown)-\d+\b/g,
+    pattern:
+      /\b(?:text|bg|border|ring|outline|fill|stroke|from|via|to|decoration|placeholder|divide|shadow)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone|brown)-\d+\b/g,
     message: 'raw Tailwind palette name — use a semantic token',
   },
   {
@@ -260,12 +268,15 @@ const SOURCE_RULES = [
   },
   {
     id: 'var-bypass',
-    pattern: /(bg|text|border|ring|outline|shadow|accent|caret|fill|stroke|placeholder|decoration)-\[var\(--color-/g,
-    message: 'CSS-variable bypass — use the design token utility class directly',
+    pattern:
+      /(bg|text|border|ring|outline|shadow|accent|caret|fill|stroke|placeholder|decoration)-\[var\(--color-/g,
+    message:
+      'CSS-variable bypass — use the design token utility class directly',
   },
   {
     id: 'arbitrary-hex-color',
-    pattern: /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g,
+    pattern:
+      /\b(?:text|bg|border|ring|outline|shadow|fill|stroke|from|via|to)-\[#[0-9a-fA-F]{3,8}\]/g,
     message: 'arbitrary hex colour — use a semantic design token',
   },
   {
@@ -372,7 +383,11 @@ for (const scope of SOURCE_SCOPES) {
     const lines = code.split('\n');
     lines.forEach((line, index) => {
       for (const rule of SOURCE_RULES) {
-        if (rule.id === 'raw-hex' && rel.startsWith('packages/design-system/src/tokens/')) continue;
+        if (
+          rule.id === 'raw-hex' &&
+          rel.startsWith('packages/design-system/src/tokens/')
+        )
+          continue;
         rule.pattern.lastIndex = 0;
         for (const match of line.matchAll(rule.pattern)) {
           fail(rel, index + 1, rule.id, rule.message + ' (' + match[0] + ')');

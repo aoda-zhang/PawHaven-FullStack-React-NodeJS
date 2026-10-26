@@ -142,7 +142,7 @@ export const ReportAnimalForm = ({
         <Button
           type="button"
           onClick={() => navigate(routePaths.home)}
-          className="w-full rounded-button-large py-3"
+          className="rounded-button-large w-full py-3"
         >
           {t('reportAnimal.success_home')}
         </Button>
@@ -153,7 +153,7 @@ export const ReportAnimalForm = ({
   return (
     <FormProvider {...form}>
       <form noValidate onSubmit={form.handleSubmit(handleSubmit)}>
-        <div className="bg-card border-border mb-6 rounded-card-large border p-6 shadow-sm">
+        <div className="bg-card border-border rounded-card-large mb-6 border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
             {t('reportAnimal.basics_title')}
           </h2>
@@ -163,7 +163,7 @@ export const ReportAnimalForm = ({
           <AnimalBasicsSection />
         </div>
 
-        <div className="bg-card border-border mb-6 rounded-card-large border p-6 shadow-sm">
+        <div className="bg-card border-border rounded-card-large mb-6 border p-6 shadow-sm">
           <h2 className="text-foreground mb-1 text-lg font-semibold">
             {t('reportAnimal.behavior_title')}
           </h2>
@@ -187,7 +187,7 @@ export const ReportAnimalForm = ({
           type="submit"
           loading={isPending}
           disabled={isPending}
-          className="w-full rounded-button-large py-3"
+          className="rounded-button-large w-full py-3"
         >
           {isPending ? t('reportAnimal.submitting') : t('reportAnimal.submit')}
         </Button>

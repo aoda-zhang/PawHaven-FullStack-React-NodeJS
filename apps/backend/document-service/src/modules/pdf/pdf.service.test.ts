@@ -122,9 +122,10 @@ describe('PdfService lazy browser initialization', () => {
     const service = buildService();
     let resolveLaunch!: (value: Browser) => void;
     launchMock.mockImplementationOnce(
-      () => new Promise<Browser>((resolve) => {
-        resolveLaunch = resolve;
-      }),
+      () =>
+        new Promise<Browser>((resolve) => {
+          resolveLaunch = resolve;
+        }),
     );
 
     const first = service.renderPdf(body, locale);

@@ -83,7 +83,6 @@ export const getRescueStatusColor = ({
   }
 };
 
-
 /** Text foreground token class for readable rescue-status badges. */
 export type RescueStatusForegroundClass =
   `text-rescue-status-${RescueStatusSuffix}-foreground`;

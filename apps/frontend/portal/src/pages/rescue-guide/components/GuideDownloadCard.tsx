@@ -18,9 +18,9 @@ export const GuideDownloadCard = ({
   const GuideIcon = item.icon;
 
   return (
-    <article className="bg-card border-border shadow-card hover:shadow-modal flex flex-col gap-4 rounded-card-large border p-5 transition-shadow">
+    <article className="bg-card border-border shadow-card hover:shadow-modal rounded-card-large flex flex-col gap-4 border p-5 transition-shadow">
       <div className="flex items-start gap-3">
-        <span className="bg-accent text-accent-foreground flex size-11 shrink-0 items-center justify-center rounded-icon">
+        <span className="bg-accent text-accent-foreground rounded-icon flex size-11 shrink-0 items-center justify-center">
           <GuideIcon className="size-5" aria-hidden="true" />
         </span>
         <div>

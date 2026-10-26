@@ -17,8 +17,9 @@ export interface HttpResType {
 /** Builds the shared public error envelope used by Nest handlers and gateway proxy responses. */
 export const createHttpErrorResponse = (
   status: number,
-  message =
-    status === HttpStatus.GATEWAY_TIMEOUT ? 'Request timeout' : 'Service error',
+  message = status === HttpStatus.GATEWAY_TIMEOUT
+    ? 'Request timeout'
+    : 'Service error',
   code = '',
   data: unknown = null,
   traceId?: string,

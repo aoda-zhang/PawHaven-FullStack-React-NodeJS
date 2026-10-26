@@ -27,7 +27,7 @@ const slide = (title: string, color: string) => ({
 export const CarouselStory: Story = {
   name: 'Carousel',
   render: () => (
-    <div className="h-64 w-full max-w-3xl overflow-hidden rounded-media">
+    <div className="rounded-media h-64 w-full max-w-3xl overflow-hidden">
       <Carousel
         label="PawHaven showcase carousel"
         images={slideData.slides.map((entry) =>
