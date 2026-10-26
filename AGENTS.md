@@ -9,7 +9,7 @@ OpenCode loads this file automatically. Treat it as the project-wide entry point
    - [System architecture](./docs/context/system-architecture-overview.md)
    - [Frontend architecture](./docs/context/frontend-architecture.md) and [frontend patterns](./docs/context/frontend-development-patterns.md)
    - [Backend architecture](./docs/context/backend-architecture.md) and [backend patterns](./docs/context/backend-development-patterns.md)
-   - [Development workflow](./docs/context/development.md) or [中文开发流程](./docs/context/development.cn.md)
+   - [Development workflow](./docs/context/development.md)
 3. Inspect the current code and available scripts before deciding what to change or verify.
 
 ## Change-control baseline

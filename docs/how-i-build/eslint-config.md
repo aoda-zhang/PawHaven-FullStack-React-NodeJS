@@ -15,12 +15,19 @@ config per project type:
 | `web`  | `web.js`  | Browser apps: React, React Hooks, TanStack Query, design-colors plugin     |
 | `node` | `node.js` | Backend services: Node env, server-side allowances                         |
 
-Each app's `.eslintrc.cjs` is a single `extends` line — there is no duplicated rule logic in any app:
+Each app's `.eslintrc.cjs` is a thin `extends` line — rule logic is never duplicated in an app. The
+portal adds one narrow `overrides` block for `*.schema.ts` naming:
 
 ```js
 // apps/frontend/portal/.eslintrc.cjs
 module.exports = {
   extends: ['@pawhaven/eslint-config/web'],
+  overrides: [
+    {
+      files: ['**/*.schema.ts'],
+      rules: { 'check-file/filename-naming-convention': 'off' },
+    },
+  ],
 };
 
 // apps/backend/core-service/.eslintrc.cjs
@@ -57,7 +64,7 @@ settings: {
       'packages/design-system/src/utilities.css',
     ],
     extraCssFiles: [
-      'apps/frontend/portal/src/shared/utils/rescueStatus/rescueStatusColors.css',
+      'apps/frontend/portal/src/shared/utils/rescue-status/rescueStatusColors.css',
     ],
   },
 },
@@ -100,13 +107,13 @@ This rule only applies to `web` apps; `node` does not load it.
 
 ## What quality is guaranteed
 
-| Guarantee     | How                                                                                     | Runs in                |
-| ------------- | --------------------------------------------------------------------------------------- | ---------------------- |
-| Import order  | `import/order` groups: builtin → external → parent → sibling → index → internal (`@/…`) | `pnpm lint`            |
-| Types         | `@typescript-eslint` recommended + `consistent-type-imports`                            | `pnpm lint`            |
-| Formatting    | `prettier/prettier`                                                                     | `pnpm lint`            |
-| Design tokens | `no-raw-color` + `no-unknown-color`, read from design-system CSS                        | `pnpm lint` (web only) |
-| Unused vars   | `@typescript-eslint/no-unused-vars`                                                     | `pnpm lint`            |
+| Guarantee     | How                                                                                                  | Runs in                |
+| ------------- | ---------------------------------------------------------------------------------------------------- | ---------------------- |
+| Import order  | `import/order` groups: builtin → external → parent → sibling → index → internal (`@/…`) → object     | `pnpm lint`            |
+| Types         | `@typescript-eslint` recommended + `consistent-type-imports` (off for backend services in `node.js`) | `pnpm lint`            |
+| Formatting    | `prettier/prettier`                                                                                  | `pnpm lint`            |
+| Design tokens | `no-raw-color` + `no-unknown-color`, read from design-system CSS                                     | `pnpm lint` (web only) |
+| Unused vars   | `@typescript-eslint/no-unused-vars`                                                                  | `pnpm lint`            |
 
 ## Related documents
 

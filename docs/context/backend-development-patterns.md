@@ -100,8 +100,7 @@ the service refuses to boot rather than reading `undefined` at request time. Req
    omitting it refuses the boot rather than defaulting open.
 3. Add a `microServices` entry to the gateway **and** to every service that will call it, with
    `gatewayPrefix` and `pathRewrite`.
-4. Give it a port. `config-service` has none and is not a service; rule A5 fails a config that counts it
-   as a deployable.
+4. Give it a port.
 
 Routing needs no code change — the gateway reads config.
 
@@ -146,7 +145,6 @@ call, use the `traceId` option; a raw header is clobbered by design.
   note in the affected feature's document. An unlisted deviation fails the gate.
 - No `EventEmitter2`, no broker. Neither is a dependency, and a string-keyed publish hides a dependency
   that a constructor signature would show.
-- No new `config-service` entry that looks like a port, a service list, or an endpoint.
 
 ## 5. Hand off
 

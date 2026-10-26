@@ -1,6 +1,6 @@
 # Feature Docs
 
-One document per **portal feature folder** — `apps/frontend/portal/src/features/*`. That is the
+One document per **portal page slice** — `apps/frontend/portal/src/pages/*`. That is the
 axis a user moves along: a route, a page, the components that make it up, and the backend behind
 it. Where a backend module has no feature folder of its own, it is documented as a section of the
 page that consumes it, not as a document of its own.

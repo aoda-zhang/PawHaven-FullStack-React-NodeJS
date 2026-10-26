@@ -1,5 +1,9 @@
 # PawHaven — Stray Animal Rescue Platform · Complete Product Blueprint
 
+> **Status: aspirational blueprint (v2.0, 2025-07-03) — not as-built.** For what exists, read
+> [`docs/features/`](../features/README.md); for the gap list, see
+> [features/README — What Is Not Built](../features/README.md#what-is-not-built).
+
 > **Version**: v2.0 | **Date**: 2025-07-03 | **Author**: Product Manager  
 > **One-liner**: A collaborative platform connecting reporters, rescuers, and adopters — from first sighting to forever home.
 
@@ -106,7 +110,7 @@
 
 ### 2.1 Three Access Tiers (NOT Three User Types)
 
-PaHaven does NOT ask users to "pick a role" at registration. Everyone registers as a single **User**. What they can do depends on their **access tier** — which is progressive:
+PawHaven does NOT ask users to "pick a role" at registration. Everyone registers as a single **User**. What they can do depends on their **access tier** — which is progressive:
 
 ```
   ┌─────────────────────────────────────────────────────────────┐
@@ -177,7 +181,7 @@ A single user account can do ALL of the above **simultaneously**:
 
 The system tracks these **per-case** or **action-based** roles. There is no profile setting that says "I am only a Reporter." The user is simply a User; what they can do depends on their tier.
 
-### 2.4 What Each Tier Sees on the Homepage
+### 2.3 What Each Tier Sees on the Homepage
 
 | Area                                    | Guest                     | Registered User            | Volunteer                                |
 | --------------------------------------- | ------------------------- | -------------------------- | ---------------------------------------- |
@@ -1011,6 +1015,8 @@ Achievements serve three purposes:
 | **Phase 2: Activate Network** | Month 3-6  | Knowledge base, volunteer achievements, wider notification logic, shelter onboarding |
 | **Phase 3: Emotional Engine** | Month 6-9  | Rescue stories, adoption matching with applications, full achievement system         |
 | **Phase 4: Ecosystem**        | Month 9-12 | Shelter admin dashboard, analytics, open API, regional resource directory            |
+
+**Execution status:** see [`docs/features/`](../features/README.md) — what is built, and what is not.
 
 ---
 

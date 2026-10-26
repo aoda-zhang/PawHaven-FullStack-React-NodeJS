@@ -14,7 +14,7 @@
 3. [C4 Model — System Landscape](#3-c4-model--system-landscape)
 4. [Data Architecture](#4-data-architecture)
 5. [API Gateway Design](#5-api-gateway-design)
-6. [Shared Kernel & Package Strategy](#6-shared-kernel--package-strategy)
+6. [Shared Kernel Rules](#6-shared-kernel-rules)
 7. [Security Architecture](#7-security-architecture)
 8. [Observability & Operations](#8-observability--operations)
 9. [Deployment Architecture](#9-deployment-architecture)
@@ -34,7 +34,7 @@
 | --- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | P1  | **Split by operational need, not domain count** | Extract a service only when it needs independent scaling, different tech stack, separate team, or different deployment cadence |
 | P2  | **Monolith-first, module-always**               | core-service is a single deployable. Internally, every bounded context is a strict module with enforced boundaries             |
-| P3  | **Internal modules = future services**          | Module boundaries are enforced by lint rules. Extraction is a deployment change, not a code rewrite                            |
+| P3  | **Internal modules = future services**          | Module boundaries are enforced by `scripts/check-architecture.mjs`. Extraction is a deployment change, not a code rewrite      |
 | P4  | **Gateway as the only public surface**          | All external traffic flows through gateway. Internal services never exposed to the internet                                    |
 | P5  | **Direct injection within, HTTP between**       | Exported service method for module-to-module within core-service. HTTP (via gateway proxy) between services                    |
 | P6  | **One database, logically partitioned**         | MongoDB with collection-per-context naming convention. Separate DB only when data isolation is legally/operationally required  |
@@ -58,32 +58,23 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │              Service 1: gateway                             │  │
-│  │  Stateless — InternalJwtService (owner + refresh), ES256    │  │
-│  │  JWT signer, allowlisted proxying, CORS, Trace ID, Logging  │  │
+│  │              Service 1: gateway (port 8080)                 │  │
+│  │  Stateless — InternalJwtService, ES256 signer,              │  │
+│  │  allowlisted proxying, CORS, Trace ID, Throttle             │  │
 │  └──────────┬──────────┬──────────┬───────────────────────────┘  │
 │             │          │          │                              │
 │             ▼          ▼          ▼                              │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐               │
 │  │ Service 2:   │ │ Service 3:   │ │ Service 4:   │               │
 │  │ auth-service │ │ core-service │ │ document-    │               │
-│  │              │ │ ┌──────────┐ │ │ service      │               │
-│  │ Register     │ │ │ rescue   │ │ │              │               │
-│  │ Login        │ │ │ report-  │ │ │  PDF render  │               │
-│  │ JWT issue    │ │ │  animal  │ │ │  + download  │               │
-│  │ Token refresh│ │ ├──────────┤ │ │  (no DB)     │               │
-│  │ User + roles │ │ │ adoption │ │ │              │               │
-│  │              │ │ ├──────────┤ │ │              │               │
-│  └──────────────┘ │ │animal-   │ │ └──────────────┘               │
-│                    │ │ follow   │ │                              │
-│                    │ ├──────────┤ │                              │
-│                    │ │  guide   │ │                              │
-│                    │ ├──────────┤ │                              │
-│                    │ │bootstrap │ │                              │
-│                    │ ├──────────┤ │                              │
-│                    │ │   home   │ │                              │
-│                    │ └──────────┘ │                              │
-│                    └──────────────┘                              │
+│  │              │ │              │ │ service      │               │
+│  │ Register     │ │ modular      │ │              │               │
+│  │ Login        │ │ monolith —   │ │  PDF render  │               │
+│  │ JWT issue    │ │ modules in   │ │  + download  │               │
+│  │ Token refresh│ │ Backend      │ │  (no DB)     │               │
+│  │ User + roles │ │ Architecture │ │              │               │
+│  │              │ │ §3           │ │              │               │
+│  └──────────────┘ └──────────────┘ └──────────────┘               │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -94,9 +85,8 @@
 | --- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | **gateway**          | Stateless. Handles ALL traffic. Needs independent horizontal scaling. TLS termination, rate limiting, CORS — infrastructure concerns, not business logic.                                                                                                                                                                                                                                                                                                                                                              | Merging into core-service couples infrastructure scaling with business logic scaling. Gateway may need 5 pods while core needs 2. |
 | 2   | **auth-service**     | Different security posture. Holds bcrypt hashes + JWT secrets. Independent security auditing. If auth is down, nothing works — circuit breaker needed.                                                                                                                                                                                                                                                                                                                                                                 | Merging into core-service means any core deployment risks auth downtime. Security audit scope expands to all business code.       |
-| 3   | **core-service**     | The modular monolith. All 7 business modules live here as strict modules. Single deployable, single database. Internal module boundaries enforced by lint rules.                                                                                                                                                                                                                                                                                                                                                       | This IS the merge target. Everything that doesn't need operational isolation lives here.                                          |
+| 3   | **core-service**     | The modular monolith: one deployable, one database, strict module boundaries (rules and the module list: [Backend Architecture §3](backend-architecture.md#3-modules-inside-core-service)).                                                                                                                                                                                                                                                                                                                            | This IS the merge target. Everything that doesn't need operational isolation lives here.                                          |
 | 4   | **document-service** | Stateless PDF render + download. Heavy deps (Puppeteer/Chromium), CPU spikes during render, different scaling model. **Never touches data** — no DB, no outbound calls, no catalog endpoint; every PDF is a template rendered from inbound **data** plus the **copy** it resolves from `@pawhaven/i18n` as a static package resource (see DD-10). Browser does not reach it — nothing in `apps/frontend` calls `/api/document`; the portal's PDF path is gateway → core-service → document-service over internal HTTP. | Merging into core-service means every core pod carries heavy dependencies. PDF generation spikes affect rescue API latency.       |
-| 5   | _(not a service)_    | `apps/backend/config-service/` holds per-environment portal runtime config (`dev` / `test` / `uat` / `prod` YAML) and a Zod schema for it. It has no `package.json`, no NestJS module, no HTTP surface, and nothing reads the YAML.                                                                                                                                                                                                                                                                                    | n/a                                                                                                                               |
 
 ### 2.3 Service-to-Service Communication
 
@@ -154,47 +144,31 @@ core-service ──HTTP──► document-service    (POST /document-service/int
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        PawHaven Platform                         │
+│                        PawHaven Platform                        │
 │                                                                  │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
-│  │   Portal SPA    │  │   Admin SPA     │  │   Mobile PWA    │  │
-│  │   (React)       │  │   (React)       │  │   (React)       │  │
-│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘  │
-│           │                    │                    │           │
-│           └────────────────────┼────────────────────┘           │
-│                                │                                │
-│                                ▼                                │
+│  ┌─────────────────┐                                             │
+│  │   Portal SPA    │   (admin app and mobile PWA are planned;     │
+│  │   React         │    no app exists for either today)          │
+│  └────────┬────────┘                                             │
+│           │                                                      │
+│           ▼                                                      │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │              gateway — Route 3000                              │  │
-│  │  InternalJwtService · JWT signer · Proxy · CORS · Trace ID     │  │
-│  └───┬──────────┬────────────┬────────────┬───────────────────┘  │
-│      │          │            │            │                     │
-│      ▼          ▼            ▼            ▼                     │
-│  ┌────────┐ ┌────────────┐ ┌────────┐ ┌────────────┐          │
-│  │ auth-  │ │ core-      │ │document│ │ config-    │          │
-│  │ service│ │ service    │ │service │ │ service    │          │
-│  │        │ │            │ │        │ │            │          │
-│  │ D B    │ │ ┌────────┐ │ │ PDF    │ │ (static     │          │
-│  │ (auth) │ │ │rescue  │ │ │render  │ │  config)   │          │
-│  └────────┘ │ │report  │ │ └────────┘ └────────────┘          │
-│             │ │adopt   │ │                                      │
-│             │ │content │ │                                      │
-│             │ │voluntr │ │                                      │
-│             │ │notify  │ │                                      │
-│             │ │achieve │ │                                      │
-│             │ │profile │ │                                      │
-│             │ │bootstrap│ │                                      │
-│             │ └────────┘ │                                      │
-│             │ Database     │                                      │
-│             │ (core)      │                                      │
-│             └────────────┘                                      │
+│  │  gateway — port 8080 (the only public surface)             │  │
+│  │  InternalJwtService · Proxy · CORS · Trace ID · Throttle    │  │
+│  └───┬──────────────┬───────────────┬────────────────────────┘  │
+│      │              │               │                            │
+│      ▼              ▼               ▼                            │
+│  ┌──────────┐  ┌──────────────┐  ┌──────────────┐               │
+│  │ auth-    │  │ core-service │  │ document-    │               │
+│  │ service  │  │ 8 modules —  │  │ service      │               │
+│  │          │  │ Backend      │  │ PDF render   │               │
+│  │ DB(auth) │  │ Architecture │  │ (no DB)      │               │
+│  └──────────┘  │ §3; DB(core) │  └──────────────┘               │
+│                └──────────────┘                                  │
 │                                                                  │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │   Internal Communication:                                   │  │
-│  │   · gateway → core/auth/document: HTTP proxy                │  │
-│  │   · core → document: HTTP (POST /pdf/render) · core → auth: HTTP│  │
-│  │   · module → module (within core): direct service injection  │  │
-│  └────────────────────────────────────────────────────────────┘  │
+│  Internal: gateway → core/auth/document over HTTP proxy          │
+│            core → document (PDF render) · core → auth (count)    │
+│            module → module within core: direct injection         │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -209,7 +183,7 @@ in the repository — each service reads its own connection string from an envir
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  auth-service  —  MongoDB via Prisma (@pawhaven/shared prisma)│
+│  auth-service  —  MongoDB via Prisma (own client)            │
 │                                                             │
 │  · User                                                     │
 │      roles String[] · status · password hash · refreshToken  │
@@ -311,7 +285,8 @@ service enforce its own endpoint policy.
 The gateway has **no business logic** — its behavior is entirely config-driven, so its "routing
 brain" lives in a dedicated `routing/` module rather than a generic `config/` folder:
 
-- `src/config/` holds **only** the per-environment JSON files (`dev|test|uat|prod/env/index.json`).
+- `src/config/` holds the per-environment JSON files (`dev|test|uat|prod/env/index.json`) and
+  `Config.schema.ts`.
   The JSON path is hard-pinned by `ConfigsModule`, so it cannot move.
 - `src/routing/` holds the gateway-specific routing layer:
   - `micro-service.registry.ts` (`MicroServiceRegistry`) — the runtime prefix→service map.
@@ -356,53 +331,28 @@ service is allowed to trust, and per-service endpoint policy.
 
 ---
 
-## 6. Shared Kernel & Package Strategy
+## 6. Shared Kernel Rules
 
-### 6.1 Package Dependency Graph
+`packages/shared` is the only layer both sides read. The per-side dependency direction and the unit
+tables live in [Frontend Architecture §2](frontend-architecture.md#2-dependencies) and
+[Backend Architecture §2](backend-architecture.md#2-dependencies); three rules span both sides:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    packages/                              │
-│                                                          │
-│  ┌──────────────┐     (zero dependencies)                │
-│  │   shared     │     Types, constants, Zod schemas,     │
-│  │              │     event definitions, pure utilities  │
-│  └──────┬───────┘                                        │
-│         │                                                │
-│    ┌────┴────────────────┐                               │
-│    │                     │                               │
-│    ▼                     ▼                               │
-│  ┌──────────────┐  ┌──────────────┐                     │
-│  │ backend-core │  │ frontend-core│                     │
-│  │ Shared infra │  │ React:       │                     │
-│  │ Prisma ext.  │  │ hooks, API   │                     │
-│  │ HTTP client  │  │ client, utils│                     │
-│  │ HttpClient   │  │              │                     │
-│  └──────┬───────┘  └──────┬───────┘                     │
-│         │                 │                              │
-│    ┌────┴────┐       ┌────┴────┐                        │
-│    ▼         ▼       ▼         ▼                        │
-│  ┌──────┐┌──────┐ ┌──────┐┌──────────┐                 │
-│  │design││  ui  │ │ i18n ││frontend- │                 │
-│  │system││(comp │ │(react││core      │                 │
-│  │(CSS  ││ lib) │ │-i18n)││(api,     │                 │
-│  │tokens││      │ │      ││hooks)    │                 │
-│  └──────┘└──────┘ └──────┘└──────────┘                 │
-└─────────────────────────────────────────────────────────┘
-```
+1. `packages/shared` has zero workspace dependencies; only `i18n`, `backend-core`, `frontend-core`
+   and the apps may depend on it.
+2. `packages/backend-core` depends on `shared` and on nothing else in the workspace; each backend
+   service composes it, and no service imports another service.
+3. No package imports from `apps/`, and no app imports another app.
 
-### 6.2 What Goes Where
+### What packages must not contain
 
-| Package                   | Contains                                                                                                                                                                                            | Must NOT Contain                                   |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `@pawhaven/shared`        | Zod schemas, TypeScript types, constants, event definitions, pure utility functions                                                                                                                 | React code, backend framework code, database logic |
-| `@pawhaven/backend-core`  | SharedModule, PrismaModule, HttpClientModule, shared app bootstrap (`setupApp` via `./setup`), decorators, interceptors, Prisma extensions, the internal-JWT module (`dynamicModules/internalJwt/`) | Business logic, domain entities                    |
-| `@pawhaven/frontend-core` | React hooks, API client, storage utilities                                                                                                                                                          | Business-specific components                       |
-| `@pawhaven/design-system` | CSS tokens, Tailwind theme, theme configuration, CSS utilities                                                                                                                                      | React components                                   |
-| `@pawhaven/ui`            | Reusable React components (Form\*, Loading, Toast, etc.)                                                                                                                                            | Business logic, API calls                          |
-| `@pawhaven/i18n`          | Translation provider, locale files, language detection, and the PDF document copy under `locales/{locale}/documents/` (Node-only — excluded from the browser glob; see DD-10)                       | React components, business logic, runtime data     |
-
----
+| Package                   | Must NOT contain                                   |
+| ------------------------- | -------------------------------------------------- |
+| `@pawhaven/shared`        | React code, backend framework code, database logic |
+| `@pawhaven/backend-core`  | Business logic, domain entities                    |
+| `@pawhaven/frontend-core` | Business-specific components                       |
+| `@pawhaven/design-system` | React components                                   |
+| `@pawhaven/ui`            | Business logic, API calls                          |
+| `@pawhaven/i18n`          | React components, business logic, runtime data     |
 
 ## 7. Security Architecture
 
@@ -410,25 +360,16 @@ service is allowed to trust, and per-service endpoint policy.
 
 ```
 Client (httpOnly cookies) → gateway
-   │
-   │ POST /api/auth/login (email + password)
-   │ ← auth-service issues Token pair (access 3min prod / 5min dev, refresh 7d) as cookies
-   │
-   │ (subsequent requests carry cookies)
+   │  POST /api/auth/login → auth-service issues access (5min) + refresh (7d) cookies
    ▼
-gateway InternalJwtService — the ONLY JWT owner
-   · verifies access token (signature, type:'access', session cap)
-   · proactive refresh window; refresh single-flight via auth-service
-   · unresolvable cookies → 401 + clear cookies (no silent anonymous)
+gateway InternalJwtService — the only JWT owner: verifies, refreshes single-flight, signs a typed
+   ES256 internal JWT (45s TTL, aud = target service) in `x-gateway-jwt`
    ▼
-signs typed InternalJwt as compact ES256 JWT (aud = target service, TTL 45s)
-   x-gateway-jwt  (kid in JOSE header, internal-v1)
-   ▼
-downstream service (auth/core/document)
-   InternalJwtGuard verifies internal JWT (fail closed)
-   default = authenticated required; @Public / @OptionalAuth allow anonymous
-   handlers inject claims via @InternalJwt() — never request headers
+downstream service — InternalJwtGuard verifies (fail closed); handlers inject claims
 ```
+
+The mechanics — `kid` allowlist, claim schema, header stripping, `internalJwt.enabled` — are
+defined once in [Backend Architecture §4 — The trust boundary](backend-architecture.md#4-the-trust-boundary).
 
 ### 7.2 Security Layers
 
@@ -438,7 +379,7 @@ downstream service (auth/core/document)
 | Authentication   | Browser JWT verified at gateway; ES256 internal-JWT InternalJwt (45s TTL) verified downstream                                                                                                                                             |
 | Authorization    | Roles travel in the JWT claims and are resolved by `bootstrap` into permission codes for menu filtering; **no endpoint denies access by role** — endpoint policy is authentication only (`@Public`/`@OptionalAuth`/default-authenticated) |
 | Input Validation | Zod schemas via global validation pipe                                                                                                                                                                                                    |
-| Rate Limiting    | Token bucket per IP + per user at gateway                                                                                                                                                                                                 |
+| Rate Limiting    | Fixed-window counters per IP at the gateway (default + stricter auth-path limiter)                                                                                                                                                        |
 | Data Privacy     | GPS fuzzing (displayArea, not exact coords post-rescue)                                                                                                                                                                                   |
 | CSRF             | SameSite cookies + token header                                                                                                                                                                                                           |
 | CORS             | Whitelist origins per environment; methods GET/POST/PUT/OPTIONS                                                                                                                                                                           |
@@ -449,22 +390,17 @@ downstream service (auth/core/document)
 
 ### 8.1 Three Pillars
 
-```
-Logging           Metrics            Tracing
-· Structured JSON · Request count    · X-Trace-Id across
-· service tag     · p50/p95/p99      · all services
-· traceId per log · Error rate       · compatible
-· levels: info/   · Status codes
-  warn/error      · DB query times
-```
+Implemented today: **structured logging** (JSON lines with a service tag and a `traceId` per entry)
+and **request tracing** across services via `x-trace-id`.
+
+Not implemented yet: metrics collection or export — there is no Prometheus endpoint, no p50/p95/p99
+tracking, and no error-rate dashboard. Do not plan against metrics until a collector exists.
 
 ### 8.2 Health Checks
 
-```
-GET /health       → { status, db, uptime, version }
-GET /health/live  → liveness probe (k8s)
-GET /health/ready → readiness probe (k8s)
-```
+No health endpoints are implemented today: no service exposes `/health`, `/health/live`, or
+`/health/ready`, and CI does not probe them. The deployment platform's own probe is the only
+liveness signal. If health checks are added, keep those three paths as the contract.
 
 ### 8.3 Structured Logging
 
@@ -488,20 +424,11 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### 9.1 MVP (Current → Month 3)
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  Single VPS / Container                                  │
-│                                                          │
-│  ┌──────────────────────────────────────────────────┐   │
-│  │  Docker Compose                                   │   │
-│  │                                                    │   │
-│  │  gateway:1    auth-service:1    core-service:2    │   │
-│  │  document-service:1                               │   │
-│  │                                                    │   │
-│  │  MongoDB (2 databases: auth + core)                │   │
-│  └──────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────┘
-```
+Deployment is Vercel-based and manual: `.github/workflows/deploy.yml` resolves one service
+(`portal`, `gateway`, `core-service`, `auth-service`, `document-service`) and promotes it
+preview → production with `VERCEL_TOKEN`. The portal also publishes a Cloudflare Pages preview
+through the GitHub integration, which is configured outside this repository. MongoDB is a managed
+cluster; `auth-service` and `core-service` each own a database.
 
 ### 9.2 Production (Phase 3+)
 
@@ -526,12 +453,12 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### DD-1: Modular Monolith Inside core-service
 
-| Field            | Detail                                                                                                                                                                                                                                                            |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**       | Accepted                                                                                                                                                                                                                                                          |
-| **Context**      | Product strategy defines 7 business modules. Premature microservice decomposition adds distribution complexity without proven value. All modules share NestJS + MongoDB tech stack, same team, same deployment cadence.                                           |
-| **Decision**     | All 7 business modules live inside core-service as strict NestJS modules. Module boundaries enforced by ESLint rules. Communication by direct injection of an exported service.                                                                                   |
-| **Consequences** | **Easier**: Fast iteration, simple deployment, zero network overhead for inter-module calls, easier debugging. **Harder**: Must maintain module boundary discipline; risk of accidental coupling. Mitigated by lint rules + architecture fitness functions in CI. |
+| Field            | Detail                                                                                                                                                                                                                                                         |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**       | Accepted                                                                                                                                                                                                                                                       |
+| **Context**      | The business surface is organised as bounded contexts inside core-service. Premature microservice decomposition adds distribution complexity without proven value. All modules share NestJS + MongoDB tech stack, same team, same deployment cadence.          |
+| **Decision**     | All 8 business modules live inside core-service as strict NestJS modules. Module boundaries enforced by `scripts/check-architecture.mjs` (§11). Communication by direct injection of an exported service.                                                      |
+| **Consequences** | **Easier**: Fast iteration, simple deployment, zero network overhead for inter-module calls, easier debugging. **Harder**: Must maintain module boundary discipline; risk of accidental coupling. Mitigated by the architecture-check fitness functions in CI. |
 
 ### DD-2: 4-Service Split Rationale
 
@@ -549,7 +476,7 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 | **Status**       | Accepted                                                                                                                                                                                                                                                                      |
 | **Context**      | core-service's modules all run in one process against one MongoDB database. Need to prevent accidental cross-module data access while keeping operational simplicity.                                                                                                         |
 | **Decision**     | One MongoDB database per service that has a Prisma schema — auth-service and core-service. Each module's service only touches its own models, and reaches another module's data through that module's public service class. No database-level access control between modules. |
-| **Consequences** | **Easier**: One database to operate, back up, and monitor per service. **Harder**: No DB-level isolation between core-service's modules, so cross-module access is prevented only by code review and lint rules.                                                              |
+| **Consequences** | **Easier**: One database to operate, back up, and monitor per service. **Harder**: No DB-level isolation between core-service's modules, so cross-module access is prevented by the §4.2 data-access rules and `architecture-check`, not by the database.                     |
 
 ### DD-4: Zod for Shared Schema Validation
 
@@ -580,12 +507,8 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### DD-6: Feature-Based Frontend Modules
 
-| Field            | Detail                                                                                                                                                                                            |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Status**       | Accepted                                                                                                                                                                                          |
-| **Context**      | 7 product modules need clear frontend organization.                                                                                                                                               |
-| **Decision**     | `features/{module}/` with api/<module>.api.ts, <module>.queries.ts, <module>.queryKeys.ts, <module>.mutations.ts, components/, hooks/, types.ts, index.tsx per feature. No cross-feature imports. |
-| **Consequences** | Clear ownership, independent development, easier code splitting. Lint rules enforce feature isolation.                                                                                            |
+Moved to [Frontend Architecture](frontend-architecture.md) — the page-slice structure and the
+dependency direction are stated there and are not copied here.
 
 ### DD-9: Follow Relations Live in Their Own Collection, and Unfollow Hard-Deletes
 
@@ -624,7 +547,7 @@ lint presets only. Every boundary named in these documents is enforced by
 | A2   | Frontend cross-feature value imports, except an explicit allowlist                                    |
 | A3   | `core-service` cross-module imports only from `home`, via an explicit allowlist                       |
 | A4   | Only `portal` exists; there is no `apps/frontend/admin`                                               |
-| A5   | `apps/backend/config-service` is not a service                                                        |
+| A5   | Frontend dependency direction — each layer reads only the layers below it                             |
 
 `pnpm token-check` separately gates styling against the design-token source.
 
@@ -632,12 +555,12 @@ lint presets only. Every boundary named in these documents is enforced by
 
 ## 12. Why This Design Works
 
-### 12.1 The Pragmatic Balance
+### 12.1 The Pragmatic Balance (executive summary)
 
 | Concern             | How It's Addressed                                                                           |
 | ------------------- | -------------------------------------------------------------------------------------------- |
 | **Scalability**     | Gateway + core scale independently. Document scales separately (heavy PDF).                  |
-| **Maintainability** | 7 modules with enforced boundaries. Each module is independently understandable.             |
+| **Maintainability** | 8 modules with enforced boundaries. Each module is independently understandable.             |
 | **Extensibility**   | New product module = new folder in `modules/`. No new service needed.                        |
 | **Deployability**   | 4 services. Each has a clear reason to exist. No "microservice for the sake of it."          |
 | **Observability**   | Structured logging with module tag. Trace ID across all services.                            |
@@ -645,20 +568,10 @@ lint presets only. Every boundary named in these documents is enforced by
 
 ### 12.2 When to Add a 5th Service
 
-> **Only when at least TWO of these are true for a module:**
->
-> 1. It needs independent scaling — a different traffic shape from the rest
-> 2. It needs a different tech stack
-> 3. A different team takes ownership
-> 4. It has a different release cadence
+See [§1 — The Extraction Trigger Rule](#the-extraction-trigger-rule). The same two-of-four test
+decides when a module becomes its own service.
 
 ### 12.3 What to Re-evaluate in 3 Months
 
-- **`apps/backend/config-service/`**: the per-environment portal YAML is read by nothing. Either
-  wire it into the portal's runtime config or delete the directory.
 - **`Route` and `RoutePermission`**: defined in the Prisma schema, queried by no code. Either
   adopt them for server-driven routing or drop them from the schema.
-
----
-
-> **Related Docs**: [Frontend Architecture](frontend-architecture.md) | [Backend Architecture](backend-architecture.md) | [Trust Boundary](backend-architecture.md#4-the-trust-boundary)

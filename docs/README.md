@@ -5,12 +5,11 @@
 `docs/` is split by what a document is **for**, so you can tell from the path whether it is
 authority, intent, or background.
 
-| Directory               | Holds                                                                       | Read it when                                           |
-| ----------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `context/`              | The living architecture and development-pattern docs                        | You are about to write the next piece of it            |
-| `features/`             | One **portal feature**'s frontend **and** backend detail, as built          | After the change lands, to update the record from code |
-| `product/`              | The product blueprint that `features/` cite                                 | You need the "why" behind a feature, or the roadmap    |
-| `architecture-reviews/` | The record of an architecture audit, and what was still open when it closed | You are acting on a finding an audit produced          |
+| Directory   | Holds                                                              | Read it when                                           |
+| ----------- | ------------------------------------------------------------------ | ------------------------------------------------------ |
+| `context/`  | The living architecture and development-pattern docs               | You are about to write the next piece of it            |
+| `features/` | One **portal feature**'s frontend **and** backend detail, as built | After the change lands, to update the record from code |
+| `product/`  | The product blueprint that `features/` cite                        | You need the "why" behind a feature, or the roadmap    |
 
 Design-system documentation lives with its owner package: the [package README](../packages/design-system/README.md) defines token usage and handoff rules, and the [token source directory](../packages/design-system/src/tokens/) provides a searchable reference. Token values remain in the package's `src/tokens/` and `src/theme.css`, enforced by `pnpm token-check`.
 
@@ -23,7 +22,7 @@ gap is stated in that document's **What Does Not Exist** section rather than bei
 to discover. [`product/`](./product/product-strategy.md) holds the full ambition, and every feature
 doc links back to the section it came from.
 
-Each document is keyed on one folder in `apps/frontend/portal/src/features/*`, and chapter 1 numbers
+Each document is keyed on one folder in `apps/frontend/portal/src/pages/*`, and chapter 1 numbers
 that page's sections. A backend module with no feature folder of its own is documented as a section
 of the page that consumes it.
 
@@ -51,11 +50,11 @@ before designing anything.
 | [development.md](./context/development.md)                                     | Prerequisites, build order, dev servers and ports, pnpm scripts                                                  |
 | [agent-constraints.md](./context/agent-constraints.md)                         | The rules every AI change must obey                                                                              |
 
-`[AGENTS.md](../AGENTS.md)` leads to these — it is the file an agent reads without choosing it.
+[AGENTS.md](../AGENTS.md) leads to these — it is the file an agent reads without choosing it.
 
 ## 2. Features
 
-One doc per **portal feature folder** (`apps/frontend/portal/src/features/*`), covering both sides
+One doc per **portal page slice** (`apps/frontend/portal/src/pages/*`), covering both sides
 of that feature. Within a document, chapter 1 breaks the page into numbered sections (1.1, 1.2, 1.3 …)
 and the later chapters cover the data path underneath.
 
@@ -108,7 +107,7 @@ workflows, the skills and the model-filter plugins.
 | [skills/](../.opencode/skills)     | The task skills, including the [UI component catalog](../.opencode/skills/ui-component-catalog) |
 | [plugins/](../.opencode/plugins)   | The model-filter and model-switch plugins                                                       |
 
-Implementation notes: [design tokens](./how-i-build/design-tokens.md), [ESLint configuration](./how-i-build/eslint-config.md), [internationalization](./how-i-build/i18n.md), [React state](./how-i-build/react-state.md), and the [UI library](./how-i-build/ui-library.md). The [agent-team workflow](./how-i-build/how-i-build-my-agent-team.md) documents the orchestration and approval sequence.
+Implementation notes: [design tokens](./how-i-build/design-tokens.md), [ESLint configuration](./how-i-build/eslint-config.md), [internationalization](./how-i-build/i18n.md), [React state](./how-i-build/react-state.md), and the [UI library](./how-i-build/ui-library.md). Engineering-process notes: [quality gates](./how-i-build/quality-gates.md), [CI/CD](./how-i-build/ci-cd.md), [testing strategy](./how-i-build/testing-strategy.md), [backend-core](./how-i-build/backend-core.md), the [PDF pipeline](./how-i-build/pdf-pipeline.md), and the [agent model plugins](./how-i-build/agent-plugins.md). The [agent-team workflow](./how-i-build/how-i-build-my-agent-team.md) documents the orchestration and approval sequence.
 
 ## 7. Documentation standards
 
@@ -144,5 +143,5 @@ system-architecture-overview.md
   → update docs/features/<feature>.md from what shipped
 ```
 
-**Verify before you trust.** The context docs carry a `v3.11 / 2026-09-25` stamp and were checked
-against the code at that time. A feature doc is as-built as of the last change that reconciled it.
+**Verify before you trust.** `system-architecture-overview.md` carries a `v3.11 / 2026-09-25`
+stamp; the other context docs record no such stamp and were checked at various times. A feature doc is as-built as of the last change that reconciled it.
