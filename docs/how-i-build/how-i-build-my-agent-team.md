@@ -13,15 +13,15 @@ This team is designed around evidence, explicit approval, clear ownership, and v
 
 ## Agent execution matrix
 
-| Agent | Default execution mode | What can run in parallel | Must remain sequential when |
-| --- | --- | --- | --- |
-| **Orchestrator** | Sequential coordination | Dispatch independent work units concurrently when supported; collect their outputs independently. | A dependency, approval gate, or shared decision is unresolved. The Orchestrator does not implement changes. |
-| **Explorer** | Parallel, read-only | Separate investigations of distinct files, call paths, runtime boundaries, or questions with minimal overlap. | Investigations depend on one another or duplicate the same evidence-gathering work. Consolidate evidence before planning. |
-| **Architect** | Sequential synthesis | Independent, read-only technical assessments may be gathered concurrently when they answer distinct questions. | One coherent plan, dependency order, risks, and acceptance criteria must be reconciled before asking for approval. |
-| **Implementer** | Conditional parallel execution | Independent work units with stable interfaces, explicit file ownership, and no shared mutable resources. | Shared contracts are changing; multiple units need the same files; dependencies are incomplete; or integration conflicts have not been resolved. |
-| **Tester** | Parallel when isolated | Independent unit, static, contract, or package checks whose environments and resources do not conflict. | Tests share a database, port, fixture, account, mutable test data, or browser/session; execution order affects results. |
-| **Reviewer** | Parallel, read-only specialist review when delegation is available | Independent reviews of different concerns or bounded diff areas, each using the applicable specialist Skills. | The runtime cannot delegate, scopes overlap heavily, or reviewers need one another's findings. Consolidate and deduplicate before the verdict. |
-| **PR Reviewer** | Parallel, read-only | Review the supplied PR diff while CI and tests run independently. | The diff changes after review; review the final diff again. This agent must not edit files or run tests. |
+| Agent            | Default execution mode                                             | What can run in parallel                                                                                       | Must remain sequential when                                                                                                                      |
+| ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Orchestrator** | Sequential coordination                                            | Dispatch independent work units concurrently when supported; collect their outputs independently.              | A dependency, approval gate, or shared decision is unresolved. The Orchestrator does not implement changes.                                      |
+| **Explorer**     | Parallel, read-only                                                | Separate investigations of distinct files, call paths, runtime boundaries, or questions with minimal overlap.  | Investigations depend on one another or duplicate the same evidence-gathering work. Consolidate evidence before planning.                        |
+| **Architect**    | Sequential synthesis                                               | Independent, read-only technical assessments may be gathered concurrently when they answer distinct questions. | One coherent plan, dependency order, risks, and acceptance criteria must be reconciled before asking for approval.                               |
+| **Implementer**  | Conditional parallel execution                                     | Independent work units with stable interfaces, explicit file ownership, and no shared mutable resources.       | Shared contracts are changing; multiple units need the same files; dependencies are incomplete; or integration conflicts have not been resolved. |
+| **Tester**       | Parallel when isolated                                             | Independent unit, static, contract, or package checks whose environments and resources do not conflict.        | Tests share a database, port, fixture, account, mutable test data, or browser/session; execution order affects results.                          |
+| **Reviewer**     | Parallel, read-only specialist review when delegation is available | Independent reviews of different concerns or bounded diff areas, each using the applicable specialist Skills.  | The runtime cannot delegate, scopes overlap heavily, or reviewers need one another's findings. Consolidate and deduplicate before the verdict.   |
+| **PR Reviewer**  | Parallel, read-only                                                | Review the supplied PR diff while CI and tests run independently.                                              | The diff changes after review; review the final diff again. This agent must not edit files or run tests.                                         |
 
 ## Recommended workflow
 
@@ -57,6 +57,25 @@ flowchart TD
 ```
 
 This diagram defines the intended workflow, not a guarantee of automatic parallel execution. Dispatch work concurrently only when the runtime supports it and the parallelization conditions below are met; otherwise execute the work units sequentially.
+
+## Agent Team Workflow
+
+The workflow keeps planning and approval with the user, delegates implementation only after approval, and routes verification results through the reviewer before findings return to the orchestrator.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant Orchestrator
+  participant Implementer
+  participant Tester
+  participant Reviewer
+  Orchestrator->>User: Present written plan
+  User->>Orchestrator: Approve plan
+  Orchestrator->>Implementer: Dispatch approved plan
+  Implementer->>Tester: Submit implementation for checks
+  Tester->>Reviewer: Provide verification results
+  Reviewer-->>Orchestrator: Provide review findings
+```
 
 ## Parallelization contract
 
