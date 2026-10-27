@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Checks that every translation key the Portal uses exists in the locale
- * documents. A key that is missing renders as its own name on screen, which
- * is easy to miss in review and impossible to notice in a screenshot.
+ * Checks that every translation key the portal and `frontend-core` use exists
+ * in the locale documents. A key that is missing renders as its own name on
+ * screen, which is easy to miss in review and impossible to notice in a
+ * screenshot.
  *
  * Exit 0 = clean, 1 = missing key, 2 = input error.
  */
@@ -15,7 +16,10 @@ const repoRoot = path.resolve(
   '..',
 );
 const localesDir = path.join(repoRoot, 'packages/i18n/locales');
-const portalDir = path.join(repoRoot, 'apps/frontend/portal/src');
+const sourceDirs = [
+  path.join(repoRoot, 'apps/frontend/portal/src'),
+  path.join(repoRoot, 'packages/frontend-core/src'),
+];
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx']);
 
@@ -64,17 +68,19 @@ const locales = fs.readdirSync(localesDir);
 const localeKeys = Object.fromEntries(locales.map((l) => [l, readLocale(l)]));
 
 const used = new Map();
-for (const file of collectSourceFiles(portalDir)) {
-  const source = fs.readFileSync(file, 'utf8');
-  for (const match of source.matchAll(
-    /\bt\(\s*['"]([a-zA-Z][\w.]*)['"]([^)]*)\)/g,
-  )) {
-    const key = match[1];
-    // A key read with `returnObjects: true` names a document, not a leaf.
-    const asObject = /returnObjects\s*:\s*true/.test(match[2] ?? '');
-    if (!used.has(key)) used.set(key, { files: new Set(), asObject });
-    used.get(key).files.add(path.relative(repoRoot, file));
-    if (asObject) used.get(key).asObject = true;
+for (const dir of sourceDirs) {
+  for (const file of collectSourceFiles(dir)) {
+    const source = fs.readFileSync(file, 'utf8');
+    for (const match of source.matchAll(
+      /\bt\(\s*['"]([a-zA-Z][\w.]*)['"]([^)]*)\)/g,
+    )) {
+      const key = match[1];
+      // A key read with `returnObjects: true` names a document, not a leaf.
+      const asObject = /returnObjects\s*:\s*true/.test(match[2] ?? '');
+      if (!used.has(key)) used.set(key, { files: new Set(), asObject });
+      used.get(key).files.add(path.relative(repoRoot, file));
+      if (asObject) used.get(key).asObject = true;
+    }
   }
 }
 

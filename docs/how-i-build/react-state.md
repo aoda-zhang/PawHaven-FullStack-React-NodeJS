@@ -6,36 +6,29 @@
 
 ## The four buckets
 
-| Bucket              | Tool                                              | Owns                                                                                | Survives refresh?                              |
-| ------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------- |
-| **App context**     | `GlobalProvider` + `useGlobalContext()` (Context) | `locale`, `userInfo`, `isAuthenticated`, `isPending`, `login`, `register`, `logout` | Yes (`localStorage`)                           |
-| **Global UI state** | Redux Toolkit + `redux-persist`                   | `isSysMaintain`                                                                     | Yes (`localStorage`)                           |
-| **Server state**    | TanStack Query (`useQuery`, `useMutation`)        | API data, bootstrap, rescue cases, reports                                          | Only queries marked `meta.persist` (bootstrap) |
-| **Component state** | `useState` + `react-hook-form`                    | Form values, toggles, local loading                                                 | No                                             |
+| Bucket              | Tool                                              | Owns                                                                      | Survives refresh?                              |
+| ------------------- | ------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------- |
+| **App context**     | `GlobalProvider` + `useGlobalContext()` (Context) | `userInfo`, `isAuthenticated`, `isPending`, `login`, `register`, `logout` | Yes (`localStorage`)                           |
+| **Global UI state** | Redux Toolkit + `redux-persist`                   | `isSysMaintain`                                                           | Yes (`localStorage`)                           |
+| **Server state**    | TanStack Query (`useQuery`, `useMutation`)        | API data, bootstrap, rescue cases, reports                                | Only queries marked `meta.persist` (bootstrap) |
+| **Component state** | `useState` + `react-hook-form`                    | Form values, toggles, local loading                                       | No                                             |
 
 ## App context: `GlobalProvider` / `useGlobalContext()`
 
-The two app-wide facts — **the language the user picked** and **who is signed in** — live in one
-context: `apps/frontend/portal/src/app/providers/GlobalProvider.tsx`, exposed as
-`useGlobalContext()`:
+The session facts — **who is signed in** and how the session is changed — live in one context:
+`apps/frontend/portal/src/app/providers/GlobalProvider.tsx`, exposed as
+`useGlobalContext()`. The UI language is not here: it is read from `useTranslation()` (see
+`docs/how-i-build/i18n.md`):
 
 ```tsx
-const {
-  locale,
-  setLocale,
-  userInfo,
-  isAuthenticated,
-  isPending,
-  login,
-  register,
-  logout,
-} = useGlobalContext();
+const { userInfo, isAuthenticated, isPending, login, register, logout } =
+  useGlobalContext();
 ```
 
 ### What it owns
 
-- `locale` — the active UI language, mirrored from `i18n.language`; `setLocale(lng)` delegates to
-  `i18n.changeLanguage`, which is what persists the choice under `i18nextLng`
+- the UI language is i18n's own state, read with `useTranslation()` and switched with
+  `i18n.changeLanguage`; the provider does not mirror it
 - `userInfo` — the identity hint `{ userId }`, seeded from `localStorage` when the provider mounts.
   It is not a credential and not the authority: it only says which id to paint the shell with until
   `/auth/me` answers. It is validated and discarded on read by
@@ -55,17 +48,16 @@ instead of leaving a signed-in shell behind. Only the id is stored — no email,
 
 ### Why Context, not Redux
 
-These facts are **broadly shared** (header, footer, every page), **low-frequency** (the language
-changes when the user picks one, the user changes once per session), and **read consistently** by
-unrelated components. Context reads are direct and re-render only the components that call
-`useGlobalContext()`. Writing them into Redux added a dispatch, a selector and a persisted
-serialisation layer for values that were read once and written once.
+These facts are **broadly shared** (header, footer, every page), **low-frequency** (the user changes
+once per session), and **read consistently** by unrelated components. Context reads are direct and
+re-render only the components that call `useGlobalContext()`. Writing them into Redux added a
+dispatch, a selector and a persisted serialisation layer for values that were read once and written
+once.
 
 ### Where it is mounted
 
 `GlobalProvider` sits in `apps/frontend/portal/src/app/providers/AppProvider.tsx`, inside
-`I18nProvider` (it mirrors `i18n.language`) and inside `QueryProvider` (login and logout are
-mutations):
+`I18nProvider` and inside `QueryProvider` (login and logout are mutations):
 
 ```tsx
 export const AppProvider = ({ children }) => (
@@ -74,8 +66,7 @@ export const AppProvider = ({ children }) => (
       <StoreProvider>
         <QueryProvider>
           <GlobalProvider>
-            {' '}
-            ← locale + session
+            ← session
             <QueryErrorBoundary>{children}</QueryErrorBoundary>
           </GlobalProvider>
         </QueryProvider>
@@ -91,7 +82,8 @@ export const AppProvider = ({ children }) => (
 
 - `global.isSysMaintain` — system-maintenance flag, read by `RootLayout`
 
-Language and the signed-in user are **not** here; they are in the app context above. Redux remains
+The UI language and the signed-in user are **not** here. The language is i18n's own state (see
+`docs/how-i-build/i18n.md`) and the session lives in the app context above. Redux remains
 because the flag is read by the shell rather than by a page, and a second cross-cutting flag should
 not need a new state tool.
 
@@ -131,7 +123,7 @@ belong in the global store.
 
 Server state is persisted only for queries that opt in with `meta.persist === true` — today that is
 `bootstrap`, stored through `PersistQueryClientProvider` (localStorage, 24 h max age). Every other
-query is re-fetched on refresh; the app context (`locale`, `userInfo`) and the Redux-held
+query is re-fetched on refresh; the app context (`userInfo`) and the Redux-held
 `isSysMaintain` flag also survive.
 
 ## Component state: `useState` + `react-hook-form`
@@ -150,5 +142,5 @@ same thing, and the next contributor will not know which one to use.
 
 - `docs/context/frontend-development-patterns.md` — component rules, form patterns, mutation hooks
 - `docs/how-i-build/eslint-config.md` — the lint rules that keep state-related code consistent
-- `docs/how-i-build/i18n.md` — how language state (`locale`) is persisted and read
+- `docs/how-i-build/i18n.md` — how the UI language is switched and persisted
 - `libs/eslint-config/web.js` — the React + TanStack Query ESLint rules

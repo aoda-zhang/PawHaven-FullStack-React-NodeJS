@@ -14,18 +14,11 @@ interface CaseCardProps {
 export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
   const { i18n } = useTranslation();
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onClick(caseData.id)}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick(caseData.id);
-        }
-      }}
-      tabIndex={0}
-      role="button"
       aria-label={caseData.title}
-      className="border-border bg-card group rounded-card-large cursor-pointer overflow-hidden border shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+      className="border-border bg-card group rounded-card-large w-full cursor-pointer overflow-hidden border text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="bg-muted relative h-48 overflow-hidden">
         {caseData.image ? (
@@ -70,6 +63,6 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
           )}
         </div>
       </div>
-    </div>
+    </button>
   );
 };

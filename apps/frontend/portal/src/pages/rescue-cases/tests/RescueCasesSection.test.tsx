@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 import type { RescueListItem } from '@pawhaven/shared/types';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { RescueCasesSection } from '../components/RescueCasesSection';
@@ -72,5 +73,18 @@ describe('RescueCasesSection', () => {
         'rescue_cases.status_summary:{"pendingCount":1,"inProgressCount":1}',
       ),
     ).toBeDefined();
+  });
+
+  it('exposes each case as a native button that reports its id', async () => {
+    const onCaseClick = vi.fn();
+    render(<RescueCasesSection cases={[mockCase]} onCaseClick={onCaseClick} />);
+
+    const card = screen.getByRole('button', { name: 'Test Cat' });
+    expect(card).toHaveAttribute('type', 'button');
+    expect(card).not.toHaveAttribute('role');
+    expect(card).not.toHaveAttribute('tabindex');
+
+    await userEvent.click(card);
+    expect(onCaseClick).toHaveBeenCalledWith('PAW-0001');
   });
 });

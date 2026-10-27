@@ -1,10 +1,13 @@
+const reportedMissingVars = new Set<string>();
+
 /**
  * Recursively resolves `${VAR}` placeholders inside a configuration object
  * using values from environment variables.
  *
  * - Supports nested objects and arrays
  * - Only string values are interpolated
- * - Missing environment variables will emit a warning and be replaced with an empty string
+ * - Missing environment variables warn once per variable and are replaced with
+ *   an empty string
  *
  * @param yamlContent - Raw configuration object (e.g. parsed from YAML)
  * @param envContent - Raw configuration object (e.g. parsed from YAML)
@@ -20,7 +23,8 @@ export const resolveAppConfig = <Y>(
       return value.replace(/\$\{([^}]+)\}/g, (_: string, varName: string) => {
         const envKey = varName.trim();
         const envValue = envContent?.[envKey];
-        if (envValue === undefined) {
+        if (envValue === undefined && !reportedMissingVars.has(envKey)) {
+          reportedMissingVars.add(envKey);
           console.warn(
             `Missing environment variable for placeholder: ${envKey}`,
           );

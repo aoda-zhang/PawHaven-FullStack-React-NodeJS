@@ -13,27 +13,14 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
   const { t } = useTranslation();
   const isInteractive = Boolean(onClick);
 
-  return (
-    <div
-      onClick={isInteractive ? () => onClick?.(pet.id) : undefined}
-      onKeyDown={
-        isInteractive
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onClick?.(pet.id);
-              }
-            }
-          : undefined
-      }
-      tabIndex={isInteractive ? 0 : undefined}
-      role={isInteractive ? 'button' : undefined}
-      aria-label={isInteractive ? pet.name : undefined}
-      className={cn(
-        'bg-background border-border rounded-card-large w-64 flex-shrink-0 snap-start overflow-hidden border shadow-sm transition-all',
-        isInteractive && 'cursor-pointer hover:-translate-y-1 hover:shadow-md',
-      )}
-    >
+  const className = cn(
+    'bg-background border-border rounded-card-large w-64 flex-shrink-0 snap-start overflow-hidden border shadow-sm transition-all',
+    isInteractive &&
+      'cursor-pointer text-left hover:-translate-y-1 hover:shadow-md',
+  );
+
+  const cardContent = (
+    <>
       <div className="bg-muted relative h-44">
         <img
           src={pet.photo}
@@ -74,6 +61,19 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
           {t('home.waiting_days', { days: pet.waitingDays })}
         </div>
       </div>
-    </div>
+    </>
+  );
+
+  return isInteractive ? (
+    <button
+      type="button"
+      onClick={() => onClick?.(pet.id)}
+      aria-label={pet.name}
+      className={className}
+    >
+      {cardContent}
+    </button>
+  ) : (
+    <div className={className}>{cardContent}</div>
   );
 };

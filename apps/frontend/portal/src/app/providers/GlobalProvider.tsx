@@ -1,7 +1,6 @@
 import type { CredentialsDto } from '@pawhaven/shared/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { bootstrapQueryOptions } from '@/app/init/bootstrap.queries';
 import {
@@ -22,8 +21,6 @@ interface GlobalCallbacks {
 }
 
 interface GlobalContextType {
-  locale: string;
-  setLocale: (locale: string) => void;
   userInfo: StoredSession | null;
   isAuthenticated: boolean;
   isPending: boolean;
@@ -35,7 +32,6 @@ interface GlobalContextType {
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const { i18n } = useTranslation();
   const [userInfo, setUserInfo] = useState<StoredSession | null>(
     readStoredSession,
   );
@@ -45,10 +41,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const registerMutation = useRegister();
   const logoutMutation = useLogout();
   const queryClient = useQueryClient();
-
-  const setLocale = (locale: string) => {
-    i18n.changeLanguage(locale).catch(() => undefined);
-  };
 
   const completeAuthentication = (
     userId: string,
@@ -104,8 +96,6 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   return (
     <GlobalContext.Provider
       value={{
-        locale: i18n.language,
-        setLocale,
         userInfo,
         isAuthenticated: !!userInfo,
         isPending:

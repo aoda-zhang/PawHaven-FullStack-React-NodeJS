@@ -130,8 +130,9 @@ direction ([Frontend Architecture](frontend-architecture.md) §2).
 - Typed Redux hooks only: `useReduxDispatch`, `useReduxSelector` from `@/app/store/reduxHooks`. Raw
   `useDispatch`/`useSelector` outside that file is a defect.
 - `useGlobalState` from `@/app/store/globalReducer` is the per-slice convenience hook.
-- `useGlobalContext` from `@/app/providers/GlobalProvider` is the only place the UI language and the
-  signed-in user are read. Do not mirror either into Redux or a second context.
+- `useGlobalContext` from `@/app/providers/GlobalProvider` is the only place the signed-in user is
+  read. The UI language comes from `useTranslation()`; do not mirror either into Redux or a second
+  context.
 - `store.getState()` appears in loaders, never in a component.
 - Query cache persistence is opt-in per query with `meta.persist = true`; the default keeps nothing on
   disk.
