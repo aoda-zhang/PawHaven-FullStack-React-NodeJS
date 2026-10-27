@@ -39,7 +39,7 @@ export const RootLayout = () => {
   const navigation = useNavigation();
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="flex min-h-dvh flex-col overflow-x-hidden">
       <ScrollRestoration />
       <Toast />
       {!isAuthPage && (
@@ -69,18 +69,18 @@ export const RootLayout = () => {
         className="flex flex-1 flex-col"
         aria-busy={navigation.state === 'loading'}
       >
-        <div className="flex-1 px-4 lg:px-28">
-          <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
-            <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <div className="flex-1 px-4 lg:px-28">
+            <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
               <Outlet />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-        {isFooterAvailable && (
-          <footer>
-            <RootLayoutFooter />
-          </footer>
-        )}
+            </ErrorBoundary>
+          </div>
+          {isFooterAvailable && (
+            <footer>
+              <RootLayoutFooter />
+            </footer>
+          )}
+        </Suspense>
       </main>
     </div>
   );
