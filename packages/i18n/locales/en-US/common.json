@@ -13,6 +13,7 @@
     "zh-CN": "中文(简体)",
     "en-US": "English",
     "de-DE": "Deutsch",
+    "select_language": "Select language",
     "go_to_home": "GO TO HOMEPAGE",
     "go_back": "Go Back",
     "not_found": "We can't find that page",
