@@ -1,5 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 
 import { rescueDetailQueryOptions } from './api/rescueDetail.queries';
@@ -8,11 +7,19 @@ import { RescueDetailSkeleton } from './components/RescueDetailSkeleton';
 
 export const RescueDetail = () => {
   const { animalID = '' } = useParams<{ animalID: string }>();
-  const { data: animal } = useSuspenseQuery(rescueDetailQueryOptions(animalID));
+  const {
+    data: animal,
+    isPending,
+    error,
+  } = useQuery(rescueDetailQueryOptions(animalID));
 
-  return (
-    <Suspense fallback={<RescueDetailSkeleton />}>
-      <RescueDetailContent animal={animal} />
-    </Suspense>
-  );
+  if (isPending) {
+    return <RescueDetailSkeleton />;
+  }
+
+  if (animal === undefined) {
+    throw error ?? new Error('Rescue detail unavailable');
+  }
+
+  return <RescueDetailContent animal={animal} />;
 };
