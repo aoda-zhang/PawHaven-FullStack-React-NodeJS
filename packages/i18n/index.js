@@ -30,6 +30,18 @@ const loadLocaleResources = async (locale) => {
   return Object.assign({}, ...loadedFiles.map((module) => module.default));
 };
 
+const syncDocumentLang = () => {
+  if (typeof document === 'undefined') return;
+
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  if (language) {
+    document.documentElement.lang = language;
+  }
+};
+
+i18n.on('languageChanged', syncDocumentLang);
+i18n.on('initialized', syncDocumentLang);
+
 i18n
   .use(LanguageDetector)
   .use(resourcesToBackend((locale) => loadLocaleResources(locale)))

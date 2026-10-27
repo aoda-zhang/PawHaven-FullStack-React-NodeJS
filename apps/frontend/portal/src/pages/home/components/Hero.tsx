@@ -1,13 +1,10 @@
 import type { HeroStats } from '@pawhaven/shared/types';
 import { ChevronRight } from 'lucide-react';
-import { preload } from 'react-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
-
-preload('/images/hero-banner.webp', { as: 'image', type: 'image/webp' });
 
 interface HeroProps {
   heroStats: HeroStats;

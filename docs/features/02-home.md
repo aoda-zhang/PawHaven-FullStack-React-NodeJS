@@ -24,7 +24,10 @@ to the sections as props. `Hero.tsx` receives `heroStats`; it does not fetch.
 
 `components/Hero.tsx`. Two-column on `lg+` (`lg:w-7/12` copy, `lg:w-5/12` image, image
 `hidden` below `lg`), copy-only below that. The banner is a static `/images/hero-banner.webp`
-declared with a module-level `preload(..., { as: 'image' })`, not a CMS asset.
+declared as a `<link rel="preload">` in `index.html` guarded by `media="(min-width:1024px)"`, so the
+hint only applies to the layout that paints it. It is not a CMS asset, and it is not deferred: the
+`<img>` sits in a `hidden lg:block` wrapper without `loading="lazy"`, so the file is downloaded at
+narrow viewports even though it is never painted.
 
 It holds the three hero stats, mapping `heroStats` through `toLocaleString()` against
 `home.hero_stat_rescues` / `_adopted` / `_volunteers`. Two CTAs: the primary navigates to

@@ -41,15 +41,30 @@ project's data is placeholder.
 ### 1.3 Outlet, error boundary, and footer
 
 ```tsx
-<ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
-  <Suspense fallback={<Loading />}>
-    <Outlet />
-  </Suspense>
-</ErrorBoundary>
+<Suspense fallback={<Loading />}>
+  <div className="flex-1 px-4 lg:px-28">
+    <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
+      <Outlet />
+    </ErrorBoundary>
+  </div>
+  {isFooterAvailable && (
+    <footer>
+      <RootLayoutFooter />
+    </footer>
+  )}
+</Suspense>
 ```
 
 The `key={pathname}` remounts the boundary on every navigation, so a thrown loader error clears on
 route change instead of sticking. `<ScrollRestoration />` and `<Toast />` sit at the shell level.
+
+The footer lives inside the `Suspense` boundary so route content resolving cannot push it down the
+page: with the footer outside the boundary it painted near the top of the document and was then
+displaced by a full page of content, which is what the layout-shift audit attributed to it. The
+`ErrorBoundary` stays inside `Suspense` and still wraps only the content, so an error view keeps
+its footer. The shell is a `flex min-h-dvh flex-col` column with `main` as `flex-1`, which is what
+makes the content wrapper's `flex-1` resolve: a short page pins the footer to the viewport bottom
+instead of leaving it mid-page.
 
 `RootLayoutFooter` renders when `isFooterAvailable`.
 

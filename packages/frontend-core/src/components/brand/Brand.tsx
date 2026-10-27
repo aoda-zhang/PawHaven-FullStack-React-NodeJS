@@ -16,6 +16,8 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
       <img
         src="/images/logo.png"
         alt={t('common.slogan')}
+        width={1110}
+        height={224}
         className="h-auto w-14 lg:w-16"
       />
     </button>
