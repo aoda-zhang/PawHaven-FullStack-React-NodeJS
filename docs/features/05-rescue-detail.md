@@ -180,7 +180,7 @@ loader resolves to data. The fallback is `RescueDetailSkeleton`.
 | GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing or soft-deleted |
 
 `toDetail` maps `animalStatus` → `status` with the same `safeParse`-or-`pending` fallback as the
-list, and resolves `photos` to an array of `/api/core/rescues/:id/photo/:index` URLs.
+list, and maps each stored storage key to `<BLOB_PUBLIC_BASE_URL>/<key>` for `photos`.
 
 `distance` is hard-coded to `0` here too, and is not rendered.
 

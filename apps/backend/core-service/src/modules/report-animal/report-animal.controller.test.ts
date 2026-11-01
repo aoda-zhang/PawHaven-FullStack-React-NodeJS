@@ -12,7 +12,7 @@ import { ReportAnimalService } from './reportAnimal.service.js';
 const HTTP_STATUS_CREATED = 201;
 const HTTP_STATUS_BAD_REQUEST = 400;
 const ROUTE = '/report-animal';
-const PHOTO = 'data:image/png;base64,AAAA';
+const PHOTO = 'report-animal/photo-123.png';
 const CLAIMS = { kind: InternalJwtKind.AUTHENTICATED, sub: 'user-1' };
 
 const validReport = () => ({
@@ -135,22 +135,19 @@ describe('ReportAnimalController validation', () => {
     expect(booted.create).toHaveBeenCalledWith(validReport(), CLAIMS);
   });
 
-  it('rejects photos that are not JPEG or PNG', async () => {
+  it('rejects values that are not storage keys', async () => {
     const booted = await boot();
     app = booted.app;
 
     const response = await booted.post({
       ...validReport(),
-      reporterPhotos: [
-        'data:image/gif;base64,AAAA',
-        'data:image/webp;base64,BBBB',
-      ],
+      reporterPhotos: ['https://evil.example.com/x.png', '../etc/passwd'],
     });
     const body = (await response.json()) as ErrorBody;
 
     expect(response.status).toBe(HTTP_STATUS_BAD_REQUEST);
     expect(body.message).toEqual(
-      expect.arrayContaining([expect.stringContaining('JPG, JPEG or PNG')]),
+      expect.arrayContaining([expect.stringContaining('storage key')]),
     );
     expect(booted.create).not.toHaveBeenCalled();
   });

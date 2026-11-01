@@ -8,6 +8,8 @@ import {
   z,
 } from '@pawhaven/backend-core/config-module';
 
+import { storageConfigSchema } from './storageConfig.schema.js';
+
 export const documentServiceConfigSchema = z.object({
   http: httpConfigSchema,
   swagger: swaggerConfigSchema,
@@ -15,5 +17,6 @@ export const documentServiceConfigSchema = z.object({
   cors: corsConfigSchema,
   internalJwt: requiredInternalJwtVerifyingSchema,
   email: emailConfigSchema,
+  storage: storageConfigSchema,
   pdf: z.object({ chromiumExecutablePath: z.string().optional() }).optional(),
 });

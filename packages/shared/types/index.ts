@@ -28,6 +28,7 @@ export type {
   AnimalFollowStatus,
   AnimalFollowResult,
 } from './AnimalFollow.schema.js';
+export type { UploadedFile, FileUploadResult } from './FileUpload.schema.js';
 
 // schemas
 
@@ -71,6 +72,11 @@ export {
   AnimalFollowStatusSchema,
   AnimalFollowResultSchema,
 } from './AnimalFollow.schema.js';
+export {
+  FILE_UPLOAD_LIMITS,
+  uploadedFileSchema,
+  fileUploadResultSchema,
+} from './FileUpload.schema.js';
 
 export {
   guideLocales,

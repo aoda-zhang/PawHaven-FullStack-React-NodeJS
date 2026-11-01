@@ -7,6 +7,7 @@ import {
   SharedModuleFeatures,
 } from '@pawhaven/backend-core';
 import { EmailModule } from '@Email/email.module.js';
+import { FilesModule } from '@Files/files.module.js';
 import { PDFModule } from '@PDF/pdf.module.js';
 import { microServiceNames } from '@pawhaven/backend-core/constants';
 
@@ -32,6 +33,7 @@ const configContext = import.meta.webpackContext('./config', {
     }),
     EmailModule,
     PDFModule,
+    FilesModule,
   ],
   providers: [],
 })

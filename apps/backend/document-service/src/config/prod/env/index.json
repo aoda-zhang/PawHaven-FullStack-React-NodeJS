@@ -56,5 +56,16 @@
     "tls": {
       "ciphers": "HIGH"
     }
+  },
+  "blob": {
+    "enabled": true,
+    "token": "${BLOB_READ_WRITE_TOKEN}"
+  },
+  "storage": {
+    "provider": "vercel",
+    "vercel": {
+      "token": "${BLOB_READ_WRITE_TOKEN}",
+      "storeId": "${BLOB_STORE_ID}"
+    }
   }
 }

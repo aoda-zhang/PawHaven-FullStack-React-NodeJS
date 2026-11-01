@@ -8,7 +8,13 @@ import { LocationSection } from './LocationSection';
 import { PhotoUpload } from './PhotoUpload';
 import { ANIMAL_TYPES, RescueAgeValues, SIZES } from './types';
 
-export const AnimalBasicsSection = () => {
+interface AnimalBasicsSectionProps {
+  onFilesSelected: (files: File[]) => void;
+}
+
+export const AnimalBasicsSection = ({
+  onFilesSelected,
+}: AnimalBasicsSectionProps) => {
   const { t } = useTranslation();
   const { control } = useFormContext<ReportAnimalFormValues>();
   const animalType = useWatch({ control, name: 'animalType' });
@@ -65,7 +71,7 @@ export const AnimalBasicsSection = () => {
         required
       />
 
-      <PhotoUpload />
+      <PhotoUpload onFilesSelected={onFilesSelected} />
     </div>
   );
 };

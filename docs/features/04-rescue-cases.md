@@ -78,12 +78,11 @@ fails at the API boundary. The route is lazy; there is no route loader.
 
 ## 3. Endpoints
 
-| Method | Path                                 | Policy            | Notes                                         |
-| ------ | ------------------------------------ | ----------------- | --------------------------------------------- |
-| GET    | `/api/core/rescues`                  | `@OptionalAuth()` | `?status=` `?limit=`                          |
-| GET    | `/api/core/rescues/:id`              | `@OptionalAuth()` | 400 if missing or soft-deleted                |
-| GET    | `/api/core/rescues/:id/photo/:index` | `@OptionalAuth()` | Decodes one data URL to a binary stream       |
-| POST   | `/api/core/rescues`                  | authenticated     | Writes the same collection as `report-animal` |
+| Method | Path                    | Policy            | Notes                                         |
+| ------ | ----------------------- | ----------------- | --------------------------------------------- |
+| GET    | `/api/core/rescues`     | `@OptionalAuth()` | `?status=` `?limit=`                          |
+| GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing or soft-deleted                |
+| POST   | `/api/core/rescues`     | authenticated     | Writes the same collection as `report-animal` |
 
 The two write paths are near-duplicates. `RescueService.create` and `ReportAnimalService.create`
 both insert into `animalReports` with `reporter` taken from the internal JWT; only the
@@ -138,14 +137,9 @@ is exported and used by nothing.** It is a dead component, superseded by the det
 
 ## 7. Photos
 
-`reporterPhotos` holds base64 data URLs inside the document. `findPhoto(id, index)` looks the row
-up, `decodePhoto` splits the mime type from the payload, and the controller returns the buffer
-with `Content-Type` from the stored mime type and
-`Cache-Control: public, max-age=31536000, immutable`.
-
-The service hard-codes the public route `/api/core/rescues` to build `image` URLs on list items, so
-the browser fetches **each image with a second request** instead of receiving them inline. A feed
-of 10 cases with 5 photos each is 11 requests, not 1.
+`reporterPhotos` holds storage keys inside the document. List and detail derive display URLs as
+`<BLOB_PUBLIC_BASE_URL>/<key>`; there is no photo decode/proxy endpoint. List rows select the key
+array and use the first key as `image`. Already-stored records are not migrated.
 
 ## 8. Frontend Files
 

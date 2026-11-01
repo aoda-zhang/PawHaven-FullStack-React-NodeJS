@@ -14,10 +14,8 @@ const phoneRegex = /^[\d\s\-+()]{7,20}$/;
 
 const BYTES_PER_KB = 1024;
 const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB;
-const MAX_PHOTO_SIZE_MB = 10;
+const MAX_PHOTO_SIZE_MB = 5;
 const MAX_PHOTO_SIZE_BYTES = MAX_PHOTO_SIZE_MB * BYTES_PER_MB;
-const BASE64_CHARS_PER_GROUP = 4;
-const BASE64_BYTES_PER_GROUP = 3;
 const CONTACT_EMAIL_MAX_LENGTH = 100;
 
 /**
@@ -27,32 +25,23 @@ export const REPORT_PHOTO_LIMITS = {
   min: 2,
   max: 5,
   maxSizeBytes: MAX_PHOTO_SIZE_BYTES,
+  acceptedTypes: ['image/jpeg', 'image/png'],
+  accept: 'image/jpeg,image/png,.jpg,.jpeg,.png',
 } as const;
 
-const supportedPhotoPrefixes = [
-  'data:image/jpeg;base64,',
-  'data:image/jpg;base64,',
-  'data:image/png;base64,',
-] as const;
-
-const photoDataUrlSchema = z
+const storageKeySchema = z
   .string()
-  .min(1, 'Photo is required')
+  .min(1)
   .refine(
-    (value) =>
-      supportedPhotoPrefixes.some((prefix) => value.startsWith(prefix)),
-    'Only JPG, JPEG or PNG images are allowed',
-  )
-  .refine((value) => {
-    const payload = value.slice(value.indexOf(',') + 1);
-    const decodedBytes =
-      Math.floor(payload.length / BASE64_CHARS_PER_GROUP) *
-      BASE64_BYTES_PER_GROUP;
-    return decodedBytes <= REPORT_PHOTO_LIMITS.maxSizeBytes;
-  }, `Each photo must be under ${MAX_PHOTO_SIZE_MB}MB`);
+    (key) =>
+      !key.includes('://') &&
+      !key.startsWith('/') &&
+      !key.split('/').includes('..'),
+    'Each photo must be a storage key',
+  );
 
 export const reporterPhotosSchema = z
-  .array(photoDataUrlSchema)
+  .array(storageKeySchema)
   .min(REPORT_PHOTO_LIMITS.min, 'At least 2 photos are required')
   .max(REPORT_PHOTO_LIMITS.max, 'At most 5 photos are allowed');
 
@@ -142,8 +131,6 @@ export interface ReportAnimalFormMessages {
   descriptionMax: string;
 }
 
-const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/png'];
-
 const isBrowserFile = (value: unknown): boolean =>
   typeof File !== 'undefined' && value instanceof File;
 
@@ -175,7 +162,10 @@ export const createReportAnimalFormSchema = (
           z
             .custom<File>(isBrowserFile, messages.photosInvalid)
             .refine(
-              (file) => ALLOWED_PHOTO_TYPES.includes(file.type),
+              (file) =>
+                REPORT_PHOTO_LIMITS.acceptedTypes.some(
+                  (type) => type === file.type,
+                ),
               messages.photosFormat,
             )
             .refine(

@@ -4,9 +4,11 @@
     "outDir": "dist",
     "jsx": "react-jsx",
     "resolveJsonModule": true,
+    "types": ["node", "multer"],
     "paths": {
       "@PDF/*": ["./src/modules/pdf/*"],
-      "@Email/*": ["./src/modules/email/*"]
+      "@Email/*": ["./src/modules/email/*"],
+      "@Files/*": ["./src/modules/files/*"]
     }
   },
   "include": ["src"]

@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { ReportAnimalService } from './reportAnimal.service.js';
 
 const RECORD_ID = 'RPT-0001';
-const PHOTO = 'data:image/png;base64,AAAA';
+const PHOTO = 'report-animal/photo-123.png';
 
 const dto = {
   animalType: 'cat',

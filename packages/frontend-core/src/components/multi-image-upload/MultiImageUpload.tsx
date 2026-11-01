@@ -1,7 +1,17 @@
 import { cn } from '@pawhaven/ui';
-import { ImagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import {
+  BYTES_PER_MB,
+  DEFAULT_ACCEPT,
+  DEFAULT_ACCEPTED_TYPES,
+  DEFAULT_MAX,
+  DEFAULT_MAX_SIZE_BYTES,
+  EMPTY_FILES,
+  type PreviewItem,
+} from './defaults.js';
+import { PreviewGrid } from './PreviewGrid.js';
 
 export interface MultiImageUploadProps {
   value: File[];
@@ -9,7 +19,7 @@ export interface MultiImageUploadProps {
   error?: string;
   max?: number;
   maxSizeBytes?: number;
-  acceptedTypes?: string[];
+  acceptedTypes?: readonly string[];
   accept?: string;
   required?: boolean;
   label?: string;
@@ -18,21 +28,6 @@ export interface MultiImageUploadProps {
   removeLabel?: string;
   className?: string;
 }
-
-interface PreviewItem {
-  id: number;
-  file: File;
-  url: string;
-}
-
-const DEFAULT_MAX = 5;
-const BYTES_PER_KB = 1024;
-const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB;
-const DEFAULT_MAX_SIZE_MB = 10;
-const DEFAULT_MAX_SIZE_BYTES = DEFAULT_MAX_SIZE_MB * BYTES_PER_MB;
-const DEFAULT_ACCEPTED_TYPES = ['image/jpeg', 'image/png'];
-const DEFAULT_ACCEPT = 'image/jpeg,image/png,.jpg,.jpeg,.png';
-const EMPTY_FILES: File[] = [];
 
 export const MultiImageUpload = ({
   value,
@@ -166,41 +161,14 @@ export const MultiImageUpload = ({
           {hint}
         </p>
       )}
-      <div className="grid grid-cols-3 gap-3">
-        {previews.map((item) => (
-          <div
-            key={item.id}
-            className="group border-border rounded-media relative aspect-square overflow-hidden border"
-          >
-            {item.url && (
-              <img
-                src={item.url}
-                alt={item.file.name}
-                className="h-full w-full object-cover"
-              />
-            )}
-            <button
-              type="button"
-              aria-label={removeLabel ?? t('imageUpload.remove')}
-              onClick={() => removeFile(item.id)}
-              className="bg-background/80 text-error hover:bg-background absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          </div>
-        ))}
-        {previews.length < max && (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            aria-label={addLabel ?? t('imageUpload.add')}
-            className="border-border text-text-secondary hover:border-primary/40 hover:bg-muted rounded-media flex aspect-square flex-col items-center justify-center gap-1 border-2 border-dashed transition-colors"
-          >
-            <ImagePlus className="h-6 w-6" />
-            <span className="text-xs">{addLabel ?? t('imageUpload.add')}</span>
-          </button>
-        )}
-      </div>
+      <PreviewGrid
+        previews={previews}
+        max={max}
+        addLabel={addLabel}
+        removeLabel={removeLabel}
+        onAdd={() => inputRef.current?.click()}
+        onRemove={removeFile}
+      />
       <p className="text-text-secondary mt-2 text-xs">
         {t('imageUpload.count', { count: previews.length, max })}
       </p>

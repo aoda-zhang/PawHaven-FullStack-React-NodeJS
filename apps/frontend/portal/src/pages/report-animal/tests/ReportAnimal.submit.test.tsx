@@ -13,9 +13,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ReportAnimal } from '../index';
 
 const postMock = vi.hoisted(() => vi.fn());
+const uploadPhotosMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/shared/utils/apiClient', () => ({
   apiClient: { post: postMock },
+  uploadFiles: uploadPhotosMock,
 }));
 
 vi.mock('@pawhaven/ui', async () => {
@@ -112,7 +114,11 @@ const fillValidForm = async (user: User) => {
 };
 
 const submitForm = async (user: User) => {
-  await user.click(screen.getByRole('button', { name: 'reportAnimal.submit' }));
+  const submitButton = await screen.findByRole('button', {
+    name: 'reportAnimal.submit',
+  });
+  await waitFor(() => expect(submitButton).toBeEnabled());
+  await user.click(submitButton);
 };
 
 const fillAndSubmit = async (user: User) => {
@@ -122,6 +128,16 @@ const fillAndSubmit = async (user: User) => {
 
 beforeEach(() => {
   postMock.mockReset();
+  uploadPhotosMock.mockReset();
+  uploadPhotosMock.mockImplementation((files: File[]) =>
+    Promise.resolve({
+      files: files.map((file) => ({
+        key: `report-animal/${file.name}`,
+        size: file.size,
+        contentType: file.type,
+      })),
+    }),
+  );
   vi.mocked(showToast).mockClear();
   scrollToMock.mockClear();
   window.scrollTo = scrollToMock;
@@ -176,23 +192,17 @@ describe('ReportAnimal submit feedback', () => {
     expect(screen.getByTestId('form-input-address')).toBeInTheDocument();
   });
 
-  it('T4 reports unreadable photos without calling the API', async () => {
-    const readSpy = vi
-      .spyOn(FileReader.prototype, 'readAsDataURL')
-      .mockImplementation(() => {
-        throw new Error('read failed');
-      });
+  it('T4 reports failed photo upload without calling the API', async () => {
+    uploadPhotosMock.mockRejectedValue(new Error('upload failed'));
     const user = userEvent.setup();
     renderPage();
 
     await fillAndSubmit(user);
 
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('reportAnimal.photos_read_failed');
+    expect(alert).toHaveTextContent('reportAnimal.photos_upload_failed');
     expect(postMock).not.toHaveBeenCalled();
     expect(screen.getByTestId('form-input-address')).toBeInTheDocument();
-
-    readSpy.mockRestore();
   });
 
   it('T5 shows the real case id returned by the server', async () => {

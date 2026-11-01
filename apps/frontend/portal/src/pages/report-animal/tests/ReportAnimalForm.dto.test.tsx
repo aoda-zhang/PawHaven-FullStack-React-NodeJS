@@ -37,7 +37,7 @@ const mapToDto = (values: {
   const description = values.description?.trim() ?? '';
   const isUrgent = values.urgent;
   const reporterPhotos = values.photos.map(
-    (_, i) => `data:image/png;base64,PHOTO${i}`,
+    (_, i) => `https://assets.blob.vercel-storage.com/report/photo-${i}.jpg`,
   );
   return {
     animalType:
@@ -145,8 +145,8 @@ describe('ReportAnimalForm DTO mapping', () => {
       status: 'other',
       description: 'Found a stray kitten',
       reporterPhotos: [
-        'data:image/png;base64,PHOTO0',
-        'data:image/png;base64,PHOTO1',
+        'https://assets.blob.vercel-storage.com/report/photo-0.jpg',
+        'https://assets.blob.vercel-storage.com/report/photo-1.jpg',
       ],
       contactInfo: { phone: '12345678', email: '' },
     });
