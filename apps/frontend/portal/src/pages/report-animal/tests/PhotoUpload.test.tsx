@@ -68,7 +68,7 @@ const renderPhotoUpload = () => {
     state.getPhotos = () => form.getValues('photos');
     return (
       <FormProvider {...form}>
-        <PhotoUpload />
+        <PhotoUpload onFilesSelected={vi.fn()} />
       </FormProvider>
     );
   };

@@ -11,12 +11,11 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { readFilesAsDataUrls } from '../utils/readFilesAsDataUrls';
-
 import { AnimalBasicsSection } from './AnimalBasicsSection';
 import { BehaviorContactSection } from './BehaviorContactSection';
 
 import { routePaths } from '@/app/router/routePaths';
+import { useFileUploads } from '@/shared/hooks/useFileUploads';
 
 interface ReportAnimalFormProps {
   onSubmit: (dto: AnimalReportDto) => void;
@@ -73,6 +72,12 @@ export const ReportAnimalForm = ({
     },
   });
 
+  const { uploadingCount, startUploads, ensureUploaded } = useFileUploads({
+    endpoint: '/document/files',
+    folder: 'report-animal',
+    onError: () => setPhotoErrorKey('reportAnimal.photos_upload_failed'),
+  });
+
   const handleSubmit = async (values: ReportAnimalFormValues) => {
     setPhotoErrorKey(null);
 
@@ -85,9 +90,11 @@ export const ReportAnimalForm = ({
 
     let reporterPhotos: string[];
     try {
-      reporterPhotos = await readFilesAsDataUrls(values.photos);
+      reporterPhotos = await Promise.all(
+        values.photos.map((file) => ensureUploaded(file)),
+      );
     } catch {
-      setPhotoErrorKey('reportAnimal.photos_read_failed');
+      setPhotoErrorKey('reportAnimal.photos_upload_failed');
       return;
     }
 
@@ -122,6 +129,7 @@ export const ReportAnimalForm = ({
   };
 
   const bannerKey = submitErrorKey ?? photoErrorKey;
+  const isUploading = uploadingCount > 0;
 
   if (submittedCaseId) {
     return (
@@ -160,7 +168,7 @@ export const ReportAnimalForm = ({
           <p className="text-text-secondary mb-5 text-sm">
             {t('reportAnimal.basics_subtitle')}
           </p>
-          <AnimalBasicsSection />
+          <AnimalBasicsSection onFilesSelected={startUploads} />
         </div>
 
         <div className="bg-card border-border rounded-card-large mb-6 border p-6 shadow-sm">
@@ -185,11 +193,13 @@ export const ReportAnimalForm = ({
 
         <Button
           type="submit"
-          loading={isPending}
-          disabled={isPending}
+          loading={isPending || isUploading}
+          disabled={isPending || isUploading}
           className="rounded-button-large w-full py-3"
         >
-          {isPending ? t('reportAnimal.submitting') : t('reportAnimal.submit')}
+          {isPending || isUploading
+            ? t('reportAnimal.submitting')
+            : t('reportAnimal.submit')}
         </Button>
       </form>
     </FormProvider>

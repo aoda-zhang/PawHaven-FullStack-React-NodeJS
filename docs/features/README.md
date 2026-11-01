@@ -55,8 +55,14 @@ both live as sections:
 | ------------------ | ------------------------------------------------------------------------------------ |
 | `core-service`     | `adoption`, `animal-follow`, `bootstrap`, `guide`, `home`, `report-animal`, `rescue` |
 | `auth-service`     | `auth`                                                                               |
-| `document-service` | `email`, `pdf`                                                                       |
+| `document-service` | `email`, `pdf`, `blob`                                                               |
 | `gateway`          | `identity`, `internal-jwt`, `proxy`, `routing`, `throttle`                           |
+
+`document-service` also exposes a **generic, authenticated upload API** — `POST /api/document/files`
+(multipart `files` + optional `folder`; images JPEG/PNG/WebP, 5 MB each, max 5). Storage is
+a provider-agnostic `FileStorage` port (currently `vercel`), so switching or adding a provider is a
+config + adapter change. It is a platform capability, not tied to one feature;
+`report-animal` is its first caller.
 
 One collection, two features: `animalReports` is written by both `report-animal` and `rescue`, and
 read by `rescue` and `home`. There is no `rescue_cases` table — **the report _is_ the case**.

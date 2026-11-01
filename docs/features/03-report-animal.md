@@ -84,15 +84,17 @@ flowchart TD
     C --> D[BehaviorContactSection<br/>behaviour · description · urgent · phone]
     D --> E{client Zod validation}
     E -- fail --> B
-    E -- pass --> F[readFilesAsDataUrls<br/>Files → base64 data URLs]
-    F --> G[map form values → AnimalReportDto<br/>urgent → status · behavior → statusDescription]
-    G --> H[POST /api/core/report-animal]
-    H --> I[Gateway signs InternalJwt]
-    I --> J[AnimalReportSchema inbound validation]
-    J --> K[ReportAnimalService.create]
-    K --> L[(animalReports<br/>animalStatus = pending<br/>reporter = claims.sub)]
-    L --> M[Rescue feed reads the same collection]
-    M --> N[Success card · case number]
+    E -- pass --> F[uploadFiles(files, 'report-animal')<br/>Files → multipart]
+    F --> G[POST /api/document/files<br/>authenticated · `files` field]
+    G --> H[File storage<br/>provider-configurable<br/>stored file URLs]
+    H --> I[map form values → AnimalReportDto<br/>urgent → status · behavior → statusDescription]
+    I --> J[POST /api/core/report-animal<br/>reporterPhotos: [key]]
+    J --> K[Gateway signs InternalJwt]
+    K --> L[AnimalReportSchema inbound validation]
+    L --> M[ReportAnimalService.create]
+    M --> N[(animalReports<br/>animalStatus = pending<br/>reporter = claims.sub)]
+    N --> O[Rescue feed reads the same collection]
+    O --> P[Success card · case number]
 ```
 
 `onSubmit` does the DTO mapping itself rather than submitting form values directly. The mapping is
@@ -101,24 +103,40 @@ unless both are present, and `status` is derived from the `urgent` checkbox.
 
 ## 3. Endpoint
 
-| Method | Path                      | Policy        | Notes                                             |
-| ------ | ------------------------- | ------------- | ------------------------------------------------- |
-| POST   | `/api/core/report-animal` | authenticated | `AnimalReportSchema` inbound, `.parse()` outbound |
+| Method | Path                      | Policy        | Notes                                                                                                                                               |
+| ------ | ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| POST   | `/api/document/files`     | authenticated | document-service generic upload: multipart `files` + optional `folder`; images (JPEG/PNG/WebP), 5 MB each, max 5; storage provider is config-driven |
+| POST   | `/api/core/report-animal` | authenticated | `AnimalReportSchema` inbound, `.parse()` outbound; `reporterPhotos` carries storage keys                                                            |
 
 There is no list, read, update, or delete endpoint for reports. The feed reads them through the
 rescue module's `GET /api/core/rescues` — see [Rescue Cases](04-rescue-cases.md).
 
 ## 4. Photos
 
-Photos are **not uploaded to a file service**. `utils/readFilesAsDataUrls.ts` reads them in the
-browser and `PhotoUpload` produces base64 data URLs that go straight into the JSON body, capped at
-5 × 10MB. `reporterPhotosSchema` enforces the data-URL prefix
-(`data:image/jpeg;base64,`, `…/jpg…`, `…/png…`) and the decoded byte size **on the server as
-well** — the client and the API both validate.
+Photos are uploaded before the report is submitted, through document-service's **generic file-upload
+API** `POST /api/document/files` (authenticated, multipart `files`, optional `folder` to namespace the
+storage key). Storage sits behind a **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
+is selected by `storage.provider`, so switching or adding a provider is a config + adapter change.
+The reusable client helper is `uploadFiles(files, folder?)` in
+`apps/frontend/portal/src/shared/api/file.api.ts`; the report form calls it with
+`folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
+endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
+the report form itself still restricts the picker to JPEG/PNG. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
 
-Consequence: the stored document carries the image bytes, so `animalReports` documents are large.
-The rescue feed works around this by serving one photo per request through
-`GET /api/core/rescues/:id/photo/:index` and decoding on read.
+document-service also verifies each upload's **real bytes** against the declared MIME
+(JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles per authenticated user
+(20 requests / 100 MB per minute, per process). Uploads return only the **storage key**
+(`report-animal/<short-uuid>.<ext>`, no original filename); the Vercel Blob host is never stored or returned. Core-service
+derives display URLs at read time as `<BLOB_PUBLIC_BASE_URL>/<key>`, where `BLOB_PUBLIC_BASE_URL` is a
+**required, validated** config that must route to the Blob store (reverse proxy or edge rewrite —
+Vercel Blob has no native custom domain).
+
+On Vercel, storage auth uses **OIDC** (`BLOB_STORE_ID` + the auto-injected
+`VERCEL_OIDC_TOKEN`); `BLOB_READ_WRITE_TOKEN` is only the local fallback.
+
+Consequence: `animalReports` documents store URLs, not bytes, so they stay small. Rescue list/detail
+return those URLs directly; there is no photo decode/proxy endpoint. Already-stored base64 documents
+are not migrated or specially handled.
 
 ## 5. Data Model
 
@@ -135,7 +153,7 @@ The rescue feed works around this by serving one photo per request through
 | `animalStatus`      | String    | Always `pending` on write                                                                                                                  |
 | `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                                     |
 | `description`       | String    | ≤ 200 chars, trimmed                                                                                                                       |
-| `reporterPhotos`    | String[]  | Base64 data URLs, 2–5 entries                                                                                                              |
+| `reporterPhotos`    | String[]  | Storage keys, 2–5 entries                                                                                                                  |
 | `reporter`          | Object?   | `{ reporterID: claims.sub, reporterName }`                                                                                                 |
 | `status`            | String    | `@default("active")` — **written by nothing, read by nothing.** Not the DTO's `status`; see [§6](#6-two-contract-fields-the-service-drops) |
 | `deletedAt`         | DateTime? | Soft delete; this is what `findAll` actually filters on                                                                                    |
@@ -197,17 +215,17 @@ a friendly one.
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `route.tsx`                                 | `reportAnimalRoute`; the only `AuthenticatedLayout`-nested route                                                         |
 | `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                   |
-| `components/ReportAnimalForm.tsx`           | RHF form; owns the DTO mapping and the success card                                                                      |
+| `components/ReportAnimalForm.tsx`           | RHF form; uploads photos, maps form values to the DTO, and owns the success card                                         |
 | `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                     |
 | `components/LocationSection.tsx`            | Address + coordinates                                                                                                    |
-| `components/PhotoUpload.tsx`                | File → data URL, count/size/type validation                                                                              |
+| `components/PhotoUpload.tsx`                | `photos` field via `MultiImageUpload`; count/size/type validation                                                        |
 | `components/AnimalCountStepper.tsx`         | Count −/+                                                                                                                |
 | `components/BehaviorContactSection.tsx`     | §1.2                                                                                                                     |
 | `components/StrayCTA.tsx`                   | §1.4 — duplicated from `home`                                                                                            |
 | `components/types.ts`                       | Re-exports `ANIMAL_TYPES`, `SIZES`, `BEHAVIORS`, `RescueAgeValues` and their types from `@pawhaven/shared/types`         |
-| `utils/readFilesAsDataUrls.ts`              | `File[]` → `string[]`                                                                                                    |
 | `utils/reportSubmitError.ts`                | Maps submit failures to the inline message key; returns `null` for errors already shown by the shared toast              |
 | `api/reportAnimal.api.ts` / `.mutations.ts` | The call; the mutation invalidates the rescue-feed and home keys                                                         |
+| `../../shared/api/file.api.ts`              | `uploadFiles(files, folder?)` — generic Blob upload helper (shared, not feature-local)                                   |
 | `tests/`                                    | Component, validation, DTO-mapping and API tests, plus `ReportAnimal.submit` (400/429/500, unreadable photos, real `id`) |
 
 Validation is schema-first on both sides, and the two schemas are deliberately different shapes:

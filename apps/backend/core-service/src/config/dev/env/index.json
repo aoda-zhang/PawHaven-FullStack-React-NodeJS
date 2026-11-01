@@ -73,5 +73,8 @@
         "port": 8083
       }
     }
-  ]
+  ],
+  "files": {
+    "publicBaseUrl": "${BLOB_PUBLIC_BASE_URL}"
+  }
 }

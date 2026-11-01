@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
+import { ConfigService } from '@nestjs/config';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
 import {
   RescueListItemSchema,
@@ -23,16 +19,16 @@ import type {
 } from '@pawhaven/shared/types';
 import { PrismaClient, type animalReports } from '@prismaClient/index.js';
 
-const PUBLIC_RESCUE_ROUTE = '/api/core/rescues';
-
-const DATA_URL_PREFIX = 'data:';
-
-const BASE64_MARKER = ';base64,';
-
-export type RescuePhoto = {
-  mimeType: string;
-  buffer: Buffer;
-};
+const RESCUE_LIST_SELECT = {
+  id: true,
+  animalType: true,
+  animalStatus: true,
+  description: true,
+  locationObj: true,
+  reporter: true,
+  reporterPhotos: true,
+  createdAt: true,
+} as const;
 
 type RescueListRecord = {
   id: string;
@@ -41,6 +37,7 @@ type RescueListRecord = {
   description: string | null;
   locationObj: unknown;
   reporter: { reporterID: string; reporterName: string | null } | null;
+  reporterPhotos: string[];
   createdAt: Date;
 };
 
@@ -51,6 +48,7 @@ export class RescueService {
   constructor(
     @InjectPrisma(databaseEngines.mongodb)
     private readonly prisma: PrismaClient,
+    private readonly configs: ConfigService,
   ) {}
 
   async create(dto: CreateRescueDto, claims: AuthenticatedInternalJwt) {
@@ -84,25 +82,11 @@ export class RescueService {
       },
       orderBy: { createdAt: 'desc' },
       take,
-      select: {
-        id: true,
-        animalType: true,
-        animalStatus: true,
-        description: true,
-        locationObj: true,
-        reporter: true,
-        createdAt: true,
-      },
+      select: RESCUE_LIST_SELECT,
     });
 
-    const photoBearingIds = await this.findPhotoBearingIds(
-      rescues.map((record) => record.id),
-    );
-
     return rescues
-      .map((record) =>
-        this.toListItemOrSkip(record, photoBearingIds.has(record.id)),
-      )
+      .map((record) => this.toListItemOrSkip(record))
       .filter((item): item is RescueListItem => item !== undefined);
   }
 
@@ -122,77 +106,33 @@ export class RescueService {
     }
   }
 
-  async findPhoto(id: string, index: number): Promise<RescuePhoto> {
-    const rescue = await this.prisma.animalReports.findUnique({
-      where: { id },
-      select: { id: true, deletedAt: true, reporterPhotos: true },
-    });
-    if (!rescue || rescue.deletedAt) {
-      throw new NotFoundException(`Rescue not found: ${id}`);
-    }
-
-    const photo = this.decodePhoto(rescue.reporterPhotos?.[index]);
-    if (!photo) {
-      throw new NotFoundException(`Photo not found: ${id}/${index}`);
-    }
-    return photo;
-  }
-
-  private decodePhoto(stored: string | undefined): RescuePhoto | undefined {
-    if (!stored || !stored.startsWith(DATA_URL_PREFIX)) {
-      return undefined;
-    }
-    const markerAt = stored.indexOf(BASE64_MARKER);
-    if (markerAt === -1) {
-      return undefined;
-    }
-    const mimeType = stored.slice(DATA_URL_PREFIX.length, markerAt);
-    const payload = stored.slice(markerAt + BASE64_MARKER.length);
-    if (!mimeType) {
-      return undefined;
-    }
-    return { mimeType, buffer: Buffer.from(payload, 'base64') };
-  }
-
-  private buildPhotoUrl(rescueId: string, index: number): string {
-    return `${PUBLIC_RESCUE_ROUTE}/${rescueId}/photo/${index}`;
-  }
-
-  private async findPhotoBearingIds(ids: string[]): Promise<Set<string>> {
-    if (ids.length === 0) {
-      return new Set();
-    }
-    const records = await this.prisma.animalReports.findMany({
-      where: { id: { in: ids }, reporterPhotos: { isEmpty: false } },
-      select: { id: true },
-    });
-    return new Set(records.map((record) => record.id));
+  private fileUrl(key: string): string {
+    const base = this.configs.getOrThrow<string>('files.publicBaseUrl');
+    return `${base.replace(/\/$/, '')}/${key}`;
   }
 
   private toListItemOrSkip(
     record: RescueListRecord,
-    hasPhoto: boolean,
   ): RescueListItem | undefined {
     try {
-      return this.toListItem(record, hasPhoto);
+      return this.toListItem(record);
     } catch (error) {
       this.logger.warn(`Skipping unmappable rescue: ${record.id}`, error);
       return undefined;
     }
   }
 
-  private toListItem(
-    record: RescueListRecord,
-    hasPhoto: boolean,
-  ): RescueListItem {
+  private toListItem(record: RescueListRecord): RescueListItem {
     const location = RescueDetailLocationSchema.parse(record.locationObj);
 
     const status = AnimalStatusSchema.safeParse(record.animalStatus);
 
+    const [coverImage] = record.reporterPhotos;
+
     return RescueListItemSchema.parse({
       id: record.id,
       title: record.animalType ?? 'unknown',
-      image: hasPhoto ? this.buildPhotoUrl(record.id, 0) : undefined,
+      image: coverImage ? this.fileUrl(coverImage) : undefined,
       status: status.success ? status.data : AnimalStatus.PENDING,
       animalType: record.animalType ?? 'unknown',
       location: location.address,
@@ -218,9 +158,7 @@ export class RescueService {
       animalCount: record.animalCount,
       appearance: RescueDetailAppearanceSchema.parse(record.appearance),
       location: RescueDetailLocationSchema.parse(record.locationObj),
-      photos: record.reporterPhotos.map((_photo, index) =>
-        this.buildPhotoUrl(record.id, index),
-      ),
+      photos: record.reporterPhotos.map((key) => this.fileUrl(key)),
       reporter: {
         reporterId: record.reporter?.reporterID ?? '',
         reporterName: record.reporter?.reporterName ?? null,

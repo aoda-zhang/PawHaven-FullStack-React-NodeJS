@@ -1,4 +1,4 @@
-import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { AnimalStatus } from '@pawhaven/shared/types';
 import { Prisma } from '@prismaClient/index.js';
 import { describe, expect, it, vi } from 'vitest';
@@ -7,7 +7,11 @@ import { RescueService } from './rescue.service.js';
 
 const RECORD_ID = 'PAW-0001';
 const REPORTED_AT = new Date('2026-08-22T10:00:00.000Z');
-const FIRST_PHOTO_URL = `/api/core/rescues/${RECORD_ID}/photo/0`;
+const FILE_BASE = 'https://assets.example.com';
+const FIRST_PHOTO_KEY = 'report-animal/PAW-0001-photo-0.png';
+const SECOND_PHOTO_KEY = 'report-animal/PAW-0001-photo-1.png';
+const FIRST_PHOTO_URL = `${FILE_BASE}/${FIRST_PHOTO_KEY}`;
+const SECOND_PHOTO_URL = `${FILE_BASE}/${SECOND_PHOTO_KEY}`;
 
 type RecordOverrides = Record<string, unknown>;
 
@@ -32,22 +36,10 @@ const buildRecord = (overrides: RecordOverrides = {}) => ({
 const buildService = (records: RecordOverrides[] | Error = []) => {
   const stored = records instanceof Error ? [] : records.map(buildRecord);
 
-  const isPhotoLookup = (args?: { select?: Record<string, boolean> }) =>
-    args?.select !== undefined && Object.keys(args.select).length === 1;
-
-  const findMany = vi.fn((args?: { select?: Record<string, boolean> }) => {
+  const findMany = vi.fn((_args?: { select?: Record<string, boolean> }) => {
     if (records instanceof Error) {
       return Promise.reject(records);
     }
-    if (isPhotoLookup(args)) {
-      return Promise.resolve(
-        stored
-          .filter((record) => record.reporterPhotos.length > 0)
-          .map((record) => ({ id: record.id })),
-      );
-    }
-    // Mirrors the projection: a list row never carries the photo payload, so a
-    // mapper that still reads `reporterPhotos` gets undefined and fails loudly.
     return Promise.resolve(
       stored.map((record) => ({
         id: record.id,
@@ -56,6 +48,7 @@ const buildService = (records: RecordOverrides[] | Error = []) => {
         description: record.description,
         locationObj: record.locationObj,
         reporter: record.reporter,
+        reporterPhotos: record.reporterPhotos,
         createdAt: record.createdAt,
       })),
     );
@@ -73,7 +66,16 @@ const buildService = (records: RecordOverrides[] | Error = []) => {
     animalReports: { findMany, findUnique },
   };
 
-  return { service: new RescueService(prisma as never), findMany, findUnique };
+  return {
+    service: new RescueService(
+      prisma as never,
+      {
+        getOrThrow: () => FILE_BASE,
+      } as never,
+    ),
+    findMany,
+    findUnique,
+  };
 };
 
 describe('RescueService.findAll', () => {
@@ -90,7 +92,7 @@ describe('RescueService.findAll', () => {
     });
   });
 
-  it('never selects the multi-megabyte photo payload for a list row', async () => {
+  it('projects reporterPhotos because photos are stored as URLs', async () => {
     const { service, findMany } = buildService([{}]);
 
     await service.findAll();
@@ -99,8 +101,7 @@ describe('RescueService.findAll', () => {
       { select: Record<string, boolean> },
     ];
 
-    expect(listQuery.select).toBeDefined();
-    expect(listQuery.select).not.toHaveProperty('reporterPhotos');
+    expect(listQuery.select).toMatchObject({ reporterPhotos: true });
   });
 
   it('maps a record into the list contract', async () => {
@@ -173,23 +174,14 @@ describe('RescueService.findAll', () => {
     expect(item.status).toBe(AnimalStatus.PENDING);
   });
 
-  it('links the first photo when the report has photos', async () => {
-    const { service, findMany } = buildService([
-      {
-        reporterPhotos: [
-          'data:image/png;base64,AAAA',
-          'data:image/png;base64,BBBB',
-        ],
-      },
+  it('returns the first stored blob url as the list image', async () => {
+    const { service } = buildService([
+      { reporterPhotos: [FIRST_PHOTO_KEY, SECOND_PHOTO_KEY] },
     ]);
 
     const [item] = await service.findAll();
 
     expect(item.image).toBe(FIRST_PHOTO_URL);
-    expect(findMany.mock.calls[1]?.[0]).toMatchObject({
-      where: { reporterPhotos: { isEmpty: false } },
-      select: { id: true },
-    });
   });
 
   it('skips a record whose stored location is not contract shaped', async () => {
@@ -245,10 +237,7 @@ describe('RescueService.findOne', () => {
     const { service } = buildService([
       {
         age: 'baby',
-        reporterPhotos: [
-          'data:image/png;base64,AAAA',
-          'data:image/png;base64,BBBB',
-        ],
+        reporterPhotos: [FIRST_PHOTO_KEY, SECOND_PHOTO_KEY],
       },
     ]);
 
@@ -258,7 +247,7 @@ describe('RescueService.findOne', () => {
       status: AnimalStatus.PENDING,
       appearance: { color: 'black' },
       location: { address: 'Central Park' },
-      photos: [FIRST_PHOTO_URL, `/api/core/rescues/${RECORD_ID}/photo/1`],
+      photos: [FIRST_PHOTO_URL, SECOND_PHOTO_URL],
       reporter: { reporterId: 'user-1', reporterName: null },
       reportedAt: REPORTED_AT.toISOString(),
     });
@@ -310,44 +299,6 @@ describe('RescueService.findOne', () => {
   });
 });
 
-describe('RescueService.findPhoto', () => {
-  it('decodes a stored data url into a mime type and buffer', async () => {
-    const payload = Buffer.from('photo-bytes').toString('base64');
-    const { service } = buildService([
-      { reporterPhotos: [`data:image/png;base64,${payload}`] },
-    ]);
-
-    const photo = await service.findPhoto(RECORD_ID, 0);
-
-    expect(photo.mimeType).toBe('image/png');
-    expect(photo.buffer.toString()).toBe('photo-bytes');
-  });
-
-  it('rejects an index that holds a non data url value', async () => {
-    const { service } = buildService([{ reporterPhotos: ['not-a-data-url'] }]);
-
-    await expect(service.findPhoto(RECORD_ID, 0)).rejects.toThrow(
-      new NotFoundException(`Photo not found: ${RECORD_ID}/0`).message,
-    );
-  });
-
-  it('rejects a photo index that does not exist', async () => {
-    const { service } = buildService([{}]);
-
-    await expect(service.findPhoto(RECORD_ID, 3)).rejects.toThrow(
-      `Photo not found: ${RECORD_ID}/3`,
-    );
-  });
-
-  it('rejects a soft deleted record', async () => {
-    const { service } = buildService([{ deletedAt: new Date() }]);
-
-    await expect(service.findPhoto(RECORD_ID, 0)).rejects.toThrow(
-      `Rescue not found: ${RECORD_ID}`,
-    );
-  });
-});
-
 describe('RescueService.create', () => {
   const dto = {
     animalType: 'cat',
@@ -369,9 +320,10 @@ describe('RescueService.create', () => {
         data: { reporter: { reporterID: string; reporterName: string | null } };
       }) => Promise.resolve({ id: RECORD_ID, ...data }),
     );
-    const service = new RescueService({
-      animalReports: { create },
-    } as never);
+    const service = new RescueService(
+      { animalReports: { create } } as never,
+      { getOrThrow: () => FILE_BASE } as never,
+    );
     return { service, create };
   };
 
@@ -430,11 +382,14 @@ describe('RescueService.create', () => {
   });
 
   it('maps a create failure to a bad request', async () => {
-    const service = new RescueService({
-      animalReports: {
-        create: vi.fn(() => Promise.reject(new Error('write failed'))),
-      },
-    } as never);
+    const service = new RescueService(
+      {
+        animalReports: {
+          create: vi.fn(() => Promise.reject(new Error('write failed'))),
+        },
+      } as never,
+      { getOrThrow: () => FILE_BASE } as never,
+    );
 
     await expect(
       service.create(dto, { kind: 'authenticated', sub: 'user-1' } as never),

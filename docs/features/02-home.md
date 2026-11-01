@@ -141,23 +141,23 @@ paging.
 
 `AdoptablePet` in `apps/backend/core-service/src/prisma/mongodb/schema.prisma`:
 
-| Field            | Type     | Notes                                                  |
-| ---------------- | -------- | ------------------------------------------------------ |
-| `id`             | ObjectId | `@map("_id")`                                          |
-| `name`           | String   |                                                        |
-| `animalType`     | String   |                                                        |
-| `age`            | String   | Free text here, **not** `baby \| adult` as in rescues  |
-| `sex`            | String   |                                                        |
-| `breed`          | String   |                                                        |
-| `location`       | String   | A single string, not the rescue location object        |
-| `waitingDays`    | Int      |                                                        |
-| `tags`           | String[] |                                                        |
-| `photo`          | String   | One photo, as a URL — not the base64 array rescues use |
-| `rescuedFrom`    | String   |                                                        |
-| `rescueDuration` | String   | Free text, not a number                                |
-| `medicalRecords` | String[] |                                                        |
-| `temperament`    | String   |                                                        |
-| `adoptionStatus` | String   | `@default("available")`, indexed                       |
+| Field            | Type     | Notes                                                   |
+| ---------------- | -------- | ------------------------------------------------------- |
+| `id`             | ObjectId | `@map("_id")`                                           |
+| `name`           | String   |                                                         |
+| `animalType`     | String   |                                                         |
+| `age`            | String   | Free text here, **not** `baby \| adult` as in rescues   |
+| `sex`            | String   |                                                         |
+| `breed`          | String   |                                                         |
+| `location`       | String   | A single string, not the rescue location object         |
+| `waitingDays`    | Int      |                                                         |
+| `tags`           | String[] |                                                         |
+| `photo`          | String   | One photo, as a URL — not the array of URLs rescues use |
+| `rescuedFrom`    | String   |                                                         |
+| `rescueDuration` | String   | Free text, not a number                                 |
+| `medicalRecords` | String[] |                                                         |
+| `temperament`    | String   |                                                         |
+| `adoptionStatus` | String   | `@default("available")`, indexed                        |
 
 `adoptionStatus` is an unconstrained string. The code reads the literal `adopted` when counting for
 the hero stats, and the schema comment names `available | pending | adopted`, but no enum or

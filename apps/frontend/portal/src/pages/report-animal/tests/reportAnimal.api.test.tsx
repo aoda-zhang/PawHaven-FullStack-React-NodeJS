@@ -30,10 +30,7 @@ const validPayload: AnimalReportDto = {
   },
   status: 'friendly',
   description: 'Found a friendly brown dog near the park',
-  reporterPhotos: [
-    'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD',
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg',
-  ],
+  reporterPhotos: ['report-animal/a.jpg', 'report-animal/b.jpg'],
   contactInfo: {
     phone: '+49 170 1234567',
   },

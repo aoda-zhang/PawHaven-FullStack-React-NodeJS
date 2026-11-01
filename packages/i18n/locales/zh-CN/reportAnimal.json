@@ -68,10 +68,10 @@
     "address_required": "请输入地址或地标",
     "map_placeholder": "地图将在此显示",
     "photos_label": "照片",
-    "photos_hint": "请上传 2-5 张照片，支持 JPG/JPEG/PNG，每张不超过 10M。",
+    "photos_hint": "请上传 2-5 张照片，支持 JPG/JPEG/PNG，每张不超过 5M。",
     "photos_required": "请至少上传 2 张照片",
     "photos_max": "最多上传 5 张照片",
-    "photos_size": "每张图片不能超过 10M",
+    "photos_size": "每张图片不能超过 5M",
     "photos_format": "仅支持 JPG、JPEG 或 PNG 格式的图片",
     "photos_invalid": "无效的照片文件",
     "photos_add": "添加照片",
@@ -122,6 +122,7 @@
     "submit_rejected": "提交的内容未通过校验，请检查后重试。",
     "submit_rate_limited": "提交过于频繁，请稍后再试。",
     "photos_read_failed": "无法读取照片，请重新选择照片后再试。",
+    "photos_upload_failed": "照片上传失败，请稍后重试。",
     "unknown": "未知"
   }
 }

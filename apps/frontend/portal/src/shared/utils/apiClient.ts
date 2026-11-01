@@ -1,4 +1,5 @@
 import { createApiClient } from '@pawhaven/frontend-core';
+import type { FileUploadResult } from '@pawhaven/shared/types';
 
 import { loadConfig } from '@/config';
 
@@ -13,3 +14,20 @@ export const apiClient = createApiClient({
   timeout: loadConfig()?.api?.timeout,
   baseURL: '/api',
 });
+
+interface UploadFilesOptions {
+  endpoint: string;
+  folder?: string;
+}
+
+export const uploadFiles = (
+  files: File[],
+  { endpoint, folder }: UploadFilesOptions,
+): Promise<FileUploadResult> => {
+  const formData = new FormData();
+  files.forEach((file) => formData.append('files', file));
+  if (folder) {
+    formData.append('folder', folder);
+  }
+  return apiClient.post<FileUploadResult, FormData>(endpoint, formData);
+};

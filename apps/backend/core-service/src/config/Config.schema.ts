@@ -22,4 +22,5 @@ export const coreServiceConfigSchema = z.object({
     { message: 'internalJwt requires a non-empty keyId and audience' },
   ),
   microServices: z.array(microServiceConfigSchema).min(1),
+  files: z.object({ publicBaseUrl: z.string().url() }),
 });
