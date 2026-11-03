@@ -57,6 +57,18 @@ describe('RescueCasesSection', () => {
     expect(screen.getByText('Test Cat')).toBeDefined();
   });
 
+  it('hides the status summary while loading', () => {
+    render(<RescueCasesSection cases={[]} onCaseClick={vi.fn()} isLoading />);
+
+    expect(screen.queryByText(/rescue_cases\.status_summary/)).toBeNull();
+  });
+
+  it('shows the status summary once loading finishes', () => {
+    render(<RescueCasesSection cases={[mockCase]} onCaseClick={vi.fn()} />);
+
+    expect(screen.getByText(/rescue_cases\.status_summary/)).toBeDefined();
+  });
+
   it('renders the status summary through the count translations', () => {
     render(
       <RescueCasesSection

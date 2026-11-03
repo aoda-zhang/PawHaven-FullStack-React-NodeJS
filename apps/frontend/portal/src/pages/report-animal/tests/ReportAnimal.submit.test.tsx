@@ -205,6 +205,102 @@ describe('ReportAnimal submit feedback', () => {
     expect(screen.getByTestId('form-input-address')).toBeInTheDocument();
   });
 
+  it('T4a shows the upload failure above the photo grid without marking the submit button busy', async () => {
+    uploadPhotosMock.mockRejectedValue(new Error('upload failed'));
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByTestId('form-input-address'), 'Central Park');
+    const fileInput = document.querySelector('input[type="file"]');
+    if (!fileInput) {
+      throw new Error('photo input not found');
+    }
+    fireEvent.change(fileInput, {
+      target: { files: [imageFile('a.jpg')] },
+    });
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('reportAnimal.photos_upload_failed');
+
+    const addButton = screen.getByRole('button', { name: 'imageUpload.add' });
+    expect(alert.compareDocumentPosition(addButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+
+    const submitButton = screen.getByRole('button', {
+      name: 'reportAnimal.submit',
+    });
+    expect(submitButton).not.toHaveAttribute('aria-busy');
+    expect(postMock).not.toHaveBeenCalled();
+  });
+
+  it('T4b disables the submit button while photos upload without a loading state', async () => {
+    uploadPhotosMock.mockImplementation(() => new Promise(() => {}));
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByTestId('form-input-address'), 'Central Park');
+    const fileInput = document.querySelector('input[type="file"]');
+    if (!fileInput) {
+      throw new Error('photo input not found');
+    }
+    fireEvent.change(fileInput, {
+      target: { files: [imageFile('a.jpg')] },
+    });
+
+    const submitButton = await screen.findByRole('button', {
+      name: 'reportAnimal.submit',
+    });
+    await waitFor(() => expect(submitButton).toBeDisabled());
+    expect(submitButton).not.toHaveAttribute('aria-busy');
+    expect(
+      screen.queryByText('reportAnimal.submitting'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('T4c shows the submit loading state only while the create request is pending', async () => {
+    postMock.mockImplementation(() => new Promise(() => {}));
+    const user = userEvent.setup();
+    renderPage();
+
+    await fillAndSubmit(user);
+
+    const submittingButton = await screen.findByRole('button', {
+      name: 'reportAnimal.submitting',
+    });
+    expect(submittingButton).toBeDisabled();
+    expect(submittingButton).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('T4d clears the upload error when a new photo selection starts', async () => {
+    uploadPhotosMock.mockRejectedValueOnce(new Error('upload failed'));
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.type(screen.getByTestId('form-input-address'), 'Central Park');
+    const fileInput = document.querySelector('input[type="file"]');
+    if (!fileInput) {
+      throw new Error('photo input not found');
+    }
+    fireEvent.change(fileInput, {
+      target: { files: [imageFile('a.jpg')] },
+    });
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'reportAnimal.photos_upload_failed',
+    );
+
+    uploadPhotosMock.mockResolvedValue({
+      files: [
+        { key: 'report-animal/b.jpg', size: 1, contentType: 'image/jpeg' },
+      ],
+    });
+    fireEvent.change(fileInput, {
+      target: { files: [imageFile('b.jpg')] },
+    });
+
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+  });
+
   it('T5 shows the real case id returned by the server', async () => {
     postMock.mockResolvedValueOnce({ id: 'stray-abc123' });
     const user = userEvent.setup();

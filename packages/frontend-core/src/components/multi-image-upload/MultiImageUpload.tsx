@@ -17,6 +17,7 @@ export interface MultiImageUploadProps {
   value: File[];
   onChange: (files: File[]) => void;
   error?: string;
+  uploadError?: string;
   max?: number;
   maxSizeBytes?: number;
   acceptedTypes?: readonly string[];
@@ -33,6 +34,7 @@ export const MultiImageUpload = ({
   value,
   onChange,
   error,
+  uploadError,
   max = DEFAULT_MAX,
   maxSizeBytes = DEFAULT_MAX_SIZE_BYTES,
   acceptedTypes = DEFAULT_ACCEPTED_TYPES,
@@ -48,6 +50,7 @@ export const MultiImageUpload = ({
   const inputId = useId();
   const hintId = `${inputId}-hint`;
   const errorId = `${inputId}-error`;
+  const uploadErrorId = `${inputId}-upload-error`;
 
   const [localError, setLocalError] = useState('');
   const [previews, setPreviews] = useState<PreviewItem[]>([]);
@@ -137,7 +140,11 @@ export const MultiImageUpload = ({
 
   const resolvedError = error ?? localError;
   const describedBy =
-    [hint ? hintId : '', resolvedError ? errorId : '']
+    [
+      hint ? hintId : '',
+      resolvedError ? errorId : '',
+      uploadError ? uploadErrorId : '',
+    ]
       .filter(Boolean)
       .join(' ') || undefined;
 
@@ -159,6 +166,11 @@ export const MultiImageUpload = ({
       {hint && (
         <p id={hintId} className="text-text-secondary mb-3 text-xs">
           {hint}
+        </p>
+      )}
+      {uploadError && (
+        <p id={uploadErrorId} role="alert" className="text-error mb-3 text-xs">
+          {uploadError}
         </p>
       )}
       <PreviewGrid

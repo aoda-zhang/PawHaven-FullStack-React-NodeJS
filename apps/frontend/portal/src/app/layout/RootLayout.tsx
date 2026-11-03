@@ -37,11 +37,13 @@ export const RootLayout = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const navigation = useNavigation();
+  const isNavigating = navigation.state === 'loading';
 
   return (
     <div className="flex min-h-dvh flex-col overflow-x-hidden">
       <ScrollRestoration />
       <Toast />
+      {isNavigating && <Loading />}
       {!isAuthPage && (
         <header className="z-sticky border-border bg-background/88 sticky top-0 border-b backdrop-blur-md">
           {isSysMaintain && (
@@ -67,7 +69,8 @@ export const RootLayout = () => {
 
       <main
         className="flex flex-1 flex-col"
-        aria-busy={navigation.state === 'loading'}
+        inert={isNavigating}
+        aria-busy={isNavigating}
       >
         <Suspense fallback={<Loading />}>
           <div className="flex-1 px-4 lg:px-28">

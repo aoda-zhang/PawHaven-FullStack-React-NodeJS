@@ -41,19 +41,44 @@ project's data is placeholder.
 ### 1.3 Outlet, error boundary, and footer
 
 ```tsx
-<Suspense fallback={<Loading />}>
-  <div className="flex-1 px-4 lg:px-28">
-    <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
-      <Outlet />
-    </ErrorBoundary>
-  </div>
-  {isFooterAvailable && (
-    <footer>
-      <RootLayoutFooter />
-    </footer>
-  )}
-</Suspense>
+<div className="flex min-h-dvh flex-col overflow-x-hidden">
+  {!isAuthPage && <header>…</header>}
+  <main
+    className="flex flex-1 flex-col"
+    inert={isNavigating}
+    aria-busy={isNavigating}
+  >
+    <Suspense fallback={<Loading />}>
+      <div className="flex-1 px-4 lg:px-28">
+        <ErrorBoundary FallbackComponent={ContentFallback} key={pathname}>
+          <Outlet />
+        </ErrorBoundary>
+      </div>
+      {isFooterAvailable && (
+        <footer>
+          <RootLayoutFooter />
+        </footer>
+      )}
+    </Suspense>
+  </main>
+</div>
 ```
+
+`Loading` from `@pawhaven/ui` is the single loading UI: an existing full-screen Lottie animation
+with `role="status"` and a default `aria-label` of `Loading`. It is reached in two ways:
+
+- **Data suspension.** Pages read their primary data with `useSuspenseQuery`; a pending query
+  suspends and the `Suspense` fallback paints `<Loading />` in place of the page content. The
+  boundary sits inside `<main>` around the content and footer, so the header stays outside it and
+  remains visible during page data loading.
+- **Lazy route chunks.** The app mounts `<RouterProvider useTransitions={false} />`. With React
+  Router's default transitions React keeps the current page on screen while the next route's chunk
+  loads, so the fallback never paints. With transitions off, `useNavigation().state === 'loading'`
+  exposes that window; `RootLayout` renders `{isNavigating && <Loading />}` beside `<Toast />` and
+  sets `inert={isNavigating}` on `<main>` (plus `aria-busy={isNavigating}` on `<main>`), so the
+  stale page cannot take focus while the header stays usable.
+
+`RouteHydrateFallback` in `app/router/router.tsx` renders `<Loading />` while the router hydrates.
 
 The `key={pathname}` remounts the boundary on every navigation, so a thrown loader error clears on
 route change instead of sticking. `<ScrollRestoration />` and `<Toast />` sit at the shell level.
@@ -188,7 +213,7 @@ The shell lives in `app/layout/` and holds no data access. The boot data lives i
 
 | File                                                      | Role                                                                     |
 | --------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `app/layout/RootLayout.tsx`                               | §1 — the shell                                                           |
+| `app/layout/RootLayout.tsx`                               | §1 — the shell, layout `Suspense`, lazy-chunk loading                    |
 | `app/layout/RootLayoutMenu.tsx` / `RootLayoutSidebar.tsx` | §1.1 — server-driven nav                                                 |
 | `app/layout/RootLayoutFooter.tsx`                         | §1.3 — 13 dead links                                                     |
 | `app/layout/hooks/useMenuVisibility.ts`                   | The two `handle` flags + `isAuthPage`                                    |
@@ -199,7 +224,8 @@ The shell lives in `app/layout/` and holds no data access. The boot data lives i
 | `app/init/bootstrap.queries.ts`                           | `bootstrapQueryOptions(scope)`                                           |
 | `app/init/bootstrap.queryKeys.ts`                         | `BootstrapScope` + the key factory it keys by `{ userID, menuUpdateAt }` |
 | `app/init/currentUser.ts`                                 | `GET /auth/me` + the current-user query behind the guard                 |
-| `app/layout/hooks/tests/useMenuNavigation.test.tsx`       | The shell's only test                                                    |
+| `app/layout/hooks/tests/useMenuNavigation.test.tsx`       | Menu navigation test                                                     |
+| `app/layout/tests/RouteLoadingSuspense.test.tsx`          | Layout fallback with and without router transitions                      |
 
 The unauthenticated redirect lives in the app layer, not in `pages/auth/`: `onAuthError` in
 `app/providers/QueryProvider.tsx` replaces the location when a request comes back `401`, and

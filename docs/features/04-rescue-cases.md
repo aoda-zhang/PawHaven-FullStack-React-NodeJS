@@ -25,9 +25,9 @@ local `useState<FilterStatus>`. Three options, from `FILTER_OPTIONS`:
 contradicts the project's snake_case key rule.
 
 Filtering is **client-side only** — `displayedCases` is a `cases.filter(...)` over the array the
-suspense query already fetched. Switching filters costs no request. Because the server call passes
-no status, the fetched set is whatever `latestRescueLimit` allows, so a filter can only ever narrow
-that window; it cannot reach a case the initial query did not return.
+query already fetched. Switching filters costs no request. Because the server call passes no status,
+the fetched set is whatever `latestRescueLimit` allows, so a filter can only ever narrow that window;
+it cannot reach a case the initial query did not return.
 
 Only two of the seven statuses are filterable. `treated`, `recovering`, `awaitingAdoption`,
 `adopted`, and `failed` have no filter and are unreachable through this UI — see
@@ -38,18 +38,23 @@ Only two of the seven statuses are filterable. `treated`, `recovering`, `awaitin
 `apps/frontend/portal/src/pages/rescue-cases/components/RescueCasesSection.tsx` receives
 `cases={displayedCases}` and `onCaseClick`, and deliberately omits `onSeeAll` and
 `showStatusSummary` (defaults: absent / `true`). So the "see all" affordance is omitted — correct,
-since this _is_ the full list — but the pending / in-progress counter **is** rendered here, unlike
-on the homepage.
+since this _is_ the full list — but the pending / in-progress counter is rendered once data has
+loaded, unlike on the homepage.
+
+`isLoading` remains a `RescueCasesSection` capability, but the route never passes it: page data is
+read with `useSuspenseQuery`, so a pending query suspends into `RootLayout`'s
+`<Suspense fallback={<Loading />}>` and the section only renders once data has arrived.
+Once data arrives, the section renders the pending / in-progress counter.
 
 States:
 
-| State       | Rendering                                      |
-| ----------- | ---------------------------------------------- |
-| `isLoading` | `RescueCasesSectionSkeleton`                   |
-| empty       | `rescue_cases.no_cases_found`, `py-16` centred |
-| populated   | `CaseCard` per case                            |
+| State     | Rendering                                      |
+| --------- | ---------------------------------------------- |
+| pending   | layout `Suspense` fallback: `Loading`          |
+| empty     | `rescue_cases.no_cases_found`, `py-16` centred |
+| populated | `CaseCard` per case                            |
 
-`safeCases = cases ?? []` guards the null case even though the query's parsed type says otherwise.
+`RescueCasesSection` still coalesces `cases ?? []` internally as a defensive guard.
 
 `CaseCard` is a `div` with `role="button"`, `tabIndex={0}` and an `onKeyDown` that activates on
 `Enter` or `Space` — so the card is keyboard-reachable, but the `role="button"` element has no
@@ -64,7 +69,9 @@ animal type, `formatDateTime`, and a `MapPin` with the address. `distance` is no
 flowchart TD
     A[GET /rescue-cases] --> B[rescueCasesRoute · lazy import]
     B --> C[RescueCasesPage · useSuspenseQuery<br/>GET /core/rescues]
-    C --> D[Filter bar · local useState]
+    C --> P{query pending}
+    P -->|yes| Q[RootLayout Suspense fallback<br/>Loading]
+    P -->|no| D[Filter bar · local useState]
     D --> E[displayedCases = cases.filter]
     E --> F[RescueCasesSection]
     F --> G[CaseCard per case<br/>image · StatusBadge · type · time · address]
@@ -72,6 +79,8 @@ flowchart TD
     H --> I[navigate routePaths.rescueCaseDetail]
     I --> J[Rescue Detail]
 ```
+
+`rescueCasesQueryOptions` carries no loading `meta`; the layout `Suspense` fallback owns the wait.
 
 `rescueCases.api.ts` parses the response with `RescueListItemSchema.array()`, so a shape drift
 fails at the API boundary. The route is lazy; there is no route loader.

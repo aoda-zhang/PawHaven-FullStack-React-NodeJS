@@ -57,7 +57,7 @@ beforeEach(() => {
 const imageFile = (name: string, type = 'image/jpeg') =>
   new File(['fake-image'], name, { type });
 
-const renderPhotoUpload = () => {
+const renderPhotoUpload = (uploadError?: string) => {
   const state: { getPhotos: () => File[] | undefined } = {
     getPhotos: () => [],
   };
@@ -68,7 +68,7 @@ const renderPhotoUpload = () => {
     state.getPhotos = () => form.getValues('photos');
     return (
       <FormProvider {...form}>
-        <PhotoUpload onFilesSelected={vi.fn()} />
+        <PhotoUpload onFilesSelected={vi.fn()} uploadError={uploadError} />
       </FormProvider>
     );
   };
@@ -155,6 +155,25 @@ describe('PhotoUpload (MultiImageUpload)', () => {
     fireEvent.click(removeButtons[0]);
 
     expect(state.getPhotos()).toHaveLength(1);
+  });
+
+  it('renders the upload error above the image grid', () => {
+    const { input } = renderPhotoUpload('reportAnimal.photos_upload_failed');
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent('reportAnimal.photos_upload_failed');
+
+    const addButton = screen.getByRole('button', {
+      name: 'imageUpload.add',
+    });
+    expect(alert.compareDocumentPosition(addButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+
+    expect(alert.id).not.toBe('');
+    const describedBy = input.getAttribute('aria-describedby') ?? '';
+    expect(describedBy.split(' ')).toContain(alert.id);
+    expect(input).not.toHaveAttribute('aria-invalid');
   });
 
   it('revokes the preview url when a photo is removed', () => {

@@ -156,11 +156,11 @@ It is the only outbound link from a detail view.
 
 ```mermaid
 flowchart TD
-    A[GET /rescue/detail/:animalID] --> B[rescueCaseDetailLoader]
-    B --> C["return { animal: ensureQueryData(...) }<br/>a Promise, not a value"]
-    C --> D[RescueDetail · Suspense + Await]
-    D --> E[RescueDetailSkeleton while pending]
-    E --> F[RescueDetailContent]
+    A[GET /rescue/detail/:animalID] --> B[rescueDetailRoute · lazy import]
+    B --> C[RescueDetail · useSuspenseQuery<br/>GET /core/rescues/:id]
+    C --> P{query pending}
+    P -->|yes| Q[RootLayout Suspense fallback<br/>Loading]
+    P -->|no| F[RescueDetailContent]
     F --> G[1.1 Photo hero · status chip]
     F --> H[1.2 Basic info tiles]
     F --> I[1.3 One-row timeline]
@@ -169,9 +169,10 @@ flowchart TD
     F --> L[RelevantGuides → /rescue/guides]
 ```
 
-The loader returns `{ animal: Promise<RescueDetail> }` rather than the value, and the component
-defers to `<Suspense>` + `<Await>`. This is the only page in the portal that does so — every other
-loader resolves to data. The fallback is `RescueDetailSkeleton`.
+There is no route loader and no `Suspense`/`Await` shell. `RescueDetail` reads the detail query with
+`useSuspenseQuery`, so a pending query suspends into `RootLayout`'s
+`<Suspense fallback={<Loading />}>`; there is no skeleton and no query `meta`. A failed
+query throws into the shell's `ContentFallback` boundary.
 
 ## 3. Endpoint
 
@@ -193,19 +194,18 @@ contract fields the write path discards.
 
 ## 5. Frontend Files
 
-| File                                                                  | Role                                  |
-| --------------------------------------------------------------------- | ------------------------------------- |
-| `route.tsx`                                                           | `rescueDetailRoute` + loader; `lazy:` |
-| `RescueDetail.tsx`                                                    | `Suspense`/`Await` shell              |
-| `components/RescueDetailContent.tsx`                                  | §1 — composes all six regions         |
-| `components/RescueDetailSkeleton.tsx`                                 | Suspense fallback                     |
-| `components/AnimalBasicInfo.tsx`                                      | §1.2                                  |
-| `components/InfoTile.tsx`                                             | §1.2 — local atom, used here only     |
-| `components/RescueTimeline.tsx`                                       | §1.3 — the single-row variant         |
-| `components/VolunteerInfo.tsx`                                        | §1.4, §1.5                            |
-| `components/RelevantGuides.tsx`                                       | §1.6 — a hard-coded link list         |
-| `api/rescueDetail.api.ts` / `.queries.ts` / `.queryKeys.ts`           | The call and its cache key            |
-| `tests/RescueDetailContent.test.tsx` / `tests/VolunteerInfo.test.tsx` | The only two tests                    |
+| File                                                                  | Role                              |
+| --------------------------------------------------------------------- | --------------------------------- |
+| `route.tsx`                                                           | `rescueDetailRoute` with `lazy:`  |
+| `index.tsx`                                                           | §2 — `useSuspenseQuery`           |
+| `components/RescueDetailContent.tsx`                                  | §1 — composes all six regions     |
+| `components/AnimalBasicInfo.tsx`                                      | §1.2                              |
+| `components/InfoTile.tsx`                                             | §1.2 — local atom, used here only |
+| `components/RescueTimeline.tsx`                                       | §1.3 — the single-row variant     |
+| `components/VolunteerInfo.tsx`                                        | §1.4, §1.5                        |
+| `components/RelevantGuides.tsx`                                       | §1.6 — a hard-coded link list     |
+| `api/rescueDetail.api.ts` / `.queries.ts` / `.queryKeys.ts`           | The call and its cache key        |
+| `tests/RescueDetailContent.test.tsx` / `tests/VolunteerInfo.test.tsx` | The only two tests                |
 
 `rescueDetail` is the only feature with a **separate query key per animal id**, so two animals can
 be cached side by side — the correct pattern, and the one [Rescue Cases](04-rescue-cases.md) does
@@ -250,7 +250,7 @@ the shared surface is a stable, self-contained button-plus-count pair. See
   follow rows. There is no delete path for reports today, so this is latent.
 - **No relevance logic on the guides card** — it is a fixed link list; see [§1.6](#16-relevant-guides).
 - **No 404 page for a missing animal.** A bad id returns 400 from the endpoint and surfaces as a
-  thrown loader error into the shell's `ErrorBoundary`.
+  thrown query error into the shell's `ErrorBoundary`.
 
 ## 7. Related Docs
 
