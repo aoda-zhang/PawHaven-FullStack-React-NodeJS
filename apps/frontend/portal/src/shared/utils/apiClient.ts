@@ -3,6 +3,8 @@ import type { FileUploadResult } from '@pawhaven/shared/types';
 
 import { loadConfig } from '@/config';
 
+const FILE_UPLOAD_TIMEOUT_MS = 60_000;
+
 /**
  * Create a single shared API client instance for this app.
  * Ensures all API requests share the same configuration.
@@ -29,5 +31,7 @@ export const uploadFiles = (
   if (folder) {
     formData.append('folder', folder);
   }
-  return apiClient.post<FileUploadResult, FormData>(endpoint, formData);
+  return apiClient.post<FileUploadResult, FormData>(endpoint, formData, {
+    timeout: FILE_UPLOAD_TIMEOUT_MS,
+  });
 };
