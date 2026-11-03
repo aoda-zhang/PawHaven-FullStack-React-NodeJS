@@ -14,7 +14,7 @@ const phoneRegex = /^[\d\s\-+()]{7,20}$/;
 
 const BYTES_PER_KB = 1024;
 const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB;
-const MAX_PHOTO_SIZE_MB = 5;
+const MAX_PHOTO_SIZE_MB = 2;
 const MAX_PHOTO_SIZE_BYTES = MAX_PHOTO_SIZE_MB * BYTES_PER_MB;
 const CONTACT_EMAIL_MAX_LENGTH = 100;
 
