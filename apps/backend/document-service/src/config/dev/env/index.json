@@ -57,10 +57,6 @@
       "ciphers": "HIGH"
     }
   },
-  "blob": {
-    "enabled": false,
-    "token": "${DOCUMENT_READ_WRITE_TOKEN}"
-  },
   "storage": {
     "provider": "vercel",
     "vercel": {

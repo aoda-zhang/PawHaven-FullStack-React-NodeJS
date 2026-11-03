@@ -78,6 +78,11 @@ export const ReportAnimalForm = ({
     onError: () => setPhotoErrorKey('reportAnimal.photos_upload_failed'),
   });
 
+  const handleFilesSelected = (files: File[]) => {
+    setPhotoErrorKey(null);
+    startUploads(files);
+  };
+
   const handleSubmit = async (values: ReportAnimalFormValues) => {
     setPhotoErrorKey(null);
 
@@ -128,7 +133,6 @@ export const ReportAnimalForm = ({
     onSubmit(dto);
   };
 
-  const bannerKey = submitErrorKey ?? photoErrorKey;
   const isUploading = uploadingCount > 0;
 
   if (submittedCaseId) {
@@ -168,7 +172,10 @@ export const ReportAnimalForm = ({
           <p className="text-text-secondary mb-5 text-sm">
             {t('reportAnimal.basics_subtitle')}
           </p>
-          <AnimalBasicsSection onFilesSelected={startUploads} />
+          <AnimalBasicsSection
+            onFilesSelected={handleFilesSelected}
+            photoError={photoErrorKey ? t(photoErrorKey) : undefined}
+          />
         </div>
 
         <div className="bg-card border-border rounded-card-large mb-6 border p-6 shadow-sm">
@@ -181,11 +188,11 @@ export const ReportAnimalForm = ({
           <BehaviorContactSection />
         </div>
 
-        {bannerKey && (
+        {submitErrorKey && (
           <NotificationBanner
             banner={{
               type: 'error',
-              message: t(bannerKey),
+              message: t(submitErrorKey),
               bannerWrapClassNames: 'mb-4 rounded-panel border lg:px-4',
             }}
           />
@@ -193,13 +200,11 @@ export const ReportAnimalForm = ({
 
         <Button
           type="submit"
-          loading={isPending || isUploading}
+          loading={isPending}
           disabled={isPending || isUploading}
           className="rounded-button-large w-full py-3"
         >
-          {isPending || isUploading
-            ? t('reportAnimal.submitting')
-            : t('reportAnimal.submit')}
+          {isPending ? t('reportAnimal.submitting') : t('reportAnimal.submit')}
         </Button>
       </form>
     </FormProvider>
