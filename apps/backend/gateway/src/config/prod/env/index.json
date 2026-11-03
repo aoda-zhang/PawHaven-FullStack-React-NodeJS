@@ -4,7 +4,7 @@
     "port": 8080,
     "maxJsonBodySize": "100mb",
     "prefix": "api",
-    "timeout": 40000,
+    "timeout": 55000,
     "retryCount": 3,
     "retryDelay": 500,
     "trustProxy": 0
@@ -84,9 +84,16 @@
       "X-Sign",
       "x-locale"
     ],
-    "origin": ["https://pawhaven.work"],
+    "origin": [
+      "https://pawhaven.work"
+    ],
     "credentials": true,
     "optionsSuccessStatus": 204,
-    "methods": ["GET", "POST", "PUT", "OPTIONS"]
+    "methods": [
+      "GET",
+      "POST",
+      "PUT",
+      "OPTIONS"
+    ]
   }
 }
