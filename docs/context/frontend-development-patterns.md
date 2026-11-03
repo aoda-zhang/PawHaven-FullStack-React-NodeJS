@@ -42,6 +42,15 @@ children. Form-local `useState` and `react-hook-form` context reads are a view's
 5. Fetch page data through the slice's query hooks (see §2.2).
 6. Add the route to the authenticated parent only if it needs a session.
 
+Page loading is owned by the shell. A page's primary data comes from `useSuspenseQuery`, and
+`RootLayout` wraps the page content inside `<main>` in one `<Suspense fallback={<Loading />}>`, so
+a suspended query paints the single full-screen `Loading` while the header stays outside the
+boundary and visible. The app mounts
+`<RouterProvider useTransitions={false} />`: React Router otherwise wraps navigations in
+`startTransition`, React keeps the current page on screen, and the fallback never paints. The
+lazy-chunk phase uses `useNavigation().state === 'loading'` to show the same `Loading` and mark
+only `<main>` inert; the header remains usable. Do not add a page-level skeleton or query `meta`.
+
 ### 2.2 Requesting data
 
 | File                  | Owns                      | Rule                                                                |
@@ -62,6 +71,9 @@ children. Form-local `useState` and `react-hook-form` context reads are a view's
   reach it — `sharedQueryKeys.rescueCases.all()`, because `report-animal` clears a slice it does not
   own. Every other key stays with its owner.
 - Server state never enters Redux.
+- Page-primary reads use `useSuspenseQuery`; the layout `Suspense` fallback owns their loading UI, so
+  no query carries a loading `meta` and no page renders a skeleton. The lazy-route chunk window is
+  the only other loading phase, driven by `useNavigation().state === 'loading'` in `RootLayout`.
 
 ### 2.3 Form
 

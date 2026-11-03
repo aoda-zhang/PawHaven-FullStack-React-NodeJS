@@ -62,7 +62,7 @@ export const RescueCasesSection = ({
           <h2 className="text-foreground font-serif text-2xl font-bold">
             {t('rescue_cases.section_title')}
           </h2>
-          {showStatusSummary && (
+          {showStatusSummary && !isLoading && (
             <p className="text-text-secondary mt-0.5 text-sm">
               {t('rescue_cases.status_summary', {
                 pendingCount,

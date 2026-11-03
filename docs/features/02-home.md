@@ -17,8 +17,10 @@ request, and the only place the adoptable-pets catalogue appears at all.
 | 3     | Adoptable pets | `components/AdoptablePetsSection.tsx`              | `adoptablePets` |
 | 4     | Stray CTA      | `components/StrayCTA.tsx`                          | static          |
 
-`Home.tsx` calls `useSuspenseQuery(homeQueryOptions())` once and passes the resulting `HomeData`
-to the sections as props. `Hero.tsx` receives `heroStats`; it does not fetch.
+`Home.tsx` calls `useSuspenseQuery(homeQueryOptions())` once and passes the resulting `HomeData` to
+the sections as props. Loading is owned by the shell: a pending query suspends into `RootLayout`'s
+`<Suspense fallback={<Loading />}>`, so there is no `HomeSkeleton` and no page-level
+loading branch. `Hero.tsx` receives `heroStats`; it does not fetch.
 
 ### 1.1 Hero
 
@@ -43,9 +45,9 @@ so the highlighted span is a component slot rather than a concatenated string.
 `home → rescue-cases` value import is the pinned A2 exception in `check-architecture.mjs`.
 Full detail in [Rescue Cases](04-rescue-cases.md).
 
-The homepage passes `showStatusSummary={false}` and omits `isLoading`, so the pending/in-progress
-counter the section can render is suppressed and the skeleton is never shown — the query has
-already resolved by the time `Home` renders.
+The homepage passes `showStatusSummary={false}` and leaves `isLoading` at its default, so the
+pending/in-progress counter the section can render is suppressed. Loading is owned by the layout
+`Suspense` fallback, so `Home` never passes `isLoading`.
 
 ### 1.3 Adoptable pets
 
@@ -74,7 +76,9 @@ flowchart TD
     A[GET /] --> B[RootLayout · useBootstrapQuery<br/>GET /core/bootstrap]
     A --> C[homeRoute · eager component]
     C --> D[Home · useSuspenseQuery<br/>homeQueryOptions → GET /core/home]
-    D --> E[Hero · RescueCasesSection<br/>AdoptablePetsSection · StrayCTA]
+    D --> P{query pending}
+    P -->|yes| Q[RootLayout Suspense fallback<br/>Loading]
+    P -->|no| E[Hero · RescueCasesSection<br/>AdoptablePetsSection · StrayCTA]
     E --> F{click a case}
     F --> G[/rescue/detail/:id]
     E --> H{click a pet}
@@ -85,10 +89,11 @@ flowchart TD
 
 There are no route loaders. `RootLayout` owns the bootstrap query and skips it on auth pages via
 `enabled: !isAuthPage`; the auth routes are lazy-loaded. `Home` reads the home query through
-TanStack Query's suspense cache, so a revisit is served from cache unless the query is stale.
-`homeRoute` imports `Home` eagerly, so the landing page is part of the initial bundle. The home
-request is all-or-nothing: if any of the three key reads fails, the query rejects and the nearest
-`ContentFallback` error boundary replaces the page content with the system error view.
+TanStack Query's suspense cache, so a revisit is served from cache unless the query is stale. A cold
+cache suspends into the layout's `Loading` fallback; there is no query `meta` and no page
+skeleton. `homeRoute` imports `Home` eagerly, so the landing page is part of the initial bundle. The
+home request is all-or-nothing: if any of the three key reads fails, the query rejects and the
+nearest `ContentFallback` error boundary replaces the page content with the system error view.
 
 ## 3. Endpoint
 
@@ -181,12 +186,13 @@ are required; there is no partial/degraded response shape.
 | `index.tsx`                                         | §1                                     |
 | `components/Hero.tsx`                               | §1.1                                   |
 | `components/AdoptablePetsSection.tsx`               | §1.3 — presentational                  |
-| `components/AdoptablePetsSectionSkeleton.tsx`       | Loading state, unused on this route    |
+| `components/AdoptablePetsSectionSkeleton.tsx`       | The section's own loading capability   |
 | `components/PetCard.tsx`                            | One pet                                |
 | `components/StrayCTA.tsx`                           | §1.4 — duplicated in `report-animal`   |
 | `api/home.api.ts` / `.queries.ts` / `.queryKeys.ts` | The call and its cache key             |
 | `types.ts`                                          | Section-local types                    |
-| `tests/AdoptablePetsSection.test.tsx`               | The only test                          |
+| `tests/AdoptablePetsSection.test.tsx`               | Section states                         |
+| `tests/Home.test.tsx`                               | Cached data + route error boundary     |
 
 `homeRoute` is eager. The auth routes are lazy; `RootLayout` remains the single bootstrap owner.
 

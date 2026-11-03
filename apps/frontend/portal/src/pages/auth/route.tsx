@@ -1,6 +1,4 @@
-import { Loading } from '@pawhaven/ui';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Suspense } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 
 import { currentUserQueryOptions } from '@/app/init/currentUser';
@@ -31,13 +29,11 @@ export const AuthenticatedLayout = () => {
   const { userInfo } = useGlobalContext();
 
   return (
-    <Suspense fallback={<Loading />}>
-      <AuthCheck
-        userId={userInfo?.userId ?? ''}
-        pathname={pathname}
-        search={search}
-      />
-    </Suspense>
+    <AuthCheck
+      userId={userInfo?.userId ?? ''}
+      pathname={pathname}
+      search={search}
+    />
   );
 };
 
