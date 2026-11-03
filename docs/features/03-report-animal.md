@@ -49,13 +49,15 @@ Ticking `urgent` also reveals a static `bg-error-light` note reading
 There is no email input. `contactInfo.email` is sent as a hard-coded `''`.
 
 The submit button is a `Button type="submit"` with `loading={isPending}` and
-`disabled={isPending}`, relabelled `reportAnimal.submitting` while in flight.
+`disabled={isPending || isUploading}`, relabelled `reportAnimal.submitting` only while the create
+request is pending. Photo uploads disable the button without changing its loading state or label.
 
-A failed submission leaves the form editable. HTTP 400, HTTP 429, unreadable-photo failures, and a
-response missing the server `id` render an inline `NotificationBanner` above the submit button.
-Server, maintenance, network, auth, and permission failures are surfaced by the shared
-`MutationCache` toast instead, so they are not duplicated inline. `window.scrollTo(0, 0)` happens
-only on success.
+A failed submission leaves the form editable. Photo-upload failures render inline above the photo
+grid through `MultiImageUpload`'s `uploadError`. A submit failure that yields an inline key — a
+response resolving without the server `id` — renders an inline `NotificationBanner` above the submit
+button. HTTP 400, HTTP 429, HTTP 500, server, maintenance, network, auth, and permission failures are
+surfaced by the shared `MutationCache` toast instead, so they are not duplicated inline.
+`window.scrollTo(0, 0)` happens only on success.
 
 ### 1.3 Success card
 
@@ -122,6 +124,9 @@ The reusable client helper is `uploadFiles(files, folder?)` in
 `folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
 endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
 the report form itself still restricts the picker to JPEG/PNG. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
+
+An upload failure is reported inline by the photo control, above the image grid, not at the bottom of
+the form.
 
 document-service also verifies each upload's **real bytes** against the declared MIME
 (JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles per authenticated user
@@ -211,22 +216,22 @@ a friendly one.
 
 ## 7. Frontend Files
 
-| File                                        | Role                                                                                                                     |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `route.tsx`                                 | `reportAnimalRoute`; the only `AuthenticatedLayout`-nested route                                                         |
-| `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                   |
-| `components/ReportAnimalForm.tsx`           | RHF form; uploads photos, maps form values to the DTO, and owns the success card                                         |
-| `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                     |
-| `components/LocationSection.tsx`            | Address + coordinates                                                                                                    |
-| `components/PhotoUpload.tsx`                | `photos` field via `MultiImageUpload`; count/size/type validation                                                        |
-| `components/AnimalCountStepper.tsx`         | Count −/+                                                                                                                |
-| `components/BehaviorContactSection.tsx`     | §1.2                                                                                                                     |
-| `components/StrayCTA.tsx`                   | §1.4 — duplicated from `home`                                                                                            |
-| `components/types.ts`                       | Re-exports `ANIMAL_TYPES`, `SIZES`, `BEHAVIORS`, `RescueAgeValues` and their types from `@pawhaven/shared/types`         |
-| `utils/reportSubmitError.ts`                | Maps submit failures to the inline message key; returns `null` for errors already shown by the shared toast              |
-| `api/reportAnimal.api.ts` / `.mutations.ts` | The call; the mutation invalidates the rescue-feed and home keys                                                         |
-| `../../shared/api/file.api.ts`              | `uploadFiles(files, folder?)` — generic Blob upload helper (shared, not feature-local)                                   |
-| `tests/`                                    | Component, validation, DTO-mapping and API tests, plus `ReportAnimal.submit` (400/429/500, unreadable photos, real `id`) |
+| File                                        | Role                                                                                                                          |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `route.tsx`                                 | `reportAnimalRoute`; the only `AuthenticatedLayout`-nested route                                                              |
+| `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                        |
+| `components/ReportAnimalForm.tsx`           | RHF form; uploads photos, maps form values to the DTO, and owns the success card                                              |
+| `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                          |
+| `components/LocationSection.tsx`            | Address + coordinates                                                                                                         |
+| `components/PhotoUpload.tsx`                | `photos` field via `MultiImageUpload`; count/size/type validation, and forwards the upload error for rendering above the grid |
+| `components/AnimalCountStepper.tsx`         | Count −/+                                                                                                                     |
+| `components/BehaviorContactSection.tsx`     | §1.2                                                                                                                          |
+| `components/StrayCTA.tsx`                   | §1.4 — duplicated from `home`                                                                                                 |
+| `components/types.ts`                       | Re-exports `ANIMAL_TYPES`, `SIZES`, `BEHAVIORS`, `RescueAgeValues` and their types from `@pawhaven/shared/types`              |
+| `utils/reportSubmitError.ts`                | Maps submit failures to the inline message key; returns `null` for errors already shown by the shared toast                   |
+| `api/reportAnimal.api.ts` / `.mutations.ts` | The call; the mutation invalidates the rescue-feed and home keys                                                              |
+| `../../shared/api/file.api.ts`              | `uploadFiles(files, folder?)` — generic Blob upload helper (shared, not feature-local)                                        |
+| `tests/`                                    | Component, validation, DTO-mapping and API tests, plus `ReportAnimal.submit` (400/429/500, unreadable photos, real `id`)      |
 
 Validation is schema-first on both sides, and the two schemas are deliberately different shapes:
 `createReportAnimalFormSchema(messages)` builds a client Zod schema with translated messages,

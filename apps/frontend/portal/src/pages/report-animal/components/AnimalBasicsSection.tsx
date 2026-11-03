@@ -10,10 +10,12 @@ import { ANIMAL_TYPES, RescueAgeValues, SIZES } from './types';
 
 interface AnimalBasicsSectionProps {
   onFilesSelected: (files: File[]) => void;
+  photoError?: string;
 }
 
 export const AnimalBasicsSection = ({
   onFilesSelected,
+  photoError,
 }: AnimalBasicsSectionProps) => {
   const { t } = useTranslation();
   const { control } = useFormContext<ReportAnimalFormValues>();
@@ -71,7 +73,7 @@ export const AnimalBasicsSection = ({
         required
       />
 
-      <PhotoUpload onFilesSelected={onFilesSelected} />
+      <PhotoUpload onFilesSelected={onFilesSelected} uploadError={photoError} />
     </div>
   );
 };

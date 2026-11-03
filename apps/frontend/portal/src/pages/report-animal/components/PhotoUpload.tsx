@@ -6,9 +6,13 @@ import { useTranslation } from 'react-i18next';
 
 interface PhotoUploadProps {
   onFilesSelected: (files: File[]) => void;
+  uploadError?: string;
 }
 
-export const PhotoUpload = ({ onFilesSelected }: PhotoUploadProps) => {
+export const PhotoUpload = ({
+  onFilesSelected,
+  uploadError,
+}: PhotoUploadProps) => {
   const { t } = useTranslation();
   const { field, fieldState } = useController<ReportAnimalFormValues, 'photos'>(
     {
@@ -24,6 +28,7 @@ export const PhotoUpload = ({ onFilesSelected }: PhotoUploadProps) => {
         onFilesSelected(files);
       }}
       error={fieldState.error?.message}
+      uploadError={uploadError}
       required
       max={REPORT_PHOTO_LIMITS.max}
       maxSizeBytes={REPORT_PHOTO_LIMITS.maxSizeBytes}
