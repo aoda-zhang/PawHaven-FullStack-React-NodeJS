@@ -121,7 +121,7 @@ The reusable client helper is `uploadFiles(files, folder?)` in
 `apps/frontend/portal/src/shared/api/file.api.ts`; the report form calls it with
 `folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
 endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
-the report form itself still restricts the picker to JPEG/PNG. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
+the report form itself restricts the picker to JPEG/PNG and applies a stricter 2 MB per-photo client-side limit. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
 
 document-service also verifies each upload's **real bytes** against the declared MIME
 (JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles per authenticated user
