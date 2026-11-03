@@ -13,7 +13,7 @@ const readStorage = (env: string) =>
 const resolvePlaceholders = (value: unknown): unknown => {
   if (typeof value === 'string') {
     return value.replace(/\$\{([A-Z_]+)\}/g, (_match, key: string) =>
-      key === 'BLOB_READ_WRITE_TOKEN' ? 'test-token' : '',
+      key === 'DOCUMENT_READ_WRITE_TOKEN' ? 'test-token' : '',
     );
   }
   if (Array.isArray(value)) {

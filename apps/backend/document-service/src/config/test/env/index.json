@@ -59,13 +59,13 @@
   },
   "blob": {
     "enabled": false,
-    "token": "${BLOB_READ_WRITE_TOKEN}"
+    "token": "${DOCUMENT_READ_WRITE_TOKEN}"
   },
   "storage": {
     "provider": "vercel",
     "vercel": {
-      "token": "${BLOB_READ_WRITE_TOKEN}",
-      "storeId": "${BLOB_STORE_ID}"
+      "token": "${DOCUMENT_READ_WRITE_TOKEN}",
+      "storeId": "${DOCUMENT_STORE_ID}"
     }
   }
 }
