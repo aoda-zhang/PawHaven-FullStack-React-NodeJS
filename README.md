@@ -8,7 +8,6 @@
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
 ![pnpm](https://img.shields.io/badge/Package-pnpm-F69220?logo=pnpm&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-Community-7289DA?logo=discord&logoColor=white)](https://discord.gg/znnG258E)
 
 **PawHaven** is a full-stack platform designed to support **stray animal rescue and adoption**, connecting volunteers, adopters, and the community.
 
@@ -65,18 +64,13 @@ Ensure you meet these version requirements before installing dependencies or run
 
 # 🤝 Community
 
-PawHaven is an open and evolving project.  
-If you are interested in animal rescue, open-source development, or project architecture discussions, you are welcome to join the community.
+PawHaven is an open and evolving project. If you are interested in animal rescue, open-source development, or contributing to the project, you are welcome to get involved.
 
-💬 **Discord**  
-👉 https://discord.gg/znnG258E
+💬 **Interested in contributing?**
 
-You can use the Discord server to:
+Feel free to reach out to me on WhatsApp. I'd be happy to connect, discuss ideas, and explore ways we can work together.
 
-- discuss project ideas and features
-- talk about technical architecture
-- ask development questions
-- collaborate with other contributors
+**Contributions are always welcome!**
 
 ---
 
