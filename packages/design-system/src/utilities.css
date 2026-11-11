@@ -31,9 +31,9 @@
 
 @utility focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
+    outline: 2px solid var(--color-primary);
     outline-offset: 2px;
-    box-shadow: 0 0 0 var(--border-width-2) var(--color-focus-ring-offset);
+    box-shadow: 0 0 0 var(--border-width-2) var(--color-primary-light);
   }
 }
 
