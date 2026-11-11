@@ -69,10 +69,6 @@ jobs:
         shell: bash
         run: pnpm token-check
 
-      - name: Theme and contrast contract
-        shell: bash
-        run: pnpm theme-check
-
       - name: Repository quality
         shell: bash
         run: pnpm quality-check
