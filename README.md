@@ -68,7 +68,7 @@ PawHaven is an open and evolving project. If you are interested in animal rescue
 
 💬 **Interested in contributing?**
 
-Feel free to reach out to me on WhatsApp. I'd be happy to connect, discuss ideas, and explore ways we can work together.
+Feel free to [reach out to me on WhatsApp](https://wa.me/8619102632826). I'd be happy to connect, discuss ideas, and explore ways we can work together.
 
 **Contributions are always welcome!**
 
