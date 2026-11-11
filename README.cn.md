@@ -8,7 +8,6 @@
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&logoColor=white)
 ![pnpm](https://img.shields.io/badge/Package-pnpm-F69220?logo=pnpm&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Discord](https://img.shields.io/badge/Discord-社区-7289DA?logo=discord&logoColor=white)](https://discord.gg/znnG258E)
 
 **PawHaven** 是一个全栈平台，旨在支持**流浪动物救援和领养**，连接志愿者、领养者和社区。
 
@@ -65,17 +64,13 @@
 
 # 🤝 社区
 
-PawHaven 是一个开放且持续发展的项目，欢迎对动物救援、开源开发或项目架构讨论感兴趣的朋友加入社区。
+PawHaven 是一个开放且持续发展的项目。如果你对动物救援、开源开发或参与项目建设感兴趣，欢迎加入我们。
 
-💬 **Discord**  
-👉 https://discord.gg/znnG258E
+💬 **对项目贡献感兴趣？**
 
-在 Discord 你可以：
+欢迎通过 WhatsApp 联系我。我们可以交流项目想法、技术方案，以及探讨如何一起改进 PawHaven。
 
-- 讨论项目想法和功能设计
-- 探讨技术架构
-- 提问开发相关问题
-- 与其他贡献者协作
+**期待更多开发者和动物爱好者参与！**
 
 ---
 
