@@ -180,7 +180,7 @@ const ToastEntry = ({ toast, onDismiss }: ToastEntryProps) => {
         type="button"
         aria-label="Dismiss notification"
         onClick={() => onDismiss(toast.id)}
-        className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors"
+        className="text-text-secondary hover:text-text shrink-0 rounded p-0.5 transition-colors focus-ring"
       >
         <X aria-hidden="true" className="size-4" />
       </button>

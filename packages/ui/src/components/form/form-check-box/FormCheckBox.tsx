@@ -59,7 +59,7 @@ export const FormCheckbox = ({
                 aria-invalid={isInvalid ? true : undefined}
                 aria-describedby={isInvalid ? errorId : undefined}
                 data-testid={`form-checkbox-${name}`}
-                className="border-border bg-background accent-primary size-4 rounded"
+                className="border-border bg-background accent-primary size-4 rounded focus-ring disabled:opacity-60"
               />
               <span>{label}</span>
             </label>

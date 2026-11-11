@@ -3,6 +3,21 @@ import type { Preview } from '@storybook/react-vite';
 import './preview.css';
 
 const preview: Preview = {
+  globals: { theme: 'light' },
+  globalTypes: {
+    theme: {
+      name: 'Theme',
+      description: 'Preview components in light and dark semantic themes',
+      toolbar: {
+        icon: 'circlehollow',
+        items: [
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {
@@ -40,8 +55,8 @@ const preview: Preview = {
     },
   },
   decorators: [
-    (Story) => (
-      <div className="bg-background text-text min-h-40 p-6">
+    (Story, context) => (
+      <div data-theme={context.globals.theme} className="bg-background text-text min-h-40 p-6">
         <Story />
       </div>
     ),

@@ -115,7 +115,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
             banner.title ? `Dismiss ${banner.title}` : 'Dismiss notification'
           }
           onClick={() => setOpen(false)}
-          className="hover:bg-background/20 shrink-0 rounded p-0.5 transition-colors"
+          className="hover:bg-background/20 shrink-0 rounded p-0.5 transition-colors focus-ring"
         >
           <X aria-hidden="true" className="size-4" />
         </button>

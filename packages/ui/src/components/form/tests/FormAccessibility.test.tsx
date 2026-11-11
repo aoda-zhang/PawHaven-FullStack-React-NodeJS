@@ -95,6 +95,23 @@ describe('form control accessibility', () => {
     expect(screen.getByLabelText('Date range end')).toBeInTheDocument();
   });
 
+  it('provides a visible keyboard focus indicator for every shared form control', () => {
+    renderAllControls();
+
+    const controls = [
+      screen.getByRole('textbox', { name: 'Name' }),
+      screen.getByRole('combobox', { name: 'Species' }),
+      screen.getByRole('textbox', { name: 'Description' }),
+      screen.getByRole('textbox', { name: 'Phone number' }),
+      screen.getByRole('checkbox', { name: 'Urgent' }),
+      screen.getByRole('radio', { name: 'Friendly' }),
+      screen.getByLabelText('Date range start'),
+      screen.getByLabelText('Date range end'),
+    ];
+
+    controls.forEach((control) => expect(control).toHaveClass('focus-ring'));
+  });
+
   it('requires a date range as a whole instead of each end', () => {
     renderAllControls();
 

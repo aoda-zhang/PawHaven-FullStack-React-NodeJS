@@ -84,7 +84,7 @@ export const FormRadio = ({
                       onBlur={field.onBlur}
                       disabled={disabled}
                       required={required}
-                      className="accent-primary size-4"
+                      className="accent-primary size-4 focus-ring disabled:opacity-60"
                     />
                     {option.label}
                   </label>

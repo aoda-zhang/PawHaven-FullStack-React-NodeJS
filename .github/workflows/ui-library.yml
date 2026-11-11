@@ -62,6 +62,9 @@ jobs:
       - name: Check design tokens
         run: pnpm token-check
 
+      - name: Check theme and contrast contract
+        run: pnpm theme-check
+
       - name: Build UI package and its workspace dependencies
         run: pnpm --filter @pawhaven/ui... build
 

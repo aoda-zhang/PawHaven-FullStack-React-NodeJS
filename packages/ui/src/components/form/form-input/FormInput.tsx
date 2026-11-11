@@ -92,7 +92,7 @@ export const FormInput = ({
                 aria-describedby={isInvalid ? errorId : undefined}
                 data-testid={`form-input-${name}`}
                 className={cn(
-                  'border-border bg-background focus:border-primary rounded-input-large w-full border text-sm transition-colors focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                  'border-border bg-background focus:border-primary rounded-input-large w-full border text-sm transition-colors focus-ring disabled:cursor-not-allowed disabled:bg-control-disabled-bg disabled:text-control-disabled-fg disabled:border-control-disabled-border',
                   sizeClasses,
                   variantClasses,
                   isInvalid && 'border-error focus:border-error',

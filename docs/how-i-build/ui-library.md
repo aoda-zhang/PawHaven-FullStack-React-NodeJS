@@ -99,6 +99,7 @@ purpose changes, **update only that one row in the index**.
 
 - [packages/ui/README.md](../../packages/ui/README.md) — component catalogue, prop vocabulary,
   accessibility notes, migration guide
+- [Accessibility and Theme States](accessibility-and-theme-states.md) — the shared keyboard, focus, reduced-motion, contrast, and theme contract
 - [Design Tokens](design-tokens.md) — where the component colours come from and how they are
   enforced
 - [Frontend development patterns](../context/frontend-development-patterns.md) — the current frontend implementation conventions
