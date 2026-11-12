@@ -1,46 +1,49 @@
 ---
 name: code-commit
-description: Create and validate Git commit messages following the project's conventional commit format (type(scope?): subject) with commitlint rules.
+description: Create and validate PawHaven commit messages using the current PW-<issue> branch and the root Commitlint rules.
 ---
 
 # Code Commit
 
-Load when the user wants to commit and push code changes, or when a commit message needs to be created or validated against the project's commitlint configuration.
+Load when the user asks to generate, validate, create, or push a Git commit.
 
 ## Required actions
 
-1. **Analyze staged changes** — Run `git diff --cached --name-only` and `git diff --cached` to understand what changed.
-2. **Determine commit type** — Map changes to one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
-3. **Determine scope (optional)** — Identify the affected module/package (e.g., `parser`, `ui`, `api`, `auth`, `db`, `ci`).
-4. **Write subject** — Concise description (≥5 chars, ≤100 chars total header) in imperative mood. Chinese allowed.
-5. **Construct message** — Format: `type(scope?): subject` (e.g., `feat(parser): add new feature`).
-6. **Validate with commitlint** — Run `pnpm commitlint --edit` or `echo "<message>" | pnpm commitlint` to verify.
-7. **Commit and push** — Only when the user has explicitly instructed commit and push in the current conversation; otherwise stop after validation and report the message. If instructed and validation passes, run `git commit -m "<message>"` then `git push`.
+1. **Verify the work branch** — Run `git branch --show-current`. Commits must be made on a work branch named exactly `PW-<issue-number>`. Never commit directly to `main` or `develop`.
+2. **Analyze staged changes** — Run `git diff --cached --name-only` and `git diff --cached`. If nothing is staged, explain that and ask whether the user wants the relevant files staged; do not stage unrelated files.
+3. **Determine commit type** — Choose one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
+4. **Determine scope (optional)** — Use the affected module/package when it improves clarity.
+5. **Write the subject** — Concise, imperative, and at least 5 characters. Preserve the repository's 100-character maximum for the complete header.
+6. **Construct the message** — The required format is `[PW-<issue-number>] type(scope?): subject`. The ticket prefix must exactly match the current branch.
+7. **Validate** — Run:
+   ```bash
+   printf '%s\\n' '[PW-119] chore: Update code-commit skill' | pnpm exec commitlint
+   ```
+   The repository Commitlint configuration also verifies that the prefix matches the checked-out branch. The Husky `commit-msg` hook repeats this validation during commit.
+8. **Commit and push** — Only when the user explicitly authorizes the action in the current conversation and validation passes. Never bypass hooks with `HUSKY=0` or `--no-verify`.
 
-## Commitlint rules (from commitlint.config.cjs)
+## Commit format
 
-| Rule               | Value                                               |
-| ------------------ | --------------------------------------------------- |
-| type-enum          | feat, fix, docs, style, refactor, perf, test, chore |
-| scope-case         | any (disabled)                                      |
-| subject-case       | any (disabled)                                      |
-| subject-min-length | 5 characters                                        |
-| header-max-length  | 100 characters                                      |
-| Format             | `type(scope?): subject`                             |
+```text
+[PW-119] chore: Update code-commit skill
+[PW-110] feat(search): Add animal search filters
+[PW-121] fix(navigation): Remove active item background
+```
 
-## Examples
+## Commitlint rules
 
-| Changes                      | Commit message                                    |
-| ---------------------------- | ------------------------------------------------- |
-| New API endpoint in apps/api | `feat(api): add user search endpoint`             |
-| Fix typo in README           | `docs: fix typo in installation guide`            |
-| Refactor auth service        | `refactor(auth): simplify token validation logic` |
-| Update CI workflow           | `chore(ci): update node version to 20`            |
-| Add unit tests for parser    | `test(parser): add unit tests for date parsing`   |
+| Rule | Requirement |
+| --- | --- |
+| Ticket prefix | Required: `[PW-<issue-number>]` |
+| Branch match | Ticket prefix must equal the current branch name |
+| Type | `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore` |
+| Scope | Optional |
+| Subject | At least 5 characters |
+| Header | Maximum 100 characters |
 
 ## Boundary
 
-- Does not decide _what_ changes to stage; user must stage files first (`git add`).
-- Does not bypass commitlint; validation failure blocks commit.
-- Does not handle merge conflicts or rebase; only creates commit messages.
+- Does not decide what files to stage; inspect staged changes and ask before staging.
+- Does not bypass Commitlint or Husky.
+- Does not create branches or pull requests; use the `pr-workflow` skill.
 - Does not amend previous commits unless explicitly asked.
