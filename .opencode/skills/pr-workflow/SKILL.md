@@ -1,115 +1,86 @@
 ---
 name: pr-workflow
-description: Standardize issue-driven Git branches, commits, pull requests, and merges for PawHaven. Use whenever starting or finishing a code task that must be tracked by a GitHub issue.
+description: Manage issue-based branches and pull requests for PawHaven.
 ---
 
-# PawHaven PR Workflow
+# PR Workflow
 
-Use this skill for every issue-driven code change in the PawHaven repository.
+Use this workflow for issue-based code changes.
 
-## Non-negotiable conventions
+## Rules
 
-- Work branches must be created from the latest `develop` branch.
-- Work branch format: `PW-<issue-number>` exactly. Do not append a description or suffix.
+- Create every work branch from the latest `develop`.
+- Branch name: `PW-<issue-number>` (no suffix).
 - Commit format: `[PW-<issue-number>] type(scope?): subject`.
-- The ticket in every commit message must exactly match the currently checked-out work branch.
-- Allowed commit types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
-- Pull request base: choose the target branch according to the user's request and the repository's integration workflow; do not hard-code `develop`.
-- Never commit work directly to `main` or `develop`.
+- The commit ticket must match the current branch.
+- Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
+- Never commit directly to `main` or `develop`.
+- Choose the PR target from the user's request or repository workflow. Ask if unclear; do not assume `develop`.
+- Never discard user changes, bypass hooks, or bypass branch protection.
 
-Examples:
+## Steps
 
+### 1. Identify the issue
+
+- Get the issue number from the user or an issue URL. If missing, ask; never invent one.
+- Check the issue's scope, acceptance criteria, and status.
+- Do not work on a closed issue unless the user asks.
+
+### 2. Create the branch
+
+- Run `git status --short`. If the worktree has changes, preserve them and ask how to proceed.
+- Run `git fetch origin`.
+- Update `develop` with fast-forward only:
+  ```bash
+  git switch develop
+  git pull --ff-only origin develop
+  ```
+- Check whether `PW-<issue-number>` already exists. Inspect an existing branch; never reset it automatically.
+- Create the branch from `develop`:
+  ```bash
+  git switch -c PW-<issue-number> develop
+  ```
+- Confirm the current branch name.
+
+### 3. Implement and check
+
+- Follow the issue acceptance criteria and repository instructions.
+- Keep changes limited to the issue.
+- Run relevant tests, lint, type checks, and build.
+- Review `git diff`, `git diff --check`, and `git status`. Report checks not run.
+
+### 4. Commit
+
+- Review staged changes before committing.
+- Use `[PW-<issue-number>] type(scope?): subject`.
+- Ensure the ticket matches the current branch.
+- Validate with `pnpm exec commitlint`; fix failures instead of bypassing the hook.
+- Commit only with the user's authorization.
+
+Example:
 ```text
 Branch:  PW-122
-Commit:  [PW-122] chore: Add PR workflow skill
-PR:      PW-122 Add PR workflow skill -> <requested-target-branch>
+Commit:  [PW-122] chore: Simplify PR workflow skill
 ```
 
-## 1. Resolve and validate the issue
+### 5. Open a pull request
 
-1. Obtain the GitHub issue number from the user's request or an explicit issue URL.
-2. If no issue number is available, stop and ask the user to create or identify an issue. Never invent an issue number.
-3. Inspect the issue title, description, acceptance criteria, labels, and state using GitHub CLI or the available GitHub integration.
-4. Confirm the issue belongs to `aoda-zhang/PawHaven-FullStack-React-NodeJS`. Do not start work against a closed issue unless the user explicitly requests it.
+- Push the work branch.
+- Confirm the PR target branch. Ask the user if it is unclear.
+- Create the PR with a concise title, summary, test results, and `Closes #<issue-number>` when applicable.
+- Verify the PR uses the confirmed target branch.
 
-## 2. Create the work branch from the latest develop
+### 6. Review and merge
 
-1. Inspect the working tree with `git status --short`. If there are unrelated or uncommitted changes, stop and ask how to handle them. Never discard or silently stash user work.
-2. Fetch remote refs: `git fetch origin`.
-3. Check out the base branch and fast-forward it only:
-   ```bash
-   git switch develop
-   git pull --ff-only origin develop
-   ```
-4. Verify the working tree is clean and the local `develop` matches `origin/develop`.
-5. Construct the branch name as `PW-<issue-number>` and validate it against `^PW-[0-9]+$`.
-6. Check whether the branch already exists locally or remotely. If it exists, inspect its base and contents before deciding whether it can be reused; never reset, overwrite, or force-update it automatically.
-7. Create the branch from develop:
-   ```bash
-   git switch -c PW-<issue-number> develop
-   ```
-8. Verify `git branch --show-current` returns the exact expected branch name.
+- Review the full diff and wait for required checks and reviews.
+- Resolve blocking feedback and re-run affected checks.
+- Merge only with the user's explicit authorization.
+- Do not force-push or bypass repository protections.
 
-Do not create a work branch from `main`, another feature branch, or a stale local `develop`.
+## Stop and ask when
 
-## 3. Implement and verify
-
-1. Follow the issue's acceptance criteria and the repository's `AGENTS.md` and relevant OpenCode skills.
-2. Keep changes scoped to the issue. Do not bundle unrelated cleanup.
-3. Run relevant tests, type checks, lint, build, and repository quality checks as appropriate.
-4. Inspect `git diff`, `git diff --check`, and `git status`. Report any checks that could not be run; do not claim they passed.
-
-## 4. Generate and validate commit messages
-
-1. Inspect the staged changes with `git diff --cached --stat` and `git diff --cached`.
-2. Generate a concise imperative subject describing the actual staged changes.
-3. Use this exact format:
-   ```text
-   [PW-<issue-number>] type(scope?): subject
-   ```
-4. The ticket prefix must equal the current branch name. For example, on `PW-119`, this is valid:
-   ```text
-   [PW-119] chore: Update code-commit skill
-   ```
-5. Validate the message with the repository's Commitlint command before committing:
-   ```bash
-   printf '%s\\n' '[PW-<issue-number>] chore: Describe the change' | pnpm exec commitlint
-   ```
-6. The Husky `commit-msg` hook performs the same validation on every commit. If validation fails, fix the message; never bypass the hook with `HUSKY=0`, `--no-verify`, or equivalent.
-7. Commit only after the user has authorized committing, and only after validation succeeds.
-
-## 5. Push and open the pull request
-
-1. Confirm the current branch still matches `^PW-[0-9]+$`.
-2. Push the branch:
-   ```bash
-   git push -u origin PW-<issue-number>
-   ```
-3. Determine the PR target branch from the user's explicit request or the task's documented integration workflow. If the target is unclear, ask before creating the PR. Do not assume or hard-code `develop`.
-4. Open a pull request with:
-   - Head: `PW-<issue-number>`
-   - Base: the confirmed target branch
-   - A concise title describing the change.
-   - A summary, implementation notes, and actual test results.
-   - A `Closes #<issue-number>` reference when the PR fully resolves the issue.
-5. Verify that the created PR uses the confirmed target branch. Do not change the target branch without authorization.
-
-## 6. Review and merge into the confirmed target branch
-
-1. Review the complete diff and confirm the PR contains only issue-related changes.
-2. Wait for required CI checks and requested reviews to complete. Resolve review feedback and re-run affected checks.
-3. Do not merge a draft PR, a failing PR, or a PR with unresolved blocking feedback.
-4. Merge into the confirmed PR target branch only when the user explicitly authorizes the merge and repository requirements are satisfied. Creating a PR does not itself authorize merging.
-5. Use the repository's permitted merge method. Do not force-push, bypass branch protection, or delete branches unless explicitly authorized.
-6. After merge, verify the PR's merged state and the resulting target branch.
-
-## Recovery and safety
-
-- **No issue number:** stop and ask; do not guess.
-- **Dirty working tree:** preserve all changes and ask before proceeding.
-- **No develop branch or fetch failure:** stop; do not fall back to main.
-- **Branch already exists:** inspect it; never reset it automatically.
-- **Commit ticket mismatch:** correct the message to match the current branch, or switch to the intended branch only after verifying the worktree is safe.
-- **Commitlint failure:** inspect the error and fix the message/configuration; never bypass validation.
-- **Merge conflict:** stop, inspect, and resolve deliberately. Never force-push as a shortcut.
-- **Checks or review pending:** leave the PR open and report what remains.
+- The issue number or PR target is unclear.
+- The worktree is not clean.
+- The branch already exists and its state is uncertain.
+- Fetching or updating `develop` fails.
+- A merge conflict or blocking check needs a decision.
