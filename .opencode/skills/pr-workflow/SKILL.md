@@ -9,12 +9,12 @@ Use this skill for every issue-driven code change in the PawHaven repository.
 
 ## Non-negotiable conventions
 
-- Base branch: `develop`.
+- Work branches must be created from the latest `develop` branch.
 - Work branch format: `PW-<issue-number>` exactly. Do not append a description or suffix.
 - Commit format: `[PW-<issue-number>] type(scope?): subject`.
 - The ticket in every commit message must exactly match the currently checked-out work branch.
 - Allowed commit types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`.
-- Pull request base: `develop`.
+- Pull request base: choose the target branch according to the user's request and the repository's integration workflow; do not hard-code `develop`.
 - Never commit work directly to `main` or `develop`.
 
 Examples:
@@ -22,7 +22,7 @@ Examples:
 ```text
 Branch:  PW-122
 Commit:  [PW-122] chore: Add PR workflow skill
-PR:      PW-122 Add PR workflow skill -> develop
+PR:      PW-122 Add PR workflow skill -> <requested-target-branch>
 ```
 
 ## 1. Resolve and validate the issue
@@ -85,23 +85,23 @@ Do not create a work branch from `main`, another feature branch, or a stale loca
    ```bash
    git push -u origin PW-<issue-number>
    ```
-3. Open a pull request with:
+3. Determine the PR target branch from the user's explicit request or the task's documented integration workflow. If the target is unclear, ask before creating the PR. Do not assume or hard-code `develop`.
+4. Open a pull request with:
    - Head: `PW-<issue-number>`
-   - Base: `develop` (always)
+   - Base: the confirmed target branch
    - A concise title describing the change.
    - A summary, implementation notes, and actual test results.
    - A `Closes #<issue-number>` reference when the PR fully resolves the issue.
-4. Verify the created PR's base is `develop`. If it is not, correct it before proceeding.
-5. Do not target `main` directly.
+5. Verify that the created PR uses the confirmed target branch. Do not change the target branch without authorization.
 
-## 6. Review and merge into develop
+## 6. Review and merge into the confirmed target branch
 
 1. Review the complete diff and confirm the PR contains only issue-related changes.
 2. Wait for required CI checks and requested reviews to complete. Resolve review feedback and re-run affected checks.
 3. Do not merge a draft PR, a failing PR, or a PR with unresolved blocking feedback.
-4. Merge into `develop` only when the user explicitly authorizes the merge and repository requirements are satisfied. Creating a PR does not itself authorize merging.
+4. Merge into the confirmed PR target branch only when the user explicitly authorizes the merge and repository requirements are satisfied. Creating a PR does not itself authorize merging.
 5. Use the repository's permitted merge method. Do not force-push, bypass branch protection, or delete branches unless explicitly authorized.
-6. After merge, verify the PR's merged state and the resulting base branch.
+6. After merge, verify the PR's merged state and the resulting target branch.
 
 ## Recovery and safety
 
