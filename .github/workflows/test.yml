@@ -1,6 +1,6 @@
-# Quality gate: lint, typecheck, automated tests and a production build.
+# Quality gate: lint, typecheck, automated tests, accessibility checks and a production build.
 # React Doctor stays in its own workflow (react-doctor.yml) and deployment in
-# deploy.yml so this job can stay fast on every pull request.
+# deploy.yml.
 name: Test
 
 on:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, typecheck, test and build
+    name: Lint, typecheck, test, accessibility and build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -84,6 +84,14 @@ jobs:
       - name: Check translation keys
         shell: bash
         run: pnpm check:i18n
+
+      - name: Install Chromium for Storybook accessibility tests
+        shell: bash
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Storybook accessibility tests (axe)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui test-storybook
 
       - name: Tests
         shell: bash
