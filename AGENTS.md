@@ -17,7 +17,7 @@ OpenCode loads this file automatically. Treat it as the project-wide entry point
 - Read-only investigation and explanation do not require a plan approval.
 - Before any code, configuration, test, or documentation file is modified, present a written plan and wait for explicit user approval in the current conversation.
 - No exception for a change being small, reversible, urgent, or single-domain. Silence or a request to investigate is not approval to implement.
-- Implement only the approved scope. If the approach or scope must change, stop and obtain approval for the revised plan.
+- Implement only the approved scope. If the approach or scope must change, stop and obtain approval for the revised scope.
 - Do not commit, push, or create a PR unless explicitly requested.
 
 The detailed, checkable rules live in [agent-constraints.md](./docs/context/agent-constraints.md). Keep this file short; do not duplicate the handbook here.
