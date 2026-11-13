@@ -1,4 +1,4 @@
-[English](./README.md) | [中文](./README.cn.md)
+**English** | [中文](./README.cn.md) | [Deutsch](./README.de.md)
 
 # 🐾 PawHaven - Animal Rescue Platform
 
