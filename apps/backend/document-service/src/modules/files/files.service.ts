@@ -2,14 +2,12 @@ import { randomUUID } from 'node:crypto';
 
 import {
   BadRequestException,
-  ForbiddenException,
   Inject,
   Injectable,
 } from '@nestjs/common';
 import { InternalJwtKind, type InternalJwt } from '@pawhaven/backend-core/types';
 import {
   FILE_UPLOAD_LIMITS,
-  REPORT_PHOTO_LIMITS,
   type UploadedFile,
 } from '@pawhaven/shared/types';
 
@@ -40,26 +38,6 @@ export class FilesService {
     folder?: string,
   ): Promise<UploadedFile[]> {
     const prefix = this.normalizeFolder(folder);
-    if (
-      claims.kind === InternalJwtKind.ANONYMOUS &&
-      prefix !== 'report-animal'
-    ) {
-      throw new ForbiddenException('Anonymous uploads are limited to reports');
-    }
-
-    if (prefix === 'report-animal') {
-      files.forEach((file) => {
-        if (
-          file.size > REPORT_PHOTO_LIMITS.maxSizeBytes ||
-          !REPORT_PHOTO_LIMITS.acceptedTypes.some(
-            (type) => type === file.mimetype,
-          )
-        ) {
-          throw new BadRequestException('Invalid report photo');
-        }
-      });
-    }
-
     const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
     if (claims.kind === InternalJwtKind.AUTHENTICATED) {
       this.rateLimiter.consume(claims.sub, totalBytes);
