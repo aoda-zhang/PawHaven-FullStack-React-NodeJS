@@ -54,6 +54,7 @@ const startCapturingUpstream = async (): Promise<Server> => {
       JSON.stringify({
         locale: req.headers['x-locale'] ?? null,
         traceId: req.headers[httpHeaders.traceId] ?? null,
+        clientIp: req.headers['x-gateway-client-ip'] ?? null,
       }),
     );
   });
@@ -305,6 +306,29 @@ describe('ProxyService: locale is normalized onto the proxied request', () => {
 
     expect(viaLocaleHeader.body.data.locale).toBe('en-US');
     expect(viaAcceptLanguage.body.data.locale).toBe('zh-CN');
+  });
+});
+
+
+describe('ProxyService: trusted client IP forwarding', () => {
+  let upstream: Server | undefined;
+
+  afterEach(async () => {
+    await close(upstream);
+    upstream = undefined;
+  });
+
+  it('replaces a caller-supplied gateway IP header with the observed client IP', async () => {
+    upstream = await startCapturingUpstream();
+    const gateway = buildGateway(urlOf(upstream));
+
+    const response = await request(gateway)
+      .get(PROXY_PATH)
+      .set('x-gateway-client-ip', '203.0.113.99');
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.clientIp).toBeTruthy();
+    expect(response.body.data.clientIp).not.toBe('203.0.113.99');
   });
 });
 

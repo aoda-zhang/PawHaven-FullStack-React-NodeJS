@@ -3,7 +3,7 @@
 > **Status**: Implemented · **Verified against**: `core-service/modules/report-animal`, `portal/features/report-animal`
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
-`/report-animal`, the only auth-gated route in the portal. One scrolling form that writes a single
+`/report-animal`, a public route that accepts both guest and authenticated submissions. One scrolling form that writes a single
 row into `animalReports` with status `pending` — the same collection the rescue feed reads, so
 **the report _is_ the case**.
 
@@ -38,15 +38,15 @@ Heading from `reportAnimal.behavior_title`, body `components/BehaviorContactSect
 
 | Order | Control          | Field          | Notes                                                                                              |
 | ----- | ---------------- | -------------- | -------------------------------------------------------------------------------------------------- |
-| 1     | `FormRadio`      | `behavior`     | `friendly \| wary \| aggressive \| unknown` — see [§6](#6-two-contract-fields-the-service-drops)   |
+| 1     | `FormRadio`      | `behavior`     | `friendly \| wary \| aggressive \| unknown` — see [§6](#6-contract-persistence-details)   |
 | 2     | `FormInput`      | `description`  | ≤ 200 chars, trimmed on submit                                                                     |
-| 3     | `FormCheckbox`   | `urgent`       | Collapses the DTO's `status` enum to 2 values — see [§6](#6-two-contract-fields-the-service-drops) |
-| 4     | `FormPhoneInput` | `contactPhone` | `.trim()`ed on submit                                                                              |
+| 3     | `FormCheckbox`   | `urgent`       | Collapses the DTO's `status` enum to 2 values — see [§6](#6-contract-persistence-details) |
+| 4     | `FormInput`      | `contactEmail` | Optional email address; validated only when provided                                              |
 
 Ticking `urgent` also reveals a static `bg-error-light` note reading
 `reportAnimal.emergency_note`.
 
-There is no email input. `contactInfo.email` is sent as a hard-coded `''`.
+`contactInfo.email` is optional. The form explains why a reachable email is recommended and confirms that it can be left blank.
 
 The submit button is a `Button type="submit"` with `loading={isPending}` and
 `disabled={isPending || isUploading}`, relabelled `reportAnimal.submitting` only while the create
@@ -81,20 +81,20 @@ A response that resolves **without** an `id` leaves the form visible and sets
 
 ```mermaid
 flowchart TD
-    A[GET /report-animal<br/>route behind AuthenticatedLayout] --> B[ReportAnimalForm<br/>one page · 2 fieldset cards]
+    A[GET /report-animal<br/>public route · optional authentication] --> B[ReportAnimalForm<br/>one page · 2 fieldset cards]
     B --> C[AnimalBasicsSection<br/>location · type · count · colour · size · age · photos]
-    C --> D[BehaviorContactSection<br/>behaviour · description · urgent · phone]
+    C --> D[BehaviorContactSection<br/>behaviour · description · urgent · optional email]
     D --> E{client Zod validation}
     E -- fail --> B
     E -- pass --> F[uploadFiles(files, 'report-animal')<br/>Files → multipart]
-    F --> G[POST /api/document/files<br/>authenticated · `files` field]
+    F --> G[POST /api/document/files<br/>guest allowed only for `report-animal` folder]
     G --> H[File storage<br/>provider-configurable<br/>stored file URLs]
     H --> I[map form values → AnimalReportDto<br/>urgent → status · behavior → statusDescription]
-    I --> J[POST /api/core/report-animal<br/>reporterPhotos: [key]]
+    I --> J[POST /api/core/report-animal<br/>optional authentication · reporterPhotos: [key]]
     J --> K[Gateway signs InternalJwt]
     K --> L[AnimalReportSchema inbound validation]
     L --> M[ReportAnimalService.create]
-    M --> N[(animalReports<br/>animalStatus = pending<br/>reporter = claims.sub)]
+    M --> N[(animalReports<br/>animalStatus = pending<br/>reporter = authenticated claims or null for guests)]
     N --> O[Rescue feed reads the same collection]
     O --> P[Success card · case number]
 ```
@@ -107,29 +107,29 @@ unless both are present, and `status` is derived from the `urgent` checkbox.
 
 | Method | Path                      | Policy        | Notes                                                                                                                                               |
 | ------ | ------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/api/document/files`     | authenticated | document-service generic upload: multipart `files` + optional `folder`; images (JPEG/PNG/WebP), 5 MB each, max 5; storage provider is config-driven |
-| POST   | `/api/core/report-animal` | authenticated | `AnimalReportSchema` inbound, `.parse()` outbound; `reporterPhotos` carries storage keys                                                            |
+| POST   | `/api/document/files`     | optional auth | document-service generic upload: multipart `files` + optional `folder`; images (JPEG/PNG/WebP), 5 MB each, max 5; storage provider is config-driven |
+| POST   | `/api/core/report-animal` | optional auth | `AnimalReportSchema` inbound, `.parse()` outbound; `reporterPhotos` carries storage keys                                                            |
 
 There is no list, read, update, or delete endpoint for reports. The feed reads them through the
 rescue module's `GET /api/core/rescues` — see [Rescue Cases](04-rescue-cases.md).
 
 ## 4. Photos
 
-Photos are uploaded before the report is submitted, through document-service's **generic file-upload
-API** `POST /api/document/files` (authenticated, multipart `files`, optional `folder` to namespace the
-storage key). Storage sits behind a **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
+Photos are uploaded before the report is submitted through document-service's file-upload API
+`POST /api/document/files` (multipart `files`, optional `folder`). Anonymous callers are restricted
+to the `report-animal` folder; authenticated callers retain the existing generic upload capability. Storage sits behind a **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
 is selected by `storage.provider`, so switching or adding a provider is a config + adapter change.
 The reusable client helper is `uploadFiles(files, folder?)` in
 `apps/frontend/portal/src/shared/api/file.api.ts`; the report form calls it with
 `folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
 endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
-the report form itself restricts the picker to JPEG/PNG and applies a stricter 2 MB per-photo client-side limit. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
+for the `report-animal` folder, FilesService also enforces JPEG/PNG and a 2 MB per-photo server-side limit, matching the form's picker and validation. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
 
 An upload failure is reported inline by the photo control, above the image grid, not at the bottom of
 the form.
 
-document-service also verifies each upload's **real bytes** against the declared MIME
-(JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles per authenticated user
+document-service applies per-IP throttling to anonymous uploads and verifies each upload's **real bytes** against the declared MIME
+(JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles authenticated uploads per user and anonymous uploads per gateway-derived client IP
 (20 requests / 100 MB per minute, per process). Uploads return only the **storage key**
 (`report-animal/<short-uuid>.<ext>`, no original filename); the Vercel Blob host is never stored or returned. Core-service
 derives display URLs at read time as `<BLOB_PUBLIC_BASE_URL>/<key>`, where `BLOB_PUBLIC_BASE_URL` is a
@@ -159,11 +159,12 @@ are not migrated or specially handled.
 | `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                                     |
 | `description`       | String    | ≤ 200 chars, trimmed                                                                                                                       |
 | `reporterPhotos`    | String[]  | Storage keys, 2–5 entries                                                                                                                  |
-| `reporter`          | Object?   | `{ reporterID: claims.sub, reporterName }`                                                                                                 |
-| `status`            | String    | `@default("active")` — **written by nothing, read by nothing.** Not the DTO's `status`; see [§6](#6-two-contract-fields-the-service-drops) |
+| `reporter`          | Object?   | Authenticated reporter identity; null for guest submissions                                         |
+| `reporterEmail`     | String?   | Optional private contact email; excluded from public rescue DTOs                                                                                                 |
+| `status`            | String    | `@default("active")` — **written by nothing, read by nothing.** Not the DTO's `status`; see [§6](#6-contract-persistence-details) |
 | `deletedAt`         | DateTime? | Soft delete; this is what `findAll` actually filters on                                                                                    |
 
-## 6. Two contract fields the service drops
+## 6. Contract persistence details
 
 `ReportAnimalService.create` writes an **explicit field list** into Prisma:
 
@@ -171,20 +172,18 @@ are not migrated or specially handled.
 data: {
   animalType, age, appearance, locationObj,
   animalStatus: AnimalStatus.PENDING, statusDescription, description,
-  size, animalCount, reporter, reporterPhotos,
+  size, animalCount, reporter, reporterEmail, reporterPhotos,
 }
 ```
 
-Two fields on `AnimalReportSchema` are absent from that list, and neither has a home on the model.
-Both are validated in transit and then discarded.
+`status` is validated in transit but is not persisted. The optional `contactInfo.email` is mapped to the private `reporterEmail` model field.
 
 ### 6.1 `contactInfo`
 
-`AnimalReportSchema` requires `contactInfo: { phone, email? }` and the client sends both. The
-service does not persist it — the model has no contact field, and the string `contactInfo` appears
-nowhere in `core-service` outside the shared schema. The phone number is collected, sent, validated
-again, and thrown away; the email is not even collected, being hard-coded to `''` on the way out.
-This is a real gap between the contract and the implementation, not a documentation error.
+`AnimalReportSchema` accepts `contactInfo: { email? }`. The email is optional and validated only
+when supplied. `ReportAnimalService.create` stores it in the private `reporterEmail` field for
+follow-up. The create endpoint returns only the report ID, and public rescue list/detail DTOs never
+select or serialize the email. No phone number is collected or stored.
 
 ### 6.2 `status` — and a name collision
 
@@ -218,7 +217,7 @@ a friendly one.
 
 | File                                        | Role                                                                                                                          |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `route.tsx`                                 | `reportAnimalRoute`; the only `AuthenticatedLayout`-nested route                                                              |
+| `route.tsx`                                 | `reportAnimalRoute`; public route with optional authentication                                                              |
 | `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                        |
 | `components/ReportAnimalForm.tsx`           | RHF form; uploads photos, maps form values to the DTO, and owns the success card                                              |
 | `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                          |
@@ -244,15 +243,14 @@ cannot cross the wire and data URLs cannot exist in a form value.
 - **No edit or delete.** A submitted report is immutable through the API, and there is no delete
   path at all.
 - **No duplicate detection.** No radius/species dedupe, no `guestToken`.
-- **No guest submission.** The route is behind `AuthenticatedLayout`, contradicting the blueprint.
+- **Guest submission is supported.** Guests can submit reports and photos without an account. Their reporter identity is null; an optional email is stored privately. There is no guest report-management or edit/delete endpoint.
 - **No urgency tiers.** `low/medium/high/critical` does not exist. The one `urgent` boolean is
   folded into a temperament enum the user never sees and the service then discards — see
   [§6.2](#62-status--and-a-name-collision). Nothing downstream can tell an urgent report from a
   calm one.
 - **No stored behaviour classification.** The user's `behavior` answer survives only as a raw,
   untyped string in `statusDescription`; the `status` enum designed to carry it is dropped.
-- **No contact retention.** `contactInfo` is validated and dropped — see
-  [§6.1](#61-contactinfo).
+- **Private contact retention.** An optional `reporterEmail` is stored for follow-up and excluded from public rescue DTOs — see [§6.1](#61-contactinfo).
 - **No case creation step, no volunteer notification, no content recommendation.** The report is
   the case; there is no event bus and no other module reacts to it.
 - **No geocoding.** `address` is typed; nothing resolves it to coordinates, and the feed renders
@@ -263,6 +261,6 @@ cannot cross the wire and data URLs cannot exist in a form value.
 
 - [Rescue Cases](04-rescue-cases.md) — reads the same `animalReports` collection
 - [Home](02-home.md) — surfaces the newest reports; owns the other `StrayCTA` copy
-- [Auth](01-auth.md) — `AuthenticatedLayout`, the only guard on this route
+- [Auth](01-auth.md) — public reporting with optional authentication
 - [Product Blueprint §3 (Discovery)](../product/product-strategy.md) — the intended
   version of this flow, including guest submission and duplicate detection

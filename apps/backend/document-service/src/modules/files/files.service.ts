@@ -1,7 +1,17 @@
 import { randomUUID } from 'node:crypto';
 
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { FILE_UPLOAD_LIMITS, type UploadedFile } from '@pawhaven/shared/types';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { InternalJwtKind, type InternalJwt } from '@pawhaven/backend-core/types';
+import {
+  FILE_UPLOAD_LIMITS,
+  REPORT_PHOTO_LIMITS,
+  type UploadedFile,
+} from '@pawhaven/shared/types';
 
 import { detectContentType } from './fileSignature.js';
 import { FILE_STORAGE, type FileStorage } from './fileStorage.js';
@@ -26,13 +36,37 @@ export class FilesService {
 
   async upload(
     files: Express.Multer.File[],
-    userId: string,
+    claims: InternalJwt,
     folder?: string,
+    clientIp?: string,
   ): Promise<UploadedFile[]> {
-    const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
-    this.rateLimiter.consume(userId, totalBytes);
-
     const prefix = this.normalizeFolder(folder);
+    if (
+      claims.kind === InternalJwtKind.ANONYMOUS &&
+      prefix !== 'report-animal'
+    ) {
+      throw new ForbiddenException('Anonymous uploads are limited to reports');
+    }
+
+    if (prefix === 'report-animal') {
+      files.forEach((file) => {
+        if (
+          file.size > REPORT_PHOTO_LIMITS.maxSizeBytes ||
+          !REPORT_PHOTO_LIMITS.acceptedTypes.some(
+            (type) => type === file.mimetype,
+          )
+        ) {
+          throw new BadRequestException('Invalid report photo');
+        }
+      });
+    }
+
+    const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+    const limiterKey =
+      claims.kind === InternalJwtKind.AUTHENTICATED
+        ? `user:${claims.sub}`
+        : `ip:${clientIp?.trim() || 'unknown'}`;
+    this.rateLimiter.consume(limiterKey, totalBytes);
 
     return Promise.all(
       files.map((file) => {

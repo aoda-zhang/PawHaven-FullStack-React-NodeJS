@@ -46,9 +46,6 @@
     "name": "Name",
     "name_required": "Please enter your name",
     "enter_name": "Please enter your name",
-    "phone": "Phone Number",
-    "phone_required": "Please enter your phone number",
-    "enter_phone": "Please enter your phone number",
     "email": "Email",
     "enter_email": "Please enter your email (optional)",
     "submit": "Submit Report",
@@ -78,8 +75,8 @@
     "photos_remove": "Remove photo",
     "photos_count": "{{count}}/5",
     "behavior_emergency_label": "Behavior & Emergency",
-    "behavior_title": "Behavior, urgency & contact",
-    "behavior_subtitle": "Describe its temperament, mark any emergency signs and leave your contact.",
+    "behavior_title": "Behavior & urgency",
+    "behavior_subtitle": "Describe its temperament and mark any emergency signs.",
     "count_label": "Number of animals",
     "count_decrease": "Fewer animals",
     "count_increase": "More animals",
@@ -108,9 +105,7 @@
     "description_max": "Description too long (max 200 characters)",
     "urgent_toggle": "This is an emergency (animal in danger)",
     "response_note": "Reports marked as urgent are prioritized for volunteers.",
-    "contact_label": "Your phone number",
-    "contact_required": "Please enter a valid phone number",
-    "privacy": "By submitting, you agree that the information is accurate to the best of your knowledge. Your contact will only be visible to the assigned volunteer.",
+    "privacy": "Any email you provide is stored privately and will not be shown on public report pages.",
     "success_title": "Report submitted!",
     "success_home": "Back to homepage",
     "success_volunteers": "Volunteers nearby have been notified.",
@@ -121,6 +116,10 @@
     "submit_failed": "We couldn't confirm your report. Please check whether it was created before trying again.",
     "photos_read_failed": "We couldn't read one of the photos. Please re-select them and try again.",
     "photos_upload_failed": "We couldn't upload the photos. Please try again.",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "email_label": "Email address (optional)",
+    "email_recommended": "To help us learn more about the animal, we strongly recommend providing an email address where we can reach you.",
+    "email_optional": "Email address is optional. You can submit your report without it.",
+    "email_invalid": "Please enter a valid email address."
   }
 }

@@ -46,9 +46,6 @@
     "name": "姓名",
     "name_required": "请输入您的姓名",
     "enter_name": "请输入您的姓名",
-    "phone": "联系电话",
-    "phone_required": "请输入联系电话",
-    "enter_phone": "请输入您的联系电话",
     "email": "电子邮箱",
     "enter_email": "请输入您的电子邮箱（选填）",
     "submit": "提交上报",
@@ -78,8 +75,8 @@
     "photos_remove": "移除照片",
     "photos_count": "{{count}}/5",
     "behavior_emergency_label": "动物行为情况",
-    "behavior_title": "行为、紧急情况与联系方式",
-    "behavior_subtitle": "描述动物的性情，标记紧急情况并留下联系方式。",
+    "behavior_title": "动物行为与紧急情况",
+    "behavior_subtitle": "描述动物的性情，并标记是否存在紧急情况。",
     "count_label": "动物数量",
     "count_decrease": "减少动物数量",
     "count_increase": "增加动物数量",
@@ -108,9 +105,7 @@
     "description_max": "描述过长（最多 200 字）",
     "urgent_toggle": "这是紧急情况（动物处于危险中）",
     "response_note": "标记为紧急的上报将优先推送给志愿者。",
-    "contact_label": "你的手机号",
-    "contact_required": "请输入有效的手机号",
-    "privacy": "提交即表示你确认信息据实填写。你的联系方式仅对指定志愿者可见。",
+    "privacy": "你提供的电子邮箱将被妥善保密，不会显示在公开的上报页面中。",
     "success_title": "上报成功！",
     "success_home": "返回首页",
     "success_volunteers": "附近志愿者已收到通知。",
@@ -123,6 +118,10 @@
     "submit_rate_limited": "提交过于频繁，请稍后再试。",
     "photos_read_failed": "无法读取照片，请重新选择照片后再试。",
     "photos_upload_failed": "照片上传失败，请稍后重试。",
-    "unknown": "未知"
+    "unknown": "未知",
+    "email_label": "电子邮箱（选填）",
+    "email_recommended": "为了帮助我们进一步了解动物的情况，我们强烈建议填写一个方便联系到你的电子邮箱。",
+    "email_optional": "电子邮箱为选填项。不填写也可以直接提交上报。",
+    "email_invalid": "请输入有效的电子邮箱地址。"
   }
 }

@@ -104,6 +104,15 @@ describe('RescueService.findAll', () => {
     expect(listQuery.select).toMatchObject({ reporterPhotos: true });
   });
 
+
+  it('does not select or expose private reporter email in the public list', async () => {
+    const { service, findMany } = buildService([{ reporterEmail: 'private@example.com' }]);
+    const items = await service.findAll();
+    const [query] = findMany.mock.calls[0] as [{ select: Record<string, boolean> }];
+    expect(query.select).not.toHaveProperty('reporterEmail');
+    expect(JSON.stringify(items)).not.toContain('private@example.com');
+  });
+
   it('maps a record into the list contract', async () => {
     const { service } = buildService([{}]);
 

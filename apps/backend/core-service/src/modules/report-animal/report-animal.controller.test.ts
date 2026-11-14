@@ -14,6 +14,7 @@ const HTTP_STATUS_BAD_REQUEST = 400;
 const ROUTE = '/report-animal';
 const PHOTO = 'report-animal/photo-123.png';
 const CLAIMS = { kind: InternalJwtKind.AUTHENTICATED, sub: 'user-1' };
+const ANONYMOUS_CLAIMS = { kind: InternalJwtKind.ANONYMOUS };
 
 const validReport = () => ({
   animalType: 'cat',
@@ -25,12 +26,12 @@ const validReport = () => ({
   status: 'friendly',
   description: 'Found a stray kitten',
   reporterPhotos: [PHOTO, PHOTO],
-  contactInfo: { phone: '12345678' },
+  contactInfo: {},
 });
 
 type ErrorBody = { message?: string[] };
 
-const boot = async () => {
+const boot = async (claims: typeof CLAIMS | typeof ANONYMOUS_CLAIMS = CLAIMS) => {
   const create = vi.fn(() => Promise.resolve({ id: 'RPT-0001' }));
 
   const moduleRef = await Test.createTestingModule({
@@ -44,7 +45,7 @@ const boot = async () => {
   const app = moduleRef.createNestApplication<NestExpressApplication>();
 
   const attachClaims: RequestHandler = (req, _res, next) => {
-    Object.assign(req, { internalJwt: CLAIMS });
+    Object.assign(req, { internalJwt: claims });
     next();
   };
   app.use(attachClaims);
@@ -92,7 +93,7 @@ describe('ReportAnimalController validation', () => {
       ...validReport(),
       animalCount: 0,
       status: 'nope',
-      contactInfo: { phone: 'abc' },
+      contactInfo: {},
     });
     const body = (await response.json()) as ErrorBody;
 
@@ -101,7 +102,6 @@ describe('ReportAnimalController validation', () => {
       expect.arrayContaining([
         expect.stringContaining('animalCount'),
         expect.stringContaining('status'),
-        expect.stringContaining('contactInfo.phone'),
       ]),
     );
     expect(booted.create).not.toHaveBeenCalled();
@@ -201,13 +201,13 @@ describe('ReportAnimalController validation', () => {
 
     const response = await booted.post({
       ...validReport(),
-      contactInfo: { phone: '12345678', email: 'reporter@example.com' },
+      contactInfo: { email: 'reporter@example.com' },
     });
 
     expect(response.status).toBe(HTTP_STATUS_CREATED);
     expect(booted.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        contactInfo: { phone: '12345678', email: 'reporter@example.com' },
+        contactInfo: { email: 'reporter@example.com' },
       }),
       CLAIMS,
     );
@@ -219,7 +219,7 @@ describe('ReportAnimalController validation', () => {
 
     const response = await booted.post({
       ...validReport(),
-      contactInfo: { phone: '12345678', email: 'not-an-email' },
+      contactInfo: { email: 'not-an-email' },
     });
     const body = (await response.json()) as ErrorBody;
 
@@ -230,6 +230,29 @@ describe('ReportAnimalController validation', () => {
       ]),
     );
     expect(booted.create).not.toHaveBeenCalled();
+  });
+
+
+  it('accepts a guest report without an email address', async () => {
+    const booted = await boot(ANONYMOUS_CLAIMS);
+    app = booted.app;
+    const response = await booted.post(validReport());
+    expect(response.status).toBe(HTTP_STATUS_CREATED);
+    expect(booted.create).toHaveBeenCalledWith(validReport(), ANONYMOUS_CLAIMS);
+  });
+
+  it('accepts a guest report with an optional email address', async () => {
+    const booted = await boot(ANONYMOUS_CLAIMS);
+    app = booted.app;
+    const guestReport = {
+      ...validReport(),
+      contactInfo: { email: 'guest@example.com' },
+    };
+
+    const response = await booted.post(guestReport);
+
+    expect(response.status).toBe(HTTP_STATUS_CREATED);
+    expect(booted.create).toHaveBeenCalledWith(guestReport, ANONYMOUS_CLAIMS);
   });
 
   it('rejects more than 5 photos', async () => {

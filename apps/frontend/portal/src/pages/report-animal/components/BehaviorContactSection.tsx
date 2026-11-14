@@ -1,7 +1,7 @@
 import type { ReportAnimalFormValues } from '@pawhaven/shared/types';
 import {
   FormCheckbox,
-  FormPhoneInput,
+  FormInput,
   FormRadio,
   FormTextArea,
 } from '@pawhaven/ui/form';
@@ -55,11 +55,11 @@ export const BehaviorContactSection = () => {
         </div>
       )}
 
-      <FormPhoneInput
-        name="contactPhone"
-        label={t('reportAnimal.contact_label')}
-        required
-      />
+      <div className="space-y-2">
+        <FormInput name="contactEmail" label={t('reportAnimal.email_label')} type="email" autoComplete="email" />
+        <p className="text-text-secondary text-sm">{t('reportAnimal.email_recommended')}</p>
+        <p className="text-text-secondary text-xs">{t('reportAnimal.email_optional')}</p>
+      </div>
 
       <div className="bg-info-light border-info/30 rounded-panel p-3 text-xs leading-relaxed">
         <span className="text-foreground">{t('reportAnimal.privacy')}</span>

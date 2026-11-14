@@ -32,7 +32,7 @@ const validPayload: AnimalReportDto = {
   description: 'Found a friendly brown dog near the park',
   reporterPhotos: ['report-animal/a.jpg', 'report-animal/b.jpg'],
   contactInfo: {
-    phone: '+49 170 1234567',
+    email: 'reporter@example.com',
   },
 };
 

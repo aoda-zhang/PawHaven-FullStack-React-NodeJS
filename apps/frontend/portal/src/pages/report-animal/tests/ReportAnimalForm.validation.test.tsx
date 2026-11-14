@@ -47,7 +47,6 @@ describe('ReportAnimalForm validation messages', () => {
       'reportAnimal.size_required',
       'reportAnimal.age_required',
       'reportAnimal.behavior_required',
-      'reportAnimal.contact_required',
       'reportAnimal.description_required',
     ];
 

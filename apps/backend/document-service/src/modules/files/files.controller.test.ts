@@ -27,15 +27,43 @@ const buildController = (upload: FilesService['upload']) =>
   new FilesController({ upload } as unknown as FilesService);
 
 describe('FilesController', () => {
-  it('is not marked public, so the global internal JWT guard applies', () => {
+  it('allows optional authentication while retaining the internal JWT guard', () => {
     const reflector = new Reflector();
 
-    const isPublic = reflector.getAllAndOverride(AuthMetadataKey.PUBLIC, [
+    const isOptional = reflector.getAllAndOverride(AuthMetadataKey.OPTIONAL, [
       FilesController.prototype.upload,
       FilesController,
     ]);
+    expect(isOptional).toBeTruthy();
+  });
 
-    expect(isPublic).toBeFalsy();
+  it('allows anonymous uploads only in the report folder', async () => {
+    const upload = vi.fn<FilesService['upload']>().mockResolvedValue([]);
+    const controller = buildController(upload);
+    const guestClaims = { ...CLAIMS, kind: InternalJwtKind.ANONYMOUS };
+
+    await expect(
+      controller.upload(
+        [buildFile('image/jpeg')],
+        'report-animal',
+        guestClaims,
+        '203.0.113.5',
+      ),
+    ).resolves.toEqual({ files: [] });
+    expect(upload).toHaveBeenCalledWith(
+      [expect.anything()],
+      guestClaims,
+      'report-animal',
+      '203.0.113.5',
+    );
+    await expect(
+      controller.upload(
+        [buildFile('image/jpeg')],
+        'other-folder',
+        guestClaims,
+        '203.0.113.5',
+      ),
+    ).rejects.toThrow('Anonymous uploads are limited to reports');
   });
 
   it('forwards files, the authenticated user and the folder to the service', async () => {
@@ -52,12 +80,13 @@ describe('FilesController', () => {
     const webp = buildFile('image/webp');
 
     await expect(
-      controller.upload([jpeg, webp], 'report-animal', CLAIMS),
+      controller.upload([jpeg, webp], 'report-animal', CLAIMS, '127.0.0.1'),
     ).resolves.toEqual({ files: uploaded });
     expect(upload).toHaveBeenCalledWith(
       [jpeg, webp],
-      'user-1',
+      CLAIMS,
       'report-animal',
+      '127.0.0.1',
     );
   });
 });

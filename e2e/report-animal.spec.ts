@@ -90,14 +90,8 @@ test.describe('report animal', () => {
     await page.getByTestId('form-input-address').fill('Near the park entrance');
     await page.getByTestId('form-input-address').blur();
 
-    await page
-      .getByTestId('form-phone-contactPhone')
-      .locator('input[type="tel"]')
-      .fill('12345678');
-    await page
-      .getByTestId('form-phone-contactPhone')
-      .locator('input[type="tel"]')
-      .blur();
+    await page.getByTestId('form-input-contactEmail').fill('guest@example.com');
+    await page.getByTestId('form-input-contactEmail').blur();
 
     await page
       .getByTestId('form-textarea-description')
@@ -164,14 +158,8 @@ test.describe('report animal', () => {
     await page.getByTestId('form-input-address').fill('Central Park');
     await page.getByTestId('form-input-address').blur();
 
-    await page
-      .getByTestId('form-phone-contactPhone')
-      .locator('input[type="tel"]')
-      .fill('12345678');
-    await page
-      .getByTestId('form-phone-contactPhone')
-      .locator('input[type="tel"]')
-      .blur();
+    await page.getByTestId('form-input-contactEmail').fill('guest@example.com');
+    await page.getByTestId('form-input-contactEmail').blur();
 
     await page.getByTestId('form-textarea-description').fill('Aggressive dog');
     await page.getByTestId('form-textarea-description').blur();
