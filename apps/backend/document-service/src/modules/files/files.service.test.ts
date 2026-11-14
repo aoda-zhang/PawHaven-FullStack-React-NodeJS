@@ -117,7 +117,7 @@ describe('FilesService', () => {
     const service = buildService(put);
 
     await expect(
-      service.upload([buildFile({ mimetype: 'image/jpeg' })], USER),
+      service.upload([buildFile({ mimetype: 'image/jpeg' })], CLAIMS),
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(put).not.toHaveBeenCalled();
   });
