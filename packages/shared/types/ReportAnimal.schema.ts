@@ -10,8 +10,6 @@ import {
  * Report Animal Schemas
  */
 
-const phoneRegex = /^[\d\s\-+()]{7,20}$/;
-
 const BYTES_PER_KB = 1024;
 const BYTES_PER_MB = BYTES_PER_KB * BYTES_PER_KB;
 const MAX_PHOTO_SIZE_MB = 2;
@@ -45,29 +43,15 @@ export const reporterPhotosSchema = z
   .min(REPORT_PHOTO_LIMITS.min, 'At least 2 photos are required')
   .max(REPORT_PHOTO_LIMITS.max, 'At most 5 photos are allowed');
 
-const contactInfoSchema = z
-  .object({
-    phone: z
-      .string()
-      .min(1, 'Phone is required')
-      .regex(phoneRegex, 'Invalid phone number'),
-    email: z
-      .string()
-      .email('Invalid email address')
-      .max(CONTACT_EMAIL_MAX_LENGTH, 'Email too long')
-      .optional()
-      .or(z.literal('')),
-  })
-  .refine(
-    (data) => {
-      if (data.email && data.email.trim() !== '') {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(data.email);
-      }
-      return true;
-    },
-    { path: ['email'], message: 'Invalid email address' },
-  );
+const contactInfoSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email('Invalid email address')
+    .max(CONTACT_EMAIL_MAX_LENGTH, 'Email too long')
+    .optional()
+    .or(z.literal('')),
+});
 
 export const AnimalReportSchema = z.object({
   animalType: z.string().min(1, 'Animal type is required'),
@@ -126,7 +110,7 @@ export interface ReportAnimalFormMessages {
   sizeRequired: string;
   ageRequired: string;
   behaviorRequired: string;
-  contactRequired: string;
+  emailInvalid: string;
   descriptionRequired: string;
   descriptionMax: string;
 }
@@ -181,10 +165,12 @@ export const createReportAnimalFormSchema = (
         .trim()
         .min(1, messages.descriptionRequired)
         .max(200, messages.descriptionMax),
-      contactPhone: z
+      contactEmail: z
         .string()
-        .min(1, messages.contactRequired)
-        .regex(phoneRegex, messages.contactRequired),
+        .trim()
+        .email(messages.emailInvalid)
+        .max(CONTACT_EMAIL_MAX_LENGTH, messages.emailInvalid)
+        .or(z.literal('')),
     })
     .superRefine((data, ctx) => {
       if (data.animalType === 'other' && !data.otherAnimalType.trim()) {

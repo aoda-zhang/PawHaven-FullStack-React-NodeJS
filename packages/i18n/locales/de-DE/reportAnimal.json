@@ -46,9 +46,6 @@
     "name": "Name",
     "name_required": "Bitte geben Sie Ihren Namen ein",
     "enter_name": "Bitte geben Sie Ihren Namen ein",
-    "phone": "Telefonnummer",
-    "phone_required": "Bitte geben Sie Ihre Telefonnummer ein",
-    "enter_phone": "Bitte geben Sie Ihre Telefonnummer ein",
     "email": "E-Mail",
     "enter_email": "Bitte geben Sie Ihre E-Mail ein (optional)",
     "submit": "Meldung abschicken",
@@ -78,8 +75,8 @@
     "photos_remove": "Foto entfernen",
     "photos_count": "{{count}}/5",
     "behavior_emergency_label": "Verhalten & Notfall",
-    "behavior_title": "Verhalten, Dringlichkeit & Kontakt",
-    "behavior_subtitle": "Beschreiben Sie das Temperament, markieren Sie Notfallzeichen und hinterlassen Sie Ihren Kontakt.",
+    "behavior_title": "Verhalten & Dringlichkeit",
+    "behavior_subtitle": "Beschreiben Sie das Temperament und markieren Sie mögliche Notfälle.",
     "count_label": "Anzahl der Tiere",
     "count_decrease": "Weniger Tiere",
     "count_increase": "Mehr Tiere",
@@ -108,9 +105,7 @@
     "description_max": "Beschreibung zu lang (max. 200 Zeichen)",
     "urgent_toggle": "Dies ist ein Notfall (Tier in Gefahr)",
     "response_note": "Als dringend markierte Meldungen werden für Freiwillige priorisiert.",
-    "contact_label": "Ihre Telefonnummer",
-    "contact_required": "Bitte geben Sie eine gültige Telefonnummer ein",
-    "privacy": "Mit dem Absenden bestätigen Sie, dass die Angaben nach bestem Wissen korrekt sind. Ihr Kontakt ist nur für den zugewiesenen Freiwilligen sichtbar.",
+    "privacy": "Eine angegebene E-Mail-Adresse wird vertraulich gespeichert und nicht auf öffentlichen Meldungsseiten angezeigt.",
     "success_title": "Meldung eingereicht!",
     "success_home": "Zurück zur Startseite",
     "success_volunteers": "Freiwillige in der Nähe wurden benachrichtigt.",
@@ -123,6 +118,9 @@
     "submit_rate_limited": "Zu viele Meldungen in kurzer Zeit. Bitte warten Sie einen Moment und versuchen Sie es erneut.",
     "photos_read_failed": "Ein Foto konnte nicht gelesen werden. Bitte wählen Sie die Fotos erneut aus und versuchen Sie es noch einmal.",
     "photos_upload_failed": "Die Fotos konnten nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "email_label": "E-Mail-Adresse (optional)",
+    "email_recommended": "Damit wir mehr über das Tier erfahren können, empfehlen wir dringend, eine E-Mail-Adresse anzugeben, unter der wir Sie erreichen können.",
+    "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
   }
 }

@@ -1,7 +1,15 @@
 import { randomUUID } from 'node:crypto';
 
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { FILE_UPLOAD_LIMITS, type UploadedFile } from '@pawhaven/shared/types';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
+import { InternalJwtKind, type InternalJwt } from '@pawhaven/backend-core/types';
+import {
+  FILE_UPLOAD_LIMITS,
+  type UploadedFile,
+} from '@pawhaven/shared/types';
 
 import { detectContentType } from './fileSignature.js';
 import { FILE_STORAGE, type FileStorage } from './fileStorage.js';
@@ -26,13 +34,14 @@ export class FilesService {
 
   async upload(
     files: Express.Multer.File[],
-    userId: string,
+    claims: InternalJwt,
     folder?: string,
   ): Promise<UploadedFile[]> {
-    const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
-    this.rateLimiter.consume(userId, totalBytes);
-
     const prefix = this.normalizeFolder(folder);
+    const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+    if (claims.kind === InternalJwtKind.AUTHENTICATED) {
+      this.rateLimiter.consume(claims.sub, totalBytes);
+    }
 
     return Promise.all(
       files.map((file) => {

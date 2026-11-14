@@ -96,8 +96,8 @@ const fillValidForm = async (user: User) => {
   await user.click(screen.getByLabelText('reportAnimal.adult'));
   await user.click(screen.getByLabelText('reportAnimal.behavior_friendly'));
   await user.type(
-    screen.getByRole('textbox', { name: 'reportAnimal.contact_label' }),
-    '13800138000',
+    screen.getByRole('textbox', { name: 'reportAnimal.email_label' }),
+    'guest@example.com',
   );
   await user.type(
     screen.getByRole('textbox', { name: 'reportAnimal.description_label' }),

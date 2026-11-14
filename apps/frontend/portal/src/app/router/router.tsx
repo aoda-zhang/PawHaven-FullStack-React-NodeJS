@@ -5,11 +5,7 @@ import { createBrowserRouter, ScrollRestoration } from 'react-router-dom';
 import { RootLayout } from '@/app/layout/RootLayout';
 import { RootLayoutFooter } from '@/app/layout/RootLayoutFooter';
 import { routePaths } from '@/app/router/routePaths';
-import {
-  AuthenticatedLayout,
-  loginRoute,
-  registerRoute,
-} from '@/pages/auth/route';
+import { loginRoute, registerRoute } from '@/pages/auth/route';
 import { homeRoute } from '@/pages/home/route';
 import { reportAnimalRoute } from '@/pages/report-animal/route';
 import { rescueCasesRoute } from '@/pages/rescue-cases/route';

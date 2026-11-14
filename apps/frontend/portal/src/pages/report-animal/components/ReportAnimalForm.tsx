@@ -48,7 +48,7 @@ export const ReportAnimalForm = ({
         sizeRequired: t('reportAnimal.size_required'),
         ageRequired: t('reportAnimal.age_required'),
         behaviorRequired: t('reportAnimal.behavior_required'),
-        contactRequired: t('reportAnimal.contact_required'),
+        emailInvalid: t('reportAnimal.email_invalid'),
         descriptionRequired: t('reportAnimal.description_required'),
         descriptionMax: t('reportAnimal.description_max'),
       }),
@@ -67,7 +67,7 @@ export const ReportAnimalForm = ({
       longitude: null,
       photos: [],
       urgent: false,
-      contactPhone: '',
+      contactEmail: '',
       description: '',
     },
   });
@@ -125,8 +125,9 @@ export const ReportAnimalForm = ({
       reporterPhotos,
       description,
       contactInfo: {
-        phone: values.contactPhone.trim(),
-        email: '',
+        ...(values.contactEmail.trim()
+          ? { email: values.contactEmail.trim() }
+          : {}),
       },
     };
 
