@@ -37,7 +37,7 @@ describe('FilesController', () => {
     expect(isOptional).toBeTruthy();
   });
 
-  it('allows anonymous uploads only in the report folder', async () => {
+  it('allows anonymous uploads with any generic folder namespace', async () => {
     const upload = vi.fn<FilesService['upload']>().mockResolvedValue([]);
     const controller = buildController(upload);
     const guestClaims = { ...CLAIMS, kind: InternalJwtKind.ANONYMOUS };
@@ -45,22 +45,15 @@ describe('FilesController', () => {
     await expect(
       controller.upload(
         [buildFile('image/jpeg')],
-        'report-animal',
+        'other-folder',
         guestClaims,
       ),
     ).resolves.toEqual({ files: [] });
     expect(upload).toHaveBeenCalledWith(
       [expect.anything()],
       guestClaims,
-      'report-animal',
+      'other-folder',
     );
-    await expect(
-      controller.upload(
-        [buildFile('image/jpeg')],
-        'other-folder',
-        guestClaims,
-      ),
-    ).rejects.toThrow('Anonymous uploads are limited to reports');
   });
 
   it('forwards files, the authenticated user and the folder to the service', async () => {
