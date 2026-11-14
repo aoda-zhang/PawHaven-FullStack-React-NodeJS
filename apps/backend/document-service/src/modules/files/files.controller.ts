@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -9,10 +8,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { OptionalAuth } from '@pawhaven/backend-core/decorators';
 import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
-import {
-  InternalJwtKind,
-  type InternalJwt as InternalJwtClaims,
-} from '@pawhaven/backend-core/types';
+import type { InternalJwt as InternalJwtClaims } from '@pawhaven/backend-core/types';
 import {
   FILE_UPLOAD_LIMITS,
   type FileUploadResult,
@@ -39,12 +35,6 @@ export class FilesController {
     @Body('folder') folder: string | undefined,
     @InternalJwt({ allowAnonymous: true }) claims: InternalJwtClaims,
   ): Promise<FileUploadResult> {
-    if (
-      claims.kind === InternalJwtKind.ANONYMOUS &&
-      folder !== 'report-animal'
-    ) {
-      throw new ForbiddenException('Anonymous uploads are limited to reports');
-    }
     return {
       files: await this.filesService.upload(
         files ?? [],
