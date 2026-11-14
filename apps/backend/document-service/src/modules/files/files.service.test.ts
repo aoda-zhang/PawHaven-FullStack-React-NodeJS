@@ -51,17 +51,22 @@ describe('FilesService', () => {
     expect(consume).toHaveBeenCalledWith(CLAIMS.sub, 12);
   });
 
-  it('does not apply the per-user upload limiter to guest uploads', async () => {
+  it('does not apply the per-user upload limiter to guest uploads in any folder', async () => {
     const put = vi
       .fn<FileStorage['put']>()
       .mockResolvedValue(storedFile('report-animal/x.png'));
     const consume = vi.fn();
     const service = buildService(put, consume);
 
-    await service.upload([buildFile()], GUEST_CLAIMS, 'report-animal');
+    await service.upload([buildFile()], GUEST_CLAIMS, 'miscellaneous');
 
     expect(consume).not.toHaveBeenCalled();
     expect(put).toHaveBeenCalledOnce();
+    expect(put).toHaveBeenCalledWith(
+      expect.stringMatching(/^miscellaneous\\/[A-Za-z0-9_-]{22}\\.png$/),
+      PNG_BYTES,
+      'image/png',
+    );
   });
 
   it('uploads under the default folder with a short uuid key (no original filename)', async () => {
@@ -79,6 +84,32 @@ describe('FilesService', () => {
       expect.stringMatching(/^uploads\/[A-Za-z0-9_-]{22}\.png$/),
       PNG_BYTES,
       'image/png',
+    );
+  });
+
+  it('accepts generic file types and sizes independently of the folder name', async () => {
+    const put = vi
+      .fn<FileStorage['put']>()
+      .mockResolvedValue(storedFile('report-animal/x.webp'));
+    const service = buildService(put);
+    const webpBytes = Buffer.from('RIFF0000WEBP');
+
+    await service.upload(
+      [
+        buildFile({
+          buffer: webpBytes,
+          size: 3 * 1024 * 1024,
+          mimetype: 'image/webp',
+        }),
+      ],
+      GUEST_CLAIMS,
+      'report-animal',
+    );
+
+    expect(put).toHaveBeenCalledWith(
+      expect.stringMatching(/^report-animal\\/[A-Za-z0-9_-]{22}\\.webp$/),
+      webpBytes,
+      'image/webp',
     );
   });
 
