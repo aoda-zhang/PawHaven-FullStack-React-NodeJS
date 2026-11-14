@@ -119,7 +119,6 @@
     "unknown": "Unknown",
     "email_label": "Email address (optional)",
     "email_recommended": "To help us learn more about the animal, we strongly recommend providing an email address where we can reach you.",
-    "email_optional": "Email address is optional. You can submit your report without it.",
     "email_invalid": "Please enter a valid email address."
   }
 }
