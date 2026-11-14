@@ -87,7 +87,7 @@ flowchart TD
     D --> E{client Zod validation}
     E -- fail --> B
     E -- pass --> F[uploadFiles(files, 'report-animal')<br/>Files → multipart]
-    F --> G[POST /api/document/files<br/>guest allowed only for `report-animal` folder]
+    F --> G[POST /api/document/files<br/>generic optional-auth upload]
     G --> H[File storage<br/>provider-configurable<br/>stored file URLs]
     H --> I[map form values → AnimalReportDto<br/>urgent → status · behavior → statusDescription]
     I --> J[POST /api/core/report-animal<br/>optional authentication · reporterPhotos: [key]]
@@ -115,22 +115,24 @@ rescue module's `GET /api/core/rescues` — see [Rescue Cases](04-rescue-cases.m
 
 ## 4. Photos
 
-Photos are uploaded before the report is submitted through document-service's file-upload API
-`POST /api/document/files` (multipart `files`, optional `folder`). Anonymous callers are restricted
-to the `report-animal` folder; authenticated callers retain the existing generic upload capability. Storage sits behind a **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
+Photos are uploaded before the report is submitted through document-service's generic file-upload API
+`POST /api/document/files` (multipart `files`, optional `folder`). The File API is business-agnostic:
+its generic JPEG/PNG/WebP and 5 MB-per-file limits apply regardless of folder or authentication.
+The report form applies its own 2 MB JPEG/PNG selection rules on the client. Storage sits behind a
+**provider-agnostic** `FileStorage` port; the Vercel Blob adapter
 is selected by `storage.provider`, so switching or adding a provider is a config + adapter change.
 The reusable client helper is `uploadFiles(files, folder?)` in
 `apps/frontend/portal/src/shared/api/file.api.ts`; the report form calls it with
 `folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
 endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
-for the `report-animal` folder, FilesService also enforces JPEG/PNG and a 2 MB per-photo server-side limit, matching the form's picker and validation. `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
+`reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
 
 An upload failure is reported inline by the photo control, above the image grid, not at the bottom of
 the form.
 
 document-service verifies each upload's **real bytes** against the declared MIME
 (JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles authenticated uploads per user
-(20 requests / 100 MB per minute, per process). Guest uploads are not subject to the document-service per-user limiter; the gateway's existing global rate limit still applies. Uploads return only the **storage key**
+(20 requests / 100 MB per minute, per process). Guest uploads are not subject to the document-service per-user limiter; the gateway's existing global rate limit still applies. The File API does not enforce report-specific folder, size, or MIME rules. Uploads return only the **storage key**
 (`report-animal/<short-uuid>.<ext>`, no original filename); the Vercel Blob host is never stored or returned. Core-service
 derives display URLs at read time as `<BLOB_PUBLIC_BASE_URL>/<key>`, where `BLOB_PUBLIC_BASE_URL` is a
 **required, validated** config that must route to the Blob store (reverse proxy or edge rewrite —
