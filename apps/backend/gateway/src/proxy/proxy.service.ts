@@ -31,7 +31,6 @@ import { MicroServiceRegistry } from '../routing/microService.registry.js';
 type PendingInternalJwtHeaders = {
   [httpHeaders.gatewayJwt]: string;
   [httpHeaders.traceId]: string;
-  clientIp: string;
 };
 
 const HTTP_REDIRECT_RANGE_MIN = 300;
@@ -83,7 +82,6 @@ export class ProxyService {
     this.pendingInternalJwtHeaders.set(req, {
       [httpHeaders.gatewayJwt]: internalJwtHeaders[httpHeaders.gatewayJwt],
       [httpHeaders.traceId]: traceId,
-      clientIp: req.ip || req.socket.remoteAddress || 'unknown',
     });
     this.proxyClient(req, res, next);
   }
@@ -303,7 +301,6 @@ export class ProxyService {
         pending[httpHeaders.gatewayJwt],
       );
       proxyReq.setHeader(httpHeaders.traceId, pending[httpHeaders.traceId]);
-      proxyReq.setHeader('x-gateway-client-ip', pending.clientIp);
     }
 
     const locale = readHeader(req.headers, httpHeaders.appLocale);

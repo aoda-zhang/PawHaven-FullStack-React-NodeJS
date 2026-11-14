@@ -47,21 +47,18 @@ describe('FilesController', () => {
         [buildFile('image/jpeg')],
         'report-animal',
         guestClaims,
-        '203.0.113.5',
       ),
     ).resolves.toEqual({ files: [] });
     expect(upload).toHaveBeenCalledWith(
       [expect.anything()],
       guestClaims,
       'report-animal',
-      '203.0.113.5',
     );
     await expect(
       controller.upload(
         [buildFile('image/jpeg')],
         'other-folder',
         guestClaims,
-        '203.0.113.5',
       ),
     ).rejects.toThrow('Anonymous uploads are limited to reports');
   });
@@ -80,13 +77,12 @@ describe('FilesController', () => {
     const webp = buildFile('image/webp');
 
     await expect(
-      controller.upload([jpeg, webp], 'report-animal', CLAIMS, '127.0.0.1'),
+      controller.upload([jpeg, webp], 'report-animal', CLAIMS),
     ).resolves.toEqual({ files: uploaded });
     expect(upload).toHaveBeenCalledWith(
       [jpeg, webp],
       CLAIMS,
       'report-animal',
-      '127.0.0.1',
     );
   });
 });

@@ -1,13 +1,16 @@
 import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
+import { InternalJwtKind } from '@pawhaven/backend-core/types';
+
 import type { FileStorage } from './fileStorage.js';
 import { FilesService } from './files.service.js';
 import type { UploadRateLimiter } from './uploadRateLimiter.js';
 
 const PNG_BYTES = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const PDF_BYTES = Buffer.from('%PDF-1.7\n');
-const USER = 'user-1';
+const CLAIMS = { kind: InternalJwtKind.AUTHENTICATED, sub: 'user-1' };
+const GUEST_CLAIMS = { kind: InternalJwtKind.ANONYMOUS };
 
 const buildFile = (overrides: Partial<Express.Multer.File> = {}) =>
   ({
@@ -42,10 +45,23 @@ describe('FilesService', () => {
 
     await service.upload(
       [buildFile({ size: 5 }), buildFile({ size: 7 })],
-      USER,
+      CLAIMS,
     );
 
-    expect(consume).toHaveBeenCalledWith(USER, 12);
+    expect(consume).toHaveBeenCalledWith(CLAIMS.sub, 12);
+  });
+
+  it('does not apply the per-user upload limiter to guest uploads', async () => {
+    const put = vi
+      .fn<FileStorage['put']>()
+      .mockResolvedValue(storedFile('report-animal/x.png'));
+    const consume = vi.fn();
+    const service = buildService(put, consume);
+
+    await service.upload([buildFile()], GUEST_CLAIMS, 'report-animal');
+
+    expect(consume).not.toHaveBeenCalled();
+    expect(put).toHaveBeenCalledOnce();
   });
 
   it('uploads under the default folder with a short uuid key (no original filename)', async () => {
@@ -56,7 +72,7 @@ describe('FilesService', () => {
 
     await service.upload(
       [buildFile({ originalname: '../../etc/passwd' })],
-      USER,
+      CLAIMS,
     );
 
     expect(put).toHaveBeenCalledWith(
@@ -72,7 +88,7 @@ describe('FilesService', () => {
       .mockResolvedValue(storedFile('report-animal/x.png'));
     const service = buildService(put);
 
-    await service.upload([buildFile()], USER, 'report-animal');
+    await service.upload([buildFile()], CLAIMS, 'report-animal');
 
     expect(put).toHaveBeenCalledWith(
       expect.stringMatching(/^report-animal\/[A-Za-z0-9_-]{22}\.png$/),
@@ -87,7 +103,7 @@ describe('FilesService', () => {
       .mockResolvedValue(storedFile('uploads/x.png'));
     const service = buildService(put);
 
-    await service.upload([buildFile()], USER, '../..');
+    await service.upload([buildFile()], CLAIMS, '../..');
 
     expect(put).toHaveBeenCalledWith(
       expect.stringMatching(/^uploads\/[A-Za-z0-9_-]{22}\.png$/),
@@ -113,7 +129,7 @@ describe('FilesService', () => {
     await expect(
       service.upload(
         [buildFile({ buffer: Buffer.from('not-an-image') })],
-        USER,
+        CLAIMS,
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(put).not.toHaveBeenCalled();
@@ -132,7 +148,7 @@ describe('FilesService', () => {
             mimetype: 'application/pdf',
           }),
         ],
-        USER,
+        CLAIMS,
       ),
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(put).not.toHaveBeenCalled();

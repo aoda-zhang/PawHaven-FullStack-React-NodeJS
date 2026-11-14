@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   ForbiddenException,
-  Headers,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -39,7 +38,6 @@ export class FilesController {
     @UploadedFiles() files: Express.Multer.File[] | undefined,
     @Body('folder') folder: string | undefined,
     @InternalJwt({ allowAnonymous: true }) claims: InternalJwtClaims,
-    @Headers('x-gateway-client-ip') clientIp?: string,
   ): Promise<FileUploadResult> {
     if (
       claims.kind === InternalJwtKind.ANONYMOUS &&
@@ -52,7 +50,6 @@ export class FilesController {
         files ?? [],
         claims,
         folder,
-        clientIp,
       ),
     };
   }

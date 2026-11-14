@@ -38,7 +38,6 @@ export class FilesService {
     files: Express.Multer.File[],
     claims: InternalJwt,
     folder?: string,
-    clientIp?: string,
   ): Promise<UploadedFile[]> {
     const prefix = this.normalizeFolder(folder);
     if (
@@ -62,11 +61,9 @@ export class FilesService {
     }
 
     const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
-    const limiterKey =
-      claims.kind === InternalJwtKind.AUTHENTICATED
-        ? `user:${claims.sub}`
-        : `ip:${clientIp?.trim() || 'unknown'}`;
-    this.rateLimiter.consume(limiterKey, totalBytes);
+    if (claims.kind === InternalJwtKind.AUTHENTICATED) {
+      this.rateLimiter.consume(claims.sub, totalBytes);
+    }
 
     return Promise.all(
       files.map((file) => {

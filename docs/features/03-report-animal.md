@@ -128,9 +128,9 @@ for the `report-animal` folder, FilesService also enforces JPEG/PNG and a 2 MB p
 An upload failure is reported inline by the photo control, above the image grid, not at the bottom of
 the form.
 
-document-service applies per-IP throttling to anonymous uploads and verifies each upload's **real bytes** against the declared MIME
-(JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles authenticated uploads per user and anonymous uploads per gateway-derived client IP
-(20 requests / 100 MB per minute, per process). Uploads return only the **storage key**
+document-service verifies each upload's **real bytes** against the declared MIME
+(JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles authenticated uploads per user
+(20 requests / 100 MB per minute, per process). Guest uploads are not subject to the document-service per-user limiter; the gateway's existing global rate limit still applies. Uploads return only the **storage key**
 (`report-animal/<short-uuid>.<ext>`, no original filename); the Vercel Blob host is never stored or returned. Core-service
 derives display URLs at read time as `<BLOB_PUBLIC_BASE_URL>/<key>`, where `BLOB_PUBLIC_BASE_URL` is a
 **required, validated** config that must route to the Blob store (reverse proxy or edge rewrite —
