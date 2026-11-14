@@ -58,8 +58,9 @@ both live as sections:
 | `document-service` | `email`, `pdf`, `blob`                                                               |
 | `gateway`          | `identity`, `internal-jwt`, `proxy`, `routing`, `throttle`                           |
 
-`document-service` also exposes a **generic, authenticated upload API** — `POST /api/document/files`
-(multipart `files` + optional `folder`; images JPEG/PNG/WebP, 5 MB each, max 5). Storage is
+`document-service` also exposes a **generic upload API with optional authentication** — `POST /api/document/files`
+(multipart `files` + optional `folder`; images JPEG/PNG/WebP, 5 MB each, max 5). Anonymous uploads
+are not restricted to a feature-specific folder. Storage is
 a provider-agnostic `FileStorage` port (currently `vercel`), so switching or adding a provider is a
 config + adapter change. It is a platform capability, not tied to one feature;
 `report-animal` is its first caller.
