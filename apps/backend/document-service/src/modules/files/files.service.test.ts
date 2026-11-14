@@ -63,7 +63,7 @@ describe('FilesService', () => {
     expect(consume).not.toHaveBeenCalled();
     expect(put).toHaveBeenCalledOnce();
     expect(put).toHaveBeenCalledWith(
-      expect.stringMatching(/^miscellaneous\\/[A-Za-z0-9_-]{22}\\.png$/),
+      expect.stringMatching(/^miscellaneous\/[A-Za-z0-9_-]{22}\.png$/),
       PNG_BYTES,
       'image/png',
     );
@@ -107,7 +107,7 @@ describe('FilesService', () => {
     );
 
     expect(put).toHaveBeenCalledWith(
-      expect.stringMatching(/^report-animal\\/[A-Za-z0-9_-]{22}\\.webp$/),
+      expect.stringMatching(/^report-animal\/[A-Za-z0-9_-]{22}\.webp$/),
       webpBytes,
       'image/webp',
     );
