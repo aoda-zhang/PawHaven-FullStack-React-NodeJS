@@ -121,7 +121,6 @@
     "unknown": "Unbekannt",
     "email_label": "E-Mail-Adresse (optional)",
     "email_recommended": "Damit wir mehr über das Tier erfahren können, empfehlen wir dringend, eine E-Mail-Adresse anzugeben, unter der wir Sie erreichen können.",
-    "email_optional": "Die E-Mail-Adresse ist optional. Sie können Ihre Meldung auch ohne sie absenden.",
     "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
   }
 }
