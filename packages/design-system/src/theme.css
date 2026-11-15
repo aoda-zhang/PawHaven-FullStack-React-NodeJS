@@ -41,9 +41,6 @@
   --color-text-secondary: var(--color-gray-7); /* #737373 */
   --color-text-tertiary: var(--color-gray-6); /* #a3a3a3 */
   --color-text-inverse: var(--color-gray-1); /* #ffffff */
-  --color-text-link: var(
-    --color-orange-9
-  ); /* #a74e15 — accessible link colour on light surfaces */
 
   /* ═══ Borders ════════════════════════════════════════ */
   --color-border: var(--color-gray-5); /* #d4d4d4 */

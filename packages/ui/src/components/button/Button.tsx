@@ -16,7 +16,7 @@ export const buttonVariants = cva(
           'border border-border bg-background text-text hover:bg-muted hover:text-text',
         secondary: 'bg-muted text-text hover:bg-muted-strong',
         ghost: 'hover:bg-muted hover:text-text',
-        link: 'text-text-link underline-offset-4 hover:underline',
+        link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         md: 'h-control px-control-x py-control-y',

@@ -53,7 +53,6 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 | `text-text-secondary`         | `--color-text-secondary` | Subtle text                                  |
 | `text-text-inverse`           | `--color-text-inverse`   | Text on dark surfaces and inverse text roles |
 | `text-primary-fg`             | `--color-primary-fg`     | White text/icons on Primary backgrounds      |
-| `text-text-link`              | `--color-text-link`      | Links                                        |
 | `border-border`               | `--color-border`         | Card borders, dividers                       |
 | `bg-error` / `text-error`     | `--color-error`          | Error states                                 |
 | `bg-success` / `text-success` | `--color-success`        | Success states                               |
