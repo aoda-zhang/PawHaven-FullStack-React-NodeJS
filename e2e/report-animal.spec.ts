@@ -4,8 +4,11 @@ const REPORT_ANIMAL_PATH = '/report-animal';
 
 test.describe('report animal', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/auth/me', (route) =>
-      route.fulfill({
+    await page.route('**/api/document/files', (route) => {
+      const body = route.request().postData() ?? '';
+      expect(body).toContain('name="folder"');
+      expect(body).toContain('report-animal');
+      return route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
@@ -14,36 +17,26 @@ test.describe('report animal', () => {
           message: 'ok',
           code: '0',
           data: {
-            userId: 'test-user-1',
-            username: 'Test User',
-            email: 'test@example.com',
-            status: 'active',
+            files: [
+              {
+                key: 'report-animal/photo-1.png',
+                size: 10,
+                contentType: 'image/png',
+              },
+            ],
           },
         }),
-      }),
-    );
+      });
+    });
   });
 
-  test('shows the report form to an authenticated user', async ({ page }) => {
+  test('shows the report form to a guest', async ({ page }) => {
     await page.goto(REPORT_ANIMAL_PATH);
 
+    await expect(page).toHaveURL(/\/report-animal$/);
     await expect(page.locator('form')).toBeVisible();
     await expect(page.getByText('Tell us about the animal')).toBeVisible();
-    await expect(page.getByText('Behavior, urgency & contact')).toBeVisible();
-  });
-
-  test('redirects an unauthenticated user to login', async ({ page }) => {
-    await page.unroute('**/api/auth/me');
-    await page.route('**/api/auth/me', (route) =>
-      route.fulfill({
-        status: 401,
-        contentType: 'application/json',
-        body: JSON.stringify({ message: 'Unauthorized' }),
-      }),
-    );
-    await page.goto(REPORT_ANIMAL_PATH);
-
-    await expect(page).toHaveURL(/\/auth\/login/);
+    await expect(page.getByText('Behavior & urgency')).toBeVisible();
   });
 
   test('shows validation errors for empty required fields', async ({

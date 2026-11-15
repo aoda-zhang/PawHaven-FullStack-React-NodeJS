@@ -9,8 +9,21 @@ import type { UploadRateLimiter } from './uploadRateLimiter.js';
 
 const PNG_BYTES = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const PDF_BYTES = Buffer.from('%PDF-1.7\n');
-const CLAIMS = { kind: InternalJwtKind.AUTHENTICATED, sub: 'user-1' };
-const GUEST_CLAIMS = { kind: InternalJwtKind.ANONYMOUS };
+const CLAIMS = {
+  aud: 'document-service',
+  iat: 0,
+  exp: 0,
+  rid: 'trace-1',
+  kind: InternalJwtKind.AUTHENTICATED,
+  sub: 'user-1',
+};
+const GUEST_CLAIMS = {
+  aud: 'document-service',
+  iat: 0,
+  exp: 0,
+  rid: 'trace-1',
+  kind: InternalJwtKind.ANONYMOUS,
+};
 
 const buildFile = (overrides: Partial<Express.Multer.File> = {}) =>
   ({
@@ -51,7 +64,7 @@ describe('FilesService', () => {
     expect(consume).toHaveBeenCalledWith(CLAIMS.sub, 12);
   });
 
-  it('does not apply the per-user upload limiter to guest uploads in any folder', async () => {
+  it('does not apply the per-user upload limiter to guest uploads', async () => {
     const put = vi
       .fn<FileStorage['put']>()
       .mockResolvedValue(storedFile('report-animal/x.png'));
@@ -87,7 +100,7 @@ describe('FilesService', () => {
     );
   });
 
-  it('accepts generic file types and sizes independently of the folder name', async () => {
+  it('accepts the same file types and sizes regardless of the folder name', async () => {
     const put = vi
       .fn<FileStorage['put']>()
       .mockResolvedValue(storedFile('report-animal/x.webp'));

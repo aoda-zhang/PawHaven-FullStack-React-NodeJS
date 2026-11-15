@@ -41,11 +41,7 @@ export const rootRoute = {
     rescueGuideRoute,
     rescueCasesRoute,
     rescueDetailRoute,
-    {
-      id: 'authenticated',
-      Component: AuthenticatedLayout,
-      children: [reportAnimalRoute],
-    },
+    reportAnimalRoute,
     {
       path: '*',
       Component: NotFound,

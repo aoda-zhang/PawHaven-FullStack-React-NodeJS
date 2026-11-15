@@ -36,12 +36,12 @@ order the DTO uses.
 
 Heading from `reportAnimal.behavior_title`, body `components/BehaviorContactSection.tsx`:
 
-| Order | Control          | Field          | Notes                                                                                              |
-| ----- | ---------------- | -------------- | -------------------------------------------------------------------------------------------------- |
-| 1     | `FormRadio`      | `behavior`     | `friendly \| wary \| aggressive \| unknown` — see [§6](#6-contract-persistence-details)   |
-| 2     | `FormInput`      | `description`  | ≤ 200 chars, trimmed on submit                                                                     |
-| 3     | `FormCheckbox`   | `urgent`       | Collapses the DTO's `status` enum to 2 values — see [§6](#6-contract-persistence-details) |
-| 4     | `FormInput`      | `contactEmail` | Optional email address; validated only when provided                                              |
+| Order | Control        | Field          | Notes                                                                                     |
+| ----- | -------------- | -------------- | ----------------------------------------------------------------------------------------- |
+| 1     | `FormRadio`    | `behavior`     | `friendly \| wary \| aggressive \| unknown` — see [§6](#6-contract-persistence-details)   |
+| 2     | `FormInput`    | `description`  | ≤ 200 chars, trimmed on submit                                                            |
+| 3     | `FormCheckbox` | `urgent`       | Collapses the DTO's `status` enum to 2 values — see [§6](#6-contract-persistence-details) |
+| 4     | `FormInput`    | `contactEmail` | Optional email address; validated only when provided                                      |
 
 Ticking `urgent` also reveals a static `bg-error-light` note reading
 `reportAnimal.emergency_note`.
@@ -115,16 +115,17 @@ rescue module's `GET /api/core/rescues` — see [Rescue Cases](04-rescue-cases.m
 
 ## 4. Photos
 
-Photos are uploaded before the report is submitted through document-service's generic file-upload API
+Photos are uploaded before the report is submitted through document-service's file-upload API
 `POST /api/document/files` (multipart `files`, optional `folder`). The File API is business-agnostic:
-its generic JPEG/PNG/WebP and 5 MB-per-file limits apply regardless of folder or authentication.
-The report form applies its own 2 MB JPEG/PNG selection rules on the client. Storage sits behind a
+its JPEG/PNG/WebP and 5 MB-per-file limits apply regardless of folder or authentication, and anonymous
+callers may use any folder. The report form applies its own 2 MB JPEG/PNG selection rules on the
+client only — the server does not re-check them. Storage sits behind a
 **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
 is selected by `storage.provider`, so switching or adding a provider is a config + adapter change.
 The reusable client helper is `uploadFiles(files, folder?)` in
-`apps/frontend/portal/src/shared/api/file.api.ts`; the report form calls it with
+`apps/frontend/portal/src/shared/utils/apiClient.ts`; the report form calls it with
 `folder: 'report-animal'`, then submits `reporterPhotos` as the returned **storage keys** in the JSON body. The
-endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`);
+endpoint accepts JPEG/PNG/WebP images up to 5 MB each, max 5 files (`FILE_UPLOAD_LIMITS`).
 `reporterPhotosSchema` enforces storage keys (2–5 entries) on the report endpoint as well.
 
 An upload failure is reported inline by the photo control, above the image grid, not at the bottom of
@@ -132,7 +133,7 @@ the form.
 
 document-service verifies each upload's **real bytes** against the declared MIME
 (JPEG/PNG/WebP signatures), so a file cannot be relabelled, and throttles authenticated uploads per user
-(20 requests / 100 MB per minute, per process). Guest uploads are not subject to the document-service per-user limiter; the gateway's existing global rate limit still applies. The File API does not enforce report-specific folder, size, or MIME rules. Uploads return only the **storage key**
+(20 requests / 100 MB per minute, per process). Guest uploads are not subject to the document-service per-user limiter; the gateway's existing global rate limit still applies. Uploads return only the **storage key**
 (`report-animal/<short-uuid>.<ext>`, no original filename); the Vercel Blob host is never stored or returned. Core-service
 derives display URLs at read time as `<BLOB_PUBLIC_BASE_URL>/<key>`, where `BLOB_PUBLIC_BASE_URL` is a
 **required, validated** config that must route to the Blob store (reverse proxy or edge rewrite —
@@ -149,22 +150,22 @@ are not migrated or specially handled.
 
 `animalReports` is shared with the rescue feature. The fields this feature writes:
 
-| Field               | Type      | Source                                                                                                                                     |
-| ------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `animalType`        | String    | `cat` \| `dog` \| `other` (+ free-text when other)                                                                                         |
-| `animalCount`       | Int       | Stepper, ≥ 1                                                                                                                               |
-| `age`               | String    | `baby` \| `adult` — only two buckets                                                                                                       |
-| `size`              | String    | `small` \| `medium` \| `large`                                                                                                             |
-| `appearance`        | Json      | `{ color }` and nothing else                                                                                                               |
-| `locationObj`       | Json      | `{ address, latitude?, longitude? }`                                                                                                       |
-| `animalStatus`      | String    | Always `pending` on write                                                                                                                  |
-| `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                                     |
-| `description`       | String    | ≤ 200 chars, trimmed                                                                                                                       |
-| `reporterPhotos`    | String[]  | Storage keys, 2–5 entries                                                                                                                  |
-| `reporter`          | Object?   | Authenticated reporter identity; null for guest submissions                                         |
-| `reporterEmail`     | String?   | Optional private contact email; excluded from public rescue DTOs                                                                                                 |
+| Field               | Type      | Source                                                                                                                            |
+| ------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `animalType`        | String    | `cat` \| `dog` \| `other` (+ free-text when other)                                                                                |
+| `animalCount`       | Int       | Stepper, ≥ 1                                                                                                                      |
+| `age`               | String    | `baby` \| `adult` — only two buckets                                                                                              |
+| `size`              | String    | `small` \| `medium` \| `large`                                                                                                    |
+| `appearance`        | Json      | `{ color }` and nothing else                                                                                                      |
+| `locationObj`       | Json      | `{ address, latitude?, longitude? }`                                                                                              |
+| `animalStatus`      | String    | Always `pending` on write                                                                                                         |
+| `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                            |
+| `description`       | String    | ≤ 200 chars, trimmed                                                                                                              |
+| `reporterPhotos`    | String[]  | Storage keys, 2–5 entries                                                                                                         |
+| `reporter`          | Object?   | Authenticated reporter identity; null for guest submissions                                                                       |
+| `reporterEmail`     | String?   | Optional private contact email; excluded from public rescue DTOs                                                                  |
 | `status`            | String    | `@default("active")` — **written by nothing, read by nothing.** Not the DTO's `status`; see [§6](#6-contract-persistence-details) |
-| `deletedAt`         | DateTime? | Soft delete; this is what `findAll` actually filters on                                                                                    |
+| `deletedAt`         | DateTime? | Soft delete; this is what `findAll` actually filters on                                                                           |
 
 ## 6. Contract persistence details
 
@@ -219,7 +220,7 @@ a friendly one.
 
 | File                                        | Role                                                                                                                          |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `route.tsx`                                 | `reportAnimalRoute`; public route with optional authentication                                                              |
+| `route.tsx`                                 | `reportAnimalRoute`; public route with optional authentication                                                                |
 | `index.tsx`                                 | Page container; exports `ReportAnimal`                                                                                        |
 | `components/ReportAnimalForm.tsx`           | RHF form; uploads photos, maps form values to the DTO, and owns the success card                                              |
 | `components/AnimalBasicsSection.tsx`        | §1.1                                                                                                                          |
@@ -231,7 +232,7 @@ a friendly one.
 | `components/types.ts`                       | Re-exports `ANIMAL_TYPES`, `SIZES`, `BEHAVIORS`, `RescueAgeValues` and their types from `@pawhaven/shared/types`              |
 | `utils/reportSubmitError.ts`                | Maps submit failures to the inline message key; returns `null` for errors already shown by the shared toast                   |
 | `api/reportAnimal.api.ts` / `.mutations.ts` | The call; the mutation invalidates the rescue-feed and home keys                                                              |
-| `../../shared/api/file.api.ts`              | `uploadFiles(files, folder?)` — generic Blob upload helper (shared, not feature-local)                                        |
+| `../../shared/utils/apiClient.ts`           | `uploadFiles(files, folder?)` — generic Blob upload helper (shared, not feature-local)                                        |
 | `tests/`                                    | Component, validation, DTO-mapping and API tests, plus `ReportAnimal.submit` (400/429/500, unreadable photos, real `id`)      |
 
 Validation is schema-first on both sides, and the two schemas are deliberately different shapes:

@@ -60,10 +60,9 @@ both live as sections:
 
 `document-service` also exposes a **generic upload API with optional authentication** — `POST /api/document/files`
 (multipart `files` + optional `folder`; images JPEG/PNG/WebP, 5 MB each, max 5). Anonymous uploads
-are not restricted to a feature-specific folder. Storage is
-a provider-agnostic `FileStorage` port (currently `vercel`), so switching or adding a provider is a
-config + adapter change. It is a platform capability, not tied to one feature;
-`report-animal` is its first caller.
+are not restricted to a feature-specific folder. Storage is a provider-agnostic `FileStorage` port
+(currently `vercel`), so switching or adding a provider is a config + adapter change. It is a
+platform capability, not tied to one feature; `report-animal` is its first caller.
 
 One collection, two features: `animalReports` is written by both `report-animal` and `rescue`, and
 read by `rescue` and `home`. There is no `rescue_cases` table — **the report _is_ the case**.
