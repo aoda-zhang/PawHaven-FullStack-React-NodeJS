@@ -13,7 +13,7 @@ const ACTION_ITEM_CLASS =
 
 const MENU_CLASSES = {
   menuItem:
-    'flex items-center gap-1.5 px-3 py-2 rounded-panel text-sm font-medium text-text-secondary transition-colors',
+    'flex items-center gap-1.5 px-3 py-2 rounded-panel text-sm font-medium text-text transition-colors',
   activeMenuItem: 'text-primary',
   login: ACTION_ITEM_CLASS,
   logout: ACTION_ITEM_CLASS,
