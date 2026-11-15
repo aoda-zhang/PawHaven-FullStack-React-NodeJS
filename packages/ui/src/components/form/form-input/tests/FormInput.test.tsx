@@ -35,20 +35,24 @@ describe('FormInput', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeDisabled();
   });
 
-  it('maps the sm and md sizes', () => {
+  it('applies the single control size by default and explicitly as md', () => {
     render(
       <Harness>
-        <FormInput name="name" label="Name" size="sm" />
+        <FormInput name="name" label="Default" />
       </Harness>,
     );
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9');
+    expect(screen.getByRole('textbox', { name: 'Default' })).toHaveClass(
+      'h-control',
+    );
 
     render(
       <Harness>
-        <FormInput name="other" label="Other" size="md" />
+        <FormInput name="other" label="Explicit" size="md" />
       </Harness>,
     );
-    expect(screen.getByRole('textbox', { name: 'Other' })).toHaveClass('h-10');
+    expect(screen.getByRole('textbox', { name: 'Explicit' })).toHaveClass(
+      'h-control',
+    );
   });
 
   it('maps the standard, outline and fill variants', () => {

@@ -23,8 +23,23 @@ vi.mock('lucide-react', () => ({
 }));
 
 vi.mock('@pawhaven/ui', () => ({
-  Button: ({ children }: { children?: ReactNode }) => (
-    <button type="button">{children}</button>
+  Button: ({
+    children,
+    variant: _variant,
+    size: _size,
+    loading: _loading,
+    asChild: _asChild,
+    ...props
+  }: {
+    children?: ReactNode;
+    variant?: string;
+    size?: string;
+    loading?: boolean;
+    asChild?: boolean;
+  } & Record<string, unknown>) => (
+    <button type="button" {...props}>
+      {children}
+    </button>
   ),
   Loading: () => null,
   cn: (...classNames: unknown[]) => classNames.filter(Boolean).join(' '),

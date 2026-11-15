@@ -1,3 +1,4 @@
+import { Button } from '@pawhaven/ui';
 import { Camera, PawPrint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -25,14 +26,14 @@ export const StrayCTA = () => {
           {t('footer.cta_description')}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <button
+          <Button
             type="button"
             onClick={() => navigate(routePaths.reportAnimal)}
-            className="bg-primary text-text-inverse rounded-button-large flex items-center gap-2 px-6 py-3 text-sm font-semibold shadow-lg transition-opacity hover:opacity-90"
+            className="gap-2 font-semibold shadow-lg"
           >
             <Camera className="h-4 w-4" />
             {t('footer.cta_button')}
-          </button>
+          </Button>
         </div>
       </div>
     </section>

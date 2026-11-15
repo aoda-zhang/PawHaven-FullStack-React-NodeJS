@@ -26,10 +26,8 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('../components/VolunteerInfo', () => ({
-  VolunteerInfo: ({ animalId }: { animalId: string }) => (
-    <span data-testid="volunteer-info">{animalId}</span>
-  ),
+vi.mock('../components/AnimalFollow', () => ({
+  AnimalFollow: () => null,
 }));
 
 const buildAnimal = (reporterName: string | null): RescueDetail => ({
@@ -52,7 +50,18 @@ const buildAnimal = (reporterName: string | null): RescueDetail => ({
 const renderContent = (reporterName: string | null) =>
   render(<RescueDetailContent animal={buildAnimal(reporterName)} />);
 
-describe('RescueDetailContent timeline author', () => {
+describe('RescueDetailContent', () => {
+  it('does not render the removed volunteer or share cards', () => {
+    renderContent('PawRescuer');
+
+    expect(
+      screen.queryByText('rescueDetail.no_volunteer'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('rescueDetail.share_case'),
+    ).not.toBeInTheDocument();
+  });
+
   it('shows the reporter username on the reported entry', () => {
     renderContent('PawRescuer');
 

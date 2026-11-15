@@ -18,11 +18,6 @@
     "no": "No",
     "no_timeline": "No rescue updates yet.",
     "timeline_reported": "Reported",
-    "volunteer_rescues": "{{count}} rescues completed",
-    "volunteer_handling": "This volunteer is currently handling this rescue. You can offer to assist.",
-    "offer_assistance": "Offer Assistance",
-    "share_case": "Share case",
-    "share_copied": "Link copied to clipboard.",
     "relevant_guides": "RELEVANT GUIDES",
     "guide_injured": "What to Do When You Find an Injured Animal",
     "guide_injured_read": "6 min read",
@@ -30,7 +25,6 @@
     "guide_kitten_read": "9 min read",
     "guide_vehicle": "First Aid for Animals Hit by Vehicles",
     "guide_vehicle_read": "7 min read",
-    "no_volunteer": "No volunteer has claimed this case yet.",
     "reported_at": "Reported at {{time}}",
     "carousel_previous": "Previous photo",
     "carousel_next": "Next photo",
@@ -43,6 +37,10 @@
     "followers_count_one": "{{count}} person following",
     "followers_count_other": "{{count}} people following",
     "follow_error": "Could not follow. Please try again.",
-    "unfollow_error": "Could not unfollow. Please try again."
+    "unfollow_error": "Could not unfollow. Please try again.",
+    "follow_signup_title": "Want to follow this animal?",
+    "follow_signup_message": "Create an account to follow this animal and receive notifications about its latest rescue updates via in-app messages or email.",
+    "follow_signup_cta": "Create a free account",
+    "follow_signup_dismiss": "Keep browsing"
   }
 }

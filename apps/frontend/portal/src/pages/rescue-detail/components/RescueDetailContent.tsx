@@ -1,14 +1,14 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
 import type { RescueDetail as RescueDetailData } from '@pawhaven/shared/types';
-import { Carousel } from '@pawhaven/ui';
+import { Button, Carousel } from '@pawhaven/ui';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AnimalBasicInfo } from './AnimalBasicInfo';
+import { AnimalFollow } from './AnimalFollow';
 import { RelevantGuides } from './RelevantGuides';
 import { RescueTimeline } from './RescueTimeline';
-import { VolunteerInfo } from './VolunteerInfo';
 
 import { getRescueStatusColor } from '@/shared/utils/rescue-status/getRescueStatusColor';
 
@@ -37,14 +37,15 @@ export const RescueDetailContent = ({
 
   return (
     <div className="mx-auto max-w-3xl py-6">
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={handleBack}
-        className="text-text-secondary hover:text-foreground mb-4 inline-flex cursor-pointer items-center gap-1 text-sm font-medium transition-colors"
+        className="text-text-secondary mb-4"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         {t('rescue_cases.back_to_cases')}
-      </button>
+      </Button>
 
       {animal.photos.length > 0 && (
         <div className="rounded-card-large relative mb-4 h-48 overflow-hidden sm:h-60">
@@ -96,7 +97,7 @@ export const RescueDetailContent = ({
           <RescueTimeline updates={timelineUpdates} />
         </div>
         <div className="space-y-4">
-          <VolunteerInfo animalId={animal.id} volunteer={undefined} />
+          <AnimalFollow animalId={animal.id} />
 
           <RelevantGuides />
         </div>

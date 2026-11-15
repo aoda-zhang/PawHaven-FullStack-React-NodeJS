@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/ui';
+import { Button, cn } from '@pawhaven/ui';
 import type { NavigateFunction } from 'react-router-dom';
 
 import { useMenuNavigation } from './hooks/useMenuNavigation';
@@ -51,17 +51,19 @@ export const RootLayoutSidebar = ({
         <ul className="flex flex-col gap-1">
           {navItems.map((item) => (
             <li key={item.label}>
-              <button
+              <Button
+                variant={isAuthItem(item) ? 'default' : 'ghost'}
                 type="button"
                 className={cn(
                   SIDEBAR_MENU_ITEM_CLASS,
                   item.className,
                   isAuthItem(item) && 'justify-center',
+                  'h-auto',
                 )}
                 onClick={() => navigateAndClose(item.to)}
               >
                 <span>{item.label}</span>
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -69,18 +71,20 @@ export const RootLayoutSidebar = ({
       {authItems.length > 0 && (
         <div className="border-border border-t px-3 py-3">
           {authItems.map((item) => (
-            <button
+            <Button
+              variant="ghost"
               key={item.label}
               type="button"
               className={cn(
                 SIDEBAR_MENU_ITEM_CLASS,
                 item.className,
                 isAuthItem(item) && 'justify-center',
+                'h-auto',
               )}
               onClick={() => navigateAndClose(item.to)}
             >
               <span>{item.label}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}

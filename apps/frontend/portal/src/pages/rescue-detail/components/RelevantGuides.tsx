@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/ui';
+import { Button, cn } from '@pawhaven/ui';
 import { BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -42,11 +42,12 @@ export const RelevantGuides = () => {
 
       <div className="space-y-3">
         {GUIDES.map((guide) => (
-          <button
+          <Button
             key={guide.title}
             type="button"
+            variant="outline"
             className={cn(
-              'border-border hover:border-primary rounded-button-large flex w-full items-start gap-3 border p-3 text-left transition-colors',
+              'hover:border-primary h-auto w-full items-start justify-start gap-3 p-3 text-left whitespace-normal',
               guide.highlight,
             )}
           >
@@ -61,7 +62,7 @@ export const RelevantGuides = () => {
                 {t(`rescueDetail.${guide.readTime}`)}
               </p>
             </div>
-          </button>
+          </Button>
         ))}
       </div>
     </section>

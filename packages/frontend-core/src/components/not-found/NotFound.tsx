@@ -1,4 +1,4 @@
-import { Button, cn } from '@pawhaven/ui';
+import { Button } from '@pawhaven/ui';
 import { ArrowLeft, Home } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +30,7 @@ export const NotFound = ({
     <div className="flex min-h-screen flex-col">
       <div className="bg-background flex w-full flex-1 flex-col px-5 pt-10 pb-10 text-center">
         <div className="mb-8">
-          <div className="bg-warning-light text-warning mx-auto inline-flex size-28 items-center justify-center rounded-full">
+          <div className="bg-primary-light text-primary mx-auto inline-flex size-28 items-center justify-center rounded-full">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -63,20 +63,12 @@ export const NotFound = ({
         <div className="flex flex-wrap items-center justify-center gap-4">
           <Button
             onClick={goToHome}
-            className={cn(
-              'bg-warning text-text-inverse hover:bg-warning-hover rounded-button-large px-8 py-3 text-base font-semibold',
-            )}
+            className="bg-primary text-primary-fg hover:bg-primary-active font-semibold"
           >
             <Home size={18} />
             {t('common.go_to_home', 'Go to Home')}
           </Button>
-          <Button
-            variant="outline"
-            onClick={goBack}
-            className={cn(
-              'rounded-button-large px-8 py-3 text-base font-semibold',
-            )}
-          >
+          <Button variant="outline" onClick={goBack} className="font-semibold">
             <ArrowLeft size={18} />
             {t('common.go_back', 'Go Back')}
           </Button>

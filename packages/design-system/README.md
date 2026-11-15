@@ -11,10 +11,11 @@ Shared design tokens, theme, and utilities for the PawHaven monorepo.
 | **Shadow**              | Semantic only  | `shadow-card`, `shadow-dropdown`                                                                                                                                                                                                |
 | **Radius**              | Semantic roles | `rounded-card`, `rounded-card-large`, `rounded-panel`, `rounded-button`, `rounded-button-large`, `rounded-input`, `rounded-input-large`, `rounded-icon`, `rounded-media`, `rounded-skeleton`, `rounded-section`, `rounded-hero` |
 | **Spacing / layout**    | Primitive OK   | `pt-2`, `gap-3`, `w-full`, `flex-col`                                                                                                                                                                                           |
+| **Control sizing**      | Semantic only  | `h-control`, `w-control`, `px-control-x`, `py-control-y`                                                                                                                                                                        |
 | **Sizing**              | Primitive OK   | `h-8`, `size-4`, `min-h-[44px]`                                                                                                                                                                                                 |
 | **Responsive / states** | Primitive OK   | `md:flex`, `hover:opacity-90`, `focus:ring`                                                                                                                                                                                     |
 
-> Rule of thumb: **design decisions** (color, type role, shadow depth, radius scale) → semantic. **Structural/layout** (space, size, breakpoint, interaction) → primitive.
+> Rule of thumb: **design decisions** (color, type role, shadow depth, radius scale, control sizing) → semantic. **Structural/layout** (space, size, breakpoint, interaction) → primitive.
 
 ## Install
 
@@ -52,7 +53,6 @@ All classnames reference **semantic tokens** from `theme.css`. Never use raw pri
 | `text-text-secondary`         | `--color-text-secondary` | Subtle text                                  |
 | `text-text-inverse`           | `--color-text-inverse`   | Text on dark surfaces and inverse text roles |
 | `text-primary-fg`             | `--color-primary-fg`     | White text/icons on Primary backgrounds      |
-| `text-text-link`              | `--color-text-link`      | Links                                        |
 | `border-border`               | `--color-border`         | Card borders, dividers                       |
 | `bg-error` / `text-error`     | `--color-error`          | Error states                                 |
 | `bg-success` / `text-success` | `--color-success`        | Success states                               |
@@ -73,13 +73,15 @@ const dotClass = getRescueStatusColor({
 
 ### Spacing, radius, shadow
 
-| Class                                                                                                                                                                                                                                      | Token           |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
-| `px-4` / `py-2` / `gap-3`                                                                                                                                                                                                                  | `--spacing-*`   |
-| `rounded-button` / `rounded-button-large` / `rounded-card` / `rounded-card-large` / `rounded-panel` / `rounded-input` / `rounded-input-large` / `rounded-icon` / `rounded-media` / `rounded-skeleton` / `rounded-section` / `rounded-hero` | `--radius-*`    |
-| `shadow-card` / `shadow-dropdown`                                                                                                                                                                                                          | `--shadow-*`    |
-| `text-3xl` / `text-6xl`                                                                                                                                                                                                                    | `--font-size-*` |
-| `font-heading` / `font-sans` / `font-serif`                                                                                                                                                                                                | `--font-*`      |
+| Class                                                                                                                                                                                                                                      | Token                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| `px-4` / `py-2` / `gap-3`                                                                                                                                                                                                                  | `--spacing-*`                                 |
+| `h-control` / `w-control`                                                                                                                                                                                                                  | `--spacing-control`                           |
+| `px-control-x` / `py-control-y`                                                                                                                                                                                                            | `--spacing-control-x` / `--spacing-control-y` |
+| `rounded-button` / `rounded-button-large` / `rounded-card` / `rounded-card-large` / `rounded-panel` / `rounded-input` / `rounded-input-large` / `rounded-icon` / `rounded-media` / `rounded-skeleton` / `rounded-section` / `rounded-hero` | `--radius-*`                                  |
+| `shadow-card` / `shadow-dropdown`                                                                                                                                                                                                          | `--shadow-*`                                  |
+| `text-3xl` / `text-6xl`                                                                                                                                                                                                                    | `--font-size-*`                               |
+| `font-heading` / `font-sans` / `font-serif`                                                                                                                                                                                                | `--font-*`                                    |
 
 ### Composite utilities
 

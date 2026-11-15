@@ -13,22 +13,22 @@
 
 @theme {
   /* ═══ Brand / Primary ════════════════════════════════════ */
-  --color-primary: var(--color-orange-6); /* #f7823a */
-  --color-primary-hover: var(--color-orange-7); /* #f66b26 */
-  --color-primary-active: var(--color-orange-8); /* #e65a1a */
-  --color-primary-light: var(--color-orange-1); /* #fff7ed */
-  --color-primary-fg: var(
-    --color-text-inverse
-  ); /* White foreground on primary backgrounds */
+  --color-primary: var(--color-orange-6); /* #ee701e */
+  --color-primary-hover: var(--color-orange-7); /* #cd601a */
+  --color-primary-active: var(--color-orange-8); /* #c35c19 */
+  --color-primary-light: var(--color-orange-1); /* #fef4ed */
+  --color-primary-fg: var(--color-text-inverse); /* #ffffff */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
-  --color-foreground: var(--color-gray-10); /* #171717 — main text, headings */
+  --color-foreground: var(
+    --color-text
+  ); /* #121212 — headings and body share one text colour */
   --color-muted: var(--color-gray-3); /* #f0f0f0 — secondary bg, inactive */
   --color-accent: var(--color-brown-2); /* #fff5ec — highlights, light pills */
   --color-accent-foreground: var(
     --color-orange-9
-  ); /* #c2410b — text on accent backgrounds */
+  ); /* #a74e15 — text on accent backgrounds */
   --color-card: var(--color-gray-1); /* #ffffff — card surfaces */
   --color-surface: var(
     --color-gray-1
@@ -37,13 +37,10 @@
   --color-muted-strong: var(--color-brown-4); /* #ecdccf */
 
   /* ═══ Text ═════════════════════════════════════════════ */
-  --color-text: var(--color-gray-9); /* #2f2f2f */
+  --color-text: var(--color-gray-9); /* #121212 */
   --color-text-secondary: var(--color-gray-7); /* #737373 */
   --color-text-tertiary: var(--color-gray-6); /* #a3a3a3 */
   --color-text-inverse: var(--color-gray-1); /* #ffffff */
-  --color-text-link: var(
-    --color-orange-9
-  ); /* Accessible link color on light surfaces */
 
   /* ═══ Borders ════════════════════════════════════════ */
   --color-border: var(--color-gray-5); /* #d4d4d4 */
@@ -87,6 +84,9 @@
   --spacing-section: var(--spacing-10);
   --spacing-card: var(--spacing-5);
   --spacing-input: var(--spacing-3);
+  --spacing-control: 2.5rem;
+  --spacing-control-x: 1rem;
+  --spacing-control-y: 0.5rem;
 
   /* ═══ Z-Index Scale ══════════════════════════════════ */
   --z-index-base: 1;

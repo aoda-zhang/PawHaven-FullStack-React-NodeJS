@@ -9,6 +9,7 @@ import {
 import { useState } from 'react';
 
 import { cn } from '../../utils/cn';
+import { Button } from '../button/Button';
 
 export type BannerType = 'info' | 'warning' | 'error' | 'success';
 
@@ -79,7 +80,7 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
         'flex items-start justify-start gap-3 border-b px-4 py-4 text-left text-sm lg:px-20',
         tone.container,
         variant === 'accent' && 'border-l-4',
-        variant === 'fill' && 'bg-primary/90 text-primary-fg',
+        variant === 'fill' && 'bg-primary text-primary-fg',
         banner.bannerWrapClassNames,
       )}
     >
@@ -109,16 +110,22 @@ export const NotificationBanner = ({ banner }: { banner: BannerMessage }) => {
         )}
       </div>
       {banner.dismissible && (
-        <button
+        <Button
           type="button"
+          size="icon"
+          variant="ghost"
           aria-label={
             banner.title ? `Dismiss ${banner.title}` : 'Dismiss notification'
           }
           onClick={() => setOpen(false)}
-          className="hover:bg-background/20 shrink-0 rounded p-0.5 transition-colors"
+          className={cn(
+            'shrink-0',
+            variant === 'fill' &&
+              'hover:bg-primary-active hover:text-primary-fg',
+          )}
         >
           <X aria-hidden="true" className="size-4" />
-        </button>
+        </Button>
       )}
     </div>
   );

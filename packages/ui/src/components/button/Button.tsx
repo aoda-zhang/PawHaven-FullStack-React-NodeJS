@@ -19,10 +19,8 @@ export const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-9 rounded-button px-3 has-[>svg]:px-2.5',
-        md: 'h-10 px-4 py-2 has-[>svg]:px-3',
-        lg: 'h-11 rounded-button px-6 has-[>svg]:px-4',
-        icon: 'size-10 rounded-button',
+        md: 'h-control px-control-x py-control-y',
+        icon: 'h-control w-control rounded-button',
       },
     },
     defaultVariants: {
@@ -32,7 +30,7 @@ export const buttonVariants = cva(
   },
 );
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+export type ButtonSize = 'md' | 'icon';
 
 export interface ButtonProps
   extends

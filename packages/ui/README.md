@@ -193,13 +193,14 @@ Classification follows the vocabulary used in
 
 ### Composite
 
-| Component                                                                                                   | Purpose                                                                                  |
-| ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `Carousel`                                                                                                  | Embla-backed image carousel with slide navigation, autoplay and accessible slide labels. |
-| `NotificationBanner`                                                                                        | Page-level banner for information, warnings, errors and success messages.                |
-| `Toast`                                                                                                     | Transient, queued notification surface with severity-appropriate announcement semantics. |
-| `Timeline` + `TimelineItem` / `TimelineSeparator` / `TimelineDot` / `TimelineConnector` / `TimelineContent` | Compound vertical timeline built on a semantic `<ol>` / `<li>` structure.                |
-| `FileDownloadButton`                                                                                        | Button that fetches a blob and triggers a browser download, with in-flight state.        |
+| Component                                                                                                   | Purpose                                                                                                                       |
+| ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `Carousel`                                                                                                  | Embla-backed image carousel with slide navigation, autoplay and accessible slide labels.                                      |
+| `Dialog`                                                                                                    | Controlled modal built on Radix UI Dialog, with accessible naming, focus return to the opener, and Escape/backdrop dismissal. |
+| `NotificationBanner`                                                                                        | Page-level banner for information, warnings, errors and success messages.                                                     |
+| `Toast`                                                                                                     | Transient, queued notification surface with severity-appropriate announcement semantics.                                      |
+| `Timeline` + `TimelineItem` / `TimelineSeparator` / `TimelineDot` / `TimelineConnector` / `TimelineContent` | Compound vertical timeline built on a semantic `<ol>` / `<li>` structure.                                                     |
+| `FileDownloadButton`                                                                                        | Button that fetches a blob and triggers a browser download, with in-flight state.                                             |
 
 ### Pattern (form controls)
 
@@ -230,10 +231,10 @@ The same names mean the same thing everywhere.
 
 ### `size`
 
-| Component   | Accepted values                | Default |
-| ----------- | ------------------------------ | ------- |
-| `Button`    | `sm` \| `md` \| `lg` \| `icon` | `md`    |
-| `FormInput` | `sm` \| `md`                   | `md`    |
+| Component   | Accepted values | Default |
+| ----------- | --------------- | ------- |
+| `Button`    | `md` \| `icon`  | `md`    |
+| `FormInput` | `md`            | `md`    |
 
 ### `variant`
 
@@ -309,6 +310,12 @@ not enough to name two separate inputs.
   `aria-hidden="true"`. While loading, the button behaves as disabled.
 - The focus indicator comes from the design-system `focus-ring` utility and
   is present on every variant.
+
+### Dialog
+
+- Radix UI Dialog provides modal semantics and focus trapping, and focus returns to the element that was focused when the dialog opened.
+- The required title supplies the accessible name; an optional description is connected through `aria-describedby`.
+- Escape and backdrop clicks request dismissal through `onOpenChange(false)`; application state remains the source of truth.
 
 ### Form controls
 

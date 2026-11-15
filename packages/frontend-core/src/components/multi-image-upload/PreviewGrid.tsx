@@ -1,3 +1,4 @@
+import { Button } from '@pawhaven/ui';
 import { ImagePlus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -36,26 +37,29 @@ export const PreviewGrid = ({
               className="h-full w-full object-cover"
             />
           )}
-          <button
+          <Button
             type="button"
+            size="icon"
+            variant="ghost"
             aria-label={removeLabel ?? t('imageUpload.remove')}
             onClick={() => onRemove(item.id)}
-            className="bg-background/80 text-error hover:bg-background absolute top-1.5 right-1.5 flex h-7 w-7 items-center justify-center rounded-full shadow-sm"
+            className="bg-background/80 text-error hover:bg-background hover:text-error absolute top-1.5 right-1.5 h-7 w-7 rounded-full shadow-sm"
           >
             <Trash2 className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
       ))}
       {previews.length < max && (
-        <button
+        <Button
           type="button"
+          variant="ghost"
           onClick={onAdd}
           aria-label={addLabel ?? t('imageUpload.add')}
-          className="border-border text-text-secondary hover:border-primary/40 hover:bg-muted rounded-media flex aspect-square flex-col items-center justify-center gap-1 border-2 border-dashed transition-colors"
+          className="border-border text-text-secondary hover:border-primary/40 rounded-media flex aspect-square h-auto flex-col items-center justify-center gap-1 border-2 border-dashed px-0 py-0 whitespace-normal"
         >
           <ImagePlus className="h-6 w-6" />
           <span className="text-xs">{addLabel ?? t('imageUpload.add')}</span>
-        </button>
+        </Button>
       )}
     </div>
   );

@@ -119,7 +119,7 @@ describe('NotificationBanner', () => {
       />,
     );
 
-    expect(container.firstElementChild).toHaveClass('bg-primary/90');
+    expect(container.firstElementChild).toHaveClass('bg-primary');
 
     rerender(
       <NotificationBanner

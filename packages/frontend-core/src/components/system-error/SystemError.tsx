@@ -73,15 +73,16 @@ export const SystemError = ({ error, footer }: SystemErrorProps) => {
               <span className="text-text-secondary text-sm">
                 {t('common.error_trace_id')}
               </span>
-              <button
+              <Button
                 type="button"
+                variant="ghost"
                 onClick={() => copyToClipboard(traceId)}
                 title={t('common.error_trace_id_copy')}
-                className="text-text-secondary hover:text-text inline-flex items-center gap-2 font-sans text-xs break-all transition-colors"
+                className="text-text-secondary h-auto gap-2 p-0 font-sans text-xs break-all"
               >
                 {traceId}
                 <Copy size={14} className="shrink-0" />
-              </button>
+              </Button>
             </div>
           ) : null}
         </div>
