@@ -55,7 +55,6 @@ describe('RescueDetailContent', () => {
   });
 
   it('shows the reporter username on the reported entry', () => {
-  it('shows the reporter username on the reported entry', () => {
     renderContent('PawRescuer');
 
     expect(screen.getByText(/PawRescuer/)).toBeInTheDocument();
