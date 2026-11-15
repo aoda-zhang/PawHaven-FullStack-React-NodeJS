@@ -106,10 +106,10 @@ describe('PhotoUpload (MultiImageUpload)', () => {
     expect(removeButtons).toHaveLength(2);
   });
 
-  it('rejects photos larger than the 5 MB limit', () => {
+  it('rejects photos larger than the 2 MB limit', () => {
     const { input, state } = renderPhotoUpload();
     const oversized = new File(
-      [new Uint8Array(5 * 1024 * 1024 + 1)],
+      [new Uint8Array(2 * 1024 * 1024 + 1)],
       'large.jpg',
       { type: 'image/jpeg' },
     );
