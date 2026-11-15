@@ -187,7 +187,6 @@ Classification follows the vocabulary used in
 | Component          | Purpose                                                                                           |
 | ------------------ | ------------------------------------------------------------------------------------------------- |
 | `Button`           | The action control. Variants, sizes, `loading`, `disabled` and optional `asChild` slot rendering. |
-| `Dialog`           | Controlled modal surface with accessible naming, Escape and backdrop dismissal.                 |
 | `Skeleton`         | A static grey placeholder block for content that has not loaded yet.                              |
 | `PhotoPlaceholder` | Decorative paw-print shown when an item has no photo.                                             |
 | `Loading`          | Full-viewport Lottie spinner with an accessible status label.                                     |
@@ -197,6 +196,7 @@ Classification follows the vocabulary used in
 | Component                                                                                                   | Purpose                                                                                  |
 | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `Carousel`                                                                                                  | Embla-backed image carousel with slide navigation, autoplay and accessible slide labels. |
+| `Dialog`                                                                                                     | Controlled modal surface with accessible naming, Escape and backdrop dismissal.          |
 | `NotificationBanner`                                                                                        | Page-level banner for information, warnings, errors and success messages.                |
 | `Toast`                                                                                                     | Transient, queued notification surface with severity-appropriate announcement semantics. |
 | `Timeline` + `TimelineItem` / `TimelineSeparator` / `TimelineDot` / `TimelineConnector` / `TimelineContent` | Compound vertical timeline built on a semantic `<ol>` / `<li>` structure.                |
