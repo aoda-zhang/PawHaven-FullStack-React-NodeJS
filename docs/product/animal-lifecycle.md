@@ -25,46 +25,32 @@ An animal enters PawHaven through a report. The report must pass volunteer moder
 
 This flow does not imply automatic rescuer assignment, medical verification, or adoption approval by PawHaven.
 
-## 2. Two independent state dimensions
+## 2. A single Animal Status field
 
-A report's moderation state and an animal's real-world lifecycle state must be modelled separately.
+PawHaven uses **one Animal Status field** from the moment an animal report is submitted. The initial status represents the moderation gate; after approval, the same field represents the animal's rescue progress. Do not create a separate Report Review Status field for this workflow.
 
-### 2.1 Report publication state
-
-The following names are a **proposed domain model**, not an approved enum:
-
-| Proposed value | Meaning |
-|---|---|
-| PENDING_REVIEW | A submitted report is waiting for volunteer review. |
-| APPROVED | A volunteer approved the report and it can be published. |
-| REJECTED | A volunteer rejected the report; it is not publicly listed. |
-
-**Confirmed rule:** every new animal report must be reviewed by a volunteer before public display.
-
-Open decisions include rejection reasons, whether a rejected report can be edited and resubmitted, duplicate detection/merging, and whether review notes are visible to the reporter.
-
-### 2.2 Animal lifecycle status
-
-The current product discussion supports the following proposed lifecycle vocabulary:
-
-| Proposed value | Meaning | Notes |
+| Animal Status | Meaning | Public visibility |
 |---|---|---|
-| NEEDS_HELP | The approved and published animal still needs rescue or assistance. | **Confirmed initial status** after report approval. |
-| RESCUE_IN_PROGRESS | Rescue activity is actively underway. | Proposed replacement for the ambiguous inProgress. |
-| UNDER_TREATMENT | The animal is receiving medical or other necessary care. | Proposed clearer meaning for treated. |
-| RECOVERING | The animal is in a recovery or rehabilitation period. | Retains the existing concept. |
-| AWAITING_ADOPTION | The animal is considered ready to be considered for adoption. | Adoption-readiness criteria are TBD. |
-| ADOPTED | The animal has completed an adoption handover. | Exact completion evidence is TBD. |
-| DECEASED | The animal has died. | Proposed explicit outcome; requires final confirmation. |
+| PENDING_REVIEW | A newly submitted animal report is waiting for Volunteer review. | Not public |
+| NEEDS_HELP | The report has been approved; the animal is published and needs help. | Public |
+| REJECTED | A Volunteer rejected the submitted report. | Not public |
+| RESCUE_IN_PROGRESS | Rescue activity is actively underway. | Public |
+| UNDER_TREATMENT | The animal is receiving medical or other necessary care. | Public |
+| RECOVERING | The animal is in a recovery or rehabilitation period. | Public |
+| AWAITING_ADOPTION | The animal is considered ready to be considered for adoption. | Public |
+| ADOPTED | The animal has completed an adoption handover. | Public |
+| DECEASED | The animal has died. | Public visibility/retention policy requires confirmation |
 
-The names above are domain-level recommendations. Do not assume the current code enum or database already uses them.
+**Confirmed publication rule:** a newly submitted animal starts as `PENDING_REVIEW` and is not publicly visible. When a Volunteer approves it, its status changes to `NEEDS_HELP` and it becomes publicly visible. If the Volunteer rejects it, its status changes to `REJECTED` and it remains unpublished.
 
-### 2.3 Values that should not be carried forward as lifecycle states
+The Volunteer review is an action/decision that causes a status transition; `APPROVED` is not an Animal Status. Likewise, do not add a separate moderation-status field for this flow.
 
-- pending currently means a report is waiting for volunteer review. It belongs to report moderation, not the animal's rescue progress.
-- failed is ambiguous: it could mean not found, escaped, deceased, or rescue not completed. These are materially different situations and should not be collapsed into one lifecycle status.
-- REUNITED_WITH_OWNER is not needed for the agreed stray-pet product scope.
-- RELEASED describes wildlife release and is outside the agreed scope.
+### Status values that should not be carried forward
+
+- `pending` is too ambiguous for the agreed workflow. Use `PENDING_REVIEW` for a newly submitted report awaiting Volunteer review.
+- `failed` is ambiguous: it could mean not found, escaped, deceased, or rescue not completed. These are materially different situations and should not be collapsed into one lifecycle status.
+- `REUNITED_WITH_OWNER` is not needed for the agreed stray-pet product scope.
+- `RELEASED` describes wildlife release and is outside the agreed scope.
 
 An animal that cannot currently be found should not automatically be marked deceased or failed. The handling of temporarily unlocated animals remains TBD.
 
@@ -84,8 +70,8 @@ A person encounters a stray pet and may decide to submit a report.
 
 The reporter submits the animal information through the report flow.
 
-- Submission creates a report in the review queue.
-- The report is not publicly discoverable while awaiting review.
+- Submission creates an animal record with Animal Status `PENDING_REVIEW`.
+- The animal is not publicly discoverable while its status is `PENDING_REVIEW`.
 - Exact required fields, photo rules, location precision, contact handling, and edit-after-submission policy must be aligned with the reporting feature specification and confirmed product requirements.
 
 The report record is the entry point for the animal journey. Current feature documentation notes that the implementation uses the animal report as the rescue record rather than a separate rescue-case table; this is an implementation fact, not a requirement to preserve that data model forever.
@@ -95,18 +81,16 @@ The report record is the entry point for the animal journey. Current feature doc
 A Volunteer reviews the submitted report.
 
 **Confirmed:**
-- A volunteer must review every new report.
-- A report becomes public only after approval.
-- A rejected report is not publicly displayed.
+- A Volunteer must review every new report.
+- The submitted animal starts as `PENDING_REVIEW` and remains unpublished.
+- On approval, the same Animal Status field changes to `NEEDS_HELP` and the animal is published.
+- On rejection, the same field changes to `REJECTED` and the animal remains unpublished.
 
-**Proposed review outcomes:**
-- Approve and publish.
-- Reject and keep unpublished.
-- Identify as a possible duplicate and route for a defined duplicate-handling decision.
+The review decision is an action that changes Animal Status; `APPROVED` and `REJECTED` are not separate report-status values. A possible duplicate should be routed through a separately defined duplicate-handling decision.
 
 Duplicate workflow, review SLA, rejection reason, and reporter appeal/resubmission path remain TBD.
 
-On approval, the animal becomes publicly visible with initial lifecycle status NEEDS_HELP.
+On approval, Animal Status changes from `PENDING_REVIEW` to `NEEDS_HELP`, and the animal becomes publicly visible.
 
 ### Stage 3 — Public discovery and community participation
 
@@ -203,7 +187,7 @@ Recommended conceptual sequence:
 5. If approved, the official animal status changes and the history records the decision.
 6. Relevant users may be notified once notification rules are defined.
 
-The exact transition matrix, concurrency handling, self-review restrictions, and administrative override policy remain TBD.
+The exact transition matrix—including the initial `PENDING_REVIEW → NEEDS_HELP` or `PENDING_REVIEW → REJECTED` review outcomes—concurrency handling, self-review restrictions, and administrative override policy remain TBD.
 
 ## 6. Public timeline and audit history
 
