@@ -1,6 +1,6 @@
-# Feature: Rescue Detail (`portal/src/features/rescue-detail`)
+# Feature: Rescue Detail (`apps/frontend/portal/src/pages/rescue-detail`)
 
-> **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `core-service/modules/animal-follow`, `portal/features/rescue-detail`, `portal/features/animal-follow`
+> **Status**: Implemented · **Verified against**: `core-service/modules/rescue`, `core-service/modules/animal-follow`, `apps/frontend/portal/src/pages/rescue-detail`
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §4–8](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue/detail/:animalID`, the single-animal page. It is the most composite page in the portal: it
