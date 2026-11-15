@@ -118,7 +118,7 @@ rescue module's `GET /api/core/rescues` — see [Rescue Cases](04-rescue-cases.m
 Photos are uploaded before the report is submitted through document-service's file-upload API
 `POST /api/document/files` (multipart `files`, optional `folder`). The File API is business-agnostic:
 its JPEG/PNG/WebP and 5 MB-per-file limits apply regardless of folder or authentication, and anonymous
-callers may use any folder. The report form applies its own 2 MB JPEG/PNG selection rules on the
+callers may use any folder. The report form applies its own 5 MB JPEG/PNG selection rules on the
 client only — the server does not re-check them. Storage sits behind a
 **provider-agnostic** `FileStorage` port; the Vercel Blob adapter
 is selected by `storage.provider`, so switching or adding a provider is a config + adapter change.

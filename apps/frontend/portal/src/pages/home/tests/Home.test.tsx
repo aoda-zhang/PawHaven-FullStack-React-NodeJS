@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 import type { HomeData } from '@pawhaven/shared/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -99,6 +99,10 @@ const renderPage = (queryClient: QueryClient) => {
       path: '/',
       Component: Home,
     },
+    {
+      path: '/report-animal',
+      Component: () => <p>report-animal-page</p>,
+    },
   ]);
 
   return render(
@@ -130,6 +134,18 @@ describe('Home', () => {
     expect(screen.getByText('home.hero_headline')).toBeDefined();
     expect(screen.getByText('Test Cat')).toBeDefined();
     expect(screen.getByText('Milo')).toBeDefined();
+  });
+
+  it('sends a guest from the hero CTA to the public report form', async () => {
+    queryClient.setQueryData(homeQueryKeys.content(), mockHomeData);
+
+    renderPage(queryClient);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'home.hero_report_cta' }),
+    );
+
+    expect(await screen.findByText('report-animal-page')).toBeInTheDocument();
   });
 
   it('hands a failed home query to the route error boundary', async () => {

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useInRouterContext, useNavigate } from 'react-router-dom';
 import type { NavigateFunction } from 'react-router-dom';
 
-import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
 type FooterLinkProps = {
@@ -13,23 +12,11 @@ type FooterLinkProps = {
   label: string;
 };
 
-const RouterFooterLink = ({ to, className, label }: FooterLinkProps) => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useGlobalContext();
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      navigate(routePaths.login);
-    }
-  };
-
-  return (
-    <Link to={to} className={className} onClick={handleClick}>
-      {label}
-    </Link>
-  );
-};
+const RouterFooterLink = ({ to, className, label }: FooterLinkProps) => (
+  <Link to={to} className={className}>
+    {label}
+  </Link>
+);
 
 const StandaloneFooterLink = ({ to, className, label }: FooterLinkProps) => (
   <a href={to} className={className}>

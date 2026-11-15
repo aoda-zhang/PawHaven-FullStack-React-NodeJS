@@ -3,7 +3,6 @@ import { ChevronRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
 interface HeroProps {
@@ -14,7 +13,6 @@ interface HeroProps {
 export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useGlobalContext();
 
   const stats = [
     {
@@ -55,13 +53,7 @@ export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
           <button
             type="button"
             className="text-text-inverse bg-primary text-body rounded-button-large cursor-pointer px-4 py-2 font-semibold transition-colors hover:opacity-90"
-            onClick={() => {
-              if (!isAuthenticated) {
-                navigate(routePaths.login);
-                return;
-              }
-              navigate(routePaths.reportAnimal);
-            }}
+            onClick={() => navigate(routePaths.reportAnimal)}
           >
             <span className="flex items-center gap-1">
               {t('home.hero_report_cta')}

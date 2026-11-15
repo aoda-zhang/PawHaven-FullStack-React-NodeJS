@@ -2,13 +2,11 @@ import { Camera, PawPrint } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
 export const StrayCTA = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useGlobalContext();
 
   return (
     <section
@@ -29,13 +27,7 @@ export const StrayCTA = () => {
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
-            onClick={() => {
-              if (!isAuthenticated) {
-                navigate(routePaths.login);
-                return;
-              }
-              navigate(routePaths.reportAnimal);
-            }}
+            onClick={() => navigate(routePaths.reportAnimal)}
             className="bg-primary text-text-inverse rounded-button-large flex items-center gap-2 px-6 py-3 text-sm font-semibold shadow-lg transition-opacity hover:opacity-90"
           >
             <Camera className="h-4 w-4" />
