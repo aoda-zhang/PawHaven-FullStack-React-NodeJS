@@ -43,18 +43,7 @@ flowchart TD
 
 ---
 
-# 📚 Documentation
-
-Documentation lives in [`docs/`](./docs/README.md), split by what each document is **for**:
-`context/` (how a change must look, and how the units fit together), `features/` (one portal
-feature's frontend and backend detail), `product/` (the blueprint `features/` cite), and
-`how-i-build/` (the reasoning behind the design system and the component library).
-
-> `docs/features/` is **as-built** — one document per portal feature folder, each verified against
-> the code. Gaps are recorded per feature, and
-> [known defects](./docs/features/README.md#known-defects-in-the-code) are tabulated in the index.
-
-### How I Build
+# How I Build
 
 | Document                                                              | Description                                                                                   |
 | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
