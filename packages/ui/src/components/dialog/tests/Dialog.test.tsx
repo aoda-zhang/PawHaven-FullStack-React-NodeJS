@@ -7,20 +7,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../Dialog';
 
-Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
-  configurable: true,
-  value() {
-    this.setAttribute('open', '');
-  },
-});
-
-Object.defineProperty(HTMLDialogElement.prototype, 'close', {
-  configurable: true,
-  value() {
-    this.removeAttribute('open');
-  },
-});
-
 interface DialogHarnessProps {
   onOpenChange?: (open: boolean) => void;
 }
@@ -44,12 +30,12 @@ const DialogHarness = ({ onOpenChange = vi.fn() }: DialogHarnessProps) => {
 };
 
 describe('Dialog', () => {
-  it('renders a labelled modal with its description and footer', () => {
+  it('renders an accessible modal with its description and footer', () => {
     render(<DialogHarness />);
 
     expect(
       screen.getByRole('dialog', { name: 'Follow this animal' }),
-    ).toHaveAttribute('open');
+    ).toBeInTheDocument();
     expect(
       screen.getByText('Create an account to keep up with its rescue progress.'),
     ).toBeInTheDocument();
@@ -59,21 +45,21 @@ describe('Dialog', () => {
     ).toBeInTheDocument();
   });
 
-  it('notifies the owner when Escape requests dismissal', () => {
+  it('dismisses when Escape is pressed', () => {
     const onOpenChange = vi.fn();
     render(<DialogHarness onOpenChange={onOpenChange} />);
 
-    fireEvent.cancel(screen.getByRole('dialog'));
+    fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('notifies the owner when the backdrop is clicked', () => {
+  it('dismisses when the backdrop is pressed', () => {
     const onOpenChange = vi.fn();
     render(<DialogHarness onOpenChange={onOpenChange} />);
 
-    fireEvent.click(screen.getByRole('dialog'));
+    fireEvent.pointerDown(document.body);
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
