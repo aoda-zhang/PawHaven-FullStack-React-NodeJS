@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { AnimalBasicInfo } from './AnimalBasicInfo';
+import { AnimalFollow } from './AnimalFollow';
 import { RelevantGuides } from './RelevantGuides';
 import { RescueTimeline } from './RescueTimeline';
 import { VolunteerInfo } from './VolunteerInfo';
@@ -96,8 +97,8 @@ export const RescueDetailContent = ({
           <RescueTimeline updates={timelineUpdates} />
         </div>
         <div className="space-y-4">
-          <VolunteerInfo animalId={animal.id} volunteer={undefined} />
-
+          <AnimalFollow animalId={animal.id} />
+          <VolunteerInfo volunteer={undefined} />
           <RelevantGuides />
         </div>
       </div>

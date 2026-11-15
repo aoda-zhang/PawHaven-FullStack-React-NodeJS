@@ -1,17 +1,7 @@
 import { Share2, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  useFollowAnimal,
-  useUnfollowAnimal,
-} from '../api/rescueDetail.mutations';
-import { useFollowStatus } from '../api/rescueDetail.queries';
-
-import { FollowButton } from './FollowButton';
-import { FollowerCount } from './FollowerCount';
-
 interface VolunteerInfoProps {
-  animalId: string;
   volunteer?: {
     name: string;
     completedRescues: number;
@@ -19,20 +9,8 @@ interface VolunteerInfoProps {
   };
 }
 
-export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
+export const VolunteerInfo = ({ volunteer }: VolunteerInfoProps) => {
   const { t } = useTranslation();
-  const { data: status, isLoading } = useFollowStatus(animalId);
-  const followMutation = useFollowAnimal();
-  const unfollowMutation = useUnfollowAnimal();
-  const isFollowing = status?.isFollowing ?? false;
-  const isPending = followMutation.isPending || unfollowMutation.isPending;
-  const isError = followMutation.isError || unfollowMutation.isError;
-  const errorKey = followMutation.isError
-    ? 'rescueDetail.follow_error'
-    : 'rescueDetail.unfollow_error';
-
-  const handleFollow = () => followMutation.mutate(animalId);
-  const handleUnfollow = () => unfollowMutation.mutate(animalId);
 
   return (
     <section className="space-y-4">
@@ -79,20 +57,6 @@ export const VolunteerInfo = ({ animalId, volunteer }: VolunteerInfoProps) => {
             {t('rescueDetail.no_volunteer')}
           </p>
         )}
-      </div>
-
-      <div className="border-border bg-card rounded-card-large border p-3 shadow-sm">
-        <FollowButton
-          animalId={animalId}
-          isFollowing={isFollowing}
-          isLoading={isLoading}
-          isPending={isPending}
-          isError={isError}
-          errorKey={errorKey}
-          onFollow={handleFollow}
-          onUnfollow={handleUnfollow}
-        />
-        <FollowerCount count={status?.followerCount} isLoading={isLoading} />
       </div>
 
       <div className="border-border bg-card hover:bg-background-subtle rounded-card-large border p-3 shadow-sm transition-colors">
