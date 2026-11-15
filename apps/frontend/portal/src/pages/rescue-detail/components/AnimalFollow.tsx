@@ -36,6 +36,7 @@ export const AnimalFollow = ({ animalId }: { animalId: string }) => {
       setIsPromptOpen(true);
       return;
     }
+
     followMutation.mutate(animalId);
   };
 
@@ -68,7 +69,11 @@ export const AnimalFollow = ({ animalId }: { animalId: string }) => {
         description={t('rescueDetail.follow_signup_message')}
         footer={
           <>
-            <Button type="button" variant="outline" onClick={() => setIsPromptOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsPromptOpen(false)}
+            >
               {t('rescueDetail.follow_signup_dismiss')}
             </Button>
             <Button type="button" onClick={handleSignUp}>
