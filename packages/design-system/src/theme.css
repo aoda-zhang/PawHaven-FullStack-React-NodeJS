@@ -87,6 +87,12 @@
   --spacing-section: var(--spacing-10);
   --spacing-card: var(--spacing-5);
   --spacing-input: var(--spacing-3);
+  --spacing-control: 2.5rem;
+  --spacing-control-sm: 2rem;
+  --spacing-control-lg: 3rem;
+  --spacing-control-x: 1rem;
+  --spacing-control-x-sm: 0.75rem;
+  --spacing-control-x-lg: 1.5rem;
 
   /* ═══ Z-Index Scale ══════════════════════════════════ */
   --z-index-base: 1;

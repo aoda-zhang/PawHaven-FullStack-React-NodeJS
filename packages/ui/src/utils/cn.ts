@@ -1,5 +1,16 @@
 import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+const twMerge = extendTailwindMerge({
+  extend: {
+    classGroups: {
+      h: [{ h: ['control', 'control-sm', 'control-lg'] }],
+      w: [{ w: ['control', 'control-sm', 'control-lg'] }],
+      px: [{ px: ['control-x', 'control-x-sm', 'control-x-lg'] }],
+      size: [{ size: ['control', 'control-sm', 'control-lg'] }],
+    },
+  },
+});
 
 /**
  * Merges Tailwind CSS class names with proper conflict resolution.

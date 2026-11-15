@@ -5,8 +5,8 @@ export type FormControlSize = 'sm' | 'md';
 export type FormControlVariant = 'standard' | 'outline' | 'fill';
 
 export const FORM_CONTROL_SIZE_CLASSES: Record<FormControlSize, string> = {
-  sm: 'h-9 px-3 text-sm',
-  md: 'h-10 px-4 text-sm',
+  sm: 'h-control-sm px-control-x-sm text-sm',
+  md: 'h-control px-control-x text-sm',
 };
 
 export const FORM_CONTROL_VARIANT_CLASSES: Record<FormControlVariant, string> =

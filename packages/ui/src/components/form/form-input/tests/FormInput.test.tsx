@@ -41,14 +41,18 @@ describe('FormInput', () => {
         <FormInput name="name" label="Name" size="sm" />
       </Harness>,
     );
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9');
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass(
+      'h-control-sm',
+    );
 
     render(
       <Harness>
         <FormInput name="other" label="Other" size="md" />
       </Harness>,
     );
-    expect(screen.getByRole('textbox', { name: 'Other' })).toHaveClass('h-10');
+    expect(screen.getByRole('textbox', { name: 'Other' })).toHaveClass(
+      'h-control',
+    );
   });
 
   it('maps the standard, outline and fill variants', () => {

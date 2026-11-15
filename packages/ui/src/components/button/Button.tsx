@@ -19,10 +19,10 @@ export const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-9 rounded-button px-3 has-[>svg]:px-2.5',
-        md: 'h-10 px-4 py-2 has-[>svg]:px-3',
-        lg: 'h-11 rounded-button px-6 has-[>svg]:px-4',
-        icon: 'size-10 rounded-button',
+        sm: 'h-control-sm rounded-button px-control-x-sm has-[>svg]:px-2.5',
+        md: 'h-control px-control-x has-[>svg]:px-3',
+        lg: 'h-control-lg rounded-button px-control-x-lg has-[>svg]:px-4',
+        icon: 'h-control w-control rounded-button',
       },
     },
     defaultVariants: {

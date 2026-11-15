@@ -3,9 +3,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-import { useGlobalContext } from '@/app/providers/GlobalProvider';
-import { routePaths } from '@/app/router/routePaths';
-
 import {
   useFollowAnimal,
   useUnfollowAnimal,
@@ -14,6 +11,9 @@ import { useFollowStatus } from '../api/rescueDetail.queries';
 
 import { FollowButton } from './FollowButton';
 import { FollowerCount } from './FollowerCount';
+
+import { useGlobalContext } from '@/app/providers/GlobalProvider';
+import { routePaths } from '@/app/router/routePaths';
 
 export const AnimalFollow = ({ animalId }: { animalId: string }) => {
   const { t } = useTranslation();
