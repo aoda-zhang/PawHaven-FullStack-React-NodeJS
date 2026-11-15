@@ -59,89 +59,49 @@ are three independent renderings of "this report exists".
 
 ### 1.4 Follow
 
-This is the `animal-follow` feature's entire user-facing surface. It is **not** a component of
-`rescue-detail`; `rescue-detail` imports across feature boundaries:
+Following an animal is a general account feature, independent of volunteer participation. The AnimalFollow container owns the status query, follow/unfollow mutations, and guest sign-up prompt. It is rendered as its own card in RescueDetailContent, separate from VolunteerInfo.
 
-```ts
-import { FollowButton } from '@/features/animal-follow/components/FollowButton';
-import { FollowerCount } from '@/features/animal-follow/components/FollowerCount';
-```
+- Authenticated users follow or unfollow immediately through the existing API.
+- Guests who click Follow see a sign-up dialog. Sign up navigates to /auth/register; Maybe later closes the dialog and leaves the user on the animal detail page.
+- Registration does not preserve or automatically resume a pending follow action.
 
-Both sit in the second card of `VolunteerInfo`. `FollowButton` toggles optimistically; `FollowerCount`
-shows the number. Neither fetches on its own behalf beyond the shared query.
+FollowButton remains a presentational control, and FollowerCount displays the count from the same status query.
 
-The backend is `core-service/modules/animal-follow`:
+The backend is core-service/modules/animal-follow:
 
-| Method | Path                                       | Policy            | Notes                                |
-| ------ | ------------------------------------------ | ----------------- | ------------------------------------ |
-| GET    | `/api/core/animal-follow/:animalId/status` | `@OptionalAuth()` | `isFollowing` is false for anonymous |
-| POST   | `/api/core/animal-follow/:animalId`        | authenticated     | Idempotent upsert                    |
-| PUT    | `/api/core/animal-follow/:animalId`        | authenticated     | Idempotent delete                    |
+| Method | Path | Policy | Notes |
+| --- | --- | --- | --- |
+| GET | /api/core/animal-follow/:animalId/status | @OptionalAuth() | isFollowing is false for anonymous |
+| POST | /api/core/animal-follow/:animalId | authenticated | Idempotent upsert |
+| PUT | /api/core/animal-follow/:animalId | authenticated | Idempotent delete |
 
 ```mermaid
 flowchart TD
-    A[Detail page renders FollowButton] --> B[GET /core/animal-follow/:id/status]
+    A[Detail page renders AnimalFollow] --> B[GET /core/animal-follow/:id/status]
     B --> C{Caller authenticated?}
-    C -- no --> D[isFollowing false<br/>followerCount still returned]
+    C -- no --> D[isFollowing false · followerCount returned]
     C -- yes --> E[isFollowing from the DB row]
-    D --> F[Button renders as Follow]
-    E --> G{Button state}
-    G -- follow --> H[POST /core/animal-follow/:id]
-    G -- unfollow --> I[PUT /core/animal-follow/:id]
-    H --> J[upsert on userId_animalId]
-    I --> K[deleteMany userId + animalId]
-    J --> L[Recount followers · return new count]
-    K --> L
-    L --> M[Query cache updated · FollowerCount re-renders]
+    D --> F[Guest clicks Follow]
+    F --> G[Sign-up dialog]
+    G -- Sign up --> H[/auth/register]
+    G -- Maybe later --> I[Return to animal detail]
+    E --> J[Follow or unfollow immediately]
+    J --> K[POST or PUT /core/animal-follow/:id]
+    K --> L[Query cache updated · FollowerCount re-renders]
 ```
-
-`animalId` is an opaque string. **Nothing verifies that it names an existing animal** — there is no
-foreign key to `animalReports` and no existence check in the service. Following an arbitrary string
-succeeds and simply never appears on any page.
-
-`PUT` for unfollow is unusual but deliberate: `deleteMany` makes the write idempotent, so
-unfollowing something you do not follow succeeds instead of 404-ing. `POST` is an `upsert` with an
-empty `update`, and it catches Prisma `P2002` and re-reads the existing row on that specific code —
-a deliberate race-path recovery, so two concurrent follows of the same animal do not surface one as
-a 400.
-
-`AnimalFollow` is the only model in the project with a compound unique constraint, and the reason
-`POST` can be an upsert:
-
-| Field                     | Type     | Notes                                |
-| ------------------------- | -------- | ------------------------------------ |
-| `id`                      | ObjectId | `@map("_id")`                        |
-| `userId`                  | String   | From the internal JWT `sub`          |
-| `animalId`                | String   | Free-form — no referential integrity |
-| `createdAt` / `updatedAt` | DateTime |                                      |
-
-```prisma
-@@unique([userId, animalId])
-@@index([animalId])
-@@map("animal_follows")
-```
-
-The `animalId` index exists to make `followerCount`'s `count({ where: { animalId } })` cheap. The
-`followedAt` the service returns is the upsert's `createdAt`; because a real unfollow deletes the
-row, re-following mints a new timestamp.
 
 ### 1.5 Volunteer card
 
-`VolunteerInfo` is a three-card stack, and its `volunteer` prop is optional:
+VolunteerInfo owns volunteer-specific presentation and the case-share control. It no longer contains follow state or follow mutations. Its volunteer prop is optional:
 
-| Card | Rendering                                                                           |
-| ---- | ----------------------------------------------------------------------------------- |
-| 1    | Volunteer identity **or** `rescueDetail.no_volunteer` when `volunteer` is undefined |
-| 2    | `FollowButton` + `FollowerCount` — §1.4                                             |
-| 3    | A share button                                                                      |
+| Card | Rendering |
+| --- | --- |
+| 1 | Volunteer identity or rescueDetail.no_volunteer when volunteer is undefined |
+| 2 | A share button |
 
-`RescueDetailContent` renders it as `volunteer={undefined}` — **the only call site, and it always
-passes `undefined`.** So card 1 always takes the `else` branch, and the entire `volunteer ?` half —
-avatar, name, completed-rescue count, the "currently handling" banner, and the "offer assistance"
-button — is **unreachable code**. There is no volunteer assignment in the data model to feed it;
-see [Auth §7](01-auth.md#7-what-does-not-exist).
+RescueDetailContent renders it as volunteer={undefined} — the only call site, and it always passes undefined. The populated volunteer branch is currently unreachable because there is no volunteer assignment in the data model; see Auth §7.
 
-Card 3's share button has **no `onClick`**. It is a dead control.
+The share button has no onClick. It is a dead control.
 
 ### 1.6 Relevant guides
 
@@ -164,8 +124,8 @@ flowchart TD
     F --> G[1.1 Photo hero · status chip]
     F --> H[1.2 Basic info tiles]
     F --> I[1.3 One-row timeline]
-    F --> J[1.4 Follow button + count]
-    F --> K[1.5 Volunteer card + share]
+    F --> J[1.4 AnimalFollow · follow + count]
+    F --> K[1.5 VolunteerInfo · volunteer + share]
     F --> L[RelevantGuides → /rescue/guides]
 ```
 
@@ -202,32 +162,29 @@ contract fields the write path discards.
 | `components/AnimalBasicInfo.tsx`                                      | §1.2                              |
 | `components/InfoTile.tsx`                                             | §1.2 — local atom, used here only |
 | `components/RescueTimeline.tsx`                                       | §1.3 — the single-row variant     |
-| `components/VolunteerInfo.tsx`                                        | §1.4, §1.5                        |
+| `components/AnimalFollow.tsx`                                         | §1.4 — follow container and guest prompt |
+| `components/VolunteerInfo.tsx`                                        | §1.5 — volunteer presentation and share |
 | `components/RelevantGuides.tsx`                                       | §1.6 — a hard-coded link list     |
 | `api/rescueDetail.api.ts` / `.queries.ts` / `.queryKeys.ts`           | The call and its cache key        |
-| `tests/RescueDetailContent.test.tsx` / `tests/VolunteerInfo.test.tsx` | The only two tests                |
+| `tests/RescueDetailContent.test.tsx`, `tests/VolunteerInfo.test.tsx`, `tests/AnimalFollow.test.tsx` | Page composition and interaction tests |
 
 `rescueDetail` is the only feature with a **separate query key per animal id**, so two animals can
 be cached side by side — the correct pattern, and the one [Rescue Cases](04-rescue-cases.md) does
 not follow.
 
-### 5.1 The `animal-follow` feature directory
+### 5.1 Animal-follow implementation
 
-`portal/src/features/animal-follow` is a top-level feature folder (10 files) that **no route
-mounts**. It is consumed only by `rescue-detail`:
+The follow feature is implemented inside the rescue-detail page slice:
 
-| File                                                                               | Role                            |
-| ---------------------------------------------------------------------------------- | ------------------------------- |
-| `components/FollowButton.tsx`                                                      | Toggle, optimistic              |
-| `components/FollowerCount.tsx`                                                     | The count                       |
-| `api/animalFollow.api.ts`                                                          | The three calls                 |
-| `api/animalFollow.queries.ts` / `.queryKeys.ts`                                    | Query + key factory             |
-| `api/tests/animalFollow.api.test.ts` / `api/tests/animalFollow.mutations.test.tsx` | Two of the feature's four tests |
-| `tests/FollowButton.test.tsx` / `tests/FollowerCount.test.tsx`                     | The other two                   |
+| File | Role |
+| --- | --- |
+| components/AnimalFollow.tsx | Follow container, auth gate, and guest sign-up dialog |
+| components/FollowButton.tsx | Presentational follow/unfollow control |
+| components/FollowerCount.tsx | Follower count |
+| api/rescueDetail.api.ts / .queries.ts / .mutations.ts | Follow status query and mutations |
+| tests/AnimalFollow.test.tsx | Guest and authenticated follow interactions |
 
-It is the one place two features share UI without it being promoted to `packages/ui`, even though
-the shared surface is a stable, self-contained button-plus-count pair. See
-[Component placement](../context/frontend-development-patterns.md#24-component).
+The follow card is composed independently from VolunteerInfo in RescueDetailContent. The API remains account-based and does not depend on volunteer assignment.
 
 ## 6. What Does Not Exist
 
@@ -245,7 +202,7 @@ the shared surface is a stable, self-contained button-plus-count pair. See
 - **No follow on the list view** — only here.
 - **No follower list.** The count is a number; no endpoint returns _who_ follows.
 - **No notification on follow**, and no notification of any kind.
-- **No follow for guests, no follow-by-email, no way to follow without an account.**
+- **No guest follow relationship.** Guests can open the sign-up prompt, but an account is required before a follow can be created. There is no follow-by-email flow.
 - **No cascade cleanup.** `animalId` has no foreign key, so deleting a report would orphan its
   follow rows. There is no delete path for reports today, so this is latent.
 - **No relevance logic on the guides card** — it is a fixed link list; see [§1.6](#16-relevant-guides).

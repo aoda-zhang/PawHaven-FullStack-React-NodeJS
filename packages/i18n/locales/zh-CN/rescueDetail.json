@@ -41,6 +41,10 @@
     "followers_count": "已有 {{count}} 人关注",
     "followers_count_other": "已有 {{count}} 人关注",
     "follow_error": "关注失败，请稍后重试。",
-    "unfollow_error": "取消关注失败，请稍后重试。"
+    "unfollow_error": "取消关注失败，请稍后重试。",
+    "follow_signup_title": "想要关注这只动物吗？",
+    "follow_signup_message": "创建账户即可关注这只动物，并持续了解它的救助进展。",
+    "follow_signup_cta": "注册",
+    "follow_signup_dismiss": "稍后再说"
   }
 }

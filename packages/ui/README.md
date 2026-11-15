@@ -196,6 +196,7 @@ Classification follows the vocabulary used in
 | Component                                                                                                   | Purpose                                                                                  |
 | ----------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `Carousel`                                                                                                  | Embla-backed image carousel with slide navigation, autoplay and accessible slide labels. |
+| `Dialog`                                                                                                     | Controlled native modal with accessible naming, Escape and backdrop dismissal.            |
 | `NotificationBanner`                                                                                        | Page-level banner for information, warnings, errors and success messages.                |
 | `Toast`                                                                                                     | Transient, queued notification surface with severity-appropriate announcement semantics. |
 | `Timeline` + `TimelineItem` / `TimelineSeparator` / `TimelineDot` / `TimelineConnector` / `TimelineContent` | Compound vertical timeline built on a semantic `<ol>` / `<li>` structure.                |
@@ -309,6 +310,12 @@ not enough to name two separate inputs.
   `aria-hidden="true"`. While loading, the button behaves as disabled.
 - The focus indicator comes from the design-system `focus-ring` utility and
   is present on every variant.
+
+### Dialog
+
+- The native dialog is opened with `showModal()`, providing modal semantics and browser-managed focus handling.
+- The required title supplies the accessible name; an optional description is connected through `aria-describedby`.
+- Escape and backdrop clicks request dismissal through `onOpenChange(false)`; application state remains the source of truth.
 
 ### Form controls
 
