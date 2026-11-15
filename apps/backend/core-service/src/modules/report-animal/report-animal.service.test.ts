@@ -1,6 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it, vi } from 'vitest';
 
+import { InternalJwtKind } from '@pawhaven/backend-core/types';
+
 import { ReportAnimalService } from './reportAnimal.service.js';
 
 const RECORD_ID = 'RPT-0001';
@@ -16,7 +18,7 @@ const dto = {
   status: 'friendly' as const,
   description: 'Found a stray kitten',
   reporterPhotos: [PHOTO, PHOTO],
-  contactInfo: { phone: '12345678' },
+  contactInfo: { email: 'reporter@example.com' },
 };
 
 const buildService = () => {
@@ -24,11 +26,16 @@ const buildService = () => {
     ({
       data,
     }: {
+      select: { id: true };
       data: {
-        reporter: { reporterID: string; reporterName: string | null };
+        reporter: { reporterID: string; reporterName: string | null } | null;
+        reporterEmail: string | null;
         animalStatus: string;
       };
-    }) => Promise.resolve({ id: RECORD_ID, ...data }),
+    }) => {
+      void data;
+      return Promise.resolve({ id: RECORD_ID });
+    },
   );
   const service = new ReportAnimalService({
     animalReports: { create },
@@ -46,8 +53,10 @@ describe('ReportAnimalService.create', () => {
       username: 'reporter-one',
     } as never);
 
+    expect(create.mock.calls[0][0].select).toEqual({ id: true });
     expect(create.mock.calls[0][0].data).toMatchObject({
       reporter: { reporterID: 'user-1', reporterName: 'reporter-one' },
+      reporterEmail: 'reporter@example.com',
       animalType: 'cat',
     });
   });
@@ -61,7 +70,7 @@ describe('ReportAnimalService.create', () => {
       username: '\t  \n',
     } as never);
 
-    expect(create.mock.calls[0][0].data.reporter.reporterName).toBeNull();
+    expect(create.mock.calls[0][0].data.reporter?.reporterName).toBeNull();
   });
 
   it('stores null when the jwt carries no username', async () => {
@@ -72,7 +81,7 @@ describe('ReportAnimalService.create', () => {
       sub: 'user-1',
     } as never);
 
-    expect(create.mock.calls[0][0].data.reporter.reporterName).toBeNull();
+    expect(create.mock.calls[0][0].data.reporter?.reporterName).toBeNull();
   });
 
   it('trims surrounding whitespace from a real username', async () => {
@@ -84,7 +93,7 @@ describe('ReportAnimalService.create', () => {
       username: ' reporter-one ',
     } as never);
 
-    expect(create.mock.calls[0][0].data.reporter.reporterName).toBe(
+    expect(create.mock.calls[0][0].data.reporter?.reporterName).toBe(
       'reporter-one',
     );
   });
@@ -99,6 +108,30 @@ describe('ReportAnimalService.create', () => {
     } as never);
 
     expect(create.mock.calls[0][0].data.animalStatus).toBe('pending');
+  });
+
+
+  it('stores guest reports without fabricating a reporter identity', async () => {
+    const { service, create } = buildService();
+
+    await service.create(dto, { kind: InternalJwtKind.ANONYMOUS } as never);
+
+    expect(create.mock.calls[0][0].data.reporter).toBeNull();
+    expect(create.mock.calls[0][0].data.reporterEmail).toBe(
+      'reporter@example.com',
+    );
+    expect(create.mock.calls[0][0].data.animalStatus).toBe('pending');
+  });
+
+  it('stores null when a guest omits the optional email', async () => {
+    const { service, create } = buildService();
+
+    await service.create(
+      { ...dto, contactInfo: {} },
+      { kind: InternalJwtKind.ANONYMOUS } as never,
+    );
+
+    expect(create.mock.calls[0][0].data.reporterEmail).toBeNull();
   });
 
   it('maps a create failure to a bad request', async () => {

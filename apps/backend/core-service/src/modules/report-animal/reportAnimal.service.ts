@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
+import { InternalJwtKind, type InternalJwt } from '@pawhaven/backend-core/types';
 import { AnimalStatus, type AnimalReportDto } from '@pawhaven/shared/types';
-import { PrismaClient, type animalReports } from '@prismaClient/index.js';
+import { PrismaClient } from '@prismaClient/index.js';
 
 @Injectable()
 export class ReportAnimalService {
@@ -16,10 +16,11 @@ export class ReportAnimalService {
 
   async create(
     dto: AnimalReportDto,
-    claims: AuthenticatedInternalJwt,
-  ): Promise<animalReports> {
+    claims: InternalJwt,
+  ): Promise<{ id: string }> {
     try {
       return await this.prisma.animalReports.create({
+        select: { id: true },
         data: {
           animalType: dto.animalType,
           age: dto.age,
@@ -30,10 +31,14 @@ export class ReportAnimalService {
           description: dto.description,
           size: dto.size,
           animalCount: dto.animalCount,
-          reporter: {
-            reporterID: claims.sub,
-            reporterName: claims.username?.trim() || null,
-          },
+          reporter:
+            claims.kind === InternalJwtKind.AUTHENTICATED
+              ? {
+                  reporterID: claims.sub,
+                  reporterName: claims.username?.trim() || null,
+                }
+              : null,
+          reporterEmail: dto.contactInfo.email?.trim() || null,
           reporterPhotos: dto.reporterPhotos,
         },
       });
