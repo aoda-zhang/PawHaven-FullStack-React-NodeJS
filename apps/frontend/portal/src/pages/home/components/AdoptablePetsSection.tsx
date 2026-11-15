@@ -76,7 +76,7 @@ export const AdoptablePetsSection = ({
             <button
               type="button"
               onClick={onSeeAll}
-              className="text-primary hidden items-center gap-1.5 text-sm font-medium hover:underline sm:flex"
+              className="text-text-link hidden items-center gap-1.5 text-sm font-medium hover:underline sm:flex"
             >
               {t('home.forever_home_see_all')}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />

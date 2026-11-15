@@ -28,7 +28,7 @@ const LanguageMenu = ({ current, onSelect }: LanguageMenuProps) => {
               className={clsx(
                 'rounded-input-large flex w-full items-center gap-3 px-2.5 py-2 text-left text-sm transition-colors',
                 active
-                  ? 'bg-primary-light text-primary font-medium'
+                  ? 'bg-primary-light text-text-link font-medium'
                   : 'text-text-secondary hover:bg-muted hover:text-text',
               )}
             >

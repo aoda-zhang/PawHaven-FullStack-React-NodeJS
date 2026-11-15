@@ -75,7 +75,7 @@ export const RescueCasesSection = ({
           <button
             type="button"
             onClick={onSeeAll}
-            className="text-primary hover:text-primary/80 flex flex-shrink-0 cursor-pointer items-center gap-1 text-sm font-medium transition-colors"
+            className="text-text-link flex flex-shrink-0 cursor-pointer items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
           >
             {t('rescue_cases.see_all')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
