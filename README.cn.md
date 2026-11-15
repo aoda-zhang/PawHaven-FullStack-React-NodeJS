@@ -17,40 +17,33 @@
 
 ---
 
-# 🛠 环境准备
+# 📚 文档
 
-- **Node.js**: `24.x`
-- **pnpm**: `12.x`
+文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`context/`（一次改动应该长什么样、各单元怎么组合）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）、`how-i-build/`（design system 与组件库背后的设计理由）。
 
-安装依赖或运行项目前，请确保满足以上版本要求。
+> `docs/features/` 是 **as-built** 文档——每个 portal feature 文件夹对应一份文档，并根据代码进行验证。各 feature 的差距会单独记录，已知缺陷汇总在[索引页](./docs/features/README.md#known-defects-in-the-code)。
 
----
+### 架构与技术实践
 
-# ✨ 核心功能
-
-- **救援案例管理**  
-  创建和跟踪救援案例，帮助志愿者协调救援行动。
-
-- **认证与权限**  
-  使用 JWT 和基于角色的访问控制保证用户安全。
-
-- **知识库**  
-  提供救援指南和领养知识，通过集中式内容系统管理。
-
-- **社区互动**  
-  分享救援故事、交流经验，增强社区互动与连接。
+| 文档 | 说明 |
+| --- | --- |
+| [全局架构](./docs/context/system-architecture-overview.md) | 整个系统——服务、包、数据流和部署 |
+| [前端架构](./docs/context/frontend-architecture.md) | 前端各单元，以及它们之间的依赖方向 |
+| [后端架构](./docs/context/backend-architecture.md) | 后端各服务与包，以及它们之间的依赖关系 |
+| [Design Token 体系](./docs/how-i-build/design-tokens.md) | 为什么需要 design system、token 分层怎么建、lint 插件怎么守住它 |
+| [UI Library 体系](./docs/how-i-build/ui-library.md) | `@pawhaven/ui` 是什么、周围有哪些质量门禁、怎么浏览和检索组件 |
 
 ---
 
 # 🚀 技术栈与亮点
 
-| 层级     | 技术                                            | 亮点                            |
-| -------- | ----------------------------------------------- | ------------------------------- |
-| 前端     | React, TypeScript, React Query, React Hook Form | 可扩展的组件化架构              |
-| 后端     | NestJS, Node.js                                 | 微服务隔离，模块化单体          |
-| 架构     | Monorepo + `pnpm workspace`                     | 全栈 TypeScript，前后端共享类型 |
-| 代码规范 | ESLint, Prettier, Husky                         | 强制代码标准、pre-commit 钩子   |
-| CI/CD    | GitHub Actions                                  | 自动化流水线                    |
+| 层级 | 技术 | 亮点 |
+| --- | --- | --- |
+| 前端 | React, TypeScript, React Query, React Hook Form | 可扩展的组件化架构 |
+| 后端 | NestJS, Node.js | 微服务隔离，模块化单体 |
+| 架构 | Monorepo + `pnpm workspace` | 全栈 TypeScript，前后端共享类型 |
+| 代码规范 | ESLint, Prettier, Husky | 强制代码标准、pre-commit 钩子 |
+| CI/CD | GitHub Actions | 自动化流水线 |
 
 ---
 
@@ -58,7 +51,7 @@
 
 **`.opencode/`** 是 PawHaven 背后的 **AI 驱动开发引擎** —— 一个 Agent 编排器，将每个开发请求转化为结构化流水线：`规划 → 分发 Agent → 测试验证 → 对照架构与模式审查 → 知识更新`。
 
-👉 [进入 harness](./.opencode/) —— 7 个 skill、5 个斜杠命令工作流、9 个 agent,以及它们强制的项目规则
+👉 [进入 harness](./.opencode/) —— 7 个 skill、5 个斜杠命令工作流、9 个 agent，以及它们强制的项目规则
 
 ---
 
@@ -71,27 +64,6 @@ PawHaven 是一个开放且持续发展的项目。如果你对动物救援、�
 欢迎通过 [WhatsApp 联系我](https://wa.me/8619102632826)。我们可以交流项目想法、技术方案，以及探讨如何一起改进 PawHaven。
 
 **期待更多开发者和动物爱好者参与！**
-
----
-
-# 📚 文档
-
-文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`context/`（一次改动应该长什么样、
-各单元怎么组合）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）、
-`how-i-build/`（design system 与组件库背后的设计理由）。
-
-> ⚠️ `docs/features/` 是**蓝图，不是现状** —— 11 个 feature 中有 7 个写到的后端模块并不存在，
-> 其中的领域事件在后端代码里一次都没出现。
-
-### 我怎么搭的
-
-| 文档                                                       | 说明                                                            |
-| ---------------------------------------------------------- | --------------------------------------------------------------- |
-| [全局架构](./docs/context/system-architecture-overview.md) | 整个系统 —— 服务、包、数据流、部署                              |
-| [前端架构](./docs/context/frontend-architecture.md)        | 前端各单元，以及它们之间的依赖方向                              |
-| [后端架构](./docs/context/backend-architecture.md)         | 后端各服务与包，以及它们之间的依赖关系                          |
-| [Design Token 体系](./docs/how-i-build/design-tokens.md)   | 为什么需要 design system、token 分层怎么建、lint 插件怎么守住它 |
-| [UI Library 体系](./docs/how-i-build/ui-library.md)        | `@pawhaven/ui` 是什么、周围有哪些质量门禁、怎么浏览和检索组件   |
 
 ---
 
