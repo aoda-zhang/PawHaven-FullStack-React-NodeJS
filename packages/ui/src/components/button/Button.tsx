@@ -16,12 +16,10 @@ export const buttonVariants = cva(
           'border border-border bg-background text-text hover:bg-muted hover:text-text',
         secondary: 'bg-muted text-text hover:bg-muted-strong',
         ghost: 'hover:bg-muted hover:text-text',
-        link: 'text-primary underline-offset-4 hover:underline',
+        link: 'text-text-link underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-control-sm rounded-button px-control-x-sm has-[>svg]:px-2.5',
-        md: 'h-control px-control-x has-[>svg]:px-3',
-        lg: 'h-control-lg rounded-button px-control-x-lg has-[>svg]:px-4',
+        md: 'h-control px-control-x py-control-y',
         icon: 'h-control w-control rounded-button',
       },
     },
@@ -32,7 +30,7 @@ export const buttonVariants = cva(
   },
 );
 
-export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+export type ButtonSize = 'md' | 'icon';
 
 export interface ButtonProps
   extends

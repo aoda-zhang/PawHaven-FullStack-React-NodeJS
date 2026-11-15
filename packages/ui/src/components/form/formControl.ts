@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
 
-export type FormControlSize = 'sm' | 'md';
+export type FormControlSize = 'md';
 
 export type FormControlVariant = 'standard' | 'outline' | 'fill';
 
 export const FORM_CONTROL_SIZE_CLASSES: Record<FormControlSize, string> = {
-  sm: 'h-control-sm px-control-x-sm text-sm',
-  md: 'h-control px-control-x text-sm',
+  md: 'h-control px-control-x py-control-y text-sm',
 };
 
 export const FORM_CONTROL_VARIANT_CLASSES: Record<FormControlVariant, string> =

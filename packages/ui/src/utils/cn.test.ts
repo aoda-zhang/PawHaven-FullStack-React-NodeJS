@@ -15,8 +15,8 @@ describe('cn', () => {
     expect(cn('h-control w-control', 'size-8')).toBe('size-8');
   });
 
-  it('collapses control size steps to the last one', () => {
-    expect(cn('h-control-sm', 'h-control')).toBe('h-control');
+  it('lets a caller width class override the control default', () => {
+    expect(cn('w-control', 'w-40')).toBe('w-40');
   });
 
   it('keeps control utilities when the caller adds an unrelated class', () => {

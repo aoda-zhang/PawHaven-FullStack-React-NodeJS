@@ -18,7 +18,7 @@ const meta = {
         'link',
       ],
     },
-    size: { control: 'select', options: ['sm', 'md', 'lg', 'icon'] },
+    size: { control: 'select', options: ['md', 'icon'] },
     loading: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
@@ -60,9 +60,7 @@ export const VariantGallery: Story = {
 export const SizeGallery: Story = {
   render: () => (
     <div className="flex flex-wrap items-center gap-3">
-      <Button size="sm">Small</Button>
       <Button size="md">Medium</Button>
-      <Button size="lg">Large</Button>
       <Button size="icon" aria-label="Icon button">
         +
       </Button>

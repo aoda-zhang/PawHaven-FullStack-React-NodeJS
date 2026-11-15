@@ -4,10 +4,10 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
-      h: [{ h: ['control', 'control-sm', 'control-lg'] }],
-      w: [{ w: ['control', 'control-sm', 'control-lg'] }],
-      px: [{ px: ['control-x', 'control-x-sm', 'control-x-lg'] }],
-      size: [{ size: ['control', 'control-sm', 'control-lg'] }],
+      h: [{ h: ['control'] }],
+      w: [{ w: ['control'] }],
+      px: [{ px: ['control-x'] }],
+      size: [{ size: ['control'] }],
     },
   },
 });
