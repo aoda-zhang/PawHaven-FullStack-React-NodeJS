@@ -4,7 +4,7 @@
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3, §4–8](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/rescue/detail/:animalID`, the single-animal page. It is the most composite page in the portal: it
-renders six distinct regions, and it is the **only** place the `animal-follow` feature's UI appears.
+renders five distinct regions, and it is the **only** place the `animal-follow` feature's UI appears.
 
 ## 1. Sections
 
@@ -59,7 +59,7 @@ are three independent renderings of "this report exists".
 
 ### 1.4 Follow
 
-Following an animal is a general account feature, independent of volunteer participation. The AnimalFollow container owns the status query, follow/unfollow mutations, and guest sign-up prompt. It is rendered as its own card in RescueDetailContent, separate from VolunteerInfo.
+Following an animal is a general account feature, independent of volunteer participation. The AnimalFollow container owns the status query, follow/unfollow mutations, and guest sign-up prompt. It is rendered as its own card in RescueDetailContent.
 
 - Authenticated users follow or unfollow immediately through the existing API.
 - Guests who click Follow see a sign-up dialog. Sign up navigates to /auth/register; Maybe later closes the dialog and leaves the user on the animal detail page.
@@ -90,20 +90,7 @@ flowchart TD
     K --> L[Query cache updated · FollowerCount re-renders]
 ```
 
-### 1.5 Volunteer card
-
-VolunteerInfo owns volunteer-specific presentation and the case-share control. It no longer contains follow state or follow mutations. Its volunteer prop is optional:
-
-| Card | Rendering |
-| --- | --- |
-| 1 | Volunteer identity or rescueDetail.no_volunteer when volunteer is undefined |
-| 2 | A share button |
-
-RescueDetailContent renders it as volunteer={undefined} — the only call site, and it always passes undefined. The populated volunteer branch is currently unreachable because there is no volunteer assignment in the data model; see Auth §7.
-
-The share button has no onClick. It is a dead control.
-
-### 1.6 Relevant guides
+### 1.5 Relevant guides
 
 `components/RelevantGuides.tsx` renders a card of guide links. It is a **hard-coded link list**,
 not a query: it does not call the guide API and has no data prop, so which guides appear is fixed
@@ -125,8 +112,7 @@ flowchart TD
     F --> H[1.2 Basic info tiles]
     F --> I[1.3 One-row timeline]
     F --> J[1.4 AnimalFollow · follow + count]
-    F --> K[1.5 VolunteerInfo · volunteer + share]
-    F --> L[RelevantGuides → /rescue/guides]
+    F --> K[1.5 RelevantGuides → /rescue/guides]
 ```
 
 There is no route loader and no `Suspense`/`Await` shell. `RescueDetail` reads the detail query with
@@ -158,15 +144,14 @@ contract fields the write path discards.
 | --------------------------------------------------------------------- | --------------------------------- |
 | `route.tsx`                                                           | `rescueDetailRoute` with `lazy:`  |
 | `index.tsx`                                                           | §2 — `useSuspenseQuery`           |
-| `components/RescueDetailContent.tsx`                                  | §1 — composes all six regions     |
+| `components/RescueDetailContent.tsx`                                  | §1 — composes all five regions     |
 | `components/AnimalBasicInfo.tsx`                                      | §1.2                              |
 | `components/InfoTile.tsx`                                             | §1.2 — local atom, used here only |
 | `components/RescueTimeline.tsx`                                       | §1.3 — the single-row variant     |
 | `components/AnimalFollow.tsx`                                         | §1.4 — follow container and guest prompt |
-| `components/VolunteerInfo.tsx`                                        | §1.5 — volunteer presentation and share |
-| `components/RelevantGuides.tsx`                                       | §1.6 — a hard-coded link list     |
+| `components/RelevantGuides.tsx`                                       | §1.5 — a hard-coded link list     |
 | `api/rescueDetail.api.ts` / `.queries.ts` / `.queryKeys.ts`           | The call and its cache key        |
-| `tests/RescueDetailContent.test.tsx`, `tests/VolunteerInfo.test.tsx`, `tests/AnimalFollow.test.tsx` | Page composition and interaction tests |
+| `tests/RescueDetailContent.test.tsx`, `tests/AnimalFollow.test.tsx` | Page composition and interaction tests |
 
 `rescueDetail` is the only feature with a **separate query key per animal id**, so two animals can
 be cached side by side — the correct pattern, and the one [Rescue Cases](04-rescue-cases.md) does
@@ -184,16 +169,14 @@ The follow feature is implemented inside the rescue-detail page slice:
 | api/rescueDetail.api.ts / .queries.ts / .mutations.ts | Follow status query and mutations |
 | tests/AnimalFollow.test.tsx | Guest and authenticated follow interactions |
 
-The follow card is composed independently from VolunteerInfo in RescueDetailContent. The API remains account-based and does not depend on volunteer assignment.
+The follow card is composed independently in RescueDetailContent. The API remains account-based and does not depend on volunteer assignment.
 
 ## 6. What Does Not Exist
 
 - **No status change, no claim, no assignee, no transition history.** The timeline is one synthetic
   row built from the report itself; see [§1.3](#13-timeline).
-- **No volunteer assignment.** `volunteer={undefined}` is hard-coded, so the entire populated
-  branch of `VolunteerInfo` — avatar, name, rescue count, "offer assistance" — never renders.
-- **No sharing.** The share button has no handler; there is no share endpoint and no Web Share API
-  call.
+- **No volunteer assignment.** The current rescue detail data contract does not expose an assigned volunteer.
+- **No sharing.** There is no share endpoint or Web Share API integration.
 - **No contact with the reporter.** `reporter.reporterID` and `reporterName` are stored, but
   `contactInfo` was never persisted, so there is no phone or email to show even in principle.
 - **No status chip when there are no photos** — the whole hero block is gated on
@@ -205,7 +188,7 @@ The follow card is composed independently from VolunteerInfo in RescueDetailCont
 - **No guest follow relationship.** Guests can open the sign-up prompt, but an account is required before a follow can be created. There is no follow-by-email flow.
 - **No cascade cleanup.** `animalId` has no foreign key, so deleting a report would orphan its
   follow rows. There is no delete path for reports today, so this is latent.
-- **No relevance logic on the guides card** — it is a fixed link list; see [§1.6](#16-relevant-guides).
+- **No relevance logic on the guides card** — it is a fixed link list; see [§1.5](#15-relevant-guides).
 - **No 404 page for a missing animal.** A bad id returns 400 from the endpoint and surfaces as a
   thrown query error into the shell's `ErrorBoundary`.
 
