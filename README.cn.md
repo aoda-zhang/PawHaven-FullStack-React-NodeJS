@@ -98,8 +98,7 @@ PawHaven 是一个开放且持续发展的项目。如果你对动物救援、�
 欢迎贡献代码与想法：
 
 1. 打开 issue 讨论想法
-2. Fork 仓库
-3. 创建功能分支
-4. 提交 Pull Request
+2. 创建功能分支
+3. 提交 Pull Request
 
 详情请查看 [LICENSE](./LICENSE) 文件。
