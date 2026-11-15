@@ -47,7 +47,7 @@ The supported animal taxonomy is stray pets. Whether the initial supported speci
 4. **Permission by action.** A user account can report, follow, comment, volunteer, or adopt as applicable; these are capabilities, not mutually exclusive identities.
 5. **Human review for consequential changes.** Volunteers review new reports and proposed lifecycle status changes.
 6. **Low-friction participation.** Browsing and commenting should not require an account. Authentication is required for actions that need an attributable account, such as requesting a status change or following an animal.
-7. **Clear separation of workflow state.** Publication review and the animal's real-world rescue progress are different concepts and must not share one status field.
+7. **One understandable animal status.** Use one Animal Status field throughout the animal journey: it starts at `PENDING_REVIEW`, then moves to `NEEDS_HELP` after approval or `REJECTED` if declined, before progressing through rescue and care. Review decisions are actions that cause status transitions, not separate animal statuses.
 8. **Honest product maturity.** Product ambition must remain distinguishable from implemented functionality.
 
 ## 4. Users and roles
@@ -79,18 +79,19 @@ The animal journey is the central product workflow:
 10. **Adoption:** an adopter discovers the animal and may express interest or apply through a future adoption workflow. The detailed screening, decision-maker, handover, and post-adoption rules remain TBD.
 11. **Outcome:** the animal may reach ADOPTED; a deceased animal may be recorded as DECEASED if that proposed status is confirmed. Exception paths are documented in the lifecycle specification.
 
-The publication review state is separate from the animal lifecycle state. PENDING_REVIEW means a report is awaiting moderation; NEEDS_HELP means an approved, publicly visible animal still needs help.
+PawHaven uses one Animal Status field from submission onward. A newly submitted animal is `PENDING_REVIEW` and is not public. When a Volunteer approves it, the status changes to `NEEDS_HELP` and the animal becomes public. If rejected, the status changes to `REJECTED` and the animal remains unpublished. `APPROVED` is the review action/decision, not an Animal Status.
 
 See [Animal Lifecycle](./animal-lifecycle.md) for the full flow, decision gates, state definitions, and exception handling.
 
 ## 6. Reporting and publication
 
-A report is a request to add an animal to PawHaven, not an automatically public rescue case. Every new report must be reviewed by a volunteer before it appears publicly.
+A report is a request to add an animal to PawHaven, not an automatically public rescue case. Every new report starts with Animal Status `PENDING_REVIEW` and must be reviewed by a Volunteer before it appears publicly.
 
-- Submission creates a report awaiting review.
-- A volunteer reviews the information and decides whether to approve or reject it.
-- Approval publishes the animal and initializes its lifecycle status to NEEDS_HELP.
-- Rejected reports remain unpublished.
+- Submission creates an animal record with status `PENDING_REVIEW`; it is not publicly visible.
+- A Volunteer reviews the information.
+- Approval changes the same Animal Status field to `NEEDS_HELP` and publishes the animal.
+- Rejection changes the same field to `REJECTED`; the animal remains unpublished.
+- `APPROVED` is the review decision/action, not a separate Animal Status.
 - Duplicate handling, rejection reasons, resubmission rules, and the visibility of review notes require further definition.
 
 The exact report form fields and validation rules should be maintained against the reporting experience and confirmed separately; this strategy does not invent a new form schema.
@@ -134,7 +135,7 @@ See [Adoption Workflow](./adoption-workflow.md) for the proposed end-to-end mode
 - Do not expose reporters' or volunteers' private contact details by default.
 - Avoid publishing precise animal coordinates where doing so could create a safety risk.
 - Make moderation actions attributable to the authorised volunteer who performed them.
-- Keep report review state separate from public animal progress.
+- Use the single Animal Status field consistently; keep `PENDING_REVIEW` and `REJECTED` records unpublished.
 - Preserve a history of approved lifecycle changes so the public timeline is explainable.
 - Provide a way for users to report inappropriate content or misuse; volunteers handle these reports.
 - Avoid encouraging untrained users to handle injured, frightened, or potentially dangerous animals.
