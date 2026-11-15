@@ -110,9 +110,8 @@ PawHaven ist ein offenes Projekt, das kontinuierlich weiterentwickelt wird. Wenn
 **Du möchtest beitragen?**
 
 1. Erstelle zunächst ein Issue, um deine Idee zu besprechen.
-2. Forke das Repository.
-3. Erstelle einen Feature-Branch.
-4. Reiche einen Pull Request ein.
+2. Erstelle einen Feature-Branch.
+3. Reiche einen Pull Request ein.
 
 Du kannst mich auch direkt über [WhatsApp](https://wa.me/8619102632826) kontaktieren, um Ideen und mögliche Beiträge zu besprechen.
 
