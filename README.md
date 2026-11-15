@@ -100,8 +100,7 @@ Contributions are welcome.
 If you would like to contribute:
 
 1. Open an issue to discuss ideas
-2. Fork the repository
-3. Create a feature branch
-4. Submit a pull request
+2. Create a feature branch
+3. Submit a pull request
 
 ---
