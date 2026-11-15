@@ -24,20 +24,20 @@
   --color-gray-6: #a3a3a3;
   --color-gray-7: #737373;
   --color-gray-8: #525252;
-  --color-gray-9: #2f2f2f;
+  --color-gray-9: #121212;
   --color-gray-10: #171717;
 
   /* ═══ Orange (Brand Primary) ═══════════════════════════ */
-  --color-orange-1: #fff7ed;
-  --color-orange-2: #ffedd5;
-  --color-orange-3: #fed7aa;
-  --color-orange-4: #fdb87a;
-  --color-orange-5: #fb923c;
-  --color-orange-6: #f7823a;
-  --color-orange-7: #f66b26;
-  --color-orange-8: #e65a1a;
-  --color-orange-9: #c2410b;
-  --color-orange-10: #7a2b08;
+  --color-orange-1: #fef4ed;
+  --color-orange-2: #fce8db;
+  --color-orange-3: #f9ceb2;
+  --color-orange-4: #f5af81;
+  --color-orange-5: #f28f50;
+  --color-orange-6: #ee701e;
+  --color-orange-7: #cd601a;
+  --color-orange-8: #c35c19;
+  --color-orange-9: #a74e15;
+  --color-orange-10: #72360e;
 
   /* ═══ Green (Secondary + Success) ═══════════════════════════ */
   --color-green-1: #f0fdf4;
