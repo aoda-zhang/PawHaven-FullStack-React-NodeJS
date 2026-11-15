@@ -43,13 +43,7 @@ flowchart TD
 
 ---
 
-# 📚 文档
-
-文档在 [`docs/`](./docs/README.md)，按每份文档的**用途**分类：`context/`（一次改动应该长什么样、各单元怎么组合）、`features/`（单个 feature 的前后端细节）、`product/`（`features/` 引用的蓝图）、`how-i-build/`（design system 与组件库背后的设计理由）。
-
-> `docs/features/` 是 **as-built** 文档——每个 portal feature 文件夹对应一份文档，并根据代码进行验证。各 feature 的差距会单独记录，已知缺陷汇总在[索引页](./docs/features/README.md#known-defects-in-the-code)。
-
-### 架构与技术实践
+# 技术实践
 
 | 文档 | 说明 |
 | --- | --- |
