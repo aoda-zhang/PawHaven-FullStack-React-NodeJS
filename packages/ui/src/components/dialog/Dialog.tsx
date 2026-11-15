@@ -2,7 +2,6 @@ import { X } from 'lucide-react';
 import { type ReactNode, useEffect, useId, useRef } from 'react';
 
 import { Button } from '../button/Button';
-import { cn } from '../../utils/cn';
 
 export interface DialogProps {
   open: boolean;
@@ -37,7 +36,7 @@ export const Dialog = ({
       onClick={(event) => {
         if (event.target === event.currentTarget) onOpenChange(false);
       }}
-      className={cn('fixed inset-0 m-auto max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-card-large border border-border bg-card p-0 text-foreground shadow-xl backdrop:bg-foreground/50')}
+      className="fixed inset-0 m-auto max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-card-large border border-border bg-card p-0 text-foreground shadow-xl backdrop:bg-foreground/50"
     >
       <div className="space-y-5 p-6">
         <header className="flex items-start justify-between gap-4">
