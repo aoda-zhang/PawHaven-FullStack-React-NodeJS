@@ -25,7 +25,7 @@ export const Dialog = ({
 }: DialogProps) => (
   <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/50 data-[state=open]:animate-in data-[state=closed]:animate-out" />
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/50" />
       <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-card-large border border-border bg-card p-0 text-foreground shadow-xl">
         <div className="space-y-5 p-6">
           <header className="flex items-start justify-between gap-4">
