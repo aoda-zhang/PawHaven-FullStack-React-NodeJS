@@ -50,7 +50,6 @@ export const Login = () => {
           >
             <FormInput
               variant="standard"
-              size="sm"
               label={t('auth.email')}
               name="email"
               type="email"
@@ -61,7 +60,6 @@ export const Login = () => {
             <FormInput
               type="password"
               variant="standard"
-              size="sm"
               label={t('auth.password')}
               name="password"
               required
@@ -72,7 +70,7 @@ export const Login = () => {
               loading={isPending}
               disabled={isPending}
               type="submit"
-              className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
+              className="mt-4 w-full font-semibold"
               data-testid="auth-submit-button"
             >
               {t('auth.login')}
@@ -84,7 +82,7 @@ export const Login = () => {
           <span>{t('auth.no_account')} </span>
           <button
             type="button"
-            className="text-primary cursor-pointer font-semibold"
+            className="text-text-link cursor-pointer font-semibold"
             onClick={() => {
               navigate(routePaths.register);
             }}

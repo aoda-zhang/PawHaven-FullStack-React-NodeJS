@@ -25,17 +25,15 @@ export const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="bg-surface flex h-dvh flex-col overflow-hidden sm:items-center sm:justify-center">
       <ScrollRestoration />
 
-      <div className="flex h-14 shrink-0 items-center justify-end px-4 sm:hidden">
+      <div className="px-card flex h-14 shrink-0 items-center justify-end sm:hidden">
         <CloseButton iconClassName="size-6" />
       </div>
 
       <div className="bg-surface sm:border-border sm:shadow-modal sm:rounded-panel flex min-h-0 w-full flex-1 flex-col sm:max-h-[calc(100dvh-4rem)] sm:max-w-[28rem] sm:flex-none sm:border">
-        <div className="hidden shrink-0 justify-end pt-4 pr-4 sm:flex">
+        <div className="pt-card pr-card hidden shrink-0 justify-end sm:flex">
           <CloseButton iconClassName="size-5" />
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-10 sm:px-8 sm:pt-1 sm:pb-8">
-          {children}
-        </div>
+        <div className="p-card min-h-0 flex-1 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

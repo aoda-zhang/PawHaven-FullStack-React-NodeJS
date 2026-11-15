@@ -47,7 +47,6 @@ export const Register = () => {
           >
             <FormInput
               variant="standard"
-              size="sm"
               label={t('auth.email')}
               name="email"
               type="email"
@@ -58,7 +57,6 @@ export const Register = () => {
             <FormInput
               type="password"
               variant="standard"
-              size="sm"
               label={t('auth.password')}
               name="password"
               required
@@ -69,7 +67,7 @@ export const Register = () => {
               loading={isPending}
               disabled={isPending}
               type="submit"
-              className="mt-4 h-11 w-full rounded-full text-sm font-semibold"
+              className="mt-4 w-full font-semibold"
               data-testid="auth-submit-button"
             >
               {t('auth.sighup')}
@@ -81,7 +79,7 @@ export const Register = () => {
           <span>{t('auth.with_account')} </span>
           <button
             type="button"
-            className="text-primary cursor-pointer font-semibold"
+            className="text-text-link cursor-pointer font-semibold"
             onClick={() => {
               navigate(routePaths.login);
             }}
