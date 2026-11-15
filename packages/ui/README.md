@@ -187,6 +187,7 @@ Classification follows the vocabulary used in
 | Component          | Purpose                                                                                           |
 | ------------------ | ------------------------------------------------------------------------------------------------- |
 | `Button`           | The action control. Variants, sizes, `loading`, `disabled` and optional `asChild` slot rendering. |
+| `Dialog`           | Controlled modal surface with accessible naming, Escape and backdrop dismissal.                 |
 | `Skeleton`         | A static grey placeholder block for content that has not loaded yet.                              |
 | `PhotoPlaceholder` | Decorative paw-print shown when an item has no photo.                                             |
 | `Loading`          | Full-viewport Lottie spinner with an accessible status label.                                     |
@@ -309,6 +310,12 @@ not enough to name two separate inputs.
   `aria-hidden="true"`. While loading, the button behaves as disabled.
 - The focus indicator comes from the design-system `focus-ring` utility and
   is present on every variant.
+
+### Dialog
+
+- The native `<dialog>` is opened with `showModal()`, which provides modal semantics, browser-managed focus containment, and focus restoration.
+- The required title supplies the accessible name; an optional description is connected with `aria-describedby`.
+- Escape and backdrop clicks request dismissal through `onOpenChange(false)`; application state remains the source of truth.
 
 ### Form controls
 
@@ -506,6 +513,7 @@ import the package stylesheet instead:
 - `Skeleton` exposes `role="status"` and `aria-label="Loading"`.
 - `Carousel` accepts `label` for the region name.
 - `Button` exports `ButtonProps` and `ButtonSize`.
+- `Dialog` exports `DialogProps`.
 - `NotificationBanner` exports `BannerLink`, `BannerMessage`, `BannerType`
   and `BannerVariant`.
 - `PhoneInput` accepts `id`, `disabled` and `defaultCountry`.
