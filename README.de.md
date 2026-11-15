@@ -15,6 +15,31 @@ Nutzer können Rettungsfälle melden, den Fortschritt von Rettungsaktionen verfo
 
 Neben der Anwendung selbst ist PawHaven auch ein praxisorientiertes Full-Stack-Engineering-Projekt mit Fokus auf skalierbare Architektur, wartbaren Code und effiziente Entwicklungsabläufe.
 
+
+## Zentraler Produktablauf
+
+Das folgende Diagramm zeigt den wichtigsten Ablauf in PawHaven – von der Meldung eines streunenden Tieres über Rettung und Versorgung bis hin zur Adoption.
+
+```mermaid
+flowchart TD
+    A["Jemand entdeckt ein streunendes Tier"] --> B["Tier melden"]
+    B --> C["PENDING_REVIEW<br/>Noch nicht öffentlich sichtbar"]
+    C --> D["Ein Volunteer prüft die Meldung"]
+
+    D -->|Ablehnen| E["REJECTED<br/>Bleibt unveröffentlicht"]
+    D -->|Genehmigen| F["NEEDS_HELP<br/>Wird öffentlich sichtbar"]
+
+    F --> G["Community kann das Tier entdecken, folgen und kommentieren"]
+    F --> H["Rettungs- und Versorgungsablauf"]
+
+    H --> I["Ein Nutzer beantragt eine Statusänderung"]
+    I --> J["Ein Volunteer prüft den Antrag"]
+    J -->|Ablehnen| H
+    J -->|Genehmigen| K["Der offizielle Tierstatus wird aktualisiert"]
+    K --> L["Rettung, Behandlung und Genesung"]
+    L --> M["Bei Bedarf: AWAITING_ADOPTION"]
+    M --> N["ADOPTED nach abgeschlossener Adoptionsübergabe"]
+```
 ---
 
 ## 📚 Dokumentation
