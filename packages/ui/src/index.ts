@@ -1,5 +1,6 @@
 export { Button, buttonVariants } from './components/button/Button';
 export type { ButtonProps, ButtonSize } from './components/button/Button';
+export { Dialog, type DialogProps } from './components/dialog/Dialog';
 export { FileDownloadButton } from './components/file-download-button/FileDownloadButton';
 export {
   Carousel,
