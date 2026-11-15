@@ -9,7 +9,6 @@ import { AnimalBasicInfo } from './AnimalBasicInfo';
 import { AnimalFollow } from './AnimalFollow';
 import { RelevantGuides } from './RelevantGuides';
 import { RescueTimeline } from './RescueTimeline';
-import { VolunteerInfo } from './VolunteerInfo';
 
 import { getRescueStatusColor } from '@/shared/utils/rescue-status/getRescueStatusColor';
 
@@ -98,7 +97,6 @@ export const RescueDetailContent = ({
         </div>
         <div className="space-y-4">
           <AnimalFollow animalId={animal.id} />
-          <VolunteerInfo volunteer={undefined} />
 
           <RelevantGuides />
         </div>
