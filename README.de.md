@@ -43,18 +43,7 @@ flowchart TD
 
 ---
 
-## 📚 Dokumentation
-
-Die Projektdokumentation befindet sich im Verzeichnis [`docs/`](./docs/README.md). Sie ist nach ihrem Zweck gegliedert:
-
-- **`context/`:** System- und Entwicklungsarchitektur sowie verbindliche Entwicklungsmuster.
-- **`features/`:** Technische Dokumentation der einzelnen Portal-Funktionen.
-- **`product/`:** Produktkonzepte und fachliche Grundlagen.
-- **`how-i-build/`:** Hintergründe zum Design-System und zur UI-Komponentenbibliothek.
-
-> `docs/features/` beschreibt den **tatsächlich implementierten Stand**. Für jeden Portal-Feature-Ordner gibt es eine anhand des Codes geprüfte Dokumentation. Abweichungen sind je Feature festgehalten; bekannte Fehler sind in der [Übersicht](./docs/features/README.md#known-defects-in-the-code) aufgeführt.
-
-### Architektur und technische Entscheidungen
+## Wie ich PawHaven entwickle
 
 | Dokument | Inhalt |
 | --- | --- |
