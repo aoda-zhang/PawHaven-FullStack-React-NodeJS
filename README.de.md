@@ -40,6 +40,7 @@ flowchart TD
     L --> M["Bei Bedarf: AWAITING_ADOPTION"]
     M --> N["ADOPTED nach abgeschlossener Adoptionsübergabe"]
 ```
+
 ---
 
 ## 📚 Dokumentation
