@@ -1,5 +1,6 @@
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
-import { type ReactNode, useEffect, useId, useRef } from 'react';
+import type { ReactNode } from 'react';
 
 import { Button } from '../button/Button';
 
@@ -21,72 +22,44 @@ export const Dialog = ({
   children,
   footer,
   closeLabel,
-}: DialogProps) => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
-  const descriptionId = useId();
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-
-    if (open && !dialog.open) {
-      dialog.showModal();
-    } else if (!open && dialog.open) {
-      dialog.close();
-    }
-  }, [open]);
-
-  return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby={titleId}
-      aria-describedby={description ? descriptionId : undefined}
-      onCancel={(event) => {
-        event.preventDefault();
-        onOpenChange(false);
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onOpenChange(false);
-        }
-      }}
-      className="fixed inset-0 m-auto max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-card-large border border-border bg-card p-0 text-foreground shadow-xl backdrop:bg-foreground/50"
-    >
-      <div className="space-y-5 p-6">
-        <header className="flex items-start justify-between gap-4">
-          <div className="min-w-0 space-y-2">
-            <h2 id={titleId} className="text-lg font-semibold">
-              {title}
-            </h2>
-            {description && (
-              <p
-                id={descriptionId}
-                className="text-text-secondary text-sm leading-6"
-              >
-                {description}
-              </p>
+}: DialogProps) => (
+  <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-foreground/50 data-[state=open]:animate-in data-[state=closed]:animate-out" />
+      <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100%-2rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-card-large border border-border bg-card p-0 text-foreground shadow-xl">
+        <div className="space-y-5 p-6">
+          <header className="flex items-start justify-between gap-4">
+            <div className="min-w-0 space-y-2">
+              <DialogPrimitive.Title className="text-lg font-semibold">
+                {title}
+              </DialogPrimitive.Title>
+              {description && (
+                <DialogPrimitive.Description className="text-text-secondary text-sm leading-6">
+                  {description}
+                </DialogPrimitive.Description>
+              )}
+            </div>
+            {closeLabel && (
+              <DialogPrimitive.Close asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  aria-label={closeLabel}
+                >
+                  <X aria-hidden="true" className="size-4" />
+                </Button>
+              </DialogPrimitive.Close>
             )}
-          </div>
-          {closeLabel && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label={closeLabel}
-              onClick={() => onOpenChange(false)}
-            >
-              <X aria-hidden="true" className="size-4" />
-            </Button>
+          </header>
+          {children && <div>{children}</div>}
+          {footer && (
+            <footer className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              {footer}
+            </footer>
           )}
-        </header>
-        {children && <div>{children}</div>}
-        {footer && (
-          <footer className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            {footer}
-          </footer>
-        )}
-      </div>
-    </dialog>
-  );
-};
+        </div>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
+  </DialogPrimitive.Root>
+);
