@@ -308,6 +308,7 @@ describe('ProxyService: locale is normalized onto the proxied request', () => {
   });
 });
 
+
 describe('ProxyService: trace id is echoed and forwarded', () => {
   let upstream: Server | undefined;
 

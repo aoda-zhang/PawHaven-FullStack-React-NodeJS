@@ -31,7 +31,7 @@ const mapToDto = (values: {
   urgent: boolean;
   behavior: string | null;
   description: string;
-  contactPhone: string;
+  contactEmail: string;
   photos: File[];
 }) => {
   const description = values.description?.trim() ?? '';
@@ -61,8 +61,9 @@ const mapToDto = (values: {
     reporterPhotos,
     description,
     contactInfo: {
-      phone: values.contactPhone.trim(),
-      email: '',
+      ...(values.contactEmail.trim()
+        ? { email: values.contactEmail.trim() }
+        : {}),
     },
   };
 };
@@ -87,7 +88,7 @@ const TestHarness = () => {
       urgent: false,
       behavior: 'friendly',
       description: 'Found a stray kitten',
-      contactPhone: '12345678',
+      contactEmail: '',
       photos: [new File(['p1'], 'p1.jpg'), new File(['p2'], 'p2.jpg')],
     });
     mutate(dto);
@@ -148,7 +149,7 @@ describe('ReportAnimalForm DTO mapping', () => {
         'https://assets.blob.vercel-storage.com/report/photo-0.jpg',
         'https://assets.blob.vercel-storage.com/report/photo-1.jpg',
       ],
-      contactInfo: { phone: '12345678', email: '' },
+      contactInfo: {},
     });
   });
 
@@ -166,7 +167,7 @@ describe('ReportAnimalForm DTO mapping', () => {
       urgent: true,
       behavior: 'friendly',
       description: 'Found a stray kitten',
-      contactPhone: '12345678',
+      contactEmail: '',
       photos: [new File(['p1'], 'p1.jpg'), new File(['p2'], 'p2.jpg')],
     });
     expect(dto.status).toBe('dangerous');
@@ -186,7 +187,7 @@ describe('ReportAnimalForm DTO mapping', () => {
       urgent: false,
       behavior: 'wary',
       description: 'Found a white rabbit',
-      contactPhone: '12345678',
+      contactEmail: '',
       photos: [new File(['p1'], 'p1.jpg'), new File(['p2'], 'p2.jpg')],
     });
     expect(dto.animalType).toBe('rabbit');
@@ -208,7 +209,7 @@ describe('ReportAnimalForm DTO mapping', () => {
       urgent: false,
       behavior: 'friendly',
       description: 'Found a stray kitten',
-      contactPhone: '12345678',
+      contactEmail: '',
       photos: [new File(['p1'], 'p1.jpg'), new File(['p2'], 'p2.jpg')],
     });
     expect(dto.location).toMatchObject({

@@ -46,7 +46,7 @@ accessible name.
 
 ### 1.4 Route guard
 
-`route.tsx` exports `AuthenticatedLayout`, the **only** route guard in the portal. It reads
+`route.tsx` exports `AuthenticatedLayout`, the portal's route guard for authenticated-only pages. It reads
 `userInfo` from the global context — the snapshot `GlobalProvider` loads from `localStorage` — and
 redirects to `/auth/login` immediately when there is no user, preserving `pathname + search` in the
 `redirect` param.
@@ -56,8 +56,7 @@ When a local user exists the layout also validates it with
 stale device snapshot cannot open a protected page. That validation runs once per user, not at boot:
 an anonymous visitor issues no `/auth/me` request at all.
 
-It is attached to the `authenticated` parent route in `app/router/router.tsx`, and exactly one route is
-nested under it: `reportAnimalRoute`. The other five are public.
+`AuthenticatedLayout` remains available for pages that require an account, but it is not currently mounted in `app/router/router.tsx`. `/report-animal` is a public route and supports optional authentication; the remaining portal routes are public as well.
 
 `currentUserQueryOptions` sets `staleTime` to 5 minutes and `retry: false`. The `userId` it keys on
 comes from the context, never from the URL.
@@ -194,4 +193,4 @@ authority. There is no profile feature, so nothing else consumes the user record
 - [Trust Boundary](../context/backend-architecture.md#4-the-trust-boundary) — the internal JWT contract and what each service is allowed to trust
 - [Frontend Patterns §2.1](../context/frontend-development-patterns.md#21-new-page) — the app layer, and where the route guard sits
 - [App Shell & Bootstrap](07-app-shell-bootstrap.md) — resolves this user's menu items
-- [Report a Stray Animal](03-report-animal.md) — the one auth-gated route
+- [Report a Stray Animal](03-report-animal.md) — public reporting with optional authentication

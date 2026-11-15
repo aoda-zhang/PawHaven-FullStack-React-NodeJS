@@ -149,7 +149,7 @@ list, and maps each stored storage key to `<BLOB_PUBLIC_BASE_URL>/<key>` for `ph
 
 No detail-owned collection. `RescueDetail` is a read model over `animalReports`; `AnimalFollow` is
 the only collection this page writes. See [Rescue Cases](04-rescue-cases.md) for the field list and
-[Report a Stray Animal §6](03-report-animal.md#6-two-contract-fields-the-service-drops) for the two
+[Report a Stray Animal §6](03-report-animal.md#6-contract-persistence-details) for the two
 contract fields the write path discards.
 
 ## 5. Frontend Files
