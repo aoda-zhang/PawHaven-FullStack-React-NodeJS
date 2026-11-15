@@ -40,6 +40,7 @@ flowchart TD
     L --> M["视情况进入 AWAITING_ADOPTION"]
     M --> N["完成领养交接后变为 ADOPTED"]
 ```
+
 ---
 
 # 📚 文档
