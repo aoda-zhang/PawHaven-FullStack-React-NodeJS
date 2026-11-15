@@ -6,7 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
-import { useFollowAnimal, useUnfollowAnimal } from '../api/rescueDetail.mutations';
+import {
+  useFollowAnimal,
+  useUnfollowAnimal,
+} from '../api/rescueDetail.mutations';
 import { useFollowStatus } from '../api/rescueDetail.queries';
 
 import { FollowButton } from './FollowButton';
@@ -24,13 +27,16 @@ export const AnimalFollow = ({ animalId }: { animalId: string }) => {
   const isFollowing = isAuthenticated && (status?.isFollowing ?? false);
   const isPending = followMutation.isPending || unfollowMutation.isPending;
   const isError = followMutation.isError || unfollowMutation.isError;
-  const errorKey = followMutation.isError ? 'rescueDetail.follow_error' : 'rescueDetail.unfollow_error';
+  const errorKey = followMutation.isError
+    ? 'rescueDetail.follow_error'
+    : 'rescueDetail.unfollow_error';
 
   const handleFollow = () => {
     if (!isAuthenticated) {
       setIsPromptOpen(true);
       return;
     }
+
     followMutation.mutate(animalId);
   };
 
@@ -63,7 +69,11 @@ export const AnimalFollow = ({ animalId }: { animalId: string }) => {
         description={t('rescueDetail.follow_signup_message')}
         footer={
           <>
-            <Button type="button" variant="outline" onClick={() => setIsPromptOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsPromptOpen(false)}
+            >
               {t('rescueDetail.follow_signup_dismiss')}
             </Button>
             <Button type="button" onClick={handleSignUp}>
