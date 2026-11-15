@@ -15,6 +15,31 @@ The platform allows users to report rescue cases, track rescue progress, share r
 
 In addition to the application itself, PawHaven also serves as a **practice of modern full-stack engineering**, focusing on scalable architecture, maintainable code, and efficient development workflows.
 
+
+## Core product journey
+
+The diagram below summarizes the main animal journey, from the initial report to rescue, care, and adoption.
+
+```mermaid
+flowchart TD
+    A["Someone discovers a stray pet"] --> B["Submit an animal report"]
+    B --> C["PENDING_REVIEW<br/>Hidden from public view"]
+    C --> D["Volunteer reviews the report"]
+
+    D -->|Reject| E["REJECTED<br/>Remains unpublished"]
+    D -->|Approve| F["NEEDS_HELP<br/>Becomes publicly visible"]
+
+    F --> G["Community discovers, follows, and comments"]
+    F --> H["Rescue and care journey"]
+
+    H --> I["User submits a status-change request"]
+    I --> J["Volunteer reviews the request"]
+    J -->|Reject| H
+    J -->|Approve| K["Official animal status is updated"]
+    K --> L["Rescue, treatment, and recovery"]
+    L --> M["AWAITING_ADOPTION, where appropriate"]
+    M --> N["ADOPTED after the adoption handover"]
+```
 ---
 
 # 📚 Documentation
