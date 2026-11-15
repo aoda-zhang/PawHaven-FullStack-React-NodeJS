@@ -49,7 +49,7 @@ describe('Dialog', () => {
     const onOpenChange = vi.fn();
     render(<DialogHarness onOpenChange={onOpenChange} />);
 
-    fireEvent.keyDown(document, { key: 'Escape' });
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
