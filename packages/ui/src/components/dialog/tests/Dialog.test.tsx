@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -29,6 +35,24 @@ const DialogHarness = ({ onOpenChange = vi.fn() }: DialogHarnessProps) => {
   );
 };
 
+const DialogOpenerHarness = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open dialog
+      </button>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Follow this animal"
+        closeLabel="Close dialog"
+      />
+    </>
+  );
+};
+
 describe('Dialog', () => {
   it('renders an accessible modal with its description and footer', () => {
     render(<DialogHarness />);
@@ -37,7 +61,9 @@ describe('Dialog', () => {
       screen.getByRole('dialog', { name: 'Follow this animal' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Create an account to keep up with its rescue progress.'),
+      screen.getByText(
+        'Create an account to keep up with its rescue progress.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign up' })).toBeInTheDocument();
     expect(
@@ -55,14 +81,39 @@ describe('Dialog', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('dismisses when the backdrop is pressed', () => {
+  it('dismisses when the backdrop is pressed', async () => {
     const onOpenChange = vi.fn();
     render(<DialogHarness onOpenChange={onOpenChange} />);
 
-    fireEvent.pointerDown(document.body);
+    // DismissableLayer registers its outside-pointerdown listener on a macrotask.
+    await act(async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+    });
 
-    expect(onOpenChange).toHaveBeenCalledWith(false);
+    act(() => {
+      fireEvent.pointerDown(document.body);
+      fireEvent.click(document.body);
+    });
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('returns focus to the element that opened it', async () => {
+    render(<DialogOpenerHarness />);
+    const opener = screen.getByRole('button', { name: 'Open dialog' });
+
+    act(() => {
+      opener.focus();
+      fireEvent.click(opener);
+    });
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+
+    await waitFor(() => expect(opener).toHaveFocus());
   });
 
   it('does not dismiss when dialog content is clicked', () => {

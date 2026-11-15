@@ -1,7 +1,8 @@
-import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 
 import { Button } from '../button/Button';
+
 import { Dialog } from './Dialog';
 
 const meta = {
@@ -11,7 +12,6 @@ const meta = {
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
 
 const DialogDemo = () => {
   const [open, setOpen] = useState(false);
@@ -34,10 +34,10 @@ const DialogDemo = () => {
               variant="outline"
               onClick={() => setOpen(false)}
             >
-              Maybe later
+              Keep browsing
             </Button>
             <Button type="button" onClick={() => setOpen(false)}>
-              Sign up
+              Create a free account
             </Button>
           </>
         }
@@ -46,4 +46,9 @@ const DialogDemo = () => {
   );
 };
 
-export const DialogStory: Story = { name: 'Dialog', render: () => <DialogDemo /> };
+type Story = StoryObj<typeof DialogDemo>;
+
+export const DialogStory: Story = {
+  name: 'Dialog',
+  render: () => <DialogDemo />,
+};
