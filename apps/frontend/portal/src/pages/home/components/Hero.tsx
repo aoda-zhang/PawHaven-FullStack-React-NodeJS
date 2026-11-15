@@ -52,7 +52,7 @@ export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <button
             type="button"
-            className="text-text-inverse bg-primary text-body rounded-button-large cursor-pointer px-4 py-2 font-semibold transition-colors hover:opacity-90"
+            className="text-primary-fg bg-primary text-body rounded-button-large px-control-x py-control-y cursor-pointer font-semibold transition-colors"
             onClick={() => navigate(routePaths.reportAnimal)}
           >
             <span className="flex items-center gap-1">
