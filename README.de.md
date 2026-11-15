@@ -17,28 +17,26 @@ Neben der Anwendung selbst ist PawHaven auch ein praxisorientiertes Full-Stack-E
 
 ---
 
-## 🛠 Voraussetzungen
+## 📚 Dokumentation
 
-- **Node.js:** `24.x`
-- **pnpm:** `12.x`
+Die Projektdokumentation befindet sich im Verzeichnis [`docs/`](./docs/README.md). Sie ist nach ihrem Zweck gegliedert:
 
-Bitte stelle sicher, dass diese Versionen installiert sind, bevor du Abhängigkeiten installierst oder das Projekt startest.
+- **`context/`:** System- und Entwicklungsarchitektur sowie verbindliche Entwicklungsmuster.
+- **`features/`:** Technische Dokumentation der einzelnen Portal-Funktionen.
+- **`product/`:** Produktkonzepte und fachliche Grundlagen.
+- **`how-i-build/`:** Hintergründe zum Design-System und zur UI-Komponentenbibliothek.
 
----
+> `docs/features/` beschreibt den **tatsächlich implementierten Stand**. Für jeden Portal-Feature-Ordner gibt es eine anhand des Codes geprüfte Dokumentation. Abweichungen sind je Feature festgehalten; bekannte Fehler sind in der [Übersicht](./docs/features/README.md#known-defects-in-the-code) aufgeführt.
 
-## ✨ Hauptfunktionen
+### Architektur und technische Entscheidungen
 
-- **Verwaltung von Rettungsfällen**  
-  Rettungsfälle erstellen und verfolgen, damit freiwillige Helfer Rettungsaktionen koordinieren können.
-
-- **Authentifizierung und Zugriffskontrolle**  
-  Sichere Authentifizierung mit JWT und rollenbasierter Zugriffskontrolle.
-
-- **Wissensdatenbank**  
-  Zentral verwaltete Ratgeber zur Tierrettung und Informationen zur Adoption.
-
-- **Community und Austausch**  
-  Rettungsgeschichten teilen und Erfahrungen innerhalb der Community austauschen.
+| Dokument | Inhalt |
+| --- | --- |
+| [Systemarchitektur](./docs/context/system-architecture-overview.md) | Services, Pakete, Datenflüsse und Deployment |
+| [Frontend-Architektur](./docs/context/frontend-architecture.md) | Frontend-Einheiten und Abhängigkeitsregeln |
+| [Backend-Architektur](./docs/context/backend-architecture.md) | Backend-Services, Module und Abhängigkeiten |
+| [Design Tokens](./docs/how-i-build/design-tokens.md) | Aufbau und Durchsetzung des Design-Token-Systems |
+| [UI-Komponentenbibliothek](./docs/how-i-build/ui-library.md) | Komponenten, Qualitätsprüfungen und Nutzung |
 
 ---
 
@@ -73,27 +71,6 @@ Die Services kommunizieren über HTTP. Innerhalb des Core Service sorgen klar de
 `Planung → Agenten koordinieren → Tests ausführen → Architektur und Implementierung prüfen → Wissen aktualisieren`
 
 👉 [Entwicklungsumgebung ansehen](./.opencode/) – mit Skills, Slash-Command-Workflows, Agents und verbindlichen Projektregeln.
-
----
-
-## 📚 Dokumentation
-
-Die Projektdokumentation befindet sich im Verzeichnis [`docs/`](./docs/README.md). Sie ist nach ihrem Zweck gegliedert:
-
-- **`context/`:** System- und Entwicklungsarchitektur sowie verbindliche Entwicklungsmuster.
-- **`features/`:** Technische Dokumentation der einzelnen Portal-Funktionen.
-- **`product/`:** Produktkonzepte und fachliche Grundlagen.
-- **`how-i-build/`:** Hintergründe zum Design-System und zur UI-Komponentenbibliothek.
-
-### Architektur und technische Entscheidungen
-
-| Dokument | Inhalt |
-| --- | --- |
-| [Systemarchitektur](./docs/context/system-architecture-overview.md) | Services, Pakete, Datenflüsse und Deployment |
-| [Frontend-Architektur](./docs/context/frontend-architecture.md) | Frontend-Einheiten und Abhängigkeitsregeln |
-| [Backend-Architektur](./docs/context/backend-architecture.md) | Backend-Services, Module und Abhängigkeiten |
-| [Design Tokens](./docs/how-i-build/design-tokens.md) | Aufbau und Durchsetzung des Design-Token-Systems |
-| [UI-Komponentenbibliothek](./docs/how-i-build/ui-library.md) | Komponenten, Qualitätsprüfungen und Nutzung |
 
 ---
 
