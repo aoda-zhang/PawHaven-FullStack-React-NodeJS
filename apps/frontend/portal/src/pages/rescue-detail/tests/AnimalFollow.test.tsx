@@ -5,6 +5,8 @@ import type { AnimalFollowResult } from '@pawhaven/shared/types';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { AnimalFollow } from '../components/AnimalFollow';
+
 Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
   configurable: true,
   value() {
@@ -18,8 +20,6 @@ Object.defineProperty(HTMLDialogElement.prototype, 'close', {
     this.removeAttribute('open');
   },
 });
-
-import { AnimalFollow } from '../components/AnimalFollow';
 
 const mocks = vi.hoisted(() => ({
   followMutate: vi.fn(),
@@ -193,7 +193,9 @@ describe('AnimalFollow', () => {
 
     renderFollow();
 
-    const button = screen.getByRole('button', { name: /rescueDetail\.follow$/ });
+    const button = screen.getByRole('button', {
+      name: /rescueDetail\.follow$/,
+    });
     expect(button).toBeDisabled();
     fireEvent.click(button);
     expect(mocks.followMutate).not.toHaveBeenCalled();

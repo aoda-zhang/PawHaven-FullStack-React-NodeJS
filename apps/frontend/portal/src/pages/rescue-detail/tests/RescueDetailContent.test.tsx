@@ -26,6 +26,10 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+vi.mock('../components/AnimalFollow', () => ({
+  AnimalFollow: () => null,
+}));
+
 const buildAnimal = (reporterName: string | null): RescueDetail => ({
   id: 'PAW-0001',
   animalType: 'cat',
