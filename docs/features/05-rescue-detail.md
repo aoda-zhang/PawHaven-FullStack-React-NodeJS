@@ -62,7 +62,7 @@ are three independent renderings of "this report exists".
 Following an animal is a general account feature, independent of volunteer participation. The AnimalFollow container owns the status query, follow/unfollow mutations, and guest sign-up prompt. It is rendered as its own card in RescueDetailContent.
 
 - Authenticated users follow or unfollow immediately through the existing API.
-- Guests who click Follow see a sign-up dialog. Sign up navigates to /auth/register; Maybe later closes the dialog and leaves the user on the animal detail page.
+- Guests who click Follow see a sign-up dialog. Create a free account navigates to /auth/register; Keep browsing closes the dialog and leaves the user on the animal detail page.
 - Registration does not preserve or automatically resume a pending follow action.
 
 FollowButton remains a presentational control, and FollowerCount displays the count from the same status query.
@@ -83,8 +83,8 @@ flowchart TD
     C -- yes --> E[isFollowing from the DB row]
     D --> F[Guest clicks Follow]
     F --> G[Sign-up dialog]
-    G -- Sign up --> H[/auth/register]
-    G -- Maybe later --> I[Return to animal detail]
+    G -- Create a free account --> H["/auth/register"]
+    G -- Keep browsing --> I[Return to animal detail]
     E --> J[Follow or unfollow immediately]
     J --> K[POST or PUT /core/animal-follow/:id]
     K --> L[Query cache updated · FollowerCount re-renders]

@@ -38,7 +38,7 @@
     "unfollow_error": "取消关注失败，请稍后重试。",
     "follow_signup_title": "想要关注这只动物吗？",
     "follow_signup_message": "创建账户即可关注这只动物，并持续了解它的救助进展。",
-    "follow_signup_cta": "注册",
-    "follow_signup_dismiss": "稍后再说"
+    "follow_signup_cta": "免费创建账户",
+    "follow_signup_dismiss": "继续浏览"
   }
 }

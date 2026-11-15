@@ -40,7 +40,7 @@
     "unfollow_error": "Could not unfollow. Please try again.",
     "follow_signup_title": "Want to follow this animal?",
     "follow_signup_message": "Create an account to follow this animal and keep up with its rescue progress.",
-    "follow_signup_cta": "Sign up",
-    "follow_signup_dismiss": "Maybe later"
+    "follow_signup_cta": "Create a free account",
+    "follow_signup_dismiss": "Keep browsing"
   }
 }
