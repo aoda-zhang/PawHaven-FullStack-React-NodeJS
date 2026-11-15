@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { cn } from '../../utils/cn';
+import { Button } from '../button/Button';
 
 export const notificationType = {
   success: 'success',
@@ -175,15 +176,17 @@ const ToastEntry = ({ toast, onDismiss }: ToastEntryProps) => {
         className={cn('mt-0.5 size-5 shrink-0', toneByType[toast.type])}
       />
       <div className="text-text flex-1 text-sm">{toast.message}</div>
-      <button
+      <Button
         ref={dismissRef}
         type="button"
+        size="icon"
+        variant="ghost"
         aria-label="Dismiss notification"
         onClick={() => onDismiss(toast.id)}
-        className="text-text-secondary hover:text-text h-control w-control inline-flex shrink-0 items-center justify-center rounded transition-colors"
+        className="text-text-secondary shrink-0"
       >
         <X aria-hidden="true" className="size-4" />
-      </button>
+      </Button>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import type { ReportAnimalFormValues } from '@pawhaven/shared/types';
+import { Button } from '@pawhaven/ui';
 import { Minus, Plus } from 'lucide-react';
 import { useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,25 +23,29 @@ export const AnimalCountStepper = ({ label }: AnimalCountStepperProps) => {
         {label}
       </label>
       <div className="flex items-center gap-3">
-        <button
+        <Button
           type="button"
+          size="icon"
+          variant="outline"
           aria-label={t('reportAnimal.count_decrease')}
           onClick={() => update(count - 1)}
-          className="border-border text-text-secondary hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
+          className="rounded-full"
         >
           <Minus className="h-4 w-4" />
-        </button>
+        </Button>
         <span className="text-foreground w-10 text-center text-lg font-semibold">
           {count}
         </span>
-        <button
+        <Button
           type="button"
+          size="icon"
+          variant="outline"
           aria-label={t('reportAnimal.count_increase')}
           onClick={() => update(count + 1)}
-          className="border-border text-text-secondary hover:bg-muted flex h-9 w-9 items-center justify-center rounded-full border"
+          className="rounded-full"
         >
           <Plus className="h-4 w-4" />
-        </button>
+        </Button>
       </div>
     </div>
   );

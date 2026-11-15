@@ -1,3 +1,4 @@
+import { Button } from '@pawhaven/ui';
 import { ChevronRight } from 'lucide-react';
 import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -73,14 +74,15 @@ export const AdoptablePetsSection = ({
             </p>
           </div>
           {onSeeAll && (
-            <button
+            <Button
               type="button"
+              variant="link"
               onClick={onSeeAll}
-              className="text-text-link hidden items-center gap-1.5 text-sm font-medium hover:underline sm:flex"
+              className="hidden sm:inline-flex"
             >
               {t('home.forever_home_see_all')}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            </button>
+            </Button>
           )}
         </div>
 

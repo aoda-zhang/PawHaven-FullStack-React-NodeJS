@@ -1,5 +1,5 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
-import { cn } from '@pawhaven/ui';
+import { Button } from '@pawhaven/ui';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,19 +47,15 @@ const RescueCasesPage = () => {
     <div className="max-w-6xl px-4">
       <div className="flex gap-1 overflow-x-auto pt-10">
         {FILTER_OPTIONS.map((option) => (
-          <button
+          <Button
             key={option.value}
             type="button"
             onClick={() => setActiveFilter(option.value)}
-            className={cn(
-              'flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
-              activeFilter === option.value
-                ? 'bg-primary text-primary-fg shadow-sm'
-                : 'bg-card border-border text-text-secondary hover:text-foreground hover:bg-muted border',
-            )}
+            variant={activeFilter === option.value ? 'default' : 'outline'}
+            className="rounded-full"
           >
             {t(option.labelKey)}
-          </button>
+          </Button>
         ))}
       </div>
       <RescueCasesSection

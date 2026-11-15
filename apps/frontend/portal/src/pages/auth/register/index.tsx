@@ -77,15 +77,16 @@ export const Register = () => {
 
         <div className="text-text-secondary mt-4 text-center text-sm">
           <span>{t('auth.with_account')} </span>
-          <button
+          <Button
             type="button"
-            className="text-text-link cursor-pointer font-semibold"
+            variant="link"
+            className="font-semibold"
             onClick={() => {
               navigate(routePaths.login);
             }}
           >
             {t('auth.login_now')}
-          </button>
+          </Button>
         </div>
       </div>
     </AuthLayout>

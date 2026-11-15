@@ -1,3 +1,4 @@
+import { Button } from '@pawhaven/ui';
 import { X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ScrollRestoration, useNavigate } from 'react-router-dom';
@@ -9,14 +10,16 @@ const CloseButton = ({ iconClassName }: { iconClassName: string }) => {
   const { t } = useTranslation();
 
   return (
-    <button
+    <Button
+      size="icon"
+      variant="ghost"
       type="button"
       onClick={() => navigate(routePaths.home)}
       aria-label={t('common.close')}
-      className="text-text-secondary hover:text-text focus-ring cursor-pointer transition-colors"
+      className="text-text-secondary hover:text-text"
     >
       <X className={iconClassName} aria-hidden="true" />
-    </button>
+    </Button>
   );
 };
 

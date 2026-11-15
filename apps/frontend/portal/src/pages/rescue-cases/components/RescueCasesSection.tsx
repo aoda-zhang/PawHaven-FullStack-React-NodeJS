@@ -1,5 +1,6 @@
 import { AnimalStatusSchema } from '@pawhaven/shared/types';
 import type { RescueListItem } from '@pawhaven/shared/types';
+import { Button } from '@pawhaven/ui';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -72,14 +73,10 @@ export const RescueCasesSection = ({
           )}
         </div>
         {onSeeAll && (
-          <button
-            type="button"
-            onClick={onSeeAll}
-            className="text-text-link flex flex-shrink-0 cursor-pointer items-center gap-1 text-sm font-medium transition-colors hover:opacity-80"
-          >
+          <Button type="button" variant="link" onClick={onSeeAll}>
             {t('rescue_cases.see_all')}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+          </Button>
         )}
       </div>
 

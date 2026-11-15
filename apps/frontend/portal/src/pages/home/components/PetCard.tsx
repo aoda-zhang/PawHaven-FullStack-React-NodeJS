@@ -1,4 +1,4 @@
-import { cn } from '@pawhaven/ui';
+import { Button, cn } from '@pawhaven/ui';
 import { Clock, Heart } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -65,14 +65,18 @@ export const PetCard = ({ pet, onClick }: PetCardProps) => {
   );
 
   return isInteractive ? (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={() => onClick?.(pet.id)}
       aria-label={pet.name}
-      className={className}
+      className={cn(
+        'hover:bg-background block h-auto w-full p-0 text-left whitespace-normal',
+        className,
+      )}
     >
       {cardContent}
-    </button>
+    </Button>
   ) : (
     <div className={className}>{cardContent}</div>
   );

@@ -30,7 +30,7 @@ export const NotFound = ({
     <div className="flex min-h-screen flex-col">
       <div className="bg-background flex w-full flex-1 flex-col px-5 pt-10 pb-10 text-center">
         <div className="mb-8">
-          <div className="bg-primary-light text-text-link mx-auto inline-flex size-28 items-center justify-center rounded-full">
+          <div className="bg-primary-light text-primary mx-auto inline-flex size-28 items-center justify-center rounded-full">
             <svg
               viewBox="0 0 24 24"
               fill="none"

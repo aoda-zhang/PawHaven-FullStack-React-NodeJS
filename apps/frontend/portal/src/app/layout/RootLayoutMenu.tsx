@@ -1,10 +1,10 @@
 import { Brand, LanguageSelector } from '@pawhaven/frontend-core';
-import { cn } from '@pawhaven/ui';
+import { Button, cn } from '@pawhaven/ui';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useMenuNavigation } from './hooks/useMenuNavigation';
+import { isAuthMenuItem, useMenuNavigation } from './hooks/useMenuNavigation';
 import { RootLayoutSidebar } from './RootLayoutSidebar';
 import type { MenuItemType } from './types';
 
@@ -46,7 +46,8 @@ export const RootLayoutMenu = ({
         <div className="flex flex-1 justify-center">
           <div className={cn('flex gap-1', 'hidden md:flex')}>
             {navItems.map((item) => (
-              <button
+              <Button
+                variant={isAuthMenuItem(item) ? 'default' : 'ghost'}
                 type="button"
                 className={item.className}
                 key={item.label}
@@ -54,7 +55,7 @@ export const RootLayoutMenu = ({
                 aria-current={activePath === item.to ? 'page' : undefined}
               >
                 <span>{item.label}</span>
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -63,7 +64,8 @@ export const RootLayoutMenu = ({
           {authItems.length > 0 && (
             <div className={cn('flex gap-1', 'hidden md:flex')}>
               {authItems.map((item) => (
-                <button
+                <Button
+                  variant={isAuthMenuItem(item) ? 'default' : 'ghost'}
                   type="button"
                   className={item.className}
                   key={item.label}
@@ -71,7 +73,7 @@ export const RootLayoutMenu = ({
                   aria-current={activePath === item.to ? 'page' : undefined}
                 >
                   <span>{item.label}</span>
-                </button>
+                </Button>
               ))}
             </div>
           )}
@@ -79,7 +81,8 @@ export const RootLayoutMenu = ({
             <LanguageSelector align="end" />
           </div>
 
-          <button
+          <Button
+            variant="ghost"
             type="button"
             className="cursor-pointer md:hidden"
             onClick={() => setSidebarOpen(!isSidebarOpen)}
@@ -95,7 +98,7 @@ export const RootLayoutMenu = ({
             ) : (
               <Menu size={34} aria-hidden="true" />
             )}
-          </button>
+          </Button>
         </div>
       </div>
 

@@ -9,17 +9,22 @@ import { routePaths } from '@/app/router/routePaths';
 const LOGOUT_MENU_CLASS = 'logout';
 
 const ACTION_ITEM_CLASS =
-  'px-3 py-2 rounded-panel bg-primary text-primary-fg font-semibold shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors hover:bg-primary/90';
+  'rounded-panel flex items-center justify-center gap-1.5 px-3 py-2 font-semibold shadow-sm transition-colors';
 
 const MENU_CLASSES = {
   menuItem:
-    'cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-panel text-sm font-medium text-text-secondary transition-colors hover:text-foreground hover:bg-muted',
+    'flex items-center gap-1.5 px-3 py-2 rounded-panel text-sm font-medium text-text-secondary transition-colors',
   activeMenuItem: 'text-primary',
   login: ACTION_ITEM_CLASS,
   logout: ACTION_ITEM_CLASS,
 } as const;
 
 type MenuClassKey = keyof typeof MENU_CLASSES;
+
+const AUTH_CLASS_NAMES = ['login', 'logout'];
+
+export const isAuthMenuItem = (item: MenuItem) =>
+  item.classNames.some((className) => AUTH_CLASS_NAMES.includes(className));
 
 /**
  * Checks if a menu item is the logout action.

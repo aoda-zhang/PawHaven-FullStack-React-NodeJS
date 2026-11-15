@@ -3,6 +3,7 @@ import { useId, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { cn } from '../../../utils/cn';
+import { Button } from '../../button/Button';
 import type { BaseFormType, BaseTextFieldType } from '../FormBase.type';
 import {
   FORM_CONTROL_SIZE_CLASSES,
@@ -100,19 +101,21 @@ export const FormInput = ({
                 )}
               />
               {shouldShowToggle && (
-                <button
+                <Button
                   type="button"
+                  size="icon"
+                  variant="ghost"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   aria-controls={inputId}
                   onClick={() => setShowPassword((s) => !s)}
-                  className="text-text-secondary hover:text-text absolute top-1/2 right-3 -translate-y-1/2"
+                  className="text-text-secondary absolute top-1/2 right-3 h-auto w-auto -translate-y-1/2 p-0"
                 >
                   {showPassword ? (
                     <EyeOff className="size-4" aria-hidden="true" />
                   ) : (
                     <Eye className="size-4" aria-hidden="true" />
                   )}
-                </button>
+                </Button>
               )}
             </div>
             {isInvalid && (

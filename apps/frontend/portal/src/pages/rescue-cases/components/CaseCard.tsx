@@ -1,6 +1,6 @@
 import { formatDateTime } from '@pawhaven/frontend-core';
 import type { RescueListItem } from '@pawhaven/shared/types';
-import { PhotoPlaceholder } from '@pawhaven/ui';
+import { Button, PhotoPlaceholder } from '@pawhaven/ui';
 import { Clock, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,11 +14,12 @@ interface CaseCardProps {
 export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
   const { i18n } = useTranslation();
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
       onClick={() => onClick(caseData.id)}
       aria-label={caseData.title}
-      className="border-border bg-card group rounded-card-large w-full cursor-pointer overflow-hidden border text-left shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+      className="rounded-card-large border-border bg-card group hover:bg-card block h-auto w-full cursor-pointer overflow-hidden border p-0 text-left whitespace-normal shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
     >
       <div className="bg-muted relative h-48 overflow-hidden">
         {caseData.image ? (
@@ -56,13 +57,13 @@ export const CaseCard = ({ caseData, onClick }: CaseCardProps) => {
             {formatDateTime(caseData.reportedAt, i18n.language)}
           </div>
           {caseData.distance > 0 && (
-            <div className="text-text-link bg-accent flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium">
+            <div className="text-primary bg-accent flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium">
               <MapPin className="h-3 w-3" />
               {caseData.distance} km
             </div>
           )}
         </div>
       </div>
-    </button>
+    </Button>
   );
 };

@@ -80,15 +80,16 @@ export const Login = () => {
 
         <div className="text-text-secondary mt-4 text-center text-sm">
           <span>{t('auth.no_account')} </span>
-          <button
+          <Button
             type="button"
-            className="text-text-link cursor-pointer font-semibold"
+            variant="link"
+            className="font-semibold"
             onClick={() => {
               navigate(routePaths.register);
             }}
           >
             {t('auth.register_now')}
-          </button>
+          </Button>
         </div>
       </div>
     </AuthLayout>

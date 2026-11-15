@@ -1,4 +1,5 @@
 import { supportedLngs } from '@pawhaven/i18n/supportedLngs';
+import { Button } from '@pawhaven/ui';
 import clsx from 'clsx';
 import { Check, ChevronDown, Globe } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -20,16 +21,17 @@ const LanguageMenu = ({ current, onSelect }: LanguageMenuProps) => {
         const active = language === current;
         return (
           <li key={language} role="none">
-            <button
+            <Button
               type="button"
               role="menuitemradio"
               aria-checked={active}
+              variant="ghost"
               onClick={() => onSelect(language)}
               className={clsx(
                 'rounded-input-large flex w-full items-center gap-3 px-2.5 py-2 text-left text-sm transition-colors',
                 active
-                  ? 'bg-primary-light text-text-link font-medium'
-                  : 'text-text-secondary hover:bg-muted hover:text-text',
+                  ? 'bg-primary-light text-primary hover:text-primary font-medium'
+                  : 'text-text-secondary',
               )}
             >
               <span
@@ -44,7 +46,7 @@ const LanguageMenu = ({ current, onSelect }: LanguageMenuProps) => {
               {active && (
                 <Check className="size-4 shrink-0" aria-hidden="true" />
               )}
-            </button>
+            </Button>
           </li>
         );
       })}
@@ -96,13 +98,14 @@ export const LanguageSelector = ({
 
   return (
     <div ref={containerRef} className="relative inline-block">
-      <button
+      <Button
         type="button"
+        variant="ghost"
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t('common.select_language')}
         onClick={() => setOpen((value) => !value)}
-        className="border-border bg-surface text-text-secondary hover:border-border-hover hover:text-text focus-ring rounded-button inline-flex shrink-0 items-center gap-2 border px-2.5 py-1.5 text-sm shadow-sm transition-colors"
+        className="border-border bg-surface text-text-secondary hover:border-border-hover hover:text-text rounded-button inline-flex shrink-0 items-center gap-2 border px-2.5 py-1.5 text-sm shadow-sm transition-colors"
       >
         <Globe className="size-4 shrink-0" aria-hidden="true" />
         <span
@@ -118,7 +121,7 @@ export const LanguageSelector = ({
           )}
           aria-hidden="true"
         />
-      </button>
+      </Button>
       {open && (
         <div
           className={clsx(

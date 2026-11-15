@@ -1,4 +1,5 @@
 import type { HeroStats } from '@pawhaven/shared/types';
+import { Button } from '@pawhaven/ui';
 import { ChevronRight } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -50,23 +51,24 @@ export const Hero = ({ heroStats, onAdoptClick }: HeroProps) => {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center gap-4">
-          <button
+          <Button
             type="button"
-            className="text-primary-fg bg-primary text-body rounded-button-large px-control-x py-control-y cursor-pointer font-semibold transition-colors"
+            className="font-semibold"
             onClick={() => navigate(routePaths.reportAnimal)}
           >
             <span className="flex items-center gap-1">
               {t('home.hero_report_cta')}
               <ChevronRight className="h-4 w-4" />
             </span>
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="text-dark-text cursor-pointer hover:underline"
+            variant="link"
+            className="text-dark-text"
             onClick={onAdoptClick}
           >
             {t('home.hero_adopt_cta')}
-          </button>
+          </Button>
         </div>
 
         <div className="divide-dark-text/15 text-dark-text mt-10 flex flex-row divide-x">

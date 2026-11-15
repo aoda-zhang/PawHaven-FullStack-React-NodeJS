@@ -16,10 +16,14 @@ vi.mock('react-i18next', async () => {
   };
 });
 
-vi.mock('lucide-react', () => ({
-  Minus: () => null,
-  Plus: () => null,
-}));
+vi.mock('lucide-react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('lucide-react')>();
+  return {
+    ...actual,
+    Minus: () => null,
+    Plus: () => null,
+  };
+});
 
 const renderStepper = (initialCount = 1) => {
   const state: { getCount: () => number | undefined } = {

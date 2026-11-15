@@ -1,3 +1,4 @@
+import { Button } from '@pawhaven/ui';
 import { useTranslation } from 'react-i18next';
 import type { NavigateFunction } from 'react-router-dom';
 
@@ -5,9 +6,10 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
   const { t } = useTranslation();
 
   return (
-    <button
+    <Button
       type="button"
-      className="flex cursor-pointer flex-row items-center gap-3"
+      variant="ghost"
+      className="h-auto justify-start gap-3 p-0"
       onClick={() => {
         navigate('/');
       }}
@@ -20,6 +22,6 @@ export const Brand = ({ navigate }: { navigate: NavigateFunction }) => {
         height={224}
         className="h-auto w-14 lg:w-16"
       />
-    </button>
+    </Button>
   );
 };
