@@ -17,9 +17,7 @@
   --color-primary-hover: var(--color-orange-7); /* #cd601a */
   --color-primary-active: var(--color-orange-8); /* #c35c19 */
   --color-primary-light: var(--color-orange-1); /* #fef4ed */
-  --color-primary-fg: var(
-    --color-text
-  ); /* #121212 — 6.2:1 on the brand orange, 4.7:1 on hover, 4.3:1 on active */
+  --color-primary-fg: var(--color-text-inverse); /* #ffffff */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
