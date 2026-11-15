@@ -25,7 +25,7 @@ const DialogDemo = () => {
         open={open}
         onOpenChange={setOpen}
         title="Follow this animal?"
-        description="Create an account to follow this animal and keep up with its rescue progress."
+        description="Create an account to follow this animal and receive notifications about its latest rescue updates via in-app messages or email."
         closeLabel="Close dialog"
         footer={
           <>
