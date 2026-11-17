@@ -31,6 +31,8 @@ pnpm dev:local
 
 `dev:local` (`scripts/restart-dev.sh`) kills any PawHaven processes still holding the local dev ports, then starts every service and the web app with file watching (`turbo run dev`). Use it whenever you want a clean restart.
 
+`dev:all` exports `NODE_ENV=dev`, and `turbo.json` declares `NODE_ENV` in `globalEnv`, so Turbo forwards it to every dev task. Only `dev`, `uat`, `test` and `prod` are accepted — a missing or unknown value fails fast. Starting one service directly (for example `pnpm --filter @pawhaven/core-service dev`) does not go through that export, so set `NODE_ENV=dev` in its `.env` (the `.env.example` shows it); without it the service exits at startup.
+
 ## Dev ports
 
 | Service          | Port |
