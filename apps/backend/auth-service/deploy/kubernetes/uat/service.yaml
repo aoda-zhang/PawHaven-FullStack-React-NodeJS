@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: pawhaven-uat
+  labels:
+    app.kubernetes.io/name: auth-service
+    app.kubernetes.io/part-of: pawhaven
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: auth-service
+  ports:
+    - name: http
+      port: 8082
+      targetPort: http
+      protocol: TCP
