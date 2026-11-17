@@ -27,7 +27,13 @@ login by route — `register/index.tsx` has one, pointing at `routePaths.login`.
 ### 1.2 Register
 
 `register/index.tsx`. The same two fields, same `CredentialsDto`, same form shape. There is no
-confirm-password field, no username field, no terms checkbox, and no password-strength indicator.
+confirm-password field, no username field, and no terms checkbox.
+
+The shared `CredentialsSchema` enforces the password policy on both pages: 6–8 characters, with an
+uppercase letter, a lowercase letter, a digit, and one of `-`, `_`, `+`; only ASCII letters, digits,
+and `-`, `_`, `+` are allowed. The password field shows one complete rule message on submit when the
+value is empty or invalid.
+
 `username` is derived server-side from the email local part; see [§4](#4-data-model).
 
 On success it navigates to `/` with `replace: true` — it does **not** honour a `redirect` param,
@@ -154,17 +160,21 @@ cannot outlive the token it carries.
 
 ## 6. Frontend Files
 
-| File                                | Role                                                             |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `route.tsx`                         | `loginRoute`, `registerRoute`, `AuthenticatedLayout`             |
-| `login/index.tsx`                   | §1.1                                                             |
-| `register/index.tsx`                | §1.2                                                             |
-| `AuthLayout.tsx`                    | §1.3                                                             |
-| `api/auth.api.ts`                   | The calls                                                        |
-| `api/auth.mutations.ts`             | `login` / `register` / `logout` mutations                        |
-| `app/init/currentUser.ts`           | `currentUserQueryOptions` — the `me` query the guard suspends on |
-| `app/providers/GlobalProvider.tsx`  | `locale` + `userInfo` context, `login` / `logout`                |
-| `api/tests/auth.mutations.test.tsx` | The only test in the feature                                     |
+| File                               | Role                                                             |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `route.tsx`                        | `loginRoute`, `registerRoute`, `AuthenticatedLayout`             |
+| `login/index.tsx`                  | §1.1                                                             |
+| `register/index.tsx`               | §1.2                                                             |
+| `AuthLayout.tsx`                   | §1.3                                                             |
+| `api/auth.api.ts`                  | The calls                                                        |
+| `api/auth.mutations.ts`            | `login` / `register` / `logout` mutations                        |
+| `app/init/currentUser.ts`          | `currentUserQueryOptions` — the `me` query the guard suspends on |
+| `app/providers/GlobalProvider.tsx` | `locale` + `userInfo` context, `login` / `logout`                |
+| `tests/auth.mutations.test.tsx`    | Mutation cache handoff                                           |
+| `tests/auth.validation.test.tsx`   | Localized validation messages                                    |
+
+Validation copy comes from the shared `CredentialsSchema` as `validation.*` i18n keys, translated by
+`useZodResolver` from `@pawhaven/frontend-core`.
 
 Session state lives in the global context (`app/providers/GlobalProvider.tsx`) and is mirrored to
 `localStorage` under `userInfo` as `{ userId, expiresAt }` — a display hint, not a credential. It is
@@ -176,7 +186,7 @@ authority. There is no profile feature, so nothing else consumes the user record
 - **No password reset.** Not an endpoint, not a token type, not a link on the login page.
 - **No email verification.** `status: pending` is written at registration and nothing ever moves
   it to `active`.
-- **No confirm-password, no password policy, no strength meter, no terms acceptance.**
+- **No confirm-password, no strength meter, no terms acceptance.**
 - **No social or SSO sign-in.** Two endpoints, email and password only.
 - **No RBAC guard.** There is no `RolesGuard` and no `@Roles()` decorator anywhere in the backend.
   Roles are read in exactly two places: the gateway copies them into the internal JWT, and the

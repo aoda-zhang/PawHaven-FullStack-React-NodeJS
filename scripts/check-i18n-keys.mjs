@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Checks that every translation key the portal and `frontend-core` use exists
- * in the locale documents. A key that is missing renders as its own name on
- * screen, which is easy to miss in review and impossible to notice in a
- * screenshot.
+ * Checks that every translation key the portal, `frontend-core`, and shared
+ * schemas use exists in the locale documents. Shared-schema message strings
+ * are keys, so they count as used keys. A key that is missing renders as its
+ * own name on screen, which is easy to miss in review and impossible to notice
+ * in a screenshot.
  *
  * Exit 0 = clean, 1 = missing key, 2 = input error.
  */
@@ -20,6 +21,7 @@ const sourceDirs = [
   path.join(repoRoot, 'apps/frontend/portal/src'),
   path.join(repoRoot, 'packages/frontend-core/src'),
 ];
+const sharedSchemaDir = path.join(repoRoot, 'packages/shared/types');
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx']);
 
@@ -81,6 +83,18 @@ for (const dir of sourceDirs) {
       used.get(key).files.add(path.relative(repoRoot, file));
       if (asObject) used.get(key).asObject = true;
     }
+  }
+}
+
+for (const file of collectSourceFiles(sharedSchemaDir)) {
+  if (file.endsWith('.test.ts')) continue;
+  const source = fs.readFileSync(file, 'utf8');
+  for (const match of source.matchAll(
+    /(['"])([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z0-9_]+)+)\1/g,
+  )) {
+    const key = match[2];
+    if (!used.has(key)) used.set(key, { files: new Set(), asObject: false });
+    used.get(key).files.add(path.relative(repoRoot, file));
   }
 }
 

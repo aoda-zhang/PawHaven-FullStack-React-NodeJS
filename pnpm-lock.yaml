@@ -1251,6 +1251,9 @@ importers:
 
   packages/frontend-core:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.2.2
+        version: 5.7.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.14.4)(effect@3.21.0)(react-hook-form@7.85.0(react@19.2.8))(zod@4.4.3)
       '@pawhaven/design-system':
         specifier: workspace:*
         version: link:../design-system
@@ -1321,12 +1324,18 @@ importers:
       jsdom:
         specifier: ^29.1.1
         version: 29.1.1
+      react-hook-form:
+        specifier: ^7.64.0
+        version: 7.85.0(react@19.2.8)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
 
   packages/i18n:
     dependencies:

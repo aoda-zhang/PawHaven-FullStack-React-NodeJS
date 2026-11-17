@@ -36,6 +36,7 @@ export { MenuItemSchema, MenuSchema } from './Menu.schema.js';
 export { BootstrapDataSchema } from './Bootstrap.schema.js';
 export {
   CredentialsSchema,
+  PasswordSchema,
   SessionSchema,
   AuthUserSchema,
   UserSchema,

@@ -33,6 +33,7 @@
     "lint": "eslint src --ext .ts,.tsx"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
     "@pawhaven/design-system": "workspace:*",
     "@pawhaven/i18n": "workspace:*",
     "@pawhaven/shared": "workspace:*",
@@ -50,7 +51,9 @@
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-error-boundary": "^4.0.0 || ^5.0.0",
-    "react-router-dom": "^6.0.0 || ^7.0.0"
+    "react-hook-form": "^7.64.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "zod": "^4.3.6"
   },
   "peerDependenciesMeta": {
     "react-error-boundary": {
@@ -68,7 +71,9 @@
     "@types/react-dom": "^18.0.0 || ^19.0.0",
     "@vitest/coverage-v8": "^4.1.11",
     "jsdom": "^29.1.1",
+    "react-hook-form": "^7.64.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "zod": "^4.3.6"
   }
 }

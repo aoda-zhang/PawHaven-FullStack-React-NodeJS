@@ -1,0 +1,10 @@
+{
+  "validation": {
+    "email": {
+      "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+    },
+    "password": {
+      "invalid": "Das Passwort muss 6–8 Zeichen lang sein und einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl sowie eines der Zeichen - _ + enthalten ."
+    }
+  }
+}

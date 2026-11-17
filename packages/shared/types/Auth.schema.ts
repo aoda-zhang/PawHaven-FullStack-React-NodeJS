@@ -16,12 +16,31 @@ export const UserSchema = z.object({
 
 export type User = z.infer<typeof UserSchema>;
 
+const PASSWORD_MIN_LENGTH = 6;
+const PASSWORD_MAX_LENGTH = 8;
+
+const isStrongPassword = (value: string): boolean =>
+  value.length >= PASSWORD_MIN_LENGTH &&
+  value.length <= PASSWORD_MAX_LENGTH &&
+  /[A-Z]/.test(value) &&
+  /[a-z]/.test(value) &&
+  /[0-9]/.test(value) &&
+  /[-_+]/.test(value) &&
+  /^[A-Za-z0-9_+-]*$/.test(value);
+
 /**
- * Login Request Schema
+ * Password policy (shared by login and register)
+ */
+export const PasswordSchema = z
+  .string({ error: 'validation.password.invalid' })
+  .refine(isStrongPassword, 'validation.password.invalid');
+
+/**
+ * Login & register credentials
  */
 export const CredentialsSchema = z.object({
-  email: z.email({ message: 'Invalid email address' }),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.email({ message: 'validation.email.invalid' }),
+  password: PasswordSchema,
 });
 
 export type CredentialsDto = z.infer<typeof CredentialsSchema>;
