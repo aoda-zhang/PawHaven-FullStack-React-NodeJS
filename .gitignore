@@ -103,7 +103,7 @@ dist
 # TernJS port file
 .tern-port
 
-# Stores VSCode versions used for testing VSCode extensions
+# Stores VSCode versions used by tools like WebStorm
 .vscode-test
 
 # yarn v2
@@ -134,6 +134,7 @@ id_rsa
 id_rsa.pub
 secrets.yml
 credentials.json
+prod-secrets.env
 
 # turbo
 .turbo
