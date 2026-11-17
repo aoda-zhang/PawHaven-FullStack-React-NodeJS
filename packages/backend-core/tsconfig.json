@@ -5,5 +5,12 @@
     "rootDir": "."
   },
   "include": ["./**/*"],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "vitest.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ]
 }

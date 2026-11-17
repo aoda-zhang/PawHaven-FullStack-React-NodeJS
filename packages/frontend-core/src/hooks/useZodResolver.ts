@@ -4,7 +4,7 @@ import type { FieldValues, Resolver, ResolverResult } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import type { ZodType } from 'zod';
 
-import { translateFieldErrors } from '../utils/translateFieldErrors';
+import { translateFieldErrors } from '../utils/translate-field-errors/translateFieldErrors';
 
 export const useZodResolver = <TInput extends FieldValues, TOutput>(
   schema: ZodType<TOutput, TInput>,

@@ -27,6 +27,7 @@ logs/
 libs/tsconfig
 libs/eslint-config
 **/config/**
+!**/modules/config/**
 packages/design-system/figma
 
 # Generated runtime output — written only by an adapter's generator. Linting a generated file either

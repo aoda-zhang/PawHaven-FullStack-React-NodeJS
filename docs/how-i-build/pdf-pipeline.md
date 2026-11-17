@@ -24,7 +24,7 @@ caller uses it. The only live path is core's guide module relaying over internal
 
 ## Contract
 
-`RenderPdfBodySchema` lives in `packages/backend-core/types/Document.schema.ts` and is a
+`RenderPdfBodySchema` lives in `packages/backend-core/common/types/Document.schema.ts` and is a
 **`z.strictObject`** — an unknown key is a 400:
 
 | Field      | Type                                                      | Notes                                                                                    |

@@ -5,7 +5,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-import { getLocale } from '../utils/locale/getLocale';
+import { getLocale } from '../utils/get-locale/getLocale';
 
 import { getUTCTimestamp } from './encrypt';
 import { normalizeHttpError } from './errorHandle';

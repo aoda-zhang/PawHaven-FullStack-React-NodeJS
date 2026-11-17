@@ -48,7 +48,16 @@
   "path-autocomplete.pathMappings": {
     "@pawhaven/ui/*": "${workspaceFolder}/packages/ui/*",
     "@pawhaven/frontend-core/*": "${workspaceFolder}/packages/frontend-core/*",
-    "@pawhaven/backend-core/*": "${workspaceFolder}/packages/backend-core/*"
+    "@pawhaven/backend-core": "${workspaceFolder}/packages/backend-core",
+    "@pawhaven/backend-core/constants": "${workspaceFolder}/packages/backend-core/common/constants",
+    "@pawhaven/backend-core/decorators": "${workspaceFolder}/packages/backend-core/common/decorators",
+    "@pawhaven/backend-core/types": "${workspaceFolder}/packages/backend-core/common/types",
+    "@pawhaven/backend-core/utils": "${workspaceFolder}/packages/backend-core/common/utils",
+    "@pawhaven/backend-core/setup": "${workspaceFolder}/packages/backend-core/infrastructure/bootstrap",
+    "@pawhaven/backend-core/middlewares": "${workspaceFolder}/packages/backend-core/infrastructure/middleware",
+    "@pawhaven/backend-core/trace": "${workspaceFolder}/packages/backend-core/infrastructure/observability/tracing",
+    "@pawhaven/backend-core/config-module": "${workspaceFolder}/packages/backend-core/modules/config",
+    "@pawhaven/backend-core/internal-jwt": "${workspaceFolder}/packages/backend-core/modules/internal-jwt"
   },
   "path-autocomplete.extensionOnImport": true,
   "[proto3]": {

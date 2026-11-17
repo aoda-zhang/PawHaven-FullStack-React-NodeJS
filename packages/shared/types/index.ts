@@ -150,17 +150,3 @@ export type {
   ReportAnimalFormMessages,
   ReportAnimalFormValues,
 } from './ReportAnimal.schema.js';
-
-export {
-  StoryTypeValues,
-  StoryTypeSchema,
-  StorySchema,
-  CreateStoryDtoSchema,
-  UpdateStoryDtoSchema,
-} from './Story.schema.js';
-export type {
-  StoryType,
-  Story,
-  CreateStoryDto,
-  UpdateStoryDto,
-} from './Story.schema.js';

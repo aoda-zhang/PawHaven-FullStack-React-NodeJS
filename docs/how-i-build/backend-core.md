@@ -12,19 +12,19 @@ that contract. It depends on `packages/shared` and on nothing else in the worksp
 
 ## Layout
 
-| Path                               | Owns                                                                                                 |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `setup/`                           | `bootstrapApp` and `configureApp` — the boot path every service calls                                |
-| `decorators/`                      | `@Public`, `@OptionalAuth` auth-mode markers, plus `@NoSign` (exported, not read by any guard today) |
-| `dynamic-modules/internal-jwt/`    | Sign, verify, guard, `@InternalJwt()`                                                                |
-| `dynamic-modules/config-module/`   | Shared config-schema fragments and the config loader                                                 |
-| `dynamic-modules/http-client/`     | `HttpClientService`, interceptors, Prisma error mapping                                              |
-| `dynamic-modules/prisma/`          | `PrismaModule` plus the soft-delete and version extensions                                           |
-| `dynamic-modules/shared.module.ts` | Wires pipe, interceptor and filter as `APP_PIPE`/`APP_INTERCEPTOR`/`APP_FILTER`                      |
-| `trace/`                           | `resolveInboundTraceId`, the trace middleware                                                        |
-| `logging/`                         | `TraceLogger` — JSON lines with service tag and trace id                                             |
-| `middlewares/`                     | Locale middleware (excludes the `health` path)                                                       |
-| `types/`, `constants/`, `utils/`   | Internal schemas (`Document.schema.ts`), header names, helpers                                       |
+| Path                                                  | Owns                                                                            |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `infrastructure/bootstrap/`                           | `bootstrapApp` and `configureApp` — the boot path every service calls           |
+| `common/decorators/`                                  | `@Public`, `@OptionalAuth` auth-mode markers                                    |
+| `modules/internal-jwt/`                               | Sign, verify, guard, `@InternalJwt()`                                           |
+| `modules/config/`                                     | Shared config-schema fragments and the config loader                            |
+| `modules/http-client/`                                | `HttpClientService`, interceptors, Prisma error mapping                         |
+| `modules/prisma/`                                     | `PrismaModule` plus the soft-delete and version extensions                      |
+| `modules/shared.module.ts`                            | Wires pipe, interceptor and filter as `APP_PIPE`/`APP_INTERCEPTOR`/`APP_FILTER` |
+| `infrastructure/observability/tracing/`               | `resolveInboundTraceId`, the trace middleware                                   |
+| `infrastructure/observability/logging/`               | `TraceLogger` — JSON lines with service tag and trace id                        |
+| `infrastructure/middleware/`                          | Locale middleware (excludes the `health` path)                                  |
+| `common/types/`, `common/constants/`, `common/utils/` | Internal schemas (`Document.schema.ts`), header names, helpers                  |
 
 ## The boot path
 
@@ -46,7 +46,7 @@ by `MiddlewareModule`.
 ## Configuration
 
 - Each service owns `src/config/Config.schema.ts`, composed from fragments in
-  `dynamic-modules/config-module/configSchema.ts`.
+  `modules/config/configSchema.ts`.
 - Values live in four environment files per service — `dev`, `test`, `uat`, `prod`. A key present in
   `dev` and absent from `prod` fails validation in `prod`; that is the intended outcome.
 - `internalJwt.enabled` must be declared explicitly. Omitting it refuses the boot.
@@ -65,12 +65,11 @@ by `MiddlewareModule`.
 
 ## Auth modes
 
-| Mode              | Meaning                                                                  |
-| ----------------- | ------------------------------------------------------------------------ |
-| _(no decorator)_  | Authenticated identity required — the default                            |
-| `@Public()`       | Genuinely open (login, register, refresh, guide reads)                   |
-| `@OptionalAuth()` | Works with or without identity; claims are anonymous or authenticated    |
-| `@NoSign()`       | Metadata marker exported for a signing opt-out; no runner reads it today |
+| Mode              | Meaning                                                               |
+| ----------------- | --------------------------------------------------------------------- |
+| _(no decorator)_  | Authenticated identity required — the default                         |
+| `@Public()`       | Genuinely open (login, register, refresh, guide reads)                |
+| `@OptionalAuth()` | Works with or without identity; claims are anonymous or authenticated |
 
 ## HTTP client
 

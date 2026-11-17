@@ -81,8 +81,7 @@ Each feature doc has the detail at the point it matters.
 - **No adoption applications.** The catalogue is read-only, has no detail route, and its
   `GET /:id` endpoint has no caller.
 - **No notifications of any kind.** No module, no collection, no delivery.
-- **No stories, no knowledge base, no achievements, no profile.** `Story.schema.ts` is exported
-  from the shared barrel and consumed by nothing.
+- **No stories, no knowledge base, no achievements, no profile.**
 - **No RBAC guard.** Roles are stored and used to filter menus; no endpoint authorises on role.
 - **No config-driven routes.** The route tree is a static literal; the `Route` model is unread.
 
