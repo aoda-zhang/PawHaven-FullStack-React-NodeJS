@@ -1,0 +1,15 @@
+# Keep Docker contexts small and exclude local credentials.
+.git
+.github
+.turbo
+**/node_modules
+**/dist
+**/build
+**/coverage
+**/.env
+**/.env.*
+**/*.env
+**/*.env.*
+**/*secrets*
+**/.DS_Store
+.vercel
