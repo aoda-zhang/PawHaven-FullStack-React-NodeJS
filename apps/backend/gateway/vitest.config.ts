@@ -23,6 +23,10 @@ export default defineConfig({
         replacement: resolve(backendCoreRoot, 'modules/internal-jwt/index.ts'),
       },
       {
+        find: /^@pawhaven\/backend-core\/config-module$/,
+        replacement: resolve(backendCoreRoot, 'modules/config/index.ts'),
+      },
+      {
         find: /^@pawhaven\/backend-core\/constants$/,
         replacement: resolve(backendCoreRoot, 'common/constants/index.ts'),
       },
@@ -42,6 +46,13 @@ export default defineConfig({
         replacement: resolve(
           backendCoreRoot,
           'infrastructure/bootstrap/index.ts',
+        ),
+      },
+      {
+        find: /^@pawhaven\/backend-core\/trace$/,
+        replacement: resolve(
+          backendCoreRoot,
+          'infrastructure/observability/tracing/index.ts',
         ),
       },
       {
