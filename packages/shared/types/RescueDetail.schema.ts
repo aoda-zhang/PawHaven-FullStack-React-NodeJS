@@ -23,7 +23,7 @@ export const RescueDetailSchema = z.object({
   id: z.string(),
   animalType: z.string(),
   age: RescueAgeSchema,
-  status: AnimalStatusSchema.default(AnimalStatus.PENDING),
+  status: AnimalStatusSchema.default(AnimalStatus.PENDING_REVIEW),
   statusDescription: z.string().nullish(),
   description: z.string(),
   size: z.string(),

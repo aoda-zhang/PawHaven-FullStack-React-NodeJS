@@ -23,7 +23,7 @@ const mockCases = [
     id: 'PAW-0001',
     title: 'Test Cat',
     image: '/test.jpg',
-    status: 'pending' as const,
+    status: 'needsHelp' as const,
     animalType: 'cat',
     location: 'Test Location',
     description: 'Test description',

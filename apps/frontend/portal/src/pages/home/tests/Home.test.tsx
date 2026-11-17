@@ -63,7 +63,7 @@ const mockHomeData: HomeData = {
       id: 'PAW-0001',
       title: 'Test Cat',
       image: '/test.jpg',
-      status: 'pending',
+      status: 'needsHelp',
       animalType: 'cat',
       location: 'Test Location',
       description: 'Test description',

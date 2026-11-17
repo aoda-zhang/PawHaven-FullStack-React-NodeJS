@@ -33,7 +33,7 @@ const mockCase: RescueListItem = {
   id: 'PAW-0001',
   title: 'Test Cat',
   image: '/test.jpg',
-  status: 'pending',
+  status: 'needsHelp',
   animalType: 'cat',
   location: 'Test Location',
   description: 'Test description',
@@ -74,7 +74,7 @@ describe('RescueCasesSection', () => {
       <RescueCasesSection
         cases={[
           mockCase,
-          { ...mockCase, id: 'PAW-0002', status: 'inProgress' },
+          { ...mockCase, id: 'PAW-0002', status: 'rescueInProgress' },
         ]}
         onCaseClick={vi.fn()}
       />,
@@ -82,7 +82,7 @@ describe('RescueCasesSection', () => {
 
     expect(
       screen.getByText(
-        'rescue_cases.status_summary:{"pendingCount":1,"inProgressCount":1}',
+        'rescue_cases.status_summary:{"needsHelpCount":1,"rescueInProgressCount":1}',
       ),
     ).toBeDefined();
   });

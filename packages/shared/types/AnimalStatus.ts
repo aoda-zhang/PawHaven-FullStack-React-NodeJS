@@ -7,13 +7,15 @@ import { z } from 'zod';
  * `status` is the API/display field exposed by list & detail responses.
  */
 export const AnimalStatusValues = [
-  'pending',
-  'inProgress',
-  'treated',
+  'pendingReview',
+  'needsHelp',
+  'rejected',
+  'rescueInProgress',
+  'underTreatment',
   'recovering',
   'awaitingAdoption',
   'adopted',
-  'failed',
+  'deceased',
 ] as const;
 
 export const AnimalStatusSchema = z.enum(AnimalStatusValues);
@@ -21,11 +23,28 @@ export const AnimalStatusSchema = z.enum(AnimalStatusValues);
 export type AnimalStatus = z.infer<typeof AnimalStatusSchema>;
 
 export const AnimalStatus = {
-  PENDING: 'pending',
-  IN_PROGRESS: 'inProgress',
-  TREATED: 'treated',
+  PENDING_REVIEW: 'pendingReview',
+  NEEDS_HELP: 'needsHelp',
+  REJECTED: 'rejected',
+  RESCUE_IN_PROGRESS: 'rescueInProgress',
+  UNDER_TREATMENT: 'underTreatment',
   RECOVERING: 'recovering',
   AWAITING_ADOPTION: 'awaitingAdoption',
   ADOPTED: 'adopted',
-  FAILED: 'failed',
+  DECEASED: 'deceased',
 } as const;
+
+export const PublicAnimalStatusValues = [
+  AnimalStatus.NEEDS_HELP,
+  AnimalStatus.RESCUE_IN_PROGRESS,
+  AnimalStatus.UNDER_TREATMENT,
+  AnimalStatus.RECOVERING,
+  AnimalStatus.AWAITING_ADOPTION,
+  AnimalStatus.ADOPTED,
+] as const;
+
+export const isPublicAnimalStatus = (
+  status: string | null | undefined,
+): status is AnimalStatus =>
+  typeof status === 'string' &&
+  (PublicAnimalStatusValues as readonly string[]).includes(status);

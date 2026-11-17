@@ -1,5 +1,6 @@
 import { BadRequestException, Logger } from '@nestjs/common';
-import { AnimalStatus } from '@pawhaven/shared/types';
+import { AnimalStatus, PublicAnimalStatusValues } from '@pawhaven/shared/types';
+import type { CreateRescueDto } from '@pawhaven/shared/types';
 import { Prisma } from '@prismaClient/index.js';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -19,7 +20,7 @@ const buildRecord = (overrides: RecordOverrides = {}) => ({
   id: RECORD_ID,
   animalType: 'cat',
   age: 'baby',
-  animalStatus: AnimalStatus.PENDING,
+  animalStatus: AnimalStatus.NEEDS_HELP,
   statusDescription: null,
   description: 'Found near the park',
   size: 'small',
@@ -85,7 +86,10 @@ describe('RescueService.findAll', () => {
     await service.findAll();
 
     expect(findMany).toHaveBeenCalledWith({
-      where: { deletedAt: { isSet: false } },
+      where: {
+        deletedAt: { isSet: false },
+        animalStatus: { in: [...PublicAnimalStatusValues] },
+      },
       orderBy: { createdAt: 'desc' },
       take: undefined,
       select: expect.objectContaining({ id: true, createdAt: true }),
@@ -104,11 +108,14 @@ describe('RescueService.findAll', () => {
     expect(listQuery.select).toMatchObject({ reporterPhotos: true });
   });
 
-
   it('does not select or expose private reporter email in the public list', async () => {
-    const { service, findMany } = buildService([{ reporterEmail: 'private@example.com' }]);
+    const { service, findMany } = buildService([
+      { reporterEmail: 'private@example.com' },
+    ]);
     const items = await service.findAll();
-    const [query] = findMany.mock.calls[0] as [{ select: Record<string, boolean> }];
+    const [query] = findMany.mock.calls[0] as [
+      { select: Record<string, boolean> },
+    ];
     expect(query.select).not.toHaveProperty('reporterEmail');
     expect(JSON.stringify(items)).not.toContain('private@example.com');
   });
@@ -121,7 +128,7 @@ describe('RescueService.findAll', () => {
         id: RECORD_ID,
         title: 'cat',
         image: undefined,
-        status: AnimalStatus.PENDING,
+        status: AnimalStatus.NEEDS_HELP,
         animalType: 'cat',
         location: 'Central Park',
         description: 'Found near the park',
@@ -140,12 +147,21 @@ describe('RescueService.findAll', () => {
     expect(findMany).toHaveBeenCalledWith({
       where: {
         deletedAt: { isSet: false },
-        animalStatus: AnimalStatus.ADOPTED,
+        animalStatus: { in: [AnimalStatus.ADOPTED] },
       },
       orderBy: { createdAt: 'desc' },
       take: undefined,
       select: expect.objectContaining({ id: true }),
     });
+  });
+
+  it('returns an empty list for a non-public status without querying', async () => {
+    const { service, findMany } = buildService([{}]);
+
+    await expect(service.findAll(AnimalStatus.PENDING_REVIEW)).resolves.toEqual(
+      [],
+    );
+    expect(findMany).not.toHaveBeenCalled();
   });
 
   it('applies a positive integer limit', async () => {
@@ -175,12 +191,12 @@ describe('RescueService.findAll', () => {
     expect(item.animalType).toBe('unknown');
   });
 
-  it('falls back to pending when the stored status is not recognised', async () => {
+  it('falls back to pending review when the stored status is not recognised', async () => {
     const { service } = buildService([{ animalStatus: 'archived' }]);
 
     const [item] = await service.findAll();
 
-    expect(item.status).toBe(AnimalStatus.PENDING);
+    expect(item.status).toBe(AnimalStatus.PENDING_REVIEW);
   });
 
   it('returns the first stored blob url as the list image', async () => {
@@ -253,7 +269,7 @@ describe('RescueService.findOne', () => {
     await expect(service.findOne(RECORD_ID)).resolves.toMatchObject({
       id: RECORD_ID,
       age: 'baby',
-      status: AnimalStatus.PENDING,
+      status: AnimalStatus.NEEDS_HELP,
       appearance: { color: 'black' },
       location: { address: 'Central Park' },
       photos: [FIRST_PHOTO_URL, SECOND_PHOTO_URL],
@@ -299,6 +315,19 @@ describe('RescueService.findOne', () => {
     );
   });
 
+  it.each([
+    AnimalStatus.PENDING_REVIEW,
+    AnimalStatus.REJECTED,
+    AnimalStatus.DECEASED,
+    'archived',
+  ])('rejects the masked status %s', async (animalStatus) => {
+    const { service } = buildService([{ animalStatus }]);
+
+    await expect(service.findOne(RECORD_ID)).rejects.toThrow(
+      `Rescue not found: ${RECORD_ID}`,
+    );
+  });
+
   it('reports a detail mapping failure as a bad request', async () => {
     const { service } = buildService([{ appearance: null }]);
 
@@ -313,7 +342,6 @@ describe('RescueService.create', () => {
     animalType: 'cat',
     age: 'baby' as const,
     locationObj: { address: 'Central Park' },
-    animalStatus: AnimalStatus.PENDING,
     description: 'Found a stray kitten',
     size: 'small',
     animalCount: 1,
@@ -326,7 +354,10 @@ describe('RescueService.create', () => {
       ({
         data,
       }: {
-        data: { reporter: { reporterID: string; reporterName: string | null } };
+        data: {
+          animalStatus: string;
+          reporter: { reporterID: string; reporterName: string | null };
+        };
       }) => Promise.resolve({ id: RECORD_ID, ...data }),
     );
     const service = new RescueService(
@@ -348,9 +379,26 @@ describe('RescueService.create', () => {
     expect(create).toHaveBeenCalledWith({
       data: {
         ...dto,
+        animalStatus: AnimalStatus.PENDING_REVIEW,
         reporter: { reporterID: 'user-1', reporterName: 'reporter-one' },
       },
     });
+  });
+
+  it('ignores an animal status supplied by a direct caller', async () => {
+    const { service, create } = buildCreateService();
+
+    await service.create(
+      {
+        ...dto,
+        animalStatus: AnimalStatus.NEEDS_HELP,
+      } as unknown as CreateRescueDto,
+      { kind: 'authenticated', sub: 'user-1' } as never,
+    );
+
+    expect(create.mock.calls[0][0].data.animalStatus).toBe(
+      AnimalStatus.PENDING_REVIEW,
+    );
   });
 
   it('normalises a whitespace-only username to null', async () => {

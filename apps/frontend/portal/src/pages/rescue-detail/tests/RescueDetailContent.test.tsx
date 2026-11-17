@@ -34,7 +34,7 @@ const buildAnimal = (reporterName: string | null): RescueDetail => ({
   id: 'PAW-0001',
   animalType: 'cat',
   age: 'adult',
-  status: 'pending',
+  status: 'needsHelp',
   statusDescription: null,
   description: 'Injured cat found near the park',
   size: 'medium',

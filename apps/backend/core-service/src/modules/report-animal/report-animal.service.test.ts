@@ -98,7 +98,7 @@ describe('ReportAnimalService.create', () => {
     );
   });
 
-  it('always stores a newly submitted report as pending', async () => {
+  it('always stores a newly submitted report as pending review', async () => {
     const { service, create } = buildService();
 
     await service.create(dto, {
@@ -107,9 +107,8 @@ describe('ReportAnimalService.create', () => {
       username: 'reporter-one',
     } as never);
 
-    expect(create.mock.calls[0][0].data.animalStatus).toBe('pending');
+    expect(create.mock.calls[0][0].data.animalStatus).toBe('pendingReview');
   });
-
 
   it('stores guest reports without fabricating a reporter identity', async () => {
     const { service, create } = buildService();
@@ -120,16 +119,15 @@ describe('ReportAnimalService.create', () => {
     expect(create.mock.calls[0][0].data.reporterEmail).toBe(
       'reporter@example.com',
     );
-    expect(create.mock.calls[0][0].data.animalStatus).toBe('pending');
+    expect(create.mock.calls[0][0].data.animalStatus).toBe('pendingReview');
   });
 
   it('stores null when a guest omits the optional email', async () => {
     const { service, create } = buildService();
 
-    await service.create(
-      { ...dto, contactInfo: {} },
-      { kind: InternalJwtKind.ANONYMOUS } as never,
-    );
+    await service.create({ ...dto, contactInfo: {} }, {
+      kind: InternalJwtKind.ANONYMOUS,
+    } as never);
 
     expect(create.mock.calls[0][0].data.reporterEmail).toBeNull();
   });

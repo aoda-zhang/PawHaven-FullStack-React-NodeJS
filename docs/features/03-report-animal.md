@@ -4,8 +4,9 @@
 > **Feature docs**: [README](README.md) · **Sources**: [Product Blueprint §3](../product/product-strategy.md) · [Design tokens](../../packages/design-system/src/tokens)
 
 `/report-animal`, a public route that accepts both guest and authenticated submissions. One scrolling form that writes a single
-row into `animalReports` with status `pending` — the same collection the rescue feed reads, so
-**the report _is_ the case**.
+row into `animalReports` with status `pendingReview` — the same collection the rescue feed reads, so
+**the report _is_ the case**. A new report is not public until a volunteer review moves it to a public
+status.
 
 ## 1. Screens
 
@@ -94,7 +95,7 @@ flowchart TD
     J --> K[Gateway signs InternalJwt]
     K --> L[AnimalReportSchema inbound validation]
     L --> M[ReportAnimalService.create]
-    M --> N[(animalReports<br/>animalStatus = pending<br/>reporter = authenticated claims or null for guests)]
+    M --> N[(animalReports<br/>animalStatus = pendingReview<br/>reporter = authenticated claims or null for guests)]
     N --> O[Rescue feed reads the same collection]
     O --> P[Success card · case number]
 ```
@@ -158,7 +159,7 @@ are not migrated or specially handled.
 | `size`              | String    | `small` \| `medium` \| `large`                                                                                                    |
 | `appearance`        | Json      | `{ color }` and nothing else                                                                                                      |
 | `locationObj`       | Json      | `{ address, latitude?, longitude? }`                                                                                              |
-| `animalStatus`      | String    | Always `pending` on write                                                                                                         |
+| `animalStatus`      | String    | Always `pendingReview` on write; not publicly visible                                                                             |
 | `statusDescription` | String?   | The raw `behavior` enum value: `values.behavior ?? ''`                                                                            |
 | `description`       | String    | ≤ 200 chars, trimmed                                                                                                              |
 | `reporterPhotos`    | String[]  | Storage keys, 2–5 entries                                                                                                         |
@@ -174,7 +175,7 @@ are not migrated or specially handled.
 ```ts
 data: {
   animalType, age, appearance, locationObj,
-  animalStatus: AnimalStatus.PENDING, statusDescription, description,
+  animalStatus: AnimalStatus.PENDING_REVIEW, statusDescription, description,
   size, animalCount, reporter, reporterEmail, reporterPhotos,
 }
 ```

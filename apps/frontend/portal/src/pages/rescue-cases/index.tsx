@@ -16,12 +16,12 @@ const FILTER_ALL: FilterStatus = 'all';
 const FILTER_OPTIONS: Array<{ value: FilterStatus; labelKey: string }> = [
   { value: FILTER_ALL, labelKey: 'rescue_cases.filter_all' },
   {
-    value: AnimalStatusSchema.enum.pending,
-    labelKey: 'common.rescue_status_pending',
+    value: AnimalStatusSchema.enum.needsHelp,
+    labelKey: 'common.rescue_status_needs_help',
   },
   {
-    value: AnimalStatusSchema.enum.inProgress,
-    labelKey: 'common.rescue_status_inProgress',
+    value: AnimalStatusSchema.enum.rescueInProgress,
+    labelKey: 'common.rescue_status_rescue_in_progress',
   },
 ];
 

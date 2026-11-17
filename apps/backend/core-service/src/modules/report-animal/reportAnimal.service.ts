@@ -1,7 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectPrisma } from '@pawhaven/backend-core';
 import { databaseEngines } from '@pawhaven/backend-core/constants';
-import { InternalJwtKind, type InternalJwt } from '@pawhaven/backend-core/types';
+import {
+  InternalJwtKind,
+  type InternalJwt,
+} from '@pawhaven/backend-core/types';
 import { AnimalStatus, type AnimalReportDto } from '@pawhaven/shared/types';
 import { PrismaClient } from '@prismaClient/index.js';
 
@@ -26,18 +29,12 @@ export class ReportAnimalService {
           age: dto.age,
           appearance: dto.appearance,
           locationObj: dto.location,
-          animalStatus: AnimalStatus.PENDING,
+          animalStatus: AnimalStatus.PENDING_REVIEW,
           statusDescription: dto.statusDescription,
           description: dto.description,
           size: dto.size,
           animalCount: dto.animalCount,
-          reporter:
-            claims.kind === InternalJwtKind.AUTHENTICATED
-              ? {
-                  reporterID: claims.sub,
-                  reporterName: claims.username?.trim() || null,
-                }
-              : null,
+          reporter: this.toReporter(claims),
           reporterEmail: dto.contactInfo.email?.trim() || null,
           reporterPhotos: dto.reporterPhotos,
         },
@@ -46,5 +43,18 @@ export class ReportAnimalService {
       this.logger.error('Failed to create report animal', error);
       throw new BadRequestException('Failed to submit report');
     }
+  }
+
+  private toReporter(
+    claims: InternalJwt,
+  ): { reporterID: string; reporterName: string | null } | null {
+    if (claims.kind !== InternalJwtKind.AUTHENTICATED) {
+      return null;
+    }
+
+    return {
+      reporterID: claims.sub,
+      reporterName: claims.username?.trim() || null,
+    };
   }
 }

@@ -22,7 +22,7 @@ A `Carousel` from `@pawhaven/ui` with `autoplay` and `loop`, `h-48 sm:h-60`, plu
 positioned overlays:
 
 - **Status chip** (top-left): a coloured dot from `getRescueStatusColor({ status, prefix: 'bg' })`
-  with a `bg-slate-400` fallback, beside `t('common.rescue_status_' + status)`.
+  with a `bg-text-tertiary` fallback, beside `t(getRescueStatusLabelKey(status))`.
 - **Type and address** (bottom, over a `from-black/70` gradient): the animal type via
   `t('reportAnimal.' + animalType, { defaultValue: animalType })`, and the address with a `MapPin`,
   rendered only when `location.address` is present.
@@ -38,9 +38,8 @@ value — and it exists only here.
 
 ### 1.3 Timeline
 
-`RescueTimeline` (this feature's copy) takes an `updates[]` prop, unlike the ladder component in
-[Rescue Cases §6](04-rescue-cases.md#6-the-status-ladder). Its only caller builds that array
-inline with **exactly one synthetic entry**, derived from the report itself:
+`RescueTimeline` takes an `updates[]` prop. Its only caller builds that array inline with
+**exactly one synthetic entry**, derived from the report itself:
 
 ```ts
 const timelineUpdates = [
@@ -54,8 +53,8 @@ const timelineUpdates = [
 ```
 
 So the "timeline" is a single-row restatement of the report. `RescueDetailSchema` has no timeline
-field, and no collection stores transitions. The status chip, the ladder, and this one-row timeline
-are three independent renderings of "this report exists".
+field, and no collection stores transitions. The status chip and this one-row timeline are two
+independent renderings of "this report exists".
 
 ### 1.4 Follow
 
@@ -122,12 +121,21 @@ query throws into the shell's `ContentFallback` boundary.
 
 ## 3. Endpoint
 
-| Method | Path                    | Policy            | Notes                          |
-| ------ | ----------------------- | ----------------- | ------------------------------ |
-| GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing or soft-deleted |
+| Method | Path                    | Policy            | Notes                                                            |
+| ------ | ----------------------- | ----------------- | ---------------------------------------------------------------- |
+| GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing, soft-deleted, or the stored status is not public |
 
-`toDetail` maps `animalStatus` → `status` with the same `safeParse`-or-`pending` fallback as the
-list, and maps each stored storage key to `<BLOB_PUBLIC_BASE_URL>/<key>` for `photos`.
+`findOne` fetches the row, then treats a missing row, a `deletedAt` value, and any status that
+`isPublicAnimalStatus` rejects as the same `400 Rescue not found: <id>` — so `pendingReview`,
+`rejected`, `deceased`, and legacy `pending`/`inProgress`/`treated`/`failed` documents are
+indistinguishable from a nonexistent one.
+
+`toDetail` maps `animalStatus` → `status` with the same `safeParse`-or-`pendingReview` fallback as
+the list, and maps each stored storage key to `<BLOB_PUBLIC_BASE_URL>/<key>` for `photos`.
+
+The status labels come from the shared `getRescueStatusLabelKey` map, which covers all nine
+`AnimalStatus` values with snake_case keys such as `common.rescue_status_needs_help` and
+`common.rescue_status_rescue_in_progress`.
 
 `distance` is hard-coded to `0` here too, and is not rendered.
 
