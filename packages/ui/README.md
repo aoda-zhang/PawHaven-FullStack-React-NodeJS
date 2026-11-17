@@ -601,6 +601,6 @@ bundle never carries story-only utilities; the catalogue needs the opposite,
 and a Tailwind `@source not` exclusion applies to every source of a build, not
 only to the one that declares it.
 
-The Storybook workflow builds on pull requests and publishes to GitHub Pages
-when changes land on `main`. Expected URL:
-https://aoda-zhang.github.io/PawHaven-FullStack-React-NodeJS/ .
+The Storybook workflow builds the catalogue on pull requests and on `main`, and
+runs the Storybook accessibility suite (`test-storybook`) plus the required
+component story check (`verify-stories.mjs`). It does not publish the build.

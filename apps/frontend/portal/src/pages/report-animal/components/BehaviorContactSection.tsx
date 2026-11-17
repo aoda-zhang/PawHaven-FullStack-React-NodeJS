@@ -56,8 +56,15 @@ export const BehaviorContactSection = () => {
       )}
 
       <div className="space-y-2">
-        <FormInput name="contactEmail" label={t('reportAnimal.email_label')} type="email" autoComplete="email" />
-        <p className="text-text-secondary text-sm">{t('reportAnimal.email_recommended')}</p>
+        <FormInput
+          name="contactEmail"
+          label={t('reportAnimal.email_label')}
+          type="email"
+          autoComplete="email"
+        />
+        <p className="text-text-secondary text-sm">
+          {t('reportAnimal.email_recommended')}
+        </p>
       </div>
 
       <div className="bg-info-light border-info/30 rounded-panel p-3 text-xs leading-relaxed">

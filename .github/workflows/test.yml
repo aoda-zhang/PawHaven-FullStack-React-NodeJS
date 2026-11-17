@@ -1,6 +1,6 @@
 # Quality gate: lint, typecheck, automated tests, accessibility checks and a production build.
-# React Doctor stays in its own workflow (react-doctor.yml) and deployment in
-# deploy.yml.
+# React Doctor stays in its own workflow (react-doctor.yml). Deployment happens
+# through platform Git integrations outside this repository, so no deploy workflow here.
 name: Test
 
 on:

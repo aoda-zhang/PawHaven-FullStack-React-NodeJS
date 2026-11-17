@@ -222,6 +222,7 @@ describe('ProxyService: upstream failures reach the caller', () => {
       message: 'Request timeout',
       code: '',
       data: null,
+      traceId: response.headers[httpHeaders.traceId],
     });
     expect(response.text).not.toContain('private-ray-id');
     expect(response.text).not.toContain('internal-origin.example');
@@ -245,6 +246,7 @@ describe('ProxyService: upstream failures reach the caller', () => {
       message: 'Service error',
       code: '',
       data: null,
+      traceId: response.headers[httpHeaders.traceId],
     });
     expect(response.text).not.toContain('Internal stack trace');
   });
@@ -307,7 +309,6 @@ describe('ProxyService: locale is normalized onto the proxied request', () => {
     expect(viaAcceptLanguage.body.data.locale).toBe('zh-CN');
   });
 });
-
 
 describe('ProxyService: trace id is echoed and forwarded', () => {
   let upstream: Server | undefined;

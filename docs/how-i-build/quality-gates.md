@@ -64,14 +64,13 @@ still run in CI.
 
 ## CI wiring
 
-| Workflow              | Purpose                                                                                                                                                         |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test.yml`            | Install (frozen lockfile) → Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, test, build; a separate job runs Playwright E2E |
-| `ui-library.yml`      | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                          |
-| `storybook.yml`       | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                       |
-| `react-doctor.yml`    | React Doctor scan on PRs and `main`                                                                                                                             |
-| `opencode-review.yml` | Read-only agent review of the PR diff (non-blocking)                                                                                                            |
-| `deploy.yml`          | Manual per-service deployment (see [CI/CD](ci-cd.md))                                                                                                           |
+| Workflow                       | Purpose                                                                                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yml`                     | Install (frozen lockfile) → Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, test, build; a separate job runs Playwright E2E |
+| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                          |
+| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                       |
+| `react-doctor.yml`             | React Doctor scan on PRs and `main`                                                                                                                             |
+| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                |
 
 ## Adding a gate
 

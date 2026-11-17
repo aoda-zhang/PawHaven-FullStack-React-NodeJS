@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpClientService } from '@pawhaven/backend-core';
 import {
@@ -50,8 +50,6 @@ const buildDisplayName = (address: NominatimAddress | undefined): string => {
 
 @Injectable()
 export class GeocodeService {
-  private readonly logger = new Logger(GeocodeService.name);
-
   private readonly geocodeClient =
     this.httpClientService.create(GEOCODE_CLIENT);
 
