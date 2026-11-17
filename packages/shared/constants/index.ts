@@ -1,5 +1,4 @@
 export { httpBusinessMappingCodes } from './httpBusinessMappingCodes.js';
-export { myPersonal } from './myPerson.js';
 export { HTTP_STATUS } from './httpReqStatus.js';
 export { localeCodes } from './localeCodes.js';
 export { runtimeEnv } from './runtimeEnv.js';

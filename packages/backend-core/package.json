@@ -12,54 +12,49 @@
       "default": "./dist/index.js"
     },
     "./internal-jwt": {
-      "types": "./dist/dynamic-modules/internal-jwt/index.d.ts",
-      "import": "./dist/dynamic-modules/internal-jwt/index.js",
-      "default": "./dist/dynamic-modules/internal-jwt/index.js"
+      "types": "./dist/modules/internal-jwt/index.d.ts",
+      "import": "./dist/modules/internal-jwt/index.js",
+      "default": "./dist/modules/internal-jwt/index.js"
     },
     "./constants": {
-      "types": "./dist/constants/index.d.ts",
-      "import": "./dist/constants/index.js",
-      "default": "./dist/constants/index.js"
+      "types": "./dist/common/constants/index.d.ts",
+      "import": "./dist/common/constants/index.js",
+      "default": "./dist/common/constants/index.js"
     },
     "./config-module": {
-      "types": "./dist/dynamic-modules/config-module/index.d.ts",
-      "import": "./dist/dynamic-modules/config-module/index.js",
-      "default": "./dist/dynamic-modules/config-module/index.js"
+      "types": "./dist/modules/config/index.d.ts",
+      "import": "./dist/modules/config/index.js",
+      "default": "./dist/modules/config/index.js"
     },
     "./decorators": {
-      "types": "./dist/decorators/index.d.ts",
-      "import": "./dist/decorators/index.js",
-      "default": "./dist/decorators/index.js"
+      "types": "./dist/common/decorators/index.d.ts",
+      "import": "./dist/common/decorators/index.js",
+      "default": "./dist/common/decorators/index.js"
     },
     "./middlewares": {
-      "types": "./dist/middlewares/index.d.ts",
-      "import": "./dist/middlewares/index.js",
-      "default": "./dist/middlewares/index.js"
+      "types": "./dist/infrastructure/middleware/index.d.ts",
+      "import": "./dist/infrastructure/middleware/index.js",
+      "default": "./dist/infrastructure/middleware/index.js"
     },
     "./trace": {
-      "types": "./dist/trace/index.d.ts",
-      "import": "./dist/trace/index.js",
-      "default": "./dist/trace/index.js"
-    },
-    "./logging": {
-      "types": "./dist/logging/index.d.ts",
-      "import": "./dist/logging/index.js",
-      "default": "./dist/logging/index.js"
+      "types": "./dist/infrastructure/observability/tracing/index.d.ts",
+      "import": "./dist/infrastructure/observability/tracing/index.js",
+      "default": "./dist/infrastructure/observability/tracing/index.js"
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js",
-      "default": "./dist/types/index.js"
+      "types": "./dist/common/types/index.d.ts",
+      "import": "./dist/common/types/index.js",
+      "default": "./dist/common/types/index.js"
     },
     "./setup": {
-      "types": "./dist/setup/index.d.ts",
-      "import": "./dist/setup/index.js",
-      "default": "./dist/setup/index.js"
+      "types": "./dist/infrastructure/bootstrap/index.d.ts",
+      "import": "./dist/infrastructure/bootstrap/index.js",
+      "default": "./dist/infrastructure/bootstrap/index.js"
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "default": "./dist/utils/index.js"
+      "types": "./dist/common/utils/index.d.ts",
+      "import": "./dist/common/utils/index.js",
+      "default": "./dist/common/utils/index.js"
     },
     "./package.json": "./package.json"
   },

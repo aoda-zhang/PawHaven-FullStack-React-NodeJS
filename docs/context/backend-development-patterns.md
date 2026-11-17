@@ -85,7 +85,7 @@ say in the feature doc why the boundary moved.
 1. Add the field to `apps/backend/<service>/src/config/Config.schema.ts`.
 2. Add a value to **all four** environment files — `dev`, `test`, `uat`, `prod` — in the same change.
 3. Use `${VAR}` for anything secret and read it through config resolution, never `process.env` directly.
-4. Reuse a fragment from `packages/backend-core/dynamic-modules/config-module/configSchema.ts` before
+4. Reuse a fragment from `packages/backend-core/modules/config/configSchema.ts` before
    writing a new one.
 
 A key present in `dev` and absent from `prod` fails validation in `prod`. That is the intended outcome —
@@ -120,11 +120,11 @@ call, use the `traceId` option; a raw header is clobbered by design.
 
 ## 3. Validation and types
 
-| Situation                        | Home                                           |
-| -------------------------------- | ---------------------------------------------- |
-| The browser sends or receives it | `packages/shared/types/<Name>.schema.ts`       |
-| Only the back end reads it       | `packages/backend-core/types/<Name>.schema.ts` |
-| It is one route's own shape      | nowhere — inline, or reuse the closest schema  |
+| Situation                        | Home                                                  |
+| -------------------------------- | ----------------------------------------------------- |
+| The browser sends or receives it | `packages/shared/types/<Name>.schema.ts`              |
+| Only the back end reads it       | `packages/backend-core/common/types/<Name>.schema.ts` |
+| It is one route's own shape      | nowhere — inline, or reuse the closest schema         |
 
 - There are no DTO classes. A payload is a Zod schema; the TS type is `z.infer` of it. `class FooDto {}`
   does not exist in this codebase.

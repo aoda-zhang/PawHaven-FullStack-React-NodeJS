@@ -111,7 +111,7 @@ All reached through the gateway at `/api/auth/*`; the gateway rewrites the prefi
 
 ### Roles
 
-`userRoles` in `packages/backend-core/constants/userRoles.ts` defines exactly two:
+`userRoles` in `packages/backend-core/common/constants/userRoles.ts` defines exactly two:
 
 | Role        | How it is granted                                |
 | ----------- | ------------------------------------------------ |
@@ -142,7 +142,7 @@ A newly registered user has `roles: []` and `status: pending` (both Prisma defau
 ## 5. Tokens & Cookies
 
 Cookie names are `access_token` and `refresh_token` (`cookieKeys` in
-`packages/backend-core/constants/auth.ts`). Both are `httpOnly`, `path: /`, and `secure` in
+`packages/backend-core/common/constants/auth.ts`). Both are `httpOnly`, `path: /`, and `secure` in
 production. The browser never holds a token in JS-readable storage.
 
 Values come from `auth-service` env config, not from code:

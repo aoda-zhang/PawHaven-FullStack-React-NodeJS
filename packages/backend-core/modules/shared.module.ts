@@ -1,0 +1,142 @@
+import {
+  DynamicModule,
+  Global,
+  Module,
+  Provider,
+  StandardSchemaValidationPipe,
+  Type,
+} from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+
+import { MiddlewareModule } from '../infrastructure/middleware/index.module.js';
+
+import { InternalJwtModule } from './internal-jwt/internalJwt.module.js';
+import { HttpSuccessInterceptor } from './http-client/httpInterceptor.js';
+import { HttpExceptionFilter } from './http-client/httpExceptionFilter.js';
+import { SwaggerModule } from './swagger/swagger.module.js';
+import { ConfigsModule } from './config/configs.module.js';
+import type { ServiceConfigSchema } from './config/configSchema.js';
+import type { ServiceConfigSource } from './config/serviceConfig.js';
+import { HttpClientModule } from './http-client/httpClient.module.js';
+import { PrismaModule } from './prisma/prisma.module.js';
+import { SharedModuleFeatures, SharedModuleItem } from './SharedModule.type.js';
+
+/**
+ * SharedModule configuration options
+ * Only accepts predefined shared modules, not custom providers or modules
+ */
+interface SharedModuleForRootOptions {
+  serviceRoot: string;
+  serviceName: string;
+  configSources?: ServiceConfigSource;
+  /**
+   * Zod schema every resolved config value must satisfy before the app boots
+   */
+  configSchema?: ServiceConfigSchema;
+  /**
+   * Optional predefined shared modules to load
+   * Only accepts modules from SharedModuleFeatures enum
+   */
+  modules?: SharedModuleItem[];
+}
+
+@Global()
+@Module({})
+export class SharedModule {
+  /**
+   * Configure SharedModule with predefined modules only
+   * For service-specific modules or providers, import them directly in your AppModule
+   */
+  static forRoot(options: SharedModuleForRootOptions): DynamicModule {
+    const {
+      serviceRoot,
+      serviceName,
+      modules = [],
+      configSources,
+      configSchema,
+    } = options;
+
+    const defaultModules = this.getDefaultModules({
+      serviceRoot,
+      serviceName,
+      configSources,
+      configSchema,
+    });
+    const optionalModules = this.loadOptionalModules(modules);
+    const sharedProviders = this.getSharedProviders();
+
+    return {
+      module: SharedModule,
+      imports: [...defaultModules, ...optionalModules],
+      exports: [...defaultModules, ...optionalModules],
+      providers: sharedProviders,
+    };
+  }
+
+  /**
+   * Core modules required by all services
+   * - ConfigsModule: Environment configuration
+   * - HttpClientModule: HTTP client utilities
+   */
+  private static getDefaultModules(options: {
+    serviceRoot: string;
+    serviceName: string;
+    configSources?: ServiceConfigSource;
+    configSchema?: ServiceConfigSchema;
+  }): Array<Type<any> | DynamicModule> {
+    const { serviceRoot, serviceName, configSources, configSchema } = options;
+
+    return [
+      ConfigsModule.forRoot({
+        serviceRoot,
+        serviceName,
+        configSources,
+        configSchema,
+      }),
+      HttpClientModule,
+      InternalJwtModule.forRoot(serviceName, configSources),
+    ];
+  }
+
+  /**
+   * Load optional predefined shared modules
+   * Only modules defined in SharedModuleFeatures are allowed
+   */
+  private static loadOptionalModules(
+    items: SharedModuleItem[],
+  ): Array<Type<any> | DynamicModule> {
+    return items.map((item) => {
+      switch (item.module) {
+        case SharedModuleFeatures.PrismaModule:
+          return PrismaModule.forRoot(item?.options);
+
+        case SharedModuleFeatures.SwaggerModule:
+          return SwaggerModule;
+
+        case SharedModuleFeatures.MonitoringModule:
+          return MiddlewareModule;
+
+        default: {
+          const _exhaustiveCheck: never = item;
+          throw new Error(
+            `Unknown shared module: ${JSON.stringify(_exhaustiveCheck)}`,
+          );
+        }
+      }
+    });
+  }
+
+  /**
+   * Global providers applied to all services
+   * - HttpExceptionFilter: Standardizes error responses
+   * - HttpSuccessInterceptor: Standardizes success responses
+   * - StandardSchemaValidationPipe: Validates route params that declare a schema
+   */
+  private static getSharedProviders(): Provider[] {
+    return [
+      { provide: APP_FILTER, useClass: HttpExceptionFilter },
+      { provide: APP_INTERCEPTOR, useClass: HttpSuccessInterceptor },
+      { provide: APP_PIPE, useClass: StandardSchemaValidationPipe },
+    ];
+  }
+}

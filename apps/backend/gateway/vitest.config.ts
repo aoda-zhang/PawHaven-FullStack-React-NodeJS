@@ -20,34 +20,37 @@ export default defineConfig({
       },
       {
         find: /^@pawhaven\/backend-core\/internal-jwt$/,
-        replacement: resolve(
-          backendCoreRoot,
-          'dynamic-modules/internal-jwt/index.ts',
-        ),
+        replacement: resolve(backendCoreRoot, 'modules/internal-jwt/index.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/constants$/,
-        replacement: resolve(backendCoreRoot, 'constants/index.ts'),
+        replacement: resolve(backendCoreRoot, 'common/constants/index.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/decorators$/,
-        replacement: resolve(backendCoreRoot, 'decorators/index.ts'),
+        replacement: resolve(backendCoreRoot, 'common/decorators/index.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/middlewares$/,
-        replacement: resolve(backendCoreRoot, 'middlewares/index.ts'),
+        replacement: resolve(
+          backendCoreRoot,
+          'infrastructure/middleware/index.ts',
+        ),
       },
       {
         find: /^@pawhaven\/backend-core\/setup$/,
-        replacement: resolve(backendCoreRoot, 'setup/configureApp.ts'),
+        replacement: resolve(
+          backendCoreRoot,
+          'infrastructure/bootstrap/index.ts',
+        ),
       },
       {
         find: /^@pawhaven\/backend-core\/types$/,
-        replacement: resolve(backendCoreRoot, 'types/index.ts'),
+        replacement: resolve(backendCoreRoot, 'common/types/index.ts'),
       },
       {
         find: /^@pawhaven\/backend-core\/utils$/,
-        replacement: resolve(backendCoreRoot, 'utils/index.ts'),
+        replacement: resolve(backendCoreRoot, 'common/utils/index.ts'),
       },
       {
         find: /^@pawhaven\/shared\/types$/,
