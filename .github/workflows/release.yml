@@ -1,0 +1,193 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to deploy to production once the images are published'
+        required: true
+        type: choice
+        default: all
+        options:
+          - all
+          - gateway
+          - core-service
+          - auth-service
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pawhaven-prod
+  cancel-in-progress: false
+
+jobs:
+  precheck:
+    name: Check the release ref
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the dispatching branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            echo "::error::Releases run from main only; this run uses ${GITHUB_REF}."
+            exit 1
+          fi
+
+  approve:
+    name: Approve the production release
+    needs: precheck
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Await approval
+        run: echo "Production release approved."
+
+  resolve:
+    name: Compute the release tag
+    needs: approve
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      services: ${{ steps.services.outputs.services }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Compute the date tag
+        id: tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --tags --force origin
+          base="v$(TZ=Asia/Shanghai date +%y.%m.%d)"
+          tag=""
+          for ((attempt = 1; attempt <= 100; attempt++)); do
+            if ((attempt == 1)); then
+              candidate="${base}"
+            else
+              candidate="${base}-${attempt}"
+            fi
+            if ! git ls-remote --exit-code --tags origin "refs/tags/${candidate}" >/dev/null 2>&1; then
+              tag="${candidate}"
+              break
+            fi
+            existing="$(git rev-list -n 1 "refs/tags/${candidate}" 2>/dev/null || true)"
+            if [[ "${existing}" == "${GITHUB_SHA}" ]]; then
+              tag="${candidate}"
+              echo "Reusing ${candidate}; it already points at ${GITHUB_SHA}."
+              break
+            fi
+          done
+          if [[ -z "${tag}" ]]; then
+            echo "::error::Could not find a free release tag for ${base}."
+            exit 1
+          fi
+          echo "Releasing ${tag} from ${GITHUB_SHA}."
+          echo "tag=${tag}" >>"${GITHUB_OUTPUT}"
+
+      - name: Map the service selection to a service list
+        id: services
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+        run: |
+          set -euo pipefail
+          if [[ "${SERVICE}" == "all" ]]; then
+            discovered=()
+            for dockerfile in apps/backend/*/deploy/Dockerfile; do
+              [[ -f "${dockerfile}" ]] || continue
+              deploy_dir="$(dirname "${dockerfile}")"
+              service="$(basename "$(dirname "${deploy_dir}")")"
+              if [[ -e "${deploy_dir}/.out-of-pipeline" ]]; then
+                echo "Skipping ${service}; it is marked out of the deployment pipeline."
+                continue
+              fi
+              discovered+=("${service}")
+            done
+            if ((${#discovered[@]} == 0)); then
+              echo "::error::No service declares apps/backend/<service>/deploy/Dockerfile."
+              exit 1
+            fi
+            services="$(printf '%s\n' "${discovered[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')"
+          else
+            services="$(jq -cn --arg service "${SERVICE}" '[$service]')"
+          fi
+          echo "services=${services}" >>"${GITHUB_OUTPUT}"
+
+  gates:
+    name: Quality gate
+    needs: resolve
+    uses: ./.github/workflows/test.yml
+
+  storybook:
+    name: Storybook gate
+    needs: resolve
+    uses: ./.github/workflows/storybook.yml
+
+  ui-library:
+    name: UI library gate
+    needs: resolve
+    uses: ./.github/workflows/ui-library.yml
+
+  tag:
+    name: Tag the release
+    needs: [resolve, gates, storybook, ui-library]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Create and push the annotated tag
+        shell: bash
+        env:
+          TAG: ${{ needs.resolve.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "pawhaven-release-bot"
+          git config user.email "pawhaven-release-bot@users.noreply.github.com"
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            git fetch --tags --force origin
+            resolved="$(git rev-list -n 1 "refs/tags/${TAG}")"
+            if [[ "${resolved}" == "${GITHUB_SHA}" ]]; then
+              echo "Tag ${TAG} already points at ${GITHUB_SHA}; nothing to push."
+              exit 0
+            fi
+            echo "::error::Tag ${TAG} points at ${resolved}, not ${GITHUB_SHA}."
+            exit 1
+          fi
+          git tag -a "${TAG}" -m "Release ${TAG}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${TAG}"
+
+  publish:
+    name: Publish images
+    needs: [resolve, tag]
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-images.yml
+    with:
+      version: ${{ needs.resolve.outputs.tag }}
+      services: all
+
+  deploy:
+    name: Deploy to prod
+    needs: [resolve, publish]
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/deploy-k3s.yml
+    with:
+      environment: prod
+      namespace: pawhaven-prod
+      version: ${{ needs.resolve.outputs.tag }}
+      services: ${{ needs.resolve.outputs.services }}
+    secrets:
+      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}

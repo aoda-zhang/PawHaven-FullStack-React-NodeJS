@@ -16,12 +16,16 @@ on:
       - '.github/workflows/storybook.yml'
       - 'pnpm-workspace.yaml'
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
 
+# Pull requests cancel superseded runs of the same PR; pushes to main cancel superseded
+# pushes. Any other trigger (including a reusable call, where github.event_name is the
+# caller's event) gets its own run id so it never joins a PR or push group.
 concurrency:
-  group: storybook-${{ github.event.pull_request.number || github.ref }}
+  group: storybook-${{ github.event.pull_request.number || (github.event_name == 'push' && github.ref) || github.run_id }}
   cancel-in-progress: true
 
 jobs:

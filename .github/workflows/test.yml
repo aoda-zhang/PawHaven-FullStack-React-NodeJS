@@ -1,6 +1,6 @@
 # Quality gate: lint, typecheck, automated tests, accessibility checks and a production build.
-# React Doctor stays in its own workflow (react-doctor.yml). Deployment happens
-# through platform Git integrations outside this repository, so no deploy workflow here.
+# React Doctor stays in its own workflow (react-doctor.yml). release.yml calls this
+# workflow as a reusable gate; it never deploys anything itself.
 name: Test
 
 on:
@@ -9,12 +9,16 @@ on:
   push:
     branches: ['main']
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
 
+# Pull requests cancel superseded runs of the same PR; pushes to main cancel superseded
+# pushes. Any other trigger (including a reusable call, where github.event_name is the
+# caller's event) gets its own run id so it never joins a PR or push group.
 concurrency:
-  group: test-${{ github.event.pull_request.number || github.ref }}
+  group: test-${{ github.event.pull_request.number || (github.event_name == 'push' && github.ref) || github.run_id }}
   cancel-in-progress: true
 
 jobs:
