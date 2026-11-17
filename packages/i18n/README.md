@@ -32,7 +32,7 @@ locales/
 │   ├── rescueGuide.json   → { "rescueGuide": { ... } }
 │   ├── rescueCases.json   → { "rescueCases": { ... } }
 │   ├── rescueDetail.json  → { "rescueDetail": { ... } }
-│   ├── animalFollow.json  → { "animalFollow": { ... } }
+│   ├── validation.json    → { "validation": { ... } }
 │   ├── footer.json        → { "footer": { ... } }
 │   ├── errorMessage.json  → { "errorMessage": { ... } }
 │   └── documents/         → Node-only, NOT part of the browser locale (see below)

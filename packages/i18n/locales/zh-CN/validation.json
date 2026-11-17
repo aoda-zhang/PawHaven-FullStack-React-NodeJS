@@ -1,0 +1,10 @@
+{
+  "validation": {
+    "email": {
+      "invalid": "请输入有效的电子邮箱地址。"
+    },
+    "password": {
+      "too_short": "密码至少需要 6 个字符。"
+    }
+  }
+}

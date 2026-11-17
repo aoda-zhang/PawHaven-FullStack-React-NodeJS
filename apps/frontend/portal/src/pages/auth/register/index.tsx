@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useZodResolver } from '@pawhaven/frontend-core';
 import { CredentialsSchema, type CredentialsDto } from '@pawhaven/shared/types';
 import { Button } from '@pawhaven/ui';
 import { FormInput } from '@pawhaven/ui/form';
@@ -12,9 +12,8 @@ import { useGlobalContext } from '@/app/providers/GlobalProvider';
 import { routePaths } from '@/app/router/routePaths';
 
 export const Register = () => {
-  const formProps = useForm<CredentialsDto>({
-    resolver: zodResolver(CredentialsSchema),
-  });
+  const resolver = useZodResolver(CredentialsSchema);
+  const formProps = useForm<CredentialsDto>({ resolver });
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { register, isPending } = useGlobalContext();

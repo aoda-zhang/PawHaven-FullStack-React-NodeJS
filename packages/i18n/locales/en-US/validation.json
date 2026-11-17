@@ -1,0 +1,10 @@
+{
+  "validation": {
+    "email": {
+      "invalid": "Please enter a valid email address."
+    },
+    "password": {
+      "too_short": "Password must be at least 6 characters."
+    }
+  }
+}

@@ -20,8 +20,8 @@ export type User = z.infer<typeof UserSchema>;
  * Login Request Schema
  */
 export const CredentialsSchema = z.object({
-  email: z.email({ message: 'Invalid email address' }),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.email({ message: 'validation.email.invalid' }),
+  password: z.string().min(6, 'validation.password.too_short'),
 });
 
 export type CredentialsDto = z.infer<typeof CredentialsSchema>;

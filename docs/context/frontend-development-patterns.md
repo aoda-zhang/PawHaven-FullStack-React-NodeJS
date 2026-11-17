@@ -78,7 +78,10 @@ only `<main>` inert; the header remains usable. Do not add a page-level skeleton
 ### 2.3 Form
 
 1. The schema is the contract and lives in `packages/shared/types/`. Both sides validate with it.
-2. `react-hook-form` + `@hookform/resolvers/zod`; the resolver takes the shared schema directly.
+   Schema messages are i18n keys, never sentences.
+2. `react-hook-form` + `useZodResolver` from `@pawhaven/frontend-core`; the resolver takes the shared
+   schema directly and translates its message keys. Report-animal is the outstanding migration: it
+   still passes `createReportAnimalFormSchema(messages)` to `zodResolver` directly.
 3. Compose fields from `@pawhaven/ui/form`; do not write a new input primitive for a one-off.
 4. Submit through a mutation; keep the payload in the schema's shape, not a hand-built object.
 5. Photo and file inputs convert to data URLs in the slice's `utils/`, never in a component.
@@ -121,6 +124,11 @@ Forbidden everywhere: raw hex, a raw Tailwind palette name (`text-gray-500`), a 
    translation — it makes the stored value depend on the submitter's locale.
 4. Read it through `useTranslation`/`t()`; a slice does not import `@pawhaven/i18n` directly.
 5. A new language is a new folder plus an entry in `supportedLngs.js`.
+6. A schema message key must exist in all three locales. Copy is static for now; interpolation is
+   deferred and will be revisited with the schema issue. `pnpm check:i18n` also scans
+   `packages/shared/types` and fails when a schema key is missing.
+7. Official-resolver limitation: schema-level issues (`refine` without `path`) surface under an empty
+   error key and are not rendered by `FormInput`; keep refinements field-scoped or attach `path`.
 
 ### 2.7 Test
 

@@ -154,17 +154,21 @@ cannot outlive the token it carries.
 
 ## 6. Frontend Files
 
-| File                                | Role                                                             |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `route.tsx`                         | `loginRoute`, `registerRoute`, `AuthenticatedLayout`             |
-| `login/index.tsx`                   | §1.1                                                             |
-| `register/index.tsx`                | §1.2                                                             |
-| `AuthLayout.tsx`                    | §1.3                                                             |
-| `api/auth.api.ts`                   | The calls                                                        |
-| `api/auth.mutations.ts`             | `login` / `register` / `logout` mutations                        |
-| `app/init/currentUser.ts`           | `currentUserQueryOptions` — the `me` query the guard suspends on |
-| `app/providers/GlobalProvider.tsx`  | `locale` + `userInfo` context, `login` / `logout`                |
-| `api/tests/auth.mutations.test.tsx` | The only test in the feature                                     |
+| File                               | Role                                                             |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `route.tsx`                        | `loginRoute`, `registerRoute`, `AuthenticatedLayout`             |
+| `login/index.tsx`                  | §1.1                                                             |
+| `register/index.tsx`               | §1.2                                                             |
+| `AuthLayout.tsx`                   | §1.3                                                             |
+| `api/auth.api.ts`                  | The calls                                                        |
+| `api/auth.mutations.ts`            | `login` / `register` / `logout` mutations                        |
+| `app/init/currentUser.ts`          | `currentUserQueryOptions` — the `me` query the guard suspends on |
+| `app/providers/GlobalProvider.tsx` | `locale` + `userInfo` context, `login` / `logout`                |
+| `tests/auth.mutations.test.tsx`    | Mutation cache handoff                                           |
+| `tests/auth.validation.test.tsx`   | Localized validation messages                                    |
+
+Validation copy comes from the shared `CredentialsSchema` as `validation.*` i18n keys, translated by
+`useZodResolver` from `@pawhaven/frontend-core`.
 
 Session state lives in the global context (`app/providers/GlobalProvider.tsx`) and is mirrored to
 `localStorage` under `userInfo` as `{ userId, expiresAt }` — a display hint, not a credential. It is
