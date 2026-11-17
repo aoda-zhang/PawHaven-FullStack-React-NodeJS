@@ -3,7 +3,7 @@ import type { FileUploadResult } from '@pawhaven/shared/types';
 
 import { loadConfig } from '@/config';
 
-const FILE_UPLOAD_TIMEOUT_MS = 60_000;
+export const FILE_UPLOAD_TIMEOUT_MS = 60_000;
 
 /**
  * Create a single shared API client instance for this app.

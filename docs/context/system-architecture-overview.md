@@ -423,11 +423,11 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### 9.1 MVP (Current → Month 3)
 
-Deployment is Vercel-based and manual: `.github/workflows/deploy.yml` resolves one service
-(`portal`, `gateway`, `core-service`, `auth-service`, `document-service`) and promotes it
-preview → production with `VERCEL_TOKEN`. The portal also publishes a Cloudflare Pages preview
-through the GitHub integration, which is configured outside this repository. MongoDB is a managed
-cluster; `auth-service` and `core-service` each own a database.
+Deployment is platform-driven and configured in dashboards outside this repository: Vercel deploys
+services from their own projects, keyed on each project's root directory (for example
+`document-service`, `core-service`, `auth-service`, as configured in the Vercel dashboard), and the
+portal publishes through Cloudflare Pages. MongoDB is a managed cluster; `auth-service` and
+`core-service` each own a database.
 
 ### 9.2 Production (Phase 3+)
 

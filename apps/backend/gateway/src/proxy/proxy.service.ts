@@ -37,6 +37,15 @@ const HTTP_REDIRECT_RANGE_MIN = 300;
 const TIMEOUT_ERROR_CODE = 'ETIMEDOUT';
 const SERVICE_PREFIX_SEGMENTS = 2;
 
+const isEnvelopePayload = (body: unknown): boolean =>
+  typeof body === 'object' && body !== null && 'isSuccess' in body;
+
+const isJsonResponse = (proxyRes: IncomingMessage): boolean => {
+  const contentType =
+    readHeader(proxyRes.headers, httpHeaders.contentType) ?? '';
+  return contentType.includes('application/json');
+};
+
 @Injectable()
 export class ProxyService {
   private readonly logger = new Logger(ProxyService.name);
@@ -117,27 +126,16 @@ export class ProxyService {
     res.setHeader(httpHeaders.traceId, traceId);
     res.setHeader('Referrer-Policy', 'no-referrer');
 
-    const contentType =
-      readHeader(proxyRes.headers, httpHeaders.contentType) ?? '';
-    const isJson = contentType.includes('application/json');
+    const isJson = isJsonResponse(proxyRes);
     const statusCode = proxyRes.statusCode ?? res.statusCode;
 
-    // Preserve service-generated error envelopes. Infrastructure responses
-    // bypass Nest's global exception filter, so normalize only non-envelope 5xx.
     if (statusCode >= 500) {
-      const body = isJson
-        ? JSON.parse(buffer.toString('utf8') || 'null')
-        : null;
-      if (body && typeof body === 'object' && 'isSuccess' in body) {
-        return buffer;
-      }
-
-      res.statusCode = statusCode;
-      res.setHeader(httpHeaders.contentType, 'application/json; charset=utf-8');
-      res.removeHeader('content-length');
-      res.removeHeader('content-encoding');
-      return JSON.stringify(
-        createHttpErrorResponse(statusCode, undefined, '', null, traceId),
+      return this.normalizeServerError(
+        buffer,
+        isJson,
+        statusCode,
+        res,
+        traceId,
       );
     }
 
@@ -149,8 +147,37 @@ export class ProxyService {
       return buffer;
     }
 
+    return this.wrapSuccessBody(buffer, statusCode);
+  }
+
+  /**
+   * Preserve service-generated error envelopes. Infrastructure responses
+   * bypass Nest's global exception filter, so normalize only non-envelope 5xx.
+   */
+  private normalizeServerError(
+    buffer: Buffer,
+    isJson: boolean,
+    statusCode: number,
+    res: Response,
+    traceId: string,
+  ): Buffer | string {
+    const body = isJson ? JSON.parse(buffer.toString('utf8') || 'null') : null;
+    if (isEnvelopePayload(body)) {
+      return buffer;
+    }
+
+    res.statusCode = statusCode;
+    res.setHeader(httpHeaders.contentType, 'application/json; charset=utf-8');
+    res.removeHeader('content-length');
+    res.removeHeader('content-encoding');
+    return JSON.stringify(
+      createHttpErrorResponse(statusCode, undefined, '', null, traceId),
+    );
+  }
+
+  private wrapSuccessBody(buffer: Buffer, statusCode: number): Buffer | string {
     const body = JSON.parse(buffer.toString('utf8') || 'null');
-    if (body && typeof body === 'object' && 'isSuccess' in body) {
+    if (isEnvelopePayload(body)) {
       return buffer;
     }
 
@@ -175,21 +202,7 @@ export class ProxyService {
     res: Response | Socket,
   ): void {
     const traceId = this.ensureTraceId(req);
-    // A spent `proxyTimeout` surfaces as a plain socket error (`ECONNRESET` /
-    // "socket hang up"), so the elapsed time is the only reliable signal.
-    const budgetMs = this.timeoutMs ?? 0;
-    const startedAt = this.requestStartedAt.get(req) ?? Date.now();
-    const exhaustedBudget = budgetMs > 0 && Date.now() - startedAt >= budgetMs;
-    const timedOut =
-      exhaustedBudget ||
-      (error as NodeJS.ErrnoException).code === TIMEOUT_ERROR_CODE ||
-      error.message.toLowerCase().includes('timeout');
-    const status = timedOut
-      ? HTTP_STATUS.GATEWAY_TIMEOUT
-      : HTTP_STATUS.BAD_GATEWAY;
-    const message = timedOut
-      ? 'Upstream service timed out'
-      : 'Upstream service unavailable';
+    const { status, message } = this.classifyProxyError(error, req);
 
     this.logger.error(
       `${message} (trace ${traceId}, target ${this.resolveTarget(req)}): ${error.message}`,
@@ -200,6 +213,42 @@ export class ProxyService {
       return;
     }
 
+    this.writeProxyError(res, status, message, traceId);
+  }
+
+  private classifyProxyError(
+    error: Error,
+    req: Request,
+  ): { status: number; message: string } {
+    // A spent `proxyTimeout` surfaces as a plain socket error (`ECONNRESET` /
+    // "socket hang up"), so the elapsed time is the only reliable signal.
+    const budgetMs = this.timeoutMs ?? 0;
+    const startedAt = this.requestStartedAt.get(req) ?? Date.now();
+    const exhaustedBudget = budgetMs > 0 && Date.now() - startedAt >= budgetMs;
+    const timedOut =
+      exhaustedBudget ||
+      (error as NodeJS.ErrnoException).code === TIMEOUT_ERROR_CODE ||
+      error.message.toLowerCase().includes('timeout');
+
+    if (timedOut) {
+      return {
+        status: HTTP_STATUS.GATEWAY_TIMEOUT,
+        message: 'Upstream service timed out',
+      };
+    }
+
+    return {
+      status: HTTP_STATUS.BAD_GATEWAY,
+      message: 'Upstream service unavailable',
+    };
+  }
+
+  private writeProxyError(
+    res: Response,
+    status: number,
+    message: string,
+    traceId: string,
+  ): void {
     res.writeHead(status, {
       [httpHeaders.contentType]: 'application/json',
       [httpHeaders.traceId]: traceId,

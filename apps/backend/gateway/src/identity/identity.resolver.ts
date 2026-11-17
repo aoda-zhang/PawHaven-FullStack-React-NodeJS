@@ -103,43 +103,48 @@ export class IdentityResolver {
     }
 
     if (accessPayload) {
-      if (refreshToken && this.shouldRefreshSoon(accessPayload)) {
-        try {
-          const refreshedPayload = await this.refreshPayload(
-            req,
-            res,
-            refreshToken,
-          );
-          if (refreshedPayload) {
-            return this.identityFromPayload(refreshedPayload);
-          }
-        } catch (error) {
-          const currentAccessPayload = this.validPayload(
-            req.cookies?.[cookieKeys.access_token],
-          );
-          if (!currentAccessPayload) {
-            throw error;
-          }
-          return this.identityFromPayload(currentAccessPayload);
-        }
-      }
-
-      return this.identityFromPayload(accessPayload);
+      return this.resolveWithAccessToken(req, res, accessPayload, refreshToken);
     }
 
     if (refreshToken) {
-      const refreshedPayload = await this.refreshPayload(
-        req,
-        res,
-        refreshToken,
-      );
-      if (refreshedPayload) {
-        return this.identityFromPayload(refreshedPayload);
+      const payload = await this.refreshPayload(req, res, refreshToken);
+      if (payload) {
+        return this.identityFromPayload(payload);
       }
     }
 
     this.clearCookies(req, res);
     throw new UnauthorizedException(SESSION_EXPIRED_MESSAGE);
+  }
+
+  private async resolveWithAccessToken(
+    req: Request,
+    res: Response,
+    accessPayload: JwtVerifyInfo,
+    refreshToken?: string,
+  ): Promise<InternalJwtIdentity> {
+    if (refreshToken && this.shouldRefreshSoon(accessPayload)) {
+      try {
+        const refreshedPayload = await this.refreshPayload(
+          req,
+          res,
+          refreshToken,
+        );
+        if (refreshedPayload) {
+          return this.identityFromPayload(refreshedPayload);
+        }
+      } catch (error) {
+        const currentAccessPayload = this.validPayload(
+          req.cookies?.[cookieKeys.access_token],
+        );
+        if (!currentAccessPayload) {
+          throw error;
+        }
+        return this.identityFromPayload(currentAccessPayload);
+      }
+    }
+
+    return this.identityFromPayload(accessPayload);
   }
 
   private async adoptRefreshedCookies(

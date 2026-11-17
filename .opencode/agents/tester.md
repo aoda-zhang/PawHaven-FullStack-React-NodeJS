@@ -25,8 +25,9 @@ Verify the approved changes. Do not modify source code or tests. The Reviewer ow
 1. Inspect the approved plan, integrated diff, project rules, scripts, and relevant tests.
 2. Choose FAST, TARGETED, or FULL verification based on change scope and risk.
 3. Load `verification` and follow its instructions. Load other specialist Skills when relevant.
-4. Run existing checks that cover the acceptance criteria. Do not invent scripts or skip unavailable checks silently.
-5. Record commands, results, evidence, and remaining gaps.
+4. Before parallel execution, apply the isolation rule in the Parallelization contract (`docs/how-i-build/how-i-build-my-agent-team.md`), serializing any check whose isolation that contract does not establish.
+5. Run existing checks that cover the acceptance criteria. Do not invent scripts or skip unavailable checks silently.
+6. Record commands, results, evidence, and remaining gaps.
 
 ## Evidence
 

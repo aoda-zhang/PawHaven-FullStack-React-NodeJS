@@ -101,7 +101,7 @@ const commands = Object.fromEntries(
 const config = read('.opencode/opencode.json');
 const constraints = read('docs/context/agent-constraints.md');
 const instructions = read('AGENTS.md');
-const prWorkflow = read('.github/workflows/opencode-review.yml');
+const prWorkflow = read('.github/workflows/opencode-review.yml.disabled');
 const teamGuide = read('docs/how-i-build/how-i-build-my-agent-team.md');
 
 for (const name of ['frontend', 'backend', 'build']) {

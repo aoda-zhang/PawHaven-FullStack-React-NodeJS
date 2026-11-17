@@ -80,9 +80,10 @@ that is a projection rather than history, a `NotFound` that 13 broken links all 
 
 ## 3. Product
 
-| File                                                 | Covers                                                                   |
-| ---------------------------------------------------- | ------------------------------------------------------------------------ |
-| [product-strategy.md](./product/product-strategy.md) | Product blueprint — animal lifecycle, personas, feature map, MVP roadmap |
+| File                                                 | Covers                                                                                             |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| [README.md](./product/README.md)                     | Product documentation index — lifecycle, roles, volunteer management, adoption, community, roadmap |
+| [product-strategy.md](./product/product-strategy.md) | Product blueprint — animal lifecycle, personas, feature map, MVP roadmap                           |
 
 ## 4. Architecture reviews
 

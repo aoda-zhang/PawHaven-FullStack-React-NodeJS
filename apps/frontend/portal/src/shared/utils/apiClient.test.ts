@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { uploadFiles } from './apiClient';
+import { FILE_UPLOAD_TIMEOUT_MS, uploadFiles } from './apiClient';
 
 const postMock = vi.hoisted(() => vi.fn());
 
@@ -40,6 +40,7 @@ describe('uploadFiles', () => {
     expect(postMock).toHaveBeenCalledWith(
       '/document/files',
       expect.any(FormData),
+      { timeout: FILE_UPLOAD_TIMEOUT_MS },
     );
     const formData = postMock.mock.calls[0]?.[1] as FormData;
     expect(formData.getAll('files')).toEqual([first]);

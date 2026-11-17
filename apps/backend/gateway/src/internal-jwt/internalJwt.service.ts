@@ -43,13 +43,7 @@ export class InternalJwtService {
     target: InternalJwtTarget,
     rid: string,
   ): InternalJwt {
-    const nowInSeconds = Math.floor(Date.now() / MS_PER_SECOND);
-    const base = {
-      aud: target.audience,
-      iat: nowInSeconds,
-      exp: nowInSeconds + this.ttlSeconds,
-      rid,
-    };
+    const base = this.baseClaims(target, rid);
 
     if (identity.kind === InternalJwtKind.ANONYMOUS) {
       return { kind: InternalJwtKind.ANONYMOUS, ...base };
@@ -70,5 +64,18 @@ export class InternalJwtService {
       claims.username = identity.username;
     }
     return claims;
+  }
+
+  private baseClaims(
+    target: InternalJwtTarget,
+    rid: string,
+  ): Pick<InternalJwt, 'aud' | 'iat' | 'exp' | 'rid'> {
+    const nowInSeconds = Math.floor(Date.now() / MS_PER_SECOND);
+    return {
+      aud: target.audience,
+      iat: nowInSeconds,
+      exp: nowInSeconds + this.ttlSeconds,
+      rid,
+    };
   }
 }

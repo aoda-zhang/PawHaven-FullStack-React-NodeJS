@@ -1,30 +1,31 @@
 # CI/CD: what runs, and how a service ships
 
 > This document covers **the workflows and the deployment path**. Gate semantics live in
-> [Quality Gates](quality-gates.md); deployment claims in the architecture docs are mirrored here
-> only where the workflow is the source of truth.
+> [Quality Gates](quality-gates.md); deployment claims in the architecture docs mirror the platform
+> configuration, which lives outside this repository.
 
 ## Principle
 
-CI proves; CD promotes. Nothing reaches a deployed service without passing the same gates a
-developer runs locally, and deployment is a manual, explicit action — not a side effect of merging.
+CI proves; CD promotes. The quality gate is the merge-readiness signal and reproduces the checks a
+developer runs locally; platform previews deploy on push, and they are gated only when the platform
+is configured to require that check.
 
 ## Workflows
 
-| Workflow              | Trigger                      | What it does                                                                                                                                                                                   |
-| --------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test.yml`            | PR, push, manual             | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, test, build; a separate job installs Chromium and runs Playwright E2E |
-| `ui-library.yml`      | PR, push, manual             | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests                                                                                                          |
-| `storybook.yml`       | PR, push, manual             | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                                                      |
-| `react-doctor.yml`    | PR, push to `main`           | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                    |
-| `opencode-review.yml` | PR                           | Read-only agent review of the PR diff; cancellation is concurrency-grouped per PR                                                                                                              |
-| `deploy.yml`          | Manual (`workflow_dispatch`) | Resolve one service → install/build → deploy preview → deploy production on Vercel                                                                                                             |
+| Workflow                       | Trigger            | What it does                                                                                                                                                                                   |
+| ------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yml`                     | PR, push, manual   | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, test, build; a separate job installs Chromium and runs Playwright E2E |
+| `ui-library.yml`               | PR, push, manual   | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests                                                                                                          |
+| `storybook.yml`                | PR, push, manual   | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                                                      |
+| `react-doctor.yml`             | PR, push to `main` | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                    |
+| `opencode-review.yml.disabled` | None               | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                 |
 
 ## Version and install discipline
 
-Both the app and the deploy workflows resolve Node from `package.json` `engines` and install the
-package manager with `corepack enable && corepack install`, then run
-`pnpm install --frozen-lockfile`. The lockfile is the contract; CI never updates it.
+Workflows that install workspace dependencies resolve Node from `package.json` `engines` and install
+the package manager with `corepack enable && corepack install`, then run
+`pnpm install --frozen-lockfile`; `react-doctor.yml` only runs the pinned scanner. The lockfile is
+the contract; CI never updates it.
 
 ## Build order
 
@@ -35,25 +36,25 @@ typecheck or test.
 
 ## Deployment path
 
-`deploy.yml` is manual and per-service:
+There is no repository-side deploy workflow. Deployment is configured in the platform dashboards
+outside this repository:
 
-1. `resolve` — `service-resolver` maps the chosen service (`portal`, `gateway`, `core-service`,
-   `auth-service`, `document-service`) to a path, a Turborepo build filter, and a
-   `VERCEL_PROJECT_ID_*` secret name.
-2. `install_build` — the shared install/build action.
-3. `deploy_preview` — deploy the target to Vercel preview (`environment: preview`).
-4. `deploy_production` — deploy to Vercel production, gated on the preview job succeeding.
+- **Backend services** — Vercel deploys services from their own projects, keyed on each project's
+  root directory (for example `document-service`, `core-service`, `auth-service`, as configured in
+  the Vercel dashboard).
+- **Portal** — Cloudflare Pages publishes the portal through its GitHub integration; that
+  configuration lives in the Cloudflare dashboard.
 
-The portal also publishes a Cloudflare Pages preview through the GitHub integration; that
-configuration lives in the Cloudflare dashboard, not in this repository.
+Preview and production promotion happen in those platforms, not in GitHub Actions.
 
 ## Concurrency and safety
 
-- The PR-review workflow cancels superseded runs per PR; the deploy workflow never runs
-  preview and production in parallel (`needs` chain).
-- The PR reviewer runs with `contents: read`; the workflow must not gain `contents: write`.
-- A service that is not listed in `service-resolver` cannot be deployed — adding a service means
-  adding its case and its project secret.
+- The preserved PR-review definition keeps its per-PR concurrency group, so a re-enabled run would
+  cancel superseded ones; as long as it is disabled it triggers nothing.
+- The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
+  `contents: write`.
+- Preview and production ordering now lives in the platform Git integrations, so this repository no
+  longer enforces it with a `needs` chain.
 
 ## Adding a workflow
 

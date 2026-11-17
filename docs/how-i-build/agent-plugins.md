@@ -48,8 +48,9 @@ options. That is deliberate: the boundaries are the documentation.
 ]
 ```
 
-The CI PR reviewer (`.github/workflows/opencode-review.yml`) uses the same four with
-`freeOnly: true` and the free review model, so a fork-safe run never depends on a paid provider.
+The PR reviewer definition (`.github/workflows/opencode-review.yml.disabled`) uses the same four with
+`freeOnly: true` and the free review model, so a fork-safe run never depends on a paid provider. The
+workflow is currently disabled and triggers nothing; its definition is preserved.
 
 ## Design rules
 
