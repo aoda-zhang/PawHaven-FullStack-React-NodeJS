@@ -25,11 +25,11 @@ export const RescueCasesSection = ({
   const { t } = useTranslation();
 
   const safeCases = cases ?? [];
-  const pendingCount = safeCases.filter(
-    (c) => c.status === AnimalStatusSchema.enum.pending,
+  const needsHelpCount = safeCases.filter(
+    (c) => c.status === AnimalStatusSchema.enum.needsHelp,
   ).length;
-  const inProgressCount = safeCases.filter(
-    (c) => c.status === AnimalStatusSchema.enum.inProgress,
+  const rescueInProgressCount = safeCases.filter(
+    (c) => c.status === AnimalStatusSchema.enum.rescueInProgress,
   ).length;
 
   const renderContent = () => {
@@ -66,8 +66,8 @@ export const RescueCasesSection = ({
           {showStatusSummary && !isLoading && (
             <p className="text-text-secondary mt-0.5 text-sm">
               {t('rescue_cases.status_summary', {
-                pendingCount,
-                inProgressCount,
+                needsHelpCount,
+                rescueInProgressCount,
               })}
             </p>
           )}

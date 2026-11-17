@@ -6,20 +6,11 @@ import {
   getRescueStatusColor,
   getRescueStatusForegroundColor,
 } from '@/shared/utils/rescue-status/getRescueStatusColor';
+import { getRescueStatusLabelKey } from '@/shared/utils/rescue-status/getRescueStatusLabelKey';
 
 interface StatusBadgeProps {
   status: AnimalStatus;
 }
-
-const STATUS_LABEL_KEYS: Record<AnimalStatus, string> = {
-  pending: 'common.rescue_status_pending',
-  inProgress: 'common.rescue_status_inProgress',
-  treated: 'common.rescue_status_treated',
-  recovering: 'common.rescue_status_recovering',
-  awaitingAdoption: 'common.rescue_status_awaitingAdoption',
-  adopted: 'common.rescue_status_adopted',
-  failed: 'common.rescue_status_failed',
-};
 
 export const StatusBadge = ({ status }: StatusBadgeProps) => {
   const { t } = useTranslation();
@@ -35,7 +26,7 @@ export const StatusBadge = ({ status }: StatusBadgeProps) => {
       <span
         className={cn('inline-block h-1.5 w-1.5 rounded-full', 'bg-current')}
       />
-      {t(STATUS_LABEL_KEYS[status])}
+      {t(getRescueStatusLabelKey(status))}
     </span>
   );
 };

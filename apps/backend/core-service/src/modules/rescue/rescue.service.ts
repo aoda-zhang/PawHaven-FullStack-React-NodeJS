@@ -10,6 +10,8 @@ import {
   AnimalStatusSchema,
   RescueAgeSchema,
   AnimalStatus,
+  PublicAnimalStatusValues,
+  isPublicAnimalStatus,
 } from '@pawhaven/shared/types';
 import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
 import type {
@@ -56,6 +58,7 @@ export class RescueService {
       return await this.prisma.animalReports.create({
         data: {
           ...dto,
+          animalStatus: AnimalStatus.PENDING_REVIEW,
           reporter: {
             reporterID: claims.sub,
             reporterName: claims.username?.trim() || null,
@@ -75,10 +78,20 @@ export class RescueService {
         ? parsedLimit
         : undefined;
 
+    let statuses: readonly AnimalStatus[] = PublicAnimalStatusValues;
+
+    if (status) {
+      statuses = isPublicAnimalStatus(status) ? [status] : [];
+    }
+
+    if (statuses.length === 0) {
+      return [];
+    }
+
     const rescues = await this.prisma.animalReports.findMany({
       where: {
         deletedAt: { isSet: false },
-        ...(status ? { animalStatus: status } : {}),
+        animalStatus: { in: [...statuses] },
       },
       orderBy: { createdAt: 'desc' },
       take,
@@ -95,7 +108,11 @@ export class RescueService {
       const rescue = await this.prisma.animalReports.findUnique({
         where: { id },
       });
-      if (!rescue || rescue.deletedAt) {
+      if (
+        !rescue ||
+        rescue.deletedAt ||
+        !isPublicAnimalStatus(rescue.animalStatus)
+      ) {
         throw new BadRequestException(`Rescue not found: ${id}`);
       }
       return this.toDetail(rescue);
@@ -133,7 +150,7 @@ export class RescueService {
       id: record.id,
       title: record.animalType ?? 'unknown',
       image: coverImage ? this.fileUrl(coverImage) : undefined,
-      status: status.success ? status.data : AnimalStatus.PENDING,
+      status: status.success ? status.data : AnimalStatus.PENDING_REVIEW,
       animalType: record.animalType ?? 'unknown',
       location: location.address,
       description: record.description,
@@ -151,7 +168,7 @@ export class RescueService {
       id: record.id,
       animalType: record.animalType ?? 'unknown',
       age: age.success ? age.data : 'adult',
-      status: status.success ? status.data : AnimalStatus.PENDING,
+      status: status.success ? status.data : AnimalStatus.PENDING_REVIEW,
       statusDescription: record.statusDescription,
       description: record.description,
       size: record.size,

@@ -11,6 +11,7 @@ import { RelevantGuides } from './RelevantGuides';
 import { RescueTimeline } from './RescueTimeline';
 
 import { getRescueStatusColor } from '@/shared/utils/rescue-status/getRescueStatusColor';
+import { getRescueStatusLabelKey } from '@/shared/utils/rescue-status/getRescueStatusLabelKey';
 
 export const RescueDetailContent = ({
   animal,
@@ -63,7 +64,7 @@ export const RescueDetailContent = ({
               <span
                 className={`h-1.5 w-1.5 rounded-full ${getRescueStatusColor({ status: animal.status, prefix: 'bg' }) ?? 'bg-text-tertiary'}`}
               />
-              {t(`common.rescue_status_${animal.status}`)}
+              {t(getRescueStatusLabelKey(animal.status))}
             </span>
           </div>
 

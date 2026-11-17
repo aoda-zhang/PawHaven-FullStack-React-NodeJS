@@ -15,36 +15,35 @@ this feature and [Report a Stray Animal](03-report-animal.md) are two views of o
 A horizontally scrollable row of pill buttons (`flex gap-1 overflow-x-auto pt-10`) driven by a
 local `useState<FilterStatus>`. Three options, from `FILTER_OPTIONS`:
 
-| Value                     | Label key                         |
-| ------------------------- | --------------------------------- |
-| `all`                     | `rescue_cases.filter_all`         |
-| `AnimalStatus.pending`    | `common.rescue_status_pending`    |
-| `AnimalStatus.inProgress` | `common.rescue_status_inProgress` |
+| Value                           | Label key                                 |
+| ------------------------------- | ----------------------------------------- |
+| `all`                           | `rescue_cases.filter_all`                 |
+| `AnimalStatus.needsHelp`        | `common.rescue_status_needs_help`         |
+| `AnimalStatus.rescueInProgress` | `common.rescue_status_rescue_in_progress` |
 
-`inProgress` is rendered with a **camelCase i18n key** (`rescue_status_inProgress`), which
-contradicts the project's snake_case key rule.
+Label keys are snake_case, matching the `common` namespace convention.
 
 Filtering is **client-side only** — `displayedCases` is a `cases.filter(...)` over the array the
 query already fetched. Switching filters costs no request. Because the server call passes no status,
 the fetched set is whatever `latestRescueLimit` allows, so a filter can only ever narrow that window;
 it cannot reach a case the initial query did not return.
 
-Only two of the seven statuses are filterable. `treated`, `recovering`, `awaitingAdoption`,
-`adopted`, and `failed` have no filter and are unreachable through this UI — see
-[§5](#5-status).
+Only two of the nine statuses are filterable. The other public statuses — `underTreatment`,
+`recovering`, `awaitingAdoption`, `adopted` — have no filter and are unreachable through this UI, and
+the non-public statuses never reach the client at all — see [§5](#5-status).
 
 ### 1.2 Case list
 
 `apps/frontend/portal/src/pages/rescue-cases/components/RescueCasesSection.tsx` receives
 `cases={displayedCases}` and `onCaseClick`, and deliberately omits `onSeeAll` and
 `showStatusSummary` (defaults: absent / `true`). So the "see all" affordance is omitted — correct,
-since this _is_ the full list — but the pending / in-progress counter is rendered once data has
+since this _is_ the full list — but the needs-help / in-progress counter is rendered once data has
 loaded, unlike on the homepage.
 
 `isLoading` remains a `RescueCasesSection` capability, but the route never passes it: page data is
 read with `useSuspenseQuery`, so a pending query suspends into `RootLayout`'s
 `<Suspense fallback={<Loading />}>` and the section only renders once data has arrived.
-Once data arrives, the section renders the pending / in-progress counter.
+Once data arrives, the section renders the needs-help / in-progress counter.
 
 States:
 
@@ -87,22 +86,26 @@ fails at the API boundary. The route is lazy; there is no route loader.
 
 ## 3. Endpoints
 
-| Method | Path                    | Policy            | Notes                                         |
-| ------ | ----------------------- | ----------------- | --------------------------------------------- |
-| GET    | `/api/core/rescues`     | `@OptionalAuth()` | `?status=` `?limit=`                          |
-| GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing or soft-deleted                |
-| POST   | `/api/core/rescues`     | authenticated     | Writes the same collection as `report-animal` |
+| Method | Path                    | Policy            | Notes                                                                    |
+| ------ | ----------------------- | ----------------- | ------------------------------------------------------------------------ |
+| GET    | `/api/core/rescues`     | `@OptionalAuth()` | `?status=` `?limit=`; `status` is validated against `AnimalStatusSchema` |
+| GET    | `/api/core/rescues/:id` | `@OptionalAuth()` | 400 if missing, soft-deleted, or the stored status is not public         |
+| POST   | `/api/core/rescues`     | authenticated     | Writes the same collection as `report-animal`, always as `pendingReview` |
 
 The two write paths are near-duplicates. `RescueService.create` and `ReportAnimalService.create`
-both insert into `animalReports` with `reporter` taken from the internal JWT; only the
-`animalStatus` seeding and the DTO differ. **In practice the portal uses `report-animal`** — nothing
-in the portal calls `POST /core/rescues`.
+both insert into `animalReports` with `reporter` taken from the internal JWT; only the DTO differs.
+Both force `animalStatus: pendingReview`, and the create DTO no longer accepts a status at all, so a
+caller cannot seed a public record. **In practice the portal uses `report-animal`** — nothing in the
+portal calls `POST /core/rescues`.
 
 ## 4. Listing Behaviour
 
 `findAll(status?, limit?)`:
 
-- filters `deletedAt: { isSet: false }` and, when given, `animalStatus`
+- filters `deletedAt: { isSet: false }` and restricts `animalStatus` to the public statuses
+- when a public `status` is requested, narrows `animalStatus` to that single value
+- when a valid non-public `status` is requested, returns `[]` before touching the database; an
+  unrecognised value is rejected at the route boundary with 400
 - orders by `createdAt` desc
 - applies `take` only — **`limit` is not pagination.** There is no cursor, no page parameter, and
   no total count, so a caller cannot walk past the first `limit` records.
@@ -115,34 +118,52 @@ object and nothing computes distance from it.
 
 ## 5. Status
 
-`AnimalStatus` in `packages/shared/types/AnimalStatus.ts` defines seven values:
+`AnimalStatus` in `packages/shared/types/AnimalStatus.ts` defines nine values, aligned with
+[Animal Lifecycle](../product/animal-lifecycle.md):
 
 ```
-pending → inProgress → treated → recovering → awaitingAdoption → adopted
-                                                             ↘ failed
+pendingReview → needsHelp → rescueInProgress → underTreatment → recovering → awaitingAdoption → adopted
+      ↘ rejected                                                            ↘ deceased
 ```
 
 Two naming conventions coexist deliberately: `animalStatus` is the DB field, `status` is the
-API/display field. The read projections map between them and fall back to `pending` when the
+API/display field. The read projections map between them and fall back to `pendingReview` when the
 stored value fails `AnimalStatusSchema.safeParse`.
 
-**Only `pending` is ever written.** There is no transition endpoint, no transition table, and no
-code that moves a case to any other value. The six other states are a declared vocabulary awaiting
-an implementation. `inProgress` is filterable but unreachable; the remaining five cannot be produced
-at all. The `home` module _counts_ `animalStatus: adopted` rows, but no code path produces them, so
-half of the homepage's "adopted" figure is structurally zero.
+Visibility is one shared predicate, `isPublicAnimalStatus`:
 
-## 6. The Status Ladder
+| Public             | Non-public                    |
+| ------------------ | ----------------------------- |
+| `needsHelp`        | `pendingReview`               |
+| `rescueInProgress` | `rejected`                    |
+| `underTreatment`   | `deceased` (retention is TBD) |
+| `recovering`       |                               |
+| `awaitingAdoption` |                               |
+| `adopted`          |                               |
 
-`components/RescueTimeline.tsx` (this feature's copy) takes `currentStatus: AnimalStatus` and
-renders the seven-stage ladder, marking earlier stages complete and the current one active.
+`GET /rescues` never returns a non-public row, `GET /rescues/:id` answers `400 Rescue not found` for
+one, and the homepage's `totalRescues` counts only public statuses. Legacy rows stored as `pending`,
+`inProgress`, `treated`, or `failed` are unrecognised, non-public, and drop out of public reads.
 
-It is a **projection of a single field**, not a history: given `pending` it shows stage 1 lit and
-stages 2–7 greyed. Since only `pending` is ever written, the ladder never advances past its first
-stage in practice. `RescueDetailSchema` has no timeline field and no collection stores transitions.
+**Only `pendingReview` is ever written.** There is no transition endpoint, no transition table, and
+no code that moves a case to a public status; volunteer review UI and approval endpoints are not
+implemented. The other eight states are a declared vocabulary awaiting that implementation. Every
+new report — through `report-animal` or `POST /rescues` — lands as `pendingReview` and stays out of
+the public feed. `rescueInProgress` is filterable but unreachable, and the `home` module _counts_
+`animalStatus: adopted` rows that no code path produces, so that half of the homepage's "adopted"
+figure remains structurally zero.
 
-`CaseDetail.tsx` renders this ladder, plus a `StatusBadge` and a single image — but **`CaseDetail`
-is exported and used by nothing.** It is a dead component, superseded by the detail page.
+## 6. Status Rendering
+
+There is **no status-ladder or transition-history component** in `rescue-cases`: `StatusBadge`
+renders the current status pill on each card, and nothing renders a progression of stages.
+
+The only timeline in the product belongs to `rescue-detail`. Its `RescueTimeline` takes an
+`updates[]` prop, and its single caller builds that array with **one synthetic "Reported" entry**
+derived from the report itself — see [Rescue Detail §1.3](05-rescue-detail.md#13-timeline). That is
+a restatement of the report, not history.
+
+`RescueDetailSchema` has no timeline field, and no collection stores status transitions.
 
 ## 7. Photos
 
@@ -171,8 +192,10 @@ whatever `staleTime` allows, with no refetch trigger tied to the route.
 ## 9. What Does Not Exist
 
 - **No case creation as a separate step.** A report is already a case.
-- **No claiming, no assignee, no `rescue_transitions`, no transition history.** The 7-stage
-  machine is an enum, not a state machine.
+- **No claiming, no assignee, no `rescue_transitions`, no transition history.** The 9-stage
+  vocabulary is an enum, not a state machine.
+- **No volunteer review or approval flow.** A report cannot move from `pendingReview` to
+  `needsHelp`; there is no review queue, no approve/reject endpoint, and no UI for either.
 - **No status update endpoint.** `PATCH /rescues/:id/status` is not implemented; the only mutating
   route is `POST /rescues`, which the portal never calls.
 - **No follow/claim coupling.** Following is a separate feature, embedded in the detail page — see

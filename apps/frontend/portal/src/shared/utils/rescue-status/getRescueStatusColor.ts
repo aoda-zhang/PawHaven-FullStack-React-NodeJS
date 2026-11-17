@@ -8,13 +8,15 @@ export type RescueStatusType = AnimalStatus;
  * the domain enum is camelCase.
  */
 type RescueStatusSuffix =
-  | 'pending'
-  | 'in-progress'
-  | 'treated'
+  | 'pending-review'
+  | 'needs-help'
+  | 'rejected'
+  | 'rescue-in-progress'
+  | 'under-treatment'
   | 'recovering'
   | 'awaiting-adoption'
   | 'adopted'
-  | 'failed';
+  | 'deceased';
 
 /** The Tailwind utility class a rescue status resolves to. */
 export type RescueStatusColorClass =
@@ -28,33 +30,39 @@ interface GetRescueStatusColorParams {
 /* The class names are spelled out rather than built from a suffix map:
    Tailwind only generates a utility for a class it can see in the source. */
 const bgStatusColors: Record<RescueStatusType, RescueStatusColorClass> = {
-  pending: 'bg-rescue-status-pending',
-  inProgress: 'bg-rescue-status-in-progress',
-  treated: 'bg-rescue-status-treated',
+  pendingReview: 'bg-rescue-status-pending-review',
+  needsHelp: 'bg-rescue-status-needs-help',
+  rejected: 'bg-rescue-status-rejected',
+  rescueInProgress: 'bg-rescue-status-rescue-in-progress',
+  underTreatment: 'bg-rescue-status-under-treatment',
   recovering: 'bg-rescue-status-recovering',
   awaitingAdoption: 'bg-rescue-status-awaiting-adoption',
   adopted: 'bg-rescue-status-adopted',
-  failed: 'bg-rescue-status-failed',
+  deceased: 'bg-rescue-status-deceased',
 };
 
 const textStatusColors: Record<RescueStatusType, RescueStatusColorClass> = {
-  pending: 'text-rescue-status-pending',
-  inProgress: 'text-rescue-status-in-progress',
-  treated: 'text-rescue-status-treated',
+  pendingReview: 'text-rescue-status-pending-review',
+  needsHelp: 'text-rescue-status-needs-help',
+  rejected: 'text-rescue-status-rejected',
+  rescueInProgress: 'text-rescue-status-rescue-in-progress',
+  underTreatment: 'text-rescue-status-under-treatment',
   recovering: 'text-rescue-status-recovering',
   awaitingAdoption: 'text-rescue-status-awaiting-adoption',
   adopted: 'text-rescue-status-adopted',
-  failed: 'text-rescue-status-failed',
+  deceased: 'text-rescue-status-deceased',
 };
 
 const borderStatusColors: Record<RescueStatusType, RescueStatusColorClass> = {
-  pending: 'border-rescue-status-pending',
-  inProgress: 'border-rescue-status-in-progress',
-  treated: 'border-rescue-status-treated',
+  pendingReview: 'border-rescue-status-pending-review',
+  needsHelp: 'border-rescue-status-needs-help',
+  rejected: 'border-rescue-status-rejected',
+  rescueInProgress: 'border-rescue-status-rescue-in-progress',
+  underTreatment: 'border-rescue-status-under-treatment',
   recovering: 'border-rescue-status-recovering',
   awaitingAdoption: 'border-rescue-status-awaiting-adoption',
   adopted: 'border-rescue-status-adopted',
-  failed: 'border-rescue-status-failed',
+  deceased: 'border-rescue-status-deceased',
 };
 
 /**
@@ -85,19 +93,29 @@ export const getRescueStatusColor = ({
 
 /** Text foreground token class for readable rescue-status badges. */
 export type RescueStatusForegroundClass =
-  `text-rescue-status-${RescueStatusSuffix}-foreground`;
+  | 'text-rescue-status-pending-review-foreground'
+  | 'text-rescue-status-needs-help-foreground'
+  | 'text-rescue-status-rejected-foreground'
+  | 'text-rescue-status-rescue-in-progress-foreground'
+  | 'text-rescue-status-under-treatment-foreground'
+  | 'text-rescue-status-recovering-foreground'
+  | 'text-rescue-status-awaiting-adoption-foreground'
+  | 'text-rescue-status-adopted-foreground'
+  | 'text-rescue-status-deceased-foreground';
 
 const statusForegroundColors: Record<
   RescueStatusType,
   RescueStatusForegroundClass
 > = {
-  pending: 'text-rescue-status-pending-foreground',
-  inProgress: 'text-rescue-status-in-progress-foreground',
-  treated: 'text-rescue-status-treated-foreground',
+  pendingReview: 'text-rescue-status-pending-review-foreground',
+  needsHelp: 'text-rescue-status-needs-help-foreground',
+  rejected: 'text-rescue-status-rejected-foreground',
+  rescueInProgress: 'text-rescue-status-rescue-in-progress-foreground',
+  underTreatment: 'text-rescue-status-under-treatment-foreground',
   recovering: 'text-rescue-status-recovering-foreground',
   awaitingAdoption: 'text-rescue-status-awaiting-adoption-foreground',
   adopted: 'text-rescue-status-adopted-foreground',
-  failed: 'text-rescue-status-failed-foreground',
+  deceased: 'text-rescue-status-deceased-foreground',
 };
 
 export const getRescueStatusForegroundColor = ({

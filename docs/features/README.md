@@ -73,9 +73,11 @@ Each feature doc has the detail at the point it matters.
 
 - **No domain events.** `@nestjs/event-emitter` is not installed. Modules coordinate by direct
   service injection instead.
-- **No case lifecycle.** The 7-value `AnimalStatus` enum exists, only `pending` is ever written,
-  and there is no transition endpoint or transition table. Both timelines in the UI are
-  projections of that one field, not history.
+- **No case lifecycle.** The 9-value `AnimalStatus` vocabulary exists, only `pendingReview` is ever
+  written, and there is no transition endpoint or transition table. The detail page's timeline is a
+  one-row restatement of the report, not history. Public reads are gated on the status, so a new
+  report stays unpublished until a volunteer review exists — see
+  [Rescue Cases §5](04-rescue-cases.md#5-status).
 - **No volunteer network.** Opting in sets a `volunteer` role string, and the opt-in endpoint has
   no caller in the portal. No profile, availability, capability, matching, or claiming.
 - **No adoption applications.** The catalogue is read-only, has no detail route, and its
@@ -103,7 +105,6 @@ contract. Each is documented at the point it occurs.
 | `RescueCasesSection` is imported by `home` across a feature boundary and never promoted to `packages/ui`                                                                                                                            | [Home §1.2](02-home.md#12-rescue-cases)                                         |
 | `AdoptablePetsSection` carries a raw inline `style={{ scrollSnapType }}` — blocking per `style-doctor`                                                                                                                              | [Home §1.3](02-home.md#13-adoptable-pets)                                       |
 | `useLoaderData()` is cast `as HomeData` instead of parsed with `HomeDataSchema`                                                                                                                                                     | [Home §6](02-home.md#6-frontend-files)                                          |
-| `CaseDetail.tsx` is exported and used by nothing                                                                                                                                                                                    | [Rescue Cases §6](04-rescue-cases.md#6-the-status-ladder)                       |
 | **13 dead link targets** across the shell, footer, and homepage — all landing on `NotFound`, including `/rescues` as a near-miss for `/rescue-cases`                                                                                | [App Shell §1.3](07-app-shell-bootstrap.md#13-outlet-error-boundary-and-footer) |
 | A `Menu` with no `MenuPermission` rows is visible to everyone                                                                                                                                                                       | [App Shell §2](07-app-shell-bootstrap.md#2-boot-flow)                           |
 | A signed-in user with `roles: []` — every new registration — is a **guest** for menu purposes                                                                                                                                       | [App Shell §2](07-app-shell-bootstrap.md#2-boot-flow)                           |

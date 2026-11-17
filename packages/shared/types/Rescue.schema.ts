@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { AnimalStatusSchema, AnimalStatus } from './AnimalStatus.js';
-
 export const RescueAgeValues = ['baby', 'adult'] as const;
 
 export const RescueAgeSchema = z.enum(RescueAgeValues);
@@ -40,7 +38,6 @@ export const CreateRescueDtoSchema = z.object({
   animalType: z.string(),
   age: RescueAgeSchema,
   locationObj: RescueLocationSchema,
-  animalStatus: AnimalStatusSchema.optional().default(AnimalStatus.PENDING),
   statusDescription: z.string().optional(),
   description: z.string().min(1, 'Description is required'),
   size: z.string().min(1, 'Size is required'),

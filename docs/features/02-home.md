@@ -46,7 +46,7 @@ so the highlighted span is a component slot rather than a concatenated string.
 Full detail in [Rescue Cases](04-rescue-cases.md).
 
 The homepage passes `showStatusSummary={false}` and leaves `isLoading` at its default, so the
-pending/in-progress counter the section can render is suppressed. Loading is owned by the layout
+needs-help/in-progress counter the section can render is suppressed. Loading is owned by the layout
 `Suspense` fallback, so `Home` never passes `isLoading`.
 
 ### 1.3 Adoptable pets
@@ -109,6 +109,9 @@ nearest `ContentFallback` error boundary replaces the page content with the syst
 
 Both limits come from `featureFlag.*` in config, not from query parameters.
 
+Because `latestRescues` comes from `RescueService.findAll` with no status, it inherits the
+public-status filter: the homepage never shows a `pendingReview`, `rejected`, or `deceased` report.
+
 `getHomeData` uses `Promise.all`. The response is only returned when all three reads succeed; any
 rejected read rejects the request. Infrastructure failures are mapped by the shared exception
 filter (503), so the portal renders the system error view instead of a partial homepage.
@@ -117,13 +120,18 @@ filter (503), so the portal renders the system error view instead of a partial h
 
 ```
 totalRescues    = animalReports where deletedAt not set
+                  and animalStatus in the public set
+                  (needsHelp, rescueInProgress, underTreatment, recovering,
+                   awaitingAdoption, adopted)
 totalAdopted    = animalReports where animalStatus = 'adopted'
                  + adoptablePet where adoptionStatus = 'adopted'
 totalVolunteers = auth-service GET /volunteer-count
 ```
 
-Two caveats, both load-bearing:
+Three caveats, all load-bearing:
 
+- `totalRescues` excludes non-public statuses, so a new report stays out of the hero figure until a
+  volunteer review publishes it. See [Rescue Cases §5](04-rescue-cases.md#5-status).
 - `totalAdopted` sums two collections, and **no code ever writes `animalStatus: 'adopted'`** — see
   [Rescue Cases §5](04-rescue-cases.md#5-status). The rescue half of that number is structurally
   zero, so the figure is really "adopted pets in the hand-maintained catalogue".

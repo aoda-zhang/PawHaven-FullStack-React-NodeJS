@@ -145,7 +145,7 @@ model animalReports {
   age               String
   appearance        Json
   locationObj       Json
-  animalStatus      String    @default("pending")
+  animalStatus      String    @default("pendingReview")
   statusDescription String?
   description       String
   size              String

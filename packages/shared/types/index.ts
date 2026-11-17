@@ -9,6 +9,7 @@ export type {
 export type { UserStatus } from './UserStatus.js';
 export type { RescueAge, CreateRescueDto } from './Rescue.schema.js';
 export type { RescueListItem } from './RescueList.schema.js';
+export type { RescueListQuery } from './RescueListQuery.schema.js';
 export type {
   RescueDetail,
   RescueDetailAppearance,
@@ -46,6 +47,8 @@ export {
   AnimalStatusValues,
   AnimalStatusSchema,
   AnimalStatus,
+  PublicAnimalStatusValues,
+  isPublicAnimalStatus,
 } from './AnimalStatus.js';
 export {
   RescueAgeSchema,
@@ -54,6 +57,7 @@ export {
   CreateRescueDtoSchema,
 } from './Rescue.schema.js';
 export { RescueListItemSchema } from './RescueList.schema.js';
+export { RescueListQuerySchema } from './RescueListQuery.schema.js';
 export {
   RescueDetailSchema,
   RescueDetailAppearanceSchema,

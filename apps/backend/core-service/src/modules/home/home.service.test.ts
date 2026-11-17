@@ -1,4 +1,4 @@
-import { AnimalStatus } from '@pawhaven/shared/types';
+import { AnimalStatus, PublicAnimalStatusValues } from '@pawhaven/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
 import { HomeService } from './home.service.js';
@@ -109,13 +109,16 @@ describe('HomeService.getStats', () => {
     });
   });
 
-  it('counts only rescues that are still present', async () => {
+  it('counts only rescues that are still published', async () => {
     const { service, animalReportsCount } = buildService({ totalRescues: 1 });
 
     await service.getStats();
 
     expect(animalReportsCount).toHaveBeenNthCalledWith(1, {
-      where: { deletedAt: { isSet: false } },
+      where: {
+        deletedAt: { isSet: false },
+        animalStatus: { in: [...PublicAnimalStatusValues] },
+      },
     });
   });
 

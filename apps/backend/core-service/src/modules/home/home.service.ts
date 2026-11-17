@@ -10,6 +10,7 @@ import {
   ApiResponseEnvelope,
   HeroStats,
   HomeData,
+  PublicAnimalStatusValues,
 } from '@pawhaven/shared/types';
 import { PrismaClient } from '@prismaClient/index.js';
 
@@ -35,7 +36,10 @@ export class HomeService {
     const [totalRescues, adoptedRescues, adoptedPets, totalVolunteers] =
       await Promise.all([
         this.prisma.animalReports.count({
-          where: { deletedAt: { isSet: false } },
+          where: {
+            deletedAt: { isSet: false },
+            animalStatus: { in: [...PublicAnimalStatusValues] },
+          },
         }),
         this.prisma.animalReports.count({
           where: {

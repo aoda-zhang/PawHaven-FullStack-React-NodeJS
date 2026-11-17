@@ -5,7 +5,9 @@ import { InternalJwt } from '@pawhaven/backend-core/internal-jwt';
 import type { AuthenticatedInternalJwt } from '@pawhaven/backend-core/types';
 import {
   CreateRescueDtoSchema,
+  RescueListQuerySchema,
   type CreateRescueDto,
+  type RescueListQuery,
 } from '@pawhaven/shared/types';
 
 import { RescueService } from './rescue.service.js';
@@ -30,9 +32,12 @@ export class RescueController {
     summary:
       'Get rescues, optionally filter by status or limit the result count. Returns user-relevant rescues if authenticated.',
   })
-  findAll(@Query('status') status?: string, @Query('limit') limit?: string) {
+  findAll(
+    @Query({ schema: RescueListQuerySchema }) query: RescueListQuery,
+    @Query('limit') limit?: string,
+  ) {
     return this.rescueService.findAll(
-      status,
+      query.status,
       limit ? Number(limit) : undefined,
     );
   }

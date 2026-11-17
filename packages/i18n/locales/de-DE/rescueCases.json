@@ -2,7 +2,7 @@
   "rescue_cases": {
     "section_title": "Rettungsfälle",
     "section_subtitle": "Verfolgen und unterstützen Sie laufende Rettungseinsätze in Ihrer Nähe",
-    "status_summary": "{{pendingCount}} ausstehend · {{inProgressCount}} in Bearbeitung",
+    "status_summary": "Hilfe benötigt: {{needsHelpCount}} · In Rettung: {{rescueInProgressCount}}",
     "filter_all": "Alle Fälle",
     "view_list": "Liste",
     "view_map": "Karte",
