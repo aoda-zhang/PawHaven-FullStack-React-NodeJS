@@ -4,7 +4,7 @@
       "invalid": "Please enter a valid email address."
     },
     "password": {
-      "too_short": "Password must be at least 6 characters."
+      "invalid": "Password must be 6–8 characters and include an uppercase letter, a lowercase letter, a number, and one of - _ + ."
     }
   }
 }

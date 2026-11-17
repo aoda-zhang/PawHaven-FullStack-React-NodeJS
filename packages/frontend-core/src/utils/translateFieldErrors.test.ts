@@ -10,14 +10,14 @@ describe('translateFieldErrors', () => {
   it('translates flat field error messages', () => {
     const errors: FieldErrors<{ email: string; password: string }> = {
       email: { type: 'invalid_string', message: 'validation.email.invalid' },
-      password: { type: 'minLength', message: 'validation.password.too_short' },
+      password: { type: 'minLength', message: 'validation.password.invalid' },
     };
 
     const result = translateFieldErrors(errors, translate);
 
     expect(result.email?.message).toBe('translated:validation.email.invalid');
     expect(result.password?.message).toBe(
-      'translated:validation.password.too_short',
+      'translated:validation.password.invalid',
     );
   });
 
@@ -71,9 +71,9 @@ describe('translateFieldErrors', () => {
     const errors: FieldErrors<{ password: string }> = {
       password: {
         type: 'invalid',
-        message: 'validation.password.too_short',
+        message: 'validation.password.invalid',
         types: {
-          minLength: 'validation.password.too_short',
+          minLength: 'validation.password.invalid',
           invalid: ['validation.password.invalid', 'Raw message'],
         },
       },
@@ -82,7 +82,7 @@ describe('translateFieldErrors', () => {
     const result = translateFieldErrors(errors, translate);
 
     expect(result.password?.types).toEqual({
-      minLength: 'translated:validation.password.too_short',
+      minLength: 'translated:validation.password.invalid',
       invalid: ['translated:validation.password.invalid', 'Raw message'],
     });
   });

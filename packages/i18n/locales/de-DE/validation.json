@@ -4,7 +4,7 @@
       "invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein."
     },
     "password": {
-      "too_short": "Das Passwort muss mindestens 6 Zeichen lang sein."
+      "invalid": "Das Passwort muss 6–8 Zeichen lang sein und einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl sowie eines der Zeichen - _ + enthalten ."
     }
   }
 }

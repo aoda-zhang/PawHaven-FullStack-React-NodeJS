@@ -27,7 +27,13 @@ login by route — `register/index.tsx` has one, pointing at `routePaths.login`.
 ### 1.2 Register
 
 `register/index.tsx`. The same two fields, same `CredentialsDto`, same form shape. There is no
-confirm-password field, no username field, no terms checkbox, and no password-strength indicator.
+confirm-password field, no username field, and no terms checkbox.
+
+The shared `CredentialsSchema` enforces the password policy on both pages: 6–8 characters, with an
+uppercase letter, a lowercase letter, a digit, and one of `-`, `_`, `+`; only ASCII letters, digits,
+and `-`, `_`, `+` are allowed. The password field shows one complete rule message on submit when the
+value is empty or invalid.
+
 `username` is derived server-side from the email local part; see [§4](#4-data-model).
 
 On success it navigates to `/` with `replace: true` — it does **not** honour a `redirect` param,
@@ -180,7 +186,7 @@ authority. There is no profile feature, so nothing else consumes the user record
 - **No password reset.** Not an endpoint, not a token type, not a link on the login page.
 - **No email verification.** `status: pending` is written at registration and nothing ever moves
   it to `active`.
-- **No confirm-password, no password policy, no strength meter, no terms acceptance.**
+- **No confirm-password, no strength meter, no terms acceptance.**
 - **No social or SSO sign-in.** Two endpoints, email and password only.
 - **No RBAC guard.** There is no `RolesGuard` and no `@Roles()` decorator anywhere in the backend.
   Roles are read in exactly two places: the gateway copies them into the internal JWT, and the
