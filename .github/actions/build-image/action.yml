@@ -1,0 +1,42 @@
+name: Build image
+description: Build a service image from its Dockerfile and upload it as an image.tar artifact.
+
+inputs:
+  service:
+    description: Service name used in the local image tag and the artifact name.
+    required: true
+  tag:
+    description: Tag applied to the locally built image.
+    required: true
+  dockerfile:
+    description: Path to the service Dockerfile, relative to the repository root.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build the image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ${{ inputs.dockerfile }}
+        push: false
+        load: true
+        tags: pawhaven-${{ inputs.service }}:${{ inputs.tag }}
+        cache-from: type=gha,scope=${{ inputs.service }}
+        cache-to: type=gha,mode=max,scope=${{ inputs.service }}
+
+    - name: Save the image
+      shell: bash
+      run: docker save -o image.tar pawhaven-${{ inputs.service }}:${{ inputs.tag }}
+
+    - name: Upload the image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: pawhaven-${{ inputs.service }}-${{ inputs.tag }}
+        path: image.tar
+        retention-days: 1
+        if-no-files-found: error

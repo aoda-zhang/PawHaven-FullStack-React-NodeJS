@@ -116,34 +116,39 @@ means adding its deploy assets and a choice entry.
    All three must pass.
 5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
    the run instead of being moved.
-6. **Build** — the `build` matrix job (`Build <service>`) builds each deployable service with
-   `docker/build-push-action@v6` (`push: false`, `load: true`) as the local tag
+6. **Build** — the `build` matrix job (`Build <service>`) calls the `build-image` composite action
+   (`./.github/actions/build-image`) with the service, the tag and the Dockerfile. The action builds
+   with `docker/build-push-action@v6` (`push: false`, `load: true`) as the local tag
    `pawhaven-<service>:<version>`, saves it with `docker save` and uploads `image.tar` through
-   `actions/upload-artifact@v4`. The job never names a registry.
-7. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) downloads that artifact,
-   loads it with `docker load`, logs in with `docker/login-action@v3`, retags it with `docker tag` and
-   publishes it with `docker push`. See [Image build and registry push](#image-build-and-registry-push).
+   `actions/upload-artifact@v4`. It never names a registry.
+7. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
+   composite action (`./.github/actions/push-image`) with the service, tag, registry, repository and
+   token. The action downloads that artifact, loads it with `docker load`, logs in with
+   `docker/login-action@v3`, retags it with `docker tag` and publishes it with `docker push`. See
+   [Image build and registry push](#image-build-and-registry-push).
 8. **Deploy** — `deploy-k3s.yml` deploys the selected services to `pawhaven-prod` from the `<version>`
    tag.
 
 ## Image build and registry push
 
-Both entry points separate building an image from publishing it. The `build` job is
-registry-agnostic: it builds with `docker/build-push-action@v6` using `push: false` and `load: true`,
-so the image lands in the local Docker daemon as `pawhaven-<service>:<tag>`, then `docker save` writes
-`image.tar` and `actions/upload-artifact@v4` uploads it under `pawhaven-<service>-<tag>`. Nothing in
-that job names a registry.
+Both entry points separate building an image from publishing it, and each half is its own composite
+action. `build-image` (`./.github/actions/build-image`) is registry-agnostic: it builds with
+`docker/build-push-action@v6` using `push: false` and `load: true`, so the image lands in the local
+Docker daemon as `pawhaven-<service>:<tag>`, then `docker save` writes `image.tar` and
+`actions/upload-artifact@v4` uploads it under `pawhaven-<service>-<tag>`. Nothing in that action names
+a registry.
 
-The `push-ghcr` job does the registry work. `actions/download-artifact@v4` fetches the artifact,
-`docker load` restores the image, `docker/login-action@v3` authenticates, `docker tag` adds the
-registry name and `docker push` publishes it. Docker publishes no official action that pushes a
-prebuilt local image, so the official pieces are setup, build, upload/download and login, and the
-transfer itself is the Docker CLI.
+`push-image` (`./.github/actions/push-image`) takes `registry`, `repository` and `token` as inputs and
+does the registry work. `actions/download-artifact@v4` fetches the artifact, `docker load` restores
+the image, `docker/login-action@v3` authenticates, `docker tag` adds the registry name and
+`docker push` publishes it. Docker publishes no official action that pushes a prebuilt local image, so
+the official pieces are setup, build, upload/download and login, and the transfer itself is the Docker
+CLI.
 
-Changing registry — to a private registry, ECR, or anything else — touches only the `push-ghcr` job:
-its login `registry`, its `docker tag` target and its `docker push` target. The build job, its cache
-and the deploy version stay as they are; only the registry name in `deploy-k3s.yml`'s `images` input
-has to match.
+Changing registry — to a private registry, ECR, or anything else — touches only the inputs passed to
+`push-image`: its `registry`, its `repository` and the `token` that authenticates there. The build
+action, its cache and the deploy version stay as they are; only the registry name in
+`deploy-k3s.yml`'s `images` input has to match.
 
 The artifact is a cost to weigh: each image travels from the build runner to artifact storage and
 back to the push runner, so a three-service release moves every image twice before it reaches the
