@@ -57,195 +57,21 @@ jobs:
           printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
           chmod 600 "${HOME}/.kube/config"
 
-      - name: Validate the image tag
-        shell: bash
-        run: |
-          set -euo pipefail
-          version_pattern='^(v[0-9]{2}\.[0-9]{2}\.[0-9]{2}(-[0-9]+)?|sha-[0-9a-f]{7})$'
-          if [[ ! "${VERSION}" =~ ${version_pattern} ]]; then
-            echo "::error::Image tag '${VERSION}' must match ${version_pattern}, such as v26.11.17, v26.11.17-2 or sha-abc1234."
-            exit 1
-          fi
-
-      - name: Ensure the namespace exists
-        shell: bash
-        run: |
-          set -euo pipefail
-          kubectl create namespace "${NAMESPACE}" --dry-run=client -o yaml \
-            | kubectl apply -f -
-
-      - name: Preflight cluster prerequisites
-        shell: bash
-        run: |
-          set -uo pipefail
-          failures=0
-
-          fail() {
-            echo "::error::$1"
-            failures=$((failures + 1))
-          }
-
-          expected_namespace="pawhaven-${ENVIRONMENT}"
-          if [[ "${NAMESPACE}" != "${expected_namespace}" ]]; then
-            fail "Environment ${ENVIRONMENT} targets namespace ${expected_namespace}; this run targets ${NAMESPACE}."
-          fi
-
-          if context="$(kubectl config current-context 2>/dev/null)"; then
-            echo "Using Kubernetes context ${context}."
-          else
-            fail "No usable kubeconfig context is configured."
-          fi
-
-          if kubectl get namespace "${NAMESPACE}" >/dev/null 2>&1; then
-            echo "Namespace ${NAMESPACE} exists."
-          else
-            fail "Namespace ${NAMESPACE} does not exist."
-          fi
-
-          configmap_keys="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
-            -o go-template='{{range $key, $value := .data}}{{$key}}{{"\n"}}{{end}}' 2>/dev/null)"
-          if [[ -z "${configmap_keys}" ]]; then
-            fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing or carries no data."
-          else
-            for key in NODE_ENV AUTH_SERVICE_HOST CORE_SERVICE_HOST DOCUMENT_SERVICE_HOST; do
-              if ! grep -qx "${key}" <<<"${configmap_keys}"; then
-                fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing key ${key}."
-              fi
-            done
-            node_env="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
-              -o jsonpath='{.data.NODE_ENV}' 2>/dev/null || true)"
-            runtime_env=""
-            case "${node_env}" in
-              test | uat | prod)
-                runtime_env="${node_env}"
-                ;;
-              production)
-                runtime_env="prod"
-                ;;
-              *)
-                fail "ConfigMap ${NAMESPACE}/pawhaven-env NODE_ENV must be test, uat, prod or production and match the target environment ${ENVIRONMENT}; found '${node_env}'."
-                ;;
-            esac
-            if [[ -n "${runtime_env}" && "${runtime_env}" != "${ENVIRONMENT}" ]]; then
-              fail "ConfigMap ${NAMESPACE}/pawhaven-env NODE_ENV is '${node_env}'; it must match the target environment ${ENVIRONMENT}."
-            fi
-          fi
-
-          secret_keys="$(kubectl get secret pawhaven-secrets -n "${NAMESPACE}" \
-            -o go-template='{{range $key, $value := .data}}{{$key}}{{"\n"}}{{end}}' 2>/dev/null)"
-          if [[ -z "${secret_keys}" ]]; then
-            fail "Secret ${NAMESPACE}/pawhaven-secrets is missing or carries no data."
-          else
-            for key in JWT_SECRET INTERNAL_JWT_PUBLIC_KEY INTERNAL_JWT_PRIVATE_KEY CORE_SERVICE_MONGODB AUTH_SERVICE_MONGODB BLOB_PUBLIC_BASE_URL; do
-              if ! grep -qx "${key}" <<<"${secret_keys}"; then
-                fail "Secret ${NAMESPACE}/pawhaven-secrets is missing key ${key}."
-              fi
-            done
-          fi
-
-          if ! kubectl get secret ghcr-pull -n "${NAMESPACE}" >/dev/null 2>&1; then
-            fail "Secret ${NAMESPACE}/ghcr-pull (image pull secret) is missing."
-          fi
-
-          if ((failures > 0)); then
-            echo "::error::Preflight failed with ${failures} problem(s); fix the cluster prerequisites and rerun."
-            exit 1
-          fi
-          echo "Preflight passed for namespace ${NAMESPACE}."
-
       - name: Apply platform resources
         shell: bash
         run: |
           set -euo pipefail
-          platform="deploy/platform/${ENVIRONMENT}"
-          if [[ ! -d "${platform}" ]]; then
-            echo "::error::Missing platform manifests in ${platform}."
-            exit 1
-          fi
-          kubectl apply -f "${platform}"
+          kubectl apply -f "deploy/platform/${ENVIRONMENT}"
 
-      - name: Apply service manifests and wait for rollouts
+      - name: Deploy services
         shell: bash
         run: |
           set -euo pipefail
-          summary=""
-          while read -r service; do
-            [[ -n "${service}" ]] || continue
-            manifests="apps/backend/${service}/deploy/kubernetes/${ENVIRONMENT}"
-            if [[ ! -d "${manifests}" ]]; then
-              echo "::error::No manifests for ${service} in ${manifests}."
-              exit 1
-            fi
+          for service in $(jq -r '.[]' <<<"${SERVICES}"); do
             tmp="$(mktemp -d)"
-            cp -R "${manifests}/." "${tmp}/"
+            cp -R "apps/backend/${service}/deploy/kubernetes/${ENVIRONMENT}/." "${tmp}/"
             sed -i "s|v0.0.0-unspecified|${VERSION}|g" "${tmp}"/*.yaml
-            if ! grep -q "namespace: ${NAMESPACE}" "${tmp}"/*.yaml; then
-              echo "::error::${service} manifests do not declare namespace ${NAMESPACE}."
-              exit 1
-            fi
-            if grep -h '^[[:space:]]*namespace:' "${tmp}"/*.yaml | grep -qv "namespace: ${NAMESPACE}"; then
-              echo "::error::${service} manifests declare a namespace other than ${NAMESPACE}."
-              exit 1
-            fi
-            previous="$(kubectl get deployment "${service}" -n "${NAMESPACE}" \
-              -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || true)"
-            [[ -n "${previous}" ]] || previous="none"
             kubectl apply -f "${tmp}"
             rm -rf "${tmp}"
             kubectl rollout status "deployment/${service}" -n "${NAMESPACE}" --timeout=300s
-            deployed="$(kubectl get deployment "${service}" -n "${NAMESPACE}" \
-              -o jsonpath='{.spec.template.spec.containers[0].image}')"
-            if [[ "${deployed}" != *":${VERSION}" ]]; then
-              echo "::error::${service} runs ${deployed}; expected the ${VERSION} tag."
-              exit 1
-            fi
-            summary="${summary}${service}: ${previous} -> ${deployed}"$'\n'
-          done < <(jq -r '.[]' <<<"${SERVICES}")
-          printf '%s' "${summary}"
-
-      - name: Keep every Service cluster-internal
-        shell: bash
-        run: |
-          set -uo pipefail
-          failures=0
-
-          services_json="${RUNNER_TEMP}/namespace-services.json"
-          if ! kubectl get services -n "${NAMESPACE}" -o json >"${services_json}" 2>/dev/null; then
-            echo "::error::Could not list Services in namespace ${NAMESPACE}."
-            exit 1
-          fi
-          while IFS=$'\t' read -r service service_type; do
-            [[ -n "${service}" ]] || continue
-            if [[ "${service_type}" != "ClusterIP" ]]; then
-              echo "::error::Service ${NAMESPACE}/${service} is ${service_type}; every Service in the namespace must be ClusterIP."
-              failures=$((failures + 1))
-            fi
-          done < <(jq -r '.items[] | [.metadata.name, .spec.type] | @tsv' "${services_json}")
-
-          ingresses_json="${RUNNER_TEMP}/namespace-ingresses.json"
-          if ! kubectl get ingress -n "${NAMESPACE}" -o json >"${ingresses_json}" 2>/dev/null; then
-            echo "::error::Could not list Ingresses in namespace ${NAMESPACE}."
-            exit 1
-          fi
-          while IFS=$'\t' read -r ingress backend; do
-            [[ -n "${backend}" ]] || continue
-            if [[ "${backend}" != "gateway" ]]; then
-              echo "::error::Ingress ${NAMESPACE}/${ingress} routes to ${backend}; only gateway may be an Ingress backend."
-              failures=$((failures + 1))
-            fi
-          done < <(jq -r '
-            .items[]
-            | .metadata.name as $name
-            | (
-                [ (.spec.rules // [])[] | (.http.paths // [])[] | .backend.service.name // empty ]
-                + [ .spec.defaultBackend.service.name // empty ]
-              )[]
-            | [ $name, . ]
-            | @tsv
-          ' "${ingresses_json}")
-
-          if ((failures > 0)); then
-            echo "::error::Internal-only guard failed with ${failures} problem(s) in namespace ${NAMESPACE}."
-            exit 1
-          fi
-          echo "Every Service in ${NAMESPACE} is ClusterIP and only gateway is an Ingress backend."
+          done

@@ -72,9 +72,10 @@ the environments apart.
 
 ## One-time setup per environment
 
-Run these once per namespace, before the first deploy. The deploy workflow creates the namespace
-itself, then fails preflight if any item below is missing — an incomplete setup stops before the
-platform manifests or any Deployment is applied. The steps below reproduce the same objects by hand.
+Run these once per namespace, before the first deploy. The deploy workflow applies
+`deploy/platform/<env>`, which creates the namespace, but it neither creates nor checks the ConfigMap,
+the Secret or the pull secret: an incomplete setup surfaces as a Pod that cannot start or cannot pull
+its image, after the Deployment is applied. The steps below are a manual prerequisite.
 
 Create the namespace first: every namespaced command below passes `-n pawhaven-prod` and fails with
 `NotFound` while the namespace does not exist.
@@ -90,8 +91,8 @@ NetworkPolicies: default-deny ingress, a same-namespace allowance, and port 8080
 whichever ingress or tunnel controller fronts it. Run it once per environment by substituting `test`
 or `uat`.
 
-The deploy workflow applies the same directory on every run after preflight, so it stays
-authoritative: a policy edited by hand in the cluster is reverted by the next deploy.
+The deploy workflow applies the same directory on every run, so it stays authoritative: a policy
+edited by hand in the cluster is reverted by the next deploy.
 
 ### Runtime ConfigMap
 
@@ -105,8 +106,8 @@ Keys read through `envFrom` by all three services:
 | `DOCUMENT_SERVICE_HOST` | `https://<document-service>.vercel.app`                                        |
 
 `NODE_ENV` selects the per-environment config directory (`config/<env>/env/index.json`) in every
-service, so apply the name of the namespace: `test`, `uat`, or `prod`. Preflight also requires it to
-resolve to the target environment; the resolver also accepts `production` for `prod`.
+service, so apply the name of the namespace: `test`, `uat`, or `prod`. The resolver also accepts
+`production` for `prod`.
 
 One ConfigMap serves every Deployment in the namespace; the per-service ConfigMaps from the earlier
 manifests (`gateway-config`, `core-service-config`, and so on) are gone.
@@ -215,33 +216,29 @@ gh run watch
 
 ## Deploy a service build
 
-Use this to build and deploy the head of a branch, or to redeploy an existing image. One run deploys
-one service.
+Use this to build and deploy the head of a branch. One run deploys one service.
 
 ```bash
 gh workflow run deploy.yml -f environment=test -f service=gateway -f branch=develop
 gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main
-gh workflow run deploy.yml -f environment=test -f service=gateway -f branch=develop -f version=v26.11.17
 ```
 
-`branch` defaults to `develop` and must exist on `origin`; an unknown branch fails the run and lists
-the branches that do. The run resolves that branch's head, checks the selected service with a
-service-scoped `typecheck`/`test`/`lint` (it does not reuse `test.yml` and runs no Playwright E2E,
-Storybook or full-repo gate), builds the selected service as `sha-<7>`, pushes it, then deploys it —
-so the manifests it applies come from the same commit as the image.
+`branch` defaults to `develop`. The run checks that branch out, so an unknown branch fails at
+checkout. It then builds the selected service as `sha-<7>`, pushes it to GHCR, applies
+`deploy/platform/<env>` and the service's manifests, and waits for the rollout — so the manifests it
+applies come from the same commit as the image.
 
-`prod` requires `branch=main` and waits for the `prod` environment approval; `test` and `uat` accept
-any branch and need no approval. Pass `version` to skip the check and the build and redeploy an image
-that is already in `ghcr.io`, which is how a release is promoted or a rollback is run. The tag must
-match `vYY.MM.DD`, `vYY.MM.DD-<n>` or `sha-<7>`, and the run fails before it connects to the cluster
-if the tag is missing for the selected service.
+`prod` waits for the `prod` environment approval; `test` and `uat` need no approval. The workflow
+restricts no branch, and it runs no tests and no cluster preflight: the gates are merge-time checks,
+so deploy a commit that has already passed CI.
 
 Each Deployment runs one replica with `maxSurge: 0`, so a rollout briefly replaces the old pod
 instead of overlapping it.
 
 ## Roll back
 
-Rollback is a deploy of an older version tag; nothing is rebuilt or retagged.
+A rollback is a forward deploy of a known-good commit. `deploy.yml` has no version input: every run
+builds `sha-<7>` from the branch it checks out, so the way back is to deploy the good commit again.
 
 Identify the previous known-good release explicitly. Do not take the newest tag blindly — during an
 incident the newest `vYY.MM.DD` tag is usually the broken release, and it is not necessarily the tag
@@ -258,19 +255,22 @@ candidate contains the last good change before deploying it:
 git log --oneline -5 <known-good-tag>
 ```
 
-Then deploy that tag by name:
+Revert the faulty change and release again:
 
 ```bash
-gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main -f version=<known-good-tag>
+git revert <faulty-commit>
+gh workflow run release.yml -f service=all
 ```
 
-With `version` set, the run skips the check and the build, so nothing is rebuilt or retagged; the
-branch supplies the manifests and must be `main` for `prod`. `deploy.yml` deploys one service per
-run, so roll back each affected service with its own dispatch.
+For a single service, dispatch `deploy.yml` with a branch whose head is the good commit; the run
+builds that commit as `sha-<7>` and deploys it:
 
-If the broken change was already released as an image, reverting the commit on `main` and running
-`release.yml` produces a new tag; the rollback command above is faster when the previous image is
-still the one you want. Record which tag you deployed and why in the incident notes.
+```bash
+gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=<branch-at-good-commit>
+```
+
+`deploy.yml` deploys one service per run, so roll back each affected service with its own dispatch.
+Record which commit you deployed and why in the incident notes.
 
 ## Gateway exposure
 
@@ -315,15 +315,15 @@ kubectl get svc -n pawhaven-prod
 ```
 
 Expected: every Service in the namespace is `ClusterIP`, including `gateway`; no `NodePort` or
-`LoadBalancer`. After deploying, the workflow requires every Service, including `gateway`, to be
-`ClusterIP` and fails the run otherwise; only the Ingress-backend check names `gateway`.
+`LoadBalancer`. Nothing in the deploy workflow checks this, so run it after a Service or platform
+manifest change.
 
 ```bash
 kubectl get ingress -n pawhaven-prod
 ```
 
-Expected: `No resources found`. The deploy workflow also fails the run if any Ingress backend is not
-`gateway`.
+Expected: `No resources found`. If an Ingress appears, confirm its backend is `gateway`; nothing in
+the deploy workflow checks that for you.
 
 ```bash
 kubectl -n default run curl-probe --rm -it --restart=Never --image=curlimages/curl -- \
@@ -343,17 +343,15 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 
 ## Failure modes
 
-| Symptom                                                                   | Cause and fix                                                                                                                                                                                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Preflight names a missing ConfigMap/Secret key                            | The key is absent or the object lacks data. Create or patch it, then rerun; the platform manifests are applied, but no Deployment was applied.                                                                                                                                                                                                                                                                          |
-| A pod exits at startup naming `NODE_ENV`                                  | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
-| Preflight reports `ghcr-pull` missing                                     | The registry secret was never created in that namespace, or has the wrong name. Recreate it as a `docker-registry` secret.                                                                                                                                                                                                                                                                                              |
-| `does not exist; leave version empty to build it or pass a published tag` | The `version` you passed is not in `ghcr.io` for the selected service. Pass a tag a release pushed to GHCR, or clear `version` so the run builds `sha-<7>` from the selected branch.                                                                                                                                                                                                                                    |
-| Pods stuck in `ImagePullBackOff` after a green deploy                     | The node cannot pull the image: expired PAT, wrong scope, or package visibility. Preflight proves the tag exists, not that this node may pull it. Recreate `ghcr-pull` and delete the pod.                                                                                                                                                                                                                              |
-| Release fails on an existing tag                                          | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                                |
-| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff`           | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                     |
-| Rollout times out after 300 s                                             | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
-| Gateway unreachable while every pod is Ready                              | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |
+| Symptom                                                         | Cause and fix                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A pod never becomes Ready and logs a config error               | A `pawhaven-env` or `pawhaven-secrets` key is missing in that namespace. Nothing checks the keys before the Deployment is applied, so the container starts and fails. Create or patch the object, then `kubectl -n <namespace> rollout restart deployment/<service>`.                                                                                                                                                   |
+| A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
+| Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, wrong package visibility, or a missing `ghcr-pull` secret in that namespace. Recreate `ghcr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                                                           |
+| Release fails on an existing tag                                | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                                |
+| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                     |
+| Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
+| Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |
 
 A NetworkPolicy cannot block traffic that originates on the node itself, so kubelet TCP probes are
 never filtered by the policy. If the CNI treats host traffic as external, add the node CIDR as an

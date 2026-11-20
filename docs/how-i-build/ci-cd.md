@@ -7,9 +7,9 @@
 
 ## Principle
 
-CI proves; a release tags what already passed and pushes it to GHCR; a deploy promotes that pushed
-image or builds the selected branch as `sha-<7>`. The quality gate is the merge-readiness signal and
-reproduces the checks a developer runs locally.
+CI proves; a release tags what already passed and pushes it to GHCR; a deploy builds the selected
+branch as `sha-<7>` and ships it. The quality gate is the merge-readiness signal and reproduces the
+checks a developer runs locally.
 
 There are exactly two deployment entry points — `release.yml` and `deploy.yml` — and both are
 `workflow_dispatch` only. No push, tag, schedule or pull request deploys anything.
@@ -22,8 +22,8 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 | `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                                 |
 | `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
 | `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
-| `deploy-k3s.yml`               | `workflow_call` only                 | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend             |
-| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), with an optional existing tag: resolve the branch head, run a service-scoped typecheck/test/lint for that service, build and push it as `sha-<7>`, then deploy; `prod` requires `branch=main` and approval                    |
+| `deploy-k3s.yml`               | `workflow_call` only                 | Apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply and wait for each rollout                                                                                                                               |
+| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), build and push that branch head as `sha-<7>`, then deploy it; `prod` waits for environment approval                                                                                                                           |
 | `release.yml`                  | manual                               | Approve, run the gates, tag `main`, push every deployable service to GHCR in the `push-ghcr` matrix job, deploy the selected scope                                                                                                                                                                 |
 | `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
@@ -34,34 +34,29 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 selected, so a run checks and deploys the same commit instead of whatever ref started the dispatch.
 
 The three gate workflows are not dispatchable. They run on their pull request and `main` push
-events, and `release.yml` calls the same definitions through `workflow_call`. `deploy.yml` does not
-call them: its `check` job runs a service-scoped typecheck, test and lint for the selected service
-and the workspace packages it depends on, and it runs neither Playwright E2E, Storybook nor the
-full-repo gates.
+events, and `release.yml` calls the same definitions through `workflow_call`. `deploy.yml` calls
+none of them: it builds and pushes the selected branch head, then deploys it, so a deploy from a
+branch that never passed the gates is unproven until that change merges.
 
 ## The two entry points
 
-| Input           | `release.yml`                                                         | `deploy.yml`                                                                                  |
-| --------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Environment     | `prod` only                                                           | `test` \| `uat` \| `prod`                                                                     |
-| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`                         |
-| Branch          | `main` only                                                           | `branch` input, default `develop`; any branch on `origin` for `test`/`uat`, `main` for `prod` |
-| Version         | computed from the date tag                                            | optional existing tag; empty builds `sha-<7>` from the selected branch                        |
-| Builds an image | yes — every deployable service, regardless of the service selection   | the selected service, unless `version` names an existing tag                                  |
-| Approval        | `prod` environment with required reviewers                            | `prod` environment, only when the target is `prod`                                            |
-| What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope | pushes the image, then the platform manifests and the selected Deployment                     |
+| Input           | `release.yml`                                                         | `deploy.yml`                                                              |
+| --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Environment     | `prod` only                                                           | `test` \| `uat` \| `prod`                                                 |
+| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`     |
+| Branch          | `main` only                                                           | `branch` input, default `develop`                                         |
+| Image tag       | the computed date tag                                                 | `sha-<7>` of the branch head, built on every run                          |
+| Approval        | `prod` environment with required reviewers                            | `prod` environment, only when the target is `prod`                        |
+| What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope | pushes the image, then the platform manifests and the selected Deployment |
 
-Service selection controls deployment scope, not what gets pushed: `release.yml` always pushes
+In `release.yml`, service selection controls deployment scope, not what gets pushed: it always pushes
 every service that declares a deploy Dockerfile to GHCR, then deploys the subset you picked.
 
-`release.yml` runs from `main` only. `deploy.yml` resolves its `branch` input to that branch's head
-and checks, builds and deploys that commit; an unknown branch fails the run and lists the branches
-that do exist on `origin`. `test` and `uat` accept any real branch by design, so a branch can be
-promoted to a non-production namespace for verification. `prod` requires `branch=main` whatever ref
-the dispatch was started from, and a `version` naming an existing tag skips both the check and the
-build, leaving only the deploy. The check itself is scoped to the selected service:
-`pnpm build:libs` then `turbo run typecheck test lint --filter=@pawhaven/<service>...`, so it proves
-that service and its dependencies without running Playwright E2E, Storybook or the full-repo gates.
+`release.yml` runs from `main` only. `deploy.yml` checks out its `branch` input, builds that head as
+`sha-<7>` and deploys it, so the image and the manifests come from the same commit. `test` and `uat`
+accept any branch by design, so a branch can be promoted to a non-production namespace for
+verification. `prod` waits for the `prod` environment approval but does not restrict the branch, so
+choose the branch deliberately: nothing checks it before the image is built and pushed.
 
 ## Where deploy assets live
 
@@ -128,20 +123,20 @@ means adding its deploy assets and a choice entry.
 
 ## Tag and rollback discipline
 
-Version tags are immutable image tags, not branches. A release always names the date tag it just
-pushed to GHCR, and rolling back is a forward deploy of an older tag:
+Release tags are immutable image tags, not branches: a release always names the date tag it just
+pushed to GHCR.
+
+`deploy.yml` has no tag input. Every run builds `sha-<7>` from the branch it checks out, so rolling
+back means deploying a known-good commit again: revert the faulty change on `main` and run
+`release.yml`, or dispatch `deploy.yml` from a branch whose head is that commit.
 
 ```bash
-gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main -f version=v26.11.10
+git revert <faulty-commit>
+gh workflow run release.yml -f service=all
 ```
 
-There is no rebuild and no retag in a rollback: a `version` that already exists skips the check and
-the build, and the branch supplies only the manifests. `prod` requires `branch=main`. `deploy.yml`
-preflights that the requested version exists in `ghcr.io` for the selected service before it touches
-the cluster; leave `version` empty to build `sha-<7>` from the selected branch instead.
-
 Immutability is enforced by the `v*` tag ruleset in [Tag protection](#tag-protection), not by branch
-protection. Choose the rollback target explicitly — the newest tag may be the broken release — by
+protection. Choose the target commit explicitly — the newest tag may be the broken release — by
 listing tags and checking the candidate's commits, as the [runbook](deployment-runbook.md#roll-back)
 describes.
 
@@ -152,18 +147,15 @@ describes.
   production, so a prod release and a prod deploy cannot overlap.
 - `release.yml` writes contents only in the tagging job; the `push-ghcr` job adds `packages: write`;
   every other job is read-only.
-- `deploy-k3s.yml` runs a guard after applying: every Service, including `gateway`, must be
-  `ClusterIP`, and only `gateway` may be an Ingress backend.
 - The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
   `contents: write`.
 
 ## Repository protection
 
-The dispatch entry points reject a non-`main` dispatch for `release.yml` and a production
-`deploy.yml` whose `branch` is not `main`, but only after a run starts. Protect `main` itself so a
-direct push or a stale pull request cannot reach the commit the deploy workflows trust. GitHub keys a
-required status check by job name, not by workflow file, so these are the gate jobs from
-[Quality Gates](quality-gates.md):
+`release.yml` rejects a non-`main` dispatch, but only after a run starts, and `deploy.yml` does not
+restrict its branch at all. Protect `main` itself so a direct push or a stale pull request cannot
+reach the commit the deploy workflows trust. GitHub keys a required status check by job name, not by
+workflow file, so these are the gate jobs from [Quality Gates](quality-gates.md):
 
 | Workflow           | Job (required-check name)                        | Required on `main` | Why                                                                       |
 | ------------------ | ------------------------------------------------ | ------------------ | ------------------------------------------------------------------------- |

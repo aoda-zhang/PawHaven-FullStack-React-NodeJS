@@ -76,6 +76,10 @@ still run in CI.
 before it creates the release tag. The release checks are those same definitions, not a
 release-only copy, so a gate tightened for a PR is also enforced before pushing to GHCR.
 
+`deploy.yml` and `deploy-k3s.yml` are not gates: they run no tests, no lint and no cluster
+preflight, so a deploy from a branch that never passed these checks is unproven until the change
+merges.
+
 ## Adding a gate
 
 1. Put the logic in `scripts/` as one focused Node script with `exit 0 = clean, 1 = finding`.
