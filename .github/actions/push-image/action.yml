@@ -1,0 +1,46 @@
+name: Push image
+description: Load a built image.tar artifact and push it to a configurable registry.
+
+inputs:
+  service:
+    description: Service name used in the local image tag and the artifact name.
+    required: true
+  tag:
+    description: Tag the image was built with.
+    required: true
+  registry:
+    description: Registry host the image is pushed to.
+    required: true
+  repository:
+    description: Image repository within the registry, in owner/pawhaven-<service> form.
+    required: true
+  token:
+    description: Password or token used to authenticate against the registry.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Download the image artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: pawhaven-${{ inputs.service }}-${{ inputs.tag }}
+
+    - name: Load the image
+      shell: bash
+      run: docker load -i image.tar
+
+    - name: Log in to the registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ inputs.token }}
+
+    - name: Tag the image
+      shell: bash
+      run: docker tag pawhaven-${{ inputs.service }}:${{ inputs.tag }} ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.tag }}
+
+    - name: Push the image
+      shell: bash
+      run: docker push ${{ inputs.registry }}/${{ inputs.repository }}:${{ inputs.tag }}

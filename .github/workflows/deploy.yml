@@ -36,12 +36,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  push-ghcr:
-    name: Build and push ${{ inputs.service }} to GHCR
+  build:
+    name: Build ${{ inputs.service }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
@@ -55,22 +54,32 @@ jobs:
         shell: bash
         run: echo "tag=sha-$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
 
-      - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/login-action@v3
+      - name: Build the image
+        uses: ./.github/actions/build-image
         with:
+          service: ${{ inputs.service }}
+          tag: ${{ steps.tag.outputs.tag }}
+          dockerfile: apps/backend/${{ inputs.service }}/deploy/Dockerfile
+
+  push-ghcr:
+    name: Push ${{ inputs.service }} to GHCR
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Push the image
+        uses: ./.github/actions/push-image
+        with:
+          service: ${{ inputs.service }}
+          tag: ${{ needs.build.outputs.tag }}
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/backend/${{ inputs.service }}/deploy/Dockerfile
-          push: true
-          tags: ghcr.io/aoda-zhang/pawhaven-${{ inputs.service }}:${{ steps.tag.outputs.tag }}
-          cache-from: type=gha,scope=${{ inputs.service }}
-          cache-to: type=gha,mode=max,scope=${{ inputs.service }}
+          repository: aoda-zhang/pawhaven-${{ inputs.service }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   approve-prod:
     name: Approve the production deployment
@@ -84,42 +93,42 @@ jobs:
 
   deploy-test:
     name: Deploy to test
-    needs: push-ghcr
+    needs: [build, push-ghcr]
     if: ${{ inputs.environment == 'test' }}
     uses: ./.github/workflows/deploy-k3s.yml
     with:
       environment: test
       namespace: pawhaven-test
       ref: ${{ inputs.branch }}
-      version: ${{ needs.push-ghcr.outputs.tag }}
+      version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_TEST }}
 
   deploy-uat:
     name: Deploy to uat
-    needs: push-ghcr
+    needs: [build, push-ghcr]
     if: ${{ inputs.environment == 'uat' }}
     uses: ./.github/workflows/deploy-k3s.yml
     with:
       environment: uat
       namespace: pawhaven-uat
       ref: ${{ inputs.branch }}
-      version: ${{ needs.push-ghcr.outputs.tag }}
+      version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_UAT }}
 
   deploy-prod:
     name: Deploy to prod
-    needs: [push-ghcr, approve-prod]
+    needs: [build, push-ghcr, approve-prod]
     if: ${{ inputs.environment == 'prod' }}
     uses: ./.github/workflows/deploy-k3s.yml
     with:
       environment: prod
       namespace: pawhaven-prod
       ref: ${{ inputs.branch }}
-      version: ${{ needs.push-ghcr.outputs.tag }}
+      version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}

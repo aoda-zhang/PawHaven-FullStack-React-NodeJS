@@ -216,7 +216,8 @@ gh run watch
 1. Merge the change to `main` and confirm the commit to ship.
 2. Dispatch `release.yml` from `main`; pick `all` or a single service for the deploy scope.
 3. Approve the `prod` environment when the run pauses.
-4. The run gates, tags, pushes every deployable service to GHCR, then deploys the selected services.
+4. The run gates, tags, builds every deployable service into an `image.tar` artifact, pushes each
+   image to GHCR, then deploys the selected services.
 5. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
 
 ## Deploy a service build
@@ -229,10 +230,21 @@ gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main
 ```
 
 `branch` defaults to `develop`. The run checks that branch out, so an unknown branch fails at
-checkout. It then builds the selected service as `sha-<7>`, pushes it to GHCR, and calls
-`deploy-k3s.yml`, which applies `deploy/platform/<env>` in a `platform` job and then each selected
-service in a matrix `services` job, waiting for every rollout — so the manifests it applies come from
-the same commit as the image.
+checkout. It then builds the selected service as `sha-<7>` through the `build-image` composite action
+(`./.github/actions/build-image`, which runs `docker/build-push-action@v6` with `load: true` and
+`push: false`) into `pawhaven-<service>:sha-<7>`, saves it with `docker save` and uploads `image.tar`
+as an artifact. A separate `push-ghcr` job calls the `push-image` composite action
+(`./.github/actions/push-image`), which downloads that artifact, restores the image with `docker load`,
+retags it with `docker tag` and publishes it with `docker push`, logging in through
+`docker/login-action@v3`. The run then calls `deploy-k3s.yml`, which applies
+`deploy/platform/<env>` in a `platform` job and then each selected service in a matrix `services` job,
+waiting for every rollout — so the manifests it applies come from the same commit as the image.
+
+Neither composite action hardcodes a registry: `build-image` names none, and `push-image` receives
+`registry` and `repository` as inputs. Pointing the pipeline at a different registry therefore means
+changing only those inputs in `push-ghcr` and the registry in `deploy-k3s.yml`'s `images` input. The
+artifact hop is the price of that separation: each image is uploaded to artifact storage and
+downloaded again before it is pushed, which a `retention-days: 1` policy keeps cheap to store.
 
 `prod` waits for the `prod` environment approval; `test` and `uat` need no approval. The workflow
 restricts no branch, and it runs no tests and no cluster preflight: the gates are merge-time checks,
