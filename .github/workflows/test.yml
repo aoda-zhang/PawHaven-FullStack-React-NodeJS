@@ -149,6 +149,10 @@ jobs:
         shell: bash
         run: pnpm install --frozen-lockfile
 
+      - name: Build shared packages
+        shell: bash
+        run: pnpm build:libs
+
       - name: Install Playwright browser
         shell: bash
         run: pnpm exec playwright install --with-deps chromium

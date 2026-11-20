@@ -16,17 +16,17 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 
 ## Workflows
 
-| Workflow                       | Trigger                              | What it does                                                                                                                                                                                                                                                                           |
-| ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test.yml`                     | PR, push to `main`, `workflow_call`  | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium and runs Playwright E2E                                           |
-| `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                     |
-| `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                    |
-| `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                            |
-| `publish-images.yml`           | `workflow_call` only                 | Build a dynamic matrix of the requested services and push `ghcr.io/aoda-zhang/pawhaven-<service>` with the version tag; no separate `sha-<7>` tag                                                                                                                                      |
-| `deploy-k3s.yml`               | `workflow_call` only                 | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend |
-| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), with an optional existing tag: check the branch, build and push the selected service as `sha-<7>`, then deploy; `prod` requires `branch=main` and approval                                                        |
-| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, publish all deployable services, deploy the selected scope                                                                                                                                                                                         |
-| `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                         |
+| Workflow                       | Trigger                              | What it does                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yml`                     | PR, push to `main`, `workflow_call`  | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs dependencies, builds the workspace packages, installs Chromium and runs Playwright E2E |
+| `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                                 |
+| `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
+| `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
+| `publish-images.yml`           | `workflow_call` only                 | Build a dynamic matrix of the requested services and push `ghcr.io/aoda-zhang/pawhaven-<service>` with the version tag; no separate `sha-<7>` tag                                                                                                                                                  |
+| `deploy-k3s.yml`               | `workflow_call` only                 | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend             |
+| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), with an optional existing tag: resolve the branch head, run a service-scoped typecheck/test/lint for that service, build and push it as `sha-<7>`, then deploy; `prod` requires `branch=main` and approval                    |
+| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, publish all deployable services, deploy the selected scope                                                                                                                                                                                                     |
+| `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
 `publish-images.yml` and `deploy-k3s.yml` carry no trigger of their own. They are reusable
 capabilities: `release.yml` and `deploy.yml` are their only callers.
@@ -36,8 +36,10 @@ passes the branch it selected, so a run checks, builds and deploys the same comm
 whatever ref started the dispatch.
 
 The three gate workflows are not dispatchable. They run on their pull request and `main` push
-events, and `release.yml` calls the same definitions through `workflow_call`; `deploy.yml` reuses
-`test.yml` the same way before it builds.
+events, and `release.yml` calls the same definitions through `workflow_call`. `deploy.yml` does not
+call them: its `check` job runs a service-scoped typecheck, test and lint for the selected service
+and the workspace packages it depends on, and it runs neither Playwright E2E, Storybook nor the
+full-repo gates.
 
 ## The two entry points
 
@@ -59,7 +61,9 @@ and checks, builds and deploys that commit; an unknown branch fails the run and 
 that do exist on `origin`. `test` and `uat` accept any real branch by design, so a branch can be
 promoted to a non-production namespace for verification. `prod` requires `branch=main` whatever ref
 the dispatch was started from, and a `version` naming an existing tag skips both the check and the
-build, leaving only the deploy.
+build, leaving only the deploy. The check itself is scoped to the selected service:
+`pnpm build:libs` then `turbo run typecheck test lint --filter=@pawhaven/<service>...`, so it proves
+that service and its dependencies without running Playwright E2E, Storybook or the full-repo gates.
 
 ## Where deploy assets live
 

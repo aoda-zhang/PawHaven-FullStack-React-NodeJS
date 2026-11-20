@@ -227,9 +227,10 @@ gh workflow run deploy.yml -f environment=test -f service=gateway -f branch=deve
 ```
 
 `branch` defaults to `develop` and must exist on `origin`; an unknown branch fails the run and lists
-the branches that do. The run resolves that branch's head, checks it through `test.yml`, builds the
-selected service as `sha-<7>`, pushes it, then deploys it — so the manifests it applies come from the
-same commit as the image.
+the branches that do. The run resolves that branch's head, checks the selected service with a
+service-scoped `typecheck`/`test`/`lint` (it does not reuse `test.yml` and runs no Playwright E2E,
+Storybook or full-repo gate), builds the selected service as `sha-<7>`, pushes it, then deploys it —
+so the manifests it applies come from the same commit as the image.
 
 `prod` requires `branch=main` and waits for the `prod` environment approval; `test` and `uat` accept
 any branch and need no approval. Pass `version` to skip the check and the build and redeploy an image
