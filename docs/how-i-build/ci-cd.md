@@ -116,8 +116,11 @@ means adding its deploy assets and a choice entry.
    All three must pass.
 5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
    the run instead of being moved.
-6. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) builds every deployable
-   service with `docker/build-push-action` and `push: true`, tagging only `<version>` (the date tag).
+6. **Build and push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) runs two
+   steps per service. The build step uses `docker/build-push-action@v6` with `load: true` and
+   `push: false`, so the image lands in the local daemon tagged `<version>` (the date tag). The push
+   step logs in with `docker/login-action@v3` and uploads it with `docker push`; no official Docker
+   action pushes a prebuilt local image.
 7. **Deploy** — `deploy-k3s.yml` deploys the selected services to `pawhaven-prod` from the `<version>`
    tag.
 

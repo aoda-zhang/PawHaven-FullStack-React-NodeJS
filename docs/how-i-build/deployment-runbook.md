@@ -229,10 +229,11 @@ gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main
 ```
 
 `branch` defaults to `develop`. The run checks that branch out, so an unknown branch fails at
-checkout. It then builds the selected service as `sha-<7>`, pushes it to GHCR, and calls
-`deploy-k3s.yml`, which applies `deploy/platform/<env>` in a `platform` job and then each selected
-service in a matrix `services` job, waiting for every rollout — so the manifests it applies come from
-the same commit as the image.
+checkout. It then builds the selected service as `sha-<7>` with `docker/build-push-action@v6`
+(`load: true`, `push: false`), pushes that local image to GHCR with `docker/login-action@v3` and
+`docker push`, and calls `deploy-k3s.yml`, which applies `deploy/platform/<env>` in a `platform` job
+and then each selected service in a matrix `services` job, waiting for every rollout — so the
+manifests it applies come from the same commit as the image.
 
 `prod` waits for the `prod` environment approval; `test` and `uat` need no approval. The workflow
 restricts no branch, and it runs no tests and no cluster preflight: the gates are merge-time checks,
