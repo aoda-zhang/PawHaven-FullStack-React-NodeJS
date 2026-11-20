@@ -192,13 +192,12 @@ jobs:
           git tag -a "${TAG}" -m "Release ${TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${TAG}"
 
-  push-ghcr:
-    name: Push ${{ matrix.service }} to GHCR
+  build:
+    name: Build ${{ matrix.service }}
     needs: [resolve, tag]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -216,15 +215,48 @@ jobs:
           file: apps/backend/${{ matrix.service }}/deploy/Dockerfile
           push: false
           load: true
-          tags: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
+          tags: pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
           cache-from: type=gha,scope=${{ matrix.service }}
           cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+      - name: Save the image
+        shell: bash
+        run: docker save -o image.tar pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
+      - name: Upload the image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pawhaven-${{ matrix.service }}-${{ needs.resolve.outputs.tag }}
+          path: image.tar
+          retention-days: 1
+          if-no-files-found: error
+
+  push-ghcr:
+    name: Push ${{ matrix.service }} to GHCR
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
+    steps:
+      - name: Download the image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pawhaven-${{ matrix.service }}-${{ needs.resolve.outputs.tag }}
+      - name: Load the image
+        shell: bash
+        run: docker load -i image.tar
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Tag the image for GHCR
+        shell: bash
+        run: docker tag pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }} ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
       - name: Push image to GHCR
         shell: bash
         run: docker push ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
