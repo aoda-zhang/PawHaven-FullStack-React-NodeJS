@@ -20,7 +20,7 @@ export class HttpClientService {
   private getDefaultHeaders(): Record<string, string> {
     return {
       [httpHeaders.appSource]: 'nestjs-gateway',
-      [httpHeaders.env]: this.config.get<string>('NODE_ENV') || 'dev',
+      [httpHeaders.env]: process.env.APP_ENV ?? 'dev',
     };
   }
 

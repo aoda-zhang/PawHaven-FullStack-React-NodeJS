@@ -6,6 +6,8 @@ RUN corepack enable && corepack prepare pnpm@12.4.1 --activate
 COPY . .
 RUN pnpm install --frozen-lockfile --filter=@pawhaven/gateway... \
     && pnpm dlx turbo@2.11.10 run build --filter=@pawhaven/gateway...
+
+ENV NODE_ENV=production
 USER node
 WORKDIR /app/apps/backend/gateway
 EXPOSE 8080

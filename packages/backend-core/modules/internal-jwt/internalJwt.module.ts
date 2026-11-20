@@ -37,7 +37,7 @@ export class InternalJwtModule {
     serviceName: string,
     configSources?: ServiceConfigSource,
   ): boolean {
-    const currentEnv = getRuntimeEnv(process.env.NODE_ENV);
+    const currentEnv = getRuntimeEnv(process.env.APP_ENV);
 
     let parsedConfig: InternalJwtConfigFile | undefined;
     try {

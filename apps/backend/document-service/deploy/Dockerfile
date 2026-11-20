@@ -47,6 +47,7 @@ RUN pnpm install --frozen-lockfile --filter=@pawhaven/document-service... \
     && pnpm dlx turbo@2.11.10 run build --filter=@pawhaven/document-service... \
     && chown -R node:node "$PUPPETEER_CACHE_DIR"
 
+ENV NODE_ENV=production
 USER node
 WORKDIR /app/apps/backend/document-service
 

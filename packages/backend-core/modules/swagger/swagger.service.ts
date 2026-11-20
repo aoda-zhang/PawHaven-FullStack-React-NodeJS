@@ -12,7 +12,7 @@ export class SwaggerService {
   constructor(private readonly config: ConfigService) {}
 
   init(app: NestExpressApplication) {
-    if (isProd(process.env.NODE_ENV)) return;
+    if (isProd(process.env.APP_ENV)) return;
 
     const options = new DocumentBuilder()
       .setTitle(this.config.getOrThrow<string>('swagger.title'))

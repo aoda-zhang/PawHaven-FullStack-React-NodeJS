@@ -71,7 +71,7 @@ export class ConfigsModule {
    * @param options see ConfigsModuleOptions
    */
   static forRoot(options: ConfigsModuleOptions): DynamicModule {
-    const currentEnv = getRuntimeEnv(process.env.NODE_ENV);
+    const currentEnv = getRuntimeEnv(process.env.APP_ENV);
 
     const DynamicConfigModule = ConfigModule.forRoot({
       isGlobal: true,

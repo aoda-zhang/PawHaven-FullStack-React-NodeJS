@@ -11,7 +11,7 @@ describe('getRuntimeEnv', () => {
     'throws for %p',
     (env) => {
       expect(() => getRuntimeEnv(env)).toThrow(
-        `Invalid NODE_ENV "${env ?? '<unset>'}"`,
+        `Invalid APP_ENV "${env ?? '<unset>'}"`,
       );
     },
   );
