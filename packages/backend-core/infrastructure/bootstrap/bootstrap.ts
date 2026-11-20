@@ -118,12 +118,6 @@ export async function bootstrapApp(
 
   applyTrustProxy(app, configService, enableTrustProxy);
 
-  if (process.env.APP_ENV === 'prod') {
-    // Express/finalhandler only know their own `production` env name, so map
-    // the app's `prod` value before the app is configured.
-    app.set('env', 'production');
-  }
-
   configureApp(app, configureOptions);
 
   const port = configService.getOrThrow<number>('http.port');

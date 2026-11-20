@@ -412,7 +412,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Only enable Swagger in non-production
-  if (process.env.APP_ENV !== 'prod') {
+  if (process.env.NODE_ENV !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('API')
       .setVersion('1.0')

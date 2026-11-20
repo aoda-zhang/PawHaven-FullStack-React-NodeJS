@@ -5,14 +5,14 @@ import {
   SwaggerModule as NestSwaggerModule,
   DocumentBuilder,
 } from '@nestjs/swagger';
-import { isProd } from '@pawhaven/shared/utils';
 
 @Injectable()
 export class SwaggerService {
   constructor(private readonly config: ConfigService) {}
 
   init(app: NestExpressApplication) {
-    if (isProd(process.env.APP_ENV)) return;
+    const isProd = process.env.NODE_ENV === 'production';
+    if (isProd) return;
 
     const options = new DocumentBuilder()
       .setTitle(this.config.getOrThrow<string>('swagger.title'))

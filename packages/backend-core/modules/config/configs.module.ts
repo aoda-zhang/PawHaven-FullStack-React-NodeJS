@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigFactory } from '@nestjs/config';
 import { getRuntimeEnv, validateConfig } from '@pawhaven/shared/utils';
+import type { RuntimeEnvType } from '@pawhaven/shared';
 
 import type { ServiceConfigSchema } from './configSchema.js';
 import {
@@ -71,7 +72,8 @@ export class ConfigsModule {
    * @param options see ConfigsModuleOptions
    */
   static forRoot(options: ConfigsModuleOptions): DynamicModule {
-    const currentEnv = getRuntimeEnv(process.env.APP_ENV);
+    const runtimeEnv = process.env.NODE_ENV as RuntimeEnvType;
+    const currentEnv = getRuntimeEnv(runtimeEnv);
 
     const DynamicConfigModule = ConfigModule.forRoot({
       isGlobal: true,

@@ -1,11 +1,11 @@
 # Config Module
 
-This module provides dynamic configuration loading for PawHaven backend services, using environment-specific JSON bundles and environment variable interpolation.
+This module provides dynamic configuration loading for PawHaven backend services, supporting environment-specific YAML files and environment variable overrides.
 
 ## Purpose
 
-- **Environment-based configuration**: Load a distinct JSON bundle for each runtime environment (`dev`, `uat`, `test`, `prod`)
-- **JSON + Environment Variables**: Bundles `src/config/<env>/env/index.json` and resolves `${VAR}` placeholders from environment variables
+- **Environment-based configuration**: Load different configs for development, staging, production
+- **YAML + Environment Variables**: Supports YAML config files with env var overrides
 - **Type-safe access**: Provides ConfigService for type-safe config access throughout the application
 - **Global availability**: Registered globally, accessible in any module without imports
 
@@ -15,37 +15,24 @@ This module provides dynamic configuration loading for PawHaven backend services
 
 A dynamic module that:
 
-- Bundles the JSON configuration for the resolved runtime environment
-- Resolves `${VAR}` placeholders from environment variables
+- Loads YAML configuration files based on `NODE_ENV`
+- Merges YAML config with environment variables (env vars take precedence)
 - Provides NestJS ConfigService for accessing configuration values
-- Fails at startup when `APP_ENV` is missing or unsupported, and validates the bundle against the optional service schema
+- Automatically validates and resolves configuration paths
 
 ## Usage
 
 ### Basic Setup
 
-The Config module is included by default in SharedModule. Each service bundles its own JSON
-configuration and passes the collected sources to `forRoot`:
+The Config module is included by default in SharedModule:
 
 ```typescript
-import { join } from 'node:path';
-
-import {
-  collectServiceConfigSources,
-  SharedModule,
-} from '@pawhaven/backend-core';
-
-const configContext = import.meta.webpackContext('./config', {
-  recursive: true,
-  regExp: /\/env\/index\.json$/,
-});
+import { SharedModule } from '@pawhaven/backend-core';
 
 @Module({
   imports: [
     SharedModule.forRoot({
-      serviceRoot: join(import.meta.dirname, '..'),
-      serviceName: 'auth-service',
-      configSources: collectServiceConfigSources(configContext),
+      serviceRoot: __dirname, // Used to resolve config file paths
     }),
   ],
 })
@@ -54,76 +41,45 @@ export class AppModule {}
 
 ### Configuration Files
 
-Configuration lives in a JSON bundle per environment, under the service's `src/config/` directory:
+Create YAML config files in your service's `config/` directory:
 
-```text
+```
 apps/backend/auth-service/
 ├── src/
-│   └── config/
-│       ├── Config.schema.ts
-│       ├── dev/env/index.json
-│       ├── uat/env/index.json
-│       ├── test/env/index.json
-│       └── prod/env/index.json
-└── .env.example
+└── config/
+    ├── development.yaml
+    ├── staging.yaml
+    └── production.yaml
 ```
 
-Example `src/config/dev/env/index.json`:
+Example `development.yaml`:
 
-```json
-{
-  "http": {
-    "port": 8082,
-    "prefix": "auth-service"
-  },
-  "auth": {
-    "jwtSecret": "${JWT_SECRET}",
-    "jwtExpiresIn": 300
-  },
-  "internalJwt": {
-    "enabled": true,
-    "audience": "auth-service",
-    "publicKeys": {
-      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
-    },
-    "ttlSeconds": 45,
-    "clockSkewSeconds": 30
-  },
-  "dbConnections": [
-    {
-      "enable": true,
-      "options": {
-        "name": "AUTH_SERVICE_MONGODB",
-        "uri": "${AUTH_SERVICE_MONGODB}"
-      }
-    }
-  ]
-}
+```yaml
+auth:
+  jwtSecret: 'dev-secret-key'
+  jwtExpiresIn: 900
+
+database:
+  url: 'mongodb://localhost:27017/pawhaven-dev'
+
+server:
+  port: 3000
+  corsOrigins:
+    - 'http://localhost:5173'
 ```
-
-auth-service's schema requires the `internalJwt` block, so the bundle is not valid without it: keep
-verification enabled (`enabled: true`), let `audience` name the service that verifies the token, and
-give `publicKeys` at least one key id. core-service uses the same verifying shape; the gateway, which
-signs the token, also carries `keyId` and `privateKey`.
-
-The `import.meta.webpackContext` regular expression above decides which bundles exist at runtime: only
-`src/config/<env>/env/index.json` files are collected, keyed by their environment directory. There is
-no YAML file and no merge step.
 
 ### Environment Variables
 
-String values in the JSON bundle may contain `${VAR}` placeholders, which the module resolves from
-environment variables at startup:
+Override YAML config using environment variables:
 
 ```bash
 # .env or shell
-JWT_SECRET=dev-secret-key
-AUTH_SERVICE_MONGODB=mongodb://localhost:27017/pawhaven-dev
+AUTH_JWT_SECRET=production-secret-key
+DATABASE_URL=mongodb://prod-server:27017/pawhaven
+SERVER_PORT=8080
 ```
 
-The service root's `.env.local.<env>`, `.env.<env>`, `.env.local` and `.env` files are loaded, with
-an already-set process environment variable winning over the files. A missing placeholder logs a
-warning and resolves to an empty string.
+Environment variables take precedence over YAML values.
 
 ### Accessing Configuration
 
@@ -186,53 +142,35 @@ export class AuthModule {}
 
 ### Runtime Environment Resolution
 
-The module automatically resolves the runtime environment from `APP_ENV`. Only `dev`, `uat`, `test`, and `prod` are accepted; any other value (or a missing `APP_ENV`) fails at startup:
+The module automatically resolves the runtime environment:
 
-- `dev` → bundles `src/config/dev/env/index.json`
-- `uat` → bundles `src/config/uat/env/index.json`
-- `test` → bundles `src/config/test/env/index.json`
-- `prod` → bundles `src/config/prod/env/index.json`
+- `development` / `dev` → loads `config/development.yaml`
+- `staging` / `stage` → loads `config/staging.yaml`
+- `production` / `prod` → loads `config/production.yaml`
 
-Set via `APP_ENV`:
+Set via `NODE_ENV`:
 
 ```bash
-APP_ENV=prod npm start
+NODE_ENV=production npm start
 ```
 
-`APP_ENV` is the application selector, not the framework mode. `NODE_ENV` keeps its usual meaning
-for Node, Express and the hosting platform — Docker images set `NODE_ENV=production`, and Vercel
-forces it — so it never chooses the bundle. A cluster pod receives `APP_ENV` from the
-`pawhaven-env` ConfigMap; a local run receives it from `.env` or the shell.
+### Configuration Merging Priority
 
-There is no fallback: a missing or unrecognised value throws before any bundle loads, so a service
-never runs with another environment's configuration.
-
-### Configuration Resolution
-
-1. **`src/config/<env>/env/index.json`** — the bundled JSON is the base configuration
-2. **`${VAR}` placeholders** — resolved from environment variables and `.env` files
-3. **Default Values** passed to `configService.get` in code (lowest priority)
-
-Keys declared in the bundle take precedence over same-named environment variables; the environment
-supplies `${VAR}` placeholder values.
+1. **Environment Variables** (highest priority)
+2. **YAML Config File**
+3. **Default Values** in code (lowest priority)
 
 ### Nested Configuration Access
 
 Use dot notation for nested values:
 
-`src/config/dev/env/index.json`:
-
-```json
-{
-  "database": {
-    "mongodb": {
-      "url": "mongodb://localhost:27017",
-      "options": {
-        "retryWrites": true
-      }
-    }
-  }
-}
+```yaml
+# config/development.yaml
+database:
+  mongodb:
+    url: 'mongodb://localhost:27017'
+    options:
+      retryWrites: true
 ```
 
 ```typescript
@@ -249,7 +187,7 @@ const retryWrites = configService.get<boolean>(
 2. **Provide defaults**: Always provide sensible defaults in code
 3. **Validate early**: Throw errors on startup if required config is missing
 4. **Type safety**: Use TypeScript interfaces for config shapes
-5. **Document config**: Document all config options in the service's `src/config/<env>/env/index.json` and its schema
+5. **Document config**: Document all config options in YAML files with comments
 
 ### Example with Validation
 
@@ -271,74 +209,35 @@ export class MyService {
 
 ### Development
 
-`src/config/dev/env/index.json`:
+```yaml
+# config/development.yaml
+auth:
+  jwtSecret: 'dev-secret'
+  jwtExpiresIn: 86400 # 24 hours for convenience
 
-```json
-{
-  "http": {
-    "env": "dev",
-    "port": 8082,
-    "prefix": "auth-service"
-  },
-  "auth": {
-    "jwtSecret": "${JWT_SECRET}",
-    "jwtExpiresIn": 300
-  },
-  "internalJwt": {
-    "enabled": true,
-    "audience": "auth-service",
-    "publicKeys": {
-      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
-    },
-    "ttlSeconds": 45,
-    "clockSkewSeconds": 30
-  },
-  "cors": {
-    "origin": ["http://localhost:3001"]
-  }
-}
+logging:
+  level: 'debug'
 ```
 
 ### Production
 
-`src/config/prod/env/index.json`:
+```yaml
+# config/production.yaml
+auth:
+  # Secret should come from env var in production
+  jwtExpiresIn: 300 # 5 minutes for security
 
-```json
-{
-  "http": {
-    "env": "prod",
-    "port": 8082,
-    "prefix": "auth-service"
-  },
-  "auth": {
-    "jwtSecret": "${JWT_SECRET}",
-    "jwtExpiresIn": 300
-  },
-  "internalJwt": {
-    "enabled": true,
-    "audience": "auth-service",
-    "publicKeys": {
-      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
-    },
-    "ttlSeconds": 45,
-    "clockSkewSeconds": 30
-  },
-  "cors": {
-    "origin": ["https://pawhaven.work"]
-  }
-}
+logging:
+  level: 'info'
 ```
-
-The secret stays in the environment through `${JWT_SECRET}`; a bundle never carries it. `test` and
-`uat` bundles follow the same shape under their own directories.
 
 ## Troubleshooting
 
 **Problem**: Config values are undefined  
-**Solution**: Check the `serviceRoot` and the webpack context; `src/config/<env>/env/index.json` must exist for the current `APP_ENV` and match `/env/index.json`
+**Solution**: Check serviceRoot path is correct, ensure YAML file exists for current NODE_ENV
 
-**Problem**: A `${VAR}` placeholder resolves to an empty string  
-**Solution**: Set the variable in the shell or one of the service's `.env` files; a missing placeholder warns once per variable
+**Problem**: Environment variables not overriding YAML  
+**Solution**: Verify env var naming matches config path (use underscores for nested paths)
 
 **Problem**: "Cannot read property of undefined"  
 **Solution**: Use optional chaining or provide default values when accessing config

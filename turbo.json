@@ -1,7 +1,6 @@
 {
   "$schema": "https://v2-11-10.turborepo.dev/schema.json",
   "globalDependencies": ["pnpm-lock.yaml"],
-  "globalEnv": ["APP_ENV", "NODE_ENV"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
