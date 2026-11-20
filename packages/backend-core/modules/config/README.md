@@ -18,7 +18,7 @@ A dynamic module that:
 - Bundles the JSON configuration for the resolved runtime environment
 - Resolves `${VAR}` placeholders from environment variables
 - Provides NestJS ConfigService for accessing configuration values
-- Fails at startup when `NODE_ENV` is missing or unsupported, and validates the bundle against the optional service schema
+- Fails at startup when `APP_ENV` is missing or unsupported, and validates the bundle against the optional service schema
 
 ## Usage
 
@@ -80,6 +80,15 @@ Example `src/config/dev/env/index.json`:
     "jwtSecret": "${JWT_SECRET}",
     "jwtExpiresIn": 300
   },
+  "internalJwt": {
+    "enabled": true,
+    "audience": "auth-service",
+    "publicKeys": {
+      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
+    },
+    "ttlSeconds": 45,
+    "clockSkewSeconds": 30
+  },
   "dbConnections": [
     {
       "enable": true,
@@ -91,6 +100,11 @@ Example `src/config/dev/env/index.json`:
   ]
 }
 ```
+
+auth-service's schema requires the `internalJwt` block, so the bundle is not valid without it: keep
+verification enabled (`enabled: true`), let `audience` name the service that verifies the token, and
+give `publicKeys` at least one key id. core-service uses the same verifying shape; the gateway, which
+signs the token, also carries `keyId` and `privateKey`.
 
 The `import.meta.webpackContext` regular expression above decides which bundles exist at runtime: only
 `src/config/<env>/env/index.json` files are collected, keyed by their environment directory. There is
@@ -172,18 +186,23 @@ export class AuthModule {}
 
 ### Runtime Environment Resolution
 
-The module automatically resolves the runtime environment. Only `dev`, `uat`, `test`, and `prod` are accepted; any other value (or a missing `NODE_ENV`) fails at startup:
+The module automatically resolves the runtime environment from `APP_ENV`. Only `dev`, `uat`, `test`, and `prod` are accepted; any other value (or a missing `APP_ENV`) fails at startup:
 
 - `dev` → bundles `src/config/dev/env/index.json`
 - `uat` → bundles `src/config/uat/env/index.json`
 - `test` → bundles `src/config/test/env/index.json`
 - `prod` → bundles `src/config/prod/env/index.json`
 
-Set via `NODE_ENV`:
+Set via `APP_ENV`:
 
 ```bash
-NODE_ENV=prod npm start
+APP_ENV=prod npm start
 ```
+
+`APP_ENV` is the application selector, not the framework mode. `NODE_ENV` keeps its usual meaning
+for Node, Express and the hosting platform — Docker images set `NODE_ENV=production`, and Vercel
+forces it — so it never chooses the bundle. A cluster pod receives `APP_ENV` from the
+`pawhaven-env` ConfigMap; a local run receives it from `.env` or the shell.
 
 There is no fallback: a missing or unrecognised value throws before any bundle loads, so a service
 never runs with another environment's configuration.
@@ -265,6 +284,15 @@ export class MyService {
     "jwtSecret": "${JWT_SECRET}",
     "jwtExpiresIn": 300
   },
+  "internalJwt": {
+    "enabled": true,
+    "audience": "auth-service",
+    "publicKeys": {
+      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
+    },
+    "ttlSeconds": 45,
+    "clockSkewSeconds": 30
+  },
   "cors": {
     "origin": ["http://localhost:3001"]
   }
@@ -286,6 +314,15 @@ export class MyService {
     "jwtSecret": "${JWT_SECRET}",
     "jwtExpiresIn": 300
   },
+  "internalJwt": {
+    "enabled": true,
+    "audience": "auth-service",
+    "publicKeys": {
+      "internal-v1": "${INTERNAL_JWT_PUBLIC_KEY}"
+    },
+    "ttlSeconds": 45,
+    "clockSkewSeconds": 30
+  },
   "cors": {
     "origin": ["https://pawhaven.work"]
   }
@@ -298,7 +335,7 @@ The secret stays in the environment through `${JWT_SECRET}`; a bundle never carr
 ## Troubleshooting
 
 **Problem**: Config values are undefined  
-**Solution**: Check the `serviceRoot` and the webpack context; `src/config/<env>/env/index.json` must exist for the current `NODE_ENV` and match `/env/index.json`
+**Solution**: Check the `serviceRoot` and the webpack context; `src/config/<env>/env/index.json` must exist for the current `APP_ENV` and match `/env/index.json`
 
 **Problem**: A `${VAR}` placeholder resolves to an empty string  
 **Solution**: Set the variable in the shell or one of the service's `.env` files; a missing placeholder warns once per variable

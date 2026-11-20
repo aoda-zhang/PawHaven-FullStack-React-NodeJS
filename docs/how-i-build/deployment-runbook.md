@@ -73,8 +73,25 @@ the environments apart.
 ## One-time setup per environment
 
 Run these once per namespace, before the first deploy. The deploy workflow creates the namespace
-itself, then fails preflight if any item below is missing — so an incomplete setup stops before the
-platform manifests or any Deployment is applied.
+itself, then fails preflight if any item below is missing — an incomplete setup stops before the
+platform manifests or any Deployment is applied. The steps below reproduce the same objects by hand.
+
+Create the namespace first: every namespaced command below passes `-n pawhaven-prod` and fails with
+`NotFound` while the namespace does not exist.
+
+### Namespace
+
+```bash
+kubectl apply -f deploy/platform/prod
+```
+
+`deploy/platform/prod` applies the Namespace, the `pawhaven-runtime` ServiceAccount and three
+NetworkPolicies: default-deny ingress, a same-namespace allowance, and port 8080 on the gateway for
+whichever ingress or tunnel controller fronts it. Run it once per environment by substituting `test`
+or `uat`.
+
+The deploy workflow applies the same directory on every run after preflight, so it stays
+authoritative: a policy edited by hand in the cluster is reverted by the next deploy.
 
 ### Runtime ConfigMap
 
@@ -82,13 +99,15 @@ Keys read through `envFrom` by all three services:
 
 | Key                     | Value                                                                          |
 | ----------------------- | ------------------------------------------------------------------------------ |
-| `NODE_ENV`              | `test`, `uat` or `prod` — matches the namespace; missing/unknown fails startup |
+| `APP_ENV`               | `test`, `uat` or `prod` — matches the namespace; missing/unknown fails startup |
 | `AUTH_SERVICE_HOST`     | `http://auth-service:8082`                                                     |
 | `CORE_SERVICE_HOST`     | `http://core-service:8081`                                                     |
 | `DOCUMENT_SERVICE_HOST` | `https://<document-service>.vercel.app`                                        |
 
-`NODE_ENV` selects the per-environment config directory (`config/<env>/env/index.json`) in every
-service, so apply the name of the namespace: `test`, `uat`, or `prod`.
+`APP_ENV` selects the per-environment config directory (`config/<env>/env/index.json`) in every
+service, so apply the name of the namespace: `test`, `uat`, or `prod`. Preflight also requires it to
+equal the target environment. `NODE_ENV` is not the selector: it stays the framework/platform
+variable and the Docker images set it to `production`.
 
 One ConfigMap serves every Deployment in the namespace; the per-service ConfigMaps from the earlier
 manifests (`gateway-config`, `core-service-config`, and so on) are gone.
@@ -104,7 +123,7 @@ document-service runs on Vercel, not in the cluster.
 
 ```bash
 kubectl -n pawhaven-prod create configmap pawhaven-env \
-  --from-literal=NODE_ENV=prod \
+  --from-literal=APP_ENV=prod \
   --from-literal=AUTH_SERVICE_HOST=http://auth-service:8082 \
   --from-literal=CORE_SERVICE_HOST=http://core-service:8081 \
   --from-literal=DOCUMENT_SERVICE_HOST=https://<document-service>.vercel.app \
@@ -135,11 +154,11 @@ kubectl -n pawhaven-prod create secret generic pawhaven-secrets \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-### Image pull secret and ServiceAccount
+### Image pull secret
 
 `ghcr.io` packages are private, so the namespace needs a registry credential named `ghcr-pull`. The
-platform manifests create the ServiceAccount `pawhaven-runtime`, which references that secret as its
-`imagePullSecrets`, and every Deployment runs as it.
+`pawhaven-runtime` ServiceAccount from [Namespace](#namespace) references it as `imagePullSecrets`,
+and every Deployment runs as that account.
 
 ```bash
 kubectl -n pawhaven-prod create secret docker-registry ghcr-pull \
@@ -147,16 +166,7 @@ kubectl -n pawhaven-prod create secret docker-registry ghcr-pull \
   --docker-username='<github-user>' \
   --docker-password='<PAT with read:packages>' \
   --dry-run=client -o yaml | kubectl apply -f -
-
-kubectl apply -f deploy/platform/prod
 ```
-
-`deploy/platform/prod` applies the Namespace, the ServiceAccount and three NetworkPolicies:
-default-deny ingress, a same-namespace allowance, and port 8080 on the gateway for whichever ingress
-or tunnel controller fronts it. Run it once per environment by substituting `test` or `uat`.
-
-The deploy workflow applies the same directory on every run, so it stays authoritative: a policy
-edited by hand in the cluster is reverted by the next deploy.
 
 ### GitHub secrets and approval
 
@@ -172,9 +182,21 @@ environment secrets — `gh secret set` without `--env` stores them at repositor
 environment supplies the human approval gate only; it does not inject any kubeconfig. `test` and
 `uat` have no environment gate.
 
+That repository scope is an accepted risk. Anyone with write access can read a repository secret by
+pushing a branch whose workflow prints it, so write access is itself part of the production boundary:
+limit it to the people who may deploy, and protect `main` as described in
+[CI/CD](ci-cd.md#repository-protection) so a pushed branch cannot become the deployed commit. The
+`prod` deploy is main-only and approval-gated, but neither check helps if an untrusted writer can
+read the kubeconfig. If stronger isolation is required, move the kubeconfigs to environment-scoped
+secrets and accept the approval-flow change: every job that needs one must bind to that environment,
+so `test` and `uat` need their own environment objects and the `prod` deploy keeps a dedicated
+approved job.
+
 Registry authentication is separate: the cluster pulls private `ghcr.io` images with the `ghcr-pull`
-Kubernetes secret created in the namespace, not with a GitHub environment secret. Protect the `v*`
-tag pattern with a ruleset so a release tag cannot be moved or deleted.
+Kubernetes secret created in the namespace, not with a GitHub environment secret. Tag protection is
+separate too: protect the `v*` tag pattern with a tag ruleset, as described in
+[CI/CD](ci-cd.md#tag-protection), so a release tag cannot be moved or deleted. Tag protection does not
+gate merges, and branch protection does not cover tags.
 
 ## Release procedure
 
@@ -214,13 +236,30 @@ instead of overlapping it.
 
 Rollback is a deploy of an older version tag; nothing is rebuilt or retagged.
 
+Identify the previous known-good release explicitly. Do not take the newest tag blindly — during an
+incident the newest `vYY.MM.DD` tag is usually the broken release, and it is not necessarily the tag
+you want:
+
 ```bash
-gh workflow run deploy.yml -f environment=prod -f service=all -f version=v26.11.10
+git tag --list 'v*' --sort=-creatordate | head -n 10
 ```
 
-Pick the previous `vYY.MM.DD` tag from `git tag --sort=-creatordate | head`. If the broken change was
-already released as an image, reverting the commit on `main` and running `release.yml` produces a
-new tag; the rollback command above is faster when the previous image is still the one you want.
+Read the list, exclude the broken release and any tag cut from the faulty commit, and confirm the
+candidate contains the last good change before deploying it:
+
+```bash
+git log --oneline -5 <known-good-tag>
+```
+
+Then deploy that tag by name:
+
+```bash
+gh workflow run deploy.yml -f environment=prod -f service=all -f version=<known-good-tag>
+```
+
+If the broken change was already released as an image, reverting the commit on `main` and running
+`release.yml` produces a new tag; the rollback command above is faster when the previous image is
+still the one you want. Record which tag you deployed and why in the incident notes.
 
 ## Gateway exposure
 
@@ -232,6 +271,26 @@ empty.
 
 On the host, the ECS security group should expose only 80/443 to the internet, with 22 and 6443
 restricted to operator addresses. Those rules live in Alibaba Cloud, not in this repository.
+
+The deploy workflows connect from GitHub's runners, not from an operator laptop, so the operator
+allowlist on 6443 does not by itself make a deploy possible. This repository does not record which
+arrangement is in use and assumes no endpoint: choose one of the following, apply it, and verify it
+from a runner of the same kind before relying on a deploy.
+
+1. **Public API endpoint plus a runner egress allowance.** Keep the operator allowlist on 6443 and
+   add the GitHub Actions address ranges published at `https://api.github.com/meta` (the `actions`
+   key) as a second explicit source; refresh the rule when GitHub changes the ranges. Never replace
+   the allowlist with `0.0.0.0/0`.
+2. **A private route or tunnel.** The runner joins a private network (WireGuard, Tailscale,
+   Cloudflare Tunnel or equivalent) and the kubeconfig points at a private address, so 6443 stays
+   closed to the internet.
+3. **A self-hosted runner inside the VPC.** The runner reaches the private API address directly, and
+   the hosted-runner egress question disappears.
+
+A kubeconfig whose `server` is a private ECS address cannot work from a GitHub-hosted runner without
+option 2 or 3. Verify the chosen arrangement with a trivial dispatched job on the same runner type
+that runs `kubectl get ns`; a timeout there is a network rule, not a deploy bug. Record the verified
+arrangement here so the next operator does not rediscover it.
 
 The gateway NetworkPolicy `pawhaven-allow-gateway-ingress` in
 `deploy/platform/<env>/network-policies.yaml` admits TCP 8080 without a `from` peer, so any ingress
@@ -273,17 +332,17 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 
 ## Failure modes
 
-| Symptom                                                         | Cause and fix                                                                                                                                                                                                                                                                                                                                       |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Preflight names a missing ConfigMap/Secret key                  | The key is absent or the object lacks data. Create or patch it, then rerun; nothing was applied.                                                                                                                                                                                                                                                    |
-| A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace.                                                                                                                     |
-| Preflight reports `ghcr-pull` missing                           | The registry secret was never created in that namespace, or has the wrong name. Recreate it as a `docker-registry` secret.                                                                                                                                                                                                                          |
-| `does not exist; publish it through release.yml first`          | The version tag is not in `ghcr.io` for a selected service. Run `release.yml`, or pass a tag that exists.                                                                                                                                                                                                                                           |
-| Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, or package visibility. Preflight proves the tag exists, not that this node may pull it. Recreate `ghcr-pull` and delete the pod.                                                                                                                                                          |
-| Release fails on an existing tag                                | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                            |
-| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand. |
-| Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                |
-| Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                             |
+| Symptom                                                         | Cause and fix                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Preflight names a missing ConfigMap/Secret key                  | The key is absent or the object lacks data. Create or patch it, then rerun; the platform manifests are applied, but no Deployment was applied.                                                                                                                                                                                                                                                                         |
+| A pod exits at startup naming `APP_ENV`                         | `APP_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
+| Preflight reports `ghcr-pull` missing                           | The registry secret was never created in that namespace, or has the wrong name. Recreate it as a `docker-registry` secret.                                                                                                                                                                                                                                                                                             |
+| `does not exist; publish it through release.yml first`          | The version tag is not in `ghcr.io` for a selected service. Run `release.yml`, or pass a tag that exists.                                                                                                                                                                                                                                                                                                              |
+| Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, or package visibility. Preflight proves the tag exists, not that this node may pull it. Recreate `ghcr-pull` and delete the pod.                                                                                                                                                                                                                             |
+| Release fails on an existing tag                                | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                               |
+| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                    |
+| Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                   |
+| Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                |
 
 A NetworkPolicy cannot block traffic that originates on the node itself, so kubelet TCP probes are
 never filtered by the policy. If the CNI treats host traffic as external, add the node CIDR as an
@@ -302,6 +361,11 @@ and manifests are kept for local or break-glass use. An empty `.out-of-pipeline`
 directory keeps it out of `deploy.yml` and `release.yml`; `publish-images.yml` can still build it
 through its `include_document_service` input, which `release.yml` does not set. The optional
 manifests also reference secret keys the cluster secret does not carry (`DOCUMENT_SERVICE_MONGODB`,
-`DOCUMENT_STORE_ID`, SMTP credentials, and others); see
+`DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the `EMAIL_SMTP_*` credentials); see
 [`apps/backend/document-service/deploy/README.md`](../../apps/backend/document-service/deploy/README.md)
 before applying them.
+
+Vercel forces `NODE_ENV=production` and does not let a project override it, so set `APP_ENV=prod` in
+the document-service Vercel project — the app selects its config bundle from `APP_ENV`, not from
+`NODE_ENV`. Any auth-service or core-service Vercel project left from before the ECS migration needs
+its own `APP_ENV` or should be retired; the cluster services read `APP_ENV` from `pawhaven-env`.

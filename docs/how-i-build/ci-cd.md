@@ -2,7 +2,8 @@
 
 > This document covers **the workflows and the deployment model**. Gate semantics live in
 > [Quality Gates](quality-gates.md); the commands, cluster setup and failure modes live in the
-> [deployment runbook](deployment-runbook.md).
+> [deployment runbook](deployment-runbook.md). Repository settings — branch protection and required
+> status checks — are in [Repository protection](#repository-protection).
 
 ## Principle
 
@@ -14,20 +15,23 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 
 ## Workflows
 
-| Workflow                       | Trigger                                      | What it does                                                                                                                                                                                                                                                                           |
-| ------------------------------ | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test.yml`                     | PR, push to `main`, manual, `workflow_call`  | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium and runs Playwright E2E                                           |
-| `ui-library.yml`               | PR/push on UI paths, manual, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                     |
-| `storybook.yml`                | PR/push on UI paths, manual, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                    |
-| `react-doctor.yml`             | PR, push to `main`                           | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                            |
-| `publish-images.yml`           | `workflow_call` only                         | Build a dynamic matrix of the requested services and push `ghcr.io/aoda-zhang/pawhaven-<service>` with the version tag plus `sha-<7>`                                                                                                                                                  |
-| `deploy-k3s.yml`               | `workflow_call` only                         | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend |
-| `deploy.yml`                   | manual                                       | Deploy an already-published image to `test`, `uat` or `prod`                                                                                                                                                                                                                           |
-| `release.yml`                  | manual                                       | Approve, run the gates, tag `main`, publish all deployable services, deploy the selected scope                                                                                                                                                                                         |
-| `opencode-review.yml.disabled` | None                                         | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                         |
+| Workflow                       | Trigger                              | What it does                                                                                                                                                                                                                                                                           |
+| ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yml`                     | PR, push to `main`, `workflow_call`  | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium and runs Playwright E2E                                           |
+| `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                     |
+| `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                    |
+| `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                            |
+| `publish-images.yml`           | `workflow_call` only                 | Build a dynamic matrix of the requested services and push `ghcr.io/aoda-zhang/pawhaven-<service>` with the version tag plus `sha-<7>`                                                                                                                                                  |
+| `deploy-k3s.yml`               | `workflow_call` only                 | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend |
+| `deploy.yml`                   | manual                               | Deploy an already-published image to `test`, `uat` or `prod`                                                                                                                                                                                                                           |
+| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, publish all deployable services, deploy the selected scope                                                                                                                                                                                         |
+| `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                         |
 
 `publish-images.yml` and `deploy-k3s.yml` carry no trigger of their own. They are reusable
 capabilities: `release.yml` and `deploy.yml` are their only callers.
+
+The three gate workflows are not dispatchable. They run on their pull request and `main` push
+events, and `release.yml` calls the same definitions through `workflow_call`.
 
 ## The two entry points
 
@@ -82,6 +86,11 @@ scan for that file rather than reading a list. A service whose deploy directory 
 publishes it only when `include_document_service` is `true`. document-service is that service: Vercel
 is its production runtime.
 
+Vercel sets `NODE_ENV=production` itself and does not allow a project to override it, so `NODE_ENV`
+cannot name a config bundle there: every PawHaven Vercel project must set `APP_ENV` (document-service
+`prod`) because the app reads that variable. An auth-service or core-service Vercel project left from
+before the ECS migration needs its own `APP_ENV` or should be retired.
+
 `deploy.yml` and `release.yml` still carry the only static enumeration of services, in their `service`
 choice lists, because GitHub computes `choice` options before the workflow runs. Adding a service
 means adding its deploy assets and a choice entry.
@@ -116,6 +125,11 @@ gh workflow run deploy.yml -f environment=prod -f service=all -f version=v26.11.
 There is no rebuild and no retag in a rollback. `deploy.yml` preflights that the requested version
 exists in `ghcr.io` for every selected service before it touches the cluster.
 
+Immutability is enforced by the `v*` tag ruleset in [Tag protection](#tag-protection), not by branch
+protection. Choose the rollback target explicitly — the newest tag may be the broken release — by
+listing tags and checking the candidate's commits, as the [runbook](deployment-runbook.md#roll-back)
+describes.
+
 ## Concurrency and safety
 
 - `release.yml` uses the fixed `pawhaven-prod` group with `cancel-in-progress: false`; `deploy.yml`
@@ -127,6 +141,89 @@ exists in `ghcr.io` for every selected service before it touches the cluster.
   `ClusterIP`, and only `gateway` may be an Ingress backend.
 - The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
   `contents: write`.
+
+## Repository protection
+
+The dispatch entry points reject a non-`main` ref for `release.yml` and a production `deploy.yml`,
+but only after a run starts. Protect `main` itself so a direct push or a stale pull request cannot
+reach the commit the deploy workflows trust. GitHub keys a required status check by job name, not by
+workflow file, so these are the gate jobs from [Quality Gates](quality-gates.md):
+
+| Workflow           | Job (required-check name)                        | Required on `main` | Why                                                                       |
+| ------------------ | ------------------------------------------------ | ------------------ | ------------------------------------------------------------------------- |
+| `test.yml`         | `Lint, typecheck, test, accessibility and build` | yes                | Lint, typecheck, tests, accessibility and build                           |
+| `test.yml`         | `Critical journeys (chromium)`                   | yes                | Playwright E2E, runs after the quality job                                |
+| `react-doctor.yml` | `react-doctor`                                   | yes                | React Doctor scan on every pull request                                   |
+| `ui-library.yml`   | `UI package, accessibility tests and Portal CSS` | no                 | Path-filtered: reports only when UI, design-system or Portal paths change |
+| `storybook.yml`    | `Build component catalogue`                      | no                 | Path-filtered the same way                                                |
+
+A required context that never reports holds a pull request at `Expected` and blocks it forever,
+which is why the path-filtered UI jobs are not global requirements. They still run on any pull
+request that touches their paths, and a failure is a merge blocker; making them hard requirements
+needs an always-running reporter job in the same workflow, which is a workflow change, not a
+settings change.
+
+Apply the branch rule:
+
+```bash
+gh api --method PUT repos/aoda-zhang/PawHaven/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [
+      "Lint, typecheck, test, accessibility and build",
+      "Critical journeys (chromium)",
+      "react-doctor"
+    ]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "dismiss_stale_reviews": true,
+    "require_code_owner_reviews": false,
+    "required_approving_review_count": 1
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false,
+  "required_conversation_resolution": true
+}
+JSON
+```
+
+`required_approving_review_count: 1` assumes a second reviewer; set it to `0` on a single-maintainer
+repository to require a pull request without a second approval. Read the result back:
+
+```bash
+gh api repos/aoda-zhang/PawHaven/branches/main/protection --jq \
+  '{checks: .required_status_checks.contexts, strict: .required_status_checks.strict, force_push: .allow_force_pushes.enabled, deletions: .allow_deletions.enabled}'
+```
+
+`strict: true` is GitHub's "Require branches to be up to date before merging", so a green check
+proves the merge result rather than the pull request's old base. `enforce_admins: true` applies the
+rule to the people most able to bypass it.
+
+### Tag protection
+
+Release tags are a different object with a different rule: branch protection does not cover tags,
+and a tag ruleset does not gate merges. Create a tag ruleset once (Settings → Rules → Rulesets → New
+tag ruleset, or the API call below) so a `v*` tag cannot be moved or deleted:
+
+```bash
+gh api --method POST repos/aoda-zhang/PawHaven/rulesets --input - <<'JSON'
+{
+  "name": "Immutable release tags",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": { "include": ["refs/tags/v*"], "exclude": [] }
+  },
+  "rules": [{ "type": "deletion" }, { "type": "update" }]
+}
+JSON
+```
+
+Confirm it with
+`gh api repos/aoda-zhang/PawHaven/rulesets --jq '.[] | select(.target == "tag") | {name, target, enforcement}'`.
 
 ## Version and install discipline
 
