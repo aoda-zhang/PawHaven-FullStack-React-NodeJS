@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pawhaven-test
+  labels:
+    app.kubernetes.io/part-of: pawhaven
+    app.kubernetes.io/environment: test

@@ -39,6 +39,9 @@
 
 ## CI wiring
 
+- `release.yml` runs `test.yml`, `ui-library.yml` and `storybook.yml` as reusable gates before it
+  tags a release, so the checks that block a release are the same definitions that run on pull
+  requests.
 - `test.yml` runs the gates, then lint/typecheck/test/build, and a separate job installs Chromium and
   runs `pnpm test:e2e`.
 - `ui-library.yml` builds `@pawhaven/ui` and its workspace dependencies, runs `verify:package`, then

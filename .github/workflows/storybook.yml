@@ -15,13 +15,16 @@ on:
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
       - 'pnpm-workspace.yaml'
-  workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
 
+# Pull requests cancel superseded runs of the same PR; pushes to main cancel superseded
+# pushes. Any other trigger (including a reusable call, where github.event_name is the
+# caller's event) gets its own run id so it never joins a PR or push group.
 concurrency:
-  group: storybook-${{ github.event.pull_request.number || github.ref }}
+  group: storybook-${{ github.event.pull_request.number || (github.event_name == 'push' && github.ref) || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -32,28 +35,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Resolve Node.js version from package.json
-        id: node_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
-          if [[ -z "${NODE_VERSION}" ]]; then
-            echo "Missing engines.node in package.json" >&2
-            exit 1
-          fi
-          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.node_version.outputs.node_version }}
+          node-version-file: package.json
+          cache: pnpm
 
-      - name: Enable pnpm and install workspace dependencies
-        run: |
-          corepack enable
-          corepack install
-          pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright Chromium
         run: pnpm --filter @pawhaven/ui exec playwright install --with-deps chromium

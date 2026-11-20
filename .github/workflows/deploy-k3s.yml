@@ -1,0 +1,99 @@
+name: Deploy Kubernetes
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Deployment environment: test, uat or prod'
+        required: true
+        type: string
+      namespace:
+        description: 'Target Kubernetes namespace'
+        required: true
+        type: string
+      ref:
+        description: 'Git ref to deploy; defaults to the dispatched commit'
+        required: false
+        type: string
+      version:
+        description: 'Image tag to deploy'
+        required: true
+        type: string
+      services:
+        description: 'JSON array of services to deploy'
+        required: true
+        type: string
+    secrets:
+      KUBECONFIG_B64:
+        description: 'Base64 encoded kubeconfig for the target cluster'
+        required: true
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  platform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Write kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${HOME}/.kube"
+          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
+          chmod 600 "${HOME}/.kube/config"
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Apply platform resources
+        uses: Azure/k8s-deploy@v7
+        with:
+          namespace: ${{ inputs.namespace }}
+          manifests: deploy/platform/${{ inputs.environment }}
+          action: deploy
+          strategy: basic
+          timeout: 300s
+
+  services:
+    needs: platform
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJSON(inputs.services) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Write kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
+        run: |
+          set -euo pipefail
+          mkdir -p "${HOME}/.kube"
+          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
+          chmod 600 "${HOME}/.kube/config"
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy ${{ matrix.service }}
+        uses: Azure/k8s-deploy@v7
+        with:
+          namespace: ${{ inputs.namespace }}
+          manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
+          images: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          action: deploy
+          strategy: basic
+          timeout: 300s

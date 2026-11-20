@@ -423,26 +423,51 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ### 9.1 MVP (Current → Month 3)
 
-Deployment is platform-driven and configured in dashboards outside this repository: Vercel deploys
-services from their own projects, keyed on each project's root directory (for example
-`document-service`, `core-service`, `auth-service`, as configured in the Vercel dashboard), and the
-portal publishes through Cloudflare Pages. MongoDB is a managed cluster; `auth-service` and
-`core-service` each own a database.
+One Alibaba Cloud ECS host runs K3s. The cluster hosts `gateway`, `core-service` and
+`auth-service` in three namespaces — `pawhaven-test`, `pawhaven-uat`, `pawhaven-prod`, one per
+environment — with images pulled from GitHub Container Registry
+(`ghcr.io/aoda-zhang/pawhaven-<service>`).
+
+| Piece                               | Runtime                                                            |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| gateway, core-service, auth-service | K3s on one ECS host, one namespace per environment                 |
+| document-service                    | Vercel (Vercel Blob for file storage)                              |
+| portal                              | Cloudflare Pages                                                   |
+| MongoDB                             | Managed cluster; auth-service and core-service each own a database |
+
+Shipping is manual. `release.yml` tags `main`, pushes every deployable service image to GHCR, and
+deploys the selected scope after a `prod` environment approval. `deploy.yml` builds and pushes the
+selected service from the chosen branch to GHCR as `sha-<7>`, then deploys it to `test`, `uat` or
+`prod`; `prod` still requires approval. auth-service and core-service are cluster-internal: `ClusterIP` Services,
+no Ingress, behind a default-deny ingress NetworkPolicy. Public traffic reaches the gateway through
+the existing Traefik / Cloudflare Tunnel routing, which lives outside this repository. Setup,
+commands and rollback: [deployment runbook](../how-i-build/deployment-runbook.md).
 
 ### 9.2 Production (Phase 3+)
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  K8s Cluster                                            │
-│                                                          │
-│  gateway:     2-5 pods (HPA on CPU)                     │
-│  auth:        2 pods                                    │
-│  core:        2-5 pods (HPA on CPU)                     │
-│  document:    1-2 pods (HPA on CPU)                     │
-│                                                          │
-│  Managed MongoDB (2 databases: auth + core)             │
-└─────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────┐
+│ Alibaba Cloud ECS host — K3s                              │
+│                                                           │
+│  pawhaven-prod namespace                                  │
+│    gateway       1 pod · ClusterIP · exposed by Traefik   │
+│    auth-service  1 pod · ClusterIP · internal only        │
+│    core-service  1 pod · ClusterIP · internal only        │
+│                                                           │
+│  pawhaven-test and pawhaven-uat — the same three services │
+│  Managed MongoDB (2 databases: auth + core), off the host │
+└───────────────────────────────────────────────────────────┘
+        │                                   │
+        │ Traefik / Cloudflare Tunnel       │ HTTPS + internal JWT
+        ▼                                   ▼
+   public HTTPS                    document-service on Vercel
+   (routing configured             (Vercel Blob storage;
+    outside this repo)              not part of the K3s pipeline)
 ```
+
+Probes are TCP handshakes because no service exposes a health endpoint yet (§8.2). Each Deployment
+runs one replica with `maxSurge: 0`, so a release is a short recreate rather than a zero-downtime
+rollout; more replicas and autoscaling stay a Phase 3+ change.
 
 ---
 

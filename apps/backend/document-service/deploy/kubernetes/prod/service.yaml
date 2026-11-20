@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: document-service
+  namespace: pawhaven-prod
+  labels:
+    app.kubernetes.io/name: document-service
+    app.kubernetes.io/part-of: pawhaven
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: document-service
+  ports:
+    - name: http
+      port: 8083
+      targetPort: http
+      protocol: TCP

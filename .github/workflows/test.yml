@@ -1,6 +1,6 @@
 # Quality gate: lint, typecheck, automated tests, accessibility checks and a production build.
-# React Doctor stays in its own workflow (react-doctor.yml). Deployment happens
-# through platform Git integrations outside this repository, so no deploy workflow here.
+# React Doctor stays in its own workflow (react-doctor.yml). release.yml calls this
+# workflow as a reusable gate; it never deploys anything itself.
 name: Test
 
 on:
@@ -8,13 +8,21 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: ['main']
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Git ref to check; defaults to the dispatched commit'
+        required: false
+        type: string
 
 permissions:
   contents: read
 
+# Pull requests cancel superseded runs of the same PR; pushes to main cancel superseded
+# pushes. Any other trigger (including a reusable call, where github.event_name is the
+# caller's event) gets its own run id so it never joins a PR or push group.
 concurrency:
-  group: test-${{ github.event.pull_request.number || github.ref }}
+  group: test-${{ github.event.pull_request.number || (github.event_name == 'push' && github.ref) || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -24,30 +32,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
-      - name: Resolve Node.js version from package.json
-        id: node_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
-          if [[ -z "${NODE_VERSION}" ]]; then
-            echo "Missing engines.node in package.json" >&2
-            exit 1
-          fi
-          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.node_version.outputs.node_version }}
-
-      - name: Enable package manager from package.json
-        shell: bash
-        run: |
-          set -euo pipefail
-          corepack enable
-          corepack install
+          node-version-file: package.json
+          cache: pnpm
 
       - name: Install dependencies
         shell: bash
@@ -108,34 +105,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
-      - name: Resolve Node.js version from package.json
-        id: node_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
-          if [[ -z "${NODE_VERSION}" ]]; then
-            echo "Missing engines.node in package.json" >&2
-            exit 1
-          fi
-          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.node_version.outputs.node_version }}
-
-      - name: Enable package manager from package.json
-        shell: bash
-        run: |
-          set -euo pipefail
-          corepack enable
-          corepack install
+          node-version-file: package.json
+          cache: pnpm
 
       - name: Install dependencies
         shell: bash
         run: pnpm install --frozen-lockfile
+
+      - name: Build shared packages
+        shell: bash
+        run: pnpm build:libs
 
       - name: Install Playwright browser
         shell: bash
