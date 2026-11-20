@@ -74,7 +74,7 @@ still run in CI.
 
 `release.yml` calls the three gate workflows through `workflow_call` and waits for all of them
 before it creates the release tag. The release checks are those same definitions, not a
-release-only copy, so a gate tightened for a PR is also enforced before publishing.
+release-only copy, so a gate tightened for a PR is also enforced before pushing to GHCR.
 
 ## Adding a gate
 

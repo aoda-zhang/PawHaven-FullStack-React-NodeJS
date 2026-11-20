@@ -51,6 +51,7 @@ jobs:
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
       services: ${{ steps.services.outputs.services }}
+      allServices: ${{ steps.all-services.outputs.allServices }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -118,6 +119,29 @@ jobs:
           fi
           echo "services=${services}" >>"${GITHUB_OUTPUT}"
 
+      - name: Discover every deployable service
+        id: all-services
+        shell: bash
+        run: |
+          set -euo pipefail
+          discovered=()
+          for dockerfile in apps/backend/*/deploy/Dockerfile; do
+            [[ -f "${dockerfile}" ]] || continue
+            deploy_dir="$(dirname "${dockerfile}")"
+            service="$(basename "$(dirname "${deploy_dir}")")"
+            if [[ -e "${deploy_dir}/.out-of-pipeline" ]]; then
+              echo "Skipping ${service}; it is marked out of the publishing pipeline."
+              continue
+            fi
+            discovered+=("${service}")
+          done
+          if ((${#discovered[@]} == 0)); then
+            echo "::error::No service declares apps/backend/<service>/deploy/Dockerfile."
+            exit 1
+          fi
+          all_services="$(printf '%s\n' "${discovered[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')"
+          echo "allServices=${all_services}" >>"${GITHUB_OUTPUT}"
+
   gates:
     name: Quality gate
     needs: resolve
@@ -168,21 +192,41 @@ jobs:
           git tag -a "${TAG}" -m "Release ${TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${TAG}"
 
-  publish:
-    name: Publish images
+  push-ghcr:
+    name: Push ${{ matrix.service }} to GHCR
     needs: [resolve, tag]
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    uses: ./.github/workflows/publish-images.yml
-    with:
-      ref: ${{ github.sha }}
-      version: ${{ needs.resolve.outputs.tag }}
-      services: all
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/${{ matrix.service }}/deploy/Dockerfile
+          push: true
+          tags: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ needs.resolve.outputs.tag }}
+          cache-from: type=gha,scope=${{ matrix.service }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
 
   deploy:
     name: Deploy to prod
-    needs: [resolve, publish]
+    needs: [resolve, push-ghcr]
     permissions:
       contents: read
       packages: read

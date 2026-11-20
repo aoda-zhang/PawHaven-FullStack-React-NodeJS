@@ -35,29 +35,16 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.sha }}
 
-      - name: Resolve Node.js version from package.json
-        id: node_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
-          if [[ -z "${NODE_VERSION}" ]]; then
-            echo "Missing engines.node in package.json" >&2
-            exit 1
-          fi
-          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.node_version.outputs.node_version }}
-
-      - name: Enable package manager from package.json
-        shell: bash
-        run: |
-          set -euo pipefail
-          corepack enable
-          corepack install
+          node-version-file: package.json
+          cache: pnpm
 
       - name: Install dependencies
         shell: bash
@@ -121,29 +108,16 @@ jobs:
         with:
           ref: ${{ inputs.ref || github.sha }}
 
-      - name: Resolve Node.js version from package.json
-        id: node_version
-        shell: bash
-        run: |
-          set -euo pipefail
-          NODE_VERSION=$(node -p "require('./package.json').engines?.node || ''")
-          if [[ -z "${NODE_VERSION}" ]]; then
-            echo "Missing engines.node in package.json" >&2
-            exit 1
-          fi
-          echo "node_version=${NODE_VERSION}" >> "$GITHUB_OUTPUT"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ steps.node_version.outputs.node_version }}
-
-      - name: Enable package manager from package.json
-        shell: bash
-        run: |
-          set -euo pipefail
-          corepack enable
-          corepack install
+          node-version-file: package.json
+          cache: pnpm
 
       - name: Install dependencies
         shell: bash

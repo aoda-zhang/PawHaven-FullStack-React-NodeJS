@@ -7,7 +7,7 @@
 
 ## Principle
 
-CI proves; a release tags what already passed and publishes it; a deploy promotes that published
+CI proves; a release tags what already passed and pushes it to GHCR; a deploy promotes that pushed
 image or builds the selected branch as `sha-<7>`. The quality gate is the merge-readiness signal and
 reproduces the checks a developer runs locally.
 
@@ -22,18 +22,16 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 | `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                                 |
 | `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
 | `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
-| `publish-images.yml`           | `workflow_call` only                 | Build a dynamic matrix of the requested services and push `ghcr.io/aoda-zhang/pawhaven-<service>` with the version tag; no separate `sha-<7>` tag                                                                                                                                                  |
 | `deploy-k3s.yml`               | `workflow_call` only                 | Preflight the target namespace, apply `deploy/platform/<env>`, then copy each selected service's `<env>` manifests to a temp dir, substitute the version with `sed`, apply, wait for each rollout and assert every Service stays `ClusterIP` with only `gateway` as an Ingress backend             |
 | `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), with an optional existing tag: resolve the branch head, run a service-scoped typecheck/test/lint for that service, build and push it as `sha-<7>`, then deploy; `prod` requires `branch=main` and approval                    |
-| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, publish all deployable services, deploy the selected scope                                                                                                                                                                                                     |
+| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, push every deployable service to GHCR in the `push-ghcr` matrix job, deploy the selected scope                                                                                                                                                                 |
 | `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
-`publish-images.yml` and `deploy-k3s.yml` carry no trigger of their own. They are reusable
-capabilities: `release.yml` and `deploy.yml` are their only callers.
+`deploy-k3s.yml` carries no trigger of its own. It is a reusable capability, and `release.yml` and
+`deploy.yml` are its only callers.
 
-`test.yml`, `publish-images.yml` and `deploy-k3s.yml` each accept an optional `ref`, and the caller
-passes the branch it selected, so a run checks, builds and deploys the same commit instead of
-whatever ref started the dispatch.
+`test.yml` and `deploy-k3s.yml` each accept an optional `ref`, and the caller passes the branch it
+selected, so a run checks and deploys the same commit instead of whatever ref started the dispatch.
 
 The three gate workflows are not dispatchable. They run on their pull request and `main` push
 events, and `release.yml` calls the same definitions through `workflow_call`. `deploy.yml` does not
@@ -43,18 +41,18 @@ full-repo gates.
 
 ## The two entry points
 
-| Input           | `release.yml`                                                       | `deploy.yml`                                                                                  |
-| --------------- | ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Environment     | `prod` only                                                         | `test` \| `uat` \| `prod`                                                                     |
-| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`              | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`                         |
-| Branch          | `main` only                                                         | `branch` input, default `develop`; any branch on `origin` for `test`/`uat`, `main` for `prod` |
-| Version         | computed from the date tag                                          | optional existing tag; empty builds `sha-<7>` from the selected branch                        |
-| Builds an image | yes — every deployable service, regardless of the service selection | the selected service, unless `version` names an existing tag                                  |
-| Approval        | `prod` environment with required reviewers                          | `prod` environment, only when the target is `prod`                                            |
-| What it changes | creates the tag, then publishes, then deploys the selected scope    | pushes the image, then the platform manifests and the selected Deployment                     |
+| Input           | `release.yml`                                                         | `deploy.yml`                                                                                  |
+| --------------- | --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Environment     | `prod` only                                                           | `test` \| `uat` \| `prod`                                                                     |
+| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`                         |
+| Branch          | `main` only                                                           | `branch` input, default `develop`; any branch on `origin` for `test`/`uat`, `main` for `prod` |
+| Version         | computed from the date tag                                            | optional existing tag; empty builds `sha-<7>` from the selected branch                        |
+| Builds an image | yes — every deployable service, regardless of the service selection   | the selected service, unless `version` names an existing tag                                  |
+| Approval        | `prod` environment with required reviewers                            | `prod` environment, only when the target is `prod`                                            |
+| What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope | pushes the image, then the platform manifests and the selected Deployment                     |
 
-Service selection controls deployment scope, not what gets built: `release.yml` always publishes
-every service that declares a deploy Dockerfile, then deploys the subset you picked.
+Service selection controls deployment scope, not what gets pushed: `release.yml` always pushes
+every service that declares a deploy Dockerfile to GHCR, then deploys the subset you picked.
 
 `release.yml` runs from `main` only. `deploy.yml` resolves its `branch` input to that branch's head
 and checks, builds and deploys that commit; an unknown branch fails the run and lists the branches
@@ -96,8 +94,7 @@ substitutes the version.
 
 A service joins the pipeline by declaring `apps/backend/<service>/deploy/Dockerfile`; the resolvers
 scan for that file rather than reading a list. A service whose deploy directory carries an
-`.out-of-pipeline` marker is left out of the `release.yml` discovery and the `service` choice lists,
-and `publish-images.yml` publishes it only when `include_document_service` is `true`. document-service
+`.out-of-pipeline` marker is left out of that scan and the `service` choice lists. document-service
 is that service: Vercel is its production runtime.
 
 Vercel sets `NODE_ENV=production` itself; the shared resolver maps `production` to `prod`, so a
@@ -118,20 +115,21 @@ means adding its deploy assets and a choice entry.
    reviewer.
 3. **Resolve** — computes the tag `vYY.MM.DD` in `Asia/Shanghai`; a second release the same day takes
    `-2`, then `-3`. If the candidate tag already points at the same commit, it is reused instead of
-   duplicated.
+   duplicated. The same job discovers every deployable service for the `push-ghcr` matrix and maps
+   the service selection to the deploy scope.
 4. **Gate** — `test.yml`, `storybook.yml` and `ui-library.yml` are called as reusable workflows.
    All three must pass.
 5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
    the run instead of being moved.
-6. **Publish** — `publish-images.yml` builds every deployable service and pushes the `<version>`
-   (date) tag only. An image whose version tag already exists is left as published.
+6. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) builds every deployable
+   service with `docker/build-push-action` and `push: true`, tagging only `<version>` (the date tag).
 7. **Deploy** — `deploy-k3s.yml` deploys the selected services to `pawhaven-prod` from the `<version>`
    tag.
 
 ## Tag and rollback discipline
 
 Version tags are immutable image tags, not branches. A release always names the date tag it just
-published, and rolling back is a forward deploy of an older tag:
+pushed to GHCR, and rolling back is a forward deploy of an older tag:
 
 ```bash
 gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main -f version=v26.11.10
@@ -152,8 +150,8 @@ describes.
 - `release.yml` uses the fixed `pawhaven-prod` group with `cancel-in-progress: false`; `deploy.yml`
   uses `pawhaven-${{ inputs.environment }}` with the same policy. Both resolve to `pawhaven-prod` for
   production, so a prod release and a prod deploy cannot overlap.
-- `release.yml` writes contents only in the tagging job; publishing adds `packages: write`; every
-  other job is read-only.
+- `release.yml` writes contents only in the tagging job; the `push-ghcr` job adds `packages: write`;
+  every other job is read-only.
 - `deploy-k3s.yml` runs a guard after applying: every Service, including `gateway`, must be
   `ClusterIP`, and only `gateway` may be an Ingress backend.
 - The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
@@ -245,10 +243,10 @@ Confirm it with
 
 ## Version and install discipline
 
-Workflows that install workspace dependencies resolve Node from `package.json` `engines` and install
-the package manager with `corepack enable && corepack install`, then run
-`pnpm install --frozen-lockfile`; `react-doctor.yml` only runs the pinned scanner. The lockfile is
-the contract; CI never updates it.
+Workflows that install workspace dependencies set up pnpm with `pnpm/action-setup@v4`, which reads
+the `packageManager` field from `package.json`, then set up Node with `actions/setup-node@v4` using
+`node-version-file: package.json` and `cache: pnpm`, then run `pnpm install --frozen-lockfile`;
+`react-doctor.yml` only runs the pinned scanner. The lockfile is the contract; CI never updates it.
 
 ## Build order
 
@@ -259,11 +257,11 @@ typecheck or test.
 
 ## Adding a workflow
 
-1. Reuse the version/install/corepack steps; do not hardcode a Node version.
+1. Reuse the pnpm and Node setup steps; do not hardcode a Node or pnpm version.
 2. Run `build:libs` and Prisma generation before anything that typechecks or tests.
 3. Keep write permissions minimal; the PR reviewer stays read-only for repository contents.
 4. Name the job after the invariant it proves, and make the failing step name the command it ran.
-5. A workflow that deploys or publishes is a `workflow_call` capability with no trigger of its own;
-   a dispatch-only entry point stays the only way to start it.
+5. A workflow that deploys is a `workflow_call` capability with no trigger of its own; a
+   dispatch-only entry point stays the only way to start it.
 6. A gate workflow keeps its PR/push triggers and adds `workflow_call`; `release.yml` reuses the
    definition instead of copying steps.

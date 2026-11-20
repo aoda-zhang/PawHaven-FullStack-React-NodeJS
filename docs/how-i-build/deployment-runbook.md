@@ -52,13 +52,11 @@ until a deploy substitutes a version.
 
 A service joins the pipeline by declaring a Dockerfile in its deploy directory; the workflows
 discover services by scanning for that file, not by reading a list. An `.out-of-pipeline` marker
-beside the Dockerfile keeps the service out of the `release.yml` discovery and out of both `service`
-choice lists, and `publish-images.yml` publishes it only when it receives
-`include_document_service: true`. document-service is the one service marked that way, so
-`release.yml` skips it even when the deploy scope is `all`, and `deploy.yml` — which deploys one
-service per run and has no `all` — never offers it. The `service` choice lists in `deploy.yml` and
-`release.yml` remain the only static enumeration, because GitHub cannot compute `choice` options at
-run time.
+beside the Dockerfile keeps the service out of that scan and out of both `service` choice lists.
+document-service is the one service marked that way, so `release.yml` neither pushes nor deploys
+it even when the deploy scope is `all`, and `deploy.yml` — which deploys one service per run and has
+no `all` — never offers it. The `service` choice lists in `deploy.yml` and `release.yml` remain the
+only static enumeration, because GitHub cannot compute `choice` options at run time.
 
 ## Environments
 
@@ -212,7 +210,7 @@ gh run watch
 1. Merge the change to `main` and confirm the commit to ship.
 2. Dispatch `release.yml` from `main`; pick `all` or a single service for the deploy scope.
 3. Approve the `prod` environment when the run pauses.
-4. The run gates, tags, publishes every deployable service, then deploys the selected services.
+4. The run gates, tags, pushes every deployable service to GHCR, then deploys the selected services.
 5. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
 
 ## Deploy a service build
@@ -350,7 +348,7 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | Preflight names a missing ConfigMap/Secret key                            | The key is absent or the object lacks data. Create or patch it, then rerun; the platform manifests are applied, but no Deployment was applied.                                                                                                                                                                                                                                                                          |
 | A pod exits at startup naming `NODE_ENV`                                  | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
 | Preflight reports `ghcr-pull` missing                                     | The registry secret was never created in that namespace, or has the wrong name. Recreate it as a `docker-registry` secret.                                                                                                                                                                                                                                                                                              |
-| `does not exist; leave version empty to build it or pass a published tag` | The `version` you passed is not in `ghcr.io` for the selected service. Pass a tag that a release published, or clear `version` so the run builds `sha-<7>` from the selected branch.                                                                                                                                                                                                                                    |
+| `does not exist; leave version empty to build it or pass a published tag` | The `version` you passed is not in `ghcr.io` for the selected service. Pass a tag a release pushed to GHCR, or clear `version` so the run builds `sha-<7>` from the selected branch.                                                                                                                                                                                                                                    |
 | Pods stuck in `ImagePullBackOff` after a green deploy                     | The node cannot pull the image: expired PAT, wrong scope, or package visibility. Preflight proves the tag exists, not that this node may pull it. Recreate `ghcr-pull` and delete the pod.                                                                                                                                                                                                                              |
 | Release fails on an existing tag                                          | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                                |
 | A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff`           | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                     |
@@ -371,9 +369,8 @@ and 256Mi, with limits up to 1.1 CPU and 768Mi, before system pods and page cach
 
 document-service stays on Vercel in production, with Vercel Blob for uploaded files; its Dockerfile
 and manifests are kept for local or break-glass use. An empty `.out-of-pipeline` marker in its deploy
-directory keeps it out of the `release.yml` discovery and both `service` choice lists, so no
-`release.yml` run and no `deploy.yml` run selects it; `publish-images.yml` can still build it through
-its `include_document_service` input, which `release.yml` does not set. The optional manifests also
+directory keeps it out of the release discovery and both `service` choice lists, so no `release.yml`
+run pushes or deploys it and no `deploy.yml` run selects it. The optional manifests also
 reference secret keys the cluster secret does not carry (`DOCUMENT_SERVICE_MONGODB`,
 `DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the `EMAIL_SMTP_*` credentials); see
 [`apps/backend/document-service/deploy/README.md`](../../apps/backend/document-service/deploy/README.md)
