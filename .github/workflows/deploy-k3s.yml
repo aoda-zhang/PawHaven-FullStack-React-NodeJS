@@ -101,17 +101,21 @@ jobs:
           if [[ -z "${configmap_keys}" ]]; then
             fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing or carries no data."
           else
-            for key in NODE_ENV AUTH_SERVICE_HOST CORE_SERVICE_HOST DOCUMENT_SERVICE_HOST; do
+            for key in APP_ENV AUTH_SERVICE_HOST CORE_SERVICE_HOST DOCUMENT_SERVICE_HOST; do
               if ! grep -qx "${key}" <<<"${configmap_keys}"; then
                 fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing key ${key}."
               fi
             done
-            node_env="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
-              -o jsonpath='{.data.NODE_ENV}' 2>/dev/null || true)"
-            case "${node_env}" in
-              test | uat | prod) ;;
+            app_env="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
+              -o jsonpath='{.data.APP_ENV}' 2>/dev/null || true)"
+            case "${app_env}" in
+              test | uat | prod)
+                if [[ "${app_env}" != "${ENVIRONMENT}" ]]; then
+                  fail "ConfigMap ${NAMESPACE}/pawhaven-env APP_ENV is '${app_env}'; it must match the target environment ${ENVIRONMENT}."
+                fi
+                ;;
               *)
-                fail "ConfigMap ${NAMESPACE}/pawhaven-env NODE_ENV must be one of test, uat or prod; found '${node_env}'."
+                fail "ConfigMap ${NAMESPACE}/pawhaven-env APP_ENV must be one of test, uat or prod and match the target environment ${ENVIRONMENT}; found '${app_env}'."
                 ;;
             esac
           fi
