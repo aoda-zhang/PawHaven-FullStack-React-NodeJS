@@ -48,7 +48,12 @@ document-service keeps only `kubernetes/prod/` and is marked `.out-of-pipeline`;
 `deploy/platform/<env>` holds only cluster-wide objects: the Namespace, three NetworkPolicies and the
 `pawhaven-runtime` ServiceAccount. A Deployment and its Service live in the `kubernetes/<env>`
 directory beside the service's Dockerfile, and they keep the image placeholder `v0.0.0-unspecified`
-until a deploy substitutes a version.
+until a deploy substitutes the version through the `images` input of `Azure/k8s-deploy`.
+
+`deploy-k3s.yml` runs two jobs, both with `azure/setup-kubectl` and a kubeconfig decoded from the
+`KUBECONFIG_B64` secret: a `platform` job applies `deploy/platform/<env>` with `Azure/k8s-deploy`, and
+a `services` job that needs it fans out over the `services` JSON array as a matrix, deploying each
+service's directory with that action and the release tag, which also waits for the rollout.
 
 A service joins the pipeline by declaring a Dockerfile in its deploy directory; the workflows
 discover services by scanning for that file, not by reading a list. An `.out-of-pipeline` marker
@@ -224,9 +229,10 @@ gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main
 ```
 
 `branch` defaults to `develop`. The run checks that branch out, so an unknown branch fails at
-checkout. It then builds the selected service as `sha-<7>`, pushes it to GHCR, applies
-`deploy/platform/<env>` and the service's manifests, and waits for the rollout — so the manifests it
-applies come from the same commit as the image.
+checkout. It then builds the selected service as `sha-<7>`, pushes it to GHCR, and calls
+`deploy-k3s.yml`, which applies `deploy/platform/<env>` in a `platform` job and then each selected
+service in a matrix `services` job, waiting for every rollout — so the manifests it applies come from
+the same commit as the image.
 
 `prod` waits for the `prod` environment approval; `test` and `uat` need no approval. The workflow
 restricts no branch, and it runs no tests and no cluster preflight: the gates are merge-time checks,
@@ -349,7 +355,7 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
 | Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, wrong package visibility, or a missing `ghcr-pull` secret in that namespace. Recreate `ghcr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                                                           |
 | Release fails on an existing tag                                | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                                |
-| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow copies the service directory to a temp dir, replaces the placeholder with `sed`, and applies that copy, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                     |
+| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow lets `Azure/k8s-deploy` substitute the release tag from its `images` input, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                                 |
 | Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
 | Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |
 

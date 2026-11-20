@@ -33,14 +33,8 @@ permissions:
   packages: read
 
 jobs:
-  deploy:
-    name: Deploy ${{ inputs.environment }}
+  platform:
     runs-on: ubuntu-latest
-    env:
-      ENVIRONMENT: ${{ inputs.environment }}
-      NAMESPACE: ${{ inputs.namespace }}
-      VERSION: ${{ inputs.version }}
-      SERVICES: ${{ inputs.services }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -57,21 +51,49 @@ jobs:
           printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
           chmod 600 "${HOME}/.kube/config"
 
-      - name: Apply platform resources
-        shell: bash
-        run: |
-          set -euo pipefail
-          kubectl apply -f "deploy/platform/${ENVIRONMENT}"
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
 
-      - name: Deploy services
+      - name: Apply platform resources
+        uses: Azure/k8s-deploy@v7
+        with:
+          namespace: ${{ inputs.namespace }}
+          manifests: deploy/platform/${{ inputs.environment }}
+          action: deploy
+          strategy: basic
+          timeout: 300s
+
+  services:
+    needs: platform
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJSON(inputs.services) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+
+      - name: Write kubeconfig
         shell: bash
+        env:
+          KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
         run: |
           set -euo pipefail
-          for service in $(jq -r '.[]' <<<"${SERVICES}"); do
-            tmp="$(mktemp -d)"
-            cp -R "apps/backend/${service}/deploy/kubernetes/${ENVIRONMENT}/." "${tmp}/"
-            sed -i "s|v0.0.0-unspecified|${VERSION}|g" "${tmp}"/*.yaml
-            kubectl apply -f "${tmp}"
-            rm -rf "${tmp}"
-            kubectl rollout status "deployment/${service}" -n "${NAMESPACE}" --timeout=300s
-          done
+          mkdir -p "${HOME}/.kube"
+          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
+          chmod 600 "${HOME}/.kube/config"
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Deploy ${{ matrix.service }}
+        uses: Azure/k8s-deploy@v7
+        with:
+          namespace: ${{ inputs.namespace }}
+          manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
+          images: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          action: deploy
+          strategy: basic
+          timeout: 300s
