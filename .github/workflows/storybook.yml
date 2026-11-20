@@ -15,7 +15,6 @@ on:
       - 'packages/design-system/**'
       - '.github/workflows/storybook.yml'
       - 'pnpm-workspace.yaml'
-  workflow_dispatch:
   workflow_call:
 
 permissions:

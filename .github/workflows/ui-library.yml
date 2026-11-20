@@ -17,7 +17,6 @@ on:
       - 'apps/frontend/portal/**'
       - '.github/workflows/ui-library.yml'
       - 'pnpm-workspace.yaml'
-  workflow_dispatch:
   workflow_call:
 
 permissions:
