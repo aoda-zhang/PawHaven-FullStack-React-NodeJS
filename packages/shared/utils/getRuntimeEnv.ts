@@ -1,10 +1,11 @@
 import { runtimeEnv } from '../constants/runtimeEnv.js';
 import type { RuntimeEnvType } from '../constants/runtimeEnv.js';
 
-const ACCEPTED_RUNTIME_ENVS = Object.keys(runtimeEnv).join(', ');
+const RUNTIME_ENV_KEYS = Object.keys(runtimeEnv);
+const ACCEPTED_RUNTIME_ENVS = RUNTIME_ENV_KEYS.join(', ');
 
 const isRuntimeEnv = (value: string): value is RuntimeEnvType =>
-  Object.prototype.hasOwnProperty.call(runtimeEnv, value);
+  RUNTIME_ENV_KEYS.includes(value);
 
 /**
  * Resolves an APP_ENV value into a runtime environment.
