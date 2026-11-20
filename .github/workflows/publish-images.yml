@@ -3,6 +3,10 @@ name: Publish Images
 on:
   workflow_call:
     inputs:
+      ref:
+        description: 'Git ref to check; defaults to the dispatched commit'
+        required: false
+        type: string
       version:
         description: 'Image tag to publish, for example v26.11.17'
         required: true
@@ -31,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Compute the publish matrix
         id: matrix
@@ -102,6 +108,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -112,15 +120,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Compute image tags
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}
-          tags: |
-            type=raw,value=${{ inputs.version }}
-            type=sha,prefix=sha-,format=short
 
       - name: Check whether the version tag already exists
         id: existing
@@ -152,14 +151,18 @@ jobs:
           echo "::error::Could not determine whether ${image} exists after ${attempts} attempts; refusing to overwrite an existing tag. Last error: ${last_error}"
           exit 1
 
-      - name: Build and push
+      - name: Build the image
         if: ${{ steps.existing.outputs.build == 'true' }}
-        uses: docker/build-push-action@v6
+        uses: ./.github/actions/build-image
         with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.service }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.service }}
+          service: ${{ matrix.service }}
+          tag: ${{ inputs.version }}
+          dockerfile: ${{ matrix.dockerfile }}
+
+      - name: Push the image
+        if: ${{ steps.existing.outputs.build == 'true' }}
+        uses: ./.github/actions/push-image
+        with:
+          service: ${{ matrix.service }}
+          tag: ${{ inputs.version }}
+          token: ${{ secrets.GITHUB_TOKEN }}

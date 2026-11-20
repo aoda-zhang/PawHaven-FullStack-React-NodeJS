@@ -11,6 +11,10 @@ on:
         description: 'Target Kubernetes namespace'
         required: true
         type: string
+      ref:
+        description: 'Git ref to deploy; defaults to the dispatched commit'
+        required: false
+        type: string
       version:
         description: 'Image tag to deploy'
         required: true
@@ -40,6 +44,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.sha }}
 
       - name: Write kubeconfig
         shell: bash
@@ -55,9 +61,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version_pattern='^v[0-9]{2}\.[0-9]{2}\.[0-9]{2}(-[0-9]+)?$'
+          version_pattern='^(v[0-9]{2}\.[0-9]{2}\.[0-9]{2}(-[0-9]+)?|sha-[0-9a-f]{7})$'
           if [[ ! "${VERSION}" =~ ${version_pattern} ]]; then
-            echo "::error::Image tag '${VERSION}' must match ${version_pattern}, such as v26.11.17 or v26.11.17-2."
+            echo "::error::Image tag '${VERSION}' must match ${version_pattern}, such as v26.11.17, v26.11.17-2 or sha-abc1234."
             exit 1
           fi
 

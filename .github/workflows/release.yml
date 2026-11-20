@@ -122,6 +122,8 @@ jobs:
     name: Quality gate
     needs: resolve
     uses: ./.github/workflows/test.yml
+    with:
+      ref: ${{ github.sha }}
 
   storybook:
     name: Storybook gate
@@ -174,6 +176,7 @@ jobs:
       packages: write
     uses: ./.github/workflows/publish-images.yml
     with:
+      ref: ${{ github.sha }}
       version: ${{ needs.resolve.outputs.tag }}
       services: all
 
@@ -185,6 +188,7 @@ jobs:
       packages: read
     uses: ./.github/workflows/deploy-k3s.yml
     with:
+      ref: ${{ github.sha }}
       environment: prod
       namespace: pawhaven-prod
       version: ${{ needs.resolve.outputs.tag }}

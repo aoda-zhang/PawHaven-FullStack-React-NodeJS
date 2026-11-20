@@ -1,0 +1,43 @@
+name: Build service image
+description: Build a service image into the local Docker image store without logging in or pushing.
+
+inputs:
+  service:
+    description: 'Service name, for example gateway'
+    required: true
+  tag:
+    description: 'Image tag to build'
+    required: true
+  dockerfile:
+    description: 'Dockerfile to build, for example apps/backend/gateway/deploy/Dockerfile'
+    required: true
+
+outputs:
+  image:
+    description: 'Fully qualified image reference that was built'
+    value: ${{ steps.reference.outputs.image }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set the image reference
+      id: reference
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+        TAG: ${{ inputs.tag }}
+      run: echo "image=ghcr.io/aoda-zhang/pawhaven-${SERVICE}:${TAG}" >>"${GITHUB_OUTPUT}"
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build the image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ${{ inputs.dockerfile }}
+        push: false
+        load: true
+        tags: ghcr.io/aoda-zhang/pawhaven-${{ inputs.service }}:${{ inputs.tag }}
+        cache-from: type=gha,scope=${{ inputs.service }}
+        cache-to: type=gha,mode=max,scope=${{ inputs.service }}
