@@ -86,10 +86,10 @@ scan for that file rather than reading a list. A service whose deploy directory 
 publishes it only when `include_document_service` is `true`. document-service is that service: Vercel
 is its production runtime.
 
-Vercel sets `NODE_ENV=production` itself and does not allow a project to override it, so `NODE_ENV`
-cannot name a config bundle there: every PawHaven Vercel project must set `APP_ENV` (document-service
-`prod`) because the app reads that variable. An auth-service or core-service Vercel project left from
-before the ECS migration needs its own `APP_ENV` or should be retired.
+Vercel sets `NODE_ENV=production` itself; the shared resolver maps `production` to `prod`, so a
+PawHaven Vercel project needs no extra variable to select the production config bundle. An
+auth-service or core-service Vercel project left from before the ECS migration cannot select `test`
+or `uat` that way and should be retired.
 
 `deploy.yml` and `release.yml` still carry the only static enumeration of services, in their `service`
 choice lists, because GitHub computes `choice` options before the workflow runs. Adding a service

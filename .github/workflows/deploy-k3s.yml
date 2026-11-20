@@ -101,23 +101,28 @@ jobs:
           if [[ -z "${configmap_keys}" ]]; then
             fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing or carries no data."
           else
-            for key in APP_ENV AUTH_SERVICE_HOST CORE_SERVICE_HOST DOCUMENT_SERVICE_HOST; do
+            for key in NODE_ENV AUTH_SERVICE_HOST CORE_SERVICE_HOST DOCUMENT_SERVICE_HOST; do
               if ! grep -qx "${key}" <<<"${configmap_keys}"; then
                 fail "ConfigMap ${NAMESPACE}/pawhaven-env is missing key ${key}."
               fi
             done
-            app_env="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
-              -o jsonpath='{.data.APP_ENV}' 2>/dev/null || true)"
-            case "${app_env}" in
+            node_env="$(kubectl get configmap pawhaven-env -n "${NAMESPACE}" \
+              -o jsonpath='{.data.NODE_ENV}' 2>/dev/null || true)"
+            runtime_env=""
+            case "${node_env}" in
               test | uat | prod)
-                if [[ "${app_env}" != "${ENVIRONMENT}" ]]; then
-                  fail "ConfigMap ${NAMESPACE}/pawhaven-env APP_ENV is '${app_env}'; it must match the target environment ${ENVIRONMENT}."
-                fi
+                runtime_env="${node_env}"
+                ;;
+              production)
+                runtime_env="prod"
                 ;;
               *)
-                fail "ConfigMap ${NAMESPACE}/pawhaven-env APP_ENV must be one of test, uat or prod and match the target environment ${ENVIRONMENT}; found '${app_env}'."
+                fail "ConfigMap ${NAMESPACE}/pawhaven-env NODE_ENV must be test, uat, prod or production and match the target environment ${ENVIRONMENT}; found '${node_env}'."
                 ;;
             esac
+            if [[ -n "${runtime_env}" && "${runtime_env}" != "${ENVIRONMENT}" ]]; then
+              fail "ConfigMap ${NAMESPACE}/pawhaven-env NODE_ENV is '${node_env}'; it must match the target environment ${ENVIRONMENT}."
+            fi
           fi
 
           secret_keys="$(kubectl get secret pawhaven-secrets -n "${NAMESPACE}" \
