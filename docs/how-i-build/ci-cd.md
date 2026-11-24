@@ -7,46 +7,47 @@
 
 ## Principle
 
-CI proves; a release tags what already passed, builds it into an image artifact and pushes that
-artifact to GHCR; a deploy builds `main`'s head as `sha-<7>` and ships it. The quality gate is
-the merge-readiness signal and reproduces the checks a developer runs locally.
+CI proves; a release builds `main`'s head into an image artifact, waits for a human approval, then
+tags it and pushes it to GHCR; a deploy builds `main`'s head as `sha-<7>` and ships it. The quality
+gate is the merge-readiness signal and reproduces the checks a developer runs locally.
 
 There are exactly two deployment entry points — `release.yml` and `deploy.yml` — and both are
 `workflow_dispatch` only. No push, tag, schedule or pull request deploys anything.
 
 ## Workflows
 
-| Workflow                       | Trigger                              | What it does                                                                                                                                                                                                                                                                                       |
-| ------------------------------ | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test.yml`                     | PR, push to `main`, `workflow_call`  | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs dependencies, builds the workspace packages, installs Chromium and runs Playwright E2E |
-| `ui-library.yml`               | PR/push on UI paths, `workflow_call` | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                                 |
-| `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
-| `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
-| `deploy-k3s.yml`               | `workflow_call` only                 | Apply `deploy/platform/<env>` through `Azure/k8s-deploy`, then a per-service matrix job that deploys each selected service's `<env>` manifests with the release image tag and waits for its rollout                                                                                                |
-| `deploy.yml`                   | manual                               | Runs from `main` only: select an environment and one service, build `main`'s head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it to `test` or `uat`                                                                                                         |
-| `release.yml`                  | manual                               | Approve, run the gates, tag `main`, build every deployable service into an image artifact, push each one to GHCR in the `push-ghcr` matrix job, deploy the selected scope                                                                                                                          |
-| `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
+| Workflow                       | Trigger              | What it does                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test.yml`                     | PR, push to `main`   | Install (frozen lockfile) → generate Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs dependencies, builds the workspace packages, installs Chromium and runs Playwright E2E |
+| `ui-library.yml`               | PR/push on UI paths  | `token-check` → build `@pawhaven/ui` and workspace deps → `verify:package` → UI tests → Portal CSS contract checks                                                                                                                                                                                 |
+| `storybook.yml`                | PR/push on UI paths  | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
+| `react-doctor.yml`             | PR, push to `main`   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
+| `deploy-k3s.yml`               | `workflow_call` only | Apply `deploy/platform/<env>` through `Azure/k8s-deploy`, then a per-service matrix job that deploys each selected service's `<env>` manifests with the release image tag and waits for its rollout                                                                                                |
+| `deploy.yml`                   | manual               | Runs from `main` only: select an environment and one service, build `main`'s head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it to `test` or `uat`                                                                                                         |
+| `release.yml`                  | manual               | Resolve the date tag, build every deployable service into an image artifact, wait for the `prod` approval, tag `main`, push each image to GHCR in the `push-ghcr` matrix job, deploy the selected scope                                                                                            |
+| `opencode-review.yml.disabled` | None                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
 `deploy-k3s.yml` carries no trigger of its own. It is a reusable capability, and `release.yml` and
 `deploy.yml` are its only callers.
 
-`test.yml` and `deploy-k3s.yml` each accept an optional `ref`, and the caller passes the commit to
-check and deploy, so a run uses one commit rather than whatever ref started the dispatch.
+`deploy-k3s.yml` accepts an optional `ref`, and the two deploy workflows pass the commit to deploy, so
+a run uses one commit rather than whatever ref started the dispatch.
 
-The three gate workflows are not dispatchable. They run on their pull request and `main` push
-events, and `release.yml` calls the same definitions through `workflow_call`. `deploy.yml` calls
-none of them: it builds and pushes `main`'s head, which the merge-time gates already checked.
+The three gate workflows are not dispatchable. They run on pull requests and `main` pushes only;
+`release.yml` does not re-run them, so a release ships a commit the merge-time gates already
+checked. `deploy.yml` calls none of them either: it builds and pushes `main`'s head, which the
+merge-time gates already checked.
 
 ## The two entry points
 
-| Input           | `release.yml`                                                         | `deploy.yml`                                                              |
-| --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Environment     | `prod` only                                                           | `test` \| `uat`                                                           |
-| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`     |
-| Branch          | `main` only                                                           | `main` only                                                               |
-| Image tag       | the computed date tag                                                 | `sha-<7>` of `main`'s head, built on every run                            |
-| Approval        | `prod` environment with required reviewers                            | none — production ships through `release.yml`                             |
-| What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope | pushes the image, then the platform manifests and the selected Deployment |
+| Input           | `release.yml`                                                                                        | `deploy.yml`                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Environment     | `prod` only                                                                                          | `test` \| `uat`                                                           |
+| Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                                               | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`     |
+| Branch          | `main` only                                                                                          | `main` only                                                               |
+| Image tag       | the computed date tag                                                                                | `sha-<7>` of `main`'s head, built on every run                            |
+| Approval        | `prod` environment with required reviewers, after the images are built and before they are published | none — production ships through `release.yml`                             |
+| What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope                                | pushes the image, then the platform manifests and the selected Deployment |
 
 In `release.yml`, service selection controls deployment scope, not what gets pushed: it always pushes
 every service that declares a deploy Dockerfile to GHCR, then deploys the subset you picked.
@@ -105,27 +106,25 @@ means adding its deploy assets and a choice entry.
 `release.yml` runs in this order, and each stage depends on the previous one:
 
 1. **Precheck** — the `precheck` job fails unless the dispatched ref is `refs/heads/main`.
-2. **Approve** — the `approve` job binds to the `prod` environment, so the run waits for a required
-   reviewer.
-3. **Resolve** — computes the tag `vYY.MM.DD` in `Asia/Shanghai`; a second release the same day takes
+2. **Resolve** — computes the tag `vYY.MM.DD` in `Asia/Shanghai`; a second release the same day takes
    `-2`, then `-3`. If the candidate tag already points at the same commit, it is reused instead of
    duplicated. The same job discovers every deployable service for the `push-ghcr` matrix and maps
    the service selection to the deploy scope.
-4. **Gate** — `test.yml`, `storybook.yml` and `ui-library.yml` are called as reusable workflows.
-   All three must pass.
-5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
-   the run instead of being moved.
-6. **Build** — the `build` matrix job (`Build <service>`) calls the `build-image` composite action
+3. **Build** — the `build` matrix job (`Build <service>`) calls the `build-image` composite action
    (`./.github/actions/build-image`) with the service, the tag and the Dockerfile. The action builds
    with `docker/build-push-action@v6` (`push: false`, `load: true`) as the local tag
    `pawhaven-<service>:<version>`, saves it with `docker save` and uploads `image.tar` through
    `actions/upload-artifact@v4`. It never names a registry.
-7. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
+4. **Approve** — the `approve` job binds to the `prod` environment, so the run pauses after the
+   images are built and waits for a required reviewer before anything is published.
+5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
+   the run instead of being moved.
+6. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
    composite action (`./.github/actions/push-image`) with the service, tag, registry, repository and
    token. The action downloads that artifact, loads it with `docker load`, logs in with
    `docker/login-action@v3`, retags it with `docker tag` and publishes it with `docker push`. See
    [Image build and registry push](#image-build-and-registry-push).
-8. **Deploy** — `deploy-k3s.yml` deploys the selected services to `pawhaven-prod` from the `<version>`
+7. **Deploy** — `deploy-k3s.yml` deploys the selected services to `pawhaven-prod` from the `<version>`
    tag.
 
 ## Image build and registry push
@@ -151,8 +150,11 @@ action, its cache and the deploy version stay as they are; only the registry nam
 
 The artifact is a cost to weigh: each image travels from the build runner to artifact storage and
 back to the push runner, so a three-service release moves every image twice before it reaches the
-registry. `retention-days: 1` bounds the stored copies, and the shared build cache keeps the rebuild
-itself cheap.
+registry. `retention-days: 7` bounds the stored copies and covers realistic approval latency, but
+GitHub lets an environment gate wait up to 30 days, so a long wait can outlive the artifact. If the
+approval lands after it expires, the push job fails after the tag exists; re-dispatching recovers,
+because `resolve` reuses the same date tag when it already points at the dispatched commit and the
+`tag` job then no-ops. The shared build cache keeps the rebuild cheap.
 
 ## Tag and rollback discipline
 
@@ -292,5 +294,5 @@ typecheck or test.
 4. Name the job after the invariant it proves, and make the failing step name the command it ran.
 5. A workflow that deploys is a `workflow_call` capability with no trigger of its own; a
    dispatch-only entry point stays the only way to start it.
-6. A gate workflow keeps its PR/push triggers and adds `workflow_call`; `release.yml` reuses the
-   definition instead of copying steps.
+6. A gate workflow runs on pull requests and pushes to `main`; a release does not re-run it, so the
+   gate must block merges, not publishing.

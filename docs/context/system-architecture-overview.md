@@ -435,9 +435,10 @@ environment — with images pulled from GitHub Container Registry
 | portal                              | Cloudflare Pages                                                   |
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
-Shipping is manual. `release.yml` tags `main`, pushes every deployable service image to GHCR, and
-deploys the selected scope after a `prod` environment approval. `deploy.yml` builds and pushes the
-selected service from `main` to GHCR as `sha-<7>`, then deploys it to `test` or `uat` only.
+Shipping is manual. `release.yml` builds every deployable service image, waits for the `prod`
+environment approval, then tags `main`, pushes the images to GHCR and deploys the selected scope.
+`deploy.yml` builds and pushes the selected service from `main` to GHCR as `sha-<7>`, then deploys it
+to `test` or `uat` only.
 auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a
 default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the existing
 Traefik / Cloudflare Tunnel routing, which lives outside this repository. Setup, commands and

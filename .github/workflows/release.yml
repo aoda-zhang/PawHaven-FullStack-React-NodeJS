@@ -35,18 +35,9 @@ jobs:
             exit 1
           fi
 
-  approve:
-    name: Approve the production release
-    needs: precheck
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-      - name: Await approval
-        run: echo "Production release approved."
-
   resolve:
     name: Compute the release tag
-    needs: approve
+    needs: precheck
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
@@ -142,26 +133,41 @@ jobs:
           all_services="$(printf '%s\n' "${discovered[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')"
           echo "allServices=${all_services}" >>"${GITHUB_OUTPUT}"
 
-  gates:
-    name: Quality gate
-    needs: resolve
-    uses: ./.github/workflows/test.yml
-    with:
-      ref: ${{ github.sha }}
+  build:
+    name: Build ${{ matrix.service }}
+    needs: [resolve]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
 
-  storybook:
-    name: Storybook gate
-    needs: resolve
-    uses: ./.github/workflows/storybook.yml
+      - name: Build the image
+        uses: ./.github/actions/build-image
+        with:
+          service: ${{ matrix.service }}
+          tag: ${{ needs.resolve.outputs.tag }}
+          dockerfile: apps/backend/${{ matrix.service }}/deploy/Dockerfile
 
-  ui-library:
-    name: UI library gate
-    needs: resolve
-    uses: ./.github/workflows/ui-library.yml
+  approve:
+    name: Approve the production release
+    needs: [resolve, build]
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Await approval
+        run: echo "Production release approved."
 
   tag:
     name: Tag the release
-    needs: [resolve, gates, storybook, ui-library]
+    needs: [resolve, approve]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -170,6 +176,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
+          ref: ${{ github.sha }}
 
       - name: Create and push the annotated tag
         shell: bash
@@ -192,32 +199,9 @@ jobs:
           git tag -a "${TAG}" -m "Release ${TAG}" "${GITHUB_SHA}"
           git push origin "refs/tags/${TAG}"
 
-  build:
-    name: Build ${{ matrix.service }}
-    needs: [resolve, tag]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ github.sha }}
-
-      - name: Build the image
-        uses: ./.github/actions/build-image
-        with:
-          service: ${{ matrix.service }}
-          tag: ${{ needs.resolve.outputs.tag }}
-          dockerfile: apps/backend/${{ matrix.service }}/deploy/Dockerfile
-
   push-ghcr:
     name: Push ${{ matrix.service }} to GHCR
-    needs: build
+    needs: [resolve, build, approve, tag]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -229,6 +213,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ github.sha }}
 
       - name: Push the image
         uses: ./.github/actions/push-image

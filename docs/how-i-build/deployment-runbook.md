@@ -180,8 +180,9 @@ base64 < ~/.kube/config | tr -d '\n' | gh secret set KUBECONFIG_PROD
 ```
 
 Create the `prod` environment under Settings → Environments and add the required reviewers there;
-that environment is what gates `release.yml`. The approval job is the only job bound to it; the
-deploy jobs read the kubeconfig from repository scope.
+that environment is what gates `release.yml`, pausing the run after the images are built and before
+they are tagged and pushed. The approval job is the only job bound to it; the deploy jobs read the
+kubeconfig from repository scope.
 `KUBECONFIG_TEST`, `KUBECONFIG_UAT` and `KUBECONFIG_PROD` are therefore **repository** secrets, not
 environment secrets — `gh secret set` without `--env` stores them at repository scope. The `prod`
 environment supplies the human approval gate only; it does not inject any kubeconfig. `test` and
@@ -215,10 +216,14 @@ gh run watch
 
 1. Merge the change to `main` and confirm the commit to ship.
 2. Dispatch `release.yml` from `main`; pick `all` or a single service for the deploy scope.
-3. Approve the `prod` environment when the run pauses.
-4. The run gates, tags, builds every deployable service into an `image.tar` artifact, pushes each
-   image to GHCR, then deploys the selected services.
-5. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
+3. The run builds every deployable service into an `image.tar` artifact, then pauses.
+4. Approve the `prod` environment.
+5. The run tags the commit, pushes each image to GHCR and deploys the selected services.
+6. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
+
+If the approval is granted after the artifact expired (7 days after the build), the push job fails
+after the tag already exists. Re-dispatch `release.yml`: `resolve` reuses the same date tag because it
+points at the same commit, and the `tag` job no-ops.
 
 ## Deploy a service build
 
@@ -245,7 +250,7 @@ Neither composite action hardcodes a registry: `build-image` names none, and `pu
 `registry` and `repository` as inputs. Pointing the pipeline at a different registry therefore means
 changing only those inputs in `push-ghcr` and the registry in `deploy-k3s.yml`'s `images` input. The
 artifact hop is the price of that separation: each image is uploaded to artifact storage and
-downloaded again before it is pushed, which a `retention-days: 1` policy keeps cheap to store.
+downloaded again before it is pushed, which a `retention-days: 7` policy keeps cheap to store.
 
 `deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow runs from `main`
 only, and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a

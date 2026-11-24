@@ -66,15 +66,15 @@ still run in CI.
 
 | Workflow                       | Purpose                                                                                                                                                                                                                        | Also called by |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| `test.yml`                     | Install (frozen lockfile) → Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium for Playwright E2E | `release.yml`  |
-| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                                                                                         | `release.yml`  |
-| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                                                                                      | `release.yml`  |
+| `test.yml`                     | Install (frozen lockfile) → Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium for Playwright E2E | —              |
+| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                                                                                         | —              |
+| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                                                                                      | —              |
 | `react-doctor.yml`             | React Doctor scan on PRs and `main`                                                                                                                                                                                            | —              |
 | `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                                                                               | —              |
 
-`release.yml` calls the three gate workflows through `workflow_call` and waits for all of them
-before it creates the release tag. The release checks are those same definitions, not a
-release-only copy, so a gate tightened for a PR is also enforced before pushing to GHCR.
+The gates run on pull requests and pushes to `main` only; `release.yml` does not re-run them, so a
+gate tightened for a PR is enforced before that commit can reach `main`, and a release ships an
+already-gated commit.
 
 `deploy.yml` and `deploy-k3s.yml` are not gates: they run no tests, no lint and no cluster
 preflight. `deploy.yml` deploys only `main`'s head, so the checks that matter are the merge-time

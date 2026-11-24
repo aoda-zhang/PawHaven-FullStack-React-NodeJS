@@ -1,6 +1,6 @@
 # Quality gate: lint, typecheck, automated tests, accessibility checks and a production build.
-# React Doctor stays in its own workflow (react-doctor.yml). release.yml calls this
-# workflow as a reusable gate; it never deploys anything itself.
+# React Doctor stays in its own workflow (react-doctor.yml). This workflow runs on pull
+# requests and pushes to main, and never deploys anything itself.
 name: Test
 
 on:
@@ -8,19 +8,12 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: ['main']
-  workflow_call:
-    inputs:
-      ref:
-        description: 'Git ref to check; defaults to the dispatched commit'
-        required: false
-        type: string
 
 permissions:
   contents: read
 
 # Pull requests cancel superseded runs of the same PR; pushes to main cancel superseded
-# pushes. Any other trigger (including a reusable call, where github.event_name is the
-# caller's event) gets its own run id so it never joins a PR or push group.
+# pushes. Any other event gets its own run id so it never joins a PR or push group.
 concurrency:
   group: test-${{ github.event.pull_request.number || (github.event_name == 'push' && github.ref) || github.run_id }}
   cancel-in-progress: true
@@ -33,7 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -106,7 +99,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          ref: ${{ github.sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
