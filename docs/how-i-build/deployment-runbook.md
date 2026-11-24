@@ -6,16 +6,19 @@
 
 ## Where each service runs
 
-| Service            | Runtime                                     | Image                                                   | Dockerfile                                        |
-| ------------------ | ------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------- |
-| `gateway`          | K3s, `ClusterIP`, reachable through Traefik | `ghcr.io/aoda-zhang/pawhaven-gateway`                   | `apps/backend/gateway/deploy/Dockerfile`          |
-| `core-service`     | K3s, `ClusterIP`, internal only             | `ghcr.io/aoda-zhang/pawhaven-core-service`              | `apps/backend/core-service/deploy/Dockerfile`     |
-| `auth-service`     | K3s, `ClusterIP`, internal only             | `ghcr.io/aoda-zhang/pawhaven-auth-service`              | `apps/backend/auth-service/deploy/Dockerfile`     |
-| `document-service` | Vercel — out of this pipeline               | `ghcr.io/aoda-zhang/pawhaven-document-service` (opt-in) | `apps/backend/document-service/deploy/Dockerfile` |
-| portal             | Cloudflare Pages                            | —                                                       | —                                                 |
-| MongoDB            | Managed cluster, outside the host           | —                                                       | —                                                 |
+| Service            | Runtime                                     | Image                                                             | Dockerfile                                        |
+| ------------------ | ------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
+| `gateway`          | K3s, `ClusterIP`, reachable through Traefik | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-gateway`      | `apps/backend/gateway/deploy/Dockerfile`          |
+| `core-service`     | K3s, `ClusterIP`, internal only             | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-core-service` | `apps/backend/core-service/deploy/Dockerfile`     |
+| `auth-service`     | K3s, `ClusterIP`, internal only             | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-auth-service` | `apps/backend/auth-service/deploy/Dockerfile`     |
+| `document-service` | Vercel — out of this pipeline               | —                                                                 | `apps/backend/document-service/deploy/Dockerfile` |
+| portal             | Cloudflare Pages                            | —                                                                 | —                                                 |
+| MongoDB            | Managed cluster, outside the host           | —                                                                 | —                                                 |
 
-The cluster is one Alibaba Cloud ECS host running K3s.
+The cluster is one Alibaba Cloud ECS host running K3s, and the images live in Alibaba Cloud Container
+Registry (ACR): host `registry.cn-beijing.aliyuncs.com`, namespace `pawhaven`, repository
+`pawhaven/pawhaven-<service>`. ACR personal edition is free and the registry instance sits in the same
+region as the ECS host.
 
 ## Deploy asset layout
 
@@ -158,15 +161,15 @@ kubectl -n pawhaven-prod create secret generic pawhaven-secrets \
 
 ### Image pull secret
 
-`ghcr.io` packages are private, so the namespace needs a registry credential named `ghcr-pull`. The
-`pawhaven-runtime` ServiceAccount from [Namespace](#namespace) references it as `imagePullSecrets`,
-and every Deployment runs as that account.
+`registry.cn-beijing.aliyuncs.com` repositories are private, so the namespace needs a registry
+credential named `acr-pull`. The `pawhaven-runtime` ServiceAccount from [Namespace](#namespace)
+references it as `imagePullSecrets`, and every Deployment runs as that account.
 
 ```bash
-kubectl -n pawhaven-prod create secret docker-registry ghcr-pull \
-  --docker-server=ghcr.io \
-  --docker-username='<github-user>' \
-  --docker-password='<PAT with read:packages>' \
+kubectl -n pawhaven-prod create secret docker-registry acr-pull \
+  --docker-server=registry.cn-beijing.aliyuncs.com \
+  --docker-username='<ACR_USERNAME>' \
+  --docker-password='<ACR_PASSWORD>' \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
@@ -185,6 +188,16 @@ environment secrets — `gh secret set` without `--env` stores them at repositor
 environment supplies the human approval gate only; it does not inject any kubeconfig. `test` and
 `uat` have no environment gate.
 
+The push job authenticates against ACR with two more repository secrets, not with `GITHUB_TOKEN`:
+
+```bash
+gh secret set ACR_USERNAME
+gh secret set ACR_PASSWORD
+```
+
+`ACR_PASSWORD` is the ACR registry password for that user; rotating it in ACR means setting the
+secret again and recreating the `acr-pull` secret in each namespace.
+
 The deploy jobs fail fast with an explicit error when the kubeconfig secret is empty or the cluster
 is unreachable, because kubectl otherwise falls back to `localhost:8080`.
 
@@ -198,11 +211,11 @@ secrets and accept the approval-flow change: every job that needs one must bind 
 so `test` and `uat` need their own environment objects and `release.yml` keeps a dedicated approved
 job for `prod`.
 
-Registry authentication is separate: the cluster pulls private `ghcr.io` images with the `ghcr-pull`
-Kubernetes secret created in the namespace, not with a GitHub environment secret. Tag protection is
-separate too: releases currently create no git tag, so protect the `v*` tag pattern with a tag ruleset,
-as described in [CI/CD](ci-cd.md#tag-protection), for any tag created manually. Tag protection does not
-gate merges, and branch protection does not cover tags.
+Registry authentication is separate: the cluster pulls private `registry.cn-beijing.aliyuncs.com`
+images with the `acr-pull` Kubernetes secret created in the namespace, not with a GitHub environment
+secret. Tag protection is separate too: releases currently create no git tag, so protect the `v*` tag
+pattern with a tag ruleset, as described in [CI/CD](ci-cd.md#tag-protection), for any tag created
+manually. Tag protection does not gate merges, and branch protection does not cover tags.
 
 ## Release procedure
 
@@ -219,7 +232,7 @@ gh run watch
    appears as `Release-<service>`.
 3. The run builds the selected service into an `image.tar` artifact, then pauses.
 4. Approve the `prod` environment.
-5. The run pushes the image to GHCR and deploys the selected service.
+5. The run pushes the image to ACR and deploys the selected service.
 6. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
 
 If the approval is granted after the artifact expired (7 days after the build), the push job fails and
@@ -240,7 +253,7 @@ not from `main`, so the deployed commit is the `main` head at dispatch time. It 
 selected service as `sha-<7>` through the `build-image` composite action
 (`./.github/actions/build-image`, which runs `docker/build-push-action@v6` with `load: true` and
 `push: false`) into `pawhaven-<service>:sha-<7>`, saves it with `docker save` and uploads `image.tar`
-as an artifact. A separate `push-ghcr` job calls the `push-image` composite action
+as an artifact. A separate `push-image` job calls the `push-image` composite action
 (`./.github/actions/push-image`), which downloads that artifact, restores the image with `docker load`,
 retags it with `docker tag` and publishes it with `docker push`, logging in through
 `docker/login-action@v3`. The run then calls `deploy-k3s.yml`, which applies
@@ -248,10 +261,11 @@ retags it with `docker tag` and publishes it with `docker push`, logging in thro
 waiting for every rollout — so the manifests it applies come from the same commit as the image.
 
 Neither composite action hardcodes a registry: `build-image` names none, and `push-image` receives
-`registry` and `repository` as inputs. Pointing the pipeline at a different registry therefore means
-changing only those inputs in `push-ghcr` and the registry in `deploy-k3s.yml`'s `images` input. The
-artifact hop is the price of that separation: each image is uploaded to artifact storage and
-downloaded again before it is pushed, which a `retention-days: 7` policy keeps cheap to store.
+`registry`, `repository`, `username` and `token` as inputs. Pointing the pipeline at a different
+registry therefore means changing only those inputs in `push-image` and the registry in
+`deploy-k3s.yml`'s `images` input. The artifact hop is the price of that separation: each image is
+uploaded to artifact storage and downloaded again before it is pushed, which a `retention-days: 7`
+policy keeps cheap to store.
 
 `deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow runs from `main`
 only, and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a
@@ -374,7 +388,7 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A pod never becomes Ready and logs a config error               | A `pawhaven-env` or `pawhaven-secrets` key is missing in that namespace. Nothing checks the keys before the Deployment is applied, so the container starts and fails. Create or patch the object, then `kubectl -n <namespace> rollout restart deployment/<service>`.                                                                                                                                                   |
 | A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
-| Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, wrong package visibility, or a missing `ghcr-pull` secret in that namespace. Recreate `ghcr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                                                           |
+| Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: a rotated or wrong `ACR_PASSWORD`, a missing `acr-pull` secret in that namespace, or a personal-edition ACR access rule that omits the node. Recreate `acr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                      |
 | Push fails after approval (artifact expired)                    | The image artifact expired before the approval (7 days). Nothing was published; re-dispatch `release.yml` for the same commit to rebuild and retry the same image tag.                                                                                                                                                                                                                                                  |
 | A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow lets `Azure/k8s-deploy` substitute the release tag from its `images` input, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                                 |
 | Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
@@ -393,10 +407,13 @@ and 256Mi, with limits up to 1.1 CPU and 768Mi, before system pods and page cach
 ## document-service
 
 document-service stays on Vercel in production, with Vercel Blob for uploaded files; its Dockerfile
-and manifests are kept for local or break-glass use. No workflow scans for Dockerfiles; the service
-is absent from both `service` choice lists, so no run selects it, and the empty `.out-of-pipeline`
-marker records that intent. The optional manifests also reference secret keys the cluster secret does
-not carry (`DOCUMENT_SERVICE_MONGODB`, `DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the
+and manifests are kept for local or break-glass use. Those optional manifests still name their own
+registry image and pull secret, because no workflow publishes this service — the
+[document-service deploy README](../../apps/backend/document-service/deploy/README.md) is the
+authority for them, not this runbook. No workflow scans for Dockerfiles; the service is absent from
+both `service` choice lists, so no run selects it, and the empty `.out-of-pipeline` marker records
+that intent. The optional manifests also reference secret keys the cluster secret does not carry
+(`DOCUMENT_SERVICE_MONGODB`, `DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the
 `EMAIL_SMTP_*` credentials); see
 [`apps/backend/document-service/deploy/README.md`](../../apps/backend/document-service/deploy/README.md)
 before applying them.

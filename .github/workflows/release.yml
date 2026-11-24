@@ -95,13 +95,12 @@ jobs:
       - name: Await approval
         run: echo "Production release approved."
 
-  push-ghcr:
-    name: Push ${{ matrix.service }} to GHCR
+  push-image:
+    name: Push ${{ matrix.service }} to ACR
     needs: [resolve, build, approve]
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     strategy:
       fail-fast: false
       matrix:
@@ -117,19 +116,19 @@ jobs:
         with:
           service: ${{ matrix.service }}
           tag: ${{ needs.resolve.outputs.version }}
-          registry: ghcr.io
-          repository: aoda-zhang/pawhaven-${{ matrix.service }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          registry: registry.cn-beijing.aliyuncs.com
+          repository: pawhaven/pawhaven-${{ matrix.service }}
+          username: ${{ secrets.ACR_USERNAME }}
+          token: ${{ secrets.ACR_PASSWORD }}
 
   deploy:
     name: Deploy to prod
-    needs: [resolve, push-ghcr]
+    needs: [resolve, push-image]
     concurrency:
       group: pawhaven-prod
       cancel-in-progress: false
     permissions:
       contents: read
-      packages: read
     uses: ./.github/workflows/deploy-k3s.yml
     with:
       ref: ${{ github.sha }}

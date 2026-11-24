@@ -425,8 +425,8 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 One Alibaba Cloud ECS host runs K3s. The cluster hosts `gateway`, `core-service` and
 `auth-service` in three namespaces — `pawhaven-test`, `pawhaven-uat`, `pawhaven-prod`, one per
-environment — with images pulled from GitHub Container Registry
-(`ghcr.io/aoda-zhang/pawhaven-<service>`).
+environment — with images pulled from Alibaba Cloud Container Registry
+(`registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-<service>`).
 
 | Piece                               | Runtime                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
@@ -436,8 +436,8 @@ environment — with images pulled from GitHub Container Registry
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
 Shipping is manual. `release.yml` builds the selected service image, waits for the `prod` environment
-approval, then pushes the image to GHCR and deploys the selected service.
-`deploy.yml` builds and pushes the selected service from `main` to GHCR as `sha-<7>`, then deploys it
+approval, then pushes the image to ACR and deploys the selected service.
+`deploy.yml` builds and pushes the selected service from `main` to ACR as `sha-<7>`, then deploys it
 to `test` or `uat` only.
 auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a
 default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the existing

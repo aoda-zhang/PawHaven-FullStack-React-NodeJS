@@ -30,7 +30,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   platform:
@@ -121,7 +120,7 @@ jobs:
         with:
           namespace: ${{ inputs.namespace }}
           manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
-          images: ghcr.io/aoda-zhang/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          images: registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
           action: deploy
           strategy: basic
           timeout: 300s

@@ -30,7 +30,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: core-service
-          image: ghcr.io/aoda-zhang/pawhaven-core-service:v0.0.0-unspecified
+          image: registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-core-service:v0.0.0-unspecified
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

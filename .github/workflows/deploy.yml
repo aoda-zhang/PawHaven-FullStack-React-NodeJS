@@ -23,7 +23,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 concurrency:
   group: pawhaven-${{ inputs.environment }}
@@ -69,13 +68,12 @@ jobs:
           tag: ${{ steps.tag.outputs.tag }}
           dockerfile: apps/backend/${{ inputs.service }}/deploy/Dockerfile
 
-  push-ghcr:
-    name: Push ${{ inputs.service }} to GHCR
+  push-image:
+    name: Push ${{ inputs.service }} to ACR
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -85,13 +83,14 @@ jobs:
         with:
           service: ${{ inputs.service }}
           tag: ${{ needs.build.outputs.tag }}
-          registry: ghcr.io
-          repository: aoda-zhang/pawhaven-${{ inputs.service }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          registry: registry.cn-beijing.aliyuncs.com
+          repository: pawhaven/pawhaven-${{ inputs.service }}
+          username: ${{ secrets.ACR_USERNAME }}
+          token: ${{ secrets.ACR_PASSWORD }}
 
   deploy-test:
     name: Deploy to test
-    needs: [build, push-ghcr]
+    needs: [build, push-image]
     if: ${{ inputs.environment == 'test' }}
     uses: ./.github/workflows/deploy-k3s.yml
     with:
@@ -105,7 +104,7 @@ jobs:
 
   deploy-uat:
     name: Deploy to uat
-    needs: [build, push-ghcr]
+    needs: [build, push-image]
     if: ${{ inputs.environment == 'uat' }}
     uses: ./.github/workflows/deploy-k3s.yml
     with:

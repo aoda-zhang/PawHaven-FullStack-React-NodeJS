@@ -1,5 +1,5 @@
 # Build from the monorepo root:
-# docker build -f apps/backend/auth-service/deploy/Dockerfile -t ghcr.io/aoda-zhang/pawhaven-auth-service:local .
+# docker build -f apps/backend/auth-service/deploy/Dockerfile -t registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-auth-service:local .
 FROM node:24-bookworm-slim
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@12.4.1 --activate

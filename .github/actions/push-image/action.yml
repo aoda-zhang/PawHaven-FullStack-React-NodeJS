@@ -14,6 +14,9 @@ inputs:
   repository:
     description: Image repository within the registry, in owner/pawhaven-<service> form.
     required: true
+  username:
+    description: Registry username.
+    required: true
   token:
     description: Password or token used to authenticate against the registry.
     required: true
@@ -34,7 +37,7 @@ runs:
       uses: docker/login-action@v3
       with:
         registry: ${{ inputs.registry }}
-        username: ${{ github.actor }}
+        username: ${{ inputs.username }}
         password: ${{ inputs.token }}
 
     - name: Tag the image

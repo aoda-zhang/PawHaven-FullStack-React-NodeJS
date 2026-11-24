@@ -8,8 +8,9 @@
 ## Principle
 
 CI proves; a release builds `main`'s head into an image artifact, waits for a human approval, then
-pushes it to GHCR; a deploy builds `main`'s head as `sha-<7>` and ships it. The quality gate is the
-merge-readiness signal and reproduces the checks a developer runs locally.
+pushes it to Alibaba Cloud Container Registry (ACR); a deploy builds `main`'s head as `sha-<7>` and
+ships it. The quality gate is the merge-readiness signal and reproduces the checks a developer runs
+locally.
 
 There are exactly two deployment entry points — `release.yml` and `deploy.yml` — and both are
 `workflow_dispatch` only. No push, tag, schedule or pull request deploys anything.
@@ -23,8 +24,8 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 | `storybook.yml`                | PR/push on UI paths  | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
 | `react-doctor.yml`             | PR, push to `main`   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
 | `deploy-k3s.yml`               | `workflow_call` only | Apply `deploy/platform/<env>` through `Azure/k8s-deploy`, then a per-service matrix job that deploys each selected service's `<env>` manifests with the release image tag and waits for its rollout                                                                                                |
-| `deploy.yml`                   | manual               | Runs from `main` only: select an environment and one service, build `main`'s head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it to `test` or `uat`                                                                                                         |
-| `release.yml`                  | manual               | Resolve the date-and-commit version, build the selected service into an image artifact, wait for the `prod` approval, push the image to GHCR in the `push-ghcr` matrix job, deploy the selected service; the run is named `Release-<service>`                                                      |
+| `deploy.yml`                   | manual               | Runs from `main` only: select an environment and one service, build `main`'s head as `sha-<7>` into an image artifact, push the loaded artifact to ACR, then deploy it to `test` or `uat`                                                                                                          |
+| `release.yml`                  | manual               | Resolve the date-and-commit version, build the selected service into an image artifact, wait for the `prod` approval, push the image to ACR in the `push-image` matrix job, deploy the selected service; the run is named `Release-<service>`                                                      |
 | `opencode-review.yml.disabled` | None                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
 `deploy-k3s.yml` carries no trigger of its own. It is a reusable capability, and `release.yml` and
@@ -49,7 +50,7 @@ merge-time gates already checked.
 | Branch          | `main` only                                                                                     | `main` only                                                               |
 | Image tag       | the computed `vYY.MM.DD-<sha7>` version                                                         | `sha-<7>` of `main`'s head, built on every run                            |
 | Approval        | `prod` environment with required reviewers, after the image is built and before it is published | none — production ships through `release.yml`                             |
-| What it changes | pushes the image to GHCR, then deploys the selected service                                     | pushes the image, then the platform manifests and the selected Deployment |
+| What it changes | pushes the image to ACR, then deploys the selected service                                      | pushes the image, then the platform manifests and the selected Deployment |
 
 In `release.yml`, the service selection controls what is built, pushed and deployed in that run: a
 release builds, pushes and deploys exactly one service, and `all` is not offered. The run is named
@@ -111,7 +112,7 @@ means adding its deploy assets and a choice entry.
 2. **Resolve** — computes the version `vYY.MM.DD-<sha7>` in `Asia/Shanghai`: the date plus the first
    seven characters of the dispatched commit, so the same commit always yields the same version and
    two commits never collide. No remote-tag lookup. The same job resolves the single selected service
-   into the `services` list that drives `build`, `push-ghcr` and `deploy`.
+   into the `services` list that drives `build`, `push-image` and `deploy`.
 3. **Build** — the `build` matrix job (`Build <service>`) calls the `build-image` composite action
    (`./.github/actions/build-image`) with the service, the tag and the Dockerfile. The action builds
    with `docker/build-push-action@v6` (`push: false`, `load: true`) as the local tag
@@ -119,9 +120,9 @@ means adding its deploy assets and a choice entry.
    `actions/upload-artifact@v4`. It never names a registry.
 4. **Approve** — the `approve` job binds to the `prod` environment, so the run pauses after the image
    is built and waits for a required reviewer before anything is published.
-5. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
-   composite action (`./.github/actions/push-image`) with the service, tag, registry, repository and
-   token. The action downloads that artifact, loads it with `docker load`, logs in with
+5. **Push to ACR** — the `push-image` matrix job (`Push <service> to ACR`) calls the `push-image`
+   composite action (`./.github/actions/push-image`) with the service, tag, registry, repository,
+   username and token. The action downloads that artifact, loads it with `docker load`, logs in with
    `docker/login-action@v3`, retags it with `docker tag` and publishes it with `docker push`. See
    [Image build and registry push](#image-build-and-registry-push).
 6. **Deploy** — `deploy-k3s.yml` deploys the selected service to `pawhaven-prod` from the `<version>`
@@ -136,16 +137,25 @@ Docker daemon as `pawhaven-<service>:<tag>`, then `docker save` writes `image.ta
 `actions/upload-artifact@v4` uploads it under `pawhaven-<service>-<tag>`. Nothing in that action names
 a registry.
 
-`push-image` (`./.github/actions/push-image`) takes `registry`, `repository` and `token` as inputs and
-does the registry work. `actions/download-artifact@v4` fetches the artifact, `docker load` restores
-the image, `docker/login-action@v3` authenticates, `docker tag` adds the registry name and
+`push-image` (`./.github/actions/push-image`) takes `registry`, `repository`, `username` and `token` as
+inputs and does the registry work. `actions/download-artifact@v4` fetches the artifact, `docker load`
+restores the image, `docker/login-action@v3` authenticates, `docker tag` adds the registry name and
 `docker push` publishes it. Docker publishes no official action that pushes a prebuilt local image, so
 the official pieces are setup, build, upload/download and login, and the transfer itself is the Docker
 CLI.
 
+Both workflows push to Alibaba Cloud Container Registry: host
+`registry.cn-beijing.aliyuncs.com`, namespace `pawhaven`, repository
+`pawhaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`
+instead of the workflow's `GITHUB_TOKEN`, so the push job declares only `contents: read` and no
+`packages` scope. ACR personal edition is free and the registry lives in the same region as the ECS
+host. The cluster authenticates the pull with the `acr-pull` docker-registry secret referenced by the
+`pawhaven-runtime` ServiceAccount; the [deployment runbook](deployment-runbook.md#image-pull-secret)
+covers creating it.
+
 Changing registry — to a private registry, ECR, or anything else — touches only the inputs passed to
-`push-image`: its `registry`, its `repository` and the `token` that authenticates there. The build
-action, its cache and the deploy version stay as they are; only the registry name in
+`push-image`: its `registry`, its `repository`, and the `username` and `token` that authenticate there.
+The build action, its cache and the deploy version stay as they are; only the registry name in
 `deploy-k3s.yml`'s `images` input has to match.
 
 The artifact is a cost to weigh: each image travels from the build runner to artifact storage and
@@ -177,9 +187,9 @@ gh workflow run release.yml -f service=<service>
   uses `pawhaven-${{ inputs.environment }}` with the same policy, which resolves to `pawhaven-test`
   or `pawhaven-uat`; the groups are independent, so a prod deploy does not serialize against a
   `test` or `uat` deploy.
-- Neither workflow writes repository contents now; the `push-ghcr` job is the only job that adds
-  `packages: write`, and the `build` jobs stay read-only (`contents: read`) and receive no registry
-  credential.
+- Neither workflow writes repository contents now; the `push-image` job declares only
+  `contents: read`, and the `build` jobs stay read-only (`contents: read`) and receive no registry
+  credential — the push job authenticates against ACR with its own secrets.
 - The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
   `contents: write`.
 
