@@ -437,11 +437,11 @@ environment — with images pulled from GitHub Container Registry
 
 Shipping is manual. `release.yml` tags `main`, pushes every deployable service image to GHCR, and
 deploys the selected scope after a `prod` environment approval. `deploy.yml` builds and pushes the
-selected service from the chosen branch to GHCR as `sha-<7>`, then deploys it to `test`, `uat` or
-`prod`; `prod` still requires approval. auth-service and core-service are cluster-internal: `ClusterIP` Services,
-no Ingress, behind a default-deny ingress NetworkPolicy. Public traffic reaches the gateway through
-the existing Traefik / Cloudflare Tunnel routing, which lives outside this repository. Setup,
-commands and rollback: [deployment runbook](../how-i-build/deployment-runbook.md).
+selected service from `main` to GHCR as `sha-<7>`, then deploys it to `test` or `uat` only.
+auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a
+default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the existing
+Traefik / Cloudflare Tunnel routing, which lives outside this repository. Setup, commands and
+rollback: [deployment runbook](../how-i-build/deployment-runbook.md).
 
 ### 9.2 Production (Phase 3+)
 
