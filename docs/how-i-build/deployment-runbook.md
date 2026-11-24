@@ -6,19 +6,22 @@
 
 ## Where each service runs
 
-| Service            | Runtime                                     | Image                                                             | Dockerfile                                        |
-| ------------------ | ------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------- |
-| `gateway`          | K3s, `ClusterIP`, reachable through Traefik | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-gateway`      | `apps/backend/gateway/deploy/Dockerfile`          |
-| `core-service`     | K3s, `ClusterIP`, internal only             | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-core-service` | `apps/backend/core-service/deploy/Dockerfile`     |
-| `auth-service`     | K3s, `ClusterIP`, internal only             | `registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-auth-service` | `apps/backend/auth-service/deploy/Dockerfile`     |
-| `document-service` | Vercel — out of this pipeline               | —                                                                 | `apps/backend/document-service/deploy/Dockerfile` |
-| portal             | Cloudflare Pages                            | —                                                                 | —                                                 |
-| MongoDB            | Managed cluster, outside the host           | —                                                                 | —                                                 |
+| Service            | Runtime                                     | Image                                                                                     | Dockerfile                                        |
+| ------------------ | ------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `gateway`          | K3s, `ClusterIP`, reachable through Traefik | `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-gateway`      | `apps/backend/gateway/deploy/Dockerfile`          |
+| `core-service`     | K3s, `ClusterIP`, internal only             | `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-core-service` | `apps/backend/core-service/deploy/Dockerfile`     |
+| `auth-service`     | K3s, `ClusterIP`, internal only             | `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-auth-service` | `apps/backend/auth-service/deploy/Dockerfile`     |
+| `document-service` | Vercel — out of this pipeline               | —                                                                                         | `apps/backend/document-service/deploy/Dockerfile` |
+| portal             | Cloudflare Pages                            | —                                                                                         | —                                                 |
+| MongoDB            | Managed cluster, outside the host           | —                                                                                         | —                                                 |
 
 The cluster is one Alibaba Cloud ECS host running K3s, and the images live in Alibaba Cloud Container
-Registry (ACR): host `registry.cn-beijing.aliyuncs.com`, namespace `pawhaven`, repository
-`pawhaven/pawhaven-<service>`. ACR personal edition is free and the registry instance sits in the same
-region as the ECS host.
+Registry (ACR): host `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`,
+repository `pahaven/pawhaven-<service>`. ACR personal edition is free and the registry instance sits in
+the same region as the ECS host. The instance also exposes a VPC endpoint
+`crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com` that in-cluster pulls can use to avoid
+public traffic, but CI must keep using the public endpoint because GitHub runners cannot reach the VPC
+address.
 
 ## Deploy asset layout
 
@@ -161,13 +164,13 @@ kubectl -n pawhaven-prod create secret generic pawhaven-secrets \
 
 ### Image pull secret
 
-`registry.cn-beijing.aliyuncs.com` repositories are private, so the namespace needs a registry
-credential named `acr-pull`. The `pawhaven-runtime` ServiceAccount from [Namespace](#namespace)
-references it as `imagePullSecrets`, and every Deployment runs as that account.
+`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` repositories are private, so the namespace
+needs a registry credential named `acr-pull`. The `pawhaven-runtime` ServiceAccount from
+[Namespace](#namespace) references it as `imagePullSecrets`, and every Deployment runs as that account.
 
 ```bash
 kubectl -n pawhaven-prod create secret docker-registry acr-pull \
-  --docker-server=registry.cn-beijing.aliyuncs.com \
+  --docker-server=crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com \
   --docker-username='<ACR_USERNAME>' \
   --docker-password='<ACR_PASSWORD>' \
   --dry-run=client -o yaml | kubectl apply -f -
@@ -211,11 +214,11 @@ secrets and accept the approval-flow change: every job that needs one must bind 
 so `test` and `uat` need their own environment objects and `release.yml` keeps a dedicated approved
 job for `prod`.
 
-Registry authentication is separate: the cluster pulls private `registry.cn-beijing.aliyuncs.com`
-images with the `acr-pull` Kubernetes secret created in the namespace, not with a GitHub environment
-secret. Tag protection is separate too: releases currently create no git tag, so protect the `v*` tag
-pattern with a tag ruleset, as described in [CI/CD](ci-cd.md#tag-protection), for any tag created
-manually. Tag protection does not gate merges, and branch protection does not cover tags.
+Registry authentication is separate: the cluster pulls private
+`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` images with the `acr-pull` Kubernetes
+secret created in the namespace, not with a GitHub environment secret. Tag protection is separate too:
+releases currently create no git tag, so protect the `v*` tag pattern with a tag ruleset, as described
+in [CI/CD](ci-cd.md#tag-protection), for any tag created manually. Tag protection does not gate merges, and branch protection does not cover tags.
 
 ## Release procedure
 

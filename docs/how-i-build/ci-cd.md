@@ -145,8 +145,8 @@ the official pieces are setup, build, upload/download and login, and the transfe
 CLI.
 
 Both workflows push to Alibaba Cloud Container Registry: host
-`registry.cn-beijing.aliyuncs.com`, namespace `pawhaven`, repository
-`pawhaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`
+`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`, repository
+`pahaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`
 instead of the workflow's `GITHUB_TOKEN`, so the push job declares only `contents: read` and no
 `packages` scope. ACR personal edition is free and the registry lives in the same region as the ECS
 host. The cluster authenticates the pull with the `acr-pull` docker-registry secret referenced by the

@@ -426,7 +426,7 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 One Alibaba Cloud ECS host runs K3s. The cluster hosts `gateway`, `core-service` and
 `auth-service` in three namespaces — `pawhaven-test`, `pawhaven-uat`, `pawhaven-prod`, one per
 environment — with images pulled from Alibaba Cloud Container Registry
-(`registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-<service>`).
+(`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-<service>`).
 
 | Piece                               | Runtime                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |

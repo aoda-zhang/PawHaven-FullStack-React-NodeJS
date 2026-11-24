@@ -120,7 +120,7 @@ jobs:
         with:
           namespace: ${{ inputs.namespace }}
           manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
-          images: registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          images: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
           action: deploy
           strategy: basic
           timeout: 300s

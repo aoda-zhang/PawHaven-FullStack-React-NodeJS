@@ -83,8 +83,8 @@ jobs:
         with:
           service: ${{ inputs.service }}
           tag: ${{ needs.build.outputs.tag }}
-          registry: registry.cn-beijing.aliyuncs.com
-          repository: pawhaven/pawhaven-${{ inputs.service }}
+          registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
+          repository: pahaven/pawhaven-${{ inputs.service }}
           username: ${{ secrets.ACR_USERNAME }}
           token: ${{ secrets.ACR_PASSWORD }}
 

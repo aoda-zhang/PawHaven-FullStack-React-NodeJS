@@ -1,5 +1,5 @@
 # Build from the monorepo root:
-# docker build -f apps/backend/core-service/deploy/Dockerfile -t registry.cn-beijing.aliyuncs.com/pawhaven/pawhaven-core-service:local .
+# docker build -f apps/backend/core-service/deploy/Dockerfile -t crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-core-service:local .
 FROM node:24-bookworm-slim
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@12.4.1 --activate

@@ -116,8 +116,8 @@ jobs:
         with:
           service: ${{ matrix.service }}
           tag: ${{ needs.resolve.outputs.version }}
-          registry: registry.cn-beijing.aliyuncs.com
-          repository: pawhaven/pawhaven-${{ matrix.service }}
+          registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
+          repository: pahaven/pawhaven-${{ matrix.service }}
           username: ${{ secrets.ACR_USERNAME }}
           token: ${{ secrets.ACR_PASSWORD }}
 
