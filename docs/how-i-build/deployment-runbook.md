@@ -55,13 +55,10 @@ until a deploy substitutes the version through the `images` input of `Azure/k8s-
 a `services` job that needs it fans out over the `services` JSON array as a matrix, deploying each
 service's directory with that action and the release tag, which also waits for the rollout.
 
-A service joins the pipeline by declaring a Dockerfile in its deploy directory; the workflows
-discover services by scanning for that file, not by reading a list. An `.out-of-pipeline` marker
-beside the Dockerfile keeps the service out of that scan and out of both `service` choice lists.
-document-service is the one service marked that way, so `release.yml` neither pushes nor deploys
-it even when the deploy scope is `all`, and `deploy.yml` — which deploys one service per run and has
-no `all` — never offers it. The `service` choice lists in `deploy.yml` and `release.yml` remain the
-only static enumeration, because GitHub cannot compute `choice` options at run time.
+A service joins the pipeline by appearing in the `service` choice lists in `deploy.yml` and
+`release.yml` — the only enumeration, because GitHub cannot compute `choice` options at run time.
+document-service runs on Vercel, is not listed in either, and its deploy directory carries an
+`.out-of-pipeline` marker.
 
 ## Environments
 
@@ -180,8 +177,8 @@ base64 < ~/.kube/config | tr -d '\n' | gh secret set KUBECONFIG_PROD
 ```
 
 Create the `prod` environment under Settings → Environments and add the required reviewers there;
-that environment is what gates `release.yml`, pausing the run after the images are built and before
-they are tagged and pushed. The approval job is the only job bound to it; the deploy jobs read the
+that environment is what gates `release.yml`, pausing the run after the image is built and before it
+is tagged and pushed. The approval job is the only job bound to it; the deploy jobs read the
 kubeconfig from repository scope.
 `KUBECONFIG_TEST`, `KUBECONFIG_UAT` and `KUBECONFIG_PROD` are therefore **repository** secrets, not
 environment secrets — `gh secret set` without `--env` stores them at repository scope. The `prod`
@@ -215,10 +212,11 @@ gh run watch
 ```
 
 1. Merge the change to `main` and confirm the commit to ship.
-2. Dispatch `release.yml` from `main`; pick `all` or a single service for the deploy scope.
-3. The run builds every deployable service into an `image.tar` artifact, then pauses.
+2. Dispatch `release.yml` from `main`; pick one service for the build, push and deploy scope. The run
+   appears as `Release-<service>`.
+3. The run builds the selected service into an `image.tar` artifact, then pauses.
 4. Approve the `prod` environment.
-5. The run tags the commit, pushes each image to GHCR and deploys the selected services.
+5. The run tags the commit, pushes the image to GHCR and deploys the selected service.
 6. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
 
 If the approval is granted after the artifact expired (7 days after the build), the push job fails
@@ -394,11 +392,11 @@ and 256Mi, with limits up to 1.1 CPU and 768Mi, before system pods and page cach
 ## document-service
 
 document-service stays on Vercel in production, with Vercel Blob for uploaded files; its Dockerfile
-and manifests are kept for local or break-glass use. An empty `.out-of-pipeline` marker in its deploy
-directory keeps it out of the release discovery and both `service` choice lists, so no `release.yml`
-run pushes or deploys it and no `deploy.yml` run selects it. The optional manifests also
-reference secret keys the cluster secret does not carry (`DOCUMENT_SERVICE_MONGODB`,
-`DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the `EMAIL_SMTP_*` credentials); see
+and manifests are kept for local or break-glass use. No workflow scans for Dockerfiles; the service
+is absent from both `service` choice lists, so no run selects it, and the empty `.out-of-pipeline`
+marker records that intent. The optional manifests also reference secret keys the cluster secret does
+not carry (`DOCUMENT_SERVICE_MONGODB`, `DOCUMENT_READ_WRITE_TOKEN`, `DOCUMENT_STORE_ID` and the
+`EMAIL_SMTP_*` credentials); see
 [`apps/backend/document-service/deploy/README.md`](../../apps/backend/document-service/deploy/README.md)
 before applying them.
 

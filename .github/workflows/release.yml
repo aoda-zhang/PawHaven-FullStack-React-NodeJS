@@ -1,15 +1,15 @@
 name: Release
+run-name: Release-${{ inputs.service }}
 
 on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy to production once the images are published'
+        description: 'Service to build, push and deploy to production'
         required: true
         type: choice
-        default: all
+        default: gateway
         options:
-          - all
           - gateway
           - core-service
           - auth-service
@@ -42,7 +42,6 @@ jobs:
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
       services: ${{ steps.services.outputs.services }}
-      allServices: ${{ steps.all-services.outputs.allServices }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -88,50 +87,8 @@ jobs:
           SERVICE: ${{ inputs.service }}
         run: |
           set -euo pipefail
-          if [[ "${SERVICE}" == "all" ]]; then
-            discovered=()
-            for dockerfile in apps/backend/*/deploy/Dockerfile; do
-              [[ -f "${dockerfile}" ]] || continue
-              deploy_dir="$(dirname "${dockerfile}")"
-              service="$(basename "$(dirname "${deploy_dir}")")"
-              if [[ -e "${deploy_dir}/.out-of-pipeline" ]]; then
-                echo "Skipping ${service}; it is marked out of the deployment pipeline."
-                continue
-              fi
-              discovered+=("${service}")
-            done
-            if ((${#discovered[@]} == 0)); then
-              echo "::error::No service declares apps/backend/<service>/deploy/Dockerfile."
-              exit 1
-            fi
-            services="$(printf '%s\n' "${discovered[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')"
-          else
-            services="$(jq -cn --arg service "${SERVICE}" '[$service]')"
-          fi
+          services="$(jq -cn --arg service "${SERVICE}" '[$service]')"
           echo "services=${services}" >>"${GITHUB_OUTPUT}"
-
-      - name: Discover every deployable service
-        id: all-services
-        shell: bash
-        run: |
-          set -euo pipefail
-          discovered=()
-          for dockerfile in apps/backend/*/deploy/Dockerfile; do
-            [[ -f "${dockerfile}" ]] || continue
-            deploy_dir="$(dirname "${dockerfile}")"
-            service="$(basename "$(dirname "${deploy_dir}")")"
-            if [[ -e "${deploy_dir}/.out-of-pipeline" ]]; then
-              echo "Skipping ${service}; it is marked out of the publishing pipeline."
-              continue
-            fi
-            discovered+=("${service}")
-          done
-          if ((${#discovered[@]} == 0)); then
-            echo "::error::No service declares apps/backend/<service>/deploy/Dockerfile."
-            exit 1
-          fi
-          all_services="$(printf '%s\n' "${discovered[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')"
-          echo "allServices=${all_services}" >>"${GITHUB_OUTPUT}"
 
   build:
     name: Build ${{ matrix.service }}
@@ -142,7 +99,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
+        service: ${{ fromJSON(needs.resolve.outputs.services) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -209,7 +166,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: ${{ fromJSON(needs.resolve.outputs.allServices) }}
+        service: ${{ fromJSON(needs.resolve.outputs.services) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
