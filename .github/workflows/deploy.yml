@@ -104,6 +104,7 @@ jobs:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_TEST }}
       REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
 
   deploy-uat:
     name: Deploy to uat
@@ -121,3 +122,4 @@ jobs:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_UAT }}
       REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}

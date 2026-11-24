@@ -141,3 +141,4 @@ jobs:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}
       REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}

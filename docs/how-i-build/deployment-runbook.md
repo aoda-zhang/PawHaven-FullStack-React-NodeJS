@@ -81,9 +81,11 @@ the environments apart.
 ## One-time setup per environment
 
 Run these once per namespace, before the first deploy. The deploy workflow applies
-`deploy/platform/<env>`, which creates the namespace, but it neither creates nor checks the ConfigMap,
-the Secret or the pull secret: an incomplete setup surfaces as a Pod that cannot start or cannot pull
-its image, after the Deployment is applied. The steps below are a manual prerequisite.
+`deploy/platform/<env>`, which creates the namespace and the `pawhaven-env` ConfigMap, and it maintains
+the `acr-pull` pull secret and the `pawhaven-secrets` Secret from repository secrets. A missing or
+invalid repository secret still surfaces as a Pod that cannot start or cannot pull its image, after the
+Deployment is applied. The commands below are the manual or break-glass fallback for a cluster outside
+the pipelines.
 
 Create the namespace first: every namespaced command below passes `-n pawhaven-prod` and fails with
 `NotFound` while the namespace does not exist.
@@ -120,6 +122,12 @@ service, so apply the name of the namespace: `test`, `uat`, or `prod`. The resol
 One ConfigMap serves every Deployment in the namespace; the per-service ConfigMaps from the earlier
 manifests (`gateway-config`, `core-service-config`, and so on) are gone.
 
+The ConfigMap lives in `deploy/platform/<env>/configmap.yaml`, and the platform job applies it on every
+deploy, so a hand-edited ConfigMap is reverted by the next run. Editing the file does not restart
+anything by itself: the values reach the pods through `envFrom`, and a running pod keeps the environment
+it started with. Run `kubectl -n <namespace> rollout restart deployment/<service>` or deploy again to
+pick up a change.
+
 The two in-cluster hosts include the scheme and port: the gateway proxy uses the configured host
 verbatim as its target (`apps/backend/gateway/src/proxy/proxy.service.ts`), and the shared HTTP
 client appends `port` only for `localhost`/`127.0.0.1`
@@ -128,6 +136,9 @@ client appends `port` only for `localhost`/`127.0.0.1`
 `DOCUMENT_SERVICE_HOST` must be the public HTTPS Vercel origin — scheme, no port, no trailing slash.
 The HTTP client strips a trailing slash but never adds a port to a non-localhost host, and
 document-service runs on Vercel, not in the cluster.
+
+The manifest carries a placeholder Vercel origin until the real one is substituted; replace it before
+the first deploy of that environment. The command below is the break-glass fallback:
 
 ```bash
 kubectl -n pawhaven-prod create configmap pawhaven-env \
@@ -150,6 +161,29 @@ All six keys are required in every namespace, whatever service a run deploys:
 | `CORE_SERVICE_MONGODB`     | core-service               |
 | `AUTH_SERVICE_MONGODB`     | auth-service               |
 | `BLOB_PUBLIC_BASE_URL`     | core-service               |
+
+The deploy workflow creates or updates this Secret in the target namespace on every run from the
+repository secret `PAWHAVEN_SECRETS_JSON`, a JSON object holding exactly these six keys. The platform
+job fails before it applies any service when that secret is unset or empty:
+
+```json
+{
+  "JWT_SECRET": "<value>",
+  "INTERNAL_JWT_PRIVATE_KEY": "<value>",
+  "INTERNAL_JWT_PUBLIC_KEY": "<value>",
+  "CORE_SERVICE_MONGODB": "<uri>",
+  "AUTH_SERVICE_MONGODB": "<uri>",
+  "BLOB_PUBLIC_BASE_URL": "<url>"
+}
+```
+
+```bash
+gh secret set PAWHAVEN_SECRETS_JSON < pawhaven-secrets.json
+```
+
+All environments currently read the same repository secret. To rotate a value, update the GitHub secret
+and re-run the deploy: the platform job replaces `pawhaven-secrets`, and the new pods pick up the new
+values. The command below is the break-glass fallback:
 
 ```bash
 kubectl -n pawhaven-prod create secret generic pawhaven-secrets \

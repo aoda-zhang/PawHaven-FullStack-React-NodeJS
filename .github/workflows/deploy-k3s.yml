@@ -37,6 +37,9 @@ on:
       REGISTRY_PASSWORD:
         description: 'Registry password for the image pull secret'
         required: true
+      PAWHAVEN_SECRETS_JSON:
+        description: 'JSON object with the pawhaven-secrets keys and values'
+        required: true
 
 permissions:
   contents: read
@@ -77,6 +80,10 @@ jobs:
           kubectl config current-context
           kubectl cluster-info
 
+      - name: Ensure the namespace
+        shell: bash
+        run: kubectl apply -f deploy/platform/${{ inputs.environment }}/namespace.yaml
+
       - name: Apply platform resources
         uses: Azure/k8s-deploy@v7
         with:
@@ -99,6 +106,22 @@ jobs:
             --docker-username="${REGISTRY_USERNAME}" \
             --docker-password="${REGISTRY_PASSWORD}" \
             --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Ensure the runtime secret
+        shell: bash
+        env:
+          SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SECRETS_JSON}" ]; then
+            echo "::error::PAWHAVEN_SECRETS_JSON is not set. It must be a JSON object with JWT_SECRET, INTERNAL_JWT_PRIVATE_KEY, INTERNAL_JWT_PUBLIC_KEY, CORE_SERVICE_MONGODB, AUTH_SERVICE_MONGODB and BLOB_PUBLIC_BASE_URL."
+            exit 1
+          fi
+          printf '%s' "${SECRETS_JSON}" | jq -r 'to_entries[] | "\(.key)=\(.value)"' > /tmp/pawhaven.env
+          kubectl -n "${{ inputs.namespace }}" create secret generic pawhaven-secrets \
+            --from-env-file=/tmp/pawhaven.env \
+            --dry-run=client -o yaml | kubectl apply -f -
+          rm -f /tmp/pawhaven.env
 
       - name: Describe the platform failure
         if: failure()
