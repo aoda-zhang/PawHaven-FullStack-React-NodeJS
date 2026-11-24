@@ -149,6 +149,12 @@ restores the image, `docker/login-action@v3` authenticates, `docker tag` adds th
 the official pieces are setup, build, upload/download and login, and the transfer itself is the Docker
 CLI.
 
+Images must stay small: ship production dependencies only and build in multiple stages, so
+compilers, source and devDependencies never reach the image the cluster runs. The node pulls the
+changed image on every deploy, so a large image is not only a registry and artifact cost — every
+megabyte is paid again on each rollout, and a pull that outlasts the deploy job's timeout fails the
+release.
+
 Both workflows push to Alibaba Cloud Container Registry: the public host
 `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`, repository
 `pahaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`

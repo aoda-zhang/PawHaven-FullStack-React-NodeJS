@@ -91,7 +91,7 @@ jobs:
           manifests: deploy/platform/${{ inputs.environment }}
           action: deploy
           strategy: basic
-          timeout: 600s
+          timeout: 900s
 
       - name: Ensure the image pull secret
         shell: bash
@@ -179,7 +179,7 @@ jobs:
           images: ${{ inputs.registry }}/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
           action: deploy
           strategy: basic
-          timeout: 600s
+          timeout: 900s
 
       - name: Describe the failed rollout
         if: failure()
