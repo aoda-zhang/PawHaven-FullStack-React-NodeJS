@@ -17,9 +17,19 @@ RUN pnpm install --frozen-lockfile --prod --ignore-scripts --filter=@pawhaven/ga
 FROM node:24-bookworm-slim AS builder
 WORKDIR /repo
 RUN corepack enable && corepack prepare pnpm@12.4.1 --activate
+# Manifests before source, so the install layer survives source-only changes. The gateway's
+# workspace graph is every project the build reads.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/backend/gateway/package.json apps/backend/gateway/
+COPY packages/backend-core/package.json packages/backend-core/
+COPY packages/shared/package.json packages/shared/
+COPY libs/eslint-config/package.json libs/eslint-config/
+COPY libs/tsconfig/package.json libs/tsconfig/
+RUN pnpm install --frozen-lockfile --filter=@pawhaven/gateway...
 COPY . .
-RUN pnpm install --frozen-lockfile --filter=@pawhaven/gateway... \
-    && pnpm dlx turbo@2.11.10 run build --filter=@pawhaven/gateway...
+# pnpm re-checks dependency state before running a script and reads the full workspace from the
+# source copy as an out-of-date install, so it would reinstall every project inside this layer.
+RUN pnpm_config_verify_deps_before_run=false pnpm exec turbo run build --filter=@pawhaven/gateway...
 
 FROM node:24-bookworm-slim AS runtime
 WORKDIR /repo

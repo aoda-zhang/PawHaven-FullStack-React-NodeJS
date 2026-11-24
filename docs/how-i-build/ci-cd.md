@@ -159,6 +159,11 @@ changed image on every deploy, so a large image is not only a registry and artif
 megabyte is paid again on each rollout, and a pull that outlasts the deploy job's timeout fails the
 release.
 
+The gateway image also caches work between builds: its builder installs the gateway's workspace
+graph from manifests alone, before the source copy, so a commit that changes source reuses that
+layer and only reruns the build. The context is trimmed the same way — `docs`, `e2e`, Playwright
+output and local editor or agent directories never leave the runner.
+
 Both workflows push to Alibaba Cloud Container Registry: the public host
 `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`, repository
 `pahaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`

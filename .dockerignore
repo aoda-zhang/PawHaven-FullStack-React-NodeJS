@@ -2,6 +2,14 @@
 .git
 .github
 .turbo
+**/.turbo
+docs
+e2e
+test-results
+playwright-report
+.opencode
+.vscode
+.husky
 **/node_modules
 **/dist
 **/build
