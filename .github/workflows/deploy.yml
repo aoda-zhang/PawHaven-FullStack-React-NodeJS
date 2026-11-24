@@ -99,8 +99,11 @@ jobs:
       ref: ${{ github.sha }}
       version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
+      registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_TEST }}
+      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
 
   deploy-uat:
     name: Deploy to uat
@@ -113,5 +116,8 @@ jobs:
       ref: ${{ github.sha }}
       version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
+      registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_UAT }}
+      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}

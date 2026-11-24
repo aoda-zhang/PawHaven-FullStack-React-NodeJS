@@ -23,9 +23,19 @@ on:
         description: 'JSON array of services to deploy'
         required: true
         type: string
+      registry:
+        description: 'Container registry host used for image pull credentials'
+        required: true
+        type: string
     secrets:
       KUBECONFIG_B64:
         description: 'Base64 encoded kubeconfig for the target cluster'
+        required: true
+      REGISTRY_USERNAME:
+        description: 'Registry username for the image pull secret'
+        required: true
+      REGISTRY_PASSWORD:
+        description: 'Registry password for the image pull secret'
         required: true
 
 permissions:
@@ -76,6 +86,29 @@ jobs:
           strategy: basic
           timeout: 300s
 
+      - name: Ensure the image pull secret
+        shell: bash
+        env:
+          REGISTRY: ${{ inputs.registry }}
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          kubectl -n "${{ inputs.namespace }}" create secret docker-registry acr-pull \
+            --docker-server="${REGISTRY}" \
+            --docker-username="${REGISTRY_USERNAME}" \
+            --docker-password="${REGISTRY_PASSWORD}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Describe the platform failure
+        if: failure()
+        shell: bash
+        run: |
+          set -uo pipefail
+          ns="${{ inputs.namespace }}"
+          kubectl -n "${ns}" get all,networkpolicies,serviceaccounts,secrets || true
+          kubectl -n "${ns}" get events --sort-by=.lastTimestamp | tail -30 || true
+
   services:
     needs: platform
     runs-on: ubuntu-latest
@@ -124,3 +157,17 @@ jobs:
           action: deploy
           strategy: basic
           timeout: 300s
+
+      - name: Describe the failed rollout
+        if: failure()
+        shell: bash
+        run: |
+          set -uo pipefail
+          ns="${{ inputs.namespace }}"
+          kubectl -n "${ns}" get pods -o wide || true
+          kubectl -n "${ns}" describe deployment/${{ matrix.service }} || true
+          for pod in $(kubectl -n "${ns}" get pods -l app.kubernetes.io/name=${{ matrix.service }} -o name 2>/dev/null); do
+            kubectl -n "${ns}" describe "${pod}" | tail -40 || true
+            kubectl -n "${ns}" logs "${pod}" --all-containers --tail=50 || true
+          done
+          kubectl -n "${ns}" get events --sort-by=.lastTimestamp | tail -30 || true

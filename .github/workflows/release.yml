@@ -136,5 +136,8 @@ jobs:
       namespace: pawhaven-prod
       version: ${{ needs.resolve.outputs.version }}
       services: ${{ needs.resolve.outputs.services }}
+      registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}
+      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
+      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}

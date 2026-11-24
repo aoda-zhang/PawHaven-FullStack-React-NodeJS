@@ -168,6 +168,10 @@ kubectl -n pawhaven-prod create secret generic pawhaven-secrets \
 needs a registry credential named `acr-pull`. The `pawhaven-runtime` ServiceAccount from
 [Namespace](#namespace) references it as `imagePullSecrets`, and every Deployment runs as that account.
 
+The deploy workflow creates or updates this secret on every run from the `ACR_USERNAME` and
+`ACR_PASSWORD` repository secrets, so you do not create it by hand. The command below is the local
+or break-glass fallback for a cluster outside the pipelines:
+
 ```bash
 kubectl -n pawhaven-prod create secret docker-registry acr-pull \
   --docker-server=crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com \
@@ -199,10 +203,12 @@ gh secret set ACR_PASSWORD
 ```
 
 `ACR_PASSWORD` is the ACR registry password for that user; rotating it in ACR means setting the
-secret again and recreating the `acr-pull` secret in each namespace.
+secret again, and the next deploy refreshes `acr-pull` in each namespace.
 
 The deploy jobs fail fast with an explicit error when the kubeconfig secret is empty or the cluster
-is unreachable, because kubectl otherwise falls back to `localhost:8080`.
+is unreachable, because kubectl otherwise falls back to `localhost:8080`. When a rollout fails, the
+services job prints pods, `describe` output, container logs and recent events into the job log; the
+platform job prints the namespace objects and events.
 
 That repository scope is an accepted risk. Anyone with write access can read a repository secret by
 pushing a branch whose workflow prints it, so write access is itself part of the production boundary:
@@ -216,7 +222,7 @@ job for `prod`.
 
 Registry authentication is separate: the cluster pulls private
 `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` images with the `acr-pull` Kubernetes
-secret created in the namespace, not with a GitHub environment secret. Tag protection is separate too:
+secret that the deploy workflow maintains in the namespace, not with a GitHub environment secret. Tag protection is separate too:
 releases currently create no git tag, so protect the `v*` tag pattern with a tag ruleset, as described
 in [CI/CD](ci-cd.md#tag-protection), for any tag created manually. Tag protection does not gate merges, and branch protection does not cover tags.
 
