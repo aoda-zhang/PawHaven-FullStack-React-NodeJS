@@ -49,7 +49,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          version="v$(TZ=Asia/Shanghai date +%y.%m.%d)-${GITHUB_SHA:0:7}"
+          version="v$(date -u +%y.%m.%d)-${GITHUB_SHA:0:7}"
           echo "Releasing ${version} from ${GITHUB_SHA}."
           echo "version=${version}" >>"${GITHUB_OUTPUT}"
 

@@ -118,7 +118,7 @@ means adding its deploy assets and a choice entry.
 `release.yml` runs in this order, and each stage depends on the previous one:
 
 1. **Precheck** — the `precheck` job fails unless the dispatched ref is `refs/heads/main`.
-2. **Resolve** — computes the version `vYY.MM.DD-<sha7>` in `Asia/Shanghai`: the date plus the first
+2. **Resolve** — computes the version `vYY.MM.DD-<sha7>` in UTC: the date plus the first
    seven characters of the dispatched commit, so the same commit always yields the same version and
    two commits never collide. No remote-tag lookup. The same job resolves the single selected service
    into the `services` list that drives `build`, `push-image` and `deploy`.
