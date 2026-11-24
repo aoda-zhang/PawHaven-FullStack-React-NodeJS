@@ -178,11 +178,12 @@ describes.
 
 ## Concurrency and safety
 
-- `release.yml` uses the fixed `pawhaven-prod` group with `cancel-in-progress: false`; `deploy.yml`
-  uses `pawhaven-${{ inputs.environment }}` with the same policy, which resolves to
-  `pawhaven-test` or `pawhaven-uat`. `release.yml` is therefore the only workflow in the
-  `pawhaven-prod` group; the two groups are independent, so a prod release does not serialize
-  against a `test` or `uat` deploy.
+- `release.yml` serializes only its `deploy` job, on the fixed `pawhaven-prod` group with
+  `cancel-in-progress: false`, so a run waiting for the `prod` approval does not block later
+  releases: they build and wait independently, then queue at the deploy step only. `deploy.yml`
+  uses `pawhaven-${{ inputs.environment }}` with the same policy, which resolves to `pawhaven-test`
+  or `pawhaven-uat`; the groups are independent, so a prod deploy does not serialize against a
+  `test` or `uat` deploy.
 - `release.yml` and `deploy.yml` write repository contents only in `release.yml`'s tagging job; the
   `push-ghcr` job is the only job that adds `packages: write`. The `build` jobs are read-only
   (`contents: read`) and receive no registry credential.

@@ -17,10 +17,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: pawhaven-prod
-  cancel-in-progress: false
-
 jobs:
   precheck:
     name: Check the release ref
@@ -185,6 +181,9 @@ jobs:
   deploy:
     name: Deploy to prod
     needs: [resolve, push-ghcr]
+    concurrency:
+      group: pawhaven-prod
+      cancel-in-progress: false
     permissions:
       contents: read
       packages: read
