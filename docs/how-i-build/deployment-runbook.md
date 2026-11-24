@@ -230,7 +230,7 @@ gh workflow run deploy.yml -f environment=uat -f service=gateway
 ```
 
 `deploy.yml` offers only `test` and `uat`; production is not selectable. It fails a dispatch that is
-not from `main`, so the deployed commit is the current `main` head. It then builds the
+not from `main`, so the deployed commit is the `main` head at dispatch time. It then builds the
 selected service as `sha-<7>` through the `build-image` composite action
 (`./.github/actions/build-image`, which runs `docker/build-push-action@v6` with `load: true` and
 `push: false`) into `pawhaven-<service>:sha-<7>`, saves it with `docker save` and uploads `image.tar`
@@ -257,7 +257,8 @@ instead of overlapping it.
 ## Roll back
 
 A rollback is a forward deploy of a known-good commit. `deploy.yml` has no version input: every run
-builds `sha-<7>` from `main`, so the way back is to deploy the good commit again.
+builds `sha-<7>` from `main`, so the way back is to revert the faulty change on `main` and deploy the
+resulting head.
 
 Identify the previous known-good release explicitly. Do not take the newest tag blindly — during an
 incident the newest `vYY.MM.DD` tag is usually the broken release, and it is not necessarily the tag

@@ -159,9 +159,10 @@ itself cheap.
 Release tags are immutable image tags, not branches: a release always names the date tag it just
 pushed to GHCR.
 
-`deploy.yml` has no tag input. Both workflows build `main`'s head as `sha-<7>`, so rolling back means
-deploying a known-good commit again: revert the faulty change on `main` and run `release.yml` for
-production, or `deploy.yml` for `test` or `uat`. There is no arbitrary-commit dispatch.
+`deploy.yml` has no tag input: it builds `main`'s head as `sha-<7>`, while `release.yml` builds the
+same head under its computed date tag. Rolling back therefore means reverting the faulty change on
+`main` and re-dispatching `release.yml` for production, or `deploy.yml` for `test` or `uat`. There is
+no arbitrary-commit dispatch.
 
 ```bash
 git revert <faulty-commit>

@@ -77,8 +77,8 @@ before it creates the release tag. The release checks are those same definitions
 release-only copy, so a gate tightened for a PR is also enforced before pushing to GHCR.
 
 `deploy.yml` and `deploy-k3s.yml` are not gates: they run no tests, no lint and no cluster
-preflight, so a deploy from a branch that never passed these checks is unproven until the change
-merges.
+preflight. `deploy.yml` deploys only `main`'s head, so the checks that matter are the merge-time
+gates on `main`.
 
 ## Adding a gate
 
