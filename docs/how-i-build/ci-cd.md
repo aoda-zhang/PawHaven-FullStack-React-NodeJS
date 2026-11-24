@@ -31,7 +31,9 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 `deploy.yml` are its only callers.
 
 `deploy-k3s.yml` accepts an optional `ref`, and the two deploy workflows pass the commit to deploy, so
-a run uses one commit rather than whatever ref started the dispatch.
+a run uses one commit rather than whatever ref started the dispatch. Both of its jobs write the
+kubeconfig into the workspace and verify it first: an empty secret or an unreachable cluster fails
+fast with an explicit error, because kubectl otherwise falls back to `localhost:8080`.
 
 The three gate workflows are not dispatchable. They run on pull requests and `main` pushes only;
 `release.yml` does not re-run them, so a release ships a commit the merge-time gates already

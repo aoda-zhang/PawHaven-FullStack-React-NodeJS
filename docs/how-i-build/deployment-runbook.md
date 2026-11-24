@@ -185,6 +185,9 @@ environment secrets — `gh secret set` without `--env` stores them at repositor
 environment supplies the human approval gate only; it does not inject any kubeconfig. `test` and
 `uat` have no environment gate.
 
+The deploy jobs fail fast with an explicit error when the kubeconfig secret is empty or the cluster
+is unreachable, because kubectl otherwise falls back to `localhost:8080`.
+
 That repository scope is an accepted risk. Anyone with write access can read a repository secret by
 pushing a branch whose workflow prints it, so write access is itself part of the production boundary:
 limit it to the people who may deploy, and protect `main` as described in

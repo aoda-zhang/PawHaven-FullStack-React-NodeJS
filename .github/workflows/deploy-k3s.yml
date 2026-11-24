@@ -47,12 +47,26 @@ jobs:
           KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
         run: |
           set -euo pipefail
-          mkdir -p "${HOME}/.kube"
-          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
-          chmod 600 "${HOME}/.kube/config"
+          mkdir -p "${GITHUB_WORKSPACE}/.kube"
+          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${GITHUB_WORKSPACE}/.kube/config"
+          chmod 600 "${GITHUB_WORKSPACE}/.kube/config"
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
+
+      - name: Verify the kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG: ${{ github.workspace }}/.kube/config
+        run: |
+          set -euo pipefail
+          if [ ! -s "${KUBECONFIG}" ]; then
+            echo "::error::The kubeconfig secret is empty. Set KUBECONFIG_<ENV> as base64 of a kubeconfig whose server is reachable from GitHub runners."
+            exit 1
+          fi
+          echo "KUBECONFIG=${KUBECONFIG}" >>"${GITHUB_ENV}"
+          kubectl config current-context
+          kubectl cluster-info
 
       - name: Apply platform resources
         uses: Azure/k8s-deploy@v7
@@ -81,12 +95,26 @@ jobs:
           KUBECONFIG_B64: ${{ secrets.KUBECONFIG_B64 }}
         run: |
           set -euo pipefail
-          mkdir -p "${HOME}/.kube"
-          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${HOME}/.kube/config"
-          chmod 600 "${HOME}/.kube/config"
+          mkdir -p "${GITHUB_WORKSPACE}/.kube"
+          printf '%s' "${KUBECONFIG_B64}" | base64 -d >"${GITHUB_WORKSPACE}/.kube/config"
+          chmod 600 "${GITHUB_WORKSPACE}/.kube/config"
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v4
+
+      - name: Verify the kubeconfig
+        shell: bash
+        env:
+          KUBECONFIG: ${{ github.workspace }}/.kube/config
+        run: |
+          set -euo pipefail
+          if [ ! -s "${KUBECONFIG}" ]; then
+            echo "::error::The kubeconfig secret is empty. Set KUBECONFIG_<ENV> as base64 of a kubeconfig whose server is reachable from GitHub runners."
+            exit 1
+          fi
+          echo "KUBECONFIG=${KUBECONFIG}" >>"${GITHUB_ENV}"
+          kubectl config current-context
+          kubectl cluster-info
 
       - name: Deploy ${{ matrix.service }}
         uses: Azure/k8s-deploy@v7
