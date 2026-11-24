@@ -369,14 +369,35 @@ in the incident notes.
 
 ## Gateway exposure
 
-The gateway Service is `ClusterIP`. Nothing in this repository publishes it: the k3s-bundled Traefik
-ingress controller sits in front of the cluster, and Cloudflare Tunnel terminates public TLS and
-forwards to it. That routing (IngressRoute or Helm values) is platform configuration outside this
-repo, which is why `kubectl get ingress -n pawhaven-prod` on a fresh environment is expected to be
-empty.
+The k3s-bundled Traefik is the ingress controller. Its Service is a `LoadBalancer` served by klipper
+ServiceLB, which binds 80 and 443 on the node, so public traffic to the host reaches Traefik
+directly. `deploy/platform/prod/ingress.yaml` routes `api.pawhaven.work` to the `gateway` Service on
+port 8080 through `ingressClassName: traefik` and names the `cloudflare-origin` TLS secret. `test` and
+`uat` have no Ingress and stay cluster-internal.
 
-On the host, the ECS security group should expose only 80/443 to the internet, with 22 and 6443
-restricted to operator addresses. Those rules live in Alibaba Cloud, not in this repository.
+In Cloudflare, point `A api → <ECS public IP>` with the record **proxied**, and set the zone SSL/TLS
+mode to **Full (strict)**: Cloudflare terminates client TLS and connects to the origin on 443 over
+TLS verified against a Cloudflare Origin Certificate. Generate that certificate for
+`api.pawhaven.work` (add a wildcard only if other hostnames need it) and store the PEM pair as the
+repository secrets `CF_ORIGIN_CERT` and `CF_ORIGIN_KEY`; the `platform` job installs it as the
+`cloudflare-origin` secret of type `kubernetes.io/tls`. Keep the PEM newlines by storing both values
+as literal multi-line strings, not base64. Rotating the certificate is a secret update plus a re-run;
+when either secret is empty the job logs a warning and leaves the Ingress without a valid
+certificate.
+
+On the host, the ECS security group must allow **443** from Cloudflare's IP ranges so proxied requests
+reach Traefik, and 80 only if you also want the HTTP-to-HTTPS redirect. Keep 22 and 6443 restricted
+to operator addresses. Those rules live in Alibaba Cloud, not in this repository.
+
+Verify the public route and the Ingress:
+
+```bash
+curl -I https://api.pawhaven.work/
+kubectl -n pawhaven-prod get ingress gateway
+```
+
+The `curl` should return any HTTP status below 500 from the gateway through Cloudflare, and the
+Ingress should list the `api.pawhaven.work` host with the `cloudflare-origin` TLS secret.
 
 The deploy workflows connect from GitHub's runners, not from an operator laptop, so the operator
 allowlist on 6443 does not by itself make a deploy possible. This repository does not record which
@@ -400,8 +421,8 @@ arrangement here so the next operator does not rediscover it.
 
 The gateway NetworkPolicy `pawhaven-allow-gateway-ingress` in
 `deploy/platform/<env>/network-policies.yaml` admits TCP 8080 without a `from` peer, so any ingress
-or tunnel controller reaches the gateway whatever namespace it runs in; a separate allowance admits
-same-namespace pods. If the tunnel targets a different port, add it to that policy.
+controller reaches the gateway whatever namespace it runs in; a separate allowance admits
+same-namespace pods. If the gateway listens on a different port, add it to that policy.
 
 ## Verify internal-only
 

@@ -440,9 +440,12 @@ approval, then pushes the image to ACR and deploys the selected service.
 `deploy.yml` builds and pushes the selected service from `main` to ACR as `sha-<7>`, then deploys it
 to `test` or `uat` only.
 auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a
-default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the existing
-Traefik / Cloudflare Tunnel routing, which lives outside this repository. Setup, commands and
-rollback: [deployment runbook](../how-i-build/deployment-runbook.md).
+default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the k3s-bundled
+Traefik ingress controller: `deploy/platform/prod/ingress.yaml` routes `api.pawhaven.work` to the
+gateway Service on port 8080, and Cloudflare proxies that hostname to the ECS public IP on 443 with
+Full (strict) using a Cloudflare Origin Certificate stored as the `cloudflare-origin` secret. `test`
+and `uat` stay cluster-internal. Setup, commands and rollback:
+[deployment runbook](../how-i-build/deployment-runbook.md).
 
 ### 9.2 Production (Phase 3+)
 
@@ -459,11 +462,12 @@ rollback: [deployment runbook](../how-i-build/deployment-runbook.md).
 │  Managed MongoDB (2 databases: auth + core), off the host │
 └───────────────────────────────────────────────────────────┘
         │                                   │
-        │ Traefik / Cloudflare Tunnel       │ HTTPS + internal JWT
+        │ Traefik / Cloudflare              │ HTTPS + internal JWT
         ▼                                   ▼
    public HTTPS                    document-service on Vercel
-   (routing configured             (Vercel Blob storage;
-    outside this repo)              not part of the K3s pipeline)
+   api.pawhaven.work               (Vercel Blob storage;
+   (prod Ingress,                   not part of the K3s pipeline)
+    Full (strict))
 ```
 
 Probes are TCP handshakes because no service exposes a health endpoint yet (§8.2). Each Deployment

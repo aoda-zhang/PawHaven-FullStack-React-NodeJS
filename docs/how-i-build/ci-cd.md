@@ -36,8 +36,10 @@ a run uses one commit rather than whatever ref started the dispatch. Both of its
 kubeconfig into the workspace and verify it first: an empty secret or an unreachable cluster fails
 fast with an explicit error, because kubectl otherwise falls back to `localhost:8080`. The platform
 job ensures the namespace, applies the platform manifests (including the `pawhaven-env` ConfigMap),
-creates or updates the `acr-pull` image pull secret from the registry credential secrets, and creates
-or updates the `pawhaven-secrets` runtime secret from the `PAWHAVEN_SECRETS_JSON` repository secret. The
+creates or updates the `acr-pull` image pull secret from the registry credential secrets, creates
+or updates the `pawhaven-secrets` runtime secret from the `PAWHAVEN_SECRETS_JSON` repository secret,
+and, when the optional `CF_ORIGIN_CERT` and `CF_ORIGIN_KEY` secrets are set, installs them as the
+`cloudflare-origin` TLS secret (empty values log a warning and skip it). The
 `services` job renders the release image into a temporary copy of each service's manifests before it
 applies them, so the committed placeholder never reaches the cluster and no placeholder pod is created.
 After the rollout, the same job smoke-checks the service from inside its container: `kubectl exec` runs
@@ -95,14 +97,16 @@ deploy/platform/
 └── prod/
     ├── namespace.yaml
     ├── network-policies.yaml
-    └── serviceaccount.yaml
+    ├── serviceaccount.yaml
+    └── ingress.yaml
 ```
 
-`deploy/platform/<env>` holds only what every service in that namespace shares: the Namespace, three
-NetworkPolicies and the `pawhaven-runtime` ServiceAccount. Deployment and Service objects stay beside
-the service that owns them, and their committed image tag is the placeholder `v0.0.0-unspecified`; the
-`services` job substitutes the release image in a temporary copy before `kubectl apply`, so the
-placeholder never reaches the cluster.
+`deploy/platform/<env>` holds what every service in that namespace shares: the Namespace, three
+NetworkPolicies and the `pawhaven-runtime` ServiceAccount. `prod` additionally carries
+`ingress.yaml`, which routes `api.pawhaven.work` to the gateway Service. Deployment and Service
+objects stay beside the service that owns them, and their committed image tag is the placeholder
+`v0.0.0-unspecified`; the `services` job substitutes the release image in a temporary copy before
+`kubectl apply`, so the placeholder never reaches the cluster.
 
 A service joins the pipeline by declaring `apps/backend/<service>/deploy/Dockerfile` and appearing in
 both `service` choice lists. document-service runs on Vercel, so it is absent from those lists and its

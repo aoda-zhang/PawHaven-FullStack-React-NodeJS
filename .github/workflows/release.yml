@@ -144,3 +144,5 @@ jobs:
       REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
       REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
       PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
+      CF_ORIGIN_CERT: ${{ secrets.CF_ORIGIN_CERT }}
+      CF_ORIGIN_KEY: ${{ secrets.CF_ORIGIN_KEY }}

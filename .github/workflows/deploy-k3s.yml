@@ -40,6 +40,12 @@ on:
       PAWHAVEN_SECRETS_JSON:
         description: 'JSON object with the pawhaven-secrets keys and values'
         required: true
+      CF_ORIGIN_CERT:
+        description: 'PEM contents of the Cloudflare Origin Certificate'
+        required: false
+      CF_ORIGIN_KEY:
+        description: 'PEM private key for the Cloudflare Origin Certificate'
+        required: false
 
 permissions:
   contents: read
@@ -122,6 +128,24 @@ jobs:
             --from-env-file=/tmp/pawhaven.env \
             --dry-run=client -o yaml | kubectl apply -f -
           rm -f /tmp/pawhaven.env
+
+      - name: Ensure the TLS secret
+        shell: bash
+        env:
+          CERT: ${{ secrets.CF_ORIGIN_CERT }}
+          KEY: ${{ secrets.CF_ORIGIN_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${CERT}" ] || [ -z "${KEY}" ]; then
+            echo "::warning::CF_ORIGIN_CERT/CF_ORIGIN_KEY are not set; the ingress stays without a certificate."
+            exit 0
+          fi
+          printf '%s' "${CERT}" > /tmp/tls.crt
+          printf '%s' "${KEY}" > /tmp/tls.key
+          kubectl -n "${{ inputs.namespace }}" create secret tls cloudflare-origin \
+            --cert=/tmp/tls.crt --key=/tmp/tls.key \
+            --dry-run=client -o yaml | kubectl apply -f -
+          rm -f /tmp/tls.crt /tmp/tls.key
 
       - name: Describe the platform failure
         if: failure()
