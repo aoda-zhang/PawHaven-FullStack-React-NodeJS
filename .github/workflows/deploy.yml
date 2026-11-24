@@ -20,11 +20,6 @@ on:
           - gateway
           - core-service
           - auth-service
-      branch:
-        description: 'Branch to build and deploy'
-        required: true
-        type: string
-        default: develop
 
 permissions:
   contents: read
@@ -35,9 +30,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  precheck:
+    name: Check the deploy ref
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the dispatching branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            echo "::error::Deploys run from main only; this run uses ${GITHUB_REF}."
+            exit 1
+          fi
+
   build:
     name: Build ${{ inputs.service }}
     runs-on: ubuntu-latest
+    needs: precheck
     permissions:
       contents: read
     outputs:
@@ -45,8 +54,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-        with:
-          ref: ${{ inputs.branch }}
 
       - name: Resolve image tag
         id: tag
@@ -88,7 +95,7 @@ jobs:
     with:
       environment: test
       namespace: pawhaven-test
-      ref: ${{ inputs.branch }}
+      ref: ${{ github.sha }}
       version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
     secrets:
@@ -102,7 +109,7 @@ jobs:
     with:
       environment: uat
       namespace: pawhaven-uat
-      ref: ${{ inputs.branch }}
+      ref: ${{ github.sha }}
       version: ${{ needs.build.outputs.tag }}
       services: '["${{ inputs.service }}"]'
     secrets:

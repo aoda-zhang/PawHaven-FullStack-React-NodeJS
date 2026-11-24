@@ -222,15 +222,15 @@ gh run watch
 
 ## Deploy a service build
 
-Use this to build and deploy the head of a branch. One run deploys one service.
+Use this to build and deploy the head of `main`. One run deploys one service.
 
 ```bash
-gh workflow run deploy.yml -f environment=test -f service=gateway -f branch=develop
-gh workflow run deploy.yml -f environment=uat -f service=gateway -f branch=develop
+gh workflow run deploy.yml -f environment=test -f service=gateway
+gh workflow run deploy.yml -f environment=uat -f service=gateway
 ```
 
-`deploy.yml` offers only `test` and `uat`; production is not selectable. `branch` defaults to
-`develop`. The run checks that branch out, so an unknown branch fails at checkout. It then builds the
+`deploy.yml` offers only `test` and `uat`; production is not selectable. It fails a dispatch that is
+not from `main`, so the deployed commit is the current `main` head. It then builds the
 selected service as `sha-<7>` through the `build-image` composite action
 (`./.github/actions/build-image`, which runs `docker/build-push-action@v6` with `load: true` and
 `push: false`) into `pawhaven-<service>:sha-<7>`, saves it with `docker save` and uploads `image.tar`
@@ -247,9 +247,9 @@ changing only those inputs in `push-ghcr` and the registry in `deploy-k3s.yml`'s
 artifact hop is the price of that separation: each image is uploaded to artifact storage and
 downloaded again before it is pushed, which a `retention-days: 1` policy keeps cheap to store.
 
-`deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow restricts no branch,
-and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a commit
-that has already passed CI. Production ships only through `release.yml`.
+`deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow runs from `main`
+only, and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a
+commit that has already passed CI. Production ships only through `release.yml`.
 
 Each Deployment runs one replica with `maxSurge: 0`, so a rollout briefly replaces the old pod
 instead of overlapping it.
@@ -257,7 +257,7 @@ instead of overlapping it.
 ## Roll back
 
 A rollback is a forward deploy of a known-good commit. `deploy.yml` has no version input: every run
-builds `sha-<7>` from the branch it checks out, so the way back is to deploy the good commit again.
+builds `sha-<7>` from `main`, so the way back is to deploy the good commit again.
 
 Identify the previous known-good release explicitly. Do not take the newest tag blindly — during an
 incident the newest `vYY.MM.DD` tag is usually the broken release, and it is not necessarily the tag
@@ -281,15 +281,15 @@ git revert <faulty-commit>
 gh workflow run release.yml -f service=all
 ```
 
-For a single service in `test` or `uat`, dispatch `deploy.yml` with a branch whose head is the good
-commit; the run builds that commit as `sha-<7>` and deploys it:
+For a single service in `test` or `uat`, revert the faulty commit on `main` and dispatch `deploy.yml`;
+the run builds `main`'s head as `sha-<7>` and deploys it:
 
 ```bash
-gh workflow run deploy.yml -f environment=uat -f service=gateway -f branch=<branch-at-good-commit>
+gh workflow run deploy.yml -f environment=uat -f service=gateway
 ```
 
-A production rollback is the revert-and-release path above: `deploy.yml` cannot target `prod` or
-deploy an arbitrary branch there. To roll back a single production service, revert and run
+A production rollback is the revert-and-release path above: `deploy.yml` cannot target `prod`. To roll
+back a single production service, revert and run
 `release.yml -f service=<service>`. `deploy.yml` deploys one service per run, so roll back each
 affected service in `test` or `uat` with its own dispatch. Record which commit you deployed and why
 in the incident notes.
