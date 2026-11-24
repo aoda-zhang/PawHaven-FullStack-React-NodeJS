@@ -65,11 +65,11 @@ only static enumeration, because GitHub cannot compute `choice` options at run t
 
 ## Environments
 
-| Environment | Namespace       | Kubeconfig secret | GitHub approval                            |
-| ----------- | --------------- | ----------------- | ------------------------------------------ |
-| `test`      | `pawhaven-test` | `KUBECONFIG_TEST` | none                                       |
-| `uat`       | `pawhaven-uat`  | `KUBECONFIG_UAT`  | none                                       |
-| `prod`      | `pawhaven-prod` | `KUBECONFIG_PROD` | `prod` environment with required reviewers |
+| Environment | Namespace       | Kubeconfig secret | GitHub approval                                                  |
+| ----------- | --------------- | ----------------- | ---------------------------------------------------------------- |
+| `test`      | `pawhaven-test` | `KUBECONFIG_TEST` | none                                                             |
+| `uat`       | `pawhaven-uat`  | `KUBECONFIG_UAT`  | none                                                             |
+| `prod`      | `pawhaven-prod` | `KUBECONFIG_PROD` | `prod` environment with required reviewers, gating `release.yml` |
 
 Each environment is a namespace on the same cluster, so the same host, Traefik and MongoDB serve all
 three. The NetworkPolicy allows same-namespace traffic, which is why separate namespaces also keep
@@ -180,8 +180,8 @@ base64 < ~/.kube/config | tr -d '\n' | gh secret set KUBECONFIG_PROD
 ```
 
 Create the `prod` environment under Settings → Environments and add the required reviewers there;
-that environment is what gates `release.yml` and a production `deploy.yml` run. The approval job is
-the only job bound to it; the deploy jobs read the kubeconfig from repository scope.
+that environment is what gates `release.yml`. The approval job is the only job bound to it; the
+deploy jobs read the kubeconfig from repository scope.
 `KUBECONFIG_TEST`, `KUBECONFIG_UAT` and `KUBECONFIG_PROD` are therefore **repository** secrets, not
 environment secrets — `gh secret set` without `--env` stores them at repository scope. The `prod`
 environment supplies the human approval gate only; it does not inject any kubeconfig. `test` and
@@ -191,11 +191,11 @@ That repository scope is an accepted risk. Anyone with write access can read a r
 pushing a branch whose workflow prints it, so write access is itself part of the production boundary:
 limit it to the people who may deploy, and protect `main` as described in
 [CI/CD](ci-cd.md#repository-protection) so a pushed branch cannot become the deployed commit. The
-`prod` deploy is main-only and approval-gated, but neither check helps if an untrusted writer can
+`prod` release is main-only and approval-gated, but neither check helps if an untrusted writer can
 read the kubeconfig. If stronger isolation is required, move the kubeconfigs to environment-scoped
 secrets and accept the approval-flow change: every job that needs one must bind to that environment,
-so `test` and `uat` need their own environment objects and the `prod` deploy keeps a dedicated
-approved job.
+so `test` and `uat` need their own environment objects and `release.yml` keeps a dedicated approved
+job for `prod`.
 
 Registry authentication is separate: the cluster pulls private `ghcr.io` images with the `ghcr-pull`
 Kubernetes secret created in the namespace, not with a GitHub environment secret. Tag protection is
@@ -226,11 +226,12 @@ Use this to build and deploy the head of a branch. One run deploys one service.
 
 ```bash
 gh workflow run deploy.yml -f environment=test -f service=gateway -f branch=develop
-gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=main
+gh workflow run deploy.yml -f environment=uat -f service=gateway -f branch=develop
 ```
 
-`branch` defaults to `develop`. The run checks that branch out, so an unknown branch fails at
-checkout. It then builds the selected service as `sha-<7>` through the `build-image` composite action
+`deploy.yml` offers only `test` and `uat`; production is not selectable. `branch` defaults to
+`develop`. The run checks that branch out, so an unknown branch fails at checkout. It then builds the
+selected service as `sha-<7>` through the `build-image` composite action
 (`./.github/actions/build-image`, which runs `docker/build-push-action@v6` with `load: true` and
 `push: false`) into `pawhaven-<service>:sha-<7>`, saves it with `docker save` and uploads `image.tar`
 as an artifact. A separate `push-ghcr` job calls the `push-image` composite action
@@ -246,9 +247,9 @@ changing only those inputs in `push-ghcr` and the registry in `deploy-k3s.yml`'s
 artifact hop is the price of that separation: each image is uploaded to artifact storage and
 downloaded again before it is pushed, which a `retention-days: 1` policy keeps cheap to store.
 
-`prod` waits for the `prod` environment approval; `test` and `uat` need no approval. The workflow
-restricts no branch, and it runs no tests and no cluster preflight: the gates are merge-time checks,
-so deploy a commit that has already passed CI.
+`deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow restricts no branch,
+and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a commit
+that has already passed CI. Production ships only through `release.yml`.
 
 Each Deployment runs one replica with `maxSurge: 0`, so a rollout briefly replaces the old pod
 instead of overlapping it.
@@ -280,15 +281,18 @@ git revert <faulty-commit>
 gh workflow run release.yml -f service=all
 ```
 
-For a single service, dispatch `deploy.yml` with a branch whose head is the good commit; the run
-builds that commit as `sha-<7>` and deploys it:
+For a single service in `test` or `uat`, dispatch `deploy.yml` with a branch whose head is the good
+commit; the run builds that commit as `sha-<7>` and deploys it:
 
 ```bash
-gh workflow run deploy.yml -f environment=prod -f service=gateway -f branch=<branch-at-good-commit>
+gh workflow run deploy.yml -f environment=uat -f service=gateway -f branch=<branch-at-good-commit>
 ```
 
-`deploy.yml` deploys one service per run, so roll back each affected service with its own dispatch.
-Record which commit you deployed and why in the incident notes.
+A production rollback is the revert-and-release path above: `deploy.yml` cannot target `prod` or
+deploy an arbitrary branch there. To roll back a single production service, revert and run
+`release.yml -f service=<service>`. `deploy.yml` deploys one service per run, so roll back each
+affected service in `test` or `uat` with its own dispatch. Record which commit you deployed and why
+in the incident notes.
 
 ## Gateway exposure
 

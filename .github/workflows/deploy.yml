@@ -11,7 +11,6 @@ on:
         options:
           - test
           - uat
-          - prod
       service:
         description: 'Service to deploy'
         required: true
@@ -81,16 +80,6 @@ jobs:
           repository: aoda-zhang/pawhaven-${{ inputs.service }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  approve-prod:
-    name: Approve the production deployment
-    needs: push-ghcr
-    if: ${{ inputs.environment == 'prod' }}
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-      - name: Await approval
-        run: echo "Production deployment approved."
-
   deploy-test:
     name: Deploy to test
     needs: [build, push-ghcr]
@@ -118,17 +107,3 @@ jobs:
       services: '["${{ inputs.service }}"]'
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_UAT }}
-
-  deploy-prod:
-    name: Deploy to prod
-    needs: [build, push-ghcr, approve-prod]
-    if: ${{ inputs.environment == 'prod' }}
-    uses: ./.github/workflows/deploy-k3s.yml
-    with:
-      environment: prod
-      namespace: pawhaven-prod
-      ref: ${{ inputs.branch }}
-      version: ${{ needs.build.outputs.tag }}
-      services: '["${{ inputs.service }}"]'
-    secrets:
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}

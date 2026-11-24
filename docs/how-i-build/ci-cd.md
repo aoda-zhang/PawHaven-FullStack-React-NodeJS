@@ -23,7 +23,7 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 | `storybook.yml`                | PR/push on UI paths, `workflow_call` | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook → verify required stories                                                                                                                                                                                |
 | `react-doctor.yml`             | PR, push to `main`                   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
 | `deploy-k3s.yml`               | `workflow_call` only                 | Apply `deploy/platform/<env>` through `Azure/k8s-deploy`, then a per-service matrix job that deploys each selected service's `<env>` manifests with the release image tag and waits for its rollout                                                                                                |
-| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), build that branch head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it; `prod` waits for environment approval                                                                           |
+| `deploy.yml`                   | manual                               | Select an environment, one service and a branch (default `develop`), build that branch head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it to `test` or `uat`                                                                                               |
 | `release.yml`                  | manual                               | Approve, run the gates, tag `main`, build every deployable service into an image artifact, push each one to GHCR in the `push-ghcr` matrix job, deploy the selected scope                                                                                                                          |
 | `opencode-review.yml.disabled` | None                                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
@@ -42,21 +42,21 @@ branch that never passed the gates is unproven until that change merges.
 
 | Input           | `release.yml`                                                         | `deploy.yml`                                                              |
 | --------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Environment     | `prod` only                                                           | `test` \| `uat` \| `prod`                                                 |
+| Environment     | `prod` only                                                           | `test` \| `uat`                                                           |
 | Service         | `all` \| `gateway` \| `core-service` \| `auth-service`                | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`     |
 | Branch          | `main` only                                                           | `branch` input, default `develop`                                         |
 | Image tag       | the computed date tag                                                 | `sha-<7>` of the branch head, built on every run                          |
-| Approval        | `prod` environment with required reviewers                            | `prod` environment, only when the target is `prod`                        |
+| Approval        | `prod` environment with required reviewers                            | none — production ships through `release.yml`                             |
 | What it changes | creates the tag, then pushes to GHCR, then deploys the selected scope | pushes the image, then the platform manifests and the selected Deployment |
 
 In `release.yml`, service selection controls deployment scope, not what gets pushed: it always pushes
 every service that declares a deploy Dockerfile to GHCR, then deploys the subset you picked.
 
 `release.yml` runs from `main` only. `deploy.yml` checks out its `branch` input, builds that head as
-`sha-<7>` and deploys it, so the image and the manifests come from the same commit. `test` and `uat`
-accept any branch by design, so a branch can be promoted to a non-production namespace for
-verification. `prod` waits for the `prod` environment approval but does not restrict the branch, so
-choose the branch deliberately: nothing checks it before the image is built and pushed.
+`sha-<7>` and deploys it, so the image and the manifests come from the same commit. `deploy.yml`
+targets `test` or `uat` only, and both accept any branch by design, so a branch can be promoted to a
+non-production namespace for verification; it has no approval gate. Production is released through
+`release.yml` from `main`, which requires the `prod` environment approval.
 
 ## Where deploy assets live
 
@@ -162,7 +162,8 @@ pushed to GHCR.
 
 `deploy.yml` has no tag input. Every run builds `sha-<7>` from the branch it checks out, so rolling
 back means deploying a known-good commit again: revert the faulty change on `main` and run
-`release.yml`, or dispatch `deploy.yml` from a branch whose head is that commit.
+`release.yml`, or dispatch `deploy.yml` from a branch whose head is that commit to re-deploy it to
+`test` or `uat`.
 
 ```bash
 git revert <faulty-commit>
@@ -177,8 +178,10 @@ describes.
 ## Concurrency and safety
 
 - `release.yml` uses the fixed `pawhaven-prod` group with `cancel-in-progress: false`; `deploy.yml`
-  uses `pawhaven-${{ inputs.environment }}` with the same policy. Both resolve to `pawhaven-prod` for
-  production, so a prod release and a prod deploy cannot overlap.
+  uses `pawhaven-${{ inputs.environment }}` with the same policy, which resolves to
+  `pawhaven-test` or `pawhaven-uat`. `release.yml` is therefore the only workflow in the
+  `pawhaven-prod` group; the two groups are independent, so a prod release does not serialize
+  against a `test` or `uat` deploy.
 - `release.yml` and `deploy.yml` write repository contents only in `release.yml`'s tagging job; the
   `push-ghcr` job is the only job that adds `packages: write`. The `build` jobs are read-only
   (`contents: read`) and receive no registry credential.
