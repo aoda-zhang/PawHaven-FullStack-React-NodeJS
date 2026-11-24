@@ -172,14 +172,22 @@ jobs:
           kubectl cluster-info
 
       - name: Deploy ${{ matrix.service }}
-        uses: Azure/k8s-deploy@v7
-        with:
-          namespace: ${{ inputs.namespace }}
-          manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
-          images: ${{ inputs.registry }}/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
-          action: deploy
-          strategy: basic
-          timeout: 900s
+        shell: bash
+        env:
+          IMAGE: ${{ inputs.registry }}/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          NAMESPACE: ${{ inputs.namespace }}
+          SERVICE: ${{ matrix.service }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          set -euo pipefail
+          source_dir="apps/backend/${SERVICE}/deploy/kubernetes/${ENVIRONMENT}"
+          work_dir="$(mktemp -d)"
+          cp "${source_dir}"/*.yaml "${work_dir}/"
+          sed -i -E "s#^([[:space:]]*image:).*#\1 ${IMAGE}#" "${work_dir}"/*.yaml
+          grep -Hn "image:" "${work_dir}"/*.yaml
+          kubectl apply -n "${NAMESPACE}" -f "${work_dir}"
+          rm -rf "${work_dir}"
+          kubectl rollout status "deployment/${SERVICE}" -n "${NAMESPACE}" --timeout=600s
 
       - name: Describe the failed rollout
         if: failure()

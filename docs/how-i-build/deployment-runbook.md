@@ -55,13 +55,16 @@ document-service keeps only `kubernetes/prod/` and is marked `.out-of-pipeline`;
 
 `deploy/platform/<env>` holds only cluster-wide objects: the Namespace, three NetworkPolicies and the
 `pawhaven-runtime` ServiceAccount. A Deployment and its Service live in the `kubernetes/<env>`
-directory beside the service's Dockerfile, and they keep the image placeholder `v0.0.0-unspecified`
-until a deploy substitutes the version through the `images` input of `Azure/k8s-deploy`.
+directory beside the service's Dockerfile, and their committed image tag is the placeholder
+`v0.0.0-unspecified`. The deploy copies that directory to a temporary location, substitutes the target
+image there, and applies the copy, so the placeholder never reaches the cluster and no placeholder pod
+is created.
 
 `deploy-k3s.yml` runs two jobs, both with `azure/setup-kubectl` and a kubeconfig decoded from the
 `KUBECONFIG_B64` secret: a `platform` job applies `deploy/platform/<env>` with `Azure/k8s-deploy`, and
-a `services` job that needs it fans out over the `services` JSON array as a matrix, deploying each
-service's directory with that action and the release tag, which also waits for the rollout.
+a `services` job that needs it fans out over the `services` JSON array as a matrix, rendering each
+service's release image into a temporary copy of its directory, applying that copy with
+`kubectl apply`, then waiting for the rollout with `kubectl rollout status --timeout=600s`.
 
 A service joins the pipeline by appearing in the `service` choice lists in `deploy.yml` and
 `release.yml` — the only enumeration, because GitHub cannot compute `choice` options at run time.
@@ -305,14 +308,15 @@ as an artifact. A separate `push-image` job calls the `push-image` composite act
 retags it with `docker tag` and publishes it with `docker push`, logging in through
 `docker/login-action@v3`. The run then calls `deploy-k3s.yml`, which applies
 `deploy/platform/<env>` in a `platform` job and then each selected service in a matrix `services` job,
-waiting for every rollout — so the manifests it applies come from the same commit as the image.
+rendering the release image into that service's manifests and waiting for every rollout — so the
+manifests it applies come from the same commit as the image.
 
 Neither composite action hardcodes a registry: `build-image` names none, and `push-image` receives
 `registry`, `repository`, `username` and `token` as inputs. Pointing the pipeline at a different
-registry therefore means changing only those inputs in `push-image` and the registry in
-`deploy-k3s.yml`'s `images` input. The artifact hop is the price of that separation: each image is
-uploaded to artifact storage and downloaded again before it is pushed, which a `retention-days: 7`
-policy keeps cheap to store.
+registry therefore means changing only those inputs in `push-image` and the `registry` input of
+`deploy-k3s.yml`, which builds each service's image reference from it. The artifact hop is the price
+of that separation: each image is uploaded to artifact storage and downloaded again before it is
+pushed, which a `retention-days: 7` policy keeps cheap to store.
 
 `deploy.yml` targets `test` and `uat`, and neither needs approval. The workflow runs from `main`
 only, and it runs no tests and no cluster preflight: the gates are merge-time checks, so deploy a
@@ -437,8 +441,8 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
 | Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: a rotated or wrong `ACR_PASSWORD`, a missing `acr-pull` secret in that namespace, or a personal-edition ACR access rule that omits the node. Recreate `acr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                      |
 | Push fails after approval (artifact expired)                    | The image artifact expired before the approval (7 days). Nothing was published; re-dispatch `release.yml` for the same commit to rebuild and retry the same image tag.                                                                                                                                                                                                                                                  |
-| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow lets `Azure/k8s-deploy` substitute the release tag from its `images` input, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                                 |
-| Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
+| A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow substitutes the release tag into a temporary copy and leaves the committed file alone, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                      |
+| A rollout or platform apply times out                           | The `services` job waits 600 s for the rollout (`kubectl rollout status --timeout=600s`) and the `platform` job waits 900 s through `Azure/k8s-deploy`. One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                            |
 | Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |
 
 A NetworkPolicy cannot block traffic that originates on the node itself, so kubelet TCP probes are
