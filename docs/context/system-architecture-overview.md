@@ -436,7 +436,7 @@ environment — with images pulled from GitHub Container Registry
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
 Shipping is manual. `release.yml` builds the selected service image, waits for the `prod` environment
-approval, then tags `main`, pushes the image to GHCR and deploys the selected service.
+approval, then pushes the image to GHCR and deploys the selected service.
 `deploy.yml` builds and pushes the selected service from `main` to GHCR as `sha-<7>`, then deploys it
 to `test` or `uat` only.
 auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a

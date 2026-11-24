@@ -178,7 +178,7 @@ base64 < ~/.kube/config | tr -d '\n' | gh secret set KUBECONFIG_PROD
 
 Create the `prod` environment under Settings → Environments and add the required reviewers there;
 that environment is what gates `release.yml`, pausing the run after the image is built and before it
-is tagged and pushed. The approval job is the only job bound to it; the deploy jobs read the
+is pushed. The approval job is the only job bound to it; the deploy jobs read the
 kubeconfig from repository scope.
 `KUBECONFIG_TEST`, `KUBECONFIG_UAT` and `KUBECONFIG_PROD` are therefore **repository** secrets, not
 environment secrets — `gh secret set` without `--env` stores them at repository scope. The `prod`
@@ -197,8 +197,8 @@ job for `prod`.
 
 Registry authentication is separate: the cluster pulls private `ghcr.io` images with the `ghcr-pull`
 Kubernetes secret created in the namespace, not with a GitHub environment secret. Tag protection is
-separate too: protect the `v*` tag pattern with a tag ruleset, as described in
-[CI/CD](ci-cd.md#tag-protection), so a release tag cannot be moved or deleted. Tag protection does not
+separate too: releases currently create no git tag, so protect the `v*` tag pattern with a tag ruleset,
+as described in [CI/CD](ci-cd.md#tag-protection), for any tag created manually. Tag protection does not
 gate merges, and branch protection does not cover tags.
 
 ## Release procedure
@@ -207,7 +207,7 @@ Use this to build and ship a new version. It runs from `main` only: the `prechec
 other ref.
 
 ```bash
-gh workflow run release.yml -f service=all
+gh workflow run release.yml -f service=<service>
 gh run watch
 ```
 
@@ -216,12 +216,12 @@ gh run watch
    appears as `Release-<service>`.
 3. The run builds the selected service into an `image.tar` artifact, then pauses.
 4. Approve the `prod` environment.
-5. The run tags the commit, pushes the image to GHCR and deploys the selected service.
+5. The run pushes the image to GHCR and deploys the selected service.
 6. Verify: `kubectl -n pawhaven-prod get deploy` and `kubectl rollout status deployment/<service> -n pawhaven-prod`.
 
-If the approval is granted after the artifact expired (7 days after the build), the push job fails
-after the tag already exists. Re-dispatch `release.yml`: `resolve` reuses the same date tag because it
-points at the same commit, and the `tag` job no-ops.
+If the approval is granted after the artifact expired (7 days after the build), the push job fails and
+nothing has been published. Re-dispatch `release.yml`: `resolve` recomputes the same version for that
+commit, so the run retries the same image tag.
 
 ## Deploy a service build
 
@@ -263,26 +263,24 @@ A rollback is a forward deploy of a known-good commit. `deploy.yml` has no versi
 builds `sha-<7>` from `main`, so the way back is to revert the faulty change on `main` and deploy the
 resulting head.
 
-Identify the previous known-good release explicitly. Do not take the newest tag blindly — during an
-incident the newest `vYY.MM.DD` tag is usually the broken release, and it is not necessarily the tag
-you want:
+Identify the faulty commit and the previous known-good commit on `main`:
 
 ```bash
-git tag --list 'v*' --sort=-creatordate | head -n 10
+git log --oneline origin/main
 ```
 
-Read the list, exclude the broken release and any tag cut from the faulty commit, and confirm the
-candidate contains the last good change before deploying it:
+The running image confirms which release is live, and its image tag names the computed version to
+compare against:
 
 ```bash
-git log --oneline -5 <known-good-tag>
+kubectl -n pawhaven-prod get deploy/pawhaven-<service> -o jsonpath='{..image}'
 ```
 
 Revert the faulty change and release again:
 
 ```bash
 git revert <faulty-commit>
-gh workflow run release.yml -f service=all
+gh workflow run release.yml -f service=<service>
 ```
 
 For a single service in `test` or `uat`, revert the faulty commit on `main` and dispatch `deploy.yml`;
@@ -374,7 +372,7 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | A pod never becomes Ready and logs a config error               | A `pawhaven-env` or `pawhaven-secrets` key is missing in that namespace. Nothing checks the keys before the Deployment is applied, so the container starts and fails. Create or patch the object, then `kubectl -n <namespace> rollout restart deployment/<service>`.                                                                                                                                                   |
 | A pod exits at startup naming `NODE_ENV`                        | `NODE_ENV` in `pawhaven-env` is missing or unrecognised; the shared resolver has no fallback, so the service stops at startup instead of loading another environment's config. Set it to `test`, `uat` or `prod` per namespace, then run `kubectl -n <namespace> rollout restart deployment/<service>`: a ConfigMap edit does not change the Pod template, so running pods keep the old value until they are recreated. |
 | Pods stuck in `ImagePullBackOff` after a green deploy           | The node cannot pull the image: expired PAT, wrong scope, wrong package visibility, or a missing `ghcr-pull` secret in that namespace. Recreate `ghcr-pull` as a `docker-registry` secret and delete the pod.                                                                                                                                                                                                           |
-| Release fails on an existing tag                                | The candidate tag points at another commit. Same-day repeats get `-2`, `-3`; a tag is never moved. Re-dispatch from the intended commit.                                                                                                                                                                                                                                                                                |
+| Push fails after approval (artifact expired)                    | The image artifact expired before the approval (7 days). Nothing was published; re-dispatch `release.yml` for the same commit to rebuild and retry the same image tag.                                                                                                                                                                                                                                                  |
 | A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow lets `Azure/k8s-deploy` substitute the release tag from its `images` input, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                                 |
 | Rollout times out after 300 s                                   | One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                                                                                                                                                                                    |
 | Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |

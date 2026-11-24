@@ -8,8 +8,8 @@
 ## Principle
 
 CI proves; a release builds `main`'s head into an image artifact, waits for a human approval, then
-tags it and pushes it to GHCR; a deploy builds `main`'s head as `sha-<7>` and ships it. The quality
-gate is the merge-readiness signal and reproduces the checks a developer runs locally.
+pushes it to GHCR; a deploy builds `main`'s head as `sha-<7>` and ships it. The quality gate is the
+merge-readiness signal and reproduces the checks a developer runs locally.
 
 There are exactly two deployment entry points — `release.yml` and `deploy.yml` — and both are
 `workflow_dispatch` only. No push, tag, schedule or pull request deploys anything.
@@ -24,7 +24,7 @@ There are exactly two deployment entry points — `release.yml` and `deploy.yml`
 | `react-doctor.yml`             | PR, push to `main`   | React Doctor scan (`millionco/react-doctor@v2`, version pinned to `0.9.12`)                                                                                                                                                                                                                        |
 | `deploy-k3s.yml`               | `workflow_call` only | Apply `deploy/platform/<env>` through `Azure/k8s-deploy`, then a per-service matrix job that deploys each selected service's `<env>` manifests with the release image tag and waits for its rollout                                                                                                |
 | `deploy.yml`                   | manual               | Runs from `main` only: select an environment and one service, build `main`'s head as `sha-<7>` into an image artifact, push the loaded artifact to GHCR, then deploy it to `test` or `uat`                                                                                                         |
-| `release.yml`                  | manual               | Resolve the date tag, build the selected service into an image artifact, wait for the `prod` approval, tag `main`, push the image to GHCR in the `push-ghcr` matrix job, deploy the selected service; the run is named `Release-<service>`                                                         |
+| `release.yml`                  | manual               | Resolve the date-and-commit version, build the selected service into an image artifact, wait for the `prod` approval, push the image to GHCR in the `push-ghcr` matrix job, deploy the selected service; the run is named `Release-<service>`                                                      |
 | `opencode-review.yml.disabled` | None                 | PR review definition is preserved but disabled: GitHub ignores the non-`.yml` filename, so it triggers nothing                                                                                                                                                                                     |
 
 `deploy-k3s.yml` carries no trigger of its own. It is a reusable capability, and `release.yml` and
@@ -45,9 +45,9 @@ merge-time gates already checked.
 | Environment     | `prod` only                                                                                     | `test` \| `uat`                                                           |
 | Service         | `gateway` \| `core-service` \| `auth-service` — one per run                                     | `gateway` \| `core-service` \| `auth-service` — one per run, no `all`     |
 | Branch          | `main` only                                                                                     | `main` only                                                               |
-| Image tag       | the computed date tag                                                                           | `sha-<7>` of `main`'s head, built on every run                            |
+| Image tag       | the computed `vYY.MM.DD-<sha7>` version                                                         | `sha-<7>` of `main`'s head, built on every run                            |
 | Approval        | `prod` environment with required reviewers, after the image is built and before it is published | none — production ships through `release.yml`                             |
-| What it changes | creates the tag, then pushes to GHCR, then deploys the selected service                         | pushes the image, then the platform manifests and the selected Deployment |
+| What it changes | pushes the image to GHCR, then deploys the selected service                                     | pushes the image, then the platform manifests and the selected Deployment |
 
 In `release.yml`, the service selection controls what is built, pushed and deployed in that run: a
 release builds, pushes and deploys exactly one service, and `all` is not offered. The run is named
@@ -106,10 +106,10 @@ means adding its deploy assets and a choice entry.
 `release.yml` runs in this order, and each stage depends on the previous one:
 
 1. **Precheck** — the `precheck` job fails unless the dispatched ref is `refs/heads/main`.
-2. **Resolve** — computes the tag `vYY.MM.DD` in `Asia/Shanghai`; a second release the same day takes
-   `-2`, then `-3`. If the candidate tag already points at the same commit, it is reused instead of
-   duplicated. The same job resolves the single selected service into the `services` list that drives
-   `build`, `push-ghcr` and `deploy`.
+2. **Resolve** — computes the version `vYY.MM.DD-<sha7>` in `Asia/Shanghai`: the date plus the first
+   seven characters of the dispatched commit, so the same commit always yields the same version and
+   two commits never collide. No remote-tag lookup. The same job resolves the single selected service
+   into the `services` list that drives `build`, `push-ghcr` and `deploy`.
 3. **Build** — the `build` matrix job (`Build <service>`) calls the `build-image` composite action
    (`./.github/actions/build-image`) with the service, the tag and the Dockerfile. The action builds
    with `docker/build-push-action@v6` (`push: false`, `load: true`) as the local tag
@@ -117,14 +117,12 @@ means adding its deploy assets and a choice entry.
    `actions/upload-artifact@v4`. It never names a registry.
 4. **Approve** — the `approve` job binds to the `prod` environment, so the run pauses after the image
    is built and waits for a required reviewer before anything is published.
-5. **Tag** — creates and pushes an annotated tag. A tag that already points at another commit fails
-   the run instead of being moved.
-6. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
+5. **Push to GHCR** — the `push-ghcr` matrix job (`Push <service> to GHCR`) calls the `push-image`
    composite action (`./.github/actions/push-image`) with the service, tag, registry, repository and
    token. The action downloads that artifact, loads it with `docker load`, logs in with
    `docker/login-action@v3`, retags it with `docker tag` and publishes it with `docker push`. See
    [Image build and registry push](#image-build-and-registry-push).
-7. **Deploy** — `deploy-k3s.yml` deploys the selected service to `pawhaven-prod` from the `<version>`
+6. **Deploy** — `deploy-k3s.yml` deploys the selected service to `pawhaven-prod` from the `<version>`
    tag.
 
 ## Image build and registry push
@@ -152,29 +150,22 @@ The artifact is a cost to weigh: each image travels from the build runner to art
 back to the push runner, so a three-service release moves every image twice before it reaches the
 registry. `retention-days: 7` bounds the stored copies and covers realistic approval latency, but
 GitHub lets an environment gate wait up to 30 days, so a long wait can outlive the artifact. If the
-approval lands after it expires, the push job fails after the tag exists; re-dispatching recovers,
-because `resolve` reuses the same date tag when it already points at the dispatched commit and the
-`tag` job then no-ops. The shared build cache keeps the rebuild cheap.
+approval lands after it expires, only the push job fails and nothing has been published; re-dispatching
+recomputes the same version for that commit and retries the same image tag. The shared build cache
+keeps the rebuild cheap.
 
-## Tag and rollback discipline
+## Image versions and rollback discipline
 
-Release tags are immutable image tags, not branches: a release always names the date tag it just
-pushed to GHCR.
-
-`deploy.yml` has no tag input: it builds `main`'s head as `sha-<7>`, while `release.yml` builds the
-same head under its computed date tag. Rolling back therefore means reverting the faulty change on
-`main` and re-dispatching `release.yml` for production, or `deploy.yml` for `test` or `uat`. There is
-no arbitrary-commit dispatch.
+Release images carry the computed `vYY.MM.DD-<sha7>` version as their image tag; `release.yml` does
+not create a git tag. `deploy.yml` has no version input: it builds `main`'s head as `sha-<7>`, while
+`release.yml` builds the same head under its computed version. Rolling back therefore means reverting
+the faulty change on `main` and re-dispatching `release.yml` for production, or `deploy.yml` for `test`
+or `uat`. There is no arbitrary-commit dispatch and no tag to redeploy.
 
 ```bash
 git revert <faulty-commit>
-gh workflow run release.yml -f service=all
+gh workflow run release.yml -f service=<service>
 ```
-
-Immutability is enforced by the `v*` tag ruleset in [Tag protection](#tag-protection), not by branch
-protection. Choose the target commit explicitly — the newest tag may be the broken release — by
-listing tags and checking the candidate's commits, as the [runbook](deployment-runbook.md#roll-back)
-describes.
 
 ## Concurrency and safety
 
@@ -184,9 +175,9 @@ describes.
   uses `pawhaven-${{ inputs.environment }}` with the same policy, which resolves to `pawhaven-test`
   or `pawhaven-uat`; the groups are independent, so a prod deploy does not serialize against a
   `test` or `uat` deploy.
-- `release.yml` and `deploy.yml` write repository contents only in `release.yml`'s tagging job; the
-  `push-ghcr` job is the only job that adds `packages: write`. The `build` jobs are read-only
-  (`contents: read`) and receive no registry credential.
+- Neither workflow writes repository contents now; the `push-ghcr` job is the only job that adds
+  `packages: write`, and the `build` jobs stay read-only (`contents: read`) and receive no registry
+  credential.
 - The PR reviewer definition must stay read-only for repository contents — `contents: read`, never
   `contents: write`.
 
@@ -252,9 +243,10 @@ rule to the people most able to bypass it.
 
 ### Tag protection
 
-Release tags are a different object with a different rule: branch protection does not cover tags,
-and a tag ruleset does not gate merges. Create a tag ruleset once (Settings → Rules → Rulesets → New
-tag ruleset, or the API call below) so a `v*` tag cannot be moved or deleted:
+Releases currently publish images only and create no git tag; keep this ruleset for any `v*` tag
+created manually. Release tags are a different object with a different rule: branch protection does
+not cover tags, and a tag ruleset does not gate merges. Create a tag ruleset once (Settings → Rules →
+Rulesets → New tag ruleset, or the API call below) so a `v*` tag cannot be moved or deleted:
 
 ```bash
 gh api --method POST repos/aoda-zhang/PawHaven/rulesets --input - <<'JSON'

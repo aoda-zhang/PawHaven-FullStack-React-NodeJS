@@ -32,11 +32,11 @@ jobs:
           fi
 
   resolve:
-    name: Compute the release tag
+    name: Compute the release version
     needs: precheck
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ steps.tag.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
       services: ${{ steps.services.outputs.services }}
     steps:
       - name: Checkout
@@ -44,37 +44,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Compute the date tag
-        id: tag
+      - name: Compute the release version
+        id: version
         shell: bash
         run: |
           set -euo pipefail
-          git fetch --tags --force origin
-          base="v$(TZ=Asia/Shanghai date +%y.%m.%d)"
-          tag=""
-          for ((attempt = 1; attempt <= 100; attempt++)); do
-            if ((attempt == 1)); then
-              candidate="${base}"
-            else
-              candidate="${base}-${attempt}"
-            fi
-            if ! git ls-remote --exit-code --tags origin "refs/tags/${candidate}" >/dev/null 2>&1; then
-              tag="${candidate}"
-              break
-            fi
-            existing="$(git rev-list -n 1 "refs/tags/${candidate}" 2>/dev/null || true)"
-            if [[ "${existing}" == "${GITHUB_SHA}" ]]; then
-              tag="${candidate}"
-              echo "Reusing ${candidate}; it already points at ${GITHUB_SHA}."
-              break
-            fi
-          done
-          if [[ -z "${tag}" ]]; then
-            echo "::error::Could not find a free release tag for ${base}."
-            exit 1
-          fi
-          echo "Releasing ${tag} from ${GITHUB_SHA}."
-          echo "tag=${tag}" >>"${GITHUB_OUTPUT}"
+          version="v$(TZ=Asia/Shanghai date +%y.%m.%d)-${GITHUB_SHA:0:7}"
+          echo "Releasing ${version} from ${GITHUB_SHA}."
+          echo "version=${version}" >>"${GITHUB_OUTPUT}"
 
       - name: Map the service selection to a service list
         id: services
@@ -106,7 +83,7 @@ jobs:
         uses: ./.github/actions/build-image
         with:
           service: ${{ matrix.service }}
-          tag: ${{ needs.resolve.outputs.tag }}
+          tag: ${{ needs.resolve.outputs.version }}
           dockerfile: apps/backend/${{ matrix.service }}/deploy/Dockerfile
 
   approve:
@@ -118,43 +95,9 @@ jobs:
       - name: Await approval
         run: echo "Production release approved."
 
-  tag:
-    name: Tag the release
-    needs: [resolve, approve]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          ref: ${{ github.sha }}
-
-      - name: Create and push the annotated tag
-        shell: bash
-        env:
-          TAG: ${{ needs.resolve.outputs.tag }}
-        run: |
-          set -euo pipefail
-          git config user.name "pawhaven-release-bot"
-          git config user.email "pawhaven-release-bot@users.noreply.github.com"
-          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
-            git fetch --tags --force origin
-            resolved="$(git rev-list -n 1 "refs/tags/${TAG}")"
-            if [[ "${resolved}" == "${GITHUB_SHA}" ]]; then
-              echo "Tag ${TAG} already points at ${GITHUB_SHA}; nothing to push."
-              exit 0
-            fi
-            echo "::error::Tag ${TAG} points at ${resolved}, not ${GITHUB_SHA}."
-            exit 1
-          fi
-          git tag -a "${TAG}" -m "Release ${TAG}" "${GITHUB_SHA}"
-          git push origin "refs/tags/${TAG}"
-
   push-ghcr:
     name: Push ${{ matrix.service }} to GHCR
-    needs: [resolve, build, approve, tag]
+    needs: [resolve, build, approve]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -173,7 +116,7 @@ jobs:
         uses: ./.github/actions/push-image
         with:
           service: ${{ matrix.service }}
-          tag: ${{ needs.resolve.outputs.tag }}
+          tag: ${{ needs.resolve.outputs.version }}
           registry: ghcr.io
           repository: aoda-zhang/pawhaven-${{ matrix.service }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -192,7 +135,7 @@ jobs:
       ref: ${{ github.sha }}
       environment: prod
       namespace: pawhaven-prod
-      version: ${{ needs.resolve.outputs.tag }}
+      version: ${{ needs.resolve.outputs.version }}
       services: ${{ needs.resolve.outputs.services }}
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}
