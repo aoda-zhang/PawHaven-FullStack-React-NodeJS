@@ -64,7 +64,10 @@ is created.
 `KUBECONFIG_B64` secret: a `platform` job applies `deploy/platform/<env>` with `Azure/k8s-deploy`, and
 a `services` job that needs it fans out over the `services` JSON array as a matrix, rendering each
 service's release image into a temporary copy of its directory, applying that copy with
-`kubectl apply`, then waiting for the rollout with `kubectl rollout status --timeout=600s`.
+`kubectl apply`, then waiting for the rollout with `kubectl rollout status --timeout=600s`. After the
+rollout, a smoke-check step runs Node's global `fetch` inside the container against the service's own
+port (gateway 8080, core-service 8081, auth-service 8082), retrying for a minute: any response below
+500 counts as healthy, including a 404, because an answer proves the listener is up.
 
 A service joins the pipeline by appearing in the `service` choice lists in `deploy.yml` and
 `release.yml` — the only enumeration, because GitHub cannot compute `choice` options at run time.
@@ -443,7 +446,21 @@ works because `pawhaven-allow-namespace-ingress` admits same-namespace pods.
 | Push fails after approval (artifact expired)                    | The image artifact expired before the approval (7 days). Nothing was published; re-dispatch `release.yml` for the same commit to rebuild and retry the same image tag.                                                                                                                                                                                                                                                  |
 | A hand-run `kubectl apply -f` leaves pods in `ImagePullBackOff` | The committed manifests still carry the placeholder `v0.0.0-unspecified`. That is deliberate: the deploy workflow substitutes the release tag into a temporary copy and leaves the committed file alone, so a manual apply fails loudly instead of deploying an arbitrary image. Replace the tag yourself before applying by hand.                                                                                      |
 | A rollout or platform apply times out                           | The `services` job waits 600 s for the rollout (`kubectl rollout status --timeout=600s`) and the `platform` job waits 900 s through `Azure/k8s-deploy`. One replica with `maxSurge: 0` means the old pod is gone during the replace. Check `kubectl -n <ns> describe pod` and the image tag in `kubectl get deploy -o yaml`.                                                                                            |
+| A `Smoke check …` step fails                                    | The container started and its rollout completed, but it did not answer HTTP on its own port within a minute. The pods are Ready, yet the deploy is not usable; inspect it as described below.                                                                                                                                                                                                                           |
 | Gateway unreachable while every pod is Ready                    | The gateway policy admits port 8080, and the namespace allowance covers same-namespace pods. Check that the ingress or Tunnel controller targets the port the policy names (see [Gateway exposure](#gateway-exposure)).                                                                                                                                                                                                 |
+
+A failed smoke check means the service did not serve HTTP: either nothing answered or the server
+returned a 5xx. Read its logs and repeat the request by hand, substituting the service and its port:
+
+```bash
+kubectl -n <namespace> logs deployment/<service>
+kubectl -n <namespace> exec deployment/<service> -- node -e \
+  "fetch('http://127.0.0.1:<port>/').then(r => console.log(r.status)).catch(e => { console.error(e.message); process.exit(1) })"
+```
+
+A 5xx is a server that answered and then failed the request; a connection error means nothing is
+listening, so look for a crash after startup, a config error or a port that does not match the
+Deployment.
 
 A NetworkPolicy cannot block traffic that originates on the node itself, so kubelet TCP probes are
 never filtered by the policy. If the CNI treats host traffic as external, add the node CIDR as an

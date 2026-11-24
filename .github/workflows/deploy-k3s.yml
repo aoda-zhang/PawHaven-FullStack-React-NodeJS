@@ -189,6 +189,30 @@ jobs:
           rm -rf "${work_dir}"
           kubectl rollout status "deployment/${SERVICE}" -n "${NAMESPACE}" --timeout=600s
 
+      - name: Smoke check ${{ matrix.service }}
+        shell: bash
+        env:
+          NAMESPACE: ${{ inputs.namespace }}
+          SERVICE: ${{ matrix.service }}
+        run: |
+          set -euo pipefail
+          case "${SERVICE}" in
+            gateway) PORT=8080 ;;
+            core-service) PORT=8081 ;;
+            auth-service) PORT=8082 ;;
+            *) echo "::error::No smoke-check port for ${SERVICE}"; exit 1 ;;
+          esac
+          for attempt in $(seq 1 30); do
+            if kubectl -n "${NAMESPACE}" exec "deploy/${SERVICE}" -- \
+              node -e "fetch('http://127.0.0.1:${PORT}/').then((r) => { console.log('HTTP', r.status); process.exit(r.status < 500 ? 0 : 1); }).catch((error) => { console.error('SMOKE FAIL', error.message); process.exit(1); });"; then
+              echo "Smoke check passed on port ${PORT}"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Smoke check failed for ${SERVICE} on port ${PORT}"
+          exit 1
+
       - name: Describe the failed rollout
         if: failure()
         shell: bash
