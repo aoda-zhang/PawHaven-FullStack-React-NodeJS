@@ -38,5 +38,5 @@ runs:
       with:
         name: pawhaven-${{ inputs.service }}-${{ inputs.tag }}
         path: image.tar
-        retention-days: 1
+        retention-days: 7
         if-no-files-found: error
