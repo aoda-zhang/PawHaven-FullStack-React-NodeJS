@@ -116,6 +116,7 @@ jobs:
         with:
           service: ${{ matrix.service }}
           tag: ${{ needs.resolve.outputs.version }}
+          # Push to the public host; the cluster pulls from the VPC host.
           registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
           repository: pahaven/pawhaven-${{ matrix.service }}
           username: ${{ secrets.ACR_USERNAME }}
@@ -136,7 +137,8 @@ jobs:
       namespace: pawhaven-prod
       version: ${{ needs.resolve.outputs.version }}
       services: ${{ needs.resolve.outputs.services }}
-      registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
+      # Push to the public host; the cluster pulls from the VPC host.
+      registry: crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com
     secrets:
       KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}
       REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}

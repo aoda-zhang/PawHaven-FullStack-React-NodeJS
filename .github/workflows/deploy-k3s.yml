@@ -24,7 +24,7 @@ on:
         required: true
         type: string
       registry:
-        description: 'Container registry host used for image pull credentials'
+        description: 'Container registry host the cluster pulls images from'
         required: true
         type: string
     secrets:
@@ -91,7 +91,7 @@ jobs:
           manifests: deploy/platform/${{ inputs.environment }}
           action: deploy
           strategy: basic
-          timeout: 300s
+          timeout: 600s
 
       - name: Ensure the image pull secret
         shell: bash
@@ -176,10 +176,10 @@ jobs:
         with:
           namespace: ${{ inputs.namespace }}
           manifests: apps/backend/${{ matrix.service }}/deploy/kubernetes/${{ inputs.environment }}
-          images: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
+          images: ${{ inputs.registry }}/pahaven/pawhaven-${{ matrix.service }}:${{ inputs.version }}
           action: deploy
           strategy: basic
-          timeout: 300s
+          timeout: 600s
 
       - name: Describe the failed rollout
         if: failure()

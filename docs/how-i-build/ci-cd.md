@@ -149,19 +149,20 @@ restores the image, `docker/login-action@v3` authenticates, `docker tag` adds th
 the official pieces are setup, build, upload/download and login, and the transfer itself is the Docker
 CLI.
 
-Both workflows push to Alibaba Cloud Container Registry: host
+Both workflows push to Alibaba Cloud Container Registry: the public host
 `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`, repository
 `pahaven/pawhaven-<service>`. Login uses the repository secrets `ACR_USERNAME` and `ACR_PASSWORD`
 instead of the workflow's `GITHUB_TOKEN`, so the push job declares only `contents: read` and no
 `packages` scope. ACR personal edition is free and the registry lives in the same region as the ECS
-host. The cluster authenticates the pull with the `acr-pull` docker-registry secret referenced by the
-`pawhaven-runtime` ServiceAccount; the [deployment runbook](deployment-runbook.md#image-pull-secret)
-covers creating it.
+host. CI must push through the public host because GitHub runners cannot reach the VPC address; the
+cluster pulls from the VPC host `crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com`,
+which `deploy-k3s.yml` receives as its `registry` input and uses both for each `images` reference and
+for the `acr-pull` docker-registry secret referenced by the `pawhaven-runtime` ServiceAccount. The
+[deployment runbook](deployment-runbook.md#image-pull-secret) covers creating that secret.
 
-Changing registry — to a private registry, ECR, or anything else — touches only the inputs passed to
-`push-image`: its `registry`, its `repository`, and the `username` and `token` that authenticate there.
-The build action, its cache and the deploy version stay as they are; only the registry name in
-`deploy-k3s.yml`'s `images` input has to match.
+Changing registry — to a private registry, ECR, or anything else — touches only the registry inputs:
+the `registry`, `repository`, `username` and `token` passed to `push-image`, and the VPC `registry`
+passed to `deploy-k3s.yml`. The build action, its cache and the deploy version stay as they are.
 
 The artifact is a cost to weigh: each image travels from the build runner to artifact storage and
 back to the push runner, so a three-service release moves every image twice before it reaches the

@@ -16,12 +16,14 @@
 | MongoDB            | Managed cluster, outside the host           | —                                                                                         | —                                                 |
 
 The cluster is one Alibaba Cloud ECS host running K3s, and the images live in Alibaba Cloud Container
-Registry (ACR): host `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com`, namespace `pahaven`,
-repository `pahaven/pawhaven-<service>`. ACR personal edition is free and the registry instance sits in
-the same region as the ECS host. The instance also exposes a VPC endpoint
-`crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com` that in-cluster pulls can use to avoid
-public traffic, but CI must keep using the public endpoint because GitHub runners cannot reach the VPC
-address.
+Registry (ACR): namespace `pahaven`, repository `pahaven/pawhaven-<service>`. ACR personal edition is
+free and the registry instance sits in the same region as the ECS host. The instance exposes two
+endpoints: the public host `crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` and the VPC host
+`crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com`. CI pushes images to the public host
+because GitHub runners cannot reach the VPC address, while the cluster pulls from the VPC host, which
+keeps pull traffic inside the VPC. `deploy-k3s.yml` therefore receives the VPC host as its `registry`
+input and builds each image reference from it; the `acr-pull` secret it creates points at the same
+host.
 
 ## Deploy asset layout
 
@@ -198,13 +200,15 @@ kubectl -n pawhaven-prod create secret generic pawhaven-secrets \
 
 ### Image pull secret
 
-`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` repositories are private, so the namespace
-needs a registry credential named `acr-pull`. The `pawhaven-runtime` ServiceAccount from
+The `pahaven` repositories are private, so the namespace needs a registry credential named `acr-pull`.
+The `pawhaven-runtime` ServiceAccount from
 [Namespace](#namespace) references it as `imagePullSecrets`, and every Deployment runs as that account.
 
 The deploy workflow creates or updates this secret on every run from the `ACR_USERNAME` and
-`ACR_PASSWORD` repository secrets, so you do not create it by hand. The command below is the local
-or break-glass fallback for a cluster outside the pipelines:
+`ACR_PASSWORD` repository secrets, pointing it at the VPC host
+`crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com`, so you do not create it by hand. The
+command below is the local or break-glass fallback for a cluster outside the pipelines, which reaches
+the public host instead:
 
 ```bash
 kubectl -n pawhaven-prod create secret docker-registry acr-pull \
@@ -255,7 +259,7 @@ so `test` and `uat` need their own environment objects and `release.yml` keeps a
 job for `prod`.
 
 Registry authentication is separate: the cluster pulls private
-`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com` images with the `acr-pull` Kubernetes
+`crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com` images with the `acr-pull` Kubernetes
 secret that the deploy workflow maintains in the namespace, not with a GitHub environment secret. Tag protection is separate too:
 releases currently create no git tag, so protect the `v*` tag pattern with a tag ruleset, as described
 in [CI/CD](ci-cd.md#tag-protection), for any tag created manually. Tag protection does not gate merges, and branch protection does not cover tags.
