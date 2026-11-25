@@ -224,6 +224,15 @@ kubectl -n pawhaven-prod create secret docker-registry acr-pull \
   --dry-run=client -o yaml | kubectl apply -f -
 ```
 
+Upstream images such as the Traefik release come from Docker Hub, which the cluster cannot reach, so
+mirror them into ACR before a manifest references them; the `Mirror image to ACR` workflow pulls,
+retags and pushes the image under the ACR namespace, and its three inputs name the source, the target
+repository and the target tag:
+
+```bash
+gh workflow run mirror-image.yml -f source=rancher/mirrored-library-traefik:v3.7.1 -f target_repository=pahaven/traefik -f target_tag=v3.7.1
+```
+
 ### GitHub secrets and approval
 
 ```bash

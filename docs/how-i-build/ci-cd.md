@@ -195,6 +195,17 @@ approval lands after it expires, only the push job fails and nothing has been pu
 recomputes the same version for that commit and retries the same image tag. The shared build cache
 keeps the rebuild cheap.
 
+### Mirroring upstream images
+
+Not every image the cluster runs is built here: Traefik and other upstream components ship from
+Docker Hub, which the cluster cannot reach. `mirror-image.yml` is the manual bridge — dispatch
+`Mirror image to ACR` with three inputs: `source`, the fully qualified upstream image
+(`registry/repository:tag`), `target_repository`, the ACR path such as `pahaven/traefik`, and
+`target_tag`. The job logs in with the same `ACR_USERNAME` and `ACR_PASSWORD` secrets, then runs
+`docker pull`, `docker tag` and `docker push` unchanged, so the cluster pulls the copy from the
+region-local registry like any service image. It has no cache, no buildx and no repository checkout:
+it moves bytes, it does not build.
+
 ## Image versions and rollback discipline
 
 Release images carry the computed `vYY.MM.DD-<sha7>` version as their image tag; `release.yml` does
