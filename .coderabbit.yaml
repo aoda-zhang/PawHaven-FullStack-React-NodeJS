@@ -1,0 +1,80 @@
+# CodeRabbit review configuration (schema v2).
+# The app is already installed on this repository; this file is what makes the review follow
+# PawHaven's own rules instead of generic advice.
+language: en-US
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  poem: false
+  review_status: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+    base_branches:
+      - "^develop$"
+      - "^main$"
+
+  # Generated, vendored and machine-owned files: reviewing them wastes budget and adds noise.
+  path_filters:
+    - "!**/dist/**"
+    - "!**/node_modules/**"
+    - "!**/coverage/**"
+    - "!apps/backend/*/src/prisma/mongodb/client/**"
+    - "!**/tsconfig.tsbuildinfo"
+    - "!pnpm-lock.yaml"
+    - "!test-results/**"
+    - "!playwright-report/**"
+
+  path_instructions:
+    - path: "apps/backend/**/src/**"
+      instructions: |
+        - Configuration is read through NestJS ConfigService, never `process.env`, except in bootstrap.
+        - Only two config bundles exist (`uat`, `prod`); `NODE_ENV=production` is Vercel's forced
+          value and maps to `prod`. Flag any new alias or fallback.
+        - Services are internal: gateway is the only public surface. Flag anything that widens exposure.
+        - `/api/<service>` prefixes are rewritten by the gateway to `/<service-name>`, so route
+          prefixes must stay aligned with the gateway's `microServices` config.
+    - path: "apps/frontend/portal/**"
+      instructions: |
+        - Colours must come from design-system tokens; flag raw hex values and Tailwind palette names.
+        - User-visible strings go through `t('namespace.key')`; flag hardcoded copy.
+        - The portal refuses to boot without `PAWHAVEN_USER_APP_ENV`; keep config validation strict.
+    - path: "packages/i18n/locales/**"
+      instructions: |
+        - Every key must exist in de-DE, en-US and zh-CN.
+        - If a new key repeats an existing value, suggest promoting the sentence to `common.*`
+          instead of storing two copies.
+    - path: ".github/workflows/**"
+      instructions: |
+        - Do not echo secrets; keep `permissions` minimal and actions pinned to a major version.
+        - The Quality Gate job names are required checks, so renaming a job changes branch protection.
+    - path: "apps/backend/*/deploy/kubernetes/**"
+      instructions: |
+        - These manifests are the container-cluster path (AKS/EKS), not the Vercel path CI uses.
+        - Flag anything that reintroduces a public exposure other than the gateway.
+
+  tools:
+    hadolint:
+      enabled: true
+    actionlint:
+      enabled: true
+    zizmor:
+      enabled: true
+    gitleaks:
+      enabled: true
+    checkov:
+      enabled: true
+
+  pre_merge_checks:
+    # Matches the commitlint rule in commitlint.config.cjs so the PR title and the commit agree.
+    title:
+      mode: warning
+      requirements: "Format: [PW-<issue>] <type>(<scope>): <subject>, where type is one of feat, fix, docs, style, refactor, perf, test, chore. Example: [PW-193] fix(ci): Accept Vercel's forced NODE_ENV value."
+    description:
+      mode: warning
+
+chat:
+  auto_reply: true
