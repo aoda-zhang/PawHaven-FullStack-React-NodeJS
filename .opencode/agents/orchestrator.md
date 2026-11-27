@@ -44,7 +44,7 @@ Coordinate workflow, dependency order, approval gates, and result aggregation. D
 
 ## Approval signal
 
-The plan approval that unblocks implementation is the human's approval in the conversation: step 4 stops until it appears, and the approved plan is the scope boundary. Publishing is gated by a different, human-only signal: the human runs `/approve-commit`, which opens the gate described in `.opencode/plugins/flow-gate/README.md`. The orchestrator must never treat its own reading of the conversation as a gate that it can satisfy.
+Approval is the human's explicit instruction in the conversation or their switch to `build` mode; the orchestrator never treats its own reading of the conversation as approval. The approved plan is the scope boundary.
 
 ## Workflow
 

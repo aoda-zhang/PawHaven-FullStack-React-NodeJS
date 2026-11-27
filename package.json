@@ -26,8 +26,7 @@
     "check:i18n": "node scripts/check-i18n-keys.mjs",
     "doctor:react": "npx react-doctor@0.9.12",
     "lint-staged": "lint-staged",
-    "agent-workflow-check": "node scripts/check-agent-workflow.mjs",
-    "flow-gate-check": "node --test .opencode/plugins/flow-gate/policy.test.mjs"
+    "agent-workflow-check": "node scripts/check-agent-workflow.mjs"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [

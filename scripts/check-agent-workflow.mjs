@@ -69,10 +69,14 @@ function actionRules(text, action) {
 }
 
 function deniesAction(text, action) {
-  const wildcard = actionRules(text, action).filter(
-    (rule) => rule.resource === '*',
+  const rules = actionRules(text, action);
+  const wildcardDeny = rules.findLast(
+    (rule) => rule.resource === '*' && rule.effect === 'deny',
   );
-  return wildcard.length > 0 && wildcard.at(-1).effect === 'deny';
+  if (!wildcardDeny) return false;
+  return !rules.some(
+    (rule) => rule.effect === 'allow' && rule.index > wildcardDeny.index,
+  );
 }
 
 function deniesEdit(text) {
@@ -128,7 +132,7 @@ const instructions = read('AGENTS.md');
 const prWorkflow = read('.github/workflows/opencode-review.yml.disabled');
 const teamGuide = read('docs/how-i-build/how-i-build-my-agent-team.md');
 
-for (const name of ['frontend', 'backend', 'build']) {
+for (const name of ['frontend', 'backend']) {
   if (existsSync(join(root, `.opencode/agents/${name}.md`)))
     failures.push(
       `fixed ${name} agent must be removed; route from actual scope`,
@@ -170,6 +174,7 @@ const wildcardDeny = subagentRules.findLast(
   (rule) => rule.resource === '*' && rule.effect === 'deny',
 );
 const deniedThenAllowed = (name) => {
+  if (wildcardDeny === undefined) return false;
   const rule = subagentRules
     .filter((candidate) => candidate.resource === name)
     .at(-1);
@@ -190,27 +195,6 @@ if (
   );
 }
 
-for (const file of ['index.ts', 'policy.mjs', 'policy.test.mjs', 'README.md']) {
-  if (!existsSync(join(root, '.opencode/plugins/flow-gate', file)))
-    failures.push(
-      `flow-gate plugin must ship .opencode/plugins/flow-gate/${file}`,
-    );
-}
-requirePattern(
-  config,
-  /\.\/plugins\/flow-gate/,
-  'opencode.json must load the flow-gate plugin from ./plugins/flow-gate',
-);
-for (const [name, content] of [
-  ['AGENTS.md', instructions],
-  ['docs/context/agent-constraints.md', constraints],
-]) {
-  requirePattern(
-    content,
-    /\.opencode\/plugins\/flow-gate\/README\.md/,
-    `${name} must point at .opencode/plugins/flow-gate/README.md`,
-  );
-}
 if (
   !/explicitly approved/i.test(agents.implementer) ||
   !/`development`/.test(agents.implementer) ||

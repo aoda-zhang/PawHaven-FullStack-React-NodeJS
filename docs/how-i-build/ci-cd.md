@@ -35,11 +35,12 @@ invariant they prove, and the `changes` job decides which of them run:
 | `Static checks`       | always                                      | Architecture boundaries, repository rules, and — by path — i18n keys/duplicates, design tokens, lint, typecheck |
 | `Unit tests`          | code or dependency files changed            | Vitest across every workspace package                                                                           |
 | `Build`               | code or dependency files changed            | `turbo run build` for every package                                                                             |
-| `Accessibility`       | `packages/ui` or `apps/frontend` changed    | axe over every story and every portal route                                                                     |
+| `Accessibility`       | `packages/ui` or `apps/frontend` changed    | axe over every portal route through `e2e/a11y.spec.ts`; story-axe lives in `Component catalogue`                |
 | `Component catalogue` | `packages/ui` or dependency files changed   | Chromium → `test-storybook` over every story → Storybook build → required-story check                           |
 | `UI package`          | `apps/frontend` or dependency files changed | `@pawhaven/ui` + workspace build → `verify:package` → Portal bundle CSS contract                                |
 | `React Doctor`        | `apps/frontend` or `packages/ui` changed    | React-specific security, performance and bundle checks                                                          |
-| `Security`            | any pull request, or a dependency change    | `dependency-review` on PRs, OSV scan of the lockfile                                                            |
+| `Security`            | pull requests only                          | `dependency-review` blocks a PR that introduces a high-severity advisory; push runs skip it                     |
+| `OSV scan`            | any pull request, or a dependency change    | Lockfile CVE scan against OSV, uploaded as SARIF; report-only while the tree has open advisories                |
 | `SonarQube Cloud`     | always                                      | Platform analysis; blocking only when `SONAR_REQUIRED=true`                                                     |
 | `Gate`                | always (`if: always()`)                     | Fails if any relevant job failed or was cancelled                                                               |
 

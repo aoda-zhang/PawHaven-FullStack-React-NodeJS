@@ -31,12 +31,6 @@
         "pinDefault": true,
         "annotate": true
       }
-    },
-    {
-      "package": "./plugins/flow-gate",
-      "options": {
-        "enabled": true
-      }
     }
   ]
 }

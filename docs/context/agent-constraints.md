@@ -2,7 +2,7 @@
 
 These are global rules: any change an AI makes in this project must obey every rule below. OpenCode loads this file through the root `AGENTS.md`; task-specific architecture documents are loaded as needed.
 
-**Enforcement.** The orchestrator cannot edit files or run shell commands — its agent frontmatter denies both statically. `.opencode/plugins/flow-gate` blocks git publishing until the user runs `/approve-commit`. Ordinary edits are not governed by a token: rules 4 and 5, plus combined-diff review, govern them. [The plugin's README](../../.opencode/plugins/flow-gate/README.md) is the sole description of that mechanism; do not restate it here. If a rule below and the gate disagree, the rule wins — report the gap.
+**Enforcement.** The session's agent mode is the control: `orchestrator` cannot edit files or run shell commands, `build` can do both, and switching to `build` is what authorises implementation. Rules 4 and 5 still define what may be done inside that mode.
 
 1. **Scope every change to the request.** Do what was asked, nothing more. Exploring what is related is fine — read, check, report. Acting beyond the request waits for explicit instruction.
 2. **Semantics over comments.** Intent belongs in names, types, and structure — not in comments. Before writing a comment, check whether well-named code already says it; if so, don't write it. When well-named code does not say it, write the comment. A comment earns its place only when the reason cannot be expressed in code, and then it states why, never what.

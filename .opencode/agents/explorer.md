@@ -8,18 +8,6 @@ permissions:
   - action: shell
     resource: '*'
     effect: deny
-  - action: shell
-    resource: 'git status*'
-    effect: allow
-  - action: shell
-    resource: 'git diff*'
-    effect: allow
-  - action: shell
-    resource: 'git log*'
-    effect: allow
-  - action: shell
-    resource: 'git show*'
-    effect: allow
 ---
 
 ## Role
@@ -34,7 +22,7 @@ Gather evidence; do not implement or design the solution.
 4. Return concrete `path:line` evidence and distinguish observed facts from hypotheses.
 5. Report what was inspected, what was not inspected, and which check would settle unverified claims.
 6. Do not split work into fixed frontend/backend lanes. Report the actual concerns and boundaries found.
-7. Report the diff and paths inspected, and stay read-only: no file writes, no commands beyond the read-only git allowlist.
+7. Report the paths and line numbers inspected, and stay read-only: no file writes and no shell commands.
 
 ## Output
 
