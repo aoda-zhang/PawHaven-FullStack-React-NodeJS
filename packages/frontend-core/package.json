@@ -42,7 +42,7 @@
     "axios": "^1.12.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
-    "i18next": "^25.6.0",
+    "i18next": "^26.3.4",
     "lucide-react": "^0.545.0",
     "react-i18next": "^16.0.0",
     "tailwind-merge": "3.2.0"
