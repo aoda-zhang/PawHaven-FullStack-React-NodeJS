@@ -16,17 +16,16 @@ registry is wired into CI today; see [Container images](#container-images).
 
 ## Workflows
 
-| Workflow                       | Trigger                      | What it does                                                                                                                                   |
-| ------------------------------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `quality-gate.yml`             | PR to `develop`/`main`, push | Classifies the diff, runs only the checks the change can affect, and reports one required check, `Gate`                                        |
-| `build.yml`                    | `workflow_call`              | Platform-neutral compile: install, `turbo run build`, `turbo run typecheck` for one workspace package                                          |
-| `deploy.yml`                   | manual                       | Vercel **preview**: install, `vercel build`, `vercel deploy --prebuilt`, then prints the preview URL and the release command                   |
-| `release.yml`                  | manual                       | Vercel **production**: promotes the deployment URL you pass, after the `prod` environment approval. No rebuild                                 |
-| `deploy-k3s.yml`               | `workflow_call`              | Container-cluster template: applies a service's Kubernetes manifests and waits for the rollout. Unused today; kept for a future AKS/EKS target |
-| `sonar.yml`                    | `workflow_call`              | SonarQube Cloud analysis (code smells, duplication, maintainability), called by the gate. Blocking only when `SONAR_REQUIRED=true`             |
-| `ui-library.yml`               | PR/push on UI paths          | `token-check` → build `@pawhaven/ui` → `verify:package` → UI tests → Portal CSS contract                                                       |
-| `storybook.yml`                | PR/push on UI paths          | Chromium → `test-storybook` → Storybook build → required-story check                                                                           |
-| `opencode-review.yml.disabled` | None                         | Preserved but disabled: GitHub ignores the non-`.yml` filename                                                                                 |
+| Workflow                       | Trigger                      | What it does                                                                                                                       |
+| ------------------------------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `quality-gate.yml`             | PR to `develop`/`main`, push | Classifies the diff, runs only the checks the change can affect, and reports one required check, `Gate`                            |
+| `build.yml`                    | `workflow_call`              | Platform-neutral compile: install, `turbo run build`, `turbo run typecheck` for one workspace package                              |
+| `deploy.yml`                   | manual                       | Vercel **preview**: install, `vercel build`, `vercel deploy --prebuilt`, then prints the preview URL and the release command       |
+| `release.yml`                  | manual                       | Vercel **production**: promotes the deployment URL you pass, after the `prod` environment approval. No rebuild                     |
+| `sonar.yml`                    | `workflow_call`              | SonarQube Cloud analysis (code smells, duplication, maintainability), called by the gate. Blocking only when `SONAR_REQUIRED=true` |
+| `ui-library.yml`               | PR/push on UI paths          | `token-check` → build `@pawhaven/ui` → `verify:package` → UI tests → Portal CSS contract                                           |
+| `storybook.yml`                | PR/push on UI paths          | Chromium → `test-storybook` → Storybook build → required-story check                                                               |
+| `opencode-review.yml.disabled` | None                         | Preserved but disabled: GitHub ignores the non-`.yml` filename                                                                     |
 
 ## The Quality Gate
 
@@ -101,10 +100,9 @@ the first is registry-agnostic (`docker/build-push-action@v6`, `push: false`, `l
 
 `apps/backend/<service>/deploy/kubernetes/{test,uat,prod}/` holds the Deployment and Service for
 each environment, pinned to its namespace, with the placeholder image tag `v0.0.0-unspecified`.
-`deploy-k3s.yml` renders the real image into a temporary copy before applying, so the placeholder
-never reaches a cluster. These manifests are plain Kubernetes: they work unchanged on AKS or EKS,
-and no Ingress, namespace or Platform manifest is committed any more — the ECS-era `deploy/platform`
-tree is gone.
+No workflow applies them today; they are plain Kubernetes and work unchanged on AKS or EKS once a
+cluster target exists. No Ingress, namespace or Platform manifest is committed any more — the
+ECS-era `deploy/platform` tree is gone.
 
 ## Concurrency and safety
 

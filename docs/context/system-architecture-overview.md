@@ -444,8 +444,7 @@ production runs the artifact that was reviewed. No push deploys anything.
 
 Each service keeps a multi-stage Dockerfile at `apps/backend/<service>/deploy/Dockerfile` and plain
 Kubernetes manifests beside it. Nothing in CI uses them today, but they are the path to a container
-runtime — AKS, EKS or a self-hosted cluster — without another architecture change: the manifests pin
-only Deployments and Services, and `deploy-k3s.yml` remains as the apply-and-wait template.
+runtime — AKS, EKS or a self-hosted cluster — without another architecture change: the manifests pin only Deployments and Services.
 
 Probes are TCP handshakes because no service exposes a health endpoint yet (§8.2). Each Deployment
 runs one replica, so a rollout is a short recreate rather than a zero-downtime roll; more replicas
