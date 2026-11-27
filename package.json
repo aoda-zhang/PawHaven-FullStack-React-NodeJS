@@ -63,7 +63,7 @@
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
     "@pawhaven/eslint-plugin-design-colors": "workspace:*",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "1.65.1",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@typescript-eslint/eslint-plugin": "^8.50.0",
     "@typescript-eslint/parser": "^8.50.0",
