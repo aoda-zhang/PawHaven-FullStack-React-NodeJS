@@ -55,6 +55,9 @@ jobs:
         shell: bash
         run: pnpm --filter @pawhaven/core-service --filter @pawhaven/auth-service prisma:generate-mongodb
 
+      # Deliberately the same command the Vercel projects run (`turbo:build`), including
+      # `--env-mode=loose`. The env mode is part of Turbo's task hash, so a different flag here
+      # would make every cache entry unusable inside `vercel build`.
       - name: Compile
         shell: bash
         env:
@@ -62,7 +65,7 @@ jobs:
         run: |
           set -euo pipefail
           pnpm_config_verify_deps_before_run=false \
-            pnpm exec turbo run build --filter="@pawhaven/${SERVICE}..."
+            pnpm --filter "@pawhaven/${SERVICE}" run turbo:build
 
       - name: Typecheck
         shell: bash
