@@ -49,7 +49,10 @@ reviews:
           instead of storing two copies.
     - path: ".github/workflows/**"
       instructions: |
-        - Do not echo secrets; keep `permissions` minimal and actions pinned to a major version.
+        - Do not echo secrets and keep `permissions` minimal.
+        - Pin non-GitHub actions and reusable workflows to a full 40-character commit SHA with the
+          release as a trailing comment (`@<sha> # vX.Y.Z`). GitHub-owned `actions/*` and
+          `github/*` may use a major tag.
         - The Quality Gate job names are required checks, so renaming a job changes branch protection.
     - path: "apps/backend/*/deploy/kubernetes/**"
       instructions: |
