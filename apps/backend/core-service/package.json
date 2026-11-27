@@ -45,7 +45,7 @@
     "dotenv": "^17.2.3",
     "express": "5.2.1",
     "js-yaml": "^4.1.0",
-    "mongoose": "^8.19.1",
+    "mongoose": "^8.24.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1",
