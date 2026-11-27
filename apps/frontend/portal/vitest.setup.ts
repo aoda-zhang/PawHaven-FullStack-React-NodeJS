@@ -45,3 +45,9 @@ function canvasGetContext(this: HTMLCanvasElement) {
 
 HTMLCanvasElement.prototype.getContext =
   canvasGetContext as unknown as HTMLCanvasElement['getContext'];
+
+// lottie-web schedules a `checkReady` timer that can fire after the jsdom environment is torn
+// down; Vitest reports that as an unhandled error and fails the whole run. Portal tests never
+// need real animation frames, so the player is stubbed for every test file.
+vi.mock('lottie-react', () => ({ Lottie: () => null, default: () => null }));
+vi.mock('lottie-web', () => ({ default: {} }));
