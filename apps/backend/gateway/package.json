@@ -73,7 +73,7 @@
     "tsconfig-paths-webpack-plugin": "^4.2.0",
     "typescript": "^5.9.3",
     "unplugin-swc": "^1.6.0",
-    "vitest": "^4.1.10",
+    "vitest": "^4.1.11",
     "webpack-node-externals": "^3.0.0"
   }
 }
