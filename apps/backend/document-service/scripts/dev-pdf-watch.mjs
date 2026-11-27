@@ -100,6 +100,17 @@ const schedulePrebuild = () => {
 console.log('› Running prebuild once at startup...');
 runPrebuild();
 
+// Local development has no Vercel Blob credentials. The storage schema requires a token or a
+// store id, so a placeholder keeps the service bootable; an upload against it fails loudly
+// instead of pretending to work.
+if (!process.env.DOCUMENT_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID) {
+  process.env.DOCUMENT_READ_WRITE_TOKEN = 'local-dev-placeholder';
+  console.warn(
+    '[document-service] DOCUMENT_READ_WRITE_TOKEN is not set; using a local placeholder. ' +
+      'Uploads to Vercel Blob will fail until a real token is in .env.',
+  );
+}
+
 const nestChild = spawn(nestBin, ['start', '--watch'], {
   cwd: docServiceRoot,
   stdio: 'inherit',

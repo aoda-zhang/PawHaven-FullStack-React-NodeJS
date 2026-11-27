@@ -7,7 +7,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "node ./scripts/dev-pdf-watch.mjs",
+    "dev": "NODE_ENV=uat node ./scripts/dev-pdf-watch.mjs",
     "prebuild": "node ./scripts/prebuild-pdf-style.mjs",
     "pretest": "node ./scripts/prebuild-pdf-style.mjs",
     "sync:design-tokens": "node ./scripts/sync-design-tokens.mjs",

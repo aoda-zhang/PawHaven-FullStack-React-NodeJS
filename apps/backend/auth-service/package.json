@@ -9,7 +9,7 @@
   },
   "scripts": {
     "postinstall": "pnpm run prisma:generate-mongodb",
-    "dev": "nest start --watch",
+    "dev": "NODE_ENV=uat nest start --watch",
     "start": "node dist/main.js",
     "prebuild": "pnpm run prisma:generate-mongodb",
     "build": "nest build",

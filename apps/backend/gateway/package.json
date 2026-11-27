@@ -8,7 +8,7 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "nest start --watch",
+    "dev": "NODE_ENV=uat nest start --watch",
     "build": "nest build",
     "turbo:build": "turbo run build --filter=@pawhaven/gateway --env-mode=loose",
     "install:gateway": "pnpm --filter=@pawhaven/gateway... install",
