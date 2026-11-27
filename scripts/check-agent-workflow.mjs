@@ -24,40 +24,64 @@ function frontmatter(content, name) {
   return match[1];
 }
 
-function deniesEdit(text) {
-  const mapRules = [...text.matchAll(/^  edit:[ \t]*(allow|deny)[ \t]*$/gm)];
-  if (mapRules.length) return mapRules.at(-1)[1] === 'deny';
-  const listRules = [
-    ...text.matchAll(
-      /-\s*action:\s*edit\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm,
-    ),
-  ];
-  return listRules.length > 0 && listRules.at(-1)[1] === 'deny';
-}
-
-// OpenCode applies the last matching permission rule, so collect every
-// wildcard bash rule (scalar, nested-map, and list form) and judge by position.
-function deniesShell(text) {
+// OpenCode applies the last matching permission rule, so collect every rule for
+// an action — legacy scalar map, legacy nested map, and the V2 list form — and
+// judge by position.
+function actionRules(text, action) {
+  const key = action.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const rules = [];
-  for (const m of text.matchAll(/^  bash:[ \t]*(allow|deny)[ \t]*$/gm)) {
-    rules.push([m.index, m[1]]);
+
+  for (const m of text.matchAll(
+    new RegExp(`^[ \\t]*${key}:[ \\t]*(allow|deny)[ \\t]*$`, 'gm'),
+  )) {
+    rules.push({ index: m.index, resource: '*', effect: m[1] });
   }
-  const block = text.match(/^  bash:[ \t]*\n((?: {4,}[^\n]*\n?)*)/m);
+
+  const block = text.match(
+    new RegExp(`^[ \\t]*${key}:[ \\t]*\\n((?:[ \\t]{4,}[^\\n]*\\n?)*)`, 'm'),
+  );
   if (block) {
     for (const m of block[1].matchAll(
-      /['"]?\*['"]?[ \t]*:[ \t]*(allow|deny)/g,
+      /['"]?([^'"\n]+?)['"]?[ \t]*:[ \t]*(allow|deny)/g,
     )) {
-      rules.push([block.index + m.index, m[1]]);
+      rules.push({
+        index: block.index + m.index,
+        resource: m[1].trim(),
+        effect: m[2],
+      });
     }
   }
+
   for (const m of text.matchAll(
-    /-\s*action:\s*bash\s*\n\s*resource:\s*['"]?\*['"]?\s*\n\s*effect:\s*(allow|deny)/gm,
+    new RegExp(
+      `-\\s*action:\\s*${key}\\s*\\n\\s*resource:\\s*(.+?)\\s*\\n\\s*effect:\\s*(allow|deny)`,
+      'gm',
+    ),
   )) {
-    rules.push([m.index, m[1]]);
+    rules.push({
+      index: m.index,
+      resource: m[1].replace(/^['"]|['"]$/g, '').trim(),
+      effect: m[2],
+    });
   }
-  if (!rules.length) return false;
-  rules.sort((a, b) => a[0] - b[0]);
-  return rules.at(-1)[1] === 'deny';
+
+  return rules.sort((a, b) => a.index - b.index);
+}
+
+function deniesAction(text, action) {
+  const wildcard = actionRules(text, action).filter(
+    (rule) => rule.resource === '*',
+  );
+  return wildcard.length > 0 && wildcard.at(-1).effect === 'deny';
+}
+
+function deniesEdit(text) {
+  return deniesAction(text, 'edit');
+}
+
+// pr-reviewer keeps the legacy nested `bash:` map; the V2 agents use `shell`.
+function deniesShell(text) {
+  return deniesAction(text, /\bbash\b/.test(text) ? 'bash' : 'shell');
 }
 
 function checkSkill(name, review = false) {
@@ -113,8 +137,9 @@ for (const name of ['frontend', 'backend', 'build']) {
 if (!/"default_agent"\s*:\s*"orchestrator"/.test(config))
   failures.push('default_agent must remain orchestrator');
 
+const orchestratorMeta = frontmatter(agents.orchestrator, 'orchestrator');
 if (
-  !deniesEdit(frontmatter(agents.orchestrator, 'orchestrator')) ||
+  !deniesEdit(orchestratorMeta) ||
   !/explicit approval/i.test(agents.orchestrator) ||
   !/actual.*scope|scope.*actual/i.test(agents.orchestrator) ||
   !/not a fixed domain label|fixed frontend\/backend lanes/i.test(
@@ -123,6 +148,67 @@ if (
 ) {
   failures.push(
     'orchestrator must deny edits, require approval, and route from actual scope, not fixed lanes',
+  );
+}
+
+if (!deniesEdit(orchestratorMeta) || !deniesShell(orchestratorMeta)) {
+  failures.push(
+    'orchestrator must deny edit and shell so it cannot write files or run commands',
+  );
+}
+
+const allowedSubagents = [
+  'architect',
+  'explorer',
+  'implementer',
+  'tester',
+  'reviewer',
+  'pr-reviewer',
+];
+const subagentRules = actionRules(orchestratorMeta, 'subagent');
+const wildcardDeny = subagentRules.findLast(
+  (rule) => rule.resource === '*' && rule.effect === 'deny',
+);
+const deniedThenAllowed = (name) => {
+  const rule = subagentRules
+    .filter((candidate) => candidate.resource === name)
+    .at(-1);
+  return rule?.effect === 'allow' && rule.index > wildcardDeny.index;
+};
+if (
+  !wildcardDeny ||
+  !allowedSubagents.every(deniedThenAllowed) ||
+  subagentRules.some(
+    (rule) =>
+      rule.index > wildcardDeny.index &&
+      rule.effect === 'allow' &&
+      !allowedSubagents.includes(rule.resource),
+  )
+) {
+  failures.push(
+    'orchestrator must deny all subagents, then allow only architect, explorer, implementer, tester, reviewer, and pr-reviewer',
+  );
+}
+
+for (const file of ['index.ts', 'policy.mjs', 'policy.test.mjs', 'README.md']) {
+  if (!existsSync(join(root, '.opencode/plugins/flow-gate', file)))
+    failures.push(
+      `flow-gate plugin must ship .opencode/plugins/flow-gate/${file}`,
+    );
+}
+requirePattern(
+  config,
+  /\.\/plugins\/flow-gate/,
+  'opencode.json must load the flow-gate plugin from ./plugins/flow-gate',
+);
+for (const [name, content] of [
+  ['AGENTS.md', instructions],
+  ['docs/context/agent-constraints.md', constraints],
+]) {
+  requirePattern(
+    content,
+    /\.opencode\/plugins\/flow-gate\/README\.md/,
+    `${name} must point at .opencode/plugins/flow-gate/README.md`,
   );
 }
 if (

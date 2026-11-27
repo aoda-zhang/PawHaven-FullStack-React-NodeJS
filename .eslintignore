@@ -18,6 +18,7 @@ out/
 # Ignore environment and tooling folders
 .husky/
 .vscode/
+.opencode/
 .github/
 scripts/
 harness-core/

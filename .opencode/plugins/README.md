@@ -1,6 +1,6 @@
 # Plugins
 
-Four OpenCode v2 plugins, each with a single responsibility. They compose through `ctx.model.transform`; filters remove models, the last plugin ranks what survives.
+Five OpenCode v2 plugins, each with a single responsibility. Four are model transforms: they compose through `ctx.model.transform`, filters remove models, and the last plugin ranks what survives. `flow-gate` is not a model transform — it enforces a publishing gate through permission hooks and a slash command.
 
 | Plugin                                             | Responsibility                                                                        | Key options                                             |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -8,10 +8,11 @@ Four OpenCode v2 plugins, each with a single responsibility. They compose throug
 | [`coding-model-filter`](./coding-model-filter)     | Keep models usable for coding (active, enabled, tool-capable)                         | `requireTools`                                          |
 | [`context-window-filter`](./context-window-filter) | Drop models with a context window below a threshold                                   | `minContext`                                            |
 | [`auto-model-switch`](./auto-model-switch)         | Rank survivors by context tier + coding fit, pin/label the best, fall back on failure | `maxRetries`, `pinDefault`, `annotate`, `contextWeight` |
+| [`flow-gate`](./flow-gate)                         | Approval gate for git publishing; denies destructive and `.git` writes                | `enabled`, `commitTtlMinutes`                           |
 
 ## Load order
 
-List `auto-model-switch` **last** by convention. Note that plugin transforms do **not** see each other's removals — `editor.list()` always returns the raw set — so auto-model-switch reads the filtered set via `ctx.model.list()` instead of relying on order (see its README).
+List `auto-model-switch` **last** among the model plugins by convention. Note that plugin transforms do **not** see each other's removals — `editor.list()` always returns the raw set — so auto-model-switch reads the filtered set via `ctx.model.list()` instead of relying on order (see its README). `flow-gate` participates via `permissions`, not transforms, so its position among the model plugins does not matter.
 
 ```jsonc
 {
@@ -32,6 +33,10 @@ List `auto-model-switch` **last** by convention. Note that plugin transforms do 
     {
       "package": "./plugins/auto-model-switch",
       "options": { "maxRetries": 1, "pinDefault": true, "annotate": true },
+    },
+    {
+      "package": "./plugins/flow-gate",
+      "options": { "enabled": true },
     },
   ],
 }
