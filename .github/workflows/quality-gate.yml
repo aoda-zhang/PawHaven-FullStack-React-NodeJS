@@ -36,12 +36,12 @@ jobs:
       deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Classify the diff
         id: filter
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v4
         with:
           filters: |
             code:
@@ -92,7 +92,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           # The duplicate-value check diffs the translation bundles against the base commit.
           fetch-depth: 0
@@ -132,7 +132,7 @@ jobs:
       # an incremental one. The key covers the config, so a rule change invalidates it.
       - name: Restore the ESLint cache
         if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: '**/.eslintcache'
           key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', '.eslintignore', 'libs/eslint-config/**') }}
@@ -157,7 +157,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -178,7 +178,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -199,7 +199,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -239,7 +239,7 @@ jobs:
       statuses: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -261,12 +261,12 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # Blocks a pull request that introduces a dependency with a known advisory.
       - name: Dependency review
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/dependency-review-action@v4
+        uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: high
 

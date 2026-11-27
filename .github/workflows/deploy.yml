@@ -35,16 +35,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 12.4.1
           run_install: false
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -56,7 +56,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Restore the Turbo cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .turbo
           key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
@@ -97,7 +97,7 @@ jobs:
 
       - name: Restore the Vercel CLI
         id: vercel-cli
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.vercel-cli
           key: vercel-cli-67.0.0-${{ runner.os }}
