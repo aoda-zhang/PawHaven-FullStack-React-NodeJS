@@ -23,8 +23,6 @@ registry is wired into CI today; see [Container images](#container-images).
 | `deploy.yml`                   | manual                       | Vercel **preview**: install, `vercel build`, `vercel deploy --prebuilt`, then prints the preview URL and the release command       |
 | `release.yml`                  | manual                       | Vercel **production**: promotes the deployment URL you pass, after the `prod` environment approval. No rebuild                     |
 | `sonar.yml`                    | `workflow_call`              | SonarQube Cloud analysis (code smells, duplication, maintainability), called by the gate. Blocking only when `SONAR_REQUIRED=true` |
-| `ui-library.yml`               | PR/push on UI paths          | `token-check` → build `@pawhaven/ui` → `verify:package` → UI tests → Portal CSS contract                                           |
-| `storybook.yml`                | PR/push on UI paths          | Chromium → `test-storybook` → Storybook build → required-story check                                                               |
 | `opencode-review.yml.disabled` | None                         | Preserved but disabled: GitHub ignores the non-`.yml` filename                                                                     |
 
 ## The Quality Gate
@@ -32,16 +30,18 @@ registry is wired into CI today; see [Container images](#container-images).
 `quality-gate.yml` is the merge gate and the only required check. Its jobs are named after the
 invariant they prove, and the `changes` job decides which of them run:
 
-| Job               | Runs when                                | Proves                                                                                                          |
-| ----------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `Static checks`   | always                                   | Architecture boundaries, repository rules, and — by path — i18n keys/duplicates, design tokens, lint, typecheck |
-| `Unit tests`      | code or dependency files changed         | Vitest across every workspace package                                                                           |
-| `Build`           | code or dependency files changed         | `turbo run build` for every package                                                                             |
-| `Accessibility`   | `packages/ui` or `apps/frontend` changed | axe over every story and every portal route                                                                     |
-| `React Doctor`    | `apps/frontend` or `packages/ui` changed | React-specific security, performance and bundle checks                                                          |
-| `Security`        | any pull request, or a dependency change | `dependency-review` on PRs, OSV scan of the lockfile                                                            |
-| `SonarQube Cloud` | always                                   | Platform analysis; blocking only when `SONAR_REQUIRED=true`                                                     |
-| `Gate`            | always (`if: always()`)                  | Fails if any relevant job failed or was cancelled                                                               |
+| Job                   | Runs when                                   | Proves                                                                                                          |
+| --------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `Static checks`       | always                                      | Architecture boundaries, repository rules, and — by path — i18n keys/duplicates, design tokens, lint, typecheck |
+| `Unit tests`          | code or dependency files changed            | Vitest across every workspace package                                                                           |
+| `Build`               | code or dependency files changed            | `turbo run build` for every package                                                                             |
+| `Accessibility`       | `packages/ui` or `apps/frontend` changed    | axe over every story and every portal route                                                                     |
+| `Component catalogue` | `packages/ui` or dependency files changed   | Chromium → `test-storybook` over every story → Storybook build → required-story check                           |
+| `UI package`          | `apps/frontend` or dependency files changed | `@pawhaven/ui` + workspace build → `verify:package` → Portal bundle CSS contract                                |
+| `React Doctor`        | `apps/frontend` or `packages/ui` changed    | React-specific security, performance and bundle checks                                                          |
+| `Security`            | any pull request, or a dependency change    | `dependency-review` on PRs, OSV scan of the lockfile                                                            |
+| `SonarQube Cloud`     | always                                      | Platform analysis; blocking only when `SONAR_REQUIRED=true`                                                     |
+| `Gate`                | always (`if: always()`)                     | Fails if any relevant job failed or was cancelled                                                               |
 
 The repository variable `SONAR_REQUIRED` decides whether Sonar's verdict is binding:
 

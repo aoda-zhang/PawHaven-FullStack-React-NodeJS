@@ -51,7 +51,7 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Resolve the Vercel project
         shell: bash
@@ -91,7 +91,7 @@ jobs:
 
       - name: Restore the Vercel CLI
         id: vercel-cli
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.vercel-cli
           key: vercel-cli-67.0.0-${{ runner.os }}
