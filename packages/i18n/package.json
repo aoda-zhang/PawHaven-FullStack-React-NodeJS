@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint . --ext .js,.jsx,.json"
+    "lint": "eslint . --ext .js,.jsx,.json --cache --cache-location .eslintcache"
   },
   "exports": {
     ".": {

@@ -30,7 +30,7 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx --cache --cache-location .eslintcache"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

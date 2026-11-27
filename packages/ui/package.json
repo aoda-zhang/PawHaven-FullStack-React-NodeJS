@@ -21,7 +21,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint": "eslint src .storybook --max-warnings 0",
+    "lint": "eslint src .storybook --max-warnings 0 --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
     "verify:package": "node scripts/verify-package.mjs",
     "test": "vitest run",
