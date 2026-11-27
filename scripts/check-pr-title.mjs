@@ -53,6 +53,10 @@ if (subject.length < SUBJECT_MIN_LENGTH) {
   fail(`the subject needs at least ${SUBJECT_MIN_LENGTH} characters`);
 }
 
+if (subject.endsWith('.') && !subject.endsWith('...')) {
+  fail('the subject must not end with a period; only an ellipsis is allowed');
+}
+
 if (title.length > HEADER_MAX_LENGTH) {
   fail(`the title exceeds ${HEADER_MAX_LENGTH} characters (${title.length})`);
 }

@@ -101,9 +101,9 @@ the first is registry-agnostic (`docker/build-push-action@v6`, `push: false`, `l
 
 `apps/backend/<service>/deploy/kubernetes/{test,uat,prod}/` holds the Deployment and Service for
 each environment, pinned to its namespace, with the placeholder image tag `v0.0.0-unspecified`.
-No workflow applies them today; they are plain Kubernetes and work unchanged on AKS or EKS once a
-cluster target exists. No Ingress, namespace or Platform manifest is committed any more — the
-ECS-era `deploy/platform` tree is gone.
+No workflow applies them today, and nothing builds or pushes the images they name, so treat them as
+templates: set the tag in each `deployment.yaml` by hand before `kubectl apply`. No Ingress,
+namespace or Platform manifest is committed any more — the ECS-era `deploy/platform` tree is gone.
 
 ## Concurrency and safety
 
