@@ -14,12 +14,14 @@ apps/backend/<service>/src/config/
 └── uat/env/index.json
 ```
 
-Only `uat` and `prod` exist. `NODE_ENV` must be one of those two values — there are no aliases and
-no fallback, so a stale value fails the boot instead of silently loading another bundle:
+Two bundles exist. `NODE_ENV` must be `uat`, `prod`, or `production` — `production` is accepted
+only because Vercel forces it and refuses to let a project override it. Any other value fails the
+boot instead of silently loading another bundle:
 
 ```bash
-NODE_ENV=uat npm start     # local development, preview deployments
-NODE_ENV=prod npm start    # production
+NODE_ENV=uat npm start          # local development, preview deployments
+NODE_ENV=prod npm start         # production outside Vercel
+NODE_ENV=production npm start   # Vercel, forced by the platform
 ```
 
 `getRuntimeEnv` in `@pawhaven/shared/utils` performs the resolution and throws on anything else.
