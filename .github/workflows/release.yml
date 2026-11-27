@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to build, push and deploy to production'
+        description: 'Service to release to Vercel production'
         required: true
         type: choice
         default: gateway
@@ -31,118 +31,81 @@ jobs:
             exit 1
           fi
 
-  resolve:
-    name: Compute the release version
-    needs: precheck
+  release:
+    name: Release ${{ inputs.service }} to production
+    needs: [precheck]
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      services: ${{ steps.services.outputs.services }}
+    # The `prod` environment carries the required-reviewer gate, so a release only
+    # reaches Vercel production after an explicit approval.
+    environment: prod
+    concurrency:
+      group: vercel-prod-${{ inputs.service }}
+      cancel-in-progress: false
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
+          version: 12.4.1
+          run_install: false
 
-      - name: Compute the release version
-        id: version
-        shell: bash
-        run: |
-          set -euo pipefail
-          version="v$(date -u +%y.%m.%d)-${GITHUB_SHA:0:7}"
-          echo "Releasing ${version} from ${GITHUB_SHA}."
-          echo "version=${version}" >>"${GITHUB_OUTPUT}"
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
 
-      - name: Map the service selection to a service list
-        id: services
+      - name: Resolve the Vercel project
         shell: bash
         env:
           SERVICE: ${{ inputs.service }}
+          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          ORG: ${{ secrets.VERCEL_ORG_ID }}
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           set -euo pipefail
-          services="$(jq -cn --arg service "${SERVICE}" '[$service]')"
-          echo "services=${services}" >>"${GITHUB_OUTPUT}"
+          case "${SERVICE}" in
+            gateway) project="${PROJECT_GATEWAY}" ;;
+            core-service) project="${PROJECT_CORE}" ;;
+            auth-service) project="${PROJECT_AUTH}" ;;
+            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
+          esac
+          missing=""
+          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+          {
+            echo "VERCEL_ORG_ID=${ORG}"
+            echo "VERCEL_PROJECT_ID=${project}"
+            echo "VERCEL_TOKEN=${TOKEN}"
+          } >>"${GITHUB_ENV}"
 
-  build:
-    name: Build ${{ matrix.service }}
-    needs: [resolve]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ fromJSON(needs.resolve.outputs.services) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ github.sha }}
+      - name: Install the Vercel CLI
+        run: npm install --global vercel@latest
 
-      - name: Build the image
-        uses: ./.github/actions/build-image
-        with:
-          service: ${{ matrix.service }}
-          tag: ${{ needs.resolve.outputs.version }}
-          dockerfile: apps/backend/${{ matrix.service }}/deploy/Dockerfile
+      - name: Pull the production settings
+        run: vercel pull --yes --environment=production
 
-  approve:
-    name: Approve the production release
-    needs: [resolve, build]
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-      - name: Await approval
-        run: echo "Production release approved."
+      - name: Build for production
+        run: vercel build --prod
 
-  push-image:
-    name: Push ${{ matrix.service }} to ACR
-    needs: [resolve, build, approve]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        service: ${{ fromJSON(needs.resolve.outputs.services) }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ github.sha }}
-
-      - name: Push the image
-        uses: ./.github/actions/push-image
-        with:
-          service: ${{ matrix.service }}
-          tag: ${{ needs.resolve.outputs.version }}
-          # Push to the public host; the cluster pulls from the VPC host.
-          registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
-          repository: pahaven/pawhaven-${{ matrix.service }}
-          username: ${{ secrets.ACR_USERNAME }}
-          token: ${{ secrets.ACR_PASSWORD }}
-
-  deploy:
-    name: Deploy to prod
-    needs: [resolve, push-image]
-    concurrency:
-      group: pawhaven-prod
-      cancel-in-progress: false
-    permissions:
-      contents: read
-    uses: ./.github/workflows/deploy-k3s.yml
-    with:
-      ref: ${{ github.sha }}
-      environment: prod
-      namespace: pawhaven-prod
-      version: ${{ needs.resolve.outputs.version }}
-      services: ${{ needs.resolve.outputs.services }}
-      # Push to the public host; the cluster pulls from the VPC host.
-      registry: crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com
-    secrets:
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_PROD }}
-      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
-      CF_ORIGIN_CERT: ${{ secrets.CF_ORIGIN_CERT }}
-      CF_ORIGIN_KEY: ${{ secrets.CF_ORIGIN_KEY }}
+      - name: Deploy to production
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="$(vercel deploy --prebuilt --prod)"
+          echo "url=${url}" >>"${GITHUB_OUTPUT}"
+          {
+            echo "### ${{ inputs.service }} production"
+            echo
+            echo "${url}"
+          } >>"${GITHUB_STEP_SUMMARY}"

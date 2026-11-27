@@ -1,18 +1,11 @@
 name: Deploy
+run-name: Deploy-${{ inputs.service }}-preview
 
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Target environment'
-        required: true
-        type: choice
-        default: test
-        options:
-          - test
-          - uat
       service:
-        description: 'Service to deploy'
+        description: 'Service to deploy to a Vercel preview'
         required: true
         type: choice
         default: gateway
@@ -25,108 +18,78 @@ permissions:
   contents: read
 
 concurrency:
-  group: pawhaven-${{ inputs.environment }}
+  group: vercel-preview-${{ inputs.service }}
   cancel-in-progress: false
 
 jobs:
-  precheck:
-    name: Check the deploy ref
+  preview:
+    name: Preview ${{ inputs.service }}
     runs-on: ubuntu-latest
     steps:
-      - name: Verify the dispatching branch
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+          run_install: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Resolve the Vercel project
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          ORG: ${{ secrets.VERCEL_ORG_ID }}
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          case "${SERVICE}" in
+            gateway) project="${PROJECT_GATEWAY}" ;;
+            core-service) project="${PROJECT_CORE}" ;;
+            auth-service) project="${PROJECT_AUTH}" ;;
+            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
+          esac
+          missing=""
+          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+          {
+            echo "VERCEL_ORG_ID=${ORG}"
+            echo "VERCEL_PROJECT_ID=${project}"
+            echo "VERCEL_TOKEN=${TOKEN}"
+          } >>"${GITHUB_ENV}"
+
+      - name: Install the Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull the preview settings
+        run: vercel pull --yes --environment=preview
+
+      - name: Build for preview
+        run: vercel build
+
+      - name: Deploy the preview
+        id: deploy
         shell: bash
         run: |
           set -euo pipefail
-          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-            echo "::error::Deploys run from main only; this run uses ${GITHUB_REF}."
-            exit 1
-          fi
-
-  build:
-    name: Build ${{ inputs.service }}
-    runs-on: ubuntu-latest
-    needs: precheck
-    permissions:
-      contents: read
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          ref: ${{ github.sha }}
-
-      - name: Resolve image tag
-        id: tag
-        shell: bash
-        run: echo "tag=sha-$(git rev-parse --short=7 HEAD)" >> "$GITHUB_OUTPUT"
-
-      - name: Build the image
-        uses: ./.github/actions/build-image
-        with:
-          service: ${{ inputs.service }}
-          tag: ${{ steps.tag.outputs.tag }}
-          dockerfile: apps/backend/${{ inputs.service }}/deploy/Dockerfile
-
-  push-image:
-    name: Push ${{ inputs.service }} to ACR
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Push the image
-        uses: ./.github/actions/push-image
-        with:
-          service: ${{ inputs.service }}
-          tag: ${{ needs.build.outputs.tag }}
-          # Push to the public host; the cluster pulls from the VPC host.
-          registry: crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com
-          repository: pahaven/pawhaven-${{ inputs.service }}
-          username: ${{ secrets.ACR_USERNAME }}
-          token: ${{ secrets.ACR_PASSWORD }}
-
-  deploy-test:
-    name: Deploy to test
-    needs: [build, push-image]
-    if: ${{ inputs.environment == 'test' }}
-    uses: ./.github/workflows/deploy-k3s.yml
-    with:
-      environment: test
-      namespace: pawhaven-test
-      ref: ${{ github.sha }}
-      version: ${{ needs.build.outputs.tag }}
-      services: '["${{ inputs.service }}"]'
-      # Push to the public host; the cluster pulls from the VPC host.
-      registry: crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com
-    secrets:
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_TEST }}
-      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
-      CF_ORIGIN_CERT: ${{ secrets.CF_ORIGIN_CERT }}
-      CF_ORIGIN_KEY: ${{ secrets.CF_ORIGIN_KEY }}
-
-  deploy-uat:
-    name: Deploy to uat
-    needs: [build, push-image]
-    if: ${{ inputs.environment == 'uat' }}
-    uses: ./.github/workflows/deploy-k3s.yml
-    with:
-      environment: uat
-      namespace: pawhaven-uat
-      ref: ${{ github.sha }}
-      version: ${{ needs.build.outputs.tag }}
-      services: '["${{ inputs.service }}"]'
-      # Push to the public host; the cluster pulls from the VPC host.
-      registry: crpi-1d0srkihv1btvqu3-vpc.cn-beijing.personal.cr.aliyuncs.com
-    secrets:
-      KUBECONFIG_B64: ${{ secrets.KUBECONFIG_UAT }}
-      REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
-      REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
-      PAWHAVEN_SECRETS_JSON: ${{ secrets.PAWHAVEN_SECRETS_JSON }}
-      CF_ORIGIN_CERT: ${{ secrets.CF_ORIGIN_CERT }}
-      CF_ORIGIN_KEY: ${{ secrets.CF_ORIGIN_KEY }}
+          url="$(vercel deploy --prebuilt)"
+          echo "url=${url}" >>"${GITHUB_OUTPUT}"
+          {
+            echo "### ${{ inputs.service }} preview"
+            echo
+            echo "${url}"
+          } >>"${GITHUB_STEP_SUMMARY}"
