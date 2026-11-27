@@ -86,18 +86,14 @@ jobs:
           kubectl config current-context
           kubectl cluster-info
 
+      # The platform manifests were part of the retired ECS setup; a target cluster only needs
+      # the namespace, the pull secret and the runtime secret before the service is applied.
       - name: Ensure the namespace
         shell: bash
-        run: kubectl apply -f deploy/platform/${{ inputs.environment }}/namespace.yaml
-
-      - name: Apply platform resources
-        uses: Azure/k8s-deploy@v7
-        with:
-          namespace: ${{ inputs.namespace }}
-          manifests: deploy/platform/${{ inputs.environment }}
-          action: deploy
-          strategy: basic
-          timeout: 900s
+        run: |
+          set -euo pipefail
+          kubectl create namespace "${{ inputs.namespace }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Ensure the image pull secret
         shell: bash
@@ -107,7 +103,7 @@ jobs:
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
         run: |
           set -euo pipefail
-          kubectl -n "${{ inputs.namespace }}" create secret docker-registry acr-pull \
+          kubectl -n "${{ inputs.namespace }}" create secret docker-registry registry-pull \
             --docker-server="${REGISTRY}" \
             --docker-username="${REGISTRY_USERNAME}" \
             --docker-password="${REGISTRY_PASSWORD}" \
@@ -128,34 +124,6 @@ jobs:
             --from-env-file=/tmp/pawhaven.env \
             --dry-run=client -o yaml | kubectl apply -f -
           rm -f /tmp/pawhaven.env
-
-      - name: Ensure the TLS secret
-        shell: bash
-        env:
-          CERT: ${{ secrets.CF_ORIGIN_CERT }}
-          KEY: ${{ secrets.CF_ORIGIN_KEY }}
-        run: |
-          set -euo pipefail
-          if [ -z "${CERT}" ] || [ -z "${KEY}" ]; then
-            echo "::warning::CF_ORIGIN_CERT/CF_ORIGIN_KEY are not set; the ingress stays without a certificate."
-            exit 0
-          fi
-          cert="$(printf '%b' "${CERT}")"
-          key="$(printf '%b' "${KEY}")"
-          case "${cert}" in
-            *"-----BEGIN CERTIFICATE-----"*) ;;
-            *) echo "::error::CF_ORIGIN_CERT is not a PEM certificate (expected -----BEGIN CERTIFICATE-----)."; exit 1 ;;
-          esac
-          case "${key}" in
-            *"PRIVATE KEY-----"*) ;;
-            *) echo "::error::CF_ORIGIN_KEY is not a PEM private key."; exit 1 ;;
-          esac
-          printf '%s\n' "${cert}" > /tmp/tls.crt
-          printf '%s\n' "${key}" > /tmp/tls.key
-          kubectl -n "${{ inputs.namespace }}" create secret tls cloudflare-origin \
-            --cert=/tmp/tls.crt --key=/tmp/tls.key \
-            --dry-run=client -o yaml | kubectl apply -f -
-          rm -f /tmp/tls.crt /tmp/tls.key
 
       - name: Describe the platform failure
         if: failure()
