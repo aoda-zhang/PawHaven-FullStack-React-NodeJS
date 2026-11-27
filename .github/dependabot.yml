@@ -1,0 +1,48 @@
+# Dependabot policy.
+#
+# Two grouped pull requests instead of one per advisory:
+#   - `security`  — every security update, opened as soon as an advisory lands;
+#   - `routine`   — scheduled minor/patch bumps, once a month.
+#
+# Major bumps of the framework and toolchain are deliberately not automated: those are planned
+# upgrades with migration notes, not drive-by pull requests. Security updates still apply to them,
+# because a patched release inside the current major is what an advisory actually requires.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    groups:
+      security:
+        applies-to: security-updates
+        patterns:
+          - '*'
+      routine:
+        applies-to: version-updates
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: react
+        update-types: ['version-update:semver-major']
+      - dependency-name: react-dom
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@nestjs/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 1
+    groups:
+      actions:
+        patterns:
+          - '*'
