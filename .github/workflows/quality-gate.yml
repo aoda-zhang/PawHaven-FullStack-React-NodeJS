@@ -31,6 +31,7 @@ jobs:
       code: ${{ steps.filter.outputs.code || steps.all.outputs.code }}
       backend: ${{ steps.filter.outputs.backend || steps.all.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend || steps.all.outputs.frontend }}
+      ui: ${{ steps.filter.outputs.ui || steps.all.outputs.ui }}
       i18n: ${{ steps.filter.outputs.i18n || steps.all.outputs.i18n }}
       css: ${{ steps.filter.outputs.css || steps.all.outputs.css }}
       deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
@@ -61,6 +62,9 @@ jobs:
               - 'packages/ui/**'
               - 'packages/frontend-core/**'
               - 'packages/design-system/**'
+            ui:
+              - 'packages/ui/**'
+              - '**/*.stories.*'
             i18n:
               - 'packages/i18n/**'
               - 'apps/frontend/**/*.ts'
@@ -81,7 +85,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
-          for area in code backend frontend i18n css deps; do
+          for area in code backend frontend ui i18n css deps; do
             echo "${area}=true" >>"${GITHUB_OUTPUT}"
           done
 
@@ -208,8 +212,6 @@ jobs:
         shell: bash
         run: pnpm build:libs
 
-      # `packages/ui` pins the same Playwright version as the root @playwright/test, so one browser
-      # install covers both the portal routes and vitest's browser mode.
       - name: Install Chromium
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
@@ -218,10 +220,6 @@ jobs:
       - name: Provide the portal environment
         shell: bash
         run: cp apps/frontend/portal/.env.example apps/frontend/portal/.env
-
-      - name: Component stories (axe over every story)
-        shell: bash
-        run: pnpm --filter @pawhaven/ui test-storybook
 
       - name: Portal pages (axe over every route)
         shell: bash
@@ -281,6 +279,83 @@ jobs:
           scan-args: |-
             --lockfile=pnpm-lock.yaml
 
+  catalogue:
+    name: Component catalogue
+    needs: [changes]
+    if: ${{ needs.changes.outputs.ui == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      - name: Build shared packages
+        shell: bash
+        run: pnpm build:libs
+
+      # vitest's browser mode uses the Playwright version pinned in packages/ui.
+      - name: Install Chromium
+        shell: bash
+        run: pnpm --filter @pawhaven/ui exec playwright install --with-deps chromium
+
+      - name: Storybook accessibility tests (axe over every story)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui test-storybook
+
+      - name: Build Storybook
+        shell: bash
+        run: pnpm --filter @pawhaven/ui build-storybook
+
+      - name: Verify the required stories exist
+        shell: bash
+        run: node packages/ui/scripts/verify-stories.mjs
+
+  ui-package:
+    name: UI package
+    needs: [changes]
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      - name: Build the UI package and its workspace dependencies
+        shell: bash
+        run: pnpm --filter @pawhaven/ui... build
+
+      - name: Verify the UI package contract (exports map, build output, sideEffects)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui verify:package
+
+      - name: Build the Portal and its workspace dependencies
+        shell: bash
+        run: pnpm --filter @pawhaven/portal... build
+
+      - name: Verify the Portal CSS keeps its design tokens and UI utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          CSS_FILES=$(find apps/frontend/portal/build -type f -name '*.css' -print)
+          if [[ -z "${CSS_FILES}" ]]; then
+            echo "Portal production build emitted no CSS files." >&2
+            exit 1
+          fi
+          if ! grep -qE -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
+            echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
+            exit 1
+          fi
+          if ! grep -qF -- ".animate-spin" ${CSS_FILES}; then
+            echo "Expected UI-library animation utility was not found in the Portal bundle." >&2
+            exit 1
+          fi
+
   sonar:
     name: SonarQube Cloud
     needs: [changes]
@@ -294,7 +369,7 @@ jobs:
 
   gate:
     name: Gate
-    needs: [changes, static, unit, build, a11y, react-doctor, security, sonar]
+    needs: [changes, static, unit, build, a11y, catalogue, ui-package, react-doctor, security, sonar]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -306,6 +381,8 @@ jobs:
           UNIT: ${{ needs.unit.result }}
           BUILD: ${{ needs.build.result }}
           A11Y: ${{ needs.a11y.result }}
+          CATALOGUE: ${{ needs.catalogue.result }}
+          UI_PACKAGE: ${{ needs.ui-package.result }}
           REACT_DOCTOR: ${{ needs.react-doctor.result }}
           SECURITY: ${{ needs.security.result }}
           SONAR: ${{ needs.sonar.result }}
@@ -319,6 +396,8 @@ jobs:
             "unit:${UNIT}" \
             "build:${BUILD}" \
             "a11y:${A11Y}" \
+            "catalogue:${CATALOGUE}" \
+            "ui-package:${UI_PACKAGE}" \
             "react-doctor:${REACT_DOCTOR}" \
             "security:${SECURITY}"; do
             name="${entry%%:*}"
