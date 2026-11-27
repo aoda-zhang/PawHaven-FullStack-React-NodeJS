@@ -421,58 +421,35 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 
 ## 9. Deployment Architecture
 
-### 9.1 MVP (Current → Month 3)
-
-One Alibaba Cloud ECS host runs K3s. The cluster hosts `gateway`, `core-service` and
-`auth-service` in three namespaces — `pawhaven-test`, `pawhaven-uat`, `pawhaven-prod`, one per
-environment — with images pulled from Alibaba Cloud Container Registry
-(`crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-<service>`).
+### 9.1 Current
 
 | Piece                               | Runtime                                                            |
 | ----------------------------------- | ------------------------------------------------------------------ |
-| gateway, core-service, auth-service | K3s on one ECS host, one namespace per environment                 |
+| gateway, core-service, auth-service | Vercel — one project per service, Node functions                   |
 | document-service                    | Vercel (Vercel Blob for file storage)                              |
 | portal                              | Cloudflare Pages                                                   |
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
-Shipping is manual. `release.yml` builds the selected service image, waits for the `prod` environment
-approval, then pushes the image to ACR and deploys the selected service.
-`deploy.yml` builds and pushes the selected service from `main` to ACR as `sha-<7>`, then deploys it
-to `test` or `uat` only.
-auth-service and core-service are cluster-internal: `ClusterIP` Services, no Ingress, behind a
-default-deny ingress NetworkPolicy. Public traffic reaches the gateway through the k3s-bundled
-Traefik ingress controller: `deploy/platform/prod/ingress.yaml` routes `api.pawhaven.work` to the
-gateway Service on port 8080, and Cloudflare proxies that hostname to the ECS public IP on 443 with
-Full (strict) using a Cloudflare Origin Certificate stored as the `cloudflare-origin` secret. `test`
-and `uat` stay cluster-internal. Setup, commands and rollback:
-[deployment runbook](../how-i-build/deployment-runbook.md).
+`api.pawhaven.work` is fronted by a Cloudflare Worker: paths under `/api/` are forwarded to the
+gateway's Vercel deployment, everything else to the portal. The gateway reaches the other services
+through `AUTH_SERVICE_HOST` and `CORE_SERVICE_HOST`, which point at their own Vercel deployments, so
+only the gateway is a public surface — core-service and auth-service have no public route, and the
+request that reaches them carries the gateway's internal JWT.
 
-### 9.2 Production (Phase 3+)
+Shipping is manual and two-stage. `deploy.yml` builds and deploys a Vercel preview for one service;
+`release.yml` promotes that exact deployment to production after the `prod` environment approval, so
+production runs the artifact that was reviewed. No push deploys anything.
 
-```
-┌───────────────────────────────────────────────────────────┐
-│ Alibaba Cloud ECS host — K3s                              │
-│                                                           │
-│  pawhaven-prod namespace                                  │
-│    gateway       1 pod · ClusterIP · exposed by Traefik   │
-│    auth-service  1 pod · ClusterIP · internal only        │
-│    core-service  1 pod · ClusterIP · internal only        │
-│                                                           │
-│  pawhaven-test and pawhaven-uat — the same three services │
-│  Managed MongoDB (2 databases: auth + core), off the host │
-└───────────────────────────────────────────────────────────┘
-        │                                   │
-        │ Traefik / Cloudflare              │ HTTPS + internal JWT
-        ▼                                   ▼
-   public HTTPS                    document-service on Vercel
-   api.pawhaven.work               (Vercel Blob storage;
-   (prod Ingress,                   not part of the K3s pipeline)
-    Full (strict))
-```
+### 9.2 Portability
+
+Each service keeps a multi-stage Dockerfile at `apps/backend/<service>/deploy/Dockerfile` and plain
+Kubernetes manifests beside it. Nothing in CI uses them today, but they are the path to a container
+runtime — AKS, EKS or a self-hosted cluster — without another architecture change: the manifests pin
+only Deployments and Services, and `deploy-k3s.yml` remains as the apply-and-wait template.
 
 Probes are TCP handshakes because no service exposes a health endpoint yet (§8.2). Each Deployment
-runs one replica with `maxSurge: 0`, so a release is a short recreate rather than a zero-downtime
-rollout; more replicas and autoscaling stay a Phase 3+ change.
+runs one replica, so a rollout is a short recreate rather than a zero-downtime roll; more replicas
+and autoscaling stay a Phase 3+ change.
 
 ---
 

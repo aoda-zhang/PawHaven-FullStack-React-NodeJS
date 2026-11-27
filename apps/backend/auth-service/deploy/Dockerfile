@@ -1,5 +1,5 @@
 # Build from the monorepo root:
-# docker build -f apps/backend/auth-service/deploy/Dockerfile -t crpi-1d0srkihv1btvqu3.cn-beijing.personal.cr.aliyuncs.com/pahaven/pawhaven-auth-service:local .
+# docker build -f apps/backend/auth-service/deploy/Dockerfile -t pawhaven-auth-service:local .
 
 FROM node:24-bookworm-slim AS deps
 WORKDIR /repo

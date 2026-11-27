@@ -1,5 +1,4 @@
-# Retained for the optional document-service image; the ECS/K3s pipeline does not
-# build or deploy it. See apps/backend/document-service/deploy/README.md.
+# Retained for the optional container image; no current pipeline builds it. See apps/backend/document-service/deploy/README.md.
 # Build from the monorepo root:
 # docker build -f apps/backend/document-service/deploy/Dockerfile -t ghcr.io/aoda-zhang/pawhaven-document-service:local .
 FROM node:24-bookworm-slim

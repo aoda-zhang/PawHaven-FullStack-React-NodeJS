@@ -64,28 +64,27 @@ still run in CI.
 
 ## CI wiring
 
-| Workflow                       | Purpose                                                                                                                                                                                                                        | Also called by |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
-| `test.yml`                     | Install (frozen lockfile) → Prisma clients → `build:libs` → architecture/token/quality gates → lint, typecheck, `check:i18n`, Storybook axe tests (Chromium), test, build; a separate job installs Chromium for Playwright E2E | —              |
-| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                                                                                         | —              |
-| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                                                                                      | —              |
-| `react-doctor.yml`             | React Doctor scan on PRs and `main`                                                                                                                                                                                            | —              |
-| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                                                                               | —              |
+| Workflow                       | Purpose                                                                                                                                                      | Also called by     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| `quality-gate.yml`             | Classifies the diff, runs `Static checks`, `Unit tests`, `Build`, `Accessibility`, `React Doctor`, `Security` and `SonarQube Cloud`, then reports one `Gate` | —                  |
+| `build.yml`                    | Platform-neutral compile for one workspace package (install, `turbo run build`, `turbo run typecheck`)                                                       | `deploy.yml`       |
+| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                       | —                  |
+| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                    | —                  |
+| `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                         | `quality-gate.yml` |
+| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                             | —                  |
 
-The gates run on pull requests and pushes to `main` only; `release.yml` does not re-run them, so a
-gate tightened for a PR is enforced before that commit can reach `main`, and a release ships an
-already-gated commit.
+The gate runs on pull requests and pushes to `develop`/`main`, and `release.yml` does not re-run
+it: a release promotes a deployment the gate already checked.
 
-`deploy.yml` and `deploy-k3s.yml` are not gates: they run no tests, no lint and no cluster
-preflight. `deploy.yml` deploys only `main`'s head, so the checks that matter are the merge-time
-gates on `main`.
+`deploy.yml` and `release.yml` are not gates: they run no tests and no lint. `release.yml` only
+promotes a deployment the gate already checked, so the checks that matter are the merge-time gates.
 
 ## Adding a gate
 
 1. Put the logic in `scripts/` as one focused Node script with `exit 0 = clean, 1 = finding`.
 2. Add a root `package.json` script; never let a gate be invoked ad hoc only.
-3. Wire it into `test.yml` (and `quality-check` if it is a repository-health concern), or into the
-   hook that needs it. Gates that share mutable resources stay sequential.
+3. Wire it into `quality-gate.yml` (and `quality-check` if it is a repository-health concern), or
+   into the hook that needs it. Gates that share mutable resources stay sequential.
 4. Never add a bypass flag. If a gate is wrong, fix the gate in its own change.
 
 ## Known gaps
