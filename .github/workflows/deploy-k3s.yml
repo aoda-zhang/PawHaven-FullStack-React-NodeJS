@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
 
@@ -70,7 +70,7 @@ jobs:
           chmod 600 "${GITHUB_WORKSPACE}/.kube/config"
 
       - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
       - name: Verify the kubeconfig
         shell: bash
@@ -142,7 +142,7 @@ jobs:
         service: ${{ fromJSON(inputs.services) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
 
@@ -157,7 +157,7 @@ jobs:
           chmod 600 "${GITHUB_WORKSPACE}/.kube/config"
 
       - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
       - name: Verify the kubeconfig
         shell: bash
