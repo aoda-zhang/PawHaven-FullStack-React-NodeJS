@@ -1,0 +1,74 @@
+# Platform-neutral compile stage. It is reusable so a deploy target can be swapped without
+# touching how the code is built: anything platform specific belongs in the calling workflow.
+name: Build
+run-name: Build-${{ inputs.service }}
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: 'Workspace package to compile'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    name: Compile ${{ inputs.service }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+          run_install: false
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      # Turbo's local cache is content-addressed, so a restored cache makes a repeated compile
+      # incremental. The deploy job restores the same key before `vercel build`.
+      - name: Restore the Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-${{ inputs.service }}-
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate the Prisma clients
+        if: ${{ inputs.service == 'core-service' || inputs.service == 'auth-service' }}
+        shell: bash
+        run: pnpm --filter @pawhaven/core-service --filter @pawhaven/auth-service prisma:generate-mongodb
+
+      - name: Compile
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+        run: |
+          set -euo pipefail
+          pnpm_config_verify_deps_before_run=false \
+            pnpm exec turbo run build --filter="@pawhaven/${SERVICE}..."
+
+      - name: Typecheck
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+        run: |
+          set -euo pipefail
+          pnpm_config_verify_deps_before_run=false \
+            pnpm exec turbo run typecheck --filter="@pawhaven/${SERVICE}..."

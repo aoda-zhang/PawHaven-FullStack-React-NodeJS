@@ -1,11 +1,14 @@
 name: Release
 run-name: Release-${{ inputs.service }}
 
+# Production is a promotion, not a rebuild: the deployment you verified in `deploy.yml` is
+# promoted as-is, so production runs exactly the artifact that was reviewed. Swapping the deploy
+# target later means replacing this workflow only; `build.yml` stays untouched.
 on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to release to Vercel production'
+        description: 'Service to promote to Vercel production'
         required: true
         type: choice
         default: gateway
@@ -13,9 +16,14 @@ on:
           - gateway
           - core-service
           - auth-service
+      deployment:
+        description: 'Preview deployment URL to promote (from the deploy.yml summary)'
+        required: true
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   precheck:
@@ -35,8 +43,9 @@ jobs:
     name: Release ${{ inputs.service }} to production
     needs: [precheck]
     runs-on: ubuntu-latest
-    # The `prod` environment carries the required-reviewer gate, so a release only
-    # reaches Vercel production after an explicit approval.
+    timeout-minutes: 15
+    # The `prod` environment carries the required-reviewer gate, so a release only reaches
+    # production after an explicit approval.
     environment: prod
     concurrency:
       group: vercel-prod-${{ inputs.service }}
@@ -45,17 +54,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 12.4.1
-          run_install: false
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
+      - name: Require a passing Test run for this commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          latest="$(gh run list --repo "${REPO}" --workflow "Test" --commit "${SHA}" --limit 1 --json status,conclusion)"
+          status="$(printf '%s' "${latest}" | jq -r '.[0].status // "missing"')"
+          conclusion="$(printf '%s' "${latest}" | jq -r '.[0].conclusion // "none"')"
+          if [ "${status}" != "completed" ] || [ "${conclusion}" != "success" ]; then
+            echo "::error::The Test workflow for ${SHA} is ${status}/${conclusion}; release blocked."
+            exit 1
+          fi
+          echo "Test workflow passed for ${SHA}."
 
       - name: Resolve the Vercel project
         shell: bash
@@ -66,6 +80,7 @@ jobs:
           PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
           ORG: ${{ secrets.VERCEL_ORG_ID }}
           TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT: ${{ inputs.deployment }}
         run: |
           set -euo pipefail
           case "${SERVICE}" in
@@ -82,30 +97,46 @@ jobs:
             echo "::error::Missing repository secrets:${missing}."
             exit 1
           fi
+          case "${DEPLOYMENT}" in
+            https://*) ;;
+            *) echo "::error::deployment must be a Vercel deployment URL, got '${DEPLOYMENT}'."; exit 1 ;;
+          esac
           {
             echo "VERCEL_ORG_ID=${ORG}"
             echo "VERCEL_PROJECT_ID=${project}"
             echo "VERCEL_TOKEN=${TOKEN}"
           } >>"${GITHUB_ENV}"
 
+      - name: Restore the Vercel CLI
+        id: vercel-cli
+        uses: actions/cache@v4
+        with:
+          path: ~/.vercel-cli
+          key: vercel-cli-67.0.0-${{ runner.os }}
+
       - name: Install the Vercel CLI
-        run: npm install --global vercel@latest
+        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
+        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
 
-      - name: Pull the production settings
-        run: vercel pull --yes --environment=production
-
-      - name: Build for production
-        run: vercel build --prod
-
-      - name: Deploy to production
-        id: deploy
+      - name: Put the Vercel CLI on PATH
         shell: bash
         run: |
           set -euo pipefail
-          url="$(vercel deploy --prebuilt --prod)"
-          echo "url=${url}" >>"${GITHUB_OUTPUT}"
+          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
+          "${HOME}/.vercel-cli/bin/vercel" --version
+
+      - name: Link the project
+        run: vercel pull --yes --environment=production
+
+      - name: Promote the deployment
+        shell: bash
+        env:
+          DEPLOYMENT: ${{ inputs.deployment }}
+        run: |
+          set -euo pipefail
+          vercel promote "${DEPLOYMENT}" --yes
           {
             echo "### ${{ inputs.service }} production"
             echo
-            echo "${url}"
+            echo "Promoted \`${DEPLOYMENT}\` to the production alias."
           } >>"${GITHUB_STEP_SUMMARY}"

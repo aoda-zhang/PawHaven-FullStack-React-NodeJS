@@ -22,9 +22,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+    with:
+      service: ${{ inputs.service }}
+
   preview:
     name: Preview ${{ inputs.service }}
+    needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -40,6 +48,15 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+
+      - name: Restore the Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            turbo-${{ inputs.service }}-
 
       - name: Resolve the Vercel project
         shell: bash
@@ -72,8 +89,23 @@ jobs:
             echo "VERCEL_TOKEN=${TOKEN}"
           } >>"${GITHUB_ENV}"
 
+      - name: Restore the Vercel CLI
+        id: vercel-cli
+        uses: actions/cache@v4
+        with:
+          path: ~/.vercel-cli
+          key: vercel-cli-67.0.0-${{ runner.os }}
+
       - name: Install the Vercel CLI
-        run: npm install --global vercel@latest
+        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
+        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
+
+      - name: Put the Vercel CLI on PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
+          "${HOME}/.vercel-cli/bin/vercel" --version
 
       - name: Pull the preview settings
         run: vercel pull --yes --environment=preview
@@ -92,4 +124,6 @@ jobs:
             echo "### ${{ inputs.service }} preview"
             echo
             echo "${url}"
+            echo
+            echo "Release it with: \`gh workflow run release.yml -f service=${{ inputs.service }} -f deployment=${url}\`"
           } >>"${GITHUB_STEP_SUMMARY}"
