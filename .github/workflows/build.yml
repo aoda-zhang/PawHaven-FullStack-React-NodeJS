@@ -21,16 +21,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           version: 12.4.1
           run_install: false
 
       - name: Set up Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           cache: pnpm
@@ -38,7 +38,7 @@ jobs:
       # Turbo's local cache is content-addressed, so a restored cache makes a repeated compile
       # incremental. The deploy job restores the same key before `vercel build`.
       - name: Restore the Turbo cache
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .turbo
           key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}

@@ -17,7 +17,7 @@
   --color-primary-hover: var(--color-orange-7); /* #cd601a */
   --color-primary-active: var(--color-orange-8); /* #c35c19 */
   --color-primary-light: var(--color-orange-1); /* #fef4ed */
-  --color-primary-fg: var(--color-gray-9); /* #121212 — white on orange-6 is 3.01:1, dark text is 6.22:1 */
+  --color-primary-fg: var(--color-text-inverse); /* #ffffff */
 
   /* ═══ Surfaces ═══════════════════════════════════════ */
   --color-background: var(--color-gray-2); /* #f8f8f8 — page background */
@@ -25,7 +25,7 @@
     --color-text
   ); /* #121212 — headings and body share one text colour */
   --color-muted: var(--color-gray-3); /* #f0f0f0 — secondary bg, inactive */
-  --color-accent: var(--color-brown-1); /* #fffaf6 — light pills; brown-2 pushed tertiary text under 4.5:1 */
+  --color-accent: var(--color-brown-2); /* #fff5ec — highlights, light pills */
   --color-accent-foreground: var(
     --color-orange-9
   ); /* #a74e15 — text on accent backgrounds */
@@ -38,8 +38,8 @@
 
   /* ═══ Text ═════════════════════════════════════════════ */
   --color-text: var(--color-gray-9); /* #121212 */
-  --color-text-secondary: var(--color-gray-8); /* #525252 — 7.26:1 on accent, 7.81:1 on white */
-  --color-text-tertiary: var(--color-gray-7); /* #737373 — 4.57:1 on accent, 4.74:1 on white */
+  --color-text-secondary: var(--color-gray-7); /* #737373 */
+  --color-text-tertiary: var(--color-gray-6); /* #a3a3a3 */
   --color-text-inverse: var(--color-gray-1); /* #ffffff */
 
   /* ═══ Borders ════════════════════════════════════════ */
@@ -58,7 +58,7 @@
     --color-gray-10
   ); /* #171717 — hero headline, dark buttons */
   --color-body-text: var(--color-brown-9); /* #6b5642 — hero/body copy */
-  --color-stat-labels: var(--color-brown-9); /* #6b5642 — 5.81:1 on brown-3; brown-8 was 3.39:1 */
+  --color-stat-labels: var(--color-brown-8); /* #8f7b69 — stat captions */
   --color-footer-text: var(--color-brown-6); /* #d3c3b3 — footer links */
   --color-footer-copy: var(--color-brown-7); /* footer body copy */
   --color-footer-muted: var(

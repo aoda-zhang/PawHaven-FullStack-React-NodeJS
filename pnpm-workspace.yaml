@@ -2,6 +2,10 @@ packages:
   - apps/**
   - packages/**
   - libs/**
+  - '!**/dist'
+  - '!**/dist/**'
+  - '!**/build'
+  - '!**/build/**'
   # Exclude Prisma generated client directories
   - '!**/prisma/**/client'
   - '!**/src/prisma/**/client'

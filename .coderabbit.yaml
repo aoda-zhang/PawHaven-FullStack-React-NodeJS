@@ -49,7 +49,9 @@ reviews:
           instead of storing two copies.
     - path: ".github/workflows/**"
       instructions: |
-        - Do not echo secrets; keep `permissions` minimal and actions pinned to a major version.
+        - Do not echo secrets and keep `permissions` minimal.
+        - Pin every action and reusable workflow to a full 40-character commit SHA with the
+          release as a trailing comment (`@<sha> # vX.Y.Z`); a tag can be moved, a SHA cannot.
         - The Quality Gate job names are required checks, so renaming a job changes branch protection.
     - path: "apps/backend/*/deploy/kubernetes/**"
       instructions: |
@@ -69,10 +71,10 @@ reviews:
       enabled: true
 
   pre_merge_checks:
-    # Matches the commitlint rule in commitlint.config.cjs so the PR title and the commit agree.
+    # The Quality Gate's `PR title` job enforces this deterministically (same rule as commitlint),
+    # so a second opinion from the review bot would only duplicate it.
     title:
-      mode: warning
-      requirements: "Format: [PW-<issue>] <type>(<scope>): <subject>, where type is one of feat, fix, docs, style, refactor, perf, test, chore. Example: [PW-193] fix(ci): Accept Vercel's forced NODE_ENV value."
+      mode: "off"
     description:
       mode: warning
 

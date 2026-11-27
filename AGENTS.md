@@ -15,9 +15,8 @@ OpenCode loads this file automatically. Treat it as the project-wide entry point
 ## Change-control baseline
 
 - Read-only investigation and explanation do not require a plan approval.
-- Before any code, configuration, test, or documentation file is modified, present a written plan and wait for explicit user approval in the current conversation.
-- No exception for a change being small, reversible, urgent, or single-domain. Silence or a request to investigate is not approval to implement.
-- Implement only the approved scope. If the approach or scope must change, stop and obtain approval for the revised scope.
+- Before any code, configuration, test, or documentation file is modified, present a written plan and wait for explicit user approval in the current conversation. No exception, no implicit approval, no scope expansion without renewed approval.
+- Silence or a request to investigate is not approval to implement.
 - Do not commit, push, or create a PR unless explicitly requested.
 
-The detailed, checkable rules live in [agent-constraints.md](./docs/context/agent-constraints.md). Keep this file short; do not duplicate the handbook here.
+The rules live in [agent-constraints.md](./docs/context/agent-constraints.md). Control is by agent mode: `orchestrator` is read-only — it cannot edit files or run shell commands — while `build` can do both, so the human switching to `build` is what authorises implementation. Point at the constraints file for the rules, never restate them.

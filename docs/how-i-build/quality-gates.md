@@ -11,16 +11,16 @@ Nothing here grades code — the gates are binary: pass or fail, warning or find
 
 ## The gate map
 
-| Command                                      | Owns                                                          | Runs in                           |
-| -------------------------------------------- | ------------------------------------------------------------- | --------------------------------- |
-| `pnpm quality-check`                         | Repository health scan (below); delegates the two named gates | CI (`test.yml`), local            |
-| `pnpm architecture-check`                    | Import boundaries A1–A5                                       | CI, local                         |
-| `pnpm token-check`                           | Design-token drift (CSS + source)                             | pre-commit, CI (`ui-library.yml`) |
-| `pnpm check:i18n`                            | Translation keys used vs. defined, JSON validity              | local, review                     |
-| `pnpm check:links`                           | Relative doc links and anchors                                | CI (via `quality-check`), local   |
-| `pnpm agent-workflow-check`                  | Agent/command/skill harness invariants                        | local, review                     |
-| `pnpm doctor:react`                          | React Doctor (security, perf, correctness, a11y, bundle)      | CI (`react-doctor.yml`)           |
-| `pnpm lint` / `typecheck` / `test` / `build` | Per-package checks via Turborepo                              | CI (`test.yml`), local            |
+| Command                                      | Owns                                                          | Runs in                          |
+| -------------------------------------------- | ------------------------------------------------------------- | -------------------------------- |
+| `pnpm quality-check`                         | Repository health scan (below); delegates the two named gates | CI (`test.yml`), local           |
+| `pnpm architecture-check`                    | Import boundaries A1–A5                                       | CI, local                        |
+| `pnpm token-check`                           | Design-token drift (CSS + source)                             | pre-commit, CI (`Static checks`) |
+| `pnpm check:i18n`                            | Translation keys used vs. defined, JSON validity              | local, review                    |
+| `pnpm check:links`                           | Relative doc links and anchors                                | CI (via `quality-check`), local  |
+| `pnpm agent-workflow-check`                  | Agent/command/skill harness invariants                        | local, review                    |
+| `pnpm doctor:react`                          | React Doctor (security, perf, correctness, a11y, bundle)      | CI (`react-doctor.yml`)          |
+| `pnpm lint` / `typecheck` / `test` / `build` | Per-package checks via Turborepo                              | CI (`test.yml`), local           |
 
 ## What `quality-check` owns
 
@@ -64,14 +64,12 @@ still run in CI.
 
 ## CI wiring
 
-| Workflow                       | Purpose                                                                                                                                                      | Also called by     |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
-| `quality-gate.yml`             | Classifies the diff, runs `Static checks`, `Unit tests`, `Build`, `Accessibility`, `React Doctor`, `Security` and `SonarQube Cloud`, then reports one `Gate` | —                  |
-| `build.yml`                    | Platform-neutral compile for one workspace package (install, `turbo run build`, `turbo run typecheck`)                                                       | `deploy.yml`       |
-| `ui-library.yml`               | `token-check` → build `@pawhaven/ui` with workspace deps → `verify:package` → UI tests                                                                       | —                  |
-| `storybook.yml`                | Install Chromium → `test-storybook` (Storybook tests in a real browser) → build Storybook                                                                    | —                  |
-| `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                         | `quality-gate.yml` |
-| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                             | —                  |
+| Workflow                       | Purpose                                                                                                                                                                                           | Also called by     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `quality-gate.yml`             | Classifies the diff, runs `Static checks`, `Unit tests`, `Build`, `Accessibility`, `Component catalogue`, `UI package`, `React Doctor`, `Security` and `SonarQube Cloud`, then reports one `Gate` | —                  |
+| `build.yml`                    | Platform-neutral compile for one workspace package (install, `turbo run build`, `turbo run typecheck`)                                                                                            | `deploy.yml`       |
+| `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                                                              | `quality-gate.yml` |
+| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                                                  | —                  |
 
 The gate runs on pull requests and pushes to `develop`/`main`, and `release.yml` does not re-run
 it: a release promotes a deployment the gate already checked.

@@ -8,6 +8,10 @@ run-name: Quality Gate · ${{ github.head_ref || github.ref_name }}
 
 on:
   pull_request:
+    # A title edit does not change the merge commit, so without `edited` the title job and the
+    # Gate keep reporting the previous title. Re-running the whole gate is the price of a
+    # meaningful title check.
+    types: [opened, synchronize, reopened, edited]
     branches: [develop, main]
   push:
     branches: [develop, main]
@@ -21,6 +25,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  title:
+    name: PR title
+    # Only a pull request has a title to check; a push skips this job and the gate ignores it.
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Same rule commitlint enforces on the commit, so a squash merge cannot land a title that
+      # could never have been committed.
+      - name: Validate the title
+        shell: bash
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: node scripts/check-pr-title.mjs "${PR_TITLE}"
+
   changes:
     name: Detect changes
     runs-on: ubuntu-latest
@@ -31,17 +53,18 @@ jobs:
       code: ${{ steps.filter.outputs.code || steps.all.outputs.code }}
       backend: ${{ steps.filter.outputs.backend || steps.all.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend || steps.all.outputs.frontend }}
+      ui: ${{ steps.filter.outputs.ui || steps.all.outputs.ui }}
       i18n: ${{ steps.filter.outputs.i18n || steps.all.outputs.i18n }}
       css: ${{ steps.filter.outputs.css || steps.all.outputs.css }}
       deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Classify the diff
         id: filter
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: dorny/paths-filter@v4
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           filters: |
             code:
@@ -61,6 +84,10 @@ jobs:
               - 'packages/ui/**'
               - 'packages/frontend-core/**'
               - 'packages/design-system/**'
+            ui:
+              - 'packages/ui/**'
+              - 'packages/design-system/**'
+              - '**/*.stories.*'
             i18n:
               - 'packages/i18n/**'
               - 'apps/frontend/**/*.ts'
@@ -81,7 +108,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
-          for area in code backend frontend i18n css deps; do
+          for area in code backend frontend ui i18n css deps; do
             echo "${area}=true" >>"${GITHUB_OUTPUT}"
           done
 
@@ -92,7 +119,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The duplicate-value check diffs the translation bundles against the base commit.
           fetch-depth: 0
@@ -132,7 +159,7 @@ jobs:
       # an incremental one. The key covers the config, so a rule change invalidates it.
       - name: Restore the ESLint cache
         if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: '**/.eslintcache'
           key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', '.eslintignore', 'libs/eslint-config/**') }}
@@ -157,7 +184,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -178,7 +205,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -199,7 +226,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -208,7 +235,6 @@ jobs:
         shell: bash
         run: pnpm build:libs
 
-      # test-storybook runs vitest in browser mode, so it needs a real Chromium.
       - name: Install Chromium
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
@@ -217,10 +243,6 @@ jobs:
       - name: Provide the portal environment
         shell: bash
         run: cp apps/frontend/portal/.env.example apps/frontend/portal/.env
-
-      - name: Component stories (axe over every story)
-        shell: bash
-        run: pnpm --filter @pawhaven/ui test-storybook
 
       - name: Portal pages (axe over every route)
         shell: bash
@@ -236,24 +258,24 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-      statuses: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Scan
-        uses: millionco/react-doctor@v2
+        uses: millionco/react-doctor@695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
         with:
           version: '0.9.12'
+          commit-status: 'false'
 
   security:
     name: Security
     needs: [changes]
-    # Dependency review only works on pull requests; the OSV scan also covers pushes that touch
-    # the dependency graph.
-    if: ${{ github.event_name == 'pull_request' || needs.changes.outputs.deps == 'true' }}
+    # Dependency review diffs a pull request against its base, so a push has nothing for it to
+    # compare.
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -261,21 +283,111 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Blocks a pull request that introduces a dependency with a known advisory.
       - name: Dependency review
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/dependency-review-action@v5
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
           fail-on-severity: high
 
-      # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
-      - name: OSV scan
-        uses: google/osv-scanner-action/osv-scanner-action@v2.7.1
-        with:
-          scan-args: |-
-            --lockfile=pnpm-lock.yaml
+  osv:
+    name: OSV scan
+    needs: [changes]
+    # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
+    # The reusable workflow is required, not optional: the scanner action itself declares only
+    # `scan-args`, so a `fail-on-vuln` input passed to it is ignored and findings fail the job.
+    # The workflow honours it, and still fails when a scan produces no results (a real error).
+    # Report-only until the dependency tree is clean (46 open advisories today).
+    if: ${{ github.event_name == 'pull_request' || needs.changes.outputs.deps == 'true' }}
+    permissions:
+      # SARIF upload to CodeQL needs both of these; the called workflow cannot grant more
+      # than the caller allows.
+      actions: read
+      contents: read
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@32d3cd482bdadfb38b186c0ad1b031902d55d932 # v2.7.1
+    with:
+      scan-args: |-
+        --lockfile=pnpm-lock.yaml
+      fail-on-vuln: false
+
+  catalogue:
+    name: Component catalogue
+    needs: [changes]
+    if: ${{ needs.changes.outputs.ui == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      - name: Build shared packages
+        shell: bash
+        run: pnpm build:libs
+
+      # vitest's browser mode uses the Playwright version pinned in packages/ui.
+      - name: Install Chromium
+        shell: bash
+        run: pnpm --filter @pawhaven/ui exec playwright install --with-deps chromium
+
+      - name: Storybook accessibility tests (axe over every story)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui test-storybook
+
+      - name: Build Storybook
+        shell: bash
+        run: pnpm --filter @pawhaven/ui build-storybook
+
+      - name: Verify the required stories exist
+        shell: bash
+        run: node packages/ui/scripts/verify-stories.mjs
+
+  ui-package:
+    name: UI package
+    needs: [changes]
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
+
+      - name: Build the UI package and its workspace dependencies
+        shell: bash
+        run: pnpm --filter @pawhaven/ui... build
+
+      - name: Verify the UI package contract (exports map, build output, sideEffects)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui verify:package
+
+      - name: Build the Portal and its workspace dependencies
+        shell: bash
+        run: pnpm --filter @pawhaven/portal... build
+
+      - name: Verify the Portal CSS keeps its design tokens and UI utilities
+        shell: bash
+        run: |
+          set -euo pipefail
+          CSS_FILES=$(find apps/frontend/portal/build -type f -name '*.css' -print)
+          if [[ -z "${CSS_FILES}" ]]; then
+            echo "Portal production build emitted no CSS files." >&2
+            exit 1
+          fi
+          if ! grep -qE -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
+            echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
+            exit 1
+          fi
+          if ! grep -qF -- ".animate-spin" ${CSS_FILES}; then
+            echo "Expected UI-library animation utility was not found in the Portal bundle." >&2
+            exit 1
+          fi
 
   sonar:
     name: SonarQube Cloud
@@ -290,33 +402,55 @@ jobs:
 
   gate:
     name: Gate
-    needs: [changes, static, unit, build, a11y, react-doctor, security, sonar]
+    needs:
+      [
+        title,
+        changes,
+        static,
+        unit,
+        build,
+        a11y,
+        catalogue,
+        ui-package,
+        react-doctor,
+        security,
+        osv,
+        sonar,
+      ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
       - name: Fail when any relevant check failed or was cancelled
         shell: bash
         env:
+          TITLE: ${{ needs.title.result }}
           CHANGES: ${{ needs.changes.result }}
           STATIC: ${{ needs.static.result }}
           UNIT: ${{ needs.unit.result }}
           BUILD: ${{ needs.build.result }}
           A11Y: ${{ needs.a11y.result }}
+          CATALOGUE: ${{ needs.catalogue.result }}
+          UI_PACKAGE: ${{ needs.ui-package.result }}
           REACT_DOCTOR: ${{ needs.react-doctor.result }}
           SECURITY: ${{ needs.security.result }}
+          OSV: ${{ needs.osv.result }}
           SONAR: ${{ needs.sonar.result }}
           SONAR_REQUIRED: ${{ vars.SONAR_REQUIRED }}
         run: |
           set -euo pipefail
           failed=0
           for entry in \
+            "title:${TITLE}" \
             "changes:${CHANGES}" \
             "static:${STATIC}" \
             "unit:${UNIT}" \
             "build:${BUILD}" \
             "a11y:${A11Y}" \
+            "catalogue:${CATALOGUE}" \
+            "ui-package:${UI_PACKAGE}" \
             "react-doctor:${REACT_DOCTOR}" \
-            "security:${SECURITY}"; do
+            "security:${SECURITY}" \
+            "osv:${OSV}"; do
             name="${entry%%:*}"
             result="${entry#*:}"
             echo "${name}: ${result}"

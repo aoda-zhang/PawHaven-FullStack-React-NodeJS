@@ -1,6 +1,6 @@
 # Plugins
 
-Four OpenCode v2 plugins, each with a single responsibility. They compose through `ctx.model.transform`; filters remove models, the last plugin ranks what survives.
+Four OpenCode v2 plugins, each with a single responsibility. They compose through `ctx.model.transform`: filters remove models, and the last plugin ranks what survives.
 
 | Plugin                                             | Responsibility                                                                        | Key options                                             |
 | -------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -11,7 +11,7 @@ Four OpenCode v2 plugins, each with a single responsibility. They compose throug
 
 ## Load order
 
-List `auto-model-switch` **last** by convention. Note that plugin transforms do **not** see each other's removals — `editor.list()` always returns the raw set — so auto-model-switch reads the filtered set via `ctx.model.list()` instead of relying on order (see its README).
+List `auto-model-switch` **last** among the model plugins by convention. Note that plugin transforms do **not** see each other's removals — `editor.list()` always returns the raw set — so auto-model-switch reads the filtered set via `ctx.model.list()` instead of relying on order (see its README).
 
 ```jsonc
 {
