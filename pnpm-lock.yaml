@@ -190,6 +190,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.50.0
         version: 8.67.0(eslint@8.57.1(supports-color@8.0.0))(supports-color@8.0.0)(typescript@5.9.3)
+      axe-core:
+        specifier: 4.13.0
+        version: 4.13.0
       eslint:
         specifier: ^8.57.1
         version: 8.57.1(supports-color@8.0.0)
