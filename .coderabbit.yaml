@@ -69,10 +69,10 @@ reviews:
       enabled: true
 
   pre_merge_checks:
-    # Matches the commitlint rule in commitlint.config.cjs so the PR title and the commit agree.
+    # The Quality Gate's `PR title` job enforces this deterministically (same rule as commitlint),
+    # so a second opinion from the review bot would only duplicate it.
     title:
-      mode: warning
-      requirements: "Format: [PW-<issue>] <type>(<scope>): <subject>, where type is one of feat, fix, docs, style, refactor, perf, test, chore. Example: [PW-193] fix(ci): Accept Vercel's forced NODE_ENV value."
+      mode: "off"
     description:
       mode: warning
 
