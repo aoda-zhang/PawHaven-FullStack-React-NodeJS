@@ -358,7 +358,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.0(chokidar@5.0.0)(prettier@3.9.6)(typescript@5.9.3)
@@ -403,7 +403,7 @@ importers:
         version: 7.2.2(supports-color@8.0.0)
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.16.2)(@types/node@24.13.3)(typescript@5.9.3)
@@ -418,7 +418,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       webpack-node-externals:
         specifier: ^3.0.0
         version: 3.0.0
@@ -515,7 +515,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.0(chokidar@5.0.0)(prettier@3.9.6)(typescript@5.9.3)
@@ -557,7 +557,7 @@ importers:
         version: 0.5.21
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.16.2)(@types/node@24.13.3)(typescript@5.9.3)
@@ -572,7 +572,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.51.2)(yaml@2.9.0))
@@ -640,8 +640,8 @@ importers:
         specifier: ^26.3.4
         version: 26.7.2(typescript@5.9.3)
       nodemailer:
-        specifier: ^10.1.4
-        version: 10.6.1
+        specifier: ^7.0.11
+        version: 7.0.13
       puppeteer:
         specifier: ^24.34.0
         version: 24.43.1(supports-color@8.0.0)(typescript@5.9.3)
@@ -663,7 +663,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.0(chokidar@5.0.0)(prettier@3.9.6)(typescript@5.9.3)
@@ -702,7 +702,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))
@@ -799,7 +799,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.0(chokidar@5.0.0)(prettier@3.9.6)(typescript@5.9.3)
@@ -853,7 +853,7 @@ importers:
         version: 7.2.2(supports-color@8.0.0)
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.16.2)(@types/node@24.13.3)(typescript@5.9.3)
@@ -868,7 +868,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))
@@ -1160,7 +1160,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.0(chokidar@5.0.0)(prettier@3.9.6)(typescript@5.9.3)
@@ -1223,7 +1223,7 @@ importers:
         version: 7.2.2(supports-color@8.0.0)
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.16.2)(@types/node@24.13.3)(typescript@5.9.3)
@@ -1235,7 +1235,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+        version: 1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))
@@ -5165,8 +5165,8 @@ packages:
     peerDependencies:
       postcss: ^8.0.9
 
-  css-select@5.1.0:
-    resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
+  css-select@6.0.0:
+    resolution: {integrity: sha512-rZZVSLle8v0+EY8QAkDWrKhpgt6SA5OtHsgBnsj6ZaLb5dmDVOWUDtQitd9ydxxvEjhewNudS6eTVU7uOyzvXw==}
 
   css-tree@2.2.0:
     resolution: {integrity: sha512-7y32czN0VBL8WkevhC/mrHnoHOmQaJ1Wvp8sjRuTz6/n9cjL83jQaUru2MvP7kzjpGVwrSy5CE4XyQObWGIHQQ==}
@@ -5176,8 +5176,8 @@ packages:
     resolution: {integrity: sha512-X7sjQzceUhu1u7Y/ylrRZFU2FS6LRiFVp6rKLPg23y3x3c3DOKAwuXGDp+PAGjh6CSnCjYeAul8pcT8bAl+lSA==}
     engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
 
-  css-what@6.1.0:
-    resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
+  css-what@7.0.0:
+    resolution: {integrity: sha512-wD5oz5xibMOPHzy13CyGmogB3phdvcDaB5t0W/Nr5Z2O/agcB8YwOz6e2Lsp10pNDzBoDO9nVa3RGs/2BttpHQ==}
     engines: {node: '>= 6'}
 
   css.escape@1.5.1:
@@ -6998,16 +6998,16 @@ packages:
     resolution: {integrity: sha512-D9UOmYG3UH1V+ENW56t5QXBwJw1YEY18ruVeus89Rw+SyIgjPkCO84bRzO3uNIYosJbNwiabWVn48o3uJLjxFQ==}
     engines: {node: '>=18'}
 
-  nodemailer@10.6.1:
-    resolution: {integrity: sha512-d7kfFfS/tR4Aca+SBvRaQ+MXKNv7d2JiRe5TxaRcFT/kYMh4GGPnW9aKksTIEvyEbA7d/7HYWE4YPDEHxzJj/g==}
-    engines: {node: '>=20.0.0'}
+  nodemailer@7.0.13:
+    resolution: {integrity: sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==}
+    engines: {node: '>=6.0.0'}
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
-  nth-check@2.0.1:
-    resolution: {integrity: sha512-it1vE95zF6dTT9lBsYbxvqh0Soy4SPowchj0UBGj/V6cTPnXXtQOPUbhZ6CmGzAD/rW22LQK6E96pcdJXk4A4w==}
+  nth-check@2.1.1:
+    resolution: {integrity: sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==}
 
   nypm@0.6.9:
     resolution: {integrity: sha512-zxlE2yvSWZWmHcNdT3+5zV2lrCogeE9YOklHrR3dFjqutq5wO7GFDYLFDRXLsYnJzwvy/im9fYoxePvS0VTW0w==}
@@ -8141,8 +8141,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svgo@4.0.2:
-    resolution: {integrity: sha512-ekx94z1rRc5LDi6oSUaeRnYhd0UOJxdtQCL2rF8xpWxD3TPAsISWOrxezqGovqS38GRZOdpDfvQe3ts6F7nsng==}
+  svgo@4.1.0:
+    resolution: {integrity: sha512-bkxnTg1kSU0guhIBmibA6UUhrQmPVA1XsQLN+ylCd+UWzbnLkySOcXpyk1mrl05f+pcaCx2eHb+sp6BgMZWX+Q==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -9597,7 +9597,7 @@ snapshots:
       axios: 1.19.0(debug@4.4.3(supports-color@8.0.0))(supports-color@8.0.0)
       rxjs: 7.8.2
 
-  '@nestjs/cli@12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))':
+  '@nestjs/cli@12.0.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(@types/node@24.13.3)(fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(prettier@3.9.6)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))':
     dependencies:
       '@angular-devkit/core': 22.1.5(chokidar@5.0.0)
       '@angular-devkit/schematics': 22.1.5(chokidar@5.0.0)
@@ -9616,10 +9616,10 @@ snapshots:
     optionalDependencies:
       '@rspack/core': 2.2.3
       '@swc/core': 1.16.2
-      fork-ts-checker-webpack-plugin: 9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
-      ts-loader: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+      fork-ts-checker-webpack-plugin: 9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
+      ts-loader: 9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       tsconfig-paths-webpack-plugin: 4.2.0
-      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)
+      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)
       webpack-node-externals: 3.0.0
     transitivePeerDependencies:
       - '@types/node'
@@ -12206,13 +12206,13 @@ snapshots:
       postcss: 8.5.26
     optional: true
 
-  css-select@5.1.0:
+  css-select@6.0.0:
     dependencies:
       boolbase: 1.0.0
-      css-what: 6.1.0
+      css-what: 7.0.0
       domhandler: 5.0.3
       domutils: 3.2.2
-      nth-check: 2.0.1
+      nth-check: 2.1.1
     optional: true
 
   css-tree@2.2.0:
@@ -12226,7 +12226,7 @@ snapshots:
       mdn-data: 2.27.1
       source-map-js: 1.2.1
 
-  css-what@6.1.0:
+  css-what@7.0.0:
     optional: true
 
   css.escape@1.5.1: {}
@@ -13124,7 +13124,7 @@ snapshots:
     dependencies:
       is-callable: 1.2.7
 
-  fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)):
+  fork-ts-checker-webpack-plugin@9.1.0(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)):
     dependencies:
       '@babel/code-frame': 7.29.7
       chalk: 4.1.2
@@ -13139,7 +13139,7 @@ snapshots:
       semver: 7.8.5
       tapable: 2.3.3
       typescript: 5.9.3
-      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)
+      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)
     optional: true
 
   form-data@4.0.6:
@@ -14084,13 +14084,13 @@ snapshots:
 
   minimist@1.2.8: {}
 
-  minimizer-webpack-plugin@5.10.1(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)):
+  minimizer-webpack-plugin@5.10.1(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.4.5
       schema-utils: 4.5.0
       terser: 5.51.2
-      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)
+      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)
     optionalDependencies:
       '@swc/core': 1.16.2
       cssnano: 7.1.9(postcss@8.5.26)
@@ -14098,7 +14098,7 @@ snapshots:
       esbuild: 0.28.2
       lightningcss: 1.32.0
       postcss: 8.5.26
-      svgo: 4.0.2
+      svgo: 4.1.0
       uglify-js: 3.19.3
 
   minipass@7.1.3: {}
@@ -14203,13 +14203,13 @@ snapshots:
 
   node-releases@2.0.53: {}
 
-  nodemailer@10.6.1: {}
+  nodemailer@7.0.13: {}
 
   npm-run-path@4.0.1:
     dependencies:
       path-key: 3.1.1
 
-  nth-check@2.0.1:
+  nth-check@2.1.1:
     dependencies:
       boolbase: 1.0.0
     optional: true
@@ -14667,7 +14667,7 @@ snapshots:
     dependencies:
       postcss: 8.5.26
       postcss-value-parser: 4.2.0
-      svgo: 4.0.2
+      svgo: 4.1.0
     optional: true
 
   postcss-unique-selectors@7.0.7(postcss@8.5.26):
@@ -15504,12 +15504,12 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svgo@4.0.2:
+  svgo@4.1.0:
     dependencies:
       commander: 11.1.0
-      css-select: 5.1.0
+      css-select: 6.0.0
       css-tree: 3.2.1
-      css-what: 6.1.0
+      css-what: 7.0.0
       csso: 5.0.5
       picocolors: 1.1.1
       sax: 1.6.1
@@ -15657,13 +15657,13 @@ snapshots:
 
   ts-dedent@2.3.0: {}
 
-  ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)):
+  ts-loader@9.6.2(typescript@5.9.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)):
     dependencies:
       chalk: 4.1.2
       picomatch: 4.0.5
       source-map: 0.7.6
       typescript: 5.9.3
-      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)
+      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)
 
   ts-node@10.9.2(@swc/core@1.16.2)(@types/node@24.13.3)(typescript@5.9.3):
     dependencies:
@@ -15822,12 +15822,12 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-swc@1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)):
+  unplugin-swc@1.6.0(@rspack/core@2.2.3)(@swc/core@1.16.2)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)):
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.62.4)
       '@swc/core': 1.16.2
       load-tsconfig: 0.2.5
-      unplugin: 3.3.0(@rspack/core@2.2.3)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+      unplugin: 3.3.0(@rspack/core@2.2.3)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@rspack/core'
@@ -15846,7 +15846,7 @@ snapshots:
       picomatch: 4.0.5
       webpack-virtual-modules: 0.6.2
 
-  unplugin@3.3.0(@rspack/core@2.2.3)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)):
+  unplugin@3.3.0(@rspack/core@2.2.3)(esbuild@0.28.2)(rollup@4.62.4)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.32.0))(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       picomatch: 4.0.5
@@ -15856,7 +15856,7 @@ snapshots:
       esbuild: 0.28.2
       rollup: 4.62.4
       vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.51.2)(yaml@2.9.0)
-      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)
+      webpack: 5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)
 
   unrs-resolver@1.12.2:
     dependencies:
@@ -16082,7 +16082,7 @@ snapshots:
 
   webpack-virtual-modules@0.6.2: {}
 
-  webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3):
+  webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3):
     dependencies:
       '@types/estree': 1.0.9
       '@types/json-schema': 7.0.15
@@ -16096,7 +16096,7 @@ snapshots:
       events: 3.3.0
       graceful-fs: 4.2.11
       mime-db: 1.54.0
-      minimizer-webpack-plugin: 5.10.1(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.0.2)(uglify-js@3.19.3))
+      minimizer-webpack-plugin: 5.10.1(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3)(webpack@5.111.0(@swc/core@1.16.2)(cssnano@7.1.9(postcss@8.5.26))(csso@5.0.5)(esbuild@0.28.2)(lightningcss@1.32.0)(postcss@8.5.26)(svgo@4.1.0)(uglify-js@3.19.3))
       schema-utils: 4.5.0
       tapable: 2.3.3
       watchpack: 2.5.2
