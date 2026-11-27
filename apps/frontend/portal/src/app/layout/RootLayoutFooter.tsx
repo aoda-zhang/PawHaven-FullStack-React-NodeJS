@@ -147,9 +147,9 @@ export const RootLayoutFooter = () => {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
             {footerColumns.map((column) => (
               <div key={column.heading}>
-                <h4 className="text-footer-copy mb-4 text-xs font-semibold tracking-widest uppercase">
+                <p className="text-footer-copy mb-4 text-xs font-semibold tracking-widest uppercase">
                   {column.heading}
-                </h4>
+                </p>
                 <ul className="flex flex-col gap-2.5">
                   {column.links.map((link) => (
                     <li key={link.label}>

@@ -253,7 +253,6 @@ jobs:
       contents: read
       pull-requests: write
       issues: write
-      statuses: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -264,13 +263,14 @@ jobs:
         uses: millionco/react-doctor@v2
         with:
           version: '0.9.12'
+          commit-status: 'false'
 
   security:
     name: Security
     needs: [changes]
-    # Dependency review only works on pull requests; the OSV scan also covers pushes that touch
-    # the dependency graph.
-    if: ${{ github.event_name == 'pull_request' || needs.changes.outputs.deps == 'true' }}
+    # Dependency review diffs a pull request against its base, so a push has nothing for it to
+    # compare.
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -282,20 +282,30 @@ jobs:
 
       # Blocks a pull request that introduces a dependency with a known advisory.
       - name: Dependency review
-        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/dependency-review-action@v4
         with:
           fail-on-severity: high
 
-      # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
-      # Report-only for now: the dependency tree still carries 46 open advisories, so blocking here
-      # would freeze every merge. Flip `fail-on-vuln` to true once the tree is clean.
-      - name: OSV scan
-        uses: google/osv-scanner-action/osv-scanner-action@v2.7.1
-        with:
-          fail-on-vuln: false
-          scan-args: |-
-            --lockfile=pnpm-lock.yaml
+  osv:
+    name: OSV scan
+    needs: [changes]
+    # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
+    # The reusable workflow is required, not optional: the scanner action itself declares only
+    # `scan-args`, so a `fail-on-vuln` input passed to it is ignored and findings fail the job.
+    # The workflow honours it, and still fails when a scan produces no results (a real error).
+    # Report-only until the dependency tree is clean (46 open advisories today).
+    if: ${{ github.event_name == 'pull_request' || needs.changes.outputs.deps == 'true' }}
+    permissions:
+      # SARIF upload to CodeQL needs both of these; the called workflow cannot grant more
+      # than the caller allows.
+      actions: read
+      contents: read
+      security-events: write
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.7.1
+    with:
+      scan-args: |-
+        --lockfile=pnpm-lock.yaml
+      fail-on-vuln: false
 
   catalogue:
     name: Component catalogue
@@ -387,7 +397,21 @@ jobs:
 
   gate:
     name: Gate
-    needs: [title, changes, static, unit, build, a11y, catalogue, ui-package, react-doctor, security, sonar]
+    needs:
+      [
+        title,
+        changes,
+        static,
+        unit,
+        build,
+        a11y,
+        catalogue,
+        ui-package,
+        react-doctor,
+        security,
+        osv,
+        sonar,
+      ]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -404,6 +428,7 @@ jobs:
           UI_PACKAGE: ${{ needs.ui-package.result }}
           REACT_DOCTOR: ${{ needs.react-doctor.result }}
           SECURITY: ${{ needs.security.result }}
+          OSV: ${{ needs.osv.result }}
           SONAR: ${{ needs.sonar.result }}
           SONAR_REQUIRED: ${{ vars.SONAR_REQUIRED }}
         run: |
@@ -419,7 +444,8 @@ jobs:
             "catalogue:${CATALOGUE}" \
             "ui-package:${UI_PACKAGE}" \
             "react-doctor:${REACT_DOCTOR}" \
-            "security:${SECURITY}"; do
+            "security:${SECURITY}" \
+            "osv:${OSV}"; do
             name="${entry%%:*}"
             result="${entry#*:}"
             echo "${name}: ${result}"
