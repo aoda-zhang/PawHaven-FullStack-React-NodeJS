@@ -1,6 +1,8 @@
-# The merge gate. Pull requests into `develop` (or `main`) run it, and the branch protection on
-# `develop` requires these jobs before a merge is allowed. The same checks run after a merge to
-# `develop`, so a post-merge regression is visible immediately.
+# Relevance-based merge gate.
+#
+# A `changes` job classifies the diff, each check declares the paths it owns, unrelated checks are
+# skipped instead of burning a runner, and a single `Gate` job fans the results in. Branch
+# protection requires only `Gate`, so a skipped check can never leave a pull request pending.
 name: Quality Gate
 run-name: Quality Gate · ${{ github.head_ref || github.ref_name }}
 
@@ -8,7 +10,7 @@ on:
   pull_request:
     branches: [develop, main]
   push:
-    branches: [develop]
+    branches: [develop, main]
   workflow_dispatch:
 
 permissions:
@@ -19,87 +21,150 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      code: ${{ steps.filter.outputs.code || steps.all.outputs.code }}
+      backend: ${{ steps.filter.outputs.backend || steps.all.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend || steps.all.outputs.frontend }}
+      i18n: ${{ steps.filter.outputs.i18n || steps.all.outputs.i18n }}
+      css: ${{ steps.filter.outputs.css || steps.all.outputs.css }}
+      deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Classify the diff
+        id: filter
+        if: ${{ github.event_name != 'workflow_dispatch' }}
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - '**/*.ts'
+              - '**/*.tsx'
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.mjs'
+              - '**/*.cjs'
+            backend:
+              - 'apps/backend/**'
+              - 'packages/backend-core/**'
+              - 'packages/shared/**'
+              - 'libs/**'
+            frontend:
+              - 'apps/frontend/**'
+              - 'packages/ui/**'
+              - 'packages/frontend-core/**'
+              - 'packages/design-system/**'
+            i18n:
+              - 'packages/i18n/**'
+              - 'apps/frontend/**/*.ts'
+              - 'apps/frontend/**/*.tsx'
+              - 'packages/frontend-core/**'
+            # token-check reads .css only; the design-system token sources are also CSS.
+            css:
+              - '**/*.css'
+            deps:
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'turbo.json'
+
+      # A manual dispatch has no base commit to diff against, so everything counts as changed.
+      - name: Assume every area changed on manual dispatch
+        id: all
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        shell: bash
+        run: |
+          for area in code backend frontend i18n css deps; do
+            echo "${area}=true" >>"${GITHUB_OUTPUT}"
+          done
+
   static:
     name: Static checks
+    needs: [changes]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
         with:
-          run_install: false
+          # The duplicate-value check diffs the translation bundles against the base commit.
+          fetch-depth: 0
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: pnpm
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
 
       - name: Build shared packages
+        if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
         shell: bash
         run: pnpm build:libs
 
+      # Architecture and repository rules hold for every change, whatever the file type.
       - name: Architecture boundaries
         shell: bash
         run: pnpm architecture-check
-
-      - name: Design token audit
-        shell: bash
-        run: pnpm token-check
 
       - name: Repository quality
         shell: bash
         run: pnpm quality-check
 
-      - name: Translation keys
+      # One script owns the catalogue: missing keys hard-fail, duplicate values added by this diff
+      # are advisory (warnings on the PR) unless the script is run with `--strict`.
+      - name: Translation keys and duplicate values
+        if: ${{ needs.changes.outputs.i18n == 'true' || needs.changes.outputs.deps == 'true' }}
         shell: bash
-        run: pnpm check:i18n
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: pnpm check:i18n -- --base "${BASE:-HEAD~1}"
+
+      - name: Design token audit
+        if: ${{ needs.changes.outputs.css == 'true' || needs.changes.outputs.deps == 'true' }}
+        shell: bash
+        run: pnpm token-check
+
+      # ESLint keeps a per-package `.eslintcache`; restoring it turns lint from a full rescan into
+      # an incremental one. The key covers the config, so a rule change invalidates it.
+      - name: Restore the ESLint cache
+        if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
+        uses: actions/cache@v4
+        with:
+          path: '**/.eslintcache'
+          key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', '.eslintignore', 'libs/eslint-config/**') }}
+          restore-keys: |
+            eslint-${{ runner.os }}-
 
       - name: Lint
+        if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
         shell: bash
         run: pnpm lint
 
       - name: Typecheck
+        if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
         shell: bash
         run: pnpm typecheck
 
   unit:
     name: Unit tests
+    needs: [changes]
+    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: pnpm
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
 
       - name: Build shared packages
         shell: bash
         run: pnpm build:libs
-
-      - name: Install Chromium for the accessibility tests
-        shell: bash
-        run: pnpm exec playwright install --with-deps chromium
 
       - name: Tests
         shell: bash
@@ -107,26 +172,16 @@ jobs:
 
   build:
     name: Build
+    needs: [changes]
+    if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: pnpm
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
 
       - name: Build shared packages
         shell: bash
@@ -136,38 +191,150 @@ jobs:
         shell: bash
         run: pnpm build
 
-  e2e:
-    name: End-to-end
-    needs: [unit]
+  a11y:
+    name: Accessibility
+    needs: [changes]
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: package.json
-          cache: pnpm
-
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile
+      - name: Set up the workspace
+        uses: ./.github/actions/setup
 
       - name: Build shared packages
         shell: bash
         run: pnpm build:libs
 
-      - name: Install Playwright browser
+      # test-storybook runs vitest in browser mode, so it needs a real Chromium.
+      - name: Install Chromium
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Critical journeys
+      # The portal refuses to boot without PAWHAVEN_USER_APP_ENV, and `.env` is gitignored.
+      - name: Provide the portal environment
         shell: bash
-        run: pnpm test:e2e
+        run: cp apps/frontend/portal/.env.example apps/frontend/portal/.env
+
+      - name: Component stories (axe over every story)
+        shell: bash
+        run: pnpm --filter @pawhaven/ui test-storybook
+
+      - name: Portal pages (axe over every route)
+        shell: bash
+        run: pnpm exec playwright test e2e/a11y.spec.ts
+
+  react-doctor:
+    name: React Doctor
+    needs: [changes]
+    if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      statuses: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Scan
+        uses: millionco/react-doctor@v2
+        with:
+          version: '0.9.12'
+
+  security:
+    name: Security
+    needs: [changes]
+    # Dependency review only works on pull requests; the OSV scan also covers pushes that touch
+    # the dependency graph.
+    if: ${{ github.event_name == 'pull_request' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # Blocks a pull request that introduces a dependency with a known advisory.
+      - name: Dependency review
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+
+      # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
+      - name: OSV scan
+        uses: google/osv-scanner-action/osv-scanner-action@v2.7.1
+        with:
+          scan-args: |-
+            --lockfile=pnpm-lock.yaml
+
+  sonar:
+    name: SonarQube Cloud
+    needs: [changes]
+    # A called workflow can only narrow the caller's token, so the scope Sonar needs for PR
+    # decoration has to be granted here.
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/sonar.yml
+    secrets: inherit
+
+  gate:
+    name: Gate
+    needs: [changes, static, unit, build, a11y, react-doctor, security, sonar]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail when any relevant check failed or was cancelled
+        shell: bash
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          STATIC: ${{ needs.static.result }}
+          UNIT: ${{ needs.unit.result }}
+          BUILD: ${{ needs.build.result }}
+          A11Y: ${{ needs.a11y.result }}
+          REACT_DOCTOR: ${{ needs.react-doctor.result }}
+          SECURITY: ${{ needs.security.result }}
+          SONAR: ${{ needs.sonar.result }}
+          SONAR_REQUIRED: ${{ vars.SONAR_REQUIRED }}
+        run: |
+          set -euo pipefail
+          failed=0
+          for entry in \
+            "changes:${CHANGES}" \
+            "static:${STATIC}" \
+            "unit:${UNIT}" \
+            "build:${BUILD}" \
+            "a11y:${A11Y}" \
+            "react-doctor:${REACT_DOCTOR}" \
+            "security:${SECURITY}"; do
+            name="${entry%%:*}"
+            result="${entry#*:}"
+            echo "${name}: ${result}"
+            case "${result}" in
+              failure|cancelled) failed=1 ;;
+            esac
+          done
+          # Sonar reports on every run; only `SONAR_REQUIRED=true` makes its verdict binding.
+          if [ "${SONAR_REQUIRED}" = "true" ]; then
+            echo "sonar: ${SONAR} (required)"
+            case "${SONAR}" in
+              failure|cancelled) failed=1 ;;
+            esac
+          else
+            echo "sonar: ${SONAR} (report only — set SONAR_REQUIRED=true to make it blocking)"
+          fi
+          if [ "${failed}" -ne 0 ]; then
+            echo "::error::A required check failed; see the jobs above."
+            exit 1
+          fi
+          echo "Every relevant check passed (skipped checks are irrelevant to this diff)."

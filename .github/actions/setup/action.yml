@@ -1,0 +1,30 @@
+# Shared preamble for every check job: pnpm + Node with the pnpm store cache, then a frozen
+# install. The checkout stays in the calling job because a local action can only be resolved
+# after the repository exists in the workspace.
+name: Set up the workspace
+description: Install pnpm and Node (with the pnpm store cache) and the workspace dependencies.
+
+inputs:
+  install:
+    description: 'Run `pnpm install --frozen-lockfile`'
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        run_install: false
+
+    - name: Set up Node
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: package.json
+        cache: pnpm
+
+    - name: Install dependencies
+      if: ${{ inputs.install == 'true' }}
+      shell: bash
+      run: pnpm install --frozen-lockfile

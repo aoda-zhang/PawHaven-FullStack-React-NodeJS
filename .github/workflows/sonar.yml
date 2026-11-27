@@ -1,0 +1,39 @@
+# SonarQube Cloud analysis — code smells, duplication, complexity and the maintainability rating.
+#
+# Called by the Quality Gate, so it always reports on the same runs. Whether a failure blocks the
+# merge is decided by the repository variable `SONAR_REQUIRED`:
+#   unset / "false" -> report only, the gate ignores this job's result
+#   "true"          -> a failed or cancelled scan fails the gate
+# Flip it in Settings -> Secrets and variables -> Actions -> Variables; no branch-protection change
+# is needed either way.
+name: Sonar
+run-name: Sonar · ${{ github.head_ref || github.ref_name }}
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: sonar-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    name: Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          # Sonar maps issues to the commit history for pull-request decoration.
+          fetch-depth: 0
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
