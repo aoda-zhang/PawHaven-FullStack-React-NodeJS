@@ -41,7 +41,7 @@
     "dayjs": "^1.11.18",
     "express": "5.2.1",
     "http-proxy-middleware": "^3.0.5",
-    "mongoose": "^8.19.1",
+    "mongoose": "^8.24.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "swagger-ui-express": "^5.0.1",
