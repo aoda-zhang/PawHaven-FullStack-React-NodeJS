@@ -97,7 +97,7 @@ jobs:
         shell: bash
         run: pnpm build:libs
 
-      - name: Unit and accessibility tests
+      - name: Install Chromium for the accessibility tests
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
 
