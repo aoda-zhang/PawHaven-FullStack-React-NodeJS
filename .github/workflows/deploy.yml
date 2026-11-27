@@ -49,6 +49,12 @@ jobs:
           node-version: 24
           cache: pnpm
 
+      # The Vercel project's Install Command is `echo skip-install`, so dependencies are installed
+      # here instead: one install, from the pnpm store that `setup-node` already restored.
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --prefer-offline
+
       - name: Restore the Turbo cache
         uses: actions/cache@v4
         with:
