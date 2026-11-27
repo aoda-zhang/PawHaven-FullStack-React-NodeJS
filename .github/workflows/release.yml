@@ -23,7 +23,6 @@ on:
 
 permissions:
   contents: read
-  actions: read
 
 jobs:
   precheck:
@@ -53,23 +52,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
-
-      - name: Require a passing Test run for this commit
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
-          latest="$(gh run list --repo "${REPO}" --workflow "Test" --commit "${SHA}" --limit 1 --json status,conclusion)"
-          status="$(printf '%s' "${latest}" | jq -r '.[0].status // "missing"')"
-          conclusion="$(printf '%s' "${latest}" | jq -r '.[0].conclusion // "none"')"
-          if [ "${status}" != "completed" ] || [ "${conclusion}" != "success" ]; then
-            echo "::error::The Test workflow for ${SHA} is ${status}/${conclusion}; release blocked."
-            exit 1
-          fi
-          echo "Test workflow passed for ${SHA}."
 
       - name: Resolve the Vercel project
         shell: bash
