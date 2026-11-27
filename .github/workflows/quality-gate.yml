@@ -33,7 +33,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Same rule commitlint enforces on the commit, so a squash merge cannot land a title that
       # could never have been committed.
@@ -59,12 +59,12 @@ jobs:
       deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Classify the diff
         id: filter
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: dorny/paths-filter@v4
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         with:
           filters: |
             code:
@@ -119,7 +119,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # The duplicate-value check diffs the translation bundles against the base commit.
           fetch-depth: 0
@@ -159,7 +159,7 @@ jobs:
       # an incremental one. The key covers the config, so a rule change invalidates it.
       - name: Restore the ESLint cache
         if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: '**/.eslintcache'
           key: eslint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', '.eslintignore', 'libs/eslint-config/**') }}
@@ -184,7 +184,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -205,7 +205,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -226,7 +226,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -260,12 +260,12 @@ jobs:
       issues: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Scan
-        uses: millionco/react-doctor@v2
+        uses: millionco/react-doctor@695e46eee203a5d1855020191aa7e9c010a1250e # v2.4.0
         with:
           version: '0.9.12'
           commit-status: 'false'
@@ -283,11 +283,11 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # Blocks a pull request that introduces a dependency with a known advisory.
       - name: Dependency review
-        uses: actions/dependency-review-action@v5
+        uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
         with:
           fail-on-severity: high
 
@@ -320,7 +320,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
@@ -354,7 +354,7 @@ jobs:
     timeout-minutes: 25
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up the workspace
         uses: ./.github/actions/setup
