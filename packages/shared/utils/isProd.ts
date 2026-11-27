@@ -1,9 +1,9 @@
 /**
- * Checks if the given environment string represents a production environment.
+ * Checks whether the given environment string is the production environment.
  *
- * @param env - The environment string to check (e.g., 'prod', 'production', 'dev')
- * @returns True if the environment is 'prod' or 'production', false otherwise
+ * @param env - The resolved `http.env` value from the service config bundle
+ * @returns True only for 'prod'
  */
 export function isProd(env?: string): boolean {
-  return env === 'prod' || env === 'production';
+  return env === 'prod';
 }

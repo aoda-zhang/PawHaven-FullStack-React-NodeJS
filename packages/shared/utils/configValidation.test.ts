@@ -153,7 +153,7 @@ describe('formatConfigIssues', () => {
   });
 
   it('uses singular "problem" wording for a single issue', () => {
-    const output = formatConfigIssues('svc', 'dev', 'src', [issues[0]]);
+    const output = formatConfigIssues('svc', 'uat', 'src', [issues[0]]);
     expect(output).toContain('1 problem:');
     expect(output).not.toContain('1 problems:');
   });

@@ -1,13 +1,22 @@
 import { runtimeEnv } from '../constants/runtimeEnv.js';
 import type { RuntimeEnvType } from '../constants/runtimeEnv.js';
 
+const SUPPORTED = Object.keys(runtimeEnv).join(', ');
+
 /**
- * Resolves the runtime environment string from a RuntimeEnvType.
- * Falls back to 'uat' if the provided environment is not found.
+ * Resolves the bundled config directory from `NODE_ENV`.
  *
- * @param currentRuntimeEnv - The runtime environment type to resolve
- * @returns The resolved runtime environment string
+ * Only the supported environments exist. Anything else is a configuration
+ * error: guessing a default would hide a misconfigured deployment.
  */
-export const getRuntimeEnv = (currentRuntimeEnv: RuntimeEnvType): string => {
-  return runtimeEnv?.[currentRuntimeEnv] ?? runtimeEnv.uat;
+export const getRuntimeEnv = (
+  currentRuntimeEnv: string | undefined,
+): string => {
+  if (!currentRuntimeEnv || !(currentRuntimeEnv in runtimeEnv)) {
+    throw new Error(
+      `Unsupported NODE_ENV "${currentRuntimeEnv ?? '<unset>'}"; set it to one of: ${SUPPORTED}.`,
+    );
+  }
+
+  return runtimeEnv[currentRuntimeEnv as RuntimeEnvType];
 };

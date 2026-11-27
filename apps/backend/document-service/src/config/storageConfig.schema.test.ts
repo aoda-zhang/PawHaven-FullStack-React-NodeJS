@@ -30,7 +30,7 @@ const resolvePlaceholders = (value: unknown): unknown => {
   return value;
 };
 
-const envFiles = ['dev', 'test', 'uat', 'prod'] as const;
+const envFiles = ['uat', 'prod'] as const;
 
 describe('storageConfigSchema', () => {
   it.each(envFiles)('accepts the %s environment storage block', (env) => {

@@ -1,7 +1,6 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { getRuntimeEnv } from '@pawhaven/shared/utils';
-import type { RuntimeEnvType } from '@pawhaven/shared';
 
 import {
   resolveServiceConfig,
@@ -38,7 +37,7 @@ export class InternalJwtModule {
     serviceName: string,
     configSources?: ServiceConfigSource,
   ): boolean {
-    const currentEnv = getRuntimeEnv(process.env.NODE_ENV as RuntimeEnvType);
+    const currentEnv = getRuntimeEnv(process.env.NODE_ENV);
 
     let parsedConfig: InternalJwtConfigFile | undefined;
     try {

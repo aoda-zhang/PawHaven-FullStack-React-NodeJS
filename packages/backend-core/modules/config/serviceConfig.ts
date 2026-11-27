@@ -1,6 +1,6 @@
 import { resolveAppConfig } from '@pawhaven/shared/utils';
 
-export type ServiceConfigEnv = 'dev' | 'test' | 'uat' | 'prod';
+export type ServiceConfigEnv = 'uat' | 'prod';
 
 export type ServiceConfig = Record<string, unknown>;
 

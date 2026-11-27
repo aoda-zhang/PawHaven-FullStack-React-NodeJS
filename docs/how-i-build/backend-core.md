@@ -47,8 +47,10 @@ by `MiddlewareModule`.
 
 - Each service owns `src/config/Config.schema.ts`, composed from fragments in
   `modules/config/configSchema.ts`.
-- Values live in four environment files per service — `dev`, `test`, `uat`, `prod`. A key present in
-  `dev` and absent from `prod` fails validation in `prod`; that is the intended outcome.
+- Values live in two environment files per service — `uat` and `prod`. A key present in `uat` and
+  absent from `prod` fails validation in `prod`; that is the intended outcome.
+- `NODE_ENV` must be `uat` or `prod`; there are no aliases and no fallback, so any other value
+  fails the boot.
 - `internalJwt.enabled` must be declared explicitly. Omitting it refuses the boot.
 - `internalJwt.ttlSeconds` is validated to 30–60 seconds; every service ships `45`.
 

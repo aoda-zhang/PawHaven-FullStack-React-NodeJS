@@ -284,7 +284,7 @@ service enforce its own endpoint policy.
 The gateway has **no business logic** — its behavior is entirely config-driven, so its "routing
 brain" lives in a dedicated `routing/` module rather than a generic `config/` folder:
 
-- `src/config/` holds the per-environment JSON files (`dev|test|uat|prod/env/index.json`) and
+- `src/config/` holds the per-environment JSON files (`uat|prod/env/index.json`) and
   `Config.schema.ts`.
   The JSON path is hard-pinned by `ConfigsModule`, so it cannot move.
 - `src/routing/` holds the gateway-specific routing layer:

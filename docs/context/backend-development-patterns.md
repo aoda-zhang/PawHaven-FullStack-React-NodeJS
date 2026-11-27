@@ -83,7 +83,7 @@ say in the feature doc why the boundary moved.
 ### 2.6 Configuration key
 
 1. Add the field to `apps/backend/<service>/src/config/Config.schema.ts`.
-2. Add a value to **all four** environment files — `dev`, `test`, `uat`, `prod` — in the same change.
+2. Add a value to **both** environment files — `uat`, `prod` — in the same change.
 3. Use `${VAR}` for anything secret and read it through config resolution, never `process.env` directly.
 4. Reuse a fragment from `packages/backend-core/modules/config/configSchema.ts` before
    writing a new one.

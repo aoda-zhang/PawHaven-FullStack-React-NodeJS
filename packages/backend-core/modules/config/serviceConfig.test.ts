@@ -18,14 +18,14 @@ describe('collectServiceConfigSources', () => {
   it('maps every bundled file to its env directory name', () => {
     const sources = collectServiceConfigSources(
       contextOf({
-        './dev/env/index.json': { http: { env: 'dev' } },
         './uat/env/index.json': { http: { env: 'uat' } },
+        './prod/env/index.json': { http: { env: 'prod' } },
       }),
     );
 
     expect(sources).toEqual({
-      dev: { http: { env: 'dev' } },
       uat: { http: { env: 'uat' } },
+      prod: { http: { env: 'prod' } },
     });
   });
 
@@ -64,7 +64,7 @@ describe('resolveServiceConfig', () => {
       resolveServiceConfig({
         serviceName: SERVICE_NAME,
         runtimeEnv: 'prod',
-        configSources: { dev: { http: { env: 'dev' } } },
+        configSources: {},
       }),
     ).toThrow(`Config file loading failed for "${SERVICE_NAME}" (env: prod)`);
   });
