@@ -267,7 +267,7 @@ importers:
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/mongoose':
         specifier: ^12.0.0
-        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.3(supports-color@8.0.0))(rxjs@7.8.2)
+        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.7(supports-color@8.0.0))(rxjs@7.8.2)
       '@nestjs/passport':
         specifier: ^12.0.0
         version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(passport@0.7.0)
@@ -276,7 +276,7 @@ importers:
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(supports-color@8.0.0)
       '@nestjs/terminus':
         specifier: ^12.0.0
-        version: 12.0.0(c83b5b9e989c7cd2bd81996d3eb80e90)
+        version: 12.0.0(fdc0182db241ecbb71a6614750a7abc2)
       '@pawhaven/backend-core':
         specifier: workspace:*
         version: link:../../../packages/backend-core
@@ -332,8 +332,8 @@ importers:
         specifier: ^17.2.3
         version: 17.4.2
       mongoose:
-        specifier: ^8.19.1
-        version: 8.24.3(socks@2.8.9)(supports-color@8.0.0)
+        specifier: ^8.24.7
+        version: 8.24.7(socks@2.8.9)(supports-color@8.0.0)
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -445,7 +445,7 @@ importers:
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/mongoose':
         specifier: ^12.0.0
-        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.3(supports-color@8.0.0))(rxjs@7.8.2)
+        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.7(supports-color@8.0.0))(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^12.1.0
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(supports-color@8.0.0)
@@ -454,7 +454,7 @@ importers:
         version: 12.0.1(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: ^12.0.0
-        version: 12.0.0(c83b5b9e989c7cd2bd81996d3eb80e90)
+        version: 12.0.0(fdc0182db241ecbb71a6614750a7abc2)
       '@pawhaven/backend-core':
         specifier: workspace:*
         version: link:../../../packages/backend-core
@@ -495,8 +495,8 @@ importers:
         specifier: ^4.1.0
         version: 4.3.1
       mongoose:
-        specifier: ^8.19.1
-        version: 8.24.3(socks@2.8.9)(supports-color@8.0.0)
+        specifier: ^8.24.7
+        version: 8.24.7(socks@2.8.9)(supports-color@8.0.0)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -637,8 +637,8 @@ importers:
         specifier: ^17.2.3
         version: 17.4.2
       i18next:
-        specifier: ^25.6.0
-        version: 25.10.10(typescript@5.9.3)
+        specifier: ^26.3.4
+        version: 26.7.2(typescript@5.9.3)
       nodemailer:
         specifier: ^10.1.4
         version: 10.6.1
@@ -653,7 +653,7 @@ importers:
         version: 19.2.8(react@19.2.8)
       react-i18next:
         specifier: ^16.0.0
-        version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+        version: 16.6.6(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -732,7 +732,7 @@ importers:
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/mongoose':
         specifier: ^12.0.0
-        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.3(supports-color@8.0.0))(rxjs@7.8.2)
+        version: 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.7(supports-color@8.0.0))(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^12.1.0
         version: 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(supports-color@8.0.0)
@@ -741,7 +741,7 @@ importers:
         version: 12.0.1(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: ^12.0.0
-        version: 12.0.0(c83b5b9e989c7cd2bd81996d3eb80e90)
+        version: 12.0.0(fdc0182db241ecbb71a6614750a7abc2)
       '@pawhaven/backend-core':
         specifier: workspace:*
         version: link:../../../packages/backend-core
@@ -779,8 +779,8 @@ importers:
         specifier: ^3.0.5
         version: 3.0.7(supports-color@8.0.0)
       mongoose:
-        specifier: ^8.19.1
-        version: 8.24.3(socks@2.8.9)(supports-color@8.0.0)
+        specifier: ^8.24.7
+        version: 8.24.7(socks@2.8.9)(supports-color@8.0.0)
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -918,8 +918,8 @@ importers:
         specifier: ^5.0.4
         version: 5.2.0(supports-color@8.0.0)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.50.0)(yaml@2.9.0))
       i18next:
-        specifier: ^25.6.0
-        version: 25.10.10(typescript@5.9.3)
+        specifier: ^26.3.4
+        version: 26.7.2(typescript@5.9.3)
       lucide-react:
         specifier: ^0.545.0
         version: 0.545.0(react@19.2.8)
@@ -937,7 +937,7 @@ importers:
         version: 7.85.0(react@19.2.8)
       react-i18next:
         specifier: ^16.0.0
-        version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+        version: 16.6.6(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
       react-redux:
         specifier: ^9.2.0
         version: 9.3.0(@types/react@19.2.18)(react@19.2.8)(redux@5.0.1)
@@ -1099,7 +1099,7 @@ importers:
         version: 12.0.1(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
         specifier: ^12.0.0
-        version: 12.0.0(c83b5b9e989c7cd2bd81996d3eb80e90)
+        version: 12.0.0(fdc0182db241ecbb71a6614750a7abc2)
       '@pawhaven/shared':
         specifier: workspace:*
         version: link:../shared
@@ -1279,8 +1279,8 @@ importers:
         specifier: ^1.11.18
         version: 1.11.21
       i18next:
-        specifier: ^25.6.0
-        version: 25.10.10(typescript@5.9.3)
+        specifier: ^26.3.4
+        version: 26.7.2(typescript@5.9.3)
       lucide-react:
         specifier: ^0.545.0
         version: 0.545.0(react@19.2.8)
@@ -1295,7 +1295,7 @@ importers:
         version: 4.0.0(react@19.2.8)
       react-i18next:
         specifier: ^16.0.0
-        version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+        version: 16.6.6(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
       react-router-dom:
         specifier: ^6.0.0 || ^7.0.0
         version: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -1343,8 +1343,8 @@ importers:
         specifier: workspace:*
         version: link:../shared
       i18next:
-        specifier: ^25.6.0
-        version: 25.10.10(typescript@5.9.3)
+        specifier: ^26.3.4
+        version: 26.7.2(typescript@5.9.3)
       i18next-browser-languagedetector:
         specifier: ^8.2.0
         version: 8.2.1
@@ -1359,7 +1359,7 @@ importers:
         version: 19.2.8(react@19.2.8)
       react-i18next:
         specifier: ^16.0.0
-        version: 16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
+        version: 16.6.6(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3)
 
   packages/shared:
     dependencies:
@@ -6108,10 +6108,10 @@ packages:
   i18next-resources-to-backend@1.2.3:
     resolution: {integrity: sha512-8Y/LLAm5fqZc2ckQxtTWbu75ndjNLzF7mcYl6rhc4g+WBopIsG3YhdYqF5qhJy64tlYhlU2KSSnEgW3gGHLqwg==}
 
-  i18next@25.10.10:
-    resolution: {integrity: sha512-cqUW2Z3EkRx7NqSyywjkgCLK7KLCL6IFVFcONG7nVYIJ3ekZ1/N5jUsihHV6Bq37NfhgtczxJcxduELtjTwkuQ==}
+  i18next@26.7.2:
+    resolution: {integrity: sha512-RsOY3BeaCDdkk52NeJSFAXELQ2rQXBO/tOub6L8ue2ICPfR/FRDWDOfEDg4xMPd1SqO5goVYQ6i72qWEUB/PPw==}
     peerDependencies:
-      typescript: ^5 || ^6
+      typescript: ^5 || ^6 || ^7
     peerDependenciesMeta:
       typescript:
         optional: true
@@ -6916,16 +6916,16 @@ packages:
       socks:
         optional: true
 
-  mongoose@8.24.3:
-    resolution: {integrity: sha512-CMHqVyjK0Szc6irT14+O+QpN30kHxJLa0FjjLiBz/Txivmfg3mUUdMWAXfYM1Ubl0SNUkcG2cyLKOnhvttLtOA==}
+  mongoose@8.24.7:
+    resolution: {integrity: sha512-+hrEOLpLGPgOt7S/UrcBAKZ4gvB6+5qf16jspWH5xQ8WtQu9lRTzcqy04ZNQrlIox4Pl6Nh2RzlNDPSOFw9rng==}
     engines: {node: '>=16.20.1'}
 
   mpath@0.9.0:
     resolution: {integrity: sha512-ikJRQTk8hw5DEoFVxHG1Gn9T/xcjtdnOKIU1JTmGjZZlg9LST2mBLmcX3/ICIbgJydT2GOc15RnNy5mHmzfSew==}
     engines: {node: '>=4.0.0'}
 
-  mquery@5.0.0:
-    resolution: {integrity: sha512-iQMncpmEK8R8ncT8HJGsGc9Dsp8xcgYMVSbs5jgnm1lFHTZqMJTUWTDx1LBO8+mK3tPNZWFLBghQEIOULSTHZg==}
+  mquery@5.0.1:
+    resolution: {integrity: sha512-C99lWV0TFI34pS008jBsi3JrE2xZPnTgUw5yApQR71nRP0hxLy8D5m1Lbbk83c8AQWJwdJ0329HzFtZ1MRTUIw==}
     engines: {node: '>=14.0.0'}
 
   mri@1.2.0:
@@ -9711,11 +9711,11 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@nestjs/mongoose@12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.3(supports-color@8.0.0))(rxjs@7.8.2)':
+  '@nestjs/mongoose@12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.7(supports-color@8.0.0))(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0)
       '@nestjs/core': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/microservices@12.1.3)(@nestjs/platform-express@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      mongoose: 8.24.3(socks@2.8.9)(supports-color@8.0.0)
+      mongoose: 8.24.7(socks@2.8.9)(supports-color@8.0.0)
       rxjs: 7.8.2
 
   '@nestjs/passport@12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(passport@0.7.0)':
@@ -9777,7 +9777,7 @@ snapshots:
       class-transformer: 0.5.1
       class-validator: 0.14.4
 
-  '@nestjs/terminus@12.0.0(c83b5b9e989c7cd2bd81996d3eb80e90)':
+  '@nestjs/terminus@12.0.0(fdc0182db241ecbb71a6614750a7abc2)':
     dependencies:
       '@nestjs/common': 12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0)
       '@nestjs/core': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/microservices@12.1.3)(@nestjs/platform-express@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -9787,10 +9787,10 @@ snapshots:
       '@grpc/proto-loader': 0.8.1
       '@nestjs/axios': 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(axios@1.19.0(debug@4.4.3(supports-color@8.0.0))(supports-color@8.0.0))(rxjs@7.8.2)
       '@nestjs/microservices': 12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/mongoose': 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.3(supports-color@8.0.0))(rxjs@7.8.2)
+      '@nestjs/mongoose': 12.0.0(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(mongoose@8.24.7(supports-color@8.0.0))(rxjs@7.8.2)
       '@nestjs/swagger': 12.0.1(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)
       '@prisma/client': 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
-      mongoose: 8.24.3(socks@2.8.9)(supports-color@8.0.0)
+      mongoose: 8.24.7(socks@2.8.9)(supports-color@8.0.0)
 
   '@nestjs/testing@12.1.3(@nestjs/common@12.1.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.0.0))(@nestjs/core@12.1.3)(@nestjs/microservices@12.1.3)(@nestjs/platform-express@12.1.3)':
     dependencies:
@@ -13429,9 +13429,7 @@ snapshots:
     dependencies:
       '@babel/runtime': 7.29.7
 
-  i18next@25.10.10(typescript@5.9.3):
-    dependencies:
-      '@babel/runtime': 7.29.7
+  i18next@26.7.2(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 
@@ -14127,13 +14125,13 @@ snapshots:
     optionalDependencies:
       socks: 2.8.9
 
-  mongoose@8.24.3(socks@2.8.9)(supports-color@8.0.0):
+  mongoose@8.24.7(socks@2.8.9)(supports-color@8.0.0):
     dependencies:
       bson: 6.10.4
       kareem: 2.6.3
       mongodb: 6.20.0(socks@2.8.9)
       mpath: 0.9.0
-      mquery: 5.0.0(supports-color@8.0.0)
+      mquery: 5.0.1(supports-color@8.0.0)
       ms: 2.1.3
       sift: 17.1.3
     transitivePeerDependencies:
@@ -14148,7 +14146,7 @@ snapshots:
 
   mpath@0.9.0: {}
 
-  mquery@5.0.0(supports-color@8.0.0):
+  mquery@5.0.1(supports-color@8.0.0):
     dependencies:
       debug: 4.4.3(supports-color@8.0.0)
     transitivePeerDependencies:
@@ -14874,11 +14872,11 @@ snapshots:
     dependencies:
       react: 19.2.8
 
-  react-i18next@16.6.6(i18next@25.10.10(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3):
+  react-i18next@16.6.6(i18next@26.7.2(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3):
     dependencies:
       '@babel/runtime': 7.29.7
       html-parse-stringify: 3.1.0
-      i18next: 25.10.10(typescript@5.9.3)
+      i18next: 26.7.2(typescript@5.9.3)
       react: 19.2.8
       use-sync-external-store: 1.6.0(react@19.2.8)
     optionalDependencies:

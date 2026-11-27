@@ -31,7 +31,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/react-query-persist-client": "^5.90.7",
     "@vitejs/plugin-react": "^5.0.4",
-    "i18next": "^25.6.0",
+    "i18next": "^26.3.4",
     "lucide-react": "^0.545.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
