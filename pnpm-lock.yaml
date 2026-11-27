@@ -252,13 +252,13 @@ importers:
     dependencies:
       '@nestjs/axios':
         specifier: ^12.0.0
-        version: 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^12.6.3
         version: 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/config':
         specifier: ^12.0.0
-        version: 12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^12.6.3
         version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -409,7 +409,7 @@ importers:
         version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.16.22)(@types/node@24.13.3)(typescript@5.9.3)
+        version: 10.9.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(typescript@5.9.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -421,7 +421,7 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       webpack-node-externals:
         specifier: ^3.0.0
         version: 3.0.0
@@ -433,13 +433,13 @@ importers:
         version: 0.8.1
       '@nestjs/axios':
         specifier: ^12.0.0
-        version: 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^12.6.3
         version: 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/config':
         specifier: ^12.0.0
-        version: 12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^12.6.3
         version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -495,8 +495,8 @@ importers:
         specifier: 5.2.1
         version: 5.2.1(supports-color@8.1.1)
       js-yaml:
-        specifier: ^4.3.2
-        version: 4.3.2
+        specifier: ^5.4.1
+        version: 5.5.0
       mongoose:
         specifier: ^8.24.7
         version: 8.24.11(socks@2.8.11)(supports-color@8.1.1)
@@ -518,7 +518,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.15(@rspack/core@2.3.4)(@swc/core@1.16.22)(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 12.0.15(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.17(chokidar@5.0.0)(prettier@3.10.1)(typescript@5.9.3)
@@ -533,7 +533,7 @@ importers:
         version: link:../../../libs/tsconfig
       '@rspack/cli':
         specifier: ^2.2.3
-        version: 2.3.4(@rspack/core@2.3.4)
+        version: 2.3.4(@rspack/core@2.3.4(@swc/helpers@0.5.24))
       '@rspack/core':
         specifier: ^2.2.3
         version: 2.3.4(@swc/helpers@0.5.24)
@@ -560,10 +560,10 @@ importers:
         version: 0.5.21
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.16.22)(@types/node@24.13.3)(typescript@5.9.3)
+        version: 10.9.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(typescript@5.9.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -575,10 +575,10 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.3.4)(@swc/core@1.16.22)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
       webpack-node-externals:
         specifier: ^3.0.0
         version: 3.0.0
@@ -590,19 +590,19 @@ importers:
         version: 5.3.1
       '@nestjs/axios':
         specifier: ^12.0.0
-        version: 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^12.6.3
         version: 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/config':
         specifier: ^12.0.0
-        version: 12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^12.6.3
-        version: 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+        version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
         specifier: ^12.6.3
-        version: 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(rxjs@7.8.2)(supports-color@8.1.1)
+        version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(rxjs@7.8.2)(supports-color@8.1.1)
       '@pawhaven/backend-core':
         specifier: workspace:*
         version: link:../../../packages/backend-core
@@ -643,8 +643,8 @@ importers:
         specifier: ^26.3.4
         version: 26.7.2(typescript@5.9.3)
       nodemailer:
-        specifier: ^7.0.11
-        version: 7.0.13
+        specifier: ^10.1.4
+        version: 10.6.1
       puppeteer:
         specifier: ^24.34.0
         version: 24.43.1(bare-buffer@3.7.3)(supports-color@8.1.1)(typescript@5.9.3)
@@ -666,7 +666,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.15(@rspack/core@2.3.4)(@swc/core@1.16.22)(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 12.0.15(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.17(chokidar@5.0.0)(prettier@3.10.1)(typescript@5.9.3)
@@ -705,10 +705,10 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.3.4)(@swc/core@1.16.22)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
       webpack-node-externals:
         specifier: ^3.0.0
         version: 3.0.0
@@ -717,13 +717,13 @@ importers:
     dependencies:
       '@nestjs/axios':
         specifier: ^12.0.0
-        version: 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^12.6.3
         version: 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/config':
         specifier: ^12.0.0
-        version: 12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^12.6.3
         version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -802,7 +802,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.15(@rspack/core@2.3.4)(@swc/core@1.16.22)(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 12.0.15(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.17(chokidar@5.0.0)(prettier@3.10.1)(typescript@5.9.3)
@@ -856,10 +856,10 @@ importers:
         version: 7.3.2(supports-color@8.1.1)
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.16.22)(@types/node@24.13.3)(typescript@5.9.3)
+        version: 10.9.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(typescript@5.9.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -871,10 +871,10 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.3.4)(@swc/core@1.16.22)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
       webpack-node-externals:
         specifier: ^3.0.0
         version: 3.0.0
@@ -904,7 +904,7 @@ importers:
         version: 2.15.0(@types/react@19.2.18)(react-redux@9.3.1(@types/react@19.2.18)(react@19.2.8)(redux@5.0.1))(react@19.2.8)
       '@tailwindcss/vite':
         specifier: ^4.1.14
-        version: 4.3.3(vite@7.3.6(@types/node@24.13.3))
+        version: 4.3.3(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@tanstack/query-async-storage-persister':
         specifier: ^5.90.7
         version: 5.108.4
@@ -1007,7 +1007,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
 
   libs/eslint-config:
     dependencies:
@@ -1075,13 +1075,13 @@ importers:
     dependencies:
       '@nestjs/axios':
         specifier: ^12.0.0
-        version: 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/common':
         specifier: ^12.1.0
         version: 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/config':
         specifier: ^12.0.0
-        version: 12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
+        version: 12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/core':
         specifier: ^12.1.0
         version: 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -1137,8 +1137,8 @@ importers:
         specifier: 5.2.1
         version: 5.2.1(supports-color@8.1.1)
       js-yaml:
-        specifier: ^4.3.2
-        version: 4.3.2
+        specifier: ^5.4.1
+        version: 5.5.0
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
@@ -1163,7 +1163,7 @@ importers:
     devDependencies:
       '@nestjs/cli':
         specifier: ^12.0.0
-        version: 12.0.15(@rspack/core@2.3.4)(@swc/core@1.16.22)(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 12.0.15(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       '@nestjs/schematics':
         specifier: ^12.0.0
         version: 12.0.17(chokidar@5.0.0)(prettier@3.10.1)(typescript@5.9.3)
@@ -1226,10 +1226,10 @@ importers:
         version: 7.3.2(supports-color@8.1.1)
       ts-loader:
         specifier: ^9.5.4
-        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.16.22)(@types/node@24.13.3)(typescript@5.9.3)
+        version: 10.9.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(typescript@5.9.3)
       tsconfig-paths:
         specifier: ^4.2.0
         version: 4.2.0
@@ -1238,10 +1238,10 @@ importers:
         version: 5.9.3
       unplugin-swc:
         specifier: ^1.6.0
-        version: 1.6.0(@rspack/core@2.3.4)(@swc/core@1.16.22)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+        version: 1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       vitest:
         specifier: ^4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
 
   packages/design-system:
     devDependencies:
@@ -1386,8 +1386,6 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
 
-  packages/shared/dist/esm: {}
-
   packages/ui:
     dependencies:
       '@pawhaven/design-system':
@@ -1444,10 +1442,10 @@ importers:
         version: 10.6.2(@vitest/browser-playwright@4.1.10)(@vitest/browser@4.1.10)(@vitest/runner@4.1.11)(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(vitest@4.1.11)
       '@storybook/react-vite':
         specifier: 10.6.2
-        version: 10.6.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3))
+        version: 10.6.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@tailwindcss/vite':
         specifier: 4.3.3
-        version: 4.3.3(vite@7.3.6(@types/node@24.13.3))
+        version: 4.3.3(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@testing-library/jest-dom':
         specifier: ^7.0.0
         version: 7.0.1(@testing-library/dom@10.4.2)(vitest@4.1.11)
@@ -1465,10 +1463,10 @@ importers:
         version: 19.2.4(@types/react@19.2.18)
       '@vitest/browser':
         specifier: 4.1.10
-        version: 4.1.10(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
+        version: 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
       '@vitest/browser-playwright':
         specifier: 4.1.10
-        version: 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
+        version: 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
       '@vitest/coverage-v8':
         specifier: 4.1.11
         version: 4.1.11(@vitest/browser@4.1.10)(vitest@4.1.11)
@@ -1501,7 +1499,7 @@ importers:
         version: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)
       vitest:
         specifier: 4.1.11
-        version: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
+        version: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
 
 packages:
 
@@ -7131,9 +7129,9 @@ packages:
     resolution: {integrity: sha512-PfvofsGQ+MiOQIPkX9fU8ELUWmy5zL74CdQaph/ismKszfFkfwXaw0cGiwbwym2hT9k5+mdyl8O5WQ1MD8EHmA==}
     engines: {node: '>=18'}
 
-  nodemailer@7.0.13:
-    resolution: {integrity: sha512-PNDFSJdP+KFgdsG3ZzMXCgquO7I6McjY2vlqILjtJd0hy8wEvtugS9xKRF2NWlPNGxvLCXlTNIae4serI7dinw==}
-    engines: {node: '>=6.0.0'}
+  nodemailer@10.6.1:
+    resolution: {integrity: sha512-d7kfFfS/tR4Aca+SBvRaQ+MXKNv7d2JiRe5TxaRcFT/kYMh4GGPnW9aKksTIEvyEbA7d/7HYWE4YPDEHxzJj/g==}
+    engines: {node: '>=20.0.0'}
 
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
@@ -9505,7 +9503,7 @@ snapshots:
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
-  '@joshwooding/vite-plugin-react-docgen-typescript@0.7.0(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3))':
+  '@joshwooding/vite-plugin-react-docgen-typescript@0.7.0(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
       glob: 13.0.7
       react-docgen-typescript: 2.4.0(typescript@5.9.3)
@@ -9608,7 +9606,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.5
     optional: true
 
-  '@nestjs/axios@12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)':
+  '@nestjs/axios@12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       axios: 1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1)
@@ -9642,34 +9640,6 @@ snapshots:
       - '@types/node'
       - prettier
 
-  '@nestjs/cli@12.0.15(@rspack/core@2.3.4)(@swc/core@1.16.22)(@types/node@24.13.3)(prettier@3.10.1)(ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)))(tsconfig-paths-webpack-plugin@4.2.0)(webpack-node-externals@3.0.0)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))':
-    dependencies:
-      '@angular-devkit/core': 22.2.7(chokidar@5.0.0)
-      '@angular-devkit/schematics': 22.2.7(chokidar@5.0.0)
-      '@angular-devkit/schematics-cli': 22.2.7(@types/node@24.13.3)(chokidar@5.0.0)
-      '@inquirer/prompts': 8.7.5(@types/node@24.13.3)
-      '@nestjs/schematics': 12.0.17(chokidar@5.0.0)(prettier@3.10.1)(typescript@6.0.3)
-      ansis: 4.5.0
-      chokidar: 5.0.0
-      cli-table3: 0.6.5
-      commander: 15.1.0
-      jsonc-parser: 3.3.1
-      minimatch: 11.0.9
-      node-emoji: 2.2.0
-      ora: 9.4.1
-      tsconfig-paths: 4.2.0
-      typescript: 6.0.3
-    optionalDependencies:
-      '@rspack/core': 2.3.4(@swc/helpers@0.5.24)
-      '@swc/core': 1.16.22(@swc/helpers@0.5.24)
-      ts-loader: 9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
-      tsconfig-paths-webpack-plugin: 4.2.0
-      webpack: 5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
-      webpack-node-externals: 3.0.0
-    transitivePeerDependencies:
-      - '@types/node'
-      - prettier
-
   '@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)':
     dependencies:
       '@standard-schema/spec': 1.1.0
@@ -9686,7 +9656,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@nestjs/config@12.1.1(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)':
+  '@nestjs/config@12.1.1(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@standard-schema/spec': 1.1.0
@@ -9708,20 +9678,6 @@ snapshots:
     optionalDependencies:
       '@nestjs/microservices': 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express': 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(rxjs@7.8.2)(supports-color@8.1.1)
-
-  '@nestjs/core@12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
-    dependencies:
-      '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      fast-safe-stringify: 2.1.1
-      iterare: 1.2.1
-      path-to-regexp: 8.4.2
-      reflect-metadata: 0.2.2
-      rxjs: 7.8.2
-      tslib: 2.9.1
-      uid: 2.0.2
-    optionalDependencies:
-      '@nestjs/microservices': 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      '@nestjs/platform-express': 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(rxjs@7.8.2)(supports-color@8.1.1)
 
   '@nestjs/jwt@12.0.5(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))':
     dependencies:
@@ -9746,16 +9702,6 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.9.1
 
-  '@nestjs/microservices@12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
-    dependencies:
-      '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      iterare: 1.2.1
-      reflect-metadata: 0.2.2
-      rxjs: 7.8.2
-      tslib: 2.9.1
-    optional: true
-
   '@nestjs/mongoose@12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(mongoose@8.24.11(supports-color@8.1.1))(rxjs@7.8.2)':
     dependencies:
       '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
@@ -9772,19 +9718,6 @@ snapshots:
     dependencies:
       '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
       '@nestjs/core': 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
-      cors: 2.8.6
-      express: 5.3.0(supports-color@8.1.1)
-      multer: 2.5.0
-      path-to-regexp: 8.4.2
-      rxjs: 7.8.2
-      tslib: 2.9.1
-    transitivePeerDependencies:
-      - supports-color
-
-  '@nestjs/platform-express@12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(rxjs@7.8.2)(supports-color@8.1.1)':
-    dependencies:
-      '@nestjs/common': 12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
-      '@nestjs/core': 12.6.3(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/microservices@12.6.3)(@nestjs/platform-express@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       cors: 2.8.6
       express: 5.3.0(supports-color@8.1.1)
       multer: 2.5.0
@@ -9845,7 +9778,7 @@ snapshots:
       rxjs: 7.8.2
     optionalDependencies:
       '@grpc/proto-loader': 0.8.1
-      '@nestjs/axios': 12.0.2(@nestjs/common@12.6.3(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
+      '@nestjs/axios': 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(axios@1.21.1(debug@4.4.3(supports-color@8.1.1))(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/microservices': 12.6.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/mongoose': 12.0.2(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(mongoose@8.24.11(supports-color@8.1.1))(rxjs@7.8.2)
       '@nestjs/swagger': 12.1.3(@nestjs/common@12.6.3(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.6.3)(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(typescript@5.9.3)
@@ -10564,7 +10497,7 @@ snapshots:
       '@rspack/binding-win32-ia32-msvc': 2.3.4
       '@rspack/binding-win32-x64-msvc': 2.3.4
 
-  '@rspack/cli@2.3.4(@rspack/core@2.3.4)':
+  '@rspack/cli@2.3.4(@rspack/core@2.3.4(@swc/helpers@0.5.24))':
     dependencies:
       '@rspack/core': 2.3.4(@swc/helpers@0.5.24)
 
@@ -10700,14 +10633,14 @@ snapshots:
       '@storybook/icons': 2.2.0(react@19.2.8)
       storybook: 10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8)
     optionalDependencies:
-      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
-      '@vitest/browser-playwright': 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
+      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
+      '@vitest/browser-playwright': 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
       '@vitest/runner': 4.1.11
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
     transitivePeerDependencies:
       - react
 
-  '@storybook/builder-vite@10.6.2(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(vite@7.3.6(@types/node@24.13.3))':
+  '@storybook/builder-vite@10.6.2(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
       storybook: 10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8)
       ts-dedent: 2.3.0
@@ -10728,11 +10661,11 @@ snapshots:
       '@types/react': 19.2.18
       '@types/react-dom': 19.2.4(@types/react@19.2.18)
 
-  '@storybook/react-vite@10.6.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3))':
+  '@storybook/react-vite@10.6.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(supports-color@8.1.1)(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
-      '@joshwooding/vite-plugin-react-docgen-typescript': 0.7.0(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3))
+      '@joshwooding/vite-plugin-react-docgen-typescript': 0.7.0(typescript@5.9.3)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@rollup/pluginutils': 5.5.1(rollup@4.68.8)
-      '@storybook/builder-vite': 10.6.2(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(vite@7.3.6(@types/node@24.13.3))
+      '@storybook/builder-vite': 10.6.2(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@storybook/react': 10.6.2(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(storybook@10.6.2(@types/react@19.2.18)(prettier@3.10.1)(react@19.2.8))(supports-color@8.1.1)(typescript@5.9.3)
       empathic: 2.1.0
       magic-string: 1.4.5
@@ -10962,7 +10895,7 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.3.5
       '@tailwindcss/oxide-win32-x64-msvc': 4.3.5
 
-  '@tailwindcss/vite@4.3.3(vite@7.3.6(@types/node@24.13.3))':
+  '@tailwindcss/vite@4.3.3(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
@@ -11067,7 +11000,7 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
     optionalDependencies:
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
 
   '@testing-library/react@16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
@@ -11518,29 +11451,29 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/browser-playwright@4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)':
+  '@vitest/browser-playwright@4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)':
     dependencies:
-      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
-      '@vitest/mocker': 4.1.10(vite@7.3.6(@types/node@24.13.3))
+      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
+      '@vitest/mocker': 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       playwright: 1.63.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
     transitivePeerDependencies:
       - bufferutil
       - msw
       - utf-8-validate
       - vite
 
-  '@vitest/browser@4.1.10(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)':
+  '@vitest/browser@4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)':
     dependencies:
       '@blazediff/core': 1.9.1
-      '@vitest/mocker': 4.1.10(vite@7.3.6(@types/node@24.13.3))
+      '@vitest/mocker': 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       '@vitest/utils': 4.1.10
       magic-string: 0.30.21
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
       ws: 8.23.0
     transitivePeerDependencies:
       - bufferutil
@@ -11560,9 +11493,9 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))
     optionalDependencies:
-      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
+      '@vitest/browser': 4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
 
   '@vitest/coverage-v8@4.1.11(vitest@4.1.11)':
     dependencies:
@@ -11576,7 +11509,7 @@ snapshots:
       obug: 2.2.1
       std-env: 4.3.0
       tinyrainbow: 3.2.0
-      vitest: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))
+      vitest: 4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3))
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -11595,7 +11528,7 @@ snapshots:
       chai: 6.3.0
       tinyrainbow: 3.2.0
 
-  '@vitest/mocker@4.1.10(vite@7.3.6(@types/node@24.13.3))':
+  '@vitest/mocker@4.1.10(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
       '@vitest/spy': 4.1.10
       estree-walker: 3.0.3
@@ -14175,18 +14108,6 @@ snapshots:
       lightningcss: 1.33.0
       postcss: 8.5.33
 
-  minimizer-webpack-plugin@5.14.1(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
-    dependencies:
-      jest-worker: 27.5.1
-      schema-utils: 4.8.5(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
-      terser: 5.51.4
-      webpack: 5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
-    optionalDependencies:
-      '@swc/core': 1.16.22(@swc/helpers@0.5.24)
-      esbuild: 0.28.2
-      lightningcss: 1.33.0
-      postcss: 8.5.33
-
   minipass@7.1.3: {}
 
   mitt@3.0.1: {}
@@ -14288,7 +14209,7 @@ snapshots:
 
   node-releases@2.0.65: {}
 
-  nodemailer@7.0.13: {}
+  nodemailer@10.6.1: {}
 
   npm-run-path@4.0.1:
     dependencies:
@@ -15054,15 +14975,6 @@ snapshots:
     optionalDependencies:
       webpack: 5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
 
-  schema-utils@4.8.5(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
-    dependencies:
-      '@types/json-schema': 7.0.15
-      ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      ajv-keywords: 5.1.0(ajv@8.20.0)
-    optionalDependencies:
-      webpack: 5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
-
   selderee@0.11.0:
     dependencies:
       parseley: 0.12.1
@@ -15590,15 +15502,7 @@ snapshots:
       typescript: 5.9.3
       webpack: 5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
 
-  ts-loader@9.6.2(typescript@5.9.3)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
-    dependencies:
-      chalk: 4.1.2
-      picomatch: 4.0.7
-      source-map: 0.7.6
-      typescript: 5.9.3
-      webpack: 5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
-
-  ts-node@10.9.2(@swc/core@1.16.22)(@types/node@24.13.3)(typescript@5.9.3):
+  ts-node@10.9.2(@swc/core@1.16.22(@swc/helpers@0.5.24))(@types/node@24.13.3)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.14
@@ -15739,30 +15643,12 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-swc@1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
+  unplugin-swc@1.6.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
     dependencies:
       '@rollup/pluginutils': 5.5.1(rollup@4.68.8)
       '@swc/core': 1.16.22(@swc/helpers@0.5.24)
       load-tsconfig: 0.2.5
-      unplugin: 3.7.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
-    transitivePeerDependencies:
-      - '@farmfe/core'
-      - '@rsbuild/core'
-      - '@rspack/core'
-      - bun-types-no-globals
-      - esbuild
-      - rolldown
-      - rollup
-      - unloader
-      - vite
-      - webpack
-
-  unplugin-swc@1.6.0(@rspack/core@2.3.4)(@swc/core@1.16.22)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
-    dependencies:
-      '@rollup/pluginutils': 5.5.1(rollup@4.68.8)
-      '@swc/core': 1.16.22(@swc/helpers@0.5.24)
-      load-tsconfig: 0.2.5
-      unplugin: 3.7.0(@rspack/core@2.3.4)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
+      unplugin: 3.7.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
     transitivePeerDependencies:
       - '@farmfe/core'
       - '@rsbuild/core'
@@ -15782,7 +15668,7 @@ snapshots:
       picomatch: 4.0.7
       webpack-virtual-modules: 0.6.2
 
-  unplugin@3.7.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
+  unplugin@3.7.0(@rspack/core@2.3.4(@swc/helpers@0.5.24))(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@rolldown/pluginutils': 1.1.1
@@ -15794,19 +15680,6 @@ snapshots:
       rollup: 4.68.8
       vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)
       webpack: 5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
-
-  unplugin@3.7.0(@rspack/core@2.3.4)(esbuild@0.28.2)(rollup@4.68.8)(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0))(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)):
-    dependencies:
-      '@jridgewell/remapping': 2.3.5
-      '@rolldown/pluginutils': 1.1.1
-      picomatch: 4.0.7
-      webpack-virtual-modules: 0.6.2
-    optionalDependencies:
-      '@rspack/core': 2.3.4(@swc/helpers@0.5.24)
-      esbuild: 0.28.2
-      rollup: 4.68.8
-      vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)
-      webpack: 5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)
 
   unrs-resolver@1.13.0:
     dependencies:
@@ -15900,7 +15773,7 @@ snapshots:
       terser: 5.51.4
       yaml: 2.9.1
 
-  vitest@4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)):
+  vitest@4.1.11(@types/node@24.13.3)(@vitest/browser-playwright@4.1.10)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(vite@7.3.6(@types/node@24.13.3))
@@ -15924,66 +15797,8 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.13.3
-      '@vitest/browser-playwright': 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3))(vitest@4.1.11)
+      '@vitest/browser-playwright': 4.1.10(playwright@1.63.0)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1))(vitest@4.1.11)
       '@vitest/coverage-v8': 4.1.11(@vitest/browser@4.1.10)(vitest@4.1.11)
-      jsdom: 29.1.1(@noble/hashes@1.8.0)
-    transitivePeerDependencies:
-      - msw
-
-  vitest@4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)):
-    dependencies:
-      '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@7.3.6(@types/node@24.13.3))
-      '@vitest/pretty-format': 4.1.11
-      '@vitest/runner': 4.1.11
-      '@vitest/snapshot': 4.1.11
-      '@vitest/spy': 4.1.11
-      '@vitest/utils': 4.1.11
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.2.1
-      pathe: 2.0.3
-      picomatch: 4.0.7
-      std-env: 4.3.0
-      tinybench: 2.9.0
-      tinyexec: 1.4.0
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.2.0
-      vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 24.13.3
-      '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)
-      jsdom: 29.1.1(@noble/hashes@1.8.0)
-    transitivePeerDependencies:
-      - msw
-
-  vitest@4.1.11(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.6(@types/node@24.13.3)(lightningcss@1.33.0)):
-    dependencies:
-      '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(vite@7.3.6(@types/node@24.13.3))
-      '@vitest/pretty-format': 4.1.11
-      '@vitest/runner': 4.1.11
-      '@vitest/snapshot': 4.1.11
-      '@vitest/spy': 4.1.11
-      '@vitest/utils': 4.1.11
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.2.1
-      pathe: 2.0.3
-      picomatch: 4.0.7
-      std-env: 4.3.0
-      tinybench: 2.9.0
-      tinyexec: 1.4.0
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.2.0
-      vite: 7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.4)(yaml@2.9.1)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 24.13.3
-      '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)
       jsdom: 29.1.1(@noble/hashes@1.8.0)
     transitivePeerDependencies:
       - msw
@@ -16054,42 +15869,6 @@ snapshots:
       mime-db: 1.54.0
       minimizer-webpack-plugin: 5.14.1(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       schema-utils: 4.8.5(webpack@5.113.0(@swc/core@1.16.22(@swc/helpers@0.5.24))(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
-      tapable: 2.3.4
-      watchpack: 2.6.4
-      webpack-sources: 3.7.1
-    transitivePeerDependencies:
-      - '@minify-html/node'
-      - '@napi-rs/image'
-      - '@swc/core'
-      - '@swc/css'
-      - '@swc/html'
-      - clean-css
-      - cssnano
-      - csso
-      - esbuild
-      - html-minifier-terser
-      - imagemin
-      - lightningcss
-      - postcss
-      - sharp
-      - svgo
-      - uglify-js
-
-  webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33):
-    dependencies:
-      '@types/estree': 1.0.11
-      '@types/json-schema': 7.0.15
-      '@webassemblyjs/ast': 1.14.1
-      '@webassemblyjs/wasm-edit': 1.14.1
-      '@webassemblyjs/wasm-parser': 1.14.1
-      browserslist: 4.29.6
-      chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.27.0
-      events: 3.3.0
-      graceful-fs: 4.2.12
-      mime-db: 1.54.0
-      minimizer-webpack-plugin: 5.14.1(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33)(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
-      schema-utils: 4.8.5(webpack@5.113.0(@swc/core@1.16.22)(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.33))
       tapable: 2.3.4
       watchpack: 2.6.4
       webpack-sources: 3.7.1
