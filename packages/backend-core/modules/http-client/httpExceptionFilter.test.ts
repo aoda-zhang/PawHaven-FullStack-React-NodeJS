@@ -1,10 +1,16 @@
-import { Controller, Get, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  type ArgumentsHost,
+} from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
 import { httpBusinessMappingCodes } from '@pawhaven/shared';
 import request from 'supertest';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { HttpExceptionFilter } from './httpExceptionFilter.js';
 import { httpHeaders } from '../../common/constants/httpHeaders.js';
@@ -97,6 +103,34 @@ class ProbeController {
     );
   }
 }
+
+type ResponseSpy = {
+  setHeader: ReturnType<typeof vi.fn>;
+  status: ReturnType<typeof vi.fn>;
+  json: ReturnType<typeof vi.fn>;
+};
+
+/**
+ * The filter's HTTP branch only touches `setHeader`, `status` and `json`. Calling it directly keeps
+ * the assertion about the *filter* — an ambient trace id must reach the response — instead of
+ * relying on AsyncLocalStorage surviving a supertest socket, which is an implementation detail of
+ * the test client and stopped holding in supertest 7.3.
+ */
+const createHttpHost = () => {
+  const response: ResponseSpy = {
+    setHeader: vi.fn(),
+    status: vi.fn(),
+    json: vi.fn(),
+  };
+  response.status.mockReturnValue(response);
+
+  const host = {
+    getType: () => 'http',
+    switchToHttp: () => ({ getResponse: () => response }),
+  } as unknown as ArgumentsHost;
+
+  return { host, response };
+};
 
 const boot = async (): Promise<NestExpressApplication> => {
   const moduleRef = await Test.createTestingModule({
@@ -232,14 +266,20 @@ describe('HttpExceptionFilter', () => {
     expect(response.headers[httpHeaders.traceId]).toBeUndefined();
   });
 
-  it('echoes the ambient trace id on the header and in the body', async () => {
-    app = await boot();
-    const response = await runWithTrace('ambient-trace', () =>
-      request(app!.getHttpServer()).get(RAW_ERROR_ROUTE),
+  it('echoes the ambient trace id on the header and in the body', () => {
+    const { host, response } = createHttpHost();
+
+    runWithTrace('ambient-trace', () =>
+      new HttpExceptionFilter().catch(new Error(PRISMA_LEAK), host),
     );
 
-    expect(response.headers[httpHeaders.traceId]).toBe('ambient-trace');
-    expect(response.body.traceId).toBe('ambient-trace');
+    expect(response.setHeader).toHaveBeenCalledWith(
+      httpHeaders.traceId,
+      'ambient-trace',
+    );
+    expect(response.json).toHaveBeenCalledWith(
+      expect.objectContaining({ traceId: 'ambient-trace' }),
+    );
   });
 
   it('prefers the failed downstream hop trace id over the ambient one', async () => {
@@ -255,13 +295,22 @@ describe('HttpExceptionFilter', () => {
     expect(response.headers[httpHeaders.traceId]).toBe('downstream-hop-trace');
   });
 
-  it('falls back to the ambient trace id when the exception carries none', async () => {
-    app = await boot();
-    const response = await runWithTrace('ambient-trace', () =>
-      request(app!.getHttpServer()).get(HTTP_EXCEPTION_ROUTE),
+  it('falls back to the ambient trace id when the exception carries none', () => {
+    const { host, response } = createHttpHost();
+
+    runWithTrace('ambient-trace', () =>
+      new HttpExceptionFilter().catch(
+        new HttpException('plain failure', HttpStatus.BAD_REQUEST),
+        host,
+      ),
     );
 
-    expect(response.body.traceId).toBe('ambient-trace');
+    expect(response.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: HttpStatus.BAD_REQUEST,
+        traceId: 'ambient-trace',
+      }),
+    );
   });
 
   it('does not let an exception payload corrupt an unrelated error response', async () => {
