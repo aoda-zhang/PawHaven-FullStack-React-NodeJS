@@ -11,16 +11,78 @@ Nothing here grades code — the gates are binary: pass or fail, warning or find
 
 ## The gate map
 
-| Command                                      | Owns                                                          | Runs in                          |
-| -------------------------------------------- | ------------------------------------------------------------- | -------------------------------- |
-| `pnpm quality-check`                         | Repository health scan (below); delegates the two named gates | CI (`test.yml`), local           |
-| `pnpm architecture-check`                    | Import boundaries A1–A5                                       | CI, local                        |
-| `pnpm token-check`                           | Design-token drift (CSS + source)                             | pre-commit, CI (`Static checks`) |
-| `pnpm check:i18n`                            | Translation keys used vs. defined, JSON validity              | local, review                    |
-| `pnpm check:links`                           | Relative doc links and anchors                                | CI (via `quality-check`), local  |
-| `pnpm agent-workflow-check`                  | Agent/command/skill harness invariants                        | local, review                    |
-| `pnpm doctor:react`                          | React Doctor (security, perf, correctness, a11y, bundle)      | CI (`react-doctor.yml`)          |
-| `pnpm lint` / `typecheck` / `test` / `build` | Per-package checks via Turborepo                              | CI (`test.yml`), local           |
+| Command                                      | Owns                                                          | Runs in                                                 |
+| -------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| `pnpm quality-check`                         | Repository health scan (below); delegates the two named gates | CI (`quality-gate.yml`), local                          |
+| `pnpm architecture-check`                    | Import boundaries A1–A5                                       | CI, local                                               |
+| `pnpm token-check`                           | Design-token drift (CSS + source)                             | pre-commit, CI (`Lint, typecheck and repository rules`) |
+| `pnpm check:i18n`                            | Translation keys used vs. defined, JSON validity              | local, review                                           |
+| `pnpm check:links`                           | Relative doc links and anchors                                | CI (via `quality-check`), local                         |
+| `pnpm agent-workflow-check`                  | Agent/command/skill harness invariants                        | local, review                                           |
+| `pnpm doctor:react`                          | React Doctor (security, perf, correctness, a11y, bundle)      | CI (`quality-gate.yml`, `React Doctor`)                 |
+| `pnpm lint` / `typecheck` / `test` / `build` | Per-package checks via Turborepo                              | CI (`quality-gate.yml`), local                          |
+
+## Quality Gate jobs
+
+`quality-gate.yml` is the merge gate and the only required check. Its jobs are named after the
+invariant they prove, and the `changes` job decides which of them run:
+
+| Job                                    | Runs when                                                                                                                      | Proves                                                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `Classify changed areas`               | always (pull request, push, manual dispatch; a manual dispatch sets every bucket true)                                         | Path filters decide which checks the diff can affect                                                   |
+| `PR title`                             | pull requests only; a push skips it                                                                                            | The title matches `[PW-<issue>] <type>(<scope>): <subject>`                                            |
+| `Lint, typecheck and repository rules` | always; architecture and repository rules always, i18n keys on `i18n`, tokens on `css`, lint and typecheck on `code` or `deps` | Architecture boundaries, repository rules, translation keys/duplicates, design tokens, lint, typecheck |
+| `Unit tests`                           | `code` or `deps`                                                                                                               | Vitest across every workspace package                                                                  |
+| `Workspace build`                      | `code` or `deps`                                                                                                               | `turbo run build` for every package                                                                    |
+| `Workflow lint`                        | `ci` or `deps`                                                                                                                 | actionlint (pinned version and checksum) over every workflow, shellcheck findings included             |
+| `Accessibility`                        | `frontend` or `deps`                                                                                                           | axe over every portal route through `e2e/a11y.spec.ts`; story-axe lives in `Component catalogue`       |
+| `Component catalogue`                  | `ui` or `deps`                                                                                                                 | Chromium → `test-storybook` over every story → Storybook build → required-story check                  |
+| `UI package contract`                  | `frontend` or `deps`                                                                                                           | `@pawhaven/ui` + workspace build → `verify:package` → Portal bundle CSS contract                       |
+| `React Doctor`                         | `frontend` or `deps`                                                                                                           | React-specific security, performance and bundle checks                                                 |
+| `Dependency review`                    | pull requests only                                                                                                             | `dependency-review` blocks a PR that introduces a high-severity advisory; push runs skip it            |
+| `Dependency CVEs (OSV)`                | pull requests, or any run with `deps`                                                                                          | Lockfile CVE scan against OSV, uploaded as SARIF; report-only while the tree has open advisories       |
+| `SonarQube analysis (advisory)`        | always                                                                                                                         | Platform analysis; blocking only when `SONAR_REQUIRED=true`                                            |
+| `Gate`                                 | always (`if: always()`)                                                                                                        | Fails if any relevant job failed or was cancelled                                                      |
+
+The repository variable `SONAR_REQUIRED` decides whether Sonar's verdict is binding:
+
+| `SONAR_REQUIRED` | Effect                                                                     |
+| ---------------- | -------------------------------------------------------------------------- |
+| unset or `false` | The scan still runs and reports on the PR; `Gate` ignores its result.      |
+| `true`           | A failed or cancelled scan fails `Gate`, so the pull request cannot merge. |
+
+It lives in Settings → Secrets and variables → Actions → Variables, so flipping the switch needs no
+branch-protection change and no workflow edit.
+
+### Execution model
+
+- `Classify changed areas` runs first and publishes one output per path bucket.
+- Every other check declares `needs: [changes]` and runs in parallel: no check waits for another.
+  `PR title` is the exception — a push has no title, so it depends only on the event.
+- `Gate` needs every job and runs with `if: always()`, so it reports whatever the checks did.
+- There is no sequential "gate order". The order in `Gate`'s `needs` list — `changes`, `title`,
+  `static`, `unit`, `build`, `workflow-lint`, `a11y`, `catalogue`, `ui-package`, `react-doctor`,
+  `security`, `osv`, then the advisory `sonar` — is display-only, as is the order of jobs in the
+  file.
+- Skipped checks are ignored by `Gate`; a `failure` or `cancelled` result in a job that ran fails
+  it. Sonar only counts when `SONAR_REQUIRED=true`.
+- Path buckets: `code`, `backend`, `frontend`, `ui`, `i18n`, `css`, `deps`, `ci` — the table below
+  lists the globs each owns. A manual dispatch treats every bucket as changed.
+
+| Bucket     | Glob patterns                                                                                      |
+| ---------- | -------------------------------------------------------------------------------------------------- |
+| `code`     | `**/*.ts`, `**/*.tsx`, `**/*.js`, `**/*.jsx`, `**/*.mjs`, `**/*.cjs`                               |
+| `backend`  | `apps/backend/**`, `packages/backend-core/**`, `packages/shared/**`, `libs/**`                     |
+| `frontend` | `apps/frontend/**`, `packages/ui/**`, `packages/frontend-core/**`, `packages/design-system/**`     |
+| `ui`       | `packages/ui/**`, `packages/design-system/**`, `**/*.stories.*`                                    |
+| `i18n`     | `packages/i18n/**`, `apps/frontend/**/*.ts`, `apps/frontend/**/*.tsx`, `packages/frontend-core/**` |
+| `css`      | `**/*.css`                                                                                         |
+| `deps`     | `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `turbo.json`                              |
+| `ci`       | `.github/**`                                                                                       |
+
+Because unrelated jobs are skipped, branch protection requires **`Gate` only**. A skipped job is
+irrelevant to the diff and `Gate` treats it as passing; a missing required check could never be
+distinguished from a pending one, which is why the fan-in job exists.
 
 ## What `quality-check` owns
 
@@ -64,11 +126,11 @@ still run in CI.
 
 ## CI wiring
 
-| Workflow                       | Purpose                                                                                                                                                                                           | Also called by     |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
-| `quality-gate.yml`             | Classifies the diff, runs `Static checks`, `Unit tests`, `Build`, `Accessibility`, `Component catalogue`, `UI package`, `React Doctor`, `Security` and `SonarQube Cloud`, then reports one `Gate` | —                  |
-| `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                                                              | `quality-gate.yml` |
-| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                                                  | —                  |
+| Workflow                       | Purpose                                                                                                                                                                                                                                                                                                      | Also called by     |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------ |
+| `quality-gate.yml`             | Classifies the diff, runs `Lint, typecheck and repository rules`, `Unit tests`, `Workspace build`, `Workflow lint`, `Accessibility`, `Component catalogue`, `UI package contract`, `React Doctor`, `Dependency review`, `Dependency CVEs (OSV)` and `SonarQube analysis (advisory)`, then reports one `Gate` | —                  |
+| `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                                                                                                                                                                         | `quality-gate.yml` |
+| `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers                                                                                                                                                                                                                                                     | —                  |
 
 The gate runs on pull requests and pushes to `develop`/`main`, and `release.yml` does not re-run
 it: a backend release promotes the Vercel preview the gate already checked, and a portal release

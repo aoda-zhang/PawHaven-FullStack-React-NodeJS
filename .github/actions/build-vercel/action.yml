@@ -1,5 +1,6 @@
-# Build stage for a Vercel service. It runs `vercel build` once and uploads the prebuilt output, so
-# a preview deploy and any later promotion ship that output instead of compiling again.
+# Build stage for a Vercel service. It runs `vercel build --standalone` and uploads the prebuilt
+# output for the preview deploy; promotion asks Vercel to rebuild the same commit with production
+# environment variables.
 name: Build for Vercel
 description: Build a service with `vercel build` and upload the prebuilt output as vercel-build-<service>.
 

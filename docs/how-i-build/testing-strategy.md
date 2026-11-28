@@ -39,16 +39,18 @@
 
 ## CI wiring
 
-- `quality-gate.yml` runs on pull requests and pushes to `main`, and its UI jobs are path-filtered.
-  `release.yml` does not re-run it, so the checks that block a release are the merge-time gates on
-  `main`, and a release ships an already-gated commit.
-- `test.yml` runs the gates, then lint/typecheck/test/build, and a separate job installs Chromium and
-  runs `pnpm test:e2e`.
-- The `UI package` job builds `@pawhaven/ui` and its workspace dependencies, runs `verify:package`,
-  then checks the Portal bundle keeps its tokens and utilities.
+- `quality-gate.yml` runs on pull requests and pushes to `develop`/`main`, and the `changes` job
+  path-filters its jobs. `release.yml` does not re-run it, so the checks that block a release are
+  the merge-time gates on `main`, and a release ships an already-gated commit.
+- Its jobs cover the repository gates plus lint, typecheck, unit tests and the workspace build. The
+  `Accessibility` job installs Chromium and runs `e2e/a11y.spec.ts` through Playwright; there is no
+  separate full end-to-end CI job, so `pnpm test:e2e` stays a local, on-demand command.
+- The `UI package contract` job builds `@pawhaven/ui` and its workspace dependencies, runs
+  `verify:package`, then checks the Portal bundle keeps its tokens and utilities.
 - The `Component catalogue` job installs Chromium, runs `test-storybook`, builds Storybook, and
   verifies the required stories.
-- `react-doctor.yml` adds a static React-health scan on PRs.
+- `Workflow lint` runs actionlint over `.github/**` when workflows or dependencies change.
+- The `React Doctor` job inside `quality-gate.yml` adds a static React-health scan on PRs.
 
 ## Rules
 

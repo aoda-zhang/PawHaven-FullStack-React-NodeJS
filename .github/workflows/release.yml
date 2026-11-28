@@ -1,9 +1,10 @@
 name: Release
 run-name: Release-${{ inputs.service }}
 
-# Production is a promotion, not a rebuild: a backend service promotes the Vercel deployment you
-# verified in `deploy.yml`, and the portal deploys the artifact that run built. Either way
-# production runs exactly the artifact that was reviewed.
+# Production from a preview is a promotion, but Vercel rebuilds a promoted preview with the
+# production environment: a backend service promotes the reviewed commit, not a byte-identical
+# preview artifact. The portal deploy instead publishes the artifact its deploy run built. For an
+# exact backend artifact, stage a production deployment built with production env before promotion.
 on:
   workflow_dispatch:
     inputs:
