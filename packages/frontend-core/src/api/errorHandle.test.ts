@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeHttpError } from './errorHandle';
+import { normalizeHttpError, toApiError } from './errorHandle';
 import { httpRequestErrors } from './types';
 
 const axiosError = (
@@ -70,5 +70,32 @@ describe('normalizeHttpError', () => {
     expect(
       normalizeHttpError(axiosError(500, { traceId: 'trace-from-body' })),
     ).toMatchObject({ traceId: 'trace-from-body' });
+  });
+});
+
+describe('toApiError', () => {
+  it('rejects with an Error that keeps every normalized field', () => {
+    const reason = toApiError(
+      normalizeHttpError(
+        axiosError(400, { code: 'BAD_REQUEST' }, { 'x-trace-id': 'trace-1' }),
+      ),
+    );
+
+    expect(reason).toBeInstanceOf(Error);
+    expect(reason).toMatchObject({
+      type: httpRequestErrors.BADREQUEST,
+      status: 400,
+      code: 'BAD_REQUEST',
+      traceId: 'trace-1',
+    });
+    expect(reason.message).toBe('BAD_REQUEST');
+  });
+
+  it('falls back to the error type when no code is present', () => {
+    const reason = toApiError(normalizeHttpError(axiosError(503)));
+
+    expect(reason).toBeInstanceOf(Error);
+    expect(reason.message).toBe(httpRequestErrors.MAINTENANCE);
+    expect(reason.code).toBeNull();
   });
 });

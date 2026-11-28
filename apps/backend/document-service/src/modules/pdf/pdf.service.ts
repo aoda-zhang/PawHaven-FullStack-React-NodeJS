@@ -19,25 +19,22 @@ export class PdfService implements OnModuleDestroy {
   constructor(private readonly configService: ConfigService) {}
 
   private async ensureBrowser(): Promise<Browser> {
-    if (this.browser) {
+    if (this.browser !== null) {
       return this.browser;
     }
 
-    if (!this.browserPromise) {
-      const launchPromise = launchBrowser(
+    let launchPromise = this.browserPromise;
+
+    if (launchPromise === null) {
+      launchPromise = launchBrowser(
         this.configService.get<string>('pdf.chromiumExecutablePath'),
       );
       this.browserPromise = launchPromise;
-      void launchPromise.catch(() => {
+      launchPromise.catch(() => {
         if (this.browserPromise === launchPromise) {
           this.browserPromise = null;
         }
       });
-    }
-
-    const launchPromise = this.browserPromise;
-    if (!launchPromise) {
-      throw new Error('Chromium initialization could not be started');
     }
 
     this.browser = await launchPromise;
@@ -45,7 +42,7 @@ export class PdfService implements OnModuleDestroy {
   }
 
   async onModuleDestroy(): Promise<void> {
-    if (this.browserPromise && !this.browser) {
+    if (this.browserPromise !== null && !this.browser) {
       try {
         await this.browserPromise;
       } catch {

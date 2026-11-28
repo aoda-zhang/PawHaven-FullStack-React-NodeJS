@@ -315,7 +315,7 @@ export class IdentityResolver {
 
   private refreshOnce(refreshToken: string): Promise<string[] | null> {
     const inflight = this.refreshInflight.get(refreshToken);
-    if (inflight) {
+    if (inflight !== undefined) {
       return inflight;
     }
     const refreshAttempt = this.requestRefresh(refreshToken);

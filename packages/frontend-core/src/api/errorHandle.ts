@@ -262,3 +262,10 @@ export const normalizeHttpError = (error: unknown): ApiErrorInfo => {
     raw: error,
   };
 };
+
+/**
+ * Carries normalized API error info on an `Error` so promise rejections keep a
+ * message and stack while callers can still read every `ApiErrorInfo` field.
+ */
+export const toApiError = (info: ApiErrorInfo): Error & ApiErrorInfo =>
+  Object.assign(new Error(info.code ?? info.type), info);
