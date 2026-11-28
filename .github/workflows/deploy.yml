@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy to a Vercel preview'
+        description: 'portal → Cloudflare Pages preview; backend services → Vercel preview'
         required: true
         type: choice
         default: gateway
@@ -13,123 +13,70 @@ on:
           - gateway
           - core-service
           - auth-service
+          - portal
 
 permissions:
   contents: read
 
-concurrency:
-  group: vercel-preview-${{ inputs.service }}
-  cancel-in-progress: false
-
 jobs:
-  build:
-    name: Build
-    uses: ./.github/workflows/build.yml
-    with:
-      service: ${{ inputs.service }}
-
-  preview:
-    name: Preview ${{ inputs.service }}
-    needs: [build]
+  build-vercel:
+    name: Build ${{ inputs.service }}
+    if: inputs.service != 'portal'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - name: Build for Vercel
+        uses: ./.github/actions/build-vercel
         with:
-          version: 12.4.1
-          run_install: false
+          service: ${{ inputs.service }}
+          vercelToken: ${{ secrets.VERCEL_TOKEN }}
+          vercelOrgId: ${{ secrets.VERCEL_ORG_ID }}
+          projectGateway: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          projectCore: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          projectAuth: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
 
-      - name: Set up Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+  build-cloudflare:
+    name: Build portal
+    if: inputs.service == 'portal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build for Cloudflare Pages
+        uses: ./.github/actions/build-cloudflare
         with:
-          node-version: 24
-          cache: pnpm
+          service: ${{ inputs.service }}
+          appEnv: prod
+          version: ${{ github.sha }}
+          apiBaseUrl: ${{ vars.PAWHAVEN_PORTAL_API_BASE_URL }}
 
-      # The Vercel project's Install Command is `echo skip-install`, so dependencies are installed
-      # here instead: one install, from the pnpm store that `setup-node` already restored.
-      - name: Install dependencies
-        shell: bash
-        run: pnpm install --frozen-lockfile --prefer-offline
+  vercel:
+    name: Vercel preview
+    if: inputs.service != 'portal'
+    needs: [build-vercel]
+    uses: ./.github/workflows/deploy-vercel.yml
+    with:
+      mode: preview
+      service: ${{ inputs.service }}
+    secrets: inherit
 
-      - name: Restore the Turbo cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .turbo
-          key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-
-            turbo-${{ inputs.service }}-
-
-      - name: Resolve the Vercel project
-        shell: bash
-        env:
-          SERVICE: ${{ inputs.service }}
-          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
-          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
-          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
-          ORG: ${{ secrets.VERCEL_ORG_ID }}
-          TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          set -euo pipefail
-          case "${SERVICE}" in
-            gateway) project="${PROJECT_GATEWAY}" ;;
-            core-service) project="${PROJECT_CORE}" ;;
-            auth-service) project="${PROJECT_AUTH}" ;;
-            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
-          esac
-          missing=""
-          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
-          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
-          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
-          if [ -n "${missing}" ]; then
-            echo "::error::Missing repository secrets:${missing}."
-            exit 1
-          fi
-          {
-            echo "VERCEL_ORG_ID=${ORG}"
-            echo "VERCEL_PROJECT_ID=${project}"
-            echo "VERCEL_TOKEN=${TOKEN}"
-          } >>"${GITHUB_ENV}"
-
-      - name: Restore the Vercel CLI
-        id: vercel-cli
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.vercel-cli
-          key: vercel-cli-67.0.0-${{ runner.os }}
-
-      - name: Install the Vercel CLI
-        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
-        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
-
-      - name: Put the Vercel CLI on PATH
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
-          "${HOME}/.vercel-cli/bin/vercel" --version
-
-      - name: Pull the preview settings
-        run: vercel pull --yes --environment=preview
-
-      - name: Build for preview
-        run: vercel build
-
-      - name: Deploy the preview
-        id: deploy
-        shell: bash
-        run: |
-          set -euo pipefail
-          url="$(vercel deploy --prebuilt)"
-          echo "url=${url}" >>"${GITHUB_OUTPUT}"
-          {
-            echo "### ${{ inputs.service }} preview"
-            echo
-            echo "${url}"
-            echo
-            echo "Release it with: \`gh workflow run release.yml -f service=${{ inputs.service }} -f deployment=${url}\`"
-          } >>"${GITHUB_STEP_SUMMARY}"
+  cloudflare:
+    name: Cloudflare Pages preview
+    if: inputs.service == 'portal'
+    needs: [build-cloudflare]
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    with:
+      mode: preview
+    secrets: inherit

@@ -1,14 +1,14 @@
 name: Release
 run-name: Release-${{ inputs.service }}
 
-# Production is a promotion, not a rebuild: the deployment you verified in `deploy.yml` is
-# promoted as-is, so production runs exactly the artifact that was reviewed. Swapping the deploy
-# target later means replacing this workflow only; `build.yml` stays untouched.
+# Production is a promotion, not a rebuild: a backend service promotes the Vercel deployment you
+# verified in `deploy.yml`, and the portal deploys the artifact that run built. Either way
+# production runs exactly the artifact that was reviewed.
 on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to promote to Vercel production'
+        description: 'Service to release to production'
         required: true
         type: choice
         default: gateway
@@ -16,17 +16,24 @@ on:
           - gateway
           - core-service
           - auth-service
+          - portal
       deployment:
-        description: 'Preview deployment URL to promote (from the deploy.yml summary)'
-        required: true
+        description: 'Vercel preview deployment URL (backend services only)'
+        required: false
         type: string
+        default: ''
+      deploy_run_id:
+        description: 'deploy.yml run ID that produced portal-build (portal only)'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
 
 jobs:
   precheck:
-    name: Check the release ref
+    name: Check the release request
     runs-on: ubuntu-latest
     steps:
       - name: Verify the dispatching branch
@@ -38,87 +45,46 @@ jobs:
             exit 1
           fi
 
-  release:
-    name: Release ${{ inputs.service }} to production
-    needs: [precheck]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    # The `prod` environment carries the required-reviewer gate, so a release only reaches
-    # production after an explicit approval.
-    environment: prod
-    concurrency:
-      group: vercel-prod-${{ inputs.service }}
-      cancel-in-progress: false
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Resolve the Vercel project
+      - name: Verify the release inputs
         shell: bash
         env:
           SERVICE: ${{ inputs.service }}
-          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
-          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
-          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
-          ORG: ${{ secrets.VERCEL_ORG_ID }}
-          TOKEN: ${{ secrets.VERCEL_TOKEN }}
           DEPLOYMENT: ${{ inputs.deployment }}
+          RUN_ID: ${{ inputs.deploy_run_id }}
         run: |
           set -euo pipefail
-          case "${SERVICE}" in
-            gateway) project="${PROJECT_GATEWAY}" ;;
-            core-service) project="${PROJECT_CORE}" ;;
-            auth-service) project="${PROJECT_AUTH}" ;;
-            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
-          esac
-          missing=""
-          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
-          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
-          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
-          if [ -n "${missing}" ]; then
-            echo "::error::Missing repository secrets:${missing}."
-            exit 1
+          if [ "${SERVICE}" = "portal" ]; then
+            if [[ ! "${RUN_ID}" =~ ^[0-9]+$ ]]; then
+              echo "::error::deploy_run_id must be the numeric run ID of a successful deploy.yml run, got '${RUN_ID}'."
+              exit 1
+            fi
+          else
+            case "${DEPLOYMENT}" in
+              https://*) ;;
+              *) echo "::error::deployment must be a Vercel deployment URL, got '${DEPLOYMENT}'."; exit 1 ;;
+            esac
           fi
-          case "${DEPLOYMENT}" in
-            https://*) ;;
-            *) echo "::error::deployment must be a Vercel deployment URL, got '${DEPLOYMENT}'."; exit 1 ;;
-          esac
-          {
-            echo "VERCEL_ORG_ID=${ORG}"
-            echo "VERCEL_PROJECT_ID=${project}"
-            echo "VERCEL_TOKEN=${TOKEN}"
-          } >>"${GITHUB_ENV}"
 
-      - name: Restore the Vercel CLI
-        id: vercel-cli
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.vercel-cli
-          key: vercel-cli-67.0.0-${{ runner.os }}
+  vercel:
+    name: Release ${{ inputs.service }} to Vercel production
+    needs: [precheck]
+    if: inputs.service != 'portal'
+    uses: ./.github/workflows/deploy-vercel.yml
+    with:
+      mode: production
+      service: ${{ inputs.service }}
+      deployment: ${{ inputs.deployment }}
+    secrets: inherit
 
-      - name: Install the Vercel CLI
-        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
-        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
-
-      - name: Put the Vercel CLI on PATH
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
-          "${HOME}/.vercel-cli/bin/vercel" --version
-
-      - name: Link the project
-        run: vercel pull --yes --environment=production
-
-      - name: Promote the deployment
-        shell: bash
-        env:
-          DEPLOYMENT: ${{ inputs.deployment }}
-        run: |
-          set -euo pipefail
-          vercel promote "${DEPLOYMENT}" --yes
-          {
-            echo "### ${{ inputs.service }} production"
-            echo
-            echo "Promoted \`${DEPLOYMENT}\` to the production alias."
-          } >>"${GITHUB_STEP_SUMMARY}"
+  cloudflare:
+    name: Release portal to Cloudflare Pages production
+    needs: [precheck]
+    if: inputs.service == 'portal'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/deploy-cloudflare.yml
+    with:
+      mode: production
+      deploy_run_id: ${{ inputs.deploy_run_id }}
+    secrets: inherit

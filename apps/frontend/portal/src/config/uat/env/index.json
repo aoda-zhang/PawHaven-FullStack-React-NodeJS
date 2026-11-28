@@ -1,12 +1,12 @@
 {
   "env": "uat",
-  "version": "${PAWHAVEN_USER_VERSION}",
+  "version": "${PAWHAVEN_PORTAL_VERSION}",
   "featureFlags": {
     "enableBetaFeature": false,
     "enableMaintenance": false
   },
   "api": {
-    "baseURL": "${PAWHAVEN_USER_API_BASE_URL}",
+    "baseURL": "${PAWHAVEN_PORTAL_API_BASE_URL}",
     "timeout": 20000
   },
   "query": {
@@ -16,13 +16,13 @@
     "gcTime": 60000
   },
   "sentry": {
-    "dsn": "${PAWHAVEN_USER_SENTRY_DSN}"
+    "dsn": "${PAWHAVEN_PORTAL_SENTRY_DSN}"
   },
   "analytics": {
-    "id": "${PAWHAVEN_USER_GA_ID}"
+    "id": "${PAWHAVEN_PORTAL_GA_ID}"
   },
   "services": {
-    "user": "${PAWHAVEN_USER_SERVICE_URL}",
-    "notification": "${PAWHAVEN_USER_NOTIFICATION_SERVICE_URL}"
+    "user": "${PAWHAVEN_PORTAL_SERVICE_URL}",
+    "notification": "${PAWHAVEN_PORTAL_NOTIFICATION_SERVICE_URL}"
   }
 }

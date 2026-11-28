@@ -239,7 +239,7 @@ jobs:
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
 
-      # The portal refuses to boot without PAWHAVEN_USER_APP_ENV, and `.env` is gitignored.
+      # The portal refuses to boot without PAWHAVEN_PORTAL_APP_ENV, and `.env` is gitignored.
       - name: Provide the portal environment
         shell: bash
         run: cp apps/frontend/portal/.env.example apps/frontend/portal/.env

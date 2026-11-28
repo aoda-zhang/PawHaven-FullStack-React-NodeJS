@@ -1,0 +1,131 @@
+# Build stage for a Vercel service. It runs `vercel build` once and uploads the prebuilt output, so
+# a preview deploy and any later promotion ship that output instead of compiling again.
+name: Build for Vercel
+description: Build a service with `vercel build` and upload the prebuilt output as vercel-build-<service>.
+
+inputs:
+  service:
+    description: 'Workspace package to build: gateway, core-service or auth-service.'
+    required: true
+  vercelToken:
+    description: 'Vercel API token.'
+    required: true
+  vercelOrgId:
+    description: 'Vercel organisation ID.'
+    required: true
+  projectGateway:
+    description: 'Vercel project ID for gateway.'
+    required: true
+  projectCore:
+    description: 'Vercel project ID for core-service.'
+    required: true
+  projectAuth:
+    description: 'Vercel project ID for auth-service.'
+    required: true
+  artifactRetentionDays:
+    description: 'Days the build artifact is kept.'
+    required: false
+    default: '7'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up the workspace
+      uses: ./.github/actions/setup
+
+    - name: Restore the Turbo cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .turbo
+        key: turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+        restore-keys: |
+          turbo-${{ inputs.service }}-${{ hashFiles('pnpm-lock.yaml') }}-
+          turbo-${{ inputs.service }}-
+
+    - name: Resolve the Vercel project
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+        PROJECT_GATEWAY: ${{ inputs.projectGateway }}
+        PROJECT_CORE: ${{ inputs.projectCore }}
+        PROJECT_AUTH: ${{ inputs.projectAuth }}
+        ORG: ${{ inputs.vercelOrgId }}
+        TOKEN: ${{ inputs.vercelToken }}
+      run: |
+        set -euo pipefail
+        case "${SERVICE}" in
+          gateway) project="${PROJECT_GATEWAY}" ;;
+          core-service) project="${PROJECT_CORE}" ;;
+          auth-service) project="${PROJECT_AUTH}" ;;
+          *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
+        esac
+        missing=""
+        if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+        if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+        if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
+        if [ -n "${missing}" ]; then
+          echo "::error::Missing repository secrets:${missing}."
+          exit 1
+        fi
+        {
+          echo "VERCEL_ORG_ID=${ORG}"
+          echo "VERCEL_PROJECT_ID=${project}"
+          echo "VERCEL_TOKEN=${TOKEN}"
+        } >>"${GITHUB_ENV}"
+
+    - name: Restore the Vercel CLI
+      id: vercel-cli
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.vercel-cli
+        key: vercel-cli-67.0.0-${{ runner.os }}
+
+    - name: Install the Vercel CLI
+      if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
+
+    - name: Put the Vercel CLI on PATH
+      shell: bash
+      run: |
+        set -euo pipefail
+        echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
+        "${HOME}/.vercel-cli/bin/vercel" --version
+
+    - name: Pull the preview settings
+      shell: bash
+      run: vercel pull --yes --environment=preview
+
+    - name: Build for preview
+      shell: bash
+      run: vercel build
+
+    - name: Typecheck the service
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+      run: |
+        set -euo pipefail
+        pnpm_config_verify_deps_before_run=false \
+          pnpm exec turbo run typecheck --filter="@pawhaven/${SERVICE}..."
+
+    - name: Stage the artifact
+      shell: bash
+      run: |
+        set -euo pipefail
+        rm -rf vercel-artifact
+        mkdir -p vercel-artifact
+        cp -R .vercel/output vercel-artifact/output
+        cp .vercel/project.json vercel-artifact/project.json
+
+    # `include-hidden-files` is required: every Vercel function carries a `.vc-config.json` inside
+    # its `.func` directory, and `upload-artifact` drops dotfiles by default.
+    - name: Upload the Vercel build
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: vercel-build-${{ inputs.service }}
+        path: vercel-artifact
+        retention-days: ${{ inputs.artifactRetentionDays }}
+        if-no-files-found: error
+        include-hidden-files: true
+        overwrite: true

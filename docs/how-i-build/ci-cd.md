@@ -6,9 +6,10 @@
 
 ## Principle
 
-CI proves; a deploy publishes. Every gate runs on a pull request and again after the merge, and
-production is never a side effect of a push: a release takes a deployment a human verified and
-promotes that exact artifact, so the thing that ships is the thing that was reviewed.
+CI proves; a build produces an artifact; a deploy publishes it. Every gate runs on a pull request and
+again after the merge, and production is never a side effect of a push: a release promotes or
+re-uploads the exact artifact a human verified, so the thing that ships is the thing that was
+reviewed.
 
 Container images are still part of the repository — one Dockerfile per service — because they are
 the portable artifact for any container runtime (AKS, EKS, ECS, Fly, a self-hosted cluster). No
@@ -16,14 +17,58 @@ registry is wired into CI today; see [Container images](#container-images).
 
 ## Workflows
 
-| Workflow                       | Trigger                      | What it does                                                                                                                       |
-| ------------------------------ | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `quality-gate.yml`             | PR to `develop`/`main`, push | Classifies the diff, runs only the checks the change can affect, and reports one required check, `Gate`                            |
-| `build.yml`                    | `workflow_call`              | Platform-neutral compile: install, `turbo run build`, `turbo run typecheck` for one workspace package                              |
-| `deploy.yml`                   | manual                       | Vercel **preview**: install, `vercel build`, `vercel deploy --prebuilt`, then prints the preview URL and the release command       |
-| `release.yml`                  | manual                       | Vercel **production**: promotes the deployment URL you pass, after the `prod` environment approval. No rebuild                     |
-| `sonar.yml`                    | `workflow_call`              | SonarQube Cloud analysis (code smells, duplication, maintainability), called by the gate. Blocking only when `SONAR_REQUIRED=true` |
-| `opencode-review.yml.disabled` | None                         | Preserved but disabled: GitHub ignores the non-`.yml` filename                                                                     |
+| Workflow                         | Trigger                      | What it does                                                                                                                       |
+| -------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `quality-gate.yml`               | PR to `develop`/`main`, push | Classifies the diff, runs only the checks the change can affect, and reports one required check, `Gate`                            |
+| `deploy.yml`                     | manual                       | Preview entry point: builds the service, then backend services call `deploy-vercel.yml`, `portal` calls `deploy-cloudflare.yml`    |
+| `deploy-vercel.yml`              | `workflow_call`              | Downloads `vercel-build-<service>` and runs `vercel deploy --prebuilt`, or promotes a preview URL for production                   |
+| `deploy-cloudflare.yml`          | `workflow_call`              | Downloads and uploads `portal-build` to a Cloudflare Pages preview, or deploys an earlier run's artifact to production             |
+| `release.yml`                    | manual                       | Production entry point: calls `deploy-vercel.yml` or `deploy-cloudflare.yml` after the `prod` environment approval. No build       |
+| `configure-vercel-retention.yml` | manual                       | Applies a deployment-retention profile to every configured Vercel project                                                          |
+| `sonar.yml`                      | `workflow_call`              | SonarQube Cloud analysis (code smells, duplication, maintainability), called by the gate. Blocking only when `SONAR_REQUIRED=true` |
+| `opencode-review.yml.disabled`   | None                         | Preserved but disabled: GitHub ignores the non-`.yml` filename                                                                     |
+
+## Build and deploy are separate stages
+
+`deploy.yml` builds first and deploys second, so a compile never runs inside a deploy job. The two
+build stages are composite actions, like `./.github/actions/build-image`:
+
+| Action                               | Scope            | Produces                                  |
+| ------------------------------------ | ---------------- | ----------------------------------------- |
+| `./.github/actions/build-vercel`     | backend services | `vercel-build-<service>`, retained 7 days |
+| `./.github/actions/build-cloudflare` | `portal`         | `portal-build`, retained 7 days           |
+
+Both actions run `./.github/actions/setup` (pnpm, Node, frozen install), so the caller only
+checks out the repository.
+
+- **Vercel.** `vercel build` writes the prebuilt deployment to `.vercel/output` and links the
+  project in `.vercel/project.json`. The action copies both into a non-hidden `vercel-artifact`
+  directory and uploads it as `vercel-build-<service>`; `artifactRetentionDays` defaults to 7 so a
+  release has time to happen. The upload sets `include-hidden-files: true` because every Vercel
+  function carries a `.vc-config.json`, which the default upload would drop. The job gets
+  `VERCEL_{ORG_ID,PROJECT_ID,TOKEN}` from the action's inputs and fails naming any missing value.
+- **Cloudflare.** The action receives `appEnv`, `version` and `apiBaseUrl` as required inputs and
+  writes them to `apps/frontend/portal/.env.production` for the commit, then runs
+  `pnpm --filter @pawhaven/portal run turbo:build` and typechecks the portal. `deploy.yml` passes
+  `appEnv: prod` literally, `version: ${{ github.sha }}` and
+  `apiBaseUrl: ${{ vars.PAWHAVEN_PORTAL_API_BASE_URL }}`, so setting the target up means creating one
+  repository variable, `PAWHAVEN_PORTAL_API_BASE_URL=https://api.pawhaven.work/api`;
+  `PAWHAVEN_PORTAL_APP_ENV` is fixed at `prod` in the workflow and `PAWHAVEN_PORTAL_VERSION` is
+  `github.sha`. Vite bakes the URL into the public bundle, so a repository variable is the right
+  place for it. An empty input fails the build naming the missing value, and the action rejects an app
+  env outside `dev|uat|test|prod` or an API base that does not start with `http://`/`https://` before
+  it writes the file. `.gitignore`
+  excludes `.env.*`, so the generated file is never committed. It uploads `apps/frontend/portal/build` as
+  `portal-build` and deliberately restores no Turbo cache: the environment file is not part of
+  Turbo's task hash, and a replayed cache entry could ship a stale environment. The build step also
+  sets `TURBO_FORCE: 'true'`, so it never replays a cache entry that appears anyway.
+
+The preview deploy only downloads the artifact and pushes it: `deploy-vercel.yml` restores
+`vercel-build-<service>` into `.vercel` and runs `vercel deploy --prebuilt`, and
+`deploy-cloudflare.yml` restores `portal-build` into `build` and runs `wrangler pages deploy`. A
+download from the same run needs no `run-id` or GitHub token, and neither preview job compiles or
+installs workspace dependencies. Keep producer and consumer names in step: the artifact name and the
+download path are a contract.
 
 ## The Quality Gate
 
@@ -60,13 +105,25 @@ distinguished from a pending one, which is why the fan-in job exists.
 
 ## The two entry points
 
-| Input        | `deploy.yml` (preview)                        | `release.yml` (production)                          |
-| ------------ | --------------------------------------------- | --------------------------------------------------- |
-| Service      | `gateway` \| `core-service` \| `auth-service` | same                                                |
-| Branch       | any ref                                       | `main` only (precheck)                              |
-| Build        | `vercel build` for the selected project       | **none** — `vercel promote`                         |
-| Approval     | none                                          | `prod` environment with required reviewers          |
-| What changes | a new immutable preview deployment            | the production alias of the selected Vercel project |
+`deploy.yml` and `release.yml` are the only manual entry points. Each one calls a reusable per-target
+workflow, so the preview and production jobs of a target share one implementation.
+
+| Input        | `deploy.yml` (preview)                                      | `release.yml` (production)                                      |
+| ------------ | ----------------------------------------------------------- | --------------------------------------------------------------- |
+| Service      | `gateway` \| `core-service` \| `auth-service` \| `portal`   | same                                                            |
+| Branch       | any ref                                                     | `main` only (precheck)                                          |
+| Target       | Vercel for backend services, Cloudflare Pages for `portal`  | same                                                            |
+| Build        | `build-vercel` or `build-cloudflare` action, in its own job | **none** — `vercel promote`, or a deploy of the portal artifact |
+| Approval     | none                                                        | `prod` environment with required reviewers                      |
+| What changes | a new immutable preview deployment, or a Pages preview URL  | the production alias, or the Pages production deployment        |
+
+`release.yml` takes a different input per target, because the two targets reuse the preview in
+different ways:
+
+| Input           | Backend services              | `portal`                      |
+| --------------- | ----------------------------- | ----------------------------- |
+| `deployment`    | Vercel preview URL to promote | left empty                    |
+| `deploy_run_id` | left empty                    | `deploy.yml` run ID to deploy |
 
 `deploy.yml` prints the preview URL in the job summary together with the exact command that releases
 it:
@@ -76,10 +133,69 @@ gh workflow run deploy.yml --ref main -f service=gateway
 gh workflow run release.yml --ref main \
   -f service=gateway \
   -f deployment=https://pawhaven-gateway-<id>-pawhaven.vercel.app
+
+gh workflow run deploy.yml --ref main -f service=portal
+gh workflow run release.yml --ref main -f service=portal -f deploy_run_id=<run id>
 ```
 
-Promotion is the whole point: no second build, so production runs the artifact that was reviewed.
-Rolling back is promoting an older deployment URL, or reverting on `main` and previewing again.
+Promotion is the whole point: no second backend build, so production runs the artifact that was
+reviewed. Rolling back is promoting an older deployment URL, or reverting on `main` and previewing
+again.
+
+### Portal artifact reuse
+
+The portal cannot be promoted, so the build job's output is what both the preview and the production
+run publish:
+
+1. `deploy.yml`'s `build-cloudflare` job runs `./.github/actions/build-cloudflare`, which builds the
+   portal once and uploads `apps/frontend/portal/build` as the `portal-build` artifact, kept for 7
+   days.
+2. The preview job in `deploy-cloudflare.yml` downloads `portal-build` from the same run and uploads
+   it to the `preview` branch.
+3. `release.yml -f service=portal` receives that run's ID as `deploy_run_id`.
+4. The production job re-reads the run through the API and refuses it unless the workflow path is
+   `.github/workflows/deploy.yml`, the branch is `main`, the commit is the current `main` SHA and the
+   conclusion is `success`.
+5. It downloads `portal-build` from that run to `build` and uploads it to Pages on `main`.
+
+The `prod` approval must therefore land within those 7 days: an artifact that expired before the
+release starts fails the run instead of shipping a stale bundle.
+
+The portal therefore ships the exact bundle the preview served, not a build of whatever `main` looks
+like at release time.
+
+## Cloudflare Pages
+
+The portal is a static Vite bundle on the Pages project `pawhaven-portal`:
+
+- production is the `main` branch, preview deployments are the `preview` branch. Before deploying,
+  the workflow reads the Pages project through the API and refuses to run unless its production
+  branch is exactly `main`, so `--branch preview` cannot publish to production and `--branch main`
+  cannot publish anywhere else;
+- deploys are direct uploads from CI through the official `cloudflare/wrangler-action`, pinned to
+  `v4.1.3` with `wranglerVersion: 4.168.0` and `packageManager: npm`. The action runs in an isolated
+  temporary working directory, so the wrangler install never lands in the pnpm workspace or the
+  downloaded bundle. The build runs in `./.github/actions/build-cloudflare` on GitHub Actions with
+  the same toolchain as every other job, and it deliberately restores no Turbo cache: Vite reads a
+  `.env.production` the action writes at build time from the caller's `appEnv`, `version` and
+  `apiBaseUrl` inputs, that file is excluded by `.gitignore` and is not part of Turbo's task hash,
+  so a replayed cache entry could ship a stale environment; the build step therefore sets
+  `TURBO_FORCE: 'true'`;
+- the action supplies `deployment-url`, `pages-deployment-alias-url` and `pages-environment` as step
+  outputs, so the workflow reads them instead of parsing wrangler's output;
+- `gitHubToken` is not passed to the action, so it creates no GitHub Deployment and the job needs no
+  `deployments: write` permission;
+- deep links resolve through Pages' built-in SPA fallback: with no top-level `404.html` in the bundle,
+  an unmatched path serves `index.html`. A `_redirects` file is not needed — a catch-all rewrite can be
+  rejected as an infinite loop, and the built-in fallback already covers deep links. Do not add a
+  `404.html` unless a replacement fallback is introduced;
+- secrets are `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`;
+- **Cloudflare Pages automatic deployments must stay off** for the project (Settings → Builds &
+  deployments → Automatic deployments). Otherwise a push to `main` publishes a bundle that skipped
+  the quality gate and the artifact validation above.
+
+The preview is visual only: the bundle calls the same-origin `/api` path, and Pages serves no API
+proxy, so API-backed flows need the production host or a local gateway.
 
 ## Container images
 
@@ -107,10 +223,41 @@ namespace or Platform manifest is committed any more — the ECS-era `deploy/pla
 
 ## Concurrency and safety
 
-- `deploy.yml` uses `vercel-preview-<service>`; `release.yml` uses `vercel-prod-<service>`, both with
-  `cancel-in-progress: false`, so two runs of the same service never race on the same alias.
-- Neither workflow writes repository contents; both declare `contents: read`.
+- The reusable jobs own the groups, one per target and mode: `vercel-preview-<service>`,
+  `vercel-prod-<service>`, `cloudflare-preview-<project>` and `cloudflare-prod-<project>`, all with
+  `cancel-in-progress: false`, so two runs of the same target never race on the same alias. The
+  retention job owns `vercel-retention`, also non-cancelling, so two profile runs never interleave.
+- No workflow writes repository contents: every workflow here declares `contents: read`. The jobs that
+  read another run's artifact — `production` in `deploy-cloudflare.yml` and `cloudflare` in
+  `release.yml` — add `actions: read` at job level, so preview and precheck jobs never request it.
+  Preview downloads happen within the same run, so a preview job needs no `actions: read`.
+  `cloudflare` in `deploy.yml` grants `actions: read` too: GitHub validates the whole declared job
+  graph of a called workflow, so even a preview-only call has to cover the `production` job it
+  declares.
 - `release.yml` refuses a non-`main` dispatch before anything else runs.
+
+## Deployment retention and Functions Storage
+
+Vercel bills per deployment artifact; a project that keeps every preview forever grows its Functions
+Storage even when the code is tiny. `configure-vercel-retention.yml` is a dispatch-only workflow that
+applies one of two profiles to every configured Vercel project: `gateway`, `core-service`,
+`auth-service`, and `document-service` when `VERCEL_PROJECT_ID_DOCUMENT_SERVICE` is set:
+
+| Profile        | `expiration` | `expirationProduction` | `expirationCanceled` | `expirationErrored` |
+| -------------- | ------------ | ---------------------- | -------------------- | ------------------- |
+| `conservative` | `1w`         | `1m`                   | `1d`                 | `1w`                |
+| `aggressive`   | `1d`         | `1w`                   | `1d`                 | `1d`                |
+
+It `PATCH`es `https://api.vercel.com/v9/projects/<project>/deployment-expiration` with the profile and
+reads `.deploymentExpiration` back from that response, falling back to
+`GET https://api.vercel.com/v2/projects/<project>` when the `PATCH` body carries no value, so the
+summary shows the stored values; if neither yields one the run fails naming the project. A project
+whose ID secret is empty is skipped with a warning; if no project ID is configured at all the run
+fails. The job runs in the `prod` environment, so it needs the same reviewer approval as a release.
+
+The metric is not immediate: deletions free storage at once but usage can take 24–48h to catch up,
+and deployments exempted from the rules can keep reporting for up to 30 days. Check the dashboard
+after that window before reducing a bundle size or a function region to cut the bill.
 
 ## Repository protection
 

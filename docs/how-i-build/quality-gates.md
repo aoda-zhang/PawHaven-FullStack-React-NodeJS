@@ -67,15 +67,15 @@ still run in CI.
 | Workflow                       | Purpose                                                                                                                                                                                           | Also called by     |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ |
 | `quality-gate.yml`             | Classifies the diff, runs `Static checks`, `Unit tests`, `Build`, `Accessibility`, `Component catalogue`, `UI package`, `React Doctor`, `Security` and `SonarQube Cloud`, then reports one `Gate` | —                  |
-| `build.yml`                    | Platform-neutral compile for one workspace package (install, `turbo run build`, `turbo run typecheck`)                                                                                            | `deploy.yml`       |
 | `sonar.yml`                    | SonarQube Cloud analysis; blocking only when the `SONAR_REQUIRED` variable is `true`                                                                                                              | `quality-gate.yml` |
 | `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers (see [CI/CD](ci-cd.md))                                                                                                                  | —                  |
 
 The gate runs on pull requests and pushes to `develop`/`main`, and `release.yml` does not re-run
-it: a release promotes a deployment the gate already checked.
+it: a backend release promotes the Vercel preview the gate already checked, and a portal release
+deploys the `portal-build` artifact from a successful `main` `deploy.yml` run at the same commit.
 
 `deploy.yml` and `release.yml` are not gates: they run no tests and no lint. `release.yml` only
-promotes a deployment the gate already checked, so the checks that matter are the merge-time gates.
+publishes what the gate already checked, so the checks that matter are the merge-time gates.
 
 ## Adding a gate
 

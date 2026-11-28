@@ -1,0 +1,100 @@
+# Build stage for the Cloudflare Pages portal. It produces the static bundle once and uploads it, so
+# a preview deploy and a later production release push the same artifact instead of rebuilding.
+name: Build for Cloudflare Pages
+description: Build the portal bundle and upload it as the portal-build artifact.
+
+inputs:
+  service:
+    description: 'Workspace package to build; only portal is supported.'
+    required: true
+  appEnv:
+    description: 'App environment baked into the bundle; supplied by the caller (for example prod).'
+    required: true
+  version:
+    description: 'Bundle version baked into the build; supplied by the caller, normally the commit SHA.'
+    required: true
+  apiBaseUrl:
+    description: 'API base URL baked into the bundle; supplied by the caller from a repository variable.'
+    required: true
+  artifactRetentionDays:
+    description: 'Days the build artifact is kept.'
+    required: false
+    default: '7'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up the workspace
+      uses: ./.github/actions/setup
+
+    - name: Verify the target service
+      shell: bash
+      env:
+        SERVICE: ${{ inputs.service }}
+      run: |
+        set -euo pipefail
+        if [ "${SERVICE}" != "portal" ]; then
+          echo "::error::build-cloudflare only builds portal, got '${SERVICE}'."
+          exit 1
+        fi
+
+    # Vite reads `.env.production` for a production build, and the bundle throws at runtime when
+    # `PAWHAVEN_PORTAL_APP_ENV` is missing.
+    # `PAWHAVEN_PORTAL_API_BASE_URL` completes the config schema; `apiClient` uses same-origin `/api`.
+    # The caller supplies every value, so the build environment is never fixed inside this action.
+    - name: Write the build environment
+      shell: bash
+      env:
+        APP_ENV: ${{ inputs.appEnv }}
+        VERSION: ${{ inputs.version }}
+        API_BASE_URL: ${{ inputs.apiBaseUrl }}
+      run: |
+        set -euo pipefail
+        missing=""
+        if [ -z "${APP_ENV}" ]; then missing="${missing} PAWHAVEN_PORTAL_APP_ENV"; fi
+        if [ -z "${VERSION}" ]; then missing="${missing} PAWHAVEN_PORTAL_VERSION"; fi
+        if [ -z "${API_BASE_URL}" ]; then missing="${missing} PAWHAVEN_PORTAL_API_BASE_URL"; fi
+        if [ -n "${missing}" ]; then
+          echo "::error::Missing build inputs:${missing}."
+          exit 1
+        fi
+        case "${APP_ENV}" in
+          dev | uat | test | prod) ;;
+          *)
+            echo "::error::PAWHAVEN_PORTAL_APP_ENV must be dev, uat, test or prod, got '${APP_ENV}'."
+            exit 1
+            ;;
+        esac
+        case "${API_BASE_URL}" in
+          http://* | https://*) ;;
+          *)
+            echo "::error::PAWHAVEN_PORTAL_API_BASE_URL must start with http:// or https://, got '${API_BASE_URL}'."
+            exit 1
+            ;;
+        esac
+        cat >apps/frontend/portal/.env.production <<EOF
+        PAWHAVEN_PORTAL_APP_ENV=${APP_ENV}
+        PAWHAVEN_PORTAL_VERSION=${VERSION}
+        PAWHAVEN_PORTAL_API_BASE_URL=${API_BASE_URL}
+        EOF
+
+    # `.env.production` is generated after checkout and is not part of Turbo's task hash, so a cache
+    # entry could replay a bundle built from a different environment; force the task instead.
+    - name: Build the portal
+      shell: bash
+      env:
+        TURBO_FORCE: 'true'
+      run: pnpm --filter @pawhaven/portal run turbo:build
+
+    - name: Typecheck the portal
+      shell: bash
+      run: pnpm_config_verify_deps_before_run=false pnpm exec turbo run typecheck --filter="@pawhaven/portal..."
+
+    - name: Upload the portal build
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: portal-build
+        path: apps/frontend/portal/build
+        retention-days: ${{ inputs.artifactRetentionDays }}
+        if-no-files-found: error
+        overwrite: true

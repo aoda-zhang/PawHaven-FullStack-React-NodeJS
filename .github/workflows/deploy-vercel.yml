@@ -1,0 +1,233 @@
+# The Vercel deploy target, shared by both entry points: `deploy.yml` calls it for a preview,
+# `release.yml` for production. It is `workflow_call` only, so it never runs on its own.
+name: Deploy Vercel
+run-name: Deploy-${{ inputs.service }}-${{ inputs.mode }}
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: 'Deployment mode: preview or production'
+        required: true
+        type: string
+      service:
+        description: 'Workspace package to deploy'
+        required: true
+        type: string
+      deployment:
+        description: 'Vercel preview deployment URL to promote (production only)'
+        required: false
+        type: string
+        default: ''
+    # Declared but not required so the job can report which secret is missing instead of failing
+    # on an empty expression.
+    secrets:
+      VERCEL_TOKEN:
+        required: false
+      VERCEL_ORG_ID:
+        required: false
+      VERCEL_PROJECT_ID_GATEWAY:
+        required: false
+      VERCEL_PROJECT_ID_CORE_SERVICE:
+        required: false
+      VERCEL_PROJECT_ID_AUTH_SERVICE:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  precheck:
+    name: Check the deployment mode
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the mode
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          set -euo pipefail
+          case "${MODE}" in
+            preview|production) ;;
+            *) echo "::error::mode must be 'preview' or 'production', got '${MODE}'."; exit 1 ;;
+          esac
+
+  preview:
+    name: Preview ${{ inputs.service }}
+    if: inputs.mode == 'preview'
+    needs: [precheck]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: vercel-preview-${{ inputs.service }}
+      cancel-in-progress: false
+    steps:
+      # The CLI only: the bundle is built by `.github/actions/build-vercel` and downloaded below, so
+      # no workspace install or Turbo cache is needed here.
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Resolve the Vercel project
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          ORG: ${{ secrets.VERCEL_ORG_ID }}
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          case "${SERVICE}" in
+            gateway) project="${PROJECT_GATEWAY}" ;;
+            core-service) project="${PROJECT_CORE}" ;;
+            auth-service) project="${PROJECT_AUTH}" ;;
+            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
+          esac
+          missing=""
+          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+          {
+            echo "VERCEL_ORG_ID=${ORG}"
+            echo "VERCEL_PROJECT_ID=${project}"
+            echo "VERCEL_TOKEN=${TOKEN}"
+          } >>"${GITHUB_ENV}"
+
+      - name: Restore the Vercel CLI
+        id: vercel-cli
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.vercel-cli
+          key: vercel-cli-67.0.0-${{ runner.os }}
+
+      - name: Install the Vercel CLI
+        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
+        shell: bash
+        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
+
+      - name: Put the Vercel CLI on PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
+          "${HOME}/.vercel-cli/bin/vercel" --version
+
+      # The artifact holds `.vercel/output` and `.vercel/project.json` at its root, so downloading it
+      # into `.vercel` restores the prebuilt deployment `vercel deploy --prebuilt` expects.
+      - name: Download the Vercel build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: vercel-build-${{ inputs.service }}
+          path: .vercel
+
+      - name: Pull the preview settings
+        shell: bash
+        run: vercel pull --yes --environment=preview
+
+      - name: Deploy the preview
+        id: deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="$(vercel deploy --prebuilt)"
+          echo "url=${url}" >>"${GITHUB_OUTPUT}"
+          {
+            echo "### ${{ inputs.service }} preview"
+            echo
+            echo "${url}"
+            echo
+            echo "Release it with: \`gh workflow run release.yml -f service=${{ inputs.service }} -f deployment=${url}\`"
+          } >>"${GITHUB_STEP_SUMMARY}"
+
+  production:
+    name: Production ${{ inputs.service }}
+    if: inputs.mode == 'production'
+    needs: [precheck]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The `prod` environment carries the required-reviewer gate, so a release only reaches
+    # production after an explicit approval.
+    environment: prod
+    concurrency:
+      group: vercel-prod-${{ inputs.service }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Resolve the Vercel project
+        shell: bash
+        env:
+          SERVICE: ${{ inputs.service }}
+          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          ORG: ${{ secrets.VERCEL_ORG_ID }}
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DEPLOYMENT: ${{ inputs.deployment }}
+        run: |
+          set -euo pipefail
+          case "${SERVICE}" in
+            gateway) project="${PROJECT_GATEWAY}" ;;
+            core-service) project="${PROJECT_CORE}" ;;
+            auth-service) project="${PROJECT_AUTH}" ;;
+            *) echo "::error::No Vercel project mapped for ${SERVICE}."; exit 1 ;;
+          esac
+          missing=""
+          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+          if [ -z "${project}" ]; then missing="${missing} VERCEL_PROJECT_ID (${SERVICE})"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+          case "${DEPLOYMENT}" in
+            https://*) ;;
+            *) echo "::error::deployment must be a Vercel deployment URL, got '${DEPLOYMENT}'."; exit 1 ;;
+          esac
+          {
+            echo "VERCEL_ORG_ID=${ORG}"
+            echo "VERCEL_PROJECT_ID=${project}"
+            echo "VERCEL_TOKEN=${TOKEN}"
+          } >>"${GITHUB_ENV}"
+
+      - name: Restore the Vercel CLI
+        id: vercel-cli
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.vercel-cli
+          key: vercel-cli-67.0.0-${{ runner.os }}
+
+      - name: Install the Vercel CLI
+        if: ${{ steps.vercel-cli.outputs.cache-hit != 'true' }}
+        run: npm install --global --prefix "${HOME}/.vercel-cli" vercel@67.0.0
+
+      - name: Put the Vercel CLI on PATH
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
+          "${HOME}/.vercel-cli/bin/vercel" --version
+
+      - name: Link the project
+        run: vercel pull --yes --environment=production
+
+      - name: Promote the deployment
+        shell: bash
+        env:
+          DEPLOYMENT: ${{ inputs.deployment }}
+        run: |
+          set -euo pipefail
+          vercel promote "${DEPLOYMENT}" --yes
+          {
+            echo "### ${{ inputs.service }} production"
+            echo
+            echo "Promoted \`${DEPLOYMENT}\` to the production alias."
+          } >>"${GITHUB_STEP_SUMMARY}"

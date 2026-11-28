@@ -41,7 +41,7 @@ reviews:
       instructions: |
         - Colours must come from design-system tokens; flag raw hex values and Tailwind palette names.
         - User-visible strings go through `t('namespace.key')`; flag hardcoded copy.
-        - The portal refuses to boot without `PAWHAVEN_USER_APP_ENV`; keep config validation strict.
+        - The portal refuses to boot without `PAWHAVEN_PORTAL_APP_ENV`; keep config validation strict.
     - path: "packages/i18n/locales/**"
       instructions: |
         - Every key must exist in de-DE, en-US and zh-CN.

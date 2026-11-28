@@ -436,9 +436,14 @@ through `AUTH_SERVICE_HOST` and `CORE_SERVICE_HOST`, which point at their own Ve
 only the gateway is a public surface — core-service and auth-service have no public route, and the
 request that reaches them carries the gateway's internal JWT.
 
-Shipping is manual and two-stage. `deploy.yml` builds and deploys a Vercel preview for one service;
-`release.yml` promotes that exact deployment to production after the `prod` environment approval, so
-production runs the artifact that was reviewed. No push deploys anything.
+Shipping is manual and splits build from deploy. `deploy.yml` first runs a build job for the chosen
+service — `.github/actions/build-vercel` produces `.vercel/output` plus `project.json` and uploads
+`vercel-build-<service>`; `.github/actions/build-cloudflare` produces the portal bundle and uploads
+`portal-build` — then a deploy job downloads that artifact and publishes it: a Vercel preview for a
+backend service, a Cloudflare Pages preview for the portal. `release.yml` never builds. It publishes
+only what was built: a backend service promotes the exact Vercel deployment, and the portal
+re-deploys the `portal-build` artifact from that earlier run after the `prod` environment approval.
+Cloudflare Pages automatic deployments are disabled, so no push deploys anything.
 
 ### 9.2 Portability
 

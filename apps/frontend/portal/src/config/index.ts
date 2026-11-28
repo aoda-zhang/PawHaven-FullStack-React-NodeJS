@@ -15,7 +15,7 @@ export const EnvVariables = {
 
 const loadEnvContent = () => {
   const environmentVariables = import.meta.env;
-  const currentEnv = environmentVariables.PAWHAVEN_USER_APP_ENV;
+  const currentEnv = environmentVariables.PAWHAVEN_PORTAL_APP_ENV;
   switch (currentEnv) {
     case EnvVariables.dev:
       return devConfig;
@@ -32,7 +32,7 @@ const loadEnvContent = () => {
 
 export const loadConfig = (): ConfigType => {
   const environmentVariables = import.meta.env;
-  const currentEnv = environmentVariables.PAWHAVEN_USER_APP_ENV;
+  const currentEnv = environmentVariables.PAWHAVEN_PORTAL_APP_ENV;
 
   if (!currentEnv || !(currentEnv in EnvVariables)) {
     throw new Error(`Invalid or missing environment mode: ${currentEnv}`);
