@@ -32,6 +32,18 @@
       * {
         box-sizing: border-box;
       }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+      }
       body {
         margin: 0;
       }
@@ -496,14 +508,18 @@
         </div>
         <div class="toolbar">
           <label class="search"
+            ><span class="visually-hidden">Search tokens</span
             ><input
               id="search"
               type="search"
               placeholder="Search token name, value, category…" /></label
+          ><label class="visually-hidden" for="layer">Filter by layer</label
           ><select id="layer">
             <option value="all">All layers</option>
             <option value="Primitive">Primitive</option>
             <option value="Semantic">Semantic</option></select
+          ><label class="visually-hidden" for="category"
+            >Filter by category</label
           ><select id="category">
             <option value="all">All categories</option></select
           ><span class="result" id="result-count"></span>
@@ -519,10 +535,13 @@
           <div class="component-row">
             <button class="demo-btn">Primary action</button
             ><button class="demo-btn secondary">Secondary action</button
-            ><input class="demo-input" placeholder="Text input" /><span
-              class="demo-badge"
-              >Success</span
-            >
+            ><label class="visually-hidden" for="demo-text-input"
+              >Demo text input</label
+            ><input
+              class="demo-input"
+              id="demo-text-input"
+              placeholder="Text input"
+            /><span class="demo-badge">Success</span>
             <div class="demo-card">
               <b>Rescue case</b>
               <p style="margin: 7px 0 0; color: #777">
@@ -2628,7 +2647,7 @@
             (/^(--spacing-|--size-|--container-)/.test(t.name) ? v : '100%');
           label = t.value;
         } else if (c === 'Opacity') {
-          style = 'opacity:' + parseFloat(v) / 100;
+          style = 'opacity:' + Number.parseFloat(v) / 100;
           label = t.value;
         } else {
           label = t.value;
@@ -2689,7 +2708,7 @@
           c === 'Container widths'
         ) {
           const v = t.resolved || t.value;
-          const n = parseFloat(v);
+          const n = Number.parseFloat(v);
           const width = Number.isFinite(n)
             ? Math.min(
                 180,
@@ -2708,7 +2727,7 @@
         else if (c === 'Opacity')
           preview =
             '<div class="sample"><div style="width:70px;height:42px;background:#ee701e;opacity:' +
-            parseFloat(t.value) / 100 +
+            Number.parseFloat(t.value) / 100 +
             ';border-radius:7px"></div></div>';
         else
           preview =

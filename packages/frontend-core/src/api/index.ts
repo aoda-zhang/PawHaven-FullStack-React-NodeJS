@@ -8,7 +8,7 @@ import axios, {
 import { getLocale } from '../utils/get-locale/getLocale';
 
 import { getUTCTimestamp } from './encrypt';
-import { normalizeHttpError } from './errorHandle';
+import { normalizeHttpError, toApiError } from './errorHandle';
 import { recordTraceId } from './trace';
 import type { ApiClientOptions, ApiResponseType } from './types';
 import { RequestMode } from './types';
@@ -64,7 +64,7 @@ export const createApiClient = (options: ApiClientOptions) => {
       return config;
     },
     (error) => {
-      return Promise.reject(normalizeHttpError(error));
+      return Promise.reject(toApiError(normalizeHttpError(error)));
     },
   );
 
@@ -90,10 +90,10 @@ export const createApiClient = (options: ApiClientOptions) => {
         return response.data.data as AxiosResponse<ApiResponseType>;
       }
 
-      return Promise.reject(normalizeHttpError(response.data));
+      return Promise.reject(toApiError(normalizeHttpError(response.data)));
     },
     (error) => {
-      return Promise.reject(normalizeHttpError(error));
+      return Promise.reject(toApiError(normalizeHttpError(error)));
     },
   );
 

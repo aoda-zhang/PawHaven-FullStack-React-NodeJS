@@ -42,7 +42,6 @@ module.exports = {
     // TypeScript-specific overrides
     '@typescript-eslint/no-var-requires': 'off', // Allow require() in Node.js scripts
     'no-useless-constructor': 'off',
-    'no-empty-function': ['error', { allow: ['constructors'] }], // Allow empty constructors for dependency injection
     '@typescript-eslint/no-useless-constructor': 'off', // Allow constructors with only dependency injection
     '@typescript-eslint/no-explicit-any': 'warn', // Warn on use of any
     '@typescript-eslint/explicit-function-return-type': 'warn', // Recommend explicit return types in backend
@@ -62,18 +61,8 @@ module.exports = {
     '@typescript-eslint/no-empty-function': 'off',
     'node/no-unsupported-features/es-syntax': 'off',
     'eslintnode/no-unsupported-features/es-syntax': 'off',
-    'prettier/prettier': [
-      'error',
-      {
-        singleQuote: true,
-        endOfLine: 'auto',
-      },
-    ],
-    'no-underscore-dangle': 'warn',
-    '@typescript-eslint/consistent-type-imports': 'off',
-    'no-empty-function': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
     'prettier/prettier': 'off',
+    'no-underscore-dangle': 'warn',
     '@typescript-eslint/consistent-type-imports': 'off',
   },
 

@@ -352,7 +352,7 @@ const normalizeLine = (line) =>
   const candidates = [...seen.entries()].filter(([, files]) => files.size >= 2);
   for (const [line, files] of candidates) {
     warnings.push(
-      `duplicate-rule candidate (${files.size} files): "${line}" — ${[...files].sort().join(', ')}`,
+      `duplicate-rule candidate (${files.size} files): "${line}" — ${[...files].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).join(', ')}`,
     );
   }
   console.log(

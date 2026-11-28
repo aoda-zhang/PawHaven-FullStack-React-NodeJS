@@ -44,7 +44,7 @@ function collectDirs(root, acc = []) {
 }
 
 function signatureOf() {
-  const hash = createHash('sha1');
+  const hash = createHash('sha256');
   const digestFile = (file) => {
     try {
       hash.update(file);
