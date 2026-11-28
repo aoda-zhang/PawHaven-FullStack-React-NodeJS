@@ -103,7 +103,8 @@ jobs:
             echo "### Storage accounting"
             echo
             echo "Deployment deletions free Functions Storage immediately, but the usage metric can lag"
-            echo "24–48h. Older deployments exempted from the retention rules can keep reporting storage"
-            echo "for up to 30 days, so re-check the dashboard after that window before sizing a bundle or"
-            echo "region change."
+            echo "24–48h. Retention exceptions can keep a deployment stored beyond the configured"
+            echo "window — for example a deployment kept by an active production alias, or the"
+            echo "recent-deployment minimum. If storage stays high, inspect the project's retention"
+            echo "exceptions and deployments instead of waiting for a fixed 30-day window."
           } >>"${GITHUB_STEP_SUMMARY}"

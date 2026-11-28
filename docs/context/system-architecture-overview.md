@@ -440,10 +440,13 @@ Shipping is manual and splits build from deploy. `deploy.yml` first runs a build
 service — `.github/actions/build-vercel` produces `.vercel/output` plus `project.json` and uploads
 `vercel-build-<service>`; `.github/actions/build-cloudflare` produces the portal bundle and uploads
 `portal-build` — then a deploy job downloads that artifact and publishes it: a Vercel preview for a
-backend service, a Cloudflare Pages preview for the portal. `release.yml` never builds. It publishes
-only what was built: a backend service promotes the exact Vercel deployment, and the portal
-re-deploys the `portal-build` artifact from that earlier run after the `prod` environment approval.
-Cloudflare Pages automatic deployments are disabled, so no push deploys anything.
+backend service, a Cloudflare Pages preview for the portal. `release.yml` never builds. A backend
+service promotes the preview URL, and Vercel rebuilds the same commit with the production
+environment, so production runs the reviewed commit rather than a byte-identical preview artifact;
+an exact-artifact release instead stages a production deployment built with the production
+environment and `--skip-domain`, then promotes that. The portal re-deploys the `portal-build`
+artifact from that earlier run after the `prod` environment approval. Cloudflare Pages automatic
+deployments are disabled, so no push deploys anything.
 
 ### 9.2 Portability
 

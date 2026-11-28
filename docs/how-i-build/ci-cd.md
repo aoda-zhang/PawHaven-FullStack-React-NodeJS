@@ -7,9 +7,9 @@
 ## Principle
 
 CI proves; a build produces an artifact; a deploy publishes it. Every gate runs on a pull request and
-again after the merge, and production is never a side effect of a push: a release promotes or
-re-uploads the exact artifact a human verified, so the thing that ships is the thing that was
-reviewed.
+again after the merge, and production is never a side effect of a push: a backend release promotes
+the verified preview, which Vercel rebuilds from the same commit with the production environment,
+and a portal release re-uploads the verified `portal-build` artifact.
 
 Container images are still part of the repository — one Dockerfile per service — because they are
 the portable artifact for any container runtime (AKS, EKS, ECS, Fly, a self-hosted cluster). No
@@ -108,14 +108,14 @@ distinguished from a pending one, which is why the fan-in job exists.
 `deploy.yml` and `release.yml` are the only manual entry points. Each one calls a reusable per-target
 workflow, so the preview and production jobs of a target share one implementation.
 
-| Input        | `deploy.yml` (preview)                                      | `release.yml` (production)                                      |
-| ------------ | ----------------------------------------------------------- | --------------------------------------------------------------- |
-| Service      | `gateway` \| `core-service` \| `auth-service` \| `portal`   | same                                                            |
-| Branch       | any ref                                                     | `main` only (precheck)                                          |
-| Target       | Vercel for backend services, Cloudflare Pages for `portal`  | same                                                            |
-| Build        | `build-vercel` or `build-cloudflare` action, in its own job | **none** — `vercel promote`, or a deploy of the portal artifact |
-| Approval     | none                                                        | `prod` environment with required reviewers                      |
-| What changes | a new immutable preview deployment, or a Pages preview URL  | the production alias, or the Pages production deployment        |
+| Input        | `deploy.yml` (preview)                                      | `release.yml` (production)                                                                                             |
+| ------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Service      | `gateway` \| `core-service` \| `auth-service` \| `portal`   | same                                                                                                                   |
+| Branch       | any ref                                                     | `main` only (precheck)                                                                                                 |
+| Target       | Vercel for backend services, Cloudflare Pages for `portal`  | same                                                                                                                   |
+| Build        | `build-vercel` or `build-cloudflare` action, in its own job | **no CI build**; Vercel rebuilds on promote with the production environment, Cloudflare re-uploads the portal artifact |
+| Approval     | none                                                        | `prod` environment with required reviewers                                                                             |
+| What changes | a new immutable preview deployment, or a Pages preview URL  | the production alias, or the Pages production deployment                                                               |
 
 `release.yml` takes a different input per target, because the two targets reuse the preview in
 different ways:
@@ -138,9 +138,11 @@ gh workflow run deploy.yml --ref main -f service=portal
 gh workflow run release.yml --ref main -f service=portal -f deploy_run_id=<run id>
 ```
 
-Promotion is the whole point: no second backend build, so production runs the artifact that was
-reviewed. Rolling back is promoting an older deployment URL, or reverting on `main` and previewing
-again.
+Promotion is the whole point: a backend release promotes the preview URL, and Vercel rebuilds the
+same commit with the production environment. Production therefore runs the reviewed commit, not a
+byte-identical preview artifact. If an exact-artifact release is required, stage a production
+deployment — build with the production environment and `--skip-domain` — and promote that instead.
+Rolling back is promoting an older deployment URL, or reverting on `main` and previewing again.
 
 ### Portal artifact reuse
 
@@ -255,9 +257,12 @@ summary shows the stored values; if neither yields one the run fails naming the 
 whose ID secret is empty is skipped with a warning; if no project ID is configured at all the run
 fails. The job runs in the `prod` environment, so it needs the same reviewer approval as a release.
 
-The metric is not immediate: deletions free storage at once but usage can take 24–48h to catch up,
-and deployments exempted from the rules can keep reporting for up to 30 days. Check the dashboard
-after that window before reducing a bundle size or a function region to cut the bill.
+The metric is not immediate: deletions free storage at once, but usage can take 24–48h to catch up.
+A long reporting delay is not the only reason storage stays high: retention exceptions can keep a
+deployment stored beyond the configured window — a deployment kept by an active production alias, or
+the recent-deployment minimum, for example. If storage stays high, inspect the project's retention
+exceptions and deployments instead of waiting for a fixed 30-day window, and only then consider
+reducing a bundle size or a function region.
 
 ## Repository protection
 

@@ -96,9 +96,10 @@ runs:
       shell: bash
       run: vercel pull --yes --environment=preview
 
+    # `--standalone` inlines workspace deps into `.vercel/output`, so no repo checkout is needed.
     - name: Build for preview
       shell: bash
-      run: vercel build
+      run: vercel build --standalone
 
     - name: Typecheck the service
       shell: bash

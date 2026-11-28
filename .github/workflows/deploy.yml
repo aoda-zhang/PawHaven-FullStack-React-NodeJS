@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-${{ inputs.service }}
+  cancel-in-progress: false
+
 jobs:
   build-vercel:
     name: Build ${{ inputs.service }}
