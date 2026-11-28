@@ -71,14 +71,14 @@ jobs:
               return
             fi
             configured=$((configured + 1))
-            response="$(curl -fsS --request PATCH \
+            response="$(curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsS --request PATCH \
               "https://api.vercel.com/v9/projects/${project}/deployment-expiration?teamId=${ORG}" \
               --header "Authorization: Bearer ${TOKEN}" \
               --header "Content-Type: application/json" \
               --data "${payload}")"
             retention="$(jq -c '.deploymentExpiration // empty' <<<"${response}" 2>/dev/null)" || retention=""
             if [ -z "${retention}" ]; then
-              project_body="$(curl -fsS \
+              project_body="$(curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsS \
                 "https://api.vercel.com/v2/projects/${project}?teamId=${ORG}" \
                 --header "Authorization: Bearer ${TOKEN}")" || project_body=""
               retention="$(jq -c '.deploymentExpiration // empty' <<<"${project_body}" 2>/dev/null)" || retention=""

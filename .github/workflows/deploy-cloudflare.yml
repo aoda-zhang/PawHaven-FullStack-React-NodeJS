@@ -62,7 +62,7 @@ jobs:
           PROJECT: ${{ inputs.project }}
         run: |
           set -euo pipefail
-          if ! response="$(curl -fsS \
+          if ! response="$(curl --proto '=https' --proto-redir '=https' --tlsv1.2 -fsS \
             "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects/${PROJECT}" \
             --header "Authorization: Bearer ${CF_TOKEN}")"; then
             echo "::error::Could not read the Cloudflare Pages project ${PROJECT}; the deploy cannot confirm which branch is production."
