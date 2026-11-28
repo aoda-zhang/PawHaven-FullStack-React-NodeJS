@@ -1,6 +1,6 @@
-# Build stage for a Vercel service. It runs `vercel build --standalone` and uploads the prebuilt
-# output for the preview deploy; promotion asks Vercel to rebuild the same commit with production
-# environment variables.
+# Build stage for a Vercel service. It runs `vercel build --standalone --prod`, so the uploaded
+# prebuilt output carries the production environment and the deploy publishes it as-is; there is no
+# preview build and no promotion.
 name: Build for Vercel
 description: Build a service with `vercel build` and upload the prebuilt output as vercel-build-<service>.
 
@@ -93,14 +93,15 @@ runs:
         echo "${HOME}/.vercel-cli/bin" >>"${GITHUB_PATH}"
         "${HOME}/.vercel-cli/bin/vercel" --version
 
-    - name: Pull the preview settings
+    - name: Pull the production settings
       shell: bash
-      run: vercel pull --yes --environment=preview
+      run: vercel pull --yes --environment=production
 
-    # `--standalone` inlines workspace deps into `.vercel/output`, so no repo checkout is needed.
-    - name: Build for preview
+    # `--standalone` inlines workspace deps into `.vercel/output`, so no repo checkout is needed;
+    # `--prod` builds against the production environment the pull above downloaded.
+    - name: Build for production
       shell: bash
-      run: vercel build --standalone
+      run: vercel build --standalone --prod
 
     - name: Typecheck the service
       shell: bash

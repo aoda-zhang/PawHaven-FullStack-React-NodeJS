@@ -1,10 +1,9 @@
 name: Release
 run-name: Release-${{ inputs.service }}
 
-# Production from a preview is a promotion, but Vercel rebuilds a promoted preview with the
-# production environment: a backend service promotes the reviewed commit, not a byte-identical
-# preview artifact. The portal deploy instead publishes the artifact its deploy run built. For an
-# exact backend artifact, stage a production deployment built with production env before promotion.
+# One manual production entry point. The build jobs produce the deploy artifact and the deploy
+# workflows publish it directly to production after the `prod` environment approval; there is no
+# preview deployment and no promotion step.
 on:
   workflow_dispatch:
     inputs:
@@ -18,16 +17,6 @@ on:
           - core-service
           - auth-service
           - portal
-      deployment:
-        description: 'Vercel preview deployment URL (backend services only)'
-        required: false
-        type: string
-        default: ''
-      deploy_run_id:
-        description: 'deploy.yml run ID that produced portal-build (portal only)'
-        required: false
-        type: string
-        default: ''
 
 permissions:
   contents: read
@@ -46,46 +35,60 @@ jobs:
             exit 1
           fi
 
-      - name: Verify the release inputs
-        shell: bash
-        env:
-          SERVICE: ${{ inputs.service }}
-          DEPLOYMENT: ${{ inputs.deployment }}
-          RUN_ID: ${{ inputs.deploy_run_id }}
-        run: |
-          set -euo pipefail
-          if [ "${SERVICE}" = "portal" ]; then
-            if [[ ! "${RUN_ID}" =~ ^[0-9]+$ ]]; then
-              echo "::error::deploy_run_id must be the numeric run ID of a successful deploy.yml run, got '${RUN_ID}'."
-              exit 1
-            fi
-          else
-            case "${DEPLOYMENT}" in
-              https://*) ;;
-              *) echo "::error::deployment must be a Vercel deployment URL, got '${DEPLOYMENT}'."; exit 1 ;;
-            esac
-          fi
+  build-vercel:
+    name: Build ${{ inputs.service }}
+    needs: [precheck]
+    if: inputs.service != 'portal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build for Vercel
+        uses: ./.github/actions/build-vercel
+        with:
+          service: ${{ inputs.service }}
+          vercelToken: ${{ secrets.VERCEL_TOKEN }}
+          vercelOrgId: ${{ secrets.VERCEL_ORG_ID }}
+          projectGateway: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          projectCore: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          projectAuth: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+
+  build-cloudflare:
+    name: Build portal
+    needs: [precheck]
+    if: inputs.service == 'portal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build for Cloudflare Pages
+        uses: ./.github/actions/build-cloudflare
+        with:
+          service: ${{ inputs.service }}
+          appEnv: prod
+          version: ${{ github.sha }}
+          apiBaseUrl: ${{ vars.PAWHAVEN_PORTAL_API_BASE_URL }}
 
   vercel:
     name: Release ${{ inputs.service }} to Vercel production
-    needs: [precheck]
+    needs: [precheck, build-vercel]
     if: inputs.service != 'portal'
     uses: ./.github/workflows/deploy-vercel.yml
     with:
-      mode: production
       service: ${{ inputs.service }}
-      deployment: ${{ inputs.deployment }}
     secrets: inherit
 
   cloudflare:
     name: Release portal to Cloudflare Pages production
-    needs: [precheck]
+    needs: [precheck, build-cloudflare]
     if: inputs.service == 'portal'
-    permissions:
-      contents: read
-      actions: read
     uses: ./.github/workflows/deploy-cloudflare.yml
-    with:
-      mode: production
-      deploy_run_id: ${{ inputs.deploy_run_id }}
     secrets: inherit

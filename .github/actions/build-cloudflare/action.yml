@@ -1,5 +1,5 @@
 # Build stage for the Cloudflare Pages portal. It produces the static bundle once and uploads it, so
-# a preview deploy and a later production release push the same artifact instead of rebuilding.
+# the production deploy publishes that artifact instead of rebuilding it.
 name: Build for Cloudflare Pages
 description: Build the portal bundle and upload it as the portal-build artifact.
 
