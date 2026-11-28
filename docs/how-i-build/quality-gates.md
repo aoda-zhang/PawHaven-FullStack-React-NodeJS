@@ -133,11 +133,11 @@ still run in CI.
 | `opencode-review.yml.disabled` | Disabled, preserved PR reviewer definition — no triggers                                                                                                                                                                                                                                                     | —                  |
 
 The gate runs on pull requests and pushes to `develop`/`main`, and `release.yml` does not re-run
-it: a backend release promotes the Vercel preview the gate already checked, and a portal release
-deploys the `portal-build` artifact from a successful `main` `deploy.yml` run at the same commit.
+it: a release builds the chosen service and publishes that artifact straight to production after
+the `prod` environment approval.
 
-`deploy.yml` and `release.yml` are not gates: they run no tests and no lint. `release.yml` only
-publishes what the gate already checked, so the checks that matter are the merge-time gates.
+`release.yml` is not a gate: it runs no tests and no lint. It only publishes what the gate already
+checked, so the checks that matter are the merge-time gates.
 
 ## Adding a gate
 
