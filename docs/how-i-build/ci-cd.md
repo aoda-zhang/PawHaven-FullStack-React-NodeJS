@@ -52,7 +52,7 @@ checks out the repository.
   `pnpm --filter @pawhaven/portal run turbo:build` and typechecks the portal. `deploy.yml` passes
   `appEnv: prod` literally, `version: ${{ github.sha }}` and
   `apiBaseUrl: ${{ vars.PAWHAVEN_PORTAL_API_BASE_URL }}`, so setting the target up means creating one
-  repository variable, `PAWHAVEN_PORTAL_API_BASE_URL=https://api.pawhaven.work/api`;
+  repository variable, `PAWHAVEN_PORTAL_API_BASE_URL=https://pawhaven.work/api`;
   `PAWHAVEN_PORTAL_APP_ENV` is fixed at `prod` in the workflow and `PAWHAVEN_PORTAL_VERSION` is
   `github.sha`. Vite bakes the URL into the public bundle, so a repository variable is the right
   place for it. An empty input fails the build naming the missing value, and the action rejects an app

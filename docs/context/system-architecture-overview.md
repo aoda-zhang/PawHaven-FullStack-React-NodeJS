@@ -430,7 +430,7 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 | portal                              | Cloudflare Pages                                                   |
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
-`api.pawhaven.work` is fronted by a Cloudflare Worker: paths under `/api/` are forwarded to the
+`pawhaven.work` is fronted by a Cloudflare Worker: paths under `/api/` are forwarded to the
 gateway's Vercel deployment, everything else to the portal. The gateway reaches the other services
 through `AUTH_SERVICE_HOST` and `CORE_SERVICE_HOST`, which point at their own Vercel deployments, so
 only the gateway is a public surface — core-service and auth-service have no public route, and the
