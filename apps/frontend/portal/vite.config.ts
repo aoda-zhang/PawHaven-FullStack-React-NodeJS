@@ -7,7 +7,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig({
-  envPrefix: 'PAWHAVEN_USER_',
+  envPrefix: 'PAWHAVEN_PORTAL_',
   base: '/',
   resolve: {
     alias: {

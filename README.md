@@ -15,7 +15,6 @@ The platform allows users to report rescue cases, track rescue progress, share r
 
 In addition to the application itself, PawHaven also serves as a **practice of modern full-stack engineering**, focusing on scalable architecture, maintainable code, and efficient development workflows.
 
-
 ## Core product journey
 
 The diagram below summarizes the main animal journey, from the initial report to rescue, care, and adoption.
@@ -45,13 +44,14 @@ flowchart TD
 
 # How I Build
 
-| Document                                                              | Description                                                                                   |
-| --------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [Global Architecture](./docs/context/system-architecture-overview.md) | The whole system — services, packages, data flow, deployment                                  |
-| [Frontend Architecture](./docs/context/frontend-architecture.md)      | The frontend units and the direction their dependencies run in                                |
-| [Backend Architecture](./docs/context/backend-architecture.md)        | The backend services and packages, and how they depend on each other                          |
-| [Design Tokens](./docs/how-i-build/design-tokens.md)                  | Why a design system, how the token layers are built, how the lint plugin holds them honest    |
-| [UI Library](./docs/how-i-build/ui-library.md)                        | What `@pawhaven/ui` is, the quality gates around it, and how to browse and look up components |
+| Document                                                              | Description                                                                                              |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [Global Architecture](./docs/context/system-architecture-overview.md) | The whole system — services, packages, data flow, deployment                                             |
+| [Frontend Architecture](./docs/context/frontend-architecture.md)      | The frontend units and the direction their dependencies run in                                           |
+| [Backend Architecture](./docs/context/backend-architecture.md)        | The backend services and packages, and how they depend on each other                                     |
+| [Design Tokens](./docs/how-i-build/design-tokens.md)                  | Why a design system, how the token layers are built, how the lint plugin holds them honest               |
+| [UI Library](./docs/how-i-build/ui-library.md)                        | What `@pawhaven/ui` is, the quality gates around it, and how to browse and look up components            |
+| [Quality Gates](./docs/how-i-build/quality-gates.md)                  | The merge gate: what each check proves, how jobs are filtered, and why `Gate` is the only required check |
 
 ---
 

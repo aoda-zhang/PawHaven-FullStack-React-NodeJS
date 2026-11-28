@@ -1,0 +1,314 @@
+# The Cloudflare Pages deploy target for the portal. Production reuses the artifact a preview run
+# built and validated, so the bundle that ships is the bundle that was reviewed.
+name: Deploy Cloudflare Pages
+run-name: Deploy-portal-${{ inputs.mode }}
+
+on:
+  workflow_call:
+    inputs:
+      mode:
+        description: 'Deployment mode: preview or production'
+        required: true
+        type: string
+      project:
+        description: 'Cloudflare Pages project name'
+        required: false
+        type: string
+        default: pawhaven-portal
+      deploy_run_id:
+        description: 'deploy.yml run ID that produced the portal-build artifact (production only)'
+        required: false
+        type: string
+        default: ''
+    # Declared but not required so the job can report which secret is missing instead of failing
+    # on an empty expression.
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: false
+      CLOUDFLARE_ACCOUNT_ID:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  precheck:
+    name: Check the deployment request
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the mode
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode }}
+          RUN_ID: ${{ inputs.deploy_run_id }}
+        run: |
+          set -euo pipefail
+          case "${MODE}" in
+            preview) ;;
+            production)
+              if [[ ! "${RUN_ID}" =~ ^[0-9]+$ ]]; then
+                echo "::error::deploy_run_id must be the numeric run ID of a successful deploy.yml run, got '${RUN_ID}'."
+                exit 1
+              fi
+              ;;
+            *) echo "::error::mode must be 'preview' or 'production', got '${MODE}'."; exit 1 ;;
+          esac
+
+  preview:
+    name: Preview ${{ inputs.project }}
+    if: inputs.mode == 'preview'
+    needs: [precheck]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: cloudflare-preview-${{ inputs.project }}
+      cancel-in-progress: false
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Verify the Cloudflare credentials
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          missing=""
+          if [ -z "${CF_TOKEN}" ]; then missing="${missing} CLOUDFLARE_API_TOKEN"; fi
+          if [ -z "${CF_ACCOUNT}" ]; then missing="${missing} CLOUDFLARE_ACCOUNT_ID"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+
+      - name: Verify the Pages production branch
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          if ! response="$(curl -fsS \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects/${PROJECT}" \
+            --header "Authorization: Bearer ${CF_TOKEN}")"; then
+            echo "::error::Could not read the Cloudflare Pages project ${PROJECT}; the deploy cannot confirm which branch is production."
+            exit 1
+          fi
+          branch="$(jq -r '.result.production_branch // empty' <<<"${response}" 2>/dev/null)" || branch=""
+          if [ "${branch}" != "main" ]; then
+            echo "::error::Cloudflare Pages project ${PROJECT} uses '${branch:-<empty>}' as its production branch, not 'main'; the deploy would target the wrong branch."
+            exit 1
+          fi
+
+      # The bundle is built by `.github/actions/build-cloudflare` in the same run and uploaded as
+      # `portal-build`, so this job only downloads it and pushes it to Pages.
+      - name: Download the portal build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: portal-build
+          path: build
+
+      # `wrangler-action` installs wrangler with npm in its working directory, so a dedicated
+      # directory keeps that install out of the pnpm workspace and away from the built artifact.
+      - name: Prepare the Wrangler workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/wrangler"
+
+      - name: Deploy the preview
+        id: deploy
+        uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
+        env:
+          WRANGLER_SEND_METRICS: false
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.168.0'
+          packageManager: npm
+          workingDirectory: ${{ runner.temp }}/wrangler
+          command: pages deploy ${{ github.workspace }}/build --project-name=${{ inputs.project }} --branch=preview --commit-hash=${{ github.sha }}
+
+      - name: Record the preview
+        shell: bash
+        env:
+          URL: ${{ steps.deploy.outputs.deployment-url }}
+          ALIAS: ${{ steps.deploy.outputs.pages-deployment-alias-url }}
+          ENVIRONMENT: ${{ steps.deploy.outputs.pages-environment }}
+        run: |
+          set -euo pipefail
+          if [ -z "${URL}" ]; then
+            echo "::error::wrangler-action reported no deployment-url for the portal preview."
+            exit 1
+          fi
+          if [ -n "${ENVIRONMENT}" ] && [ "${ENVIRONMENT}" != "preview" ]; then
+            echo "::error::The portal preview deployed to Pages environment '${ENVIRONMENT}', not 'preview'."
+            exit 1
+          fi
+          {
+            echo "### portal preview"
+            echo
+            echo "${URL}"
+            if [ -n "${ALIAS}" ]; then
+              echo
+              echo "Alias: ${ALIAS}"
+            fi
+            echo
+            echo "Release it with: \`gh workflow run release.yml -f service=portal -f deploy_run_id=${{ github.run_id }}\`"
+          } >>"${GITHUB_STEP_SUMMARY}"
+
+  production:
+    name: Production ${{ inputs.project }}
+    if: inputs.mode == 'production'
+    needs: [precheck]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # The `prod` environment carries the required-reviewer gate, so a release only reaches
+    # production after an explicit approval.
+    environment: prod
+    permissions:
+      contents: read
+      actions: read
+    concurrency:
+      group: cloudflare-prod-${{ inputs.project }}
+      cancel-in-progress: false
+    steps:
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      - name: Verify the Cloudflare credentials
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          missing=""
+          if [ -z "${CF_TOKEN}" ]; then missing="${missing} CLOUDFLARE_API_TOKEN"; fi
+          if [ -z "${CF_ACCOUNT}" ]; then missing="${missing} CLOUDFLARE_ACCOUNT_ID"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+
+      - name: Verify the Pages production branch
+        shell: bash
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ inputs.project }}
+        run: |
+          set -euo pipefail
+          if ! response="$(curl -fsS \
+            "https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT}/pages/projects/${PROJECT}" \
+            --header "Authorization: Bearer ${CF_TOKEN}")"; then
+            echo "::error::Could not read the Cloudflare Pages project ${PROJECT}; the deploy cannot confirm which branch is production."
+            exit 1
+          fi
+          branch="$(jq -r '.result.production_branch // empty' <<<"${response}" 2>/dev/null)" || branch=""
+          if [ "${branch}" != "main" ]; then
+            echo "::error::Cloudflare Pages project ${PROJECT} uses '${branch:-<empty>}' as its production branch, not 'main'; the deploy would target the wrong branch."
+            exit 1
+          fi
+
+      # `wrangler-action` installs wrangler with npm in its working directory, so a dedicated
+      # directory keeps that install out of the workspace that holds the downloaded artifact.
+      - name: Prepare the Wrangler workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "${RUNNER_TEMP}/wrangler"
+
+      - name: Validate the deploy run
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ inputs.deploy_run_id }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}")"
+          path="$(jq -r '.path' <<<"${run}")"
+          branch="$(jq -r '.head_branch' <<<"${run}")"
+          sha="$(jq -r '.head_sha' <<<"${run}")"
+          conclusion="$(jq -r '.conclusion' <<<"${run}")"
+          if [ "${path}" != ".github/workflows/deploy.yml" ]; then
+            echo "::error::Run ${RUN_ID} ran ${path}, not .github/workflows/deploy.yml."
+            exit 1
+          fi
+          if [ "${branch}" != "main" ]; then
+            echo "::error::Run ${RUN_ID} ran from ${branch}; the portal build must come from main."
+            exit 1
+          fi
+          if [ "${sha}" != "${COMMIT_SHA}" ]; then
+            echo "::error::Run ${RUN_ID} built ${sha}, but this release is for ${COMMIT_SHA}."
+            exit 1
+          fi
+          if [ "${conclusion}" != "success" ]; then
+            echo "::error::Run ${RUN_ID} concluded '${conclusion}', not 'success'."
+            exit 1
+          fi
+
+      - name: Verify the portal build artifact
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ inputs.deploy_run_id }}
+        run: |
+          set -euo pipefail
+          names="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" --jq '.artifacts[].name')"
+          if ! grep -qxF 'portal-build' <<<"${names}"; then
+            echo "::error::Run ${RUN_ID} has no portal-build artifact (not a portal deploy, or the artifact expired)."
+            exit 1
+          fi
+
+      - name: Download the portal build
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: portal-build
+          path: build
+          run-id: ${{ inputs.deploy_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy production
+        id: deploy
+        uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
+        env:
+          WRANGLER_SEND_METRICS: false
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.168.0'
+          packageManager: npm
+          workingDirectory: ${{ runner.temp }}/wrangler
+          command: pages deploy ${{ github.workspace }}/build --project-name=${{ inputs.project }} --branch=main --commit-hash=${{ github.sha }}
+
+      - name: Record the production deployment
+        shell: bash
+        env:
+          URL: ${{ steps.deploy.outputs.deployment-url }}
+          ENVIRONMENT: ${{ steps.deploy.outputs.pages-environment }}
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${URL}" ]; then
+            echo "::error::wrangler-action reported no deployment-url for the portal production deployment."
+            exit 1
+          fi
+          if [ -n "${ENVIRONMENT}" ] && [ "${ENVIRONMENT}" != "production" ]; then
+            echo "::error::The portal production deployment reported Pages environment '${ENVIRONMENT}', not 'production'."
+            exit 1
+          fi
+          {
+            echo "### portal production"
+            echo
+            echo "Commit \`${COMMIT_SHA}\`"
+            echo
+            echo "${URL}"
+          } >>"${GITHUB_STEP_SUMMARY}"

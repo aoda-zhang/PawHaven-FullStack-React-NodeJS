@@ -1,0 +1,110 @@
+# Deployment retention is a Vercel project setting, not part of a deploy. This workflow applies one
+# of two profiles to every configured project so Vercel Functions Storage stops growing with old
+# build output.
+name: Configure Vercel retention
+run-name: Configure-Vercel-retention-${{ inputs.profile }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Retention profile to apply to every Vercel project'
+        required: true
+        type: choice
+        default: conservative
+        options:
+          - conservative
+          - aggressive
+
+permissions:
+  contents: read
+
+jobs:
+  retention:
+    name: Apply the ${{ inputs.profile }} retention profile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # The `prod` environment carries the required-reviewer gate, so retention only changes after an
+    # explicit approval.
+    environment: prod
+    concurrency:
+      group: vercel-retention
+      cancel-in-progress: false
+    steps:
+      - name: Apply the retention profile
+        shell: bash
+        env:
+          PROFILE: ${{ inputs.profile }}
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          ORG: ${{ secrets.VERCEL_ORG_ID }}
+          PROJECT_GATEWAY: ${{ secrets.VERCEL_PROJECT_ID_GATEWAY }}
+          PROJECT_CORE: ${{ secrets.VERCEL_PROJECT_ID_CORE_SERVICE }}
+          PROJECT_AUTH: ${{ secrets.VERCEL_PROJECT_ID_AUTH_SERVICE }}
+          PROJECT_DOCUMENT: ${{ secrets.VERCEL_PROJECT_ID_DOCUMENT_SERVICE }}
+        run: |
+          set -euo pipefail
+          case "${PROFILE}" in
+            conservative)
+              expiration="1w"; expiration_production="1m"; expiration_canceled="1d"; expiration_errored="1w" ;;
+            aggressive)
+              expiration="1d"; expiration_production="1w"; expiration_canceled="1d"; expiration_errored="1d" ;;
+            *) echo "::error::Unknown profile '${PROFILE}'."; exit 1 ;;
+          esac
+          missing=""
+          if [ -z "${TOKEN}" ]; then missing="${missing} VERCEL_TOKEN"; fi
+          if [ -z "${ORG}" ]; then missing="${missing} VERCEL_ORG_ID"; fi
+          if [ -n "${missing}" ]; then
+            echo "::error::Missing repository secrets:${missing}."
+            exit 1
+          fi
+          payload="$(jq -n \
+            --arg expiration "${expiration}" \
+            --arg production "${expiration_production}" \
+            --arg canceled "${expiration_canceled}" \
+            --arg errored "${expiration_errored}" \
+            '{expiration: $expiration, expirationProduction: $production, expirationCanceled: $canceled, expirationErrored: $errored}')"
+          configured=0
+          apply_profile() {
+            local name="$1" project="$2"
+            if [ -z "${project}" ]; then
+              echo "::warning::Skipping ${name}: no Vercel project ID secret configured."
+              return
+            fi
+            configured=$((configured + 1))
+            response="$(curl -fsS --request PATCH \
+              "https://api.vercel.com/v9/projects/${project}/deployment-expiration?teamId=${ORG}" \
+              --header "Authorization: Bearer ${TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "${payload}")"
+            retention="$(jq -c '.deploymentExpiration // empty' <<<"${response}" 2>/dev/null)" || retention=""
+            if [ -z "${retention}" ]; then
+              project_body="$(curl -fsS \
+                "https://api.vercel.com/v2/projects/${project}?teamId=${ORG}" \
+                --header "Authorization: Bearer ${TOKEN}")" || project_body=""
+              retention="$(jq -c '.deploymentExpiration // empty' <<<"${project_body}" 2>/dev/null)" || retention=""
+            fi
+            if [ -z "${retention}" ]; then
+              echo "::error::Could not read the deployment expiration for ${name} (${project}) from the PATCH response or the project object."
+              exit 1
+            fi
+            echo "### ${name}" >>"${GITHUB_STEP_SUMMARY}"
+            jq . <<<"${retention}" | tee -a "${GITHUB_STEP_SUMMARY}"
+          }
+          apply_profile gateway "${PROJECT_GATEWAY}"
+          apply_profile core-service "${PROJECT_CORE}"
+          apply_profile auth-service "${PROJECT_AUTH}"
+          apply_profile document-service "${PROJECT_DOCUMENT}"
+          if [ "${configured}" -eq 0 ]; then
+            echo "::error::No Vercel project IDs configured; nothing to update."
+            exit 1
+          fi
+          {
+            echo
+            echo "### Storage accounting"
+            echo
+            echo "Deployment deletions free Functions Storage immediately, but the usage metric can lag"
+            echo "24–48h. Retention exceptions can keep a deployment stored beyond the configured"
+            echo "window — for example a deployment kept by an active production alias, or the"
+            echo "recent-deployment minimum. If storage stays high, inspect the project's retention"
+            echo "exceptions and deployments instead of waiting for a fixed 30-day window."
+          } >>"${GITHUB_STEP_SUMMARY}"

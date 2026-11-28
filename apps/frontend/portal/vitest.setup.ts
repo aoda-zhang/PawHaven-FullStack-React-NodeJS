@@ -4,14 +4,14 @@ import '@testing-library/jest-dom/vitest';
 import { vi } from 'vitest';
 vi.stubGlobal('import.meta', {
   env: {
-    PAWHAVEN_USER_APP_ENV: 'test',
-    PAWHAVEN_USER_API_BASE_URL: 'http://localhost',
-    PAWHAVEN_USER_API_PRIVATE_KEY: 'test-key',
-    PAWHAVEN_USER_VERSION: '1.0.0',
-    PAWHAVEN_USER_SENTRY_DSN: '',
-    PAWHAVEN_USER_GA_ID: '',
-    PAWHAVEN_USER_SERVICE_URL: '',
-    PAWHAVEN_USER_NOTIFICATION_SERVICE_URL: '',
+    PAWHAVEN_PORTAL_APP_ENV: 'test',
+    PAWHAVEN_PORTAL_API_BASE_URL: 'http://localhost',
+    PAWHAVEN_PORTAL_API_PRIVATE_KEY: 'test-key',
+    PAWHAVEN_PORTAL_VERSION: '1.0.0',
+    PAWHAVEN_PORTAL_SENTRY_DSN: '',
+    PAWHAVEN_PORTAL_GA_ID: '',
+    PAWHAVEN_PORTAL_SERVICE_URL: '',
+    PAWHAVEN_PORTAL_NOTIFICATION_SERVICE_URL: '',
   },
 });
 

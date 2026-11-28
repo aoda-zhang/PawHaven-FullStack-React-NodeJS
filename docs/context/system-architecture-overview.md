@@ -430,15 +430,23 @@ The gateway forwards an inbound `x-trace-id` header, or mints one with `crypto.r
 | portal                              | Cloudflare Pages                                                   |
 | MongoDB                             | Managed cluster; auth-service and core-service each own a database |
 
-`api.pawhaven.work` is fronted by a Cloudflare Worker: paths under `/api/` are forwarded to the
+`pawhaven.work` is fronted by a Cloudflare Worker: paths under `/api/` are forwarded to the
 gateway's Vercel deployment, everything else to the portal. The gateway reaches the other services
 through `AUTH_SERVICE_HOST` and `CORE_SERVICE_HOST`, which point at their own Vercel deployments, so
 only the gateway is a public surface — core-service and auth-service have no public route, and the
 request that reaches them carries the gateway's internal JWT.
 
-Shipping is manual and two-stage. `deploy.yml` builds and deploys a Vercel preview for one service;
-`release.yml` promotes that exact deployment to production after the `prod` environment approval, so
-production runs the artifact that was reviewed. No push deploys anything.
+Shipping is manual and splits build from deploy. `deploy.yml` first runs a build job for the chosen
+service — `.github/actions/build-vercel` produces `.vercel/output` plus `project.json` and uploads
+`vercel-build-<service>`; `.github/actions/build-cloudflare` produces the portal bundle and uploads
+`portal-build` — then a deploy job downloads that artifact and publishes it: a Vercel preview for a
+backend service, a Cloudflare Pages preview for the portal. `release.yml` never builds. A backend
+service promotes the preview URL, and Vercel rebuilds the same commit with the production
+environment, so production runs the reviewed commit rather than a byte-identical preview artifact;
+an exact-artifact release instead stages a production deployment built with the production
+environment and `--skip-domain`, then promotes that. The portal re-deploys the `portal-build`
+artifact from that earlier run after the `prod` environment approval. Cloudflare Pages automatic
+deployments are disabled, so no push deploys anything.
 
 ### 9.2 Portability
 

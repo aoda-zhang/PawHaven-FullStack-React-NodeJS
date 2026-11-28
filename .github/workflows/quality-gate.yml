@@ -44,7 +44,7 @@ jobs:
         run: node scripts/check-pr-title.mjs "${PR_TITLE}"
 
   changes:
-    name: Detect changes
+    name: Classify changed areas
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -57,6 +57,7 @@ jobs:
       i18n: ${{ steps.filter.outputs.i18n || steps.all.outputs.i18n }}
       css: ${{ steps.filter.outputs.css || steps.all.outputs.css }}
       deps: ${{ steps.filter.outputs.deps || steps.all.outputs.deps }}
+      ci: ${{ steps.filter.outputs.ci || steps.all.outputs.ci }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -101,6 +102,8 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - 'turbo.json'
+            ci:
+              - '.github/**'
 
       # A manual dispatch has no base commit to diff against, so everything counts as changed.
       - name: Assume every area changed on manual dispatch
@@ -108,12 +111,12 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         shell: bash
         run: |
-          for area in code backend frontend ui i18n css deps; do
+          for area in code backend frontend ui i18n css deps ci; do
             echo "${area}=true" >>"${GITHUB_OUTPUT}"
           done
 
   static:
-    name: Static checks
+    name: Lint, typecheck and repository rules
     needs: [changes]
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -198,7 +201,7 @@ jobs:
         run: pnpm test
 
   build:
-    name: Build
+    name: Workspace build
     needs: [changes]
     if: ${{ needs.changes.outputs.code == 'true' || needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
@@ -217,6 +220,35 @@ jobs:
       - name: Build
         shell: bash
         run: pnpm build
+
+  workflow-lint:
+    name: Workflow lint
+    needs: [changes]
+    if: ${{ needs.changes.outputs.ci == 'true' || needs.changes.outputs.deps == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install actionlint
+        shell: bash
+        env:
+          ACTIONLINT_VERSION: '1.7.12'
+          ACTIONLINT_SHA256: '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8'
+        run: |
+          set -euo pipefail
+          archive="$(mktemp)"
+          curl -fsSL -o "${archive}" "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          echo "${ACTIONLINT_SHA256}  ${archive}" | sha256sum -c -
+          tar -xzf "${archive}" -C "${RUNNER_TEMP}" actionlint
+          "${RUNNER_TEMP}/actionlint" -version
+
+      - name: Lint workflows
+        shell: bash
+        run: '"${RUNNER_TEMP}/actionlint" -color'
 
   a11y:
     name: Accessibility
@@ -239,7 +271,7 @@ jobs:
         shell: bash
         run: pnpm exec playwright install --with-deps chromium
 
-      # The portal refuses to boot without PAWHAVEN_USER_APP_ENV, and `.env` is gitignored.
+      # The portal refuses to boot without PAWHAVEN_PORTAL_APP_ENV, and `.env` is gitignored.
       - name: Provide the portal environment
         shell: bash
         run: cp apps/frontend/portal/.env.example apps/frontend/portal/.env
@@ -271,7 +303,7 @@ jobs:
           commit-status: 'false'
 
   security:
-    name: Security
+    name: Dependency review
     needs: [changes]
     # Dependency review diffs a pull request against its base, so a push has nothing for it to
     # compare.
@@ -292,7 +324,7 @@ jobs:
           fail-on-severity: high
 
   osv:
-    name: OSV scan
+    name: Dependency CVEs (OSV)
     needs: [changes]
     # Lockfile-level CVE scan against OSV (GHSA and friends). Free, no token.
     # The reusable workflow is required, not optional: the scanner action itself declares only
@@ -347,7 +379,7 @@ jobs:
         run: node packages/ui/scripts/verify-stories.mjs
 
   ui-package:
-    name: UI package
+    name: UI package contract
     needs: [changes]
     if: ${{ needs.changes.outputs.frontend == 'true' || needs.changes.outputs.deps == 'true' }}
     runs-on: ubuntu-latest
@@ -375,22 +407,22 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CSS_FILES=$(find apps/frontend/portal/build -type f -name '*.css' -print)
-          if [[ -z "${CSS_FILES}" ]]; then
+          CSS_DIR=apps/frontend/portal/build
+          if ! find "${CSS_DIR}" -type f -name '*.css' -print -quit | grep -q .; then
             echo "Portal production build emitted no CSS files." >&2
             exit 1
           fi
-          if ! grep -qE -- '--color-(primary|text)|--font-sans' ${CSS_FILES}; then
+          if ! grep -R -qE --include='*.css' -- '--color-(primary|text)|--font-sans' "${CSS_DIR}"; then
             echo "Expected design-system CSS tokens were not found in the Portal bundle." >&2
             exit 1
           fi
-          if ! grep -qF -- ".animate-spin" ${CSS_FILES}; then
+          if ! grep -R -qF --include='*.css' -- '.animate-spin' "${CSS_DIR}"; then
             echo "Expected UI-library animation utility was not found in the Portal bundle." >&2
             exit 1
           fi
 
   sonar:
-    name: SonarQube Cloud
+    name: SonarQube analysis (advisory)
     needs: [changes]
     # A called workflow can only narrow the caller's token, so the scope Sonar needs for PR
     # decoration has to be granted here.
@@ -404,11 +436,12 @@ jobs:
     name: Gate
     needs:
       [
-        title,
         changes,
+        title,
         static,
         unit,
         build,
+        workflow-lint,
         a11y,
         catalogue,
         ui-package,
@@ -428,6 +461,7 @@ jobs:
           STATIC: ${{ needs.static.result }}
           UNIT: ${{ needs.unit.result }}
           BUILD: ${{ needs.build.result }}
+          WORKFLOW_LINT: ${{ needs.workflow-lint.result }}
           A11Y: ${{ needs.a11y.result }}
           CATALOGUE: ${{ needs.catalogue.result }}
           UI_PACKAGE: ${{ needs.ui-package.result }}
@@ -440,11 +474,12 @@ jobs:
           set -euo pipefail
           failed=0
           for entry in \
-            "title:${TITLE}" \
             "changes:${CHANGES}" \
+            "title:${TITLE}" \
             "static:${STATIC}" \
             "unit:${UNIT}" \
             "build:${BUILD}" \
+            "workflow-lint:${WORKFLOW_LINT}" \
             "a11y:${A11Y}" \
             "catalogue:${CATALOGUE}" \
             "ui-package:${UI_PACKAGE}" \
